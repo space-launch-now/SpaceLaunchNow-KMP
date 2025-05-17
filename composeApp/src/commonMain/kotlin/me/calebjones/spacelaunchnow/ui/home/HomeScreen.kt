@@ -159,7 +159,7 @@ fun UpcomingHorizontalScrollableList() {
 fun PlaceholderCard() {
     Card(
         modifier = Modifier.size(150.dp, 150.dp),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -174,7 +174,7 @@ fun PlaceholderCard() {
 fun LargePlaceholderCard() {
     Card(
         modifier = Modifier.size(360.dp, 240.dp),
-        shape = MaterialTheme.shapes.large
+        shape = MaterialTheme.shapes.large,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),

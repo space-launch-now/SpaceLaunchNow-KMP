@@ -97,6 +97,10 @@ fun NextLaunchItemView(launch: LaunchNormal) {
                 .fillMaxHeight(0.7f)
                 .clip(RoundedCornerShape(64.dp)),
             shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             // Create a single Box that contains everything, with the image as the background
@@ -156,12 +160,16 @@ fun NextLaunchItemView(launch: LaunchNormal) {
           // Spacer to add some separation
         Box(modifier = Modifier.height(16.dp))
         
-        // Countdown section in its own card
+        // Countdown section in its own card        
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(24.dp)),
             shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
@@ -220,12 +228,16 @@ fun NextLaunchItemView(launch: LaunchNormal) {
         // Spacer between cards
         Box(modifier = Modifier.height(16.dp))
 
-        // Launch Window Indicator Card - now in its own card
+        // Launch Window Indicator Card - now in its own card        
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(24.dp)),
             shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(

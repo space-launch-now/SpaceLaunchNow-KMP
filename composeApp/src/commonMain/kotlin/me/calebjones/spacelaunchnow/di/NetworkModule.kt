@@ -12,6 +12,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.data.launchSerializersModule
+import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -27,11 +28,11 @@ val networkModule = module {
             // Install Logging plugin for debugging purposes
             install(Logging) {
                 level = LogLevel.BODY
-            }
-
-            // Install DefaultRequest plugin to add headers to every request
+            }            // Install DefaultRequest plugin to add headers to every request
             install(DefaultRequest) {
-                header(HttpHeaders.Authorization, "Bearer YOUR")
+                // Get API key from environment variable
+                val apiKey = EnvironmentManager.getEnv("API_KEY", "")
+                header(HttpHeaders.Authorization, "Bearer $apiKey")
                 header(HttpHeaders.ContentType, "application/json")
             }
 

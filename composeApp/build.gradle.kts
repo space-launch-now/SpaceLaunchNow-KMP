@@ -103,6 +103,8 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.okhttp)
             implementation(libs.insetsx)
+
+            implementation(libs.dotenv)
         }
     }
 }

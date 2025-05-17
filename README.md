@@ -1,5 +1,20 @@
 This is a Kotlin Multiplatform application for Space Launch Now based off Launch Library data from The Space Devs.
 
+## Setup
+
+### API Key Configuration
+
+This application uses The Space Devs API which requires an API key. To set up your API key:
+
+1. Create a `.env` file in the project root if it doesn't already exist
+2. Add your API key to the file in the following format:
+   ```
+   API_KEY=your_api_key_here
+   ```
+3. The application will automatically load the API key from the `.env` file
+
+Note: The `.env` file is ignored by Git to prevent exposing your API key in version control.
+
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
   - `commonMain` is for code that’s common for all targets.

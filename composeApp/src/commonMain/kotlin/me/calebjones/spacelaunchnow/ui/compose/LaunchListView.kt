@@ -169,6 +169,10 @@ fun LaunchItemView(launch: LaunchNormal, viewModel: LaunchViewModel) {
         modifier = Modifier
             .size(width = 340.dp, height = 240.dp),
         shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box {
