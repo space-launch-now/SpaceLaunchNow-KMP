@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.UserViewModel
 import me.calebjones.spacelaunchnow.data.UserRepository
 import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 
@@ -26,4 +27,5 @@ val appModule = module {
     viewModelOf(::UserViewModel)
     singleOf(::LaunchRepositoryImpl) { bind<LaunchRepository>() }
     viewModelOf(::LaunchViewModel)
+    viewModelOf(::NextUpViewModel)
 }

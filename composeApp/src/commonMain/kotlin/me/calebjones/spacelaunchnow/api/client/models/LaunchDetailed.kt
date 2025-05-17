@@ -90,7 +90,7 @@ data class LaunchDetailed (
 
     @SerialName(value = "net_precision") @Required val netPrecision: NetPrecision?,
 
-    @SerialName(value = "image") @Required val image: Image?,
+    @SerialName(value = "image") @Required override val image: Image?,
 
     @SerialName(value = "infographic") @Required val infographic: kotlin.String?,
 
@@ -116,7 +116,7 @@ data class LaunchDetailed (
 
     @SerialName(value = "mission_patches") @Required val missionPatches: kotlin.collections.List<MissionPatch>,
 
-    @SerialName(value = "name") val name: kotlin.String? = null,
+    @SerialName(value = "name") override val name: kotlin.String,
 
     @SerialName(value = "launch_designator") val launchDesignator: kotlin.String? = null,
 

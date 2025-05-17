@@ -3,30 +3,40 @@ agp = "8.5.2"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
-androidx-activityCompose = "1.9.3"
+androidx-activityCompose = "1.10.1"
 androidx-appcompat = "1.7.0"
-androidx-constraintlayout = "2.1.4"
-androidx-core-ktx = "1.13.1"
+androidx-constraintlayout = "2.2.1"
+androidx-core-ktx = "1.16.0"
 androidx-espresso-core = "3.6.1"
-androidx-lifecycle = "2.8.3"
+androidx-lifecycle = "2.8.4"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
-compose-plugin = "1.7.0"
-compose = "1.5.4"
-compose-material3 = "1.4.0-alpha02"
+coilCompose = "3.0.3"
+compose-plugin = "1.8.0"
+compose = "1.8.0"
+compose-material3 = "1.3.2"
+compose-hot-reload = "1.0.0-alpha10"
+insetsx = "0.1.0-alpha10"
 junit = "4.13.2"
-kotlin = "2.0.20"
+kotlin = "2.1.20"
 koin = "4.0.1-Beta1"
-ktor = "3.0.1"
+ktor = "3.0.3"
 
 kotlinx-coroutines = "1.9.0"
-kotlinx-serialization = "1.7.2"
+kotlinx-serialization = "1.7.3"
 kotlinx-dateTime = "0.6.0"
 kotlinStatistics = "1.2.1"
 
 compose-icons="1.1.1"
+media3CommonKtx = "1.6.1"
+slf4j = "1.7.36"
+koin-logger-slf4j = "3.4.0"
 
 [libraries]
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
+
+insetsx = { module = "com.moriatsushi.insetsx:insetsx", version.ref = "insetsx" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -47,6 +57,7 @@ kotlin-statistics = { module = "org.nield:kotlin-statistics", version.ref = "kot
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-dateTime" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 
 ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -60,10 +71,14 @@ ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version
 ktor-client-ios = { group = "io.ktor", name = "ktor-client-ios", version.ref = "ktor" }
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 
-androidx-compose-material3 =  { group = "androidx.compose.material3", name = "material3" }
-androidx-compose-material3-WindowSizeClass =  { group = "androidx.compose.material3", name="material3-window-size-class" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "compose-material3" }
 
 compose-icons = {module = "br.com.devsrsouza.compose.icons:font-awesome", version.ref = "compose-icons"}
+androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
+
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-logger-slf4j" }
+
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
@@ -74,5 +89,7 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+openApiGenerator = { id = "org.openapi.generator", version = "7.13.0" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }

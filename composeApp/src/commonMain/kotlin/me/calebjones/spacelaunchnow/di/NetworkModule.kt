@@ -31,7 +31,7 @@ val networkModule = module {
 
             // Install DefaultRequest plugin to add headers to every request
             install(DefaultRequest) {
-                header(HttpHeaders.Authorization, "Token <>")
+                header(HttpHeaders.Authorization, "Bearer YOUR")
                 header(HttpHeaders.ContentType, "application/json")
             }
 
@@ -51,6 +51,6 @@ val networkModule = module {
 
     // Provide the base URL as a named dependency
     single<String>(named("BaseUrl")) {
-        "https://lldev.thespacedevs.com/"
+        "https://ll.thespacedevs.com/"
     }
 }

@@ -48,6 +48,9 @@ sealed class PolymorphicLaunchEndpoint {
 
     @SerialName(value = "id") abstract val id: kotlin.String
     @SerialName(value = "url") abstract val url: kotlin.String
+    @SerialName("image") abstract val image: Image?
+    @SerialName("name") abstract val name: kotlin.String
+
 
 }
 

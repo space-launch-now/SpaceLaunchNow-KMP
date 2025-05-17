@@ -8,10 +8,18 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeHotReload)
 }
 
 kotlin {
     androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
+
+    jvm("desktop") {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -30,11 +38,30 @@ kotlin {
     }
     
     sourceSets {
+        val desktopMain by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+            
+                implementation(compose.material)
+                implementation(compose.materialIconsExtended)
+            
+                implementation(libs.kotlinx.coroutines.swing)
+
+                implementation(libs.slf4j.simple)
+                implementation(libs.koin.logger.slf4j)
+            }
+        }
         
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.koin.android)
+        val androidMain by getting {
+            dependencies {
+                implementation(compose.preview)
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.koin.android)
+            }
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -43,6 +70,9 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
 
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
@@ -69,6 +99,10 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.components.resources)
+
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.okhttp)
+            implementation(libs.insetsx)
         }
     }
 }
@@ -82,7 +116,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "me.calebjones.spacelaunchnow"
+        applicationId = "me.calebjones.spacelaunchnow.kmp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -109,4 +143,23 @@ android {
         debugImplementation(compose.uiTooling)
     }
 }
+
+// Fix resource path configuration
+tasks.withType<ProcessResources> {
+    // Ensure resources from commonMain are copied to all targets
+    from("src/commonMain/resources")
+}
+
+
+compose.desktop {
+    application {
+        mainClass = "me.calebjones.spacelaunchnow.MainKt" // Correct path to the Kotlin file containing the main function
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "SpaceLaunchNow"
+            packageVersion = "1.0.0"
+        }
+    }
+}
+
 

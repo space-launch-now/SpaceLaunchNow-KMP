@@ -1,16 +1,34 @@
 package me.calebjones.spacelaunchnow.ui.home
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,32 +39,29 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.ui.compose.LaunchListView
+import me.calebjones.spacelaunchnow.ui.compose.NextLaunchView
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun HomeScreen() {
-    Scaffold(
-        topBar = { HomeTopBar() }
-    ) { padding ->
+    Scaffold {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+                .fillMaxSize(),
         ) {
+
+            // item { HomeTopBar() }
             // Search Section
-            item { SearchBar() }
+//            item { SearchBar() }
+
+            item { NextLaunchView()}
+
 
             // Upcoming Launches Section
             item { SectionTitle(title = "Upcoming Launches", hasAction = true) }
             item { UpcomingHorizontalScrollableList() }
-
-            // This Week in Spaceflight
-            item { SectionTitle(title = "This Week in Spaceflight", hasAction = true) }
-            item { HorizontalScrollableList() }
 
             // Latest Updates
             item { SectionTitle(title = "Latest Updates", hasAction = true) }
@@ -62,17 +77,16 @@ fun HomeScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar() {
-    TopAppBar(
-        title = { Text(text = "Home", fontWeight = FontWeight.Bold, fontSize = 50.sp) },
-        actions = {
-            IconButton(onClick = { /* Handle click */ }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notifications")
-            }
-            IconButton(onClick = { /* Handle click */ }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "More Options")
-            }
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "Home", fontWeight = FontWeight.Bold, fontSize = 50.sp)
+        IconButton(onClick = { /* Handle click */ }) {
+            Icon(Icons.Default.Notifications, contentDescription = "Notifications")
         }
-    )
+    }
 }
 
 @Composable
@@ -110,11 +124,11 @@ fun SearchBar() {
 @Composable
 fun SectionTitle(title: String, hasAction: Boolean) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(text = title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
         if (hasAction) {
             TextButton(onClick = { /* Handle action click */ }) {
                 Text(text = "See All", color = MaterialTheme.colorScheme.primary)
@@ -128,7 +142,7 @@ fun HorizontalScrollableList() {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
+         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         items(5) { PlaceholderCard() }
     }
@@ -176,7 +190,7 @@ fun NewsItem() {
     val launchViewModel = koinViewModel<LaunchViewModel>()
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().absolutePadding(top = 8.dp, left = 16.dp, right = 16.dp),
         verticalAlignment = Alignment.Top
     ) {
         Surface(
