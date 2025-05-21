@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            App()
+            SpaceLaunchNowApp()
         }
     }
 
@@ -34,5 +34,5 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App()
+    SpaceLaunchNowApp()
 }

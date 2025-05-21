@@ -29,23 +29,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.client.models.LaunchNormal
+import me.calebjones.spacelaunchnow.api.client.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
+import androidx.compose.foundation.isSystemInDarkTheme
 
 @Composable
 fun NextLaunchView() {
     val launchViewModel = koinViewModel<NextUpViewModel>()
     val nextLaunch by launchViewModel.nextLaunch.collectAsState()
     val error by launchViewModel.error.collectAsState()
+    val isLoading by launchViewModel.isLoading.collectAsState()
 
     LaunchedEffect(Unit) {
         launchViewModel.fetchNextLaunch()
-    }
-
+    }    
     if (error != null) {
-        Text(text = "Error: $error")
+        ErrorMessageView(
+            errorMessage = error ?: "Unknown error occurred",
+            onRetry = { launchViewModel.fetchNextLaunch() }
+        )
     } else if (nextLaunch != null) {
+        
+        // Use the launch image for dynamic theming
         Box {
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -55,6 +62,9 @@ fun NextLaunchView() {
                 NextLaunchItemView(nextLaunch!!)
             }
         }
+    } else if (isLoading) {
+        // Show shimmer loading effect while loading
+        NextUpShimmerBox()
     } else {
         Text(text = "No upcoming launches found.")
     }
@@ -62,7 +72,7 @@ fun NextLaunchView() {
 
 
 @Composable
-fun NextLaunchItemView(launch: LaunchNormal) {
+fun NextLaunchItemView(launch: LaunchDetailed) {
     // Compute the title based on the provided logic
     val title by remember(launch) {
         mutableStateOf(
@@ -83,7 +93,8 @@ fun NextLaunchItemView(launch: LaunchNormal) {
                 "Unknown Name"
             }
         )
-    }    // Main content column
+    }    
+    // Main content column
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -157,7 +168,8 @@ fun NextLaunchItemView(launch: LaunchNormal) {
                 }
             }
         }
-          // Spacer to add some separation
+        
+        // Spacer to add some separation
         Box(modifier = Modifier.height(16.dp))
         
         // Countdown section in its own card        
@@ -177,7 +189,8 @@ fun NextLaunchItemView(launch: LaunchNormal) {
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) {                Box(
+            ) {                
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 12.dp) // Increased vertical padding
@@ -205,7 +218,7 @@ fun NextLaunchItemView(launch: LaunchNormal) {
                             color = Color.White
                         )
                     }
-                        }
+                }
 
                 // Countdown display
                 LaunchCountdown(
@@ -214,7 +227,7 @@ fun NextLaunchItemView(launch: LaunchNormal) {
                     windowClose = launch.windowEnd!!
                 )
 
-                                // Divider before countdown
+                // Divider before countdown
                 HorizontalDivider(
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
@@ -266,33 +279,92 @@ fun NextLaunchItemView(launch: LaunchNormal) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-                    LaunchWindowIndicator(
-                        launchTime = launch.net!!,
-                        windowStart = launch.windowStart!!,
-                        windowEnd = launch.windowEnd!!,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp)
-                    )
+                        LaunchWindowIndicator(
+                            launchTime = launch.net!!,
+                            windowStart = launch.windowStart!!,
+                            windowEnd = launch.windowEnd!!,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                        )
 
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        Text(
-                            text = "T + 47",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                        )
-                        Text(
-                            text = "Max Q",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Top
+                        ) {
+                            Text(
+                                text = "T + 47",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            )
+                            Text(
+                                text = "Max Q",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
-                    }
+                }
+            }
+        }
+    }
+}
+
+
+/**
+ * A component that displays error messages in a user-friendly way with a retry button
+ */
+@Composable
+fun ErrorMessageView(
+    errorMessage: String,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Error card with icon and message
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Error title
+                Text(
+                    text = "API Request Error",
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                
+                // Error message
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                
+                // Retry button
+                Button(
+                    onClick = onRetry,
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Text("Retry")
                 }
             }
         }

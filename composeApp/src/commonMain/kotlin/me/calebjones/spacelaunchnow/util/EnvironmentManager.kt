@@ -8,7 +8,8 @@ import io.github.cdimascio.dotenv.dotenv
  */
 object EnvironmentManager {
     private val dotenv = dotenv {
-        directory = "./"
+        // Using the project root directory instead of relative path
+        directory = System.getProperty("user.dir") ?: "./"
         ignoreIfMissing = true
     }
 
