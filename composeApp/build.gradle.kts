@@ -55,12 +55,12 @@ kotlin {
                 implementation(libs.koin.logger.slf4j)
             }
         }
-        
-        val androidMain by getting {
+          val androidMain by getting {
             dependencies {
                 implementation(compose.preview)
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.koin.android)
+                implementation(libs.androidx.palette)
             }
         }
         commonMain.dependencies {
@@ -70,6 +70,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.shimmer)
 
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
@@ -92,8 +93,7 @@ kotlin {
 
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.compose.icons)
-
+            implementation(libs.compose.icons)            
             implementation(compose.ui)
             implementation(compose.runtime)
             implementation(compose.foundation)

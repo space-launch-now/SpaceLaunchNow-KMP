@@ -17,6 +17,11 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val networkModule = module {
+    // Provide the API_KEY
+    single(named("API_KEY")) {
+        EnvironmentManager.getEnv("API_KEY", "***REMOVED***")
+    }
+    
     // Provide the HttpClientEngine (CIO for JVM)
     single<HttpClientEngine> {
         CIO.create()
@@ -30,9 +35,8 @@ val networkModule = module {
                 level = LogLevel.BODY
             }            // Install DefaultRequest plugin to add headers to every request
             install(DefaultRequest) {
-                // Get API key from environment variable
-                val apiKey = EnvironmentManager.getEnv("API_KEY", "")
-                header(HttpHeaders.Authorization, "Bearer $apiKey")
+                // We no longer need to set Authorization header here as ApiClient.setApiKey will handle this
+                // Each API client will set its own Authorization header
                 header(HttpHeaders.ContentType, "application/json")
             }
 
@@ -48,9 +52,7 @@ val networkModule = module {
                 )
             }
         }
-    }
-
-    // Provide the base URL as a named dependency
+    }    // Provide the base URL as a named dependency
     single<String>(named("BaseUrl")) {
         "https://ll.thespacedevs.com/"
     }

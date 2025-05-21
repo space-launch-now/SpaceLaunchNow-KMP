@@ -37,18 +37,19 @@ private val LightColorScheme = lightColorScheme(
 fun SpaceLaunchNowTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Optionally, add dynamic color support for Android 12+
-    // dynamicColor: Boolean = true,
+    dynamicColorImage: String? = null,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) {
+    // Base color scheme based on dark/light theme
+    val baseColorScheme = if (darkTheme) {
         DarkColorScheme
     } else {
         LightColorScheme
     }
-
+    
     val windowInsetsController = rememberWindowInsetsController()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(darkTheme) {
         // The status bars icon + content will change to a light color
         windowInsetsController?.setStatusBarContentColor(dark = !darkTheme)
         // The navigation bars icons will change to a light color (android only)
@@ -57,7 +58,7 @@ fun SpaceLaunchNowTheme(
 
     // Apply the Material3 Theme
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = baseColorScheme,
         typography = Typography, // Define your typography
         shapes = Shapes,         // Define your shapes
         content = content

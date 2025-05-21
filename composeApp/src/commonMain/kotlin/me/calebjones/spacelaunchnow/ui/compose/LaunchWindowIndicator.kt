@@ -23,9 +23,9 @@ fun LaunchWindowIndicator(
     modifier: Modifier = Modifier
         .fillMaxWidth()
         .height(80.dp),
-    baseBarColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    baseBarColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     windowBarColor: Color = MaterialTheme.colorScheme.primary,
-    dotColor: Color = Color.White,
+    dotColor: Color = MaterialTheme.colorScheme.inversePrimary,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     barThickness: Float = 12f
 ) {    

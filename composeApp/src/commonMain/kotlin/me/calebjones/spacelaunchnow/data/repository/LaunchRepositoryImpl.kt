@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import kotlinx.datetime.Instant
@@ -60,8 +61,10 @@ class LaunchRepositoryImpl(private val launchesApi: LaunchesApi, private val age
         } catch (e: ResponseException) {
             Result.failure(e)
         } catch (e: IOException) {
+            println(e)
             Result.failure(e)
         } catch (e: Exception) {
+            println(e)
             Result.failure(e)
         }
     }
