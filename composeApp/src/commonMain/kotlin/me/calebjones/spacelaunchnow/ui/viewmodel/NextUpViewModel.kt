@@ -34,7 +34,7 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
                 val futureDeferred = async {
                     repository.getNextLaunch(
                         mode = "normal", // Using normal mode to get LaunchNormal objects
-                        limit = 10       // Increased limit to have more candidates for filtering
+                        limit = 5       // Increased limit to have more candidates for filtering
                     )
                 }
 
@@ -47,38 +47,16 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
                         val oneHourAgo = currentTime - 1.hours
                           // Find valid launches (include all future launches and recent past launches)
 
-                        println("Filtering launches...")
-                        println("Current time: $currentTime")
-                        println("One hour ago: $oneHourAgo")
-                        println("Total launches: ${launches.results.size}")
-                        for (launch in launches.results) {
-                            println("Launch: $launch type is ${launch::class.simpleName}")
-
-                            if (launch is LaunchNormal) {
-                                println("Launch ID: ${launch.id}")
-                            }
-
-                            if (launch is LaunchNormal) {
-                                println("Launch Name: ${launch.name}")
-                            }
-
-                            if (launch is LaunchDetailed) {
-                                println("Launch Details: ${launch.name}")
-                            }
-                        }
-
                         val validLaunches = launches.results
                             .filterIsInstance<LaunchNormal>()
                             .filter { launch ->
                                 // Keep the launch if:
                                 // 1. It has a net time AND
                                 // 2. The net time is either in the future OR occurred less than one hour ago
-                                println("Checking launch: ${launch.id}")
                                 launch.net?.let { netTime -> netTime < oneHourAgo } ?: false
                             }
                             
                         if (validLaunches.isNotEmpty()) {
-                            println("Valid launches found: ${validLaunches.size}")
                             val finalLaunch = async {
                                 repository.getLaunchDetails(validLaunches.first().id)
                             }
