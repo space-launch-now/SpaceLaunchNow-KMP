@@ -9,7 +9,9 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.openApiGenerator)
 }
+
 
 kotlin {
     androidTarget {
@@ -36,8 +38,7 @@ kotlin {
             isStatic = true
         }
     }
-    
-    sourceSets {
+      sourceSets {
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -53,58 +54,72 @@ kotlin {
 
                 implementation(libs.slf4j.simple)
                 implementation(libs.koin.logger.slf4j)
+                implementation(libs.coil.compose.jvm)
             }
         }
-          val androidMain by getting {
+        
+        val androidMain by getting {
             dependencies {
                 implementation(compose.preview)
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.koin.android)
                 implementation(libs.androidx.palette)
+                implementation(libs.coil.compose.android)
             }
         }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.compose.shimmer)
 
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
+          iosMain {
 
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.koin.compose.viewmodel.nav)
+              dependencies{
+                  implementation(libs.coil.compose.ios)
+              }
+          }
+        
+        commonMain {
+            kotlin.srcDir("$projectDir/src/openApi/src/commonMain/kotlin")
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.compose.shimmer)
 
-            implementation(libs.ktor.client.core)          // Core client dependency
-            implementation(libs.ktor.client.cio)           // CIO engine for Ktor
-            implementation(libs.ktor.client.serialization) // Serialization support
-            implementation(libs.ktor.client.logging)       // Logging support
-            implementation(libs.ktor.utils)                // Utilities (for IOException)
+                implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
 
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.kotlinx.coroutines)
-            implementation(libs.kotlinx.serialization)
-            api(libs.kotlinx.datetime)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.koin.compose.viewmodel.nav)
 
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.compose.icons)            
-            implementation(compose.ui)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.components.resources)
+                implementation(libs.ktor.client.core)          // Core client dependency
+                implementation(libs.ktor.client.cio)           // CIO engine for Ktor
+                implementation(libs.ktor.client.serialization) // Serialization support
+                implementation(libs.ktor.client.logging)       // Logging support
+                implementation(libs.ktor.utils)                // Utilities (for IOException)
 
-            implementation(libs.coil.compose)
-            implementation(libs.coil.network.okhttp)
-            implementation(libs.insetsx)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.kotlinx.coroutines)
+                implementation(libs.kotlinx.serialization)
+                api(libs.kotlinx.datetime)
 
-            implementation(libs.dotenv)
+                implementation(libs.compose.icons)            
+                implementation(libs.coil.compose)
+                implementation(libs.coil.compose.ktor)
+                implementation(libs.insetsx)
+
+                implementation(libs.dotenv)
+            }
+        }
+        
+        commonTest {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+                implementation("io.ktor:ktor-client-mock:2.3.12")
+            }
         }
     }
 }
@@ -116,6 +131,7 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+    
 
     defaultConfig {
         applicationId = "me.calebjones.spacelaunchnow.kmp"
@@ -152,7 +168,6 @@ tasks.withType<ProcessResources> {
     from("src/commonMain/resources")
 }
 
-
 compose.desktop {
     application {
         mainClass = "me.calebjones.spacelaunchnow.MainKt" // Correct path to the Kotlin file containing the main function
@@ -164,4 +179,10 @@ compose.desktop {
     }
 }
 
-
+// OpenAPI Code Generation Configuration (current)
+openApiGenerate {
+    generatorName.set("kotlin")
+    inputSpec.set("$projectDir/../schema/ll_2.4.0.json")
+    outputDir.set("$projectDir/src/openApi")
+    configFile.set("$projectDir/openapi-config.yaml")
+}

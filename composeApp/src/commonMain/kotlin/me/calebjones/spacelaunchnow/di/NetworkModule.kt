@@ -11,7 +11,7 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import me.calebjones.spacelaunchnow.data.launchSerializersModule
+
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -40,20 +40,22 @@ val networkModule = module {
                 header(HttpHeaders.ContentType, "application/json")
             }
 
-            // Install ContentNegotiation plugin with Kotlinx JSON serializer
-            install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        isLenient = true
-                        classDiscriminator = "response_mode"
-                        serializersModule = launchSerializersModule
-                    }
-                )
-            }
+            // // Install ContentNegotiation plugin with Kotlinx JSON serializer
+            // install(ContentNegotiation) {
+            //     json(
+            //         Json {
+            //             ignoreUnknownKeys = true
+            //             isLenient = true
+            //             classDiscriminator = "response_mode"
+            //             serializersModule = launchSerializersModule
+            //         }
+            //     )
+            // }
         }
-    }    // Provide the base URL as a named dependency
+    }
+
+    // Provide the base URL as a named dependency
     single<String>(named("BaseUrl")) {
-        "https://ll.thespacedevs.com/"
+        "https://spacelaunchnow.app"
     }
 }

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.ui.compose.LaunchListView
 import me.calebjones.spacelaunchnow.ui.compose.NextLaunchView
+import me.calebjones.spacelaunchnow.ui.compose.LatestUpdatesView
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -65,7 +66,7 @@ fun HomeScreen() {
 
             // Latest Updates
             item { SectionTitle(title = "Latest Updates", hasAction = true) }
-            item { HorizontalScrollableList() }
+            item { LatestUpdatesView() }
 
             // News and Events
             item { SectionTitle(title = "News and Events", hasAction = false) }
