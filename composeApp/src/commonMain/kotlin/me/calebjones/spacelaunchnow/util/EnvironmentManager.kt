@@ -1,28 +1,19 @@
 package me.calebjones.spacelaunchnow.util
 
-import io.github.cdimascio.dotenv.Dotenv
-import io.github.cdimascio.dotenv.dotenv
-
 /**
  * Utility for managing environment variables across platforms
+ * Note: For now, returns a hardcoded API key since .env loading is platform-specific
  */
 object EnvironmentManager {
-    private val dotenv = dotenv {
-        // Using the project root directory instead of relative path
-        directory = System.getProperty("user.dir") ?: "./"
-        ignoreIfMissing = true
-    }
-
     /**
-     * Gets an environment variable from .env file or system environment
+     * Gets an environment variable
      * Falls back to defaultValue if not found
+     * TODO: Implement proper .env loading per platform
      */
     fun getEnv(key: String, defaultValue: String = ""): String {
-        return try {
-            val value = dotenv[key] ?: System.getenv(key)
-            value ?: defaultValue
-        } catch (e: Exception) {
-            defaultValue
+        return when (key) {
+            "API_KEY" -> "3ef4f221a3aed270dd81bf47045c86fc768f77a2"
+            else -> defaultValue
         }
     }
 }

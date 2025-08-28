@@ -20,7 +20,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.client.models.LaunchNormal
+import me.calebjones.spacelaunchnow.api.models.LaunchBasic
+import me.calebjones.spacelaunchnow.api.models.LaunchNormal
+import me.calebjones.spacelaunchnow.api.models.LaunchStatus
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 
 // Constants for layout dimensions
@@ -28,8 +30,8 @@ private val CARD_WIDTH = 340.dp
 private val CARD_HEIGHT = 240.dp
 private val CARD_SPACING = 16.dp
 
-fun getStatusColor(launch: LaunchNormal): Color {
-    return when (launch.status?.id) {
+fun getStatusColor(launchStatus: LaunchStatus): Color {
+    return when (launchStatus.id) {
         1 -> {
             Color.Green
         }
@@ -65,7 +67,8 @@ fun getStatusColor(launch: LaunchNormal): Color {
 }
 
 @Composable
-fun LaunchListView(viewModel: LaunchViewModel) {    val launches by viewModel.upcomingLaunches.collectAsState()
+fun LaunchListView(viewModel: LaunchViewModel) {
+    val launches by viewModel.upcomingLaunchesNormal.collectAsState()
     val error by viewModel.error.collectAsState()
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -76,13 +79,13 @@ fun LaunchListView(viewModel: LaunchViewModel) {    val launches by viewModel.up
     var lastScrollOffset by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchUpcomingLaunches(limit = 10)
+        viewModel.fetchUpcomingLaunchesNormal(limit = 10)
     }
 
     if (error != null) {
         Text(text = "Error: $error")
     } else if (launches != null) {
-        val launchNormalList = launches!!.results.filterIsInstance<LaunchNormal>().drop(1)
+        val launchNormalList = launches!!.results
 
         LazyRow(
             modifier = Modifier.fillMaxWidth().draggable(
@@ -130,34 +133,14 @@ fun LaunchListView(viewModel: LaunchViewModel) {    val launches by viewModel.up
 
 @Composable
 fun LaunchItemView(launch: LaunchNormal, viewModel: LaunchViewModel) {
-    val agencyId = launch.launchServiceProvider?.id ?: return
+    val agency = launch.launchServiceProvider
 
-    // Fetch agency data for this specific launch
-    LaunchedEffect(agencyId) {
-        viewModel.fetchAgencyData(agencyId)
-    }
-
-    // Observe the agency data for this specific launch
-    val agencyDataMap by viewModel.agencyDataMap.collectAsState()
-    val agencyData = agencyDataMap[agencyId]
-
-    val agencyLogo = agencyData?.socialLogo?.imageUrl ?: launch.image?.imageUrl
+    val agencyLogo = agency.socialLogo?.imageUrl ?: launch.image?.imageUrl
 
     // Compute the title based on the provided logic
     val title by remember(launch) {
         mutableStateOf(
-            if (launch.rocket?.configuration != null) {
-                val lsp = launch.launchServiceProvider
-                val providerName = if (
-                    lsp.name.length > 15 &&
-                    !lsp.abbrev.isNullOrEmpty()
-                ) {
-                    lsp.abbrev
-                } else {
-                    lsp.name
-                }
-                "$providerName | ${launch.rocket.configuration.name}"
-            } else if (launch.name.isNotEmpty()) {
+    if (launch.name?.isNotEmpty() == true) {
                 launch.name
             } else {
                 "Unknown Name"
@@ -203,7 +186,7 @@ fun LaunchItemView(launch: LaunchNormal, viewModel: LaunchViewModel) {
                             .padding(top = 16.dp, start = 16.dp)
                             .size(50.dp)
                             .clip(CircleShape)
-                            .border(2.dp, getStatusColor(launch), CircleShape),
+                            .border(2.dp, getStatusColor(launch.status!!), CircleShape),
                         contentScale = ContentScale.Crop
                     )
                 }

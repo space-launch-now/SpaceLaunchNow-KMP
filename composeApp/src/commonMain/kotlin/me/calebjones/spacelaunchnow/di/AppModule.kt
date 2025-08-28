@@ -12,8 +12,11 @@ import me.calebjones.spacelaunchnow.data.UserRepository
 import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
 
 expect fun nativeConfig() : KoinAppDeclaration
 
@@ -28,4 +31,6 @@ val appModule = module {
     singleOf(::LaunchRepositoryImpl) { bind<LaunchRepository>() }
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
+    singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
+    viewModelOf(::UpdatesViewModel)
 }

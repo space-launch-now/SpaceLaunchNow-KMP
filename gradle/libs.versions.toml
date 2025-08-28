@@ -12,16 +12,17 @@ androidx-lifecycle = "2.8.4"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 androidx-palette = "1.0.0"
-coilCompose = "3.2.0"
+coilCompose = "3.3.0"
 compose-plugin = "1.8.0"
-compose = "1.8.0"
+compose = "2.2.10"
 compose-material3 = "1.3.2"
 compose-hot-reload = "1.0.0-alpha10"
 insetsx = "0.1.0-alpha10"
 junit = "4.13.2"
-kotlin = "2.1.20"
+kotlin = "2.2.20"
+kotlin-test = "2.1.21"
 koin = "4.0.1-Beta1"
-ktor = "3.0.3"
+ktor = "3.2.3"
 
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.8.1"
@@ -37,12 +38,16 @@ compose-shimmer = "1.3.2"
 
 [libraries]
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
-coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
+coil-compose-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
+coil-compose-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+coil-compose-ios = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+coil-compose-jvm = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
+
 compose-shimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.ref = "compose-shimmer" }
 
 insetsx = { module = "com.moriatsushi.insetsx:insetsx", version.ref = "insetsx" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-test" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
@@ -94,8 +99,8 @@ ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "k
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-openApiGenerator = { id = "org.openapi.generator", version = "7.13.0" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "compose" }
+openApiGenerator = { id = "org.openapi.generator", version = "7.14.0" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "compose" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "compose"}
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }

@@ -1,5 +1,29 @@
 This is a Kotlin Multiplatform application for Space Launch Now based off Launch Library data from The Space Devs.
 
+## Prerequisites
+
+### Java 21 Requirement
+
+This application requires **Java 21** to run. The Compose Hot Reload plugin specifically needs JetBrains JDK 21.
+
+**Windows Setup:**
+- If you have Android Studio installed, you can use the bundled JBR:
+  ```
+  JAVA_HOME=D:\tools\Android Studio Q4-2024\jbr
+  ```
+- Set the JAVA_HOME environment variable or use the Gradle property:
+  ```
+  ./gradlew :composeApp:desktopRun "-Dorg.gradle.java.home=D:\tools\Android Studio Q4-2024\jbr"
+  ```
+
+### VS Code Integration
+
+The project includes VS Code tasks configured with the correct Java path:
+- **Run Desktop App**: `Ctrl+Shift+P` → "Tasks: Run Task" → "Run Desktop App"
+- **Build Desktop App**: Compile Kotlin for desktop
+- **Clean Build**: Clean and rebuild the project
+- **Regenerate API**: Regenerate API clients from OpenAPI spec
+
 ## Setup
 
 ### API Key Configuration

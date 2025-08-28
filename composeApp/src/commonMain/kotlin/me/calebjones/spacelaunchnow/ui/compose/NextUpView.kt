@@ -26,14 +26,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.client.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.api.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
+import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.viewmodel.koinViewModel
-import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
-import androidx.compose.foundation.isSystemInDarkTheme
 
 @Composable
 fun NextLaunchView() {
@@ -79,7 +82,7 @@ fun NextLaunchItemView(launch: LaunchDetailed) {
             if (launch.rocket?.configuration != null) {
                 val lsp = launch.launchServiceProvider
                 val providerName = if (
-                    lsp?.name?.length!! > 15 &&
+                    lsp.name.length > 15 &&
                     !lsp.abbrev.isNullOrEmpty()
                 ) {
                     lsp.abbrev
@@ -87,7 +90,7 @@ fun NextLaunchItemView(launch: LaunchDetailed) {
                     lsp.name
                 }
                 "$providerName | ${launch.rocket.configuration.name}"
-            } else if (launch.name.isNotEmpty()) {
+            } else if (launch.name?.isNotEmpty() == true) {
                 launch.name
             } else {
                 "Unknown Name"
@@ -126,11 +129,11 @@ fun NextLaunchItemView(launch: LaunchDetailed) {
                     )
                 }
 
-                // Semi-transparent overlay for better readability
+                // Stronger semi-transparent overlay for better readability
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
+                        .background(Color.Black.copy(alpha = 0.2f))
                 )
 
                 // Content and Countdown - All content is now in a single Column overlaid on the image
@@ -142,26 +145,45 @@ fun NextLaunchItemView(launch: LaunchDetailed) {
                     Column(
                         modifier = Modifier.padding(32.dp)
                     ) {
-                        // Display the computed title
+                        // Display the computed title with drop shadow
                         Text(
                             text = title,
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.8f),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 5f
+                                )
+                            ),
                             color = Color.White
                         )
 
                         launch.pad?.location?.name?.let { locationName ->
                             Text(
                                 text = locationName,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.8f)
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    shadow = Shadow(
+                                        color = Color.Black.copy(alpha = 0.8f),
+                                        offset = Offset(1f, 1f),
+                                        blurRadius = 2f
+                                    )
+                                ),
+                                color = Color.White.copy(alpha = 0.9f)
                             )
                         }
 
                         launch.net?.let { launchNet ->
                             Text(
-                                text = launchNet.toString(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.8f)
+                                text = DateTimeUtil.formatLaunchDateTimeRelative(launchNet),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    shadow = Shadow(
+                                        color = Color.Black.copy(alpha = 0.8f),
+                                        offset = Offset(1f, 1f),
+                                        blurRadius = 2f
+                                    )
+                                ),
+                                color = Color.White.copy(alpha = 0.9f)
                             )
                         }
                     }
