@@ -7,11 +7,8 @@ import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import kotlinx.serialization.json.*
-import kotlin.jvm.JvmStatic
-
 object SimpleApiTest {
-    @JvmStatic
-    fun main(args: Array<String>) = runBlocking {
+    fun runTest() = runBlocking {
         println("Testing Launch Library API v2.4.0...")
         println("=".repeat(50))
 
@@ -43,7 +40,7 @@ object SimpleApiTest {
                     println("  First result response_mode: ${listBody.results.first().responseMode}")
                 }
             } catch (e: Exception) {
-                println("  ✗ List mode failed: ${e.javaClass.simpleName}: ${e.message}")
+                println("  ✗ List mode failed: ${e::class.simpleName}: ${e.message}")
                 e.printStackTrace()
             }
             
@@ -62,12 +59,12 @@ object SimpleApiTest {
                     println("  First result response_mode: ${normalBody.results.first().responseMode}")
                 }
             } catch (e: Exception) {
-                println("  ✗ Normal mode failed: ${e.javaClass.simpleName}: ${e.message}")
+                println("  ✗ Normal mode failed: ${e::class.simpleName}: ${e.message}")
                 e.printStackTrace()
             }
 
         } catch (e: Exception) {
-            println("✗ Test failed: ${e.javaClass.simpleName}: ${e.message}")
+            println("✗ Test failed: ${e::class.simpleName}: ${e.message}")
             e.printStackTrace()
         }
     }

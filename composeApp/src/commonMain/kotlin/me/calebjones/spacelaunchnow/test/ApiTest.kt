@@ -10,8 +10,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.*
 
 object ApiTest {
-    @JvmStatic
-    fun main(args: Array<String>) = runBlocking {
+    fun runTest() = runBlocking {
         // Create a simple HTTP client to test the API
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
