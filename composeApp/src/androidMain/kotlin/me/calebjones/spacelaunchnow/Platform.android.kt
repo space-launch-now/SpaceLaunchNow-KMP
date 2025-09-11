@@ -15,3 +15,8 @@ actual fun getPlatform(): Platform = AndroidPlatform()
 actual fun getScreenWidth() = LocalConfiguration.current
     .screenWidthDp
     .dp
+
+@Composable
+actual fun getScreenHeight() = LocalConfiguration.current
+    .screenHeightDp
+    .dp

@@ -6,7 +6,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import me.calebjones.spacelaunchnow.ui.compose.LaunchDetailView
+import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailView
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import org.koin.compose.viewmodel.koinViewModel
 

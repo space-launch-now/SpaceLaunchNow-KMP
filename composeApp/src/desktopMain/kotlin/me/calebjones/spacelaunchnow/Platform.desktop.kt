@@ -17,3 +17,10 @@ actual fun getScreenWidth() = LocalWindowInfo.current
     .containerSize
     .width
     .dp
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+actual fun getScreenHeight() = LocalWindowInfo.current
+    .containerSize
+    .height
+    .dp

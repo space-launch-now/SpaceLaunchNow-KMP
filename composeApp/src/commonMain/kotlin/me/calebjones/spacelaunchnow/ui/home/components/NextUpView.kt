@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.compose
+package me.calebjones.spacelaunchnow.ui.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -34,11 +34,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
+import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
+import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
+import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -58,17 +61,7 @@ fun NextLaunchView(navController: NavController) {
             onRetry = { homeViewModel.refreshFeaturedLaunch() }
         )
     } else if (nextLaunch != null) {
-        
-        // Use the launch image for dynamic theming
-        Box {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                NextLaunchItemView(nextLaunch!!, navController)
-            }
-        }
+        NextLaunchItemView(nextLaunch!!, navController)
     } else if (isLoading) {
         // Show shimmer loading effect while loading
         NextUpShimmerBox()
@@ -91,7 +84,6 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.8f)
                 .clip(RoundedCornerShape(8.dp)),
             shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(
@@ -187,7 +179,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                             navController.navigate(LaunchDetail(launch.id))
                         },
                         modifier = Modifier.weight(1f),
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
@@ -210,7 +202,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                     Button(
                         onClick = { /* Handle share action */ },
                         modifier = Modifier.weight(1f),
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary
                         )
                     ) {
