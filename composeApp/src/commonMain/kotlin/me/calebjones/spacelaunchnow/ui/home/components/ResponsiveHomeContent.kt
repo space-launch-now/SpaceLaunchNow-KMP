@@ -1,0 +1,82 @@
+package me.calebjones.spacelaunchnow.ui.home.components
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import me.calebjones.spacelaunchnow.isDesktop
+import me.calebjones.spacelaunchnow.isLandscape
+import me.calebjones.spacelaunchnow.isTablet
+
+@Composable
+fun ResponsiveHomeContent(
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+    if ((isTablet() && isLandscape()) || isDesktop()) {
+        // Landscape layout - side-by-side content
+        Column(modifier = modifier.padding(top = 16.dp)) {
+            HomeTopBar()
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                // Left side - Featured launch (smaller)
+                Column(
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    NextLaunchView(navController = navController)
+                }
+                
+                // Right side - Other content
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(0.7f)
+                        .fillMaxHeight(),
+                ) {
+                    item { SectionTitle(title = "Upcoming Launches", hasAction = true) }
+                    item { UpcomingHorizontalScrollableList() }
+                    item { SectionTitle(title = "Latest Updates", hasAction = true) }
+                    item { LatestUpdatesView() }
+                    item { SectionTitle(title = "Latest News", hasAction = false) }
+                    item { ArticlesView() }
+                    item { SectionTitle(title = "Upcoming Events", hasAction = true) }
+                    item { EventsView() }
+                    item { Spacer(modifier = Modifier.height(32.dp))}
+                }
+            }
+        }
+    } else {
+        // Portrait layout - standard vertical layout
+        LazyColumn(
+            modifier = modifier,
+        ) {
+            item { HomeTopBar() }
+            item { NextLaunchView(navController = navController) }
+            item { SectionTitle(title = "Upcoming Launches", hasAction = true) }
+            item { UpcomingHorizontalScrollableList() }
+            item { SectionTitle(title = "Latest Updates", hasAction = true) }
+            item { LatestUpdatesView() }
+            item { SectionTitle(title = "Latest News", hasAction = false) }
+            item { ArticlesView() }
+            item { SectionTitle(title = "Upcoming Events", hasAction = true) }
+            item { EventsView() }
+            item { Spacer(modifier = Modifier.height(32.dp))}
+        }
+    }
+}

@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.compose
+package me.calebjones.spacelaunchnow.ui.home.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -17,8 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Update
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.ui.compose.UpdatesShimmer
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -40,17 +42,6 @@ fun LatestUpdatesView(
 
     Column(modifier = modifier) {
         when {
-            isLoading -> {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
-                ) {
-                    items(3) { // Show loading placeholders
-                        UpdateLoadingCard()
-                    }
-                }
-            }
             error != null -> {
                 ErrorCard(error = error!!)
             }
@@ -58,7 +49,7 @@ fun LatestUpdatesView(
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
+                    contentPadding = PaddingValues(all = 16.dp)
                 ) {
                     items(updates) { update ->
                         UpdateCard(update = update)
@@ -79,7 +70,7 @@ fun UpdateCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.size(280.dp, 150.dp),
+        modifier = modifier.size(280.dp, 120.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -287,10 +278,10 @@ fun EmptyUpdatesCard(
     }
 }
 
-private fun formatUpdateDate(createdOn: kotlinx.datetime.Instant): String {
+private fun formatUpdateDate(createdOn: Instant): String {
     // Simple date formatting - you might want to use a more sophisticated formatter
     return try {
-        val now = kotlinx.datetime.Clock.System.now()
+        val now = Clock.System.now()
         val duration = now - createdOn
         when {
             duration.inWholeDays > 0 -> "${duration.inWholeDays}d ago"

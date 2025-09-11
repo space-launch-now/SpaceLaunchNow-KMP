@@ -42,7 +42,7 @@ fun TabletDesktopLayout() {
     
     SpaceLaunchNowTheme {
         val screens = listOf(Home, Other, Settings)
-        val items = listOf("Home", "Other", "Settings")
+        val items = listOf("Home", "Schedule", "Settings")
         val selectedIcons = listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Settings)
 
         Scaffold {

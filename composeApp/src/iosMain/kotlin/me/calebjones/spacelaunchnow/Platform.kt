@@ -9,3 +9,9 @@ actual fun getScreenWidth(): Dp {
     // TODO: Implement platform-specific screen width for iOS
     return 375.dp // Default iPhone width as a stub
 }
+
+@Composable
+actual fun getScreenHeight(): Dp {
+    // TODO: Implement platform-specific screen height for iOS
+    return 667.dp // Default iPhone height as a stub
+}
