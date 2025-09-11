@@ -6,14 +6,15 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import me.calebjones.spacelaunchnow.api.apis.LaunchesApi
-import me.calebjones.spacelaunchnow.api.apis.AgenciesApi
-import me.calebjones.spacelaunchnow.api.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.models.PaginatedLaunchBasicList
-import me.calebjones.spacelaunchnow.api.models.PaginatedLaunchNormalList
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.data.model.ApiError
 
 class LaunchRepositoryImpl(private val launchesApi: LaunchesApi, private val agenciesApi: AgenciesApi) : LaunchRepository {
@@ -51,7 +52,7 @@ class LaunchRepositoryImpl(private val launchesApi: LaunchesApi, private val age
         return try {
             val response = launchesApi.launchesList(
                 limit = limit,
-                upcoming = true,
+                upcomingWithRecent = true,
                 ordering = "net" // Order by launch time
             )
             Result.success(response.body())
@@ -161,6 +162,66 @@ class LaunchRepositoryImpl(private val launchesApi: LaunchesApi, private val age
                 return Result.failure(Exception("API Error: $errorMessage"))
             }
             
+            // Try to deserialize the response body
+            val body = response.body()
+            Result.success(body)
+        } catch (e: ResponseException) {
+            println("ResponseException in getNextLaunch: ${e.message}")
+            // Try to get the error response body
+            try {
+                val errorBody = e.response.bodyAsText()
+                val errorMessage = parseApiError(errorBody)
+                println("Error response body: $errorMessage")
+                Result.failure(Exception("API Error: $errorMessage"))
+            } catch (bodyException: Exception) {
+                Result.failure(e)
+            }
+        } catch (e: IOException) {
+            println("IOException in getNextLaunch: ${e.message}")
+            Result.failure(e)
+        } catch (e: Exception) {
+            println("Exception in getNextLaunch: ${e::class.simpleName}: ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getNextDetailedLaunch(
+        limit: Int
+    ): Result<PaginatedLaunchDetailedList> {
+        return try {
+            val response = launchesApi.launchesDetailedList(
+                limit = limit,
+                upcomingWithRecent = true,
+                ordering = "net"
+            )
+
+            // Print raw response for debugging
+            val rawResponse = response.response.bodyAsText()
+            println("=== FULL API RESPONSE DEBUG ===")
+            println("Request URL: ${response.response.request.url}")
+            println("Request headers: ${response.response.request.headers}")
+            println("Response status: ${response.status}")
+            println("Response headers: ${response.response.headers}")
+            println("Response length: ${rawResponse.length} characters")
+            println("=== FULL RESPONSE BODY ===")
+            println(rawResponse)
+            println("=== END FULL RESPONSE ===")
+
+            // Check if it's an error response
+            if (response.status >= 400) {
+                val errorMessage = parseApiError(rawResponse)
+                println("HTTP Error ${response.status}: $errorMessage")
+                return Result.failure(Exception("API Error ${response.status}: $errorMessage"))
+            }
+
+            // Check if response looks like an error (contains "detail" field)
+            if (rawResponse.contains("\"detail\"")) {
+                val errorMessage = parseApiError(rawResponse)
+                println("API returned error response: $errorMessage")
+                return Result.failure(Exception("API Error: $errorMessage"))
+            }
+
             // Try to deserialize the response body
             val body = response.body()
             Result.success(body)

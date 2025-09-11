@@ -3,50 +3,106 @@ package me.calebjones.spacelaunchnow.ui.compose
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
-import formatTimeForUser
 import kotlinx.datetime.Instant
+import me.calebjones.spacelaunchnow.util.DateTimeUtil
 
 @Composable
 fun LaunchWindowIndicator(
     launchTime: Instant,
     windowStart: Instant,
     windowEnd: Instant,
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .height(80.dp),
-    baseBarColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
+    modifier: Modifier = Modifier,
+    baseBarColor: Color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
     windowBarColor: Color = MaterialTheme.colorScheme.primary,
     dotColor: Color = MaterialTheme.colorScheme.inversePrimary,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    barThickness: Float = 12f
+    barThickness: Float = 8f
+) {
+    Column(
+        modifier = modifier
+    ) {
+        // Title and duration row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = "Launch Window",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            // Window duration info aligned to the right
+            val durationMinutes = (windowEnd.epochSeconds - windowStart.epochSeconds) / 60
+            Text(
+                text = if (durationMinutes > 0) "${durationMinutes} min" else "Instantaneous",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Timeline indicator
+        LaunchWindowTimeline(
+            launchTime = launchTime,
+            windowStart = windowStart,
+            windowEnd = windowEnd,
+            baseBarColor = baseBarColor,
+            windowBarColor = windowBarColor,
+            dotColor = dotColor,
+            textColor = textColor,
+            barThickness = barThickness,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+        )
+    }
+}
+
+@Composable
+private fun LaunchWindowTimeline(
+    launchTime: Instant,
+    windowStart: Instant,
+    windowEnd: Instant,
+    baseBarColor: Color,
+    windowBarColor: Color,
+    dotColor: Color,
+    textColor: Color,
+    barThickness: Float,
+    modifier: Modifier = Modifier
 ) {    
     val textMeasurer = rememberTextMeasurer()
-    val fontSize = MaterialTheme.typography.labelMedium.fontSize
+    val fontSize = MaterialTheme.typography.labelSmall.fontSize
 
-    Canvas(modifier = modifier.padding(horizontal = 16.dp)) {
+    Canvas(modifier = modifier.padding(horizontal = 20.dp)) {
         val width = size.width
         val height = size.height
         val barY = height / 2
         
         // Calculate time range for display (extend beyond window by 20% on each side)
         val totalWindowDuration = windowEnd.epochSeconds - windowStart.epochSeconds
-        val extendedDuration = totalWindowDuration * 1.4f // Add 20% margin on each side
         val timelineStart = windowStart.epochSeconds - (totalWindowDuration * 0.2f)
         val timelineEnd = windowEnd.epochSeconds + (totalWindowDuration * 0.2f)
         
         // Calculate position ratios relative to extended timeline
         val startRatio = (windowStart.epochSeconds - timelineStart) / (timelineEnd - timelineStart)
         val endRatio = (windowEnd.epochSeconds - timelineStart) / (timelineEnd - timelineStart)  
-        val launchRatio = (launchTime.epochSeconds - timelineStart) / (timelineEnd - timelineStart)        // Draw base bar (full timeline)
+        val launchRatio = (launchTime.epochSeconds - timelineStart) / (timelineEnd - timelineStart)        // Draw base bar with rounded ends (full timeline)
         drawLine(
             color = baseBarColor,
             start = Offset(0f, barY),
@@ -55,34 +111,47 @@ fun LaunchWindowIndicator(
             cap = StrokeCap.Round
         )
 
-        // Draw window bar (active launch window)
+        // Draw window bar with enhanced thickness and gradient effect (active launch window)
+        val windowStartX = startRatio.coerceIn(0f, 1f) * width
+        val windowEndX = endRatio.coerceIn(0f, 1f) * width
+        
+        // Draw window bar with subtle enhancement
         drawLine(
             color = windowBarColor,
-            start = Offset(startRatio.coerceIn(0f, 1f) * width, barY),
-            end = Offset(endRatio.coerceIn(0f, 1f) * width, barY),
-            strokeWidth = barThickness,
+            start = Offset(windowStartX, barY),
+            end = Offset(windowEndX, barY),
+            strokeWidth = barThickness * 1.2f,
             cap = StrokeCap.Round
         )
 
-        // Draw launch time indicator
+        // Enhanced launch time indicator - more subtle but still prominent
         val dotX = launchRatio.coerceIn(0f, 1f) * width
-        // Draw a white highlight circle around the dot
+        
+        // Subtle outer glow
         drawCircle(
-            color = Color.White,
-            radius = barThickness * 1.2f,
+            color = dotColor.copy(alpha = 0.15f),
+            radius = barThickness * 1.6f,
             center = Offset(dotX, barY)
         )
-        // Draw the center dot
+        
+        // White highlight ring for contrast
+        drawCircle(
+            color = Color.White,
+            radius = barThickness * 1.0f,
+            center = Offset(dotX, barY)
+        )
+        
+        // Main dot - slightly larger
         drawCircle(
             color = dotColor,
-            radius = barThickness * 0.8f,
+            radius = barThickness * 0.75f,
             center = Offset(dotX, barY)
         )        
 
         // Format times as HOUR:MIN per users locale
-        val startText = formatTimeForUser(windowStart)
-        val endText = formatTimeForUser(windowEnd)
-        val launchText = formatTimeForUser(launchTime)
+        val startText = DateTimeUtil.formatLaunchTime(windowStart)
+        val endText = DateTimeUtil.formatLaunchTime(windowEnd)
+        val launchText = DateTimeUtil.formatLaunchTime(launchTime)
 
         val textStyle = TextStyle(color = textColor, fontSize = fontSize)// Draw window start text
         val startTextLayout = textMeasurer.measure(startText, style = textStyle)
@@ -118,7 +187,7 @@ fun LaunchWindowIndicator(
         if (distanceToStart > minLaunchTextSpace && distanceToEnd > minLaunchTextSpace) {
             drawText(
                 textLayoutResult = launchTextLayout,
-                topLeft = Offset(launchX, barY - barThickness * 3f - launchTextLayout.size.height)
+                topLeft = Offset(launchX, barY + barThickness * 2f)
             )
         }
     }

@@ -4,9 +4,9 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import me.calebjones.spacelaunchnow.api.apis.UpdatesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
-import me.calebjones.spacelaunchnow.api.models.PaginatedUpdateEndpointList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
 import me.calebjones.spacelaunchnow.data.model.ApiError
 
 class UpdatesRepositoryImpl(private val updatesApi: UpdatesApi) : UpdatesRepository {

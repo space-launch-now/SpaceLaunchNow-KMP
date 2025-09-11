@@ -5,9 +5,24 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.serialization.Serializable
 
-sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
-    data object Home : Screen("home", "Home", Icons.Filled.Home)
-    data object Other : Screen("other", "Schedule", Icons.Filled.List)
-    data object Settings : Screen("settings", "Settings", Icons.Filled.Settings)
+// Serializable routes for type-safe navigation (modern multiplatform approach)
+@Serializable
+data object Home
+
+@Serializable
+data object Other
+
+@Serializable
+data object Settings
+
+@Serializable
+data class LaunchDetail(val launchId: String)
+
+// Legacy sealed class for UI metadata only
+sealed class Screen(val label: String, val icon: ImageVector) {
+    data object Home : Screen("Home", Icons.Filled.Home)
+    data object Other : Screen("Schedule", Icons.Filled.List) 
+    data object Settings : Screen("Settings", Icons.Filled.Settings)
 }

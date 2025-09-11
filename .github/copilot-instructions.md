@@ -91,6 +91,40 @@ launchesApi.getLaunchMiniList(
 
 ## Key Patterns
 
+### Launch Title Formatting (STANDARDIZED PATTERN)
+**Location**: `util/LaunchFormatUtil.kt`
+**Purpose**: Provides consistent launch title formatting across all UI components
+
+```kotlin
+// Standard format: "<LSP> | <Launch Vehicle>"
+val title = LaunchFormatUtil.formatLaunchTitle(launch)
+
+// Examples of output:
+// "SpaceX | Falcon 9 Block 5"
+// "NASA | SLS Block 1"  
+// "ULA | Atlas V 551"
+```
+
+**Key Rules**:
+- **Primary Format**: `"<LSP> | <Rocket Configuration>"`
+- **LSP Abbreviation**: Use abbreviation if name > 15 chars and abbreviation exists
+- **Fallback Order**: Launch name → "Unknown Name"
+- **Consistency**: Same logic used in NextUpView, LaunchListView, and all launch displays
+
+**Available Methods**:
+- `formatLaunchTitle(launch: LaunchDetailed)` - For detailed launch objects
+- `formatLaunchTitle(launch: LaunchNormal)` - For normal launch objects  
+- `formatLaunchTitle(launch: LaunchBasic)` - For basic launch objects
+- `formatLaunchTitle(...)` - Manual parameters for custom cases
+
+**Usage Pattern**:
+```kotlin
+// In any Composable displaying launches
+val title by remember(launch) {
+    mutableStateOf(LaunchFormatUtil.formatLaunchTitle(launch))
+}
+```
+
 ### API Extension Functions (NEW PATTERN)
 **Location**: `api/extensions/LaunchesApiExtensions.kt`
 **Purpose**: Provide clean, named-parameter interfaces for generated API methods
@@ -214,6 +248,7 @@ launchesApi.getLaunchMiniList(limit = 10, upcoming = true)
 
 ## Common Gotchas
 
+- **Launch Title Formatting**: Always use `LaunchFormatUtil.formatLaunchTitle()` instead of custom title logic
 - **API Generation**: Generated files are not committed; must run `openApiGenerate` after clean checkout
 - **Extension Functions**: Always use extension functions instead of calling generated API methods directly
 - **70+ Parameters**: Generated methods have too many parameters - this is why we use extensions

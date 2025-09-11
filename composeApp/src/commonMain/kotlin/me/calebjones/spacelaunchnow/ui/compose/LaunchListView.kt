@@ -7,85 +7,56 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.models.LaunchBasic
-import me.calebjones.spacelaunchnow.api.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.models.LaunchStatus
-import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini
+import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
+import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 
 // Constants for layout dimensions
 private val CARD_WIDTH = 340.dp
 private val CARD_HEIGHT = 240.dp
 private val CARD_SPACING = 16.dp
 
-fun getStatusColor(launchStatus: LaunchStatus): Color {
-    return when (launchStatus.id) {
-        1 -> {
-            Color.Green
-        }
-        2 -> {
-            Color.Red
-        }
-        3 ->{
-            Color.Green
-        }
-        4 ->{
-            Color.Red
-        }
-        5 -> {
-            Color.Yellow
-        }
-        6 -> {
-            Color.Magenta
-        }
-        7 -> {
-            Color.Red
-        }
-        8 -> {
-            Color.Yellow
-        }
-        9 -> {
-            Color.Green
-        }
-        else -> {
-            Color.Red
-        }
-    }
-
-}
-
 @Composable
-fun LaunchListView(viewModel: LaunchViewModel) {
-    val launches by viewModel.upcomingLaunchesNormal.collectAsState()
-    val error by viewModel.error.collectAsState()
+fun LaunchListView(viewModel: HomeViewModel) {
+    val launches by viewModel.upcomingLaunches.collectAsState()
+    val error by viewModel.upcomingLaunchesError.collectAsState()
+    val isLoading by viewModel.isFeaturedLaunchLoading.collectAsState()
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     
     // Track if we're currently dragging
     var isDragging by remember { mutableStateOf(false) }
-    // Track the last scroll position to determine scroll direction
-    var lastScrollOffset by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchUpcomingLaunchesNormal(limit = 10)
+        viewModel.loadUpcomingLaunches(limit = 10)
     }
 
     if (error != null) {
         Text(text = "Error: $error")
-    } else if (launches != null) {
-        val launchNormalList = launches!!.results
+    } else if (launches.isNotEmpty()) {
+        val launchNormalList = launches
 
         LazyRow(
             modifier = Modifier.fillMaxWidth().draggable(
@@ -123,31 +94,16 @@ fun LaunchListView(viewModel: LaunchViewModel) {
                 
         ) {
             items(launchNormalList) { launch ->
-                LaunchItemView(launch, viewModel)
+                LaunchItemView(launch)
             }
         }
-    } else {
-        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+    } else if (isLoading) {
+        LaunchListShimmer()
     }
 }
 
 @Composable
-fun LaunchItemView(launch: LaunchNormal, viewModel: LaunchViewModel) {
-    val agency = launch.launchServiceProvider
-
-    val agencyLogo = agency.socialLogo?.imageUrl ?: launch.image?.imageUrl
-
-    // Compute the title based on the provided logic
-    val title by remember(launch) {
-        mutableStateOf(
-    if (launch.name?.isNotEmpty() == true) {
-                launch.name
-            } else {
-                "Unknown Name"
-            }
-        )
-    }
-
+fun LaunchItemView(launch: LaunchNormal) {
     Card(
         modifier = Modifier
             .size(width = 340.dp, height = 240.dp),
@@ -173,54 +129,118 @@ fun LaunchItemView(launch: LaunchNormal, viewModel: LaunchViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.1f))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
             )
 
-            Row {
-                // Agency Logo
-                agencyLogo?.let { url ->
-                    AsyncImage(
-                        model = url,
-                        contentDescription = "Agency Logo",
-                        modifier = Modifier
-                            .padding(top = 16.dp, start = 16.dp)
-                            .size(50.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, getStatusColor(launch.status!!), CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+            // Use the common LaunchCardHeader composable
+            LaunchCardHeader(
+                launchData = launch.toLaunchCardData(),
+                showAgencyLogo = true,
+                logoSize = 56.dp,
+                modifier = Modifier.fillMaxSize()
+            )
 
-                // Overlay with Content
-                Column(
+            // Chips in bottom right corner
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Program chip (left side)
+                ProgramChip(
+                    programs = launch.program,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    // Display the computed title
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    launch.pad?.location?.name?.let { locationName ->
-                        Text(
-                            text = locationName,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    launch.net?.let { launchNet ->
-                        Text(
-                            text = launchNet.toString(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+                )
+                
+                // Mission type chip (middle)
+                MissionTypeChip(
+                    mission = launch.mission,
+                    modifier = Modifier
+                )
+                
+                // Status chip (right side)
+                LaunchStatusChip(
+                    status = launch.status,
+                    modifier = Modifier
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun LaunchStatusChip(
+    status: LaunchStatus?,
+    modifier: Modifier = Modifier
+) {
+    if (status != null) {
+        val statusColor = getLaunchStatusColor(status.id)
+        
+        Surface(
+            modifier = modifier,
+            shape = RoundedCornerShape(12.dp),
+            color = statusColor.copy(),
+            contentColor = Color.White
+        ) {
+            Text(
+                text = status.abbrev?.uppercase() ?: status.name.uppercase(),
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                maxLines = 1
+            )
+        }
+    }
+}
+
+@Composable
+fun MissionTypeChip(
+    mission: Mission?,
+    modifier: Modifier = Modifier
+) {
+    if (mission != null) {
+        Surface(
+            modifier = modifier,
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ) {
+            Text(
+                text = mission.type,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                maxLines = 1
+            )
+        }
+    }
+}
+
+@Composable
+fun ProgramChip(
+    programs: List<ProgramMini>?,
+    modifier: Modifier = Modifier
+) {
+    val program = programs?.firstOrNull()
+    if (program != null) {
+        Surface(
+            modifier = modifier,
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+        ) {
+            Text(
+                text = program.name,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                maxLines = 1
+            )
         }
     }
 }

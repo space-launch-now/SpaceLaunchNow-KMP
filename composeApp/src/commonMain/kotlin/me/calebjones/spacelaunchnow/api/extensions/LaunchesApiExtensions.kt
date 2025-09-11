@@ -1,10 +1,11 @@
 package me.calebjones.spacelaunchnow.api.extensions
 
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.api.apis.LaunchesApi
-import me.calebjones.spacelaunchnow.api.infrastructure.HttpResponse
-import me.calebjones.spacelaunchnow.api.models.PaginatedLaunchBasicList
-import me.calebjones.spacelaunchnow.api.models.PaginatedLaunchNormalList
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.infrastructure.HttpResponse
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
+
 
 /**
  * Extension functions for LaunchesApi to provide cleaner, named-parameter interfaces

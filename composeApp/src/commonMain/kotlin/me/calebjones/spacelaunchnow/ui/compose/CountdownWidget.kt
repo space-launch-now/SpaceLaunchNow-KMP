@@ -1,8 +1,8 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Canvas
+
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -11,7 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.coroutines.delay
+import me.calebjones.spacelaunchnow.util.StatusColorUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.hours
@@ -27,28 +28,72 @@ import kotlin.time.Duration.Companion.seconds
 
 @Preview
 @Composable
-fun buildLaunchCountdown() {
+fun BuildLaunchCountdown() {
     LaunchCountdown(
         launchTime = Clock.System.now().plus(6.hours),
-        windowStart = Clock.System.now().plus(5.hours),
-        windowClose = Clock.System.now().plus(7.hours)
     )
 }
 
-@Preview
+
 @Composable
-fun SimpleComposablePreview() {
-    SimpleComposable()
+fun LaunchCountdown(
+    launchTime: Instant,
+    statusId: Int? = null,
+    statusName: String? = null
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Status button with divider overlay
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 8.dp)
+        ) {
+            // HorizontalDivider with higher contrast
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+            )
+
+            // Pill-shaped Status Button
+            Button(
+                onClick = { /* Handle click */ },
+                shape = RoundedCornerShape(25),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .shadow(8.dp, RoundedCornerShape(25.dp)),
+                colors = StatusColorUtil.getLaunchStatusButtonColors(statusId)
+            ) {
+                Text(
+                    text = statusName ?: "Unknown Status",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        // Countdown display
+        CountdownDisplay(launchTime = launchTime)
+
+        // Divider after countdown
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth()
+        )
+    }
 }
 
 @Composable
-fun SimpleComposable() {
-    Text("Hello World")
-}
-
-
-@Composable
-fun LaunchCountdown(launchTime: Instant, windowStart: Instant, windowClose: Instant) {
+private fun CountdownDisplay(launchTime: Instant) {
     val remainingTime = remember { mutableStateOf(launchTime - Clock.System.now()) }
 
     LaunchedEffect(launchTime) {
@@ -75,7 +120,7 @@ fun LaunchCountdown(launchTime: Instant, windowStart: Instant, windowClose: Inst
     ) {
         // Calculate uniform font sizes based on available width
         val containerWidth = maxWidth.value
-        val digitFontSize = (containerWidth * 0.06f).coerceIn(15f, 64f).sp
+        val digitFontSize = (containerWidth * 0.07f).coerceIn(15f, 64f).sp
         val labelFontSize = (containerWidth * 0.025f).coerceIn(10f, 22f).sp
         
         Column(
@@ -95,16 +140,16 @@ fun LaunchCountdown(launchTime: Instant, windowStart: Instant, windowClose: Inst
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(end = 2.dp),
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
-        CountdownItem(label = "DAYS", value = days, digitFontSize = digitFontSize, labelFontSize = labelFontSize)
-        CountdownSeparator(fontSize = digitFontSize)
-        CountdownItem(label = "HOURS", value = hours, digitFontSize = digitFontSize, labelFontSize = labelFontSize)
-        CountdownSeparator(fontSize = digitFontSize)
-        CountdownItem(label = "MINUTES", value = minutes, digitFontSize = digitFontSize, labelFontSize = labelFontSize)
-        CountdownSeparator(fontSize = digitFontSize)
-        CountdownItem(label = "SECONDS", value = seconds, digitFontSize = digitFontSize, labelFontSize = labelFontSize)
+                CountdownItem(label = "DAYS", value = days, digitFontSize = digitFontSize, labelFontSize = labelFontSize)
+                CountdownSeparator(fontSize = digitFontSize)
+                CountdownItem(label = "HOURS", value = hours, digitFontSize = digitFontSize, labelFontSize = labelFontSize)
+                CountdownSeparator(fontSize = digitFontSize)
+                CountdownItem(label = "MINUTES", value = minutes, digitFontSize = digitFontSize, labelFontSize = labelFontSize)
+                CountdownSeparator(fontSize = digitFontSize)
+                CountdownItem(label = "SECONDS", value = seconds, digitFontSize = digitFontSize, labelFontSize = labelFontSize)
             }
         }
     }
@@ -116,7 +161,7 @@ fun CountdownSeparator(fontSize: androidx.compose.ui.unit.TextUnit) {
         text = ":",
         fontSize = fontSize,
         fontWeight = FontWeight.Medium,
-        color = Color.White,
+        color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(horizontal = 2.dp)
     )
@@ -139,7 +184,7 @@ fun CountdownItem(
             text = value.toString().padStart(2, '0'),
             fontSize = digitFontSize,
             fontWeight = FontWeight.Medium,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             maxLines = 1
         )
@@ -148,7 +193,7 @@ fun CountdownItem(
             text = label,
             fontSize = labelFontSize,
             fontWeight = FontWeight.Light,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             maxLines = 1
         )

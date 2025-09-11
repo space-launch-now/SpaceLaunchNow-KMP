@@ -73,6 +73,74 @@ object DateTimeUtil {
             instant.toString()
         }
     }
+
+    /**
+     * Formats an ISO-8601 duration string to a relative time format for timeline events
+     * Examples: 
+     * - "-PT38M" -> "T - 38m"
+     * - "PT2H30M" -> "T + 2h 30m"
+     * - "-PT45S" -> "T - 45s"
+     * - "PT1H" -> "T + 1h"
+     */
+    fun formatTimelineRelativeTime(relativeTime: String?): String {
+        if (relativeTime.isNullOrBlank()) return "T + 0s"
+        
+        return try {
+            // Parse ISO-8601 duration format (e.g., "-PT38M", "PT2H30M15S")
+            val trimmed = relativeTime.trim()
+            val isNegative = trimmed.startsWith("-")
+            val durationPart = if (isNegative) trimmed.substring(1) else trimmed
+            
+            // Must start with "PT" for time duration
+            if (!durationPart.startsWith("PT")) {
+                return "T + 0s"
+            }
+            
+            val timePart = durationPart.substring(2) // Remove "PT"
+            
+            // Parse hours, minutes, seconds
+            var hours = 0
+            var minutes = 0
+            var seconds = 0
+            
+            var remaining = timePart
+            
+            // Parse hours (H)
+            val hoursMatch = Regex("(\\d+)H").find(remaining)
+            if (hoursMatch != null) {
+                hours = hoursMatch.groupValues[1].toInt()
+                remaining = remaining.replace(hoursMatch.value, "")
+            }
+            
+            // Parse minutes (M)
+            val minutesMatch = Regex("(\\d+)M").find(remaining)
+            if (minutesMatch != null) {
+                minutes = minutesMatch.groupValues[1].toInt()
+                remaining = remaining.replace(minutesMatch.value, "")
+            }
+            
+            // Parse seconds (S)
+            val secondsMatch = Regex("(\\d+)S").find(remaining)
+            if (secondsMatch != null) {
+                seconds = secondsMatch.groupValues[1].toInt()
+            }
+            
+            // Format the result
+            val sign = if (isNegative) "-" else "+"
+            val parts = mutableListOf<String>()
+            
+            if (hours > 0) parts.add("${hours}h")
+            if (minutes > 0) parts.add("${minutes}m")
+            if (seconds > 0) parts.add("${seconds}s")
+            
+            // If no time components found, default to 0s
+            if (parts.isEmpty()) parts.add("0s")
+            
+            "T $sign ${parts.joinToString(" ")}"
+        } catch (e: Exception) {
+            "T + 0s"
+        }
+    }
 }
 
 /**
