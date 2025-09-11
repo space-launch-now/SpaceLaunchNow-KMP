@@ -493,8 +493,7 @@ fun ArticleItem(article: Article) {
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            var image = article.imageUrl
-            image = ""
+            val image = article.imageUrl
             SubcomposeAsyncImage(
                 model = image,
                 contentDescription = "Article Image",
@@ -658,7 +657,7 @@ fun EventItem(event: EventEndpointNormal) {
             modifier = Modifier.padding(12.dp)
         ) {
             // Event image with icon fallback
-            var image = event.image?.imageUrl
+            val image = event.image?.imageUrl
             SubcomposeAsyncImage(
                 model = image,
                 contentDescription = "Event Image",
