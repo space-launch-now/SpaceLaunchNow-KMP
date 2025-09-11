@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
@@ -18,18 +18,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import me.calebjones.spacelaunchnow.navigation.Screen
+import me.calebjones.spacelaunchnow.navigation.Home
+import me.calebjones.spacelaunchnow.navigation.Other
+import me.calebjones.spacelaunchnow.navigation.Settings
+import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.other.OtherScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
+import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 
 @Composable
 fun TabletDesktopLayout() {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    
     SpaceLaunchNowTheme {
-        var selectedItem by remember { mutableIntStateOf(0) }
+        val screens = listOf(Home, Other, Settings)
         val items = listOf("Home", "Other", "Settings")
-        val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.List, Icons.Filled.Settings)
-        val unselectedIcons = listOf(Icons.Filled.Home, Icons.Filled.List, Icons.Filled.Settings)
+        val selectedIcons = listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Settings)
 
         Scaffold {
             Row(Modifier.fillMaxSize()) {
@@ -48,18 +62,25 @@ fun TabletDesktopLayout() {
                         },
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                     ){
-                        items.forEachIndexed { index, item ->
+                        screens.forEachIndexed { index, screen ->
                             NavigationRailItem(
                                 modifier = Modifier.padding(8.dp),
                                 icon = {
                                     Icon(
-                                        if (selectedItem == index) selectedIcons[index] else unselectedIcons[index],
-                                        contentDescription = item
+                                        selectedIcons[index], // Always use same icon for simplicity
+                                        contentDescription = items[index]
                                     )
                                 },
-                                label = { Text(item, color = MaterialTheme.colorScheme.onSurface) },
-                                selected = selectedItem == index,
-                                onClick = { selectedItem = index }
+                                label = { Text(items[index], color = MaterialTheme.colorScheme.onSurface) },
+                                selected = currentDestination?.route == screen::class.qualifiedName,
+                                onClick = { 
+                                    navController.navigate(screen) {
+                                        // Avoid multiple copies of the same destination
+                                        launchSingleTop = true
+                                        // Restore state when returning to a previously selected screen
+                                        restoreState = true
+                                    }
+                                }
                             )
                         }
                     }
@@ -69,14 +90,26 @@ fun TabletDesktopLayout() {
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column (
+                    NavHost(
+                        navController = navController,
+                        startDestination = Home,
                         modifier = Modifier.fillMaxSize()
-                    )
-                    {
-                        when (selectedItem) {
-                            0 -> HomeScreen()
-                            1 -> OtherScreen()
-                            2 -> SettingsScreen()
+                    ) {
+                        composable<Home> {
+                            HomeScreen(navController = navController)
+                        }
+                        composable<Other> {
+                            OtherScreen()
+                        }
+                        composable<Settings> {
+                            SettingsScreen()
+                        }
+                        composable<LaunchDetail> { backStackEntry ->
+                            val launchDetail = backStackEntry.toRoute<LaunchDetail>()
+                            LaunchDetailScreen(
+                                launchId = launchDetail.launchId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
                         }
                     }
                 }

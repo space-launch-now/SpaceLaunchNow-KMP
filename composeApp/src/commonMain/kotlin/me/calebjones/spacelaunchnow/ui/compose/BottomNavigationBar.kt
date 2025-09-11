@@ -8,6 +8,9 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import me.calebjones.spacelaunchnow.navigation.Screen
+import me.calebjones.spacelaunchnow.navigation.Home
+import me.calebjones.spacelaunchnow.navigation.Other
+import me.calebjones.spacelaunchnow.navigation.Settings
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -16,20 +19,22 @@ fun BottomNavigationBar(navController: NavHostController) {
         Screen.Other,
         Screen.Settings
     )
+    
+    val routes = listOf(Home, Other, Settings)
 
     NavigationBar {
         val navBackStackEntry = navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry.value?.destination
 
-        items.forEach { screen ->
+        items.forEachIndexed { index, screen ->
             NavigationBarItem(
                 icon = { Icon(screen.icon, contentDescription = screen.label) },
                 label = { Text(screen.label) },
-                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                selected = currentDestination?.hierarchy?.any { it.route == routes[index]::class.qualifiedName } == true,
                 onClick = {
                     // Navigate only if not already on the destination
-                    if (currentDestination?.route != screen.route) {
-                        navController.navigate(screen.route) {
+                    if (currentDestination?.route != routes[index]::class.qualifiedName) {
+                        navController.navigate(routes[index]) {
                             // Pop up to the start destination of the graph to avoid building up a large back stack
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true

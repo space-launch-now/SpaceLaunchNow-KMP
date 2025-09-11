@@ -21,7 +21,7 @@ fun isTabletOrDesktop(): Boolean {
 @Composable
 fun SpaceLaunchNowApp() {
     KoinApplication(
-        application = koinConfig
+        application = { koinConfig() }
     ){
         val isTabletOrDesktop = isTabletOrDesktop()
         if (isTabletOrDesktop) {

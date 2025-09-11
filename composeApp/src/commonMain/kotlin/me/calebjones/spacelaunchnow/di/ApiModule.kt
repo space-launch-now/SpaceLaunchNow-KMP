@@ -5,12 +5,14 @@ import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-import me.calebjones.spacelaunchnow.api.apis.LaunchesApi
-import me.calebjones.spacelaunchnow.api.apis.LauncherConfigurationsApi
-import me.calebjones.spacelaunchnow.api.apis.LaunchersApi
-import me.calebjones.spacelaunchnow.api.apis.AgenciesApi
-import me.calebjones.spacelaunchnow.api.apis.UpdatesApi
-import me.calebjones.spacelaunchnow.api.infrastructure.ApiClient
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchersApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.infrastructure.ApiClient
+import me.calebjones.spacelaunchnow.api.snapi.apis.ArticlesApi
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.LogLevel
@@ -83,5 +85,26 @@ val apiModule = module {
             setApiKey(get<String>(named("API_KEY")), "Authorization")
             setApiKeyPrefix("Token", "Authorization")
         }
+    }
+    
+    single<EventsApi> {
+        EventsApi(
+            baseUrl = get<String>(named("BaseUrl")),
+            httpClientEngine = CIO.create(),
+            httpClientConfig = httpClientConfig,
+        ).apply {
+            setApiKey(get<String>(named("API_KEY")), "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
+    }
+    
+    // SNAPI (Spaceflight News API) - separate base URL, no auth required
+    single<ArticlesApi> {
+        ArticlesApi(
+            baseUrl = "https://api.spaceflightnewsapi.net",
+            httpClientEngine = CIO.create(),
+            httpClientConfig = httpClientConfig,
+        )
+        // No API key required for SNAPI
     }
 }

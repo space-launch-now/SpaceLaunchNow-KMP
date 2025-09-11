@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.models.PaginatedUpdateEndpointList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 
 class UpdatesViewModel(private val repository: UpdatesRepository) : ViewModel() {

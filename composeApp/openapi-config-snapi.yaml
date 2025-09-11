@@ -1,0 +1,18 @@
+generatorName: kotlin
+library: multiplatform
+dateLibrary: kotlinx-datetime
+enumPropertyNaming: original
+packageName: me.calebjones.spacelaunchnow.api.snapi
+useCoroutines: true
+omitGradleWrapper: true
+# Make parameters more Kotlin-friendly
+useFunctionalInterfaces: true
+# Generate nullable types for optional parameters
+# This allows better default parameter handling
+additionalProperties:
+  # Generate methods with default parameters instead of requiring all parameters
+  generateDefaultParameters: true
+  # Use nullable types for optional query parameters
+  useNullableCollections: true
+  # Better Kotlin naming conventions
+  useKotlinConventions: true

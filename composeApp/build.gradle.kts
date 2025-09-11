@@ -46,13 +46,13 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.ui)
-            
-                implementation(compose.material)
+
                 implementation(compose.materialIconsExtended)
             
                 implementation(libs.kotlinx.coroutines.swing)
 
                 implementation(libs.slf4j.simple)
+                implementation(libs.koin.core)
                 implementation(libs.koin.logger.slf4j)
                 implementation(libs.coil.compose.jvm)
             }
@@ -76,7 +76,8 @@ kotlin {
           }
         
         commonMain {
-            kotlin.srcDir("$projectDir/src/openApi/src/commonMain/kotlin")
+            kotlin.srcDir("$projectDir/src/openApiLL/src/commonMain/kotlin")
+            kotlin.srcDir("$projectDir/src/openApiSNAPI/src/commonMain/kotlin")
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
@@ -105,12 +106,15 @@ kotlin {
                 implementation(libs.kotlinx.serialization)
                 api(libs.kotlinx.datetime)
 
-                implementation(libs.compose.icons)            
+                implementation(libs.compose.icons.fontAwesome)
+                implementation(libs.compose.icons.weatherIcons)
                 implementation(libs.coil.compose)
                 implementation(libs.coil.compose.ktor)
                 implementation(libs.insetsx)
 
                 implementation(libs.dotenv)
+
+                implementation(libs.materialKolor)
             }
         }
         
@@ -179,10 +183,24 @@ compose.desktop {
     }
 }
 
-// OpenAPI Code Generation Configuration (current)
+// OpenAPI Code Generation Configuration for Launch Library 2.4.0
 openApiGenerate {
     generatorName.set("kotlin")
     inputSpec.set("$projectDir/../schema/ll_2.4.0.json")
-    outputDir.set("$projectDir/src/openApi")
-    configFile.set("$projectDir/openapi-config.yaml")
+    outputDir.set("$projectDir/src/openApiLL")
+    configFile.set("$projectDir/openapi-config-ll.yaml")
+}
+
+// Register separate task for SNAPI v4 generation
+tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("generateSnapiClient") {
+    generatorName.set("kotlin")
+    inputSpec.set("$projectDir/../schema/snapi_v4.yaml")
+    outputDir.set("$projectDir/src/openApiSNAPI")
+    configFile.set("$projectDir/openapi-config-snapi.yaml")
+}
+
+// Convenience task to generate both API clients
+tasks.register("generateAllApiClients") {
+    dependsOn("openApiGenerate", "generateSnapiClient")
+    description = "Generate both Launch Library 2.4.0 and SNAPI v4 API clients"
 }

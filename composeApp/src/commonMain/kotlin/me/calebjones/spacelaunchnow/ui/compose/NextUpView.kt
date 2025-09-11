@@ -4,65 +4,69 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
-import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun NextLaunchView() {
-    val launchViewModel = koinViewModel<NextUpViewModel>()
-    val nextLaunch by launchViewModel.nextLaunch.collectAsState()
-    val error by launchViewModel.error.collectAsState()
-    val isLoading by launchViewModel.isLoading.collectAsState()
+fun NextLaunchView(navController: NavController) {
+    val homeViewModel = koinViewModel<HomeViewModel>()
+    val nextLaunch by homeViewModel.featuredLaunch.collectAsState()
+    val error by homeViewModel.featuredLaunchError.collectAsState()
+    val isLoading by homeViewModel.isFeaturedLaunchLoading.collectAsState()
 
     LaunchedEffect(Unit) {
-        launchViewModel.fetchNextLaunch()
+        homeViewModel.loadFeaturedLaunch()
     }    
     if (error != null) {
         ErrorMessageView(
             errorMessage = error ?: "Unknown error occurred",
-            onRetry = { launchViewModel.fetchNextLaunch() }
+            onRetry = { homeViewModel.refreshFeaturedLaunch() }
         )
     } else if (nextLaunch != null) {
         
         // Use the launch image for dynamic theming
         Box {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                NextLaunchItemView(nextLaunch!!)
+                NextLaunchItemView(nextLaunch!!, navController)
             }
         }
     } else if (isLoading) {
@@ -75,258 +79,152 @@ fun NextLaunchView() {
 
 
 @Composable
-fun NextLaunchItemView(launch: LaunchDetailed) {
-    // Compute the title based on the provided logic
-    val title by remember(launch) {
-        mutableStateOf(
-            if (launch.rocket?.configuration != null) {
-                val lsp = launch.launchServiceProvider
-                val providerName = if (
-                    lsp.name.length > 15 &&
-                    !lsp.abbrev.isNullOrEmpty()
-                ) {
-                    lsp.abbrev
-                } else {
-                    lsp.name
-                }
-                "$providerName | ${launch.rocket.configuration.name}"
-            } else if (launch.name?.isNotEmpty() == true) {
-                launch.name
-            } else {
-                "Unknown Name"
-            }
-        )
-    }    
+fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
     // Main content column
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(8.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        // Image card (takes up about 70% of the space)
+        // Image card with fixed height for LazyColumn compatibility
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.7f)
-                .clip(RoundedCornerShape(64.dp)),
+                .fillMaxHeight(0.8f)
+                .clip(RoundedCornerShape(8.dp)),
             shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            // Create a single Box that contains everything, with the image as the background
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Background Image covering the entire card
-                launch.image?.imageUrl?.let { url ->
-                    AsyncImage(
-                        model = url,
-                        contentDescription = "Launch Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                    )
-                }
-
-                // Stronger semi-transparent overlay for better readability
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.2f))
-                )
-
-                // Content and Countdown - All content is now in a single Column overlaid on the image
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Content at the top with padding
-                    Column(
-                        modifier = Modifier.padding(32.dp)
-                    ) {
-                        // Display the computed title with drop shadow
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                shadow = Shadow(
-                                    color = Color.Black.copy(alpha = 0.8f),
-                                    offset = Offset(2f, 2f),
-                                    blurRadius = 5f
-                                )
-                            ),
-                            color = Color.White
-                        )
-
-                        launch.pad?.location?.name?.let { locationName ->
-                            Text(
-                                text = locationName,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    shadow = Shadow(
-                                        color = Color.Black.copy(alpha = 0.8f),
-                                        offset = Offset(1f, 1f),
-                                        blurRadius = 2f
-                                    )
-                                ),
-                                color = Color.White.copy(alpha = 0.9f)
-                            )
-                        }
-
-                        launch.net?.let { launchNet ->
-                            Text(
-                                text = DateTimeUtil.formatLaunchDateTimeRelative(launchNet),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    shadow = Shadow(
-                                        color = Color.Black.copy(alpha = 0.8f),
-                                        offset = Offset(1f, 1f),
-                                        blurRadius = 2f
-                                    )
-                                ),
-                                color = Color.White.copy(alpha = 0.9f)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        
-        // Spacer to add some separation
-        Box(modifier = Modifier.height(16.dp))
-        
-        // Countdown section in its own card        
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp)),
-            shape = MaterialTheme.shapes.medium,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {                
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp) // Increased vertical padding
-                ) {
-                    // HorizontalDivider with higher contrast
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                        modifier = Modifier
-                            .padding(horizontal = 32.dp)
-                            .fillMaxWidth()
-                            .align(Alignment.Center) // Align divider to center of Box
-                    )
-
-                    // Pill-shaped Button
-                    Button(
-                        onClick = { /* Handle click */ },
-                        shape = RoundedCornerShape(50),
-                        modifier = Modifier
-                            .align(Alignment.Center) // Center the button in the Box
-                    ) {
-                        Text(
-                            text = launch.status?.name ?: "Unknown Status",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.White
-                        )
-                    }
-                }
-
-                // Countdown display
-                LaunchCountdown(
-                    launchTime = launch.net!!,
-                    windowStart = launch.windowStart!!,
-                    windowClose = launch.windowEnd!!
-                )
-
-                // Divider before countdown
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                    modifier = Modifier
-                        .padding(horizontal = 32.dp, vertical = 8.dp)
-                        .fillMaxWidth()
-                )
-            }
-        }
-
-        // Spacer between cards
-        Box(modifier = Modifier.height(16.dp))
-
-        // Launch Window Indicator Card - now in its own card        
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp)),
-            shape = MaterialTheme.shapes.medium,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp),
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title for the Launch Window card
-                Text(
-                    text = "Launch Window",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
+                // Image section with limited height
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
+                        .height(250.dp) // Limit image area to 300dp
                 ) {
+                    // Background Image covering only the image area
+                    launch.image?.imageUrl?.let { url ->
+                        AsyncImage(
+                            model = url,
+                            contentDescription = "Launch Image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
+
+                    // Stronger semi-transparent overlay for better readability
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.4f))
+                    )
+
+                    // Use the common LaunchCardHeaderOverlay composable
+                    LaunchCardHeaderOverlay(
+                        launchData = launch.toLaunchCardData(),
+                        useRelativeTime = true,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                // Comprehensive countdown section with status, timer, and launch window
+                LaunchCountdown(
+                    launchTime = launch.net!!,
+                    statusId = launch.status?.id,
+                    statusName = launch.status?.name
+                )
+
+                // Mission information section
+                launch.mission?.let { mission ->
                     Column(
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-
-                        LaunchWindowIndicator(
-                            launchTime = launch.net!!,
-                            windowStart = launch.windowStart!!,
-                            windowEnd = launch.windowEnd!!,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(80.dp)
+                        // Mission name
+                        Text(
+                            text = mission.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
-                        Column(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Top
-                        ) {
+                        // Mission description
+                        mission.description?.let { description ->
                             Text(
-                                text = "T + 47",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
-                            Text(
-                                text = "Max Q",
+                                text = description,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                                maxLines = 4,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
+                    }
+                }
+
+                // Action buttons section
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    // Explore button
+                    Button(
+                        onClick = { 
+                            navController.navigate(LaunchDetail(launch.id))
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Explore,
+                            contentDescription = "Explore",
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Explore",
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    // Share button
+                    Button(
+                        onClick = { /* Handle share action */ },
+                        modifier = Modifier.weight(1f),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = "Share",
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Share",
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
             }
@@ -346,7 +244,7 @@ fun ErrorMessageView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -354,7 +252,7 @@ fun ErrorMessageView(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(8.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.errorContainer,
                 contentColor = MaterialTheme.colorScheme.onErrorContainer

@@ -1,0 +1,918 @@
+openapi: 3.0.3
+info:
+  title: Spaceflight News API
+  version: 4.25.0 (v4)
+  description: |-
+    The Spaceflight News API (SNAPI) is a product by [The Space Devs](https://thespacedevs.com) (TSD). It's the most complete and up-to-date spaceflight news API currently available.
+
+    While this API is **free to use**, we do encourage developers to support us through [Patreon](https://www.patreon.com/TheSpaceDevs) to keep the API up and running.
+
+     ### GraphQL
+
+     The Spaceflight News API also has GraphQL support available! You can find the GraphiQl IDE [here](https://api.spaceflightnewsapi.net/v4/graphql/).
+
+     ### FAQs & Tutorials
+
+     - [GitHub repository](https://github.com/TheSpaceDevs/Tutorials/): contains FAQs and tutorials for TSD APIs
+
+     - [TSD FAQ](https://github.com/TheSpaceDevs/Tutorials/blob/main/faqs/faq_TSD.md): TSD-specific FAQ (e.g. history, network, funding, etc.)
+
+     - [SNAPI FAQ](https://github.com/TheSpaceDevs/Tutorials/blob/main/faqs/faq_SNAPI.md): SNAPI-specific FAQ
+
+     ### Feedback & Support
+
+     If you need any help with SNAPI, you can ask in the [`💬feedback-and-help`](https://discord.com/channels/676725644444565514/1019976345884827750) forum of the TSD [Discord server](https://discord.gg/p7ntkNA) or email [derk@spaceflightnewsapi.net](mailto:derk@spaceflightnewsapi.net).
+paths:
+  /v4/articles/:
+    get:
+      operationId: articles_list
+      parameters:
+      - in: query
+        name: event
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Search for all documents related to a specific event using its
+          Launch Library 2 ID.
+        explode: false
+        style: form
+      - in: query
+        name: has_event
+        schema:
+          type: boolean
+        description: Get all documents that have a related event.
+      - in: query
+        name: has_launch
+        schema:
+          type: boolean
+        description: Get all documents that have a related launch.
+      - in: query
+        name: is_featured
+        schema:
+          type: boolean
+        description: Get all documents that are featured.
+      - in: query
+        name: launch
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Search for all documents related to a specific launch using its
+          Launch Library 2 ID.
+        explode: false
+        style: form
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: news_site
+        schema:
+          type: string
+        description: Search for documents with a news_site__name present in a list
+          of comma-separated values. Case insensitive.
+      - in: query
+        name: news_site_exclude
+        schema:
+          type: string
+        description: Search for documents with a news_site__name not present in a
+          list of comma-separated values. Case insensitive.
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -published_at
+            - -updated_at
+            - published_at
+            - updated_at
+        description: |-
+          Order the result on `published_at, -published_at, updated_at, -updated_at`.
+
+          * `published_at` - Published at
+          * `-published_at` - Published at (descending)
+          * `updated_at` - Updated at
+          * `-updated_at` - Updated at (descending)
+        explode: false
+        style: form
+      - in: query
+        name: published_at_gt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published after a given ISO8601 timestamp (excluded).
+      - in: query
+        name: published_at_gte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published after a given ISO8601 timestamp (included).
+      - in: query
+        name: published_at_lt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published before a given ISO8601 timestamp
+          (excluded).
+      - in: query
+        name: published_at_lte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published before a given ISO8601 timestamp
+          (included).
+      - name: search
+        required: false
+        in: query
+        description: Search for documents with a specific phrase in the title or summary.
+        schema:
+          type: string
+      - in: query
+        name: summary_contains
+        schema:
+          type: string
+        description: Search for all documents with a specific phrase in the summary.
+      - in: query
+        name: summary_contains_all
+        schema:
+          type: string
+        description: Search for documents with a summary containing all keywords from
+          comma-separated values.
+      - in: query
+        name: summary_contains_one
+        schema:
+          type: string
+        description: Search for documents with a summary containing at least one keyword
+          from comma-separated values.
+      - in: query
+        name: title_contains
+        schema:
+          type: string
+        description: Search for all documents with a specific phrase in the title.
+      - in: query
+        name: title_contains_all
+        schema:
+          type: string
+        description: Search for documents with a title containing all keywords from
+          comma-separated values.
+      - in: query
+        name: title_contains_one
+        schema:
+          type: string
+        description: Search for documents with a title containing at least one keyword
+          from comma-separated values.
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated after a given ISO8601 timestamp (excluded).
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated after a given ISO8601 timestamp (included).
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated before a given ISO8601 timestamp (excluded).
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated before a given ISO8601 timestamp (included).
+      tags:
+      - articles
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedArticleList'
+          description: ''
+  /v4/articles/{id}/:
+    get:
+      operationId: articles_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this article.
+        required: true
+      tags:
+      - articles
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+          description: ''
+  /v4/blogs/:
+    get:
+      operationId: blogs_list
+      parameters:
+      - in: query
+        name: event
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Search for all documents related to a specific event using its
+          Launch Library 2 ID.
+        explode: false
+        style: form
+      - in: query
+        name: has_event
+        schema:
+          type: boolean
+        description: Get all documents that have a related event.
+      - in: query
+        name: has_launch
+        schema:
+          type: boolean
+        description: Get all documents that have a related launch.
+      - in: query
+        name: is_featured
+        schema:
+          type: boolean
+        description: Get all documents that are featured.
+      - in: query
+        name: launch
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Search for all documents related to a specific launch using its
+          Launch Library 2 ID.
+        explode: false
+        style: form
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: news_site
+        schema:
+          type: string
+        description: Search for documents with a news_site__name present in a list
+          of comma-separated values. Case insensitive.
+      - in: query
+        name: news_site_exclude
+        schema:
+          type: string
+        description: Search for documents with a news_site__name not present in a
+          list of comma-separated values. Case insensitive.
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -published_at
+            - -updated_at
+            - published_at
+            - updated_at
+        description: |-
+          Order the result on `published_at, -published_at, updated_at, -updated_at`.
+
+          * `published_at` - Published at
+          * `-published_at` - Published at (descending)
+          * `updated_at` - Updated at
+          * `-updated_at` - Updated at (descending)
+        explode: false
+        style: form
+      - in: query
+        name: published_at_gt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published after a given ISO8601 timestamp (excluded).
+      - in: query
+        name: published_at_gte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published after a given ISO8601 timestamp (included).
+      - in: query
+        name: published_at_lt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published before a given ISO8601 timestamp
+          (excluded).
+      - in: query
+        name: published_at_lte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published before a given ISO8601 timestamp
+          (included).
+      - name: search
+        required: false
+        in: query
+        description: Search for documents with a specific phrase in the title or summary.
+        schema:
+          type: string
+      - in: query
+        name: summary_contains
+        schema:
+          type: string
+        description: Search for all documents with a specific phrase in the summary.
+      - in: query
+        name: summary_contains_all
+        schema:
+          type: string
+        description: Search for documents with a summary containing all keywords from
+          comma-separated values.
+      - in: query
+        name: summary_contains_one
+        schema:
+          type: string
+        description: Search for documents with a summary containing at least one keyword
+          from comma-separated values.
+      - in: query
+        name: title_contains
+        schema:
+          type: string
+        description: Search for all documents with a specific phrase in the title.
+      - in: query
+        name: title_contains_all
+        schema:
+          type: string
+        description: Search for documents with a title containing all keywords from
+          comma-separated values.
+      - in: query
+        name: title_contains_one
+        schema:
+          type: string
+        description: Search for documents with a title containing at least one keyword
+          from comma-separated values.
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated after a given ISO8601 timestamp (excluded).
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated after a given ISO8601 timestamp (included).
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated before a given ISO8601 timestamp (excluded).
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated before a given ISO8601 timestamp (included).
+      tags:
+      - blogs
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBlogList'
+          description: ''
+  /v4/blogs/{id}/:
+    get:
+      operationId: blogs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this blog.
+        required: true
+      tags:
+      - blogs
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Blog'
+          description: ''
+  /v4/info/:
+    get:
+      operationId: info_retrieve
+      tags:
+      - info
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Info'
+          description: ''
+  /v4/reports/:
+    get:
+      operationId: reports_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: news_site
+        schema:
+          type: string
+        description: Search for documents with a news_site__name present in a list
+          of comma-separated values. Case insensitive.
+      - in: query
+        name: news_site_exclude
+        schema:
+          type: string
+        description: Search for documents with a news_site__name not present in a
+          list of comma-separated values. Case insensitive.
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -published_at
+            - -updated_at
+            - published_at
+            - updated_at
+        description: |-
+          Order the result on `published_at, -published_at, updated_at, -updated_at`.
+
+          * `published_at` - Published at
+          * `-published_at` - Published at (descending)
+          * `updated_at` - Updated at
+          * `-updated_at` - Updated at (descending)
+        explode: false
+        style: form
+      - in: query
+        name: published_at_gt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published after a given ISO8601 timestamp (excluded).
+      - in: query
+        name: published_at_gte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published after a given ISO8601 timestamp (included).
+      - in: query
+        name: published_at_lt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published before a given ISO8601 timestamp
+          (excluded).
+      - in: query
+        name: published_at_lte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents published before a given ISO8601 timestamp
+          (included).
+      - name: search
+        required: false
+        in: query
+        description: Search for documents with a specific phrase in the title or summary.
+        schema:
+          type: string
+      - in: query
+        name: summary_contains
+        schema:
+          type: string
+        description: Search for all documents with a specific phrase in the summary.
+      - in: query
+        name: summary_contains_all
+        schema:
+          type: string
+        description: Search for documents with a summary containing all keywords from
+          comma-separated values.
+      - in: query
+        name: summary_contains_one
+        schema:
+          type: string
+        description: Search for documents with a summary containing at least one keyword
+          from comma-separated values.
+      - in: query
+        name: title_contains
+        schema:
+          type: string
+        description: Search for all documents with a specific phrase in the title.
+      - in: query
+        name: title_contains_all
+        schema:
+          type: string
+        description: Search for documents with a title containing all keywords from
+          comma-separated values.
+      - in: query
+        name: title_contains_one
+        schema:
+          type: string
+        description: Search for documents with a title containing at least one keyword
+          from comma-separated values.
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated after a given ISO8601 timestamp (excluded).
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated after a given ISO8601 timestamp (included).
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated before a given ISO8601 timestamp (excluded).
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+          format: date-time
+        description: Get all documents updated before a given ISO8601 timestamp (included).
+      tags:
+      - reports
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReportList'
+          description: ''
+  /v4/reports/{id}/:
+    get:
+      operationId: reports_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this report.
+        required: true
+      tags:
+      - reports
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+          description: ''
+components:
+  schemas:
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 250
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+        url:
+          type: string
+          format: uri
+          maxLength: 200
+        image_url:
+          type: string
+          format: uri
+          maxLength: 500
+        news_site:
+          type: string
+          readOnly: true
+        summary:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        featured:
+          type: boolean
+        launches:
+          type: array
+          items:
+            $ref: '#/components/schemas/Launch'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+      required:
+      - authors
+      - events
+      - id
+      - image_url
+      - launches
+      - news_site
+      - published_at
+      - summary
+      - title
+      - updated_at
+      - url
+    Author:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 250
+        socials:
+          $ref: '#/components/schemas/Socials'
+      required:
+      - name
+    Blog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 250
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+        url:
+          type: string
+          format: uri
+          maxLength: 200
+        image_url:
+          type: string
+          format: uri
+          maxLength: 500
+        news_site:
+          type: string
+          readOnly: true
+        summary:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        featured:
+          type: boolean
+        launches:
+          type: array
+          items:
+            $ref: '#/components/schemas/Launch'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+      required:
+      - authors
+      - events
+      - id
+      - image_url
+      - launches
+      - news_site
+      - published_at
+      - summary
+      - title
+      - updated_at
+      - url
+    Event:
+      type: object
+      properties:
+        event_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        provider:
+          type: string
+          readOnly: true
+      required:
+      - event_id
+      - provider
+    Info:
+      type: object
+      properties:
+        version:
+          type: string
+        news_sites:
+          type: array
+          items:
+            type: string
+      required:
+      - news_sites
+      - version
+    Launch:
+      type: object
+      properties:
+        launch_id:
+          type: string
+          format: uuid
+        provider:
+          type: string
+          readOnly: true
+      required:
+      - launch_id
+      - provider
+    PaginatedArticleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+    PaginatedBlogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Blog'
+    PaginatedReportList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Report'
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 250
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+        url:
+          type: string
+          format: uri
+          maxLength: 200
+        image_url:
+          type: string
+          format: uri
+          maxLength: 200
+        news_site:
+          type: string
+          readOnly: true
+        summary:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - authors
+      - id
+      - image_url
+      - news_site
+      - published_at
+      - title
+      - updated_at
+      - url
+    Socials:
+      type: object
+      properties:
+        x:
+          type: string
+          format: uri
+          maxLength: 200
+        youtube:
+          type: string
+          format: uri
+          maxLength: 200
+        instagram:
+          type: string
+          format: uri
+          maxLength: 200
+        linkedin:
+          type: string
+          format: uri
+          maxLength: 200
+        mastodon:
+          type: string
+          format: uri
+          maxLength: 200
+        bluesky:
+          type: string
+          format: uri
+          maxLength: 200

@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.models.PaginatedLaunchBasicList
-import me.calebjones.spacelaunchnow.api.models.PaginatedLaunchNormalList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 
 class LaunchViewModel(private val repository: LaunchRepository) : ViewModel() {
