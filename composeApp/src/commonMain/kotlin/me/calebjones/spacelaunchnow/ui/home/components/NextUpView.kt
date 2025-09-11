@@ -176,6 +176,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                     // Explore button
                     Button(
                         onClick = { 
+                            // Navigate to detailed view - data should already be pre-fetched and cached!
                             navController.navigate(LaunchDetail(launch.id))
                         },
                         modifier = Modifier.weight(1f),

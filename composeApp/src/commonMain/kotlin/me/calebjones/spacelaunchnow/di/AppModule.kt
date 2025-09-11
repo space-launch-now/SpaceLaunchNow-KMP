@@ -22,6 +22,7 @@ import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.cache.LaunchCache
 
 expect fun nativeConfig() : KoinAppDeclaration
 
@@ -41,4 +42,5 @@ val appModule = module {
     viewModelOf(::UpdatesViewModel)
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
+    singleOf(::LaunchCache)
 }

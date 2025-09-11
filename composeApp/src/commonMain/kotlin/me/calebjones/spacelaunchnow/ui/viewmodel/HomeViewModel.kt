@@ -20,6 +20,7 @@ import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
+import me.calebjones.spacelaunchnow.cache.LaunchCache
 
 /**
  * Consolidated ViewModel for the Home Screen that manages:
@@ -33,7 +34,8 @@ class HomeViewModel(
     private val launchRepository: LaunchRepository,
     private val updatesRepository: UpdatesRepository,
     private val articlesRepository: ArticlesRepository,
-    private val eventsRepository: EventsRepository
+    private val eventsRepository: EventsRepository,
+    private val launchCache: LaunchCache
 ) : ViewModel() {
 
     // Featured Launch (replaces NextUpViewModel functionality)
@@ -158,10 +160,18 @@ class HomeViewModel(
                     
                     // Set the first launch as the featured launch and remove it from upcoming list
                     if (paginatedLaunches.results.isNotEmpty()) {
-                        _featuredLaunch.value = paginatedLaunches.results.first()
+                        val featuredLaunch = paginatedLaunches.results.first()
+                        _featuredLaunch.value = featuredLaunch
+                        
+                        // Store the LaunchNormal in cache for quick access
+                        launchCache.cacheLaunchNormal(featuredLaunch)
+                        
+                        // Pre-fetch detailed data in the background for instant loading if user clicks "Explore"
+                        preFetchLaunchDetails(featuredLaunch.id)
+                        
                         // Remove the first launch from upcoming list to avoid duplication
                         _upcomingLaunches.value = paginatedLaunches.results.drop(1)
-                        println("Featured launch set from first upcoming: ${paginatedLaunches.results.first().name}")
+                        println("Featured launch set from first upcoming: ${featuredLaunch.name}")
                         println("Upcoming launches list contains ${paginatedLaunches.results.size - 1} items (excluding featured)")
                         _featuredLaunchError.value = null
                     } else {
@@ -378,6 +388,32 @@ class HomeViewModel(
         _updatesError.value = null
         _articlesError.value = null
         _eventsError.value = null
+    }
+
+    /**
+     * Pre-fetches detailed launch data in the background to prepare for instant loading
+     * when user clicks "Explore" on the featured launch
+     */
+    private fun preFetchLaunchDetails(launchId: String) {
+        viewModelScope.launch {
+            try {
+                println("Pre-fetching detailed data for launch: $launchId")
+                val result = launchRepository.getLaunchDetails(launchId)
+                
+                result.onSuccess { launchDetailed ->
+                    // Cache the detailed launch data for instant access later
+                    launchCache.cacheLaunchDetailed(launchDetailed)
+                    println("Successfully pre-fetched and cached detailed data for launch: ${launchDetailed.name}")
+                }.onFailure { exception ->
+                    println("Failed to pre-fetch detailed data for launch $launchId: ${exception.message}")
+                    // Don't show error to user since this is background prefetch
+                    // The detail screen will handle the error when the user actually navigates to it
+                }
+            } catch (exception: Exception) {
+                println("Exception during pre-fetch for launch $launchId: ${exception.message}")
+                // Silently fail - this is a background optimization, not critical
+            }
+        }
     }
 
     /**

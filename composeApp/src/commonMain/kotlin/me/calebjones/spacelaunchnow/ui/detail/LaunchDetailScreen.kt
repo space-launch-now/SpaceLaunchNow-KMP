@@ -8,7 +8,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailView
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.cache.LaunchCache
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -17,6 +20,10 @@ fun LaunchDetailScreen(
     onNavigateBack: () -> Unit
 ) {
     val viewModel = koinViewModel<LaunchViewModel>()
+    val launchCache = koinInject<LaunchCache>()
+    
+    // Check if we have pre-loaded detailed data in cache
+    val cachedLaunchDetailed = remember(launchId) { launchCache.getCachedLaunchDetailed(launchId) }
     
     Scaffold(
         topBar = {
@@ -34,7 +41,11 @@ fun LaunchDetailScreen(
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            LaunchDetailView(viewModel = viewModel, launchId = launchId)
+            LaunchDetailView(
+                viewModel = viewModel, 
+                launchId = launchId,
+                preloadedLaunchDetailed = cachedLaunchDetailed
+            )
         }
     }
 }
