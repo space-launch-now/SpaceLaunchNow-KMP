@@ -4,13 +4,14 @@ import androidx.compose.runtime.Composable
 
 @Composable
 actual fun initPlatformSpecific(colorExtractor: ImageColorExtractor) {
-    // No special initialization needed for JVM
+    // No special initialization needed for Android
 }
 
 actual class ImageColorExtractor {
-    // JVM implementation - basic color extraction
+    // Android implementation - could use Palette API in the future
     fun extractColors(imageUrl: String): List<Int> {
-        // For JVM, return empty list or default colors
+        // For Android, return empty list or default colors
+        // TODO: Implement Android Palette API for color extraction
         return emptyList()
     }
 }
