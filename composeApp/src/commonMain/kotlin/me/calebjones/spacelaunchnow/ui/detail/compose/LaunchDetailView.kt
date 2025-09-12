@@ -99,6 +99,15 @@ private fun LaunchDetailContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
+            item {
+                AsyncImage(
+                    model = launch.image?.imageUrl ?: "",
+                    contentDescription = "Launch image",
+                    modifier = Modifier.fillMaxWidth().height(350.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             // 1. Launch Info Card - With padding
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
