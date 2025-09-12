@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.Text
+import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
@@ -55,8 +56,8 @@ fun TabletDesktopLayout() {
                     NavigationRail(
                         header = {
                             Icon(
-                                Icons.Filled.Home,
-                                contentDescription = "Home",
+                                Icons.Filled.RocketLaunch,
+                                contentDescription = "App",
                                 modifier = Modifier.absolutePadding(left = 8.dp, right = 8.dp, bottom = 32.dp, top = 16.dp)
                             )
                         },

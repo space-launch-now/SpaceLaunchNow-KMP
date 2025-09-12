@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.layout.phone
 
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,19 +34,26 @@ fun PhoneLayout() {
             NavHost(
                 navController = navController,
                 startDestination = Home,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier
             ) {
                 composable<Home> {
-                    HomeScreen(navController = navController)
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        HomeScreen(navController = navController)
+                    }
                 }
                 composable<Other> {
-                    OtherScreen()
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        OtherScreen()
+                    }
                 }
                 composable<Settings> {
-                    SettingsScreen()
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        SettingsScreen()
+                    }
                 }
                 composable<LaunchDetail> { backStackEntry ->
                     val launchDetail = backStackEntry.toRoute<LaunchDetail>()
+                    // LaunchDetailScreen gets full screen access (no padding)
                     LaunchDetailScreen(
                         launchId = launchDetail.launchId,
                         onNavigateBack = { navController.popBackStack() }
