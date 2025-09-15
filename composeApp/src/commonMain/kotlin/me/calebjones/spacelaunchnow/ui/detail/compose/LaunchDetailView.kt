@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,11 +24,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
+import kotlin.math.max
+import kotlin.math.min
 import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
@@ -93,19 +102,22 @@ fun LaunchDetailView(
 private fun LaunchDetailContent(
     launch: LaunchDetailed
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(bottom = 16.dp)
-    ) {
+    val scrollState = rememberLazyListState()
+    
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = scrollState,
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
             item {
-                AsyncImage(
-                    model = launch.image?.imageUrl ?: "",
-                    contentDescription = "Launch image",
-                    modifier = Modifier.fillMaxWidth().height(350.dp),
-                    contentScale = ContentScale.Crop
-                )
+                LaunchDetailHeroSection(launch = launch)
+            }
+
+            // Add spacing for the overlaid agency logo
+            item {
+                Spacer(modifier = Modifier.height(60.dp))
             }
 
             // 1. Launch Info Card - With padding
@@ -182,13 +194,14 @@ private fun LaunchDetailContent(
             }
         }
     }
+}
 
 @Composable
 private fun LaunchDetailHeroSection(launch: LaunchDetailed) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(400.dp) // Taller for better hero effect
+            .height(350.dp)
     ) {
         // Background image - full width
         AsyncImage(
@@ -197,33 +210,31 @@ private fun LaunchDetailHeroSection(launch: LaunchDetailed) {
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
-        Column(
+        
+        // Gradient overlay for better readability
+        Box(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Image section with limited height
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp) // Limit image area to 300dp
-            ) {
-                // Stronger semi-transparent overlay for better readability
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.4f))
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.3f),
+                            Color.Black.copy(alpha = 0.7f)
+                        ),
+                        startY = 0f,
+                        endY = Float.POSITIVE_INFINITY
+                    )
                 )
-
-                // Use the common LaunchCardHeaderOverlay composable
-                LaunchCardHeaderOverlay(
-                    launchData = launch.toLaunchCardData(),
-                    useRelativeTime = true,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
+        )
+        
+        // Launch info at the bottom of hero section
+        LaunchCardHeaderOverlay(
+            launchData = launch.toLaunchCardData(),
+            useRelativeTime = true,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+        )
     }
 }
 
