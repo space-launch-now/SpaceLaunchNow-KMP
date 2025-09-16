@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 
 interface EventsRepository {
     
@@ -23,4 +24,9 @@ interface EventsRepository {
         upcoming: Boolean? = null,
         typeIds: List<Int>? = null
     ): Result<PaginatedEventEndpointNormalList>
+
+    /**
+     * Get detailed information for a single event by ID
+     */
+    suspend fun getEventDetails(eventId: Int): Result<EventEndpointDetailed>
 }

@@ -40,9 +40,11 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.navigation.NavController
+import me.calebjones.spacelaunchnow.navigation.EventDetail
 
 @Composable
-fun EventsView() {
+fun EventsView(navController: NavController) {
     val homeViewModel = koinViewModel<HomeViewModel>()
     val events by homeViewModel.events.collectAsState()
     val isLoading by homeViewModel.isEventsLoading.collectAsState()
@@ -70,7 +72,7 @@ fun EventsView() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(events) { event ->
-                    EventItem(event = event)
+                    EventItem(event = event, navController = navController)
                 }
             }
         }
@@ -90,9 +92,9 @@ fun EventsView() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventItem(event: EventEndpointNormal) {
+fun EventItem(event: EventEndpointNormal, navController: NavController) {
     Card(
-        onClick = { /* TODO: Open event details */ },
+        onClick = { navController.navigate(EventDetail(event.id)) },
         modifier = Modifier.width(280.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
