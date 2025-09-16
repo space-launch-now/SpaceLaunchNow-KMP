@@ -42,6 +42,14 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.navigation.NavController
 import me.calebjones.spacelaunchnow.navigation.EventDetail
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.material3.MaterialTheme as M3
+import me.calebjones.spacelaunchnow.ui.detail.compose.snackDetailBoundsTransform
+import me.calebjones.spacelaunchnow.ui.SharedElementType
+import me.calebjones.spacelaunchnow.ui.EventSharedElementKey
+import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
+import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
 
 @Composable
 fun EventsView(navController: NavController) {
@@ -90,9 +98,129 @@ fun EventsView(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun EventItem(event: EventEndpointNormal, navController: NavController) {
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            Card(
+                onClick = { navController.navigate(EventDetail(event.id)) },
+                modifier = Modifier
+                    .width(280.dp)
+                    .sharedBounds(
+                        rememberSharedContentState(
+                            key = EventSharedElementKey(
+                                eventId = event.id,
+                                type = SharedElementType.Bounds,
+                            ),
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        boundsTransform = snackDetailBoundsTransform,
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    // Event image with icon fallback
+                    val image = event.image?.imageUrl
+                    SubcomposeAsyncImage(
+                        model = image,
+                        contentDescription = "Event Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .sharedBounds(
+                                rememberSharedContentState(
+                                    key = EventSharedElementKey(
+                                        eventId = event.id,
+                                        type = SharedElementType.Image,
+                                    ),
+                                ),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                boundsTransform = snackDetailBoundsTransform,
+                            ),
+                        contentScale = ContentScale.Crop,
+                        error = {
+                            // Show Font Awesome calendar icon as fallback
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = FontAwesomeIcons.Solid.CalendarDay,
+                                    contentDescription = "Event Icon",
+                                    modifier = Modifier.size(96.dp),
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                )
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Event title
+                    Text(
+                        text = event.name,
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.sharedBounds(
+                            rememberSharedContentState(
+                                key = EventSharedElementKey(
+                                    eventId = event.id,
+                                    type = SharedElementType.Title,
+                                ),
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = snackDetailBoundsTransform,
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // Event description
+                    event.description?.let { description ->
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 3,
+                            minLines = 3,
+                            overflow = TextOverflow.Clip,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+
+                    // Event type
+                    Text(
+                        text = event.type.name ?: "Unknown Event",
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+
+                    // Event date (if available)
+                    event.date?.let { date ->
+                        Text(
+                            text = formatLaunchDateTime(date),
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+            }
+            return
+        }
+    }
     Card(
         onClick = { navController.navigate(EventDetail(event.id)) },
         modifier = Modifier.width(280.dp),
