@@ -27,11 +27,13 @@ import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.Other
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.ui.compose.BottomNavigationBar
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.other.OtherScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
+import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -45,11 +47,12 @@ fun PhoneLayout() {
     // Determine if the bottom bar should be shown
     val showBottomBar = when (navBackStackEntry?.destination?.route) {
         LaunchDetail::class.qualifiedName -> false // Hide for LaunchDetail
+        EventDetail::class.qualifiedName -> false // Hide for EventDetail
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern
             val currentRoute = navBackStackEntry?.destination?.route
             // If the route contains LaunchDetail class name or pattern, hide bottom bar
-            currentRoute?.contains("LaunchDetail") != true
+            currentRoute?.contains("LaunchDetail") != true && currentRoute?.contains("EventDetail") != true
         }
     }
     
@@ -92,6 +95,13 @@ fun PhoneLayout() {
                             // LaunchDetailScreen gets full screen access (no padding)
                             LaunchDetailScreen(
                                 launchId = launchDetail.launchId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<EventDetail> { backStackEntry ->
+                            val eventDetail = backStackEntry.toRoute<EventDetail>()
+                            EventDetailScreen(
+                                eventId = eventDetail.eventId,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

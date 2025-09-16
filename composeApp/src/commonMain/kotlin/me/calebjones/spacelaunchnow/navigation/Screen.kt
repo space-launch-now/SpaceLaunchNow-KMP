@@ -20,6 +20,9 @@ data object Settings
 @Serializable
 data class LaunchDetail(val launchId: String)
 
+@Serializable
+data class EventDetail(val eventId: Int)
+
 // Legacy sealed class for UI metadata only
 sealed class Screen(val label: String, val icon: ImageVector) {
     data object Home : Screen("Home", Icons.Filled.Home)
