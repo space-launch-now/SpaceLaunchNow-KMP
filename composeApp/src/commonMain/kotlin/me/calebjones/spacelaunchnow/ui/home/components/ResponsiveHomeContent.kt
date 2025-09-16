@@ -56,7 +56,7 @@ fun ResponsiveHomeContent(
                     item { SectionTitle(title = "Latest News", hasAction = false) }
                     item { ArticlesView() }
                     item { SectionTitle(title = "Upcoming Events", hasAction = true) }
-                    item { EventsView() }
+                    item { EventsView(navController = navController) }
                     item { Spacer(modifier = Modifier.height(32.dp))}
                 }
             }
@@ -75,7 +75,7 @@ fun ResponsiveHomeContent(
             item { SectionTitle(title = "Latest News", hasAction = false) }
             item { ArticlesView() }
             item { SectionTitle(title = "Upcoming Events", hasAction = true) }
-            item { EventsView() }
+            item { EventsView(navController = navController) }
             item { Spacer(modifier = Modifier.height(32.dp))}
         }
     }
