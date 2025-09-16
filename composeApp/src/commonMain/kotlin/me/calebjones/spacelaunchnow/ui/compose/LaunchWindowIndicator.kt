@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -37,7 +39,7 @@ fun LaunchWindowIndicator(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.Top
         ) {
             Text(
                 text = "Launch Window",
@@ -47,12 +49,19 @@ fun LaunchWindowIndicator(
             
             // Window duration info aligned to the right
             val durationMinutes = (windowEnd.epochSeconds - windowStart.epochSeconds) / 60
-            Text(
-                text = if (durationMinutes > 0) "${durationMinutes} min" else "Instantaneous",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                Text(
+                    text = "Duration",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = if (durationMinutes > 0) "$durationMinutes min" else "Instantaneous",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
         
         Spacer(modifier = Modifier.height(12.dp))
