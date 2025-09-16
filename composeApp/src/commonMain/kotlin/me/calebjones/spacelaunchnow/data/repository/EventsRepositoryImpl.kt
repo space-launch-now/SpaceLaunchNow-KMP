@@ -5,6 +5,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.api.extensions.getEventList
 import me.calebjones.spacelaunchnow.api.extensions.getUpcomingEvents
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 
 class EventsRepositoryImpl(
     private val eventsApi: EventsApi
@@ -83,6 +84,21 @@ class EventsRepositoryImpl(
             Result.failure(e)
         } catch (e: Exception) {
             println("Failed to get events: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getEventDetails(eventId: Int): Result<EventEndpointDetailed> {
+        return try {
+            println("=== EventsRepository: Getting event details for $eventId ===")
+            val response = eventsApi.eventsRetrieve(eventId)
+            println("Response status: ${response.status}")
+            Result.success(response.body())
+        } catch (e: ResponseException) {
+            println("API Error: Status ${e.response.status}, Message: ${e.message}")
+            Result.failure(e)
+        } catch (e: Exception) {
+            println("Failed to get event details: ${e.message}")
             Result.failure(e)
         }
     }

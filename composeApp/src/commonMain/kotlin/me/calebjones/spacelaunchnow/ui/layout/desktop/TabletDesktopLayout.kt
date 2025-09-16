@@ -29,10 +29,12 @@ import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.Other
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.other.OtherScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
+import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 
 @Composable
@@ -109,6 +111,13 @@ fun TabletDesktopLayout() {
                             val launchDetail = backStackEntry.toRoute<LaunchDetail>()
                             LaunchDetailScreen(
                                 launchId = launchDetail.launchId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable<EventDetail> { backStackEntry ->
+                            val eventDetail = backStackEntry.toRoute<EventDetail>()
+                            EventDetailScreen(
+                                eventId = eventDetail.eventId,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

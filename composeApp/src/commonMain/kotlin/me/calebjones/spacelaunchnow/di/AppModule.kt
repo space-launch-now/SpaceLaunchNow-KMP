@@ -14,6 +14,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
@@ -40,6 +41,7 @@ val appModule = module {
     viewModelOf(::HomeViewModel)
     singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
+    viewModelOf(::EventViewModel)
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::LaunchCache)
