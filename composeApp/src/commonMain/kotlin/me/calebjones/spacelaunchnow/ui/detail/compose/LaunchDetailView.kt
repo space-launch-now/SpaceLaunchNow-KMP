@@ -1,240 +1,556 @@
 package me.calebjones.spacelaunchnow.ui.detail.compose
 
+import androidx.compose.animation.BoundsTransform
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import kotlin.math.max
 import kotlin.math.min
 import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
+import me.calebjones.spacelaunchnow.ui.SharedElementKey
+import me.calebjones.spacelaunchnow.ui.SharedElementType
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
+import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
+import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
+import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Landing
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
-import kotlin.math.max
+import kotlinx.coroutines.delay
+import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
+import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalMaterial3Api::class)
+// Shared Transition Layout Constants
+private val BottomBarHeight = 56.dp
+private val TitleHeight = 128.dp
+private val GradientScroll = 180.dp
+private val ImageOverlap = 115.dp
+private val MinTitleOffset = 56.dp
+private val MinImageOffset = 12.dp
+private val MaxTitleOffset = ImageOverlap + MinTitleOffset + GradientScroll
+private val ExpandedImageSize = 300.dp
+private val CollapsedImageSize = 100.dp
+private val HzPadding = Modifier.padding(horizontal = 24.dp)
+
+fun <T> spatialExpressiveSpring() = spring<T>(
+    dampingRatio = 0.8f,
+    stiffness = 380f,
+)
+
+fun <T> nonSpatialExpressiveSpring() = spring<T>(
+    dampingRatio = 1f,
+    stiffness = 1600f,
+)
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+val snackDetailBoundsTransform = BoundsTransform { _, _ ->
+    spatialExpressiveSpring()
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalSharedTransitionApi::class
+)
 @Composable
 fun LaunchDetailView(
-    viewModel: LaunchViewModel,
-    launchId: String,
-    preloadedLaunchDetailed: LaunchDetailed? = null,
+    launch: LaunchDetailed,
+    onNavigateBack: () -> Unit
 ) {
-    val launchDetails by viewModel.launchDetails.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
-
-    // Use preloaded data if available, otherwise use fetched data
-    val currentLaunch = preloadedLaunchDetailed ?: launchDetails
-
-    LaunchedEffect(launchId) {
-        if (preloadedLaunchDetailed != null) {
-            // We have preloaded data, set it immediately to avoid loading state
-            viewModel.setLaunchDetails(preloadedLaunchDetailed)
-        } else {
-            // No preloaded data, fetch from API
-            viewModel.fetchLaunchDetails(launchId)
-        }
-    }
-
-    when {
-        error != null -> {
-            ErrorCard(
-                errorMessage = error ?: "Unknown error occurred",
-                onRetry = { viewModel.fetchLaunchDetails(launchId) }
-            )
-        }
-        currentLaunch != null -> {
-            LaunchDetailContent(
-                launch = currentLaunch
-            )
-        }
-        isLoading -> {
-            LaunchDetailShimmer()
-        }
-        else -> {
-            ErrorCard(
-                errorMessage = "Launch not found",
-                onRetry = { viewModel.fetchLaunchDetails(launchId) }
-            )
-        }
-    }
+    // Directly render the shared transition content with non-null launch data
+    LaunchDetailSharedTransitionContent(
+        launch = launch,
+        onNavigateBack = onNavigateBack
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun LaunchDetailContent(
-    launch: LaunchDetailed
+private fun LaunchDetailSharedTransitionContent(
+    launch: LaunchDetailed,
+    onNavigateBack: () -> Unit
 ) {
-    val scrollState = rememberLazyListState()
-    
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = scrollState,
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 16.dp)
-        ) {
-            item {
-                LaunchDetailHeroSection(launch = launch)
-            }
-
-            // Add spacing for the overlaid agency logo
-            item {
-                Spacer(modifier = Modifier.height(60.dp))
-            }
-
-            // 1. Launch Info Card - With padding
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    LaunchInfoCard(launch = launch)
-                }
-            }
-
-            // 2. Countdown Card (if upcoming) - With padding
-            item {
-                launch.net?.let { launchTime ->
-                    if (launchTime > Clock.System.now()) {
-                        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                            CountdownCard(launch = launch)
-                        }
-                    }
-                }
-            }
-
-            // 3. Quick Stats Grid - With padding
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    QuickStatsGrid(launch = launch)
-                }
-            }
-
-            // 4. Mission Details Card - With padding
-            launch.mission?.let { mission ->
-                item {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        MissionDetailsCard(mission = mission)
-                    }
-                }
-            }
-
-            // 5. Launch Vehicle Details Card - With padding
-            launch.rocket?.configuration?.let { rocketConfig ->
-                item {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
-                    }
-                }
-            }
-
-            // 6. Spacecraft Details Card - With padding
-            if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
-                item {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        SpacecraftDetailsCard(spacecraftStages = launch.rocket?.spacecraftStage ?: emptyList())
-                    }
-                }
-            }
-
-            // 7. Landing Details Card - With padding
-            if (!launch.rocket?.launcherStage.isNullOrEmpty()) {
-                item {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        LandingDetailsCard(launcherStages = launch.rocket?.launcherStage ?: emptyList())
-                    }
-                }
-            }
-
-            // 8. Agency Card - With padding
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    AgencyDetailsCard(agency = launch.launchServiceProvider)
-                }
-            }
-
-            // Bottom spacing
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+        ?: throw IllegalStateException("No Scope found")
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+        ?: throw IllegalStateException("No Scope found")
+    val roundedCornerAnim by animatedVisibilityScope.transition
+        .animateDp(label = "rounded corner") { enterExit: EnterExitState ->
+            when (enterExit) {
+                EnterExitState.PreEnter -> 20.dp
+                EnterExitState.Visible -> 0.dp
+                EnterExitState.PostExit -> 20.dp
             }
         }
-    }
-}
 
-@Composable
-private fun LaunchDetailHeroSection(launch: LaunchDetailed) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(350.dp)
-    ) {
-        // Background image - full width
-        AsyncImage(
-            model = launch.image?.imageUrl ?: "",
-            contentDescription = "Launch image",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-        
-        // Gradient overlay for better readability
+    with(sharedTransitionScope) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Black.copy(alpha = 0.3f),
-                            Color.Black.copy(alpha = 0.7f)
+            Modifier
+                .clip(RoundedCornerShape(roundedCornerAnim))
+                .sharedBounds(
+                    rememberSharedContentState(
+                        key = SharedElementKey(
+                            launchId = launch.id,
+                            type = SharedElementType.Bounds,
                         ),
-                        startY = 0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
+                    ),
+                    animatedVisibilityScope,
+                    clipInOverlayDuringTransition =
+                        OverlayClip(RoundedCornerShape(roundedCornerAnim)),
+                    boundsTransform = snackDetailBoundsTransform,
+                    exit = fadeOut(nonSpatialExpressiveSpring()),
+                    enter = fadeIn(nonSpatialExpressiveSpring()),
                 )
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.surfaceContainer),
+        ) {
+            val scroll = rememberScrollState(0)
+            Header(launch.id, launch)
+            Body(launch, scroll)
+            Title(launch) { scroll.value }
+            Image(launch) { scroll.value }
+            Up(onNavigateBack)
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun Header(launchId: String, launch: LaunchDetailed) {
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+        ?: throw IllegalArgumentException("No Scope found")
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+        ?: throw IllegalArgumentException("No Scope found")
+    val colors = listOf(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.surfaceVariant, getLaunchStatusColor(
+        launch.status?.id
+    ))
+
+    with(sharedTransitionScope) {
+        // Extract colors from launch image
+        var brushColors by remember { mutableStateOf(colors) }
+
+        val infiniteTransition = rememberInfiniteTransition(label = "background")
+        val targetOffset = with(LocalDensity.current) {
+            5000.dp.toPx()
+        }
+        val offset by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = targetOffset,
+            animationSpec = infiniteRepeatable(
+                tween(300000, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
+            label = "offset",
         )
-        
-        // Launch info at the bottom of hero section
-        LaunchCardHeaderOverlay(
-            launchData = launch.toLaunchCardData(),
-            useRelativeTime = true,
+        Spacer(
             modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
+                .sharedBounds(
+                    rememberSharedContentState(
+                        key = SharedElementKey(
+                            launchId = launchId,
+                            type = SharedElementType.Background,
+                        ),
+                    ),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = snackDetailBoundsTransform,
+                    enter = fadeIn(nonSpatialExpressiveSpring()),
+                    exit = fadeOut(nonSpatialExpressiveSpring()),
+                    resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds(),
+                )
+                .height(280.dp)
+                .fillMaxWidth()
+                .blur(40.dp)
+                .drawWithCache {
+                    val brushSize = 1200F
+                    val brush = Brush.linearGradient(
+                        colors = brushColors,
+                        start = Offset(offset, offset),
+                        end = Offset(offset + brushSize, offset + brushSize),
+                        tileMode = TileMode.Mirror,
+                    )
+                    onDrawBehind {
+                        drawRect(brush)
+                    }
+                },
         )
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun SharedTransitionScope.Up(upPress: () -> Unit) {
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+        ?: throw IllegalArgumentException("No Scope found")
+    with(animatedVisibilityScope) {
+        IconButton(
+            onClick = upPress,
+            modifier = Modifier
+                .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 3f)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .size(36.dp)
+                .animateEnterExit(
+                    enter = scaleIn(tween(300, delayMillis = 300)),
+                    exit = scaleOut(tween(20)),
+                )
+                .background(
+                    color = Color(0xff121212).copy(alpha = 0.32f),
+                    shape = CircleShape,
+                ),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                contentDescription = "Back",
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun Body(launch: LaunchDetailed, scroll: ScrollState) {
+    val sharedTransitionScope =
+        LocalSharedTransitionScope.current ?: throw IllegalStateException("No scope found")
+    with(sharedTransitionScope) {
+        Column(modifier = Modifier.skipToLookaheadSize()) {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .height(MinTitleOffset),
+            )
+
+            Column(
+                modifier = Modifier.verticalScroll(scroll),
+            ) {
+                Spacer(Modifier.height(GradientScroll))
+                Spacer(Modifier.height(ImageOverlap))
+                Surface(
+                    Modifier
+                        .fillMaxWidth()
+                ) {
+                    // Replace the existing test content with actual launch detail content
+                    LaunchDetailContentInBody(launch = launch)
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun Title(launch: LaunchDetailed, scrollProvider: () -> Int) {
+    val maxOffset = with(LocalDensity.current) { MaxTitleOffset.toPx() }
+    val minOffset = with(LocalDensity.current) { MinTitleOffset.toPx() }
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+        ?: throw IllegalArgumentException("No Scope found")
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+        ?: throw IllegalArgumentException("No Scope found")
+
+    // Calculate collapse fraction to determine image size and position
+    val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
+    val collapseFraction = (scrollProvider() / collapseRange).coerceIn(0f, 1f)
+
+    // Calculate current image size and position
+    val imageMaxSize = with(LocalDensity.current) { ExpandedImageSize.toPx() }
+    val imageMinSize = with(LocalDensity.current) { CollapsedImageSize.toPx() }
+    val currentImageSize = lerp(imageMaxSize, imageMinSize, collapseFraction)
+
+    // Calculate horizontal padding needed to avoid overlap with collapsed image
+    val horizontalPaddingPx = with(LocalDensity.current) { 12.dp.toPx() } // HzPadding value
+    val rightPaddingPx = if (collapseFraction > 0.5f) {
+        // When significantly collapsed, add extra padding for the image
+        horizontalPaddingPx + currentImageSize + with(LocalDensity.current) { 8.dp.toPx() }
+    } else {
+        horizontalPaddingPx
+    }
+
+    with(sharedTransitionScope) {
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = TitleHeight)
+                .statusBarsPadding()
+                .offset {
+                    val scroll = scrollProvider()
+                    val offset = (maxOffset - scroll).coerceAtLeast(minOffset)
+                    IntOffset(x = 0, y = offset.toInt())
+                }
+                .background(MaterialTheme.colorScheme.surfaceContainer),
+        ) {
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = LaunchFormatUtil.formatLaunchTitle(launch),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(
+                        start = with(LocalDensity.current) { horizontalPaddingPx.toDp() },
+                        end = with(LocalDensity.current) { rightPaddingPx.toDp() },
+                        top = 0.dp,
+                        bottom = 0.dp
+                    )
+                    .sharedBounds(
+                        rememberSharedContentState(
+                            key = SharedElementKey(
+                                launchId = launch.id,
+                                type = SharedElementType.Title,
+                            ),
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        boundsTransform = snackDetailBoundsTransform,
+                    )
+                    .wrapContentWidth(),
+            )
+            Text(
+                text = launch.launchServiceProvider.name,
+                style = MaterialTheme.typography.titleSmall,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(
+                        start = with(LocalDensity.current) { horizontalPaddingPx.toDp() },
+                        end = with(LocalDensity.current) { rightPaddingPx.toDp() },
+                        top = 0.dp,
+                        bottom = 0.dp
+                    )
+                    .sharedBounds(
+                        rememberSharedContentState(
+                            key = SharedElementKey(
+                                launchId = launch.id,
+                                type = SharedElementType.Tagline,
+                            ),
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        boundsTransform = snackDetailBoundsTransform,
+                    )
+                    .wrapContentWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun Image(
+    launch: LaunchDetailed,
+    scrollProvider: () -> Int,
+) {
+    val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
+    val collapseFractionProvider = {
+        (scrollProvider() / collapseRange).coerceIn(0f, 1f)
+    }
+
+    CollapsingImageLayout(
+        collapseFractionProvider = collapseFractionProvider,
+        modifier = HzPadding.statusBarsPadding(),
+    ) {
+        val sharedTransitionScope = LocalSharedTransitionScope.current
+            ?: throw IllegalStateException("No sharedTransitionScope found")
+        val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+            ?: throw IllegalStateException("No animatedVisibilityScope found")
+
+        with(sharedTransitionScope) {
+            AsyncImage(
+                model = launch.image?.imageUrl ?: "",
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .border(
+                        4.dp,
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                        CircleShape
+                    )
+                    .sharedBounds(
+                        rememberSharedContentState(
+                            key = SharedElementKey(
+                                launchId = launch.id,
+                                type = SharedElementType.Image,
+                            ),
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        exit = fadeOut(),
+                        enter = fadeIn(),
+                        boundsTransform = snackDetailBoundsTransform,
+                    )
+                    .fillMaxSize(),
+
+                )
+        }
+    }
+}
+
+@Composable
+private fun CollapsingImageLayout(collapseFractionProvider: () -> Float, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(
+        modifier = modifier,
+        content = content,
+    ) { measurables, constraints ->
+        check(measurables.size == 1)
+
+        val collapseFraction = collapseFractionProvider()
+
+        val imageMaxSize = min(ExpandedImageSize.roundToPx(), constraints.maxWidth)
+        val imageMinSize = max(CollapsedImageSize.roundToPx(), constraints.minWidth)
+        val imageWidth = lerp(imageMaxSize, imageMinSize, collapseFraction)
+        val imagePlaceable = measurables[0].measure(Constraints.fixed(imageWidth, imageWidth))
+
+        val imageY = lerp(MinTitleOffset, MinImageOffset, collapseFraction).roundToPx()
+        val imageX = lerp(
+            (constraints.maxWidth - imageWidth) / 2, // centered when expanded
+            constraints.maxWidth - imageWidth, // right aligned when collapsed
+            collapseFraction,
+        )
+        layout(
+            width = constraints.maxWidth,
+            height = imageY + imageWidth,
+        ) {
+            imagePlaceable.placeRelative(imageX, imageY)
+        }
+    }
+}
+
+// This composable contains all the detailed launch information
+@Composable
+private fun LaunchDetailContentInBody(launch: LaunchDetailed) {
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        Spacer(Modifier.height(TitleHeight - 28.dp))
+
+        // 2. Countdown Card (if upcoming)
+        launch.net?.let { launchTime ->
+                CountdownCard(launch = launch)
+                Spacer(Modifier.height(16.dp))
+        }
+
+        // 2b. Launch Window Card (separate card if window exists)
+        launch.windowStart?.let { ws ->
+            launch.windowEnd?.let { we ->
+                LaunchWindowIndicatorCard(
+                    launchTime = launch.net ?: ws,
+                    windowStart = ws,
+                    windowEnd = we
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
+
+        // Now include all the detailed content - no null checks needed
+        // 1. Launch Info Card
+        LaunchInfoCard(launch = launch)
+        Spacer(Modifier.height(16.dp))
+
+        // 3. Quick Stats Grid
+        QuickStatsGrid(launch = launch)
+        Spacer(Modifier.height(16.dp))
+        
+        // 4. Mission Details Card
+        launch.mission?.let { mission ->
+            MissionDetailsCard(mission = mission)
+            Spacer(Modifier.height(16.dp))
+        }
+        
+        // 5. Launch Vehicle Details Card
+        launch.rocket?.configuration?.let { rocketConfig ->
+            LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
+            Spacer(Modifier.height(16.dp))
+        }
+        
+        // 6. Spacecraft Details Card
+        if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
+            SpacecraftDetailsCard(spacecraftStages = launch.rocket?.spacecraftStage ?: emptyList())
+            Spacer(Modifier.height(16.dp))
+        }
+        
+        // 7. Landing Details Card
+        if (!launch.rocket?.launcherStage.isNullOrEmpty()) {
+            LandingDetailsCard(launcherStages = launch.rocket?.launcherStage ?: emptyList())
+            Spacer(Modifier.height(16.dp))
+        }
+        
+        // 8. Agency Card
+        launch.launchServiceProvider?.let { agency ->
+            AgencyDetailsCard(agency = agency)
+            Spacer(Modifier.height(16.dp))
+        }
+        
+        // Bottom spacing
+        Spacer(Modifier.height(200.dp))
     }
 }
 
@@ -309,13 +625,6 @@ private fun CountdownCard(launch: LaunchDetailed) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Launch Countdown",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-
             launch.net?.let { launchTime ->
                 LaunchCountdown(
                     launchTime = launchTime,
@@ -323,85 +632,59 @@ private fun CountdownCard(launch: LaunchDetailed) {
                     statusName = launch.status?.name
                 )
             }
-
-            // Launch window progress bar
-            launch.windowStart?.let { windowStart ->
-                launch.windowEnd?.let { windowEnd ->
-                    LaunchWindowCard(
-                        windowStart = windowStart,
-                        windowEnd = windowEnd,
-                        currentTime = launch.net
-                    )
-                }
-            }
         }
     }
 }
 
 @Composable
 private fun QuickStatsGrid(launch: LaunchDetailed) {
-    Card(
+    // Build a dynamic list of facts that are available
+    data class Fact(val icon: ImageVector, val value: String, val label: String)
+
+    val facts = buildList {
+        launch.probability?.let { prob ->
+            add(Fact(Icons.AutoMirrored.Filled.TrendingUp, "${prob}%", "Weather\nProb."))
+        }
+        launch.orbitalLaunchAttemptCount?.let { count ->
+            add(Fact(Icons.Filled.Public, "#${count}", "Orbital\nAttempt"))
+        }
+        launch.padLaunchAttemptCount?.let { count ->
+            add(Fact(Icons.Filled.Place, "#${count}", "Pad\nAttempt"))
+        }
+        launch.orbitalLaunchAttemptCountYear?.let { count ->
+            add(Fact(Icons.Filled.CalendarToday, "#${count}", "Year\nAttempt"))
+        }
+    }
+
+    if (facts.isEmpty()) return
+
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = "Quick Stats",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+        Text(
+            text = "Quick Facts",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
 
+        // Render in rows of two cards per row
+        facts.chunked(2).forEach { rowFacts ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Success probability
-                launch.probability?.let { prob ->
+                rowFacts.forEach { fact ->
                     StatCard(
                         modifier = Modifier.weight(1f),
-                        icon = Icons.Filled.TrendingUp,
-                        value = "${prob}%",
-                        label = "Success\nProb."
+                        icon = fact.icon,
+                        value = fact.value,
+                        label = fact.label
                     )
                 }
-
-                // Orbital attempts
-                launch.orbitalLaunchAttemptCount?.let { count ->
-                    StatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Filled.Public,
-                        value = "#$count",
-                        label = "Orbital\nAttempt"
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Pad attempts
-                launch.padLaunchAttemptCount?.let { count ->
-                    StatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Filled.Place,
-                        value = "#$count",
-                        label = "Pad\nAttempt"
-                    )
-                }
-
-                // Year attempts
-                launch.orbitalLaunchAttemptCountYear?.let { count ->
-                    StatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Filled.CalendarToday,
-                        value = "#$count",
-                        label = "Year\nAttempt"
-                    )
+                if (rowFacts.size == 1) {
+                    // Balance layout if odd count
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -409,7 +692,7 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
 }
 
 @Composable
-private fun MissionDetailsCard(mission: me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission) {
+private fun MissionDetailsCard(mission: Mission) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -425,7 +708,7 @@ private fun MissionDetailsCard(mission: me.calebjones.spacelaunchnow.api.launchl
                 fontWeight = FontWeight.Bold
             )
 
-            Divider(color = MaterialTheme.colorScheme.outlineVariant)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // Mission description
             mission.description?.let { description ->
@@ -472,7 +755,6 @@ private fun MissionDetailsCard(mission: me.calebjones.spacelaunchnow.api.launchl
     }
 }
 
-// Helper Composables
 @Composable
 private fun InfoRow(
     icon: ImageVector,
@@ -514,28 +796,29 @@ private fun StatCard(
     label: String
 ) {
     Card(
-        modifier = modifier.height(80.dp),
-        shape = RoundedCornerShape(12.dp),
+        modifier = modifier,
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(12.dp)
+                .defaultMinSize(minHeight = 100.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(28.dp)
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
@@ -543,7 +826,7 @@ private fun StatCard(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
-                lineHeight = 12.sp
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -597,49 +880,27 @@ private fun LiveBadge() {
 }
 
 @Composable
-private fun LaunchWindowCard(
+private fun LaunchWindowIndicatorCard(
+    launchTime: Instant,
     windowStart: Instant,
     windowEnd: Instant,
-    currentTime: Instant?
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Launch Window",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Medium
-            )
-
-            // Progress bar
-            val windowDuration = windowEnd.epochSeconds - windowStart.epochSeconds
-            val progress = if (currentTime != null && windowDuration > 0) {
-                val elapsed = maxOf(0L, currentTime.epochSeconds - windowStart.epochSeconds)
-                (elapsed.toFloat() / windowDuration.toFloat()).coerceIn(0f, 1f)
-            } else 0f
-
-            LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp))
-            )
-        }
+        LaunchWindowIndicator(
+            launchTime = launchTime,
+            windowStart = windowStart,
+            windowEnd = windowEnd,
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }
 
 @Composable
-private fun LaunchVehicleDetailsCard(rocketConfig: me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed) {
+private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -655,7 +916,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: me.calebjones.spacelaunchnow.
                 fontWeight = FontWeight.Bold
             )
 
-            Divider(color = MaterialTheme.colorScheme.outlineVariant)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // Vehicle name and family
             InfoRow(
@@ -789,7 +1050,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: me.calebjones.spacelaunchnow.
 }
 
 @Composable
-private fun SpacecraftDetailsCard(spacecraftStages: List<me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch>) {
+private fun SpacecraftDetailsCard(spacecraftStages: List<SpacecraftFlightDetailedSerializerNoLaunch>) {
     if (spacecraftStages.isEmpty()) return
 
     Card(
@@ -823,7 +1084,7 @@ private fun SpacecraftDetailsCard(spacecraftStages: List<me.calebjones.spacelaun
 }
 
 @Composable
-private fun SpacecraftItem(spacecraft: me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch) {
+private fun SpacecraftItem(spacecraft: SpacecraftFlightDetailedSerializerNoLaunch) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -864,7 +1125,7 @@ private fun SpacecraftItem(spacecraft: me.calebjones.spacelaunchnow.api.launchli
 }
 
 @Composable
-private fun LandingDetailsCard(launcherStages: List<me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal>) {
+private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -903,8 +1164,8 @@ private fun LandingDetailsCard(launcherStages: List<me.calebjones.spacelaunchnow
 
 @Composable
 private fun LauncherStageItem(
-    stage: me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal,
-    landing: me.calebjones.spacelaunchnow.api.launchlibrary.models.Landing
+    stage: FirstStageNormal,
+    landing: Landing
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -959,7 +1220,7 @@ private fun LauncherStageItem(
 }
 
 @Composable
-private fun AgencyDetailsCard(agency: me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed) {
+private fun AgencyDetailsCard(agency: AgencyDetailed) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -1198,7 +1459,7 @@ private fun StatusChip(text: String, color: Color) {
 }
 
 @Composable
-private fun CountryInfoRow(countries: List<me.calebjones.spacelaunchnow.api.launchlibrary.models.Country>) {
+private fun CountryInfoRow(countries: List<Country>) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -1230,7 +1491,7 @@ private fun CountryInfoRow(countries: List<me.calebjones.spacelaunchnow.api.laun
 }
 
 @Composable
-private fun CountryChip(country: me.calebjones.spacelaunchnow.api.launchlibrary.models.Country) {
+private fun CountryChip(country: Country) {
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -1347,21 +1608,8 @@ private fun LaunchDetailShimmer() {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            // Hero section shimmer
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
             // Info card shimmer - With padding
-            repeat(3) {
+            repeat(1) {
                 item {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         Card(
@@ -1383,5 +1631,72 @@ private fun LaunchDetailShimmer() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun LaunchDetailErrorView(
+    errorMessage: String,
+    onRetry: () -> Unit,
+    onNavigateBack: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        // Back button
+        IconButton(
+            onClick = onNavigateBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .statusBarsPadding()
+                .padding(16.dp)
+                .size(36.dp)
+                .background(
+                    color = Color(0xff121212).copy(alpha = 0.32f),
+                    shape = CircleShape,
+                ),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                contentDescription = "Back",
+            )
+        }
+        
+        // Error content
+        ErrorCard(
+            errorMessage = errorMessage,
+            onRetry = onRetry
+        )
+    }
+}
+
+@Composable
+fun LaunchDetailLoadingView(onNavigateBack: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+//        // Back button
+//        IconButton(
+//            onClick = onNavigateBack,
+//            modifier = Modifier
+//                .align(Alignment.TopStart)
+//                .statusBarsPadding()
+//                .padding(16.dp)
+//                .size(36.dp)
+//                .background(
+//                    color = Color(0xff121212).copy(alpha = 0.32f),
+//                    shape = CircleShape,
+//                ),
+//        ) {
+//            Icon(
+//                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+//                contentDescription = "Back",
+//            )
+//        }
+        
+        // Loading content
+        LaunchDetailShimmer()
     }
 }

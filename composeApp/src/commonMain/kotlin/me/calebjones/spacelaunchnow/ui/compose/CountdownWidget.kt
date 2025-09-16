@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.coroutines.delay
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.util.StatusColorUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.abs
@@ -29,9 +30,13 @@ import kotlin.time.Duration.Companion.seconds
 @Preview
 @Composable
 fun BuildLaunchCountdown() {
-    LaunchCountdown(
-        launchTime = Clock.System.now().plus(6.hours),
-    )
+    SpaceLaunchNowTheme {
+        Card {
+            LaunchCountdown(
+                launchTime = Clock.System.now().plus(6.hours),
+            )
+        }
+    }
 }
 
 
