@@ -24,13 +24,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Home
-import me.calebjones.spacelaunchnow.navigation.Other
+import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.ui.compose.BottomNavigationBar
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
-import me.calebjones.spacelaunchnow.ui.other.OtherScreen
+import me.calebjones.spacelaunchnow.ui.other.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
@@ -80,9 +80,11 @@ fun PhoneLayout() {
                                 HomeScreen(navController = navController)
                             }
                         }
-                        composableWithCompositionLocal<Other> {
+                        composableWithCompositionLocal<Schedule> {
                             Box(modifier = Modifier.padding(innerPadding)) {
-                                OtherScreen()
+                                ScheduleScreen(
+                                    onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
+                                )
                             }
                         }
                         composableWithCompositionLocal<Settings> {
