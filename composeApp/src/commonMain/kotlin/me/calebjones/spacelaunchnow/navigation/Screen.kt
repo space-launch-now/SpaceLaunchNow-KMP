@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 data object Home
 
 @Serializable
-data object Other
+data object Schedule
 
 @Serializable
 data object Settings
@@ -26,6 +26,6 @@ data class EventDetail(val eventId: Int)
 // Legacy sealed class for UI metadata only
 sealed class Screen(val label: String, val icon: ImageVector) {
     data object Home : Screen("Home", Icons.Filled.Home)
-    data object Other : Screen("Schedule", Icons.Filled.List) 
+    data object Schedule : Screen("Schedule", Icons.Filled.List)
     data object Settings : Screen("Settings", Icons.Filled.Settings)
 }
