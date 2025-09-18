@@ -26,12 +26,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Home
-import me.calebjones.spacelaunchnow.navigation.Other
+import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
-import me.calebjones.spacelaunchnow.ui.other.OtherScreen
+import me.calebjones.spacelaunchnow.ui.other.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
@@ -44,7 +44,7 @@ fun TabletDesktopLayout() {
     val currentDestination = navBackStackEntry?.destination
     
     SpaceLaunchNowTheme {
-        val screens = listOf(Home, Other, Settings)
+        val screens = listOf(Home, Schedule, Settings)
         val items = listOf("Home", "Schedule", "Settings")
         val selectedIcons = listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Settings)
 
@@ -101,8 +101,10 @@ fun TabletDesktopLayout() {
                         composable<Home> {
                             HomeScreen(navController = navController)
                         }
-                        composable<Other> {
-                            OtherScreen()
+                        composable<Schedule> {
+                            ScheduleScreen(
+                                onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
+                            )
                         }
                         composable<Settings> {
                             SettingsScreen()
