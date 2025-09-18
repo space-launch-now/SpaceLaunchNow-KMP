@@ -29,6 +29,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -81,6 +84,8 @@ import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal
@@ -90,6 +95,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import kotlinx.coroutines.delay
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import kotlin.time.Duration.Companion.seconds
 
@@ -182,9 +188,12 @@ private fun LaunchDetailContentInBody(launch: LaunchDetailed) {
         }
         
         // 7. Landing Details Card
-        if (!launch.rocket?.launcherStage.isNullOrEmpty()) {
-            LandingDetailsCard(launcherStages = launch.rocket?.launcherStage ?: emptyList())
-            Spacer(Modifier.height(16.dp))
+        run {
+            val landingStages = launch.rocket?.launcherStage ?: emptyList()
+            if (landingStages.any { it.landing != null }) {
+                LandingDetailsCard(launcherStages = landingStages)
+                Spacer(Modifier.height(16.dp))
+            }
         }
         
         // 8. Agency Card
@@ -199,6 +208,151 @@ private fun LaunchDetailContentInBody(launch: LaunchDetailed) {
 }
 
 @Composable
+private fun InfoTile(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun InfoChip(icon: ImageVector, text: String) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(14.dp)
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelSmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun LaunchInfoCardHeroContent(launch: LaunchDetailed) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Hero band
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = launch.net?.let { formatLaunchTime(it) } ?: "TBD",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    launch.net?.let {
+                        Text(
+                            text = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTimeRelative(
+                                it
+                            ),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    PrecisionBadge(
+                        netPrecision = launch.netPrecision,
+                    )
+                }
+            }
+        }
+
+        // Metrics grid below
+        val tiles = buildList {
+            launch.mission?.name?.takeIf { it.isNotBlank() }
+                ?.let { add(Triple(Icons.Filled.Rocket, "Mission", it)) }
+            launch.launchDesignator?.takeIf { it.isNotBlank() }
+                ?.let { add(Triple(Icons.Filled.Tag, "Designation", it)) }
+            launch.pad?.let { pad ->
+                val site = listOfNotNull(pad.name, pad.location?.name).joinToString(" - ")
+                if (site.isNotBlank()) add(Triple(Icons.Filled.LocationOn, "Launch Site", site))
+            }
+        }
+        if (tiles.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                tiles.chunked(2).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        row.forEach { (icon, label, value) ->
+                            InfoTile(
+                                icon = icon,
+                                label = label,
+                                value = value,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun LaunchInfoCard(launch: LaunchDetailed) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -209,50 +363,60 @@ private fun LaunchInfoCard(launch: LaunchDetailed) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Mission name
-            launch.mission?.name?.let { missionName ->
-                InfoRow(
-                    icon = Icons.Filled.Rocket,
-                    label = "Mission",
-                    value = missionName
-                )
-            }
+            // Hero layout selected by default
+            LaunchInfoCardHeroContent(launch)
+        }
+    }
+}
 
-            // Launch designation
-            launch.launchDesignator?.let { designator ->
-                InfoRow(
-                    icon = Icons.Filled.Tag,
-                    label = "Designation",
-                    value = designator
-                )
-            }
+@Composable
+private fun LaunchInfoCardLinearContent(launch: LaunchDetailed) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Mission name
+        launch.mission?.name?.let { missionName ->
+            InfoRow(
+                icon = Icons.Filled.Rocket,
+                label = "Mission",
+                value = missionName
+            )
+        }
 
-            // Launch site
-            launch.pad?.let { pad ->
-                InfoRow(
-                    icon = Icons.Filled.LocationOn,
-                    label = "Launch Site",
-                    value = "${pad.name} - ${pad.location?.name ?: ""}"
-                )
-            }
+        // Launch designation
+        launch.launchDesignator?.let { designator ->
+            InfoRow(
+                icon = Icons.Filled.Tag,
+                label = "Designation",
+                value = designator
+            )
+        }
 
-            // Launch time
-            launch.net?.let { launchTime ->
-                InfoRow(
-                    icon = Icons.Filled.Schedule,
-                    label = "Launch Time",
-                    value = formatLaunchTime(launchTime)
-                )
-            }
+        // Launch site
+        launch.pad?.let { pad ->
+            InfoRow(
+                icon = Icons.Filled.LocationOn,
+                label = "Launch Site",
+                value = "${pad.name} - ${pad.location?.name ?: ""}"
+            )
+        }
 
-            // Status
-            launch.status?.let { status ->
-                InfoRow(
-                    icon = Icons.Filled.Flag,
-                    label = "Status",
-                    value = status.name
-                )
-            }
+        // Launch time
+        launch.net?.let { launchTime ->
+            InfoRow(
+                icon = Icons.Filled.Schedule,
+                label = "Launch Time",
+                value = formatLaunchTime(launchTime)
+            )
+        }
+
+        // Status
+        launch.status?.let { status ->
+            InfoRow(
+                icon = Icons.Filled.Flag,
+                label = "Status",
+                value = status.name
+            )
         }
     }
 }
@@ -285,18 +449,23 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
     // Build a dynamic list of facts that are available
     data class Fact(val icon: ImageVector, val value: String, val label: String)
 
+    val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
+
     val facts = buildList {
         launch.probability?.let { prob ->
             add(Fact(Icons.AutoMirrored.Filled.TrendingUp, "${prob}%", "Weather\nProb."))
         }
         launch.orbitalLaunchAttemptCount?.let { count ->
-            add(Fact(Icons.Filled.Public, "#${count}", "Orbital\nAttempt"))
+            add(Fact(Icons.Filled.Public, "#${count}", "Launch\nAll Time"))
         }
         launch.padLaunchAttemptCount?.let { count ->
-            add(Fact(Icons.Filled.Place, "#${count}", "Pad\nAttempt"))
+            add(Fact(Icons.Filled.Place, "#${count}", "Location\nAll Time"))
         }
         launch.orbitalLaunchAttemptCountYear?.let { count ->
-            add(Fact(Icons.Filled.CalendarToday, "#${count}", "Year\nAttempt"))
+            add(Fact(Icons.Filled.CalendarToday, "#${count}", "Total\n$currentYear"))
+        }
+        launch.agencyLaunchAttemptCountYear?.let { count ->
+            add(Fact(Icons.Filled.Business, "#${count}", "${launch.launchServiceProvider.name}\n$currentYear"))
         }
     }
 
@@ -304,11 +473,11 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
             text = "Quick Facts",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
 
@@ -316,7 +485,7 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
         facts.chunked(2).forEach { rowFacts ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 rowFacts.forEach { fact ->
                     StatCard(
@@ -347,52 +516,261 @@ private fun MissionDetailsCard(mission: Mission) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "🎯 Mission Details",
-                style = MaterialTheme.typography.titleMedium,
+                text = "Mission Details",
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            // Locked to Chips layout
+            MissionDetailsChipsContent(mission)
+        }
+    }
+}
 
-            // Mission description
-            mission.description?.let { description ->
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    lineHeight = 20.sp
-                )
-            }
+private enum class MissionDetailsStyle { Chips, Grid, Sections, Linear }
 
-            // Mission type and orbit
-            mission.type?.let { type ->
-                InfoRow(
-                    icon = Icons.Filled.Category,
-                    label = "Mission Type",
-                    value = type
-                )
-            }
-
-            mission.orbit?.name?.let { orbitName ->
-                InfoRow(
-                    icon = Icons.Filled.Public,
-                    label = "Target Orbit",
-                    value = orbitName
-                )
-            }
-
-            // Agencies involved
-            if (!mission.agencies.isNullOrEmpty()) {
-                Text(
-                    text = "Agencies",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+@Composable
+private fun MissionStylePicker(
+    selected: MissionDetailsStyle,
+    onSelected: (MissionDetailsStyle) -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        val options = listOf(
+            MissionDetailsStyle.Chips to "Chips",
+            MissionDetailsStyle.Grid to "Grid",
+            MissionDetailsStyle.Sections to "Sections",
+            MissionDetailsStyle.Linear to "Linear",
+        )
+        options.forEach { (style, label) ->
+            val isSelected = style == selected
+            if (isSelected) {
+                FilledTonalButton(
+                    onClick = { onSelected(style) },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                 ) {
-                    items(mission.agencies) { agency ->
-                        AgencyChip(agencyName = agency.name)
+                    Text(label)
+                }
+            } else {
+                OutlinedButton(
+                    onClick = { onSelected(style) },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(label)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MissionDetailsChipsContent(mission: Mission) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Tag chips row for type and orbit
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            mission.type?.takeIf { it.isNotBlank() }?.let { type ->
+                item { InfoChip(icon = Icons.Filled.Category, text = type) }
+            }
+            mission.orbit?.name?.takeIf { it.isNotBlank() }?.let { orbitName ->
+                item { InfoChip(icon = Icons.Filled.Public, text = orbitName) }
+            }
+        }
+
+        // Collapsible description
+        mission.description?.takeIf { it.isNotBlank() }?.let { desc ->
+            var expanded by remember { mutableStateOf(false) }
+            var hasOverflow by remember { mutableStateOf(false) }
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = desc,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = if (expanded) Int.MAX_VALUE else 4,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 20.sp,
+                    onTextLayout = { result ->
+                        // Only update overflow state when not expanded to avoid flicker
+                        if (!expanded) hasOverflow = result.hasVisualOverflow
                     }
+                )
+                if (hasOverflow || expanded) {
+                    TextButton(onClick = { expanded = !expanded }) {
+                        Text(if (expanded) "Read less" else "Read more")
+                    }
+                }
+            }
+        }
+
+        // Agencies chips (if present)
+        if (!mission.agencies.isNullOrEmpty()) {
+            Text(
+                text = "Agencies",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(mission.agencies) { agency ->
+                    AgencyChip(agencyName = agency.name)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MissionDetailsGridContent(mission: Mission) {
+    val tiles = buildList {
+        mission.type?.takeIf { it.isNotBlank() }?.let {
+            add(Triple(Icons.Filled.Category, "Type", it))
+        }
+        mission.orbit?.name?.takeIf { it.isNotBlank() }?.let {
+            add(Triple(Icons.Filled.Public, "Target Orbit", it))
+        }
+        if (!mission.agencies.isNullOrEmpty()) {
+            val count = mission.agencies.size
+            add(Triple(Icons.Filled.Business, if (count == 1) "Agency" else "Agencies", "$count"))
+        }
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (tiles.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                tiles.chunked(2).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        row.forEach { (icon, label, value) ->
+                            InfoTile(
+                                icon = icon,
+                                label = label,
+                                value = value,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+        // Description below grid if present
+        mission.description?.takeIf { it.isNotBlank() }?.let { desc ->
+            Text(
+                text = desc,
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = 20.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun MissionDetailsSectionedContent(mission: Mission) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // About
+        mission.description?.takeIf { it.isNotBlank() }?.let { desc ->
+            Text(
+                text = "About",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+            var expanded by remember { mutableStateOf(false) }
+            var hasOverflow by remember { mutableStateOf(false) }
+            Text(
+                text = desc,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = if (expanded) Int.MAX_VALUE else 5,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 20.sp,
+                onTextLayout = { result ->
+                    if (!expanded) hasOverflow = result.hasVisualOverflow
+                }
+            )
+            if (hasOverflow || expanded) {
+                TextButton(onClick = { expanded = !expanded }) {
+                    Text(if (expanded) "Show less" else "Show more")
+                }
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        }
+
+        // Details
+        val details = buildList {
+            mission.type?.takeIf { it.isNotBlank() }?.let { add("Mission Type" to it) }
+            mission.orbit?.name?.takeIf { it.isNotBlank() }?.let { add("Target Orbit" to it) }
+        }
+        if (details.isNotEmpty()) {
+            Text(
+                text = "Details",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                details.forEach { (label, value) ->
+                    InfoRow(
+                        icon = if (label.contains("Orbit")) Icons.Filled.Public else Icons.Filled.Category,
+                        label = label,
+                        value = value
+                    )
+                }
+            }
+        }
+
+        // Agencies
+        if (!mission.agencies.isNullOrEmpty()) {
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Text(
+                text = if (mission.agencies.size == 1) "Agency" else "Agencies",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(mission.agencies) { agency ->
+                    AgencyChip(agencyName = agency.name)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MissionDetailsLinearContent(mission: Mission) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Mission description
+        mission.description?.let { description ->
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = 20.sp
+            )
+        }
+
+        // Mission type and orbit
+        mission.type?.let { type ->
+            InfoRow(
+                icon = Icons.Filled.Category,
+                label = "Mission Type",
+                value = type,
+            )
+        }
+
+        mission.orbit?.name?.let { orbitName ->
+            InfoRow(
+                icon = Icons.Filled.Public,
+                label = "Target Orbit",
+                value = orbitName
+            )
+        }
+
+        // Agencies involved
+        if (!mission.agencies.isNullOrEmpty()) {
+            Text(
+                text = "Agencies",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(mission.agencies) { agency ->
+                    AgencyChip(agencyName = agency.name)
                 }
             }
         }
@@ -414,13 +792,13 @@ private fun InfoRow(
             imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(32.dp)
         )
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
@@ -437,41 +815,59 @@ private fun StatCard(
     modifier: Modifier = Modifier,
     icon: ImageVector,
     value: String,
-    label: String
+    label: String,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant
 ) {
     Card(
         modifier = modifier,
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+            containerColor = containerColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-                .defaultMinSize(minHeight = 100.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 96.dp)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp)
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .padding(12.dp)
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
@@ -499,6 +895,123 @@ private fun StatusBadge(
             style = MaterialTheme.typography.labelSmall,
             color = Color.White,
             fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+private fun PrecisionBadge(
+    netPrecision: NetPrecision?,
+) {
+
+    val ui = remember(netPrecision) { mapNetPrecisionUi(netPrecision) }
+
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        modifier = Modifier.clip(RoundedCornerShape(12.dp))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = ui.icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.9f),
+                modifier = Modifier.size(16.dp)
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = "NET: ${ui.primary}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                ui.secondary?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.85f),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    }
+}
+
+private data class PrecisionUi(
+    val icon: ImageVector,
+    val primary: String,
+    val secondary: String?
+)
+
+private fun mapNetPrecisionUi(netPrecision: NetPrecision?): PrecisionUi {
+    // Defaults
+    val defaultPrimary = netPrecision?.abbrev?.takeIf { it.isNotBlank() }
+        ?: netPrecision?.name?.takeIf { it.isNotBlank() }
+        ?: "Unknown"
+    val fallbackSecondary = netPrecision?.description?.takeIf { it.isNotBlank() }
+
+    // Choose icon and concise secondary by id when available
+    return when (netPrecision?.id) {
+        0 -> PrecisionUi(
+            icon = Icons.Filled.Schedule,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
+        )
+
+        1 -> PrecisionUi(
+            icon = Icons.Filled.Schedule,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
+        )
+
+        2 -> PrecisionUi(
+            icon = Icons.Filled.Schedule,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
+        )
+
+        3 -> PrecisionUi(
+            icon = Icons.Filled.Schedule,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
+        )
+
+        4 -> PrecisionUi(
+            icon = Icons.Filled.Schedule,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
+        )
+
+        5 -> PrecisionUi(
+            icon = Icons.Filled.CalendarToday,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
+        )
+
+        7 -> PrecisionUi(
+            icon = Icons.Filled.CalendarToday,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
+        )
+
+        8, 9, 10 -> PrecisionUi(
+            icon = Icons.Filled.CalendarToday,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
+        )
+
+        else -> PrecisionUi(
+            icon = Icons.Filled.CalendarToday,
+            primary = defaultPrimary,
+            secondary = fallbackSecondary
         )
     }
 }
@@ -555,39 +1068,92 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "🚀 Launch Vehicle Details",
-                style = MaterialTheme.typography.titleMedium,
+                text = rocketConfig.fullName ?: "Unknown Rocket",
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-            // Vehicle name and family
-            InfoRow(
-                icon = Icons.Filled.Rocket,
-                label = "Vehicle",
-                value = rocketConfig.fullName ?: rocketConfig.name
-            )
-
-            // Handle families as a list
-            if (!rocketConfig.families.isNullOrEmpty()) {
-                val familyNames = rocketConfig.families.mapNotNull { it.name }.joinToString(", ")
-                if (familyNames.isNotEmpty()) {
-                    InfoRow(
-                        icon = Icons.Filled.Category,
-                        label = if (rocketConfig.families.size == 1) "Family" else "Families",
-                        value = familyNames
+            // Build info tiles and render as two-column grid
+            val infoTiles = buildList {
+                rocketConfig.manufacturer?.name?.takeIf { it.isNotBlank() }?.let {
+                    add(Triple(Icons.Filled.Factory, "Manufacturer", it))
+                }
+                rocketConfig.variant?.takeIf { it.isNotBlank() }?.let {
+                    add(Triple(Icons.Filled.Badge, "Variant", it))
+                }
+                rocketConfig.alias?.takeIf { it.isNotBlank() }?.let {
+                    add(Triple(Icons.Filled.Label, "Alias", it))
+                }
+                if (!rocketConfig.families.isNullOrEmpty()) {
+                    val familyNames = rocketConfig.families.joinToString(", ") { it.name }
+                    if (familyNames.isNotBlank()) {
+                        add(
+                            Triple(
+                                Icons.Filled.Category,
+                                if (rocketConfig.families.size == 1) "Family" else "Families",
+                                familyNames
+                            )
+                        )
+                    }
+                }
+                val stages = listOfNotNull(rocketConfig.minStage, rocketConfig.maxStage)
+                if (stages.isNotEmpty()) {
+                    val stageText =
+                        if (rocketConfig.minStage != null && rocketConfig.maxStage != null && rocketConfig.minStage != rocketConfig.maxStage) "${rocketConfig.minStage}-${rocketConfig.maxStage}" else (rocketConfig.minStage
+                            ?: rocketConfig.maxStage).toString()
+                    add(Triple(Icons.Filled.Stairs, "Stages", stageText))
+                }
+                rocketConfig.maidenFlight?.let {
+                    add(
+                        Triple(
+                            Icons.Filled.CalendarMonth,
+                            "Maiden Flight",
+                            it.toString()
+                        )
                     )
+                }
+                rocketConfig.fastestTurnaround?.takeIf { it.isNotBlank() }
+                    ?.let { add(Triple(Icons.Filled.Timelapse, "Fastest Turnaround", it)) }
+            }
+            if (infoTiles.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    infoTiles.chunked(2).forEach { row ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            row.forEach { (icon, label, value) ->
+                                InfoTile(
+                                    icon = icon,
+                                    label = label,
+                                    value = value,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
                 }
             }
 
-            // Maiden flight
-            rocketConfig.maidenFlight?.let { maidenFlight ->
-                InfoRow(
-                    icon = Icons.Filled.CalendarMonth,
-                    label = "Maiden Flight",
-                    value = maidenFlight.toString()
-                )
+            // Description (overflow-aware)
+            rocketConfig.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                var expanded by remember { mutableStateOf(false) }
+                var hasOverflow by remember { mutableStateOf(false) }
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = desc,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = if (expanded) Int.MAX_VALUE else 5,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 20.sp,
+                        onTextLayout = { result ->
+                            if (!expanded) hasOverflow = result.hasVisualOverflow
+                        }
+                    )
+                    if (hasOverflow || expanded) {
+                        TextButton(onClick = { expanded = !expanded }) {
+                            Text(if (expanded) "Show less" else "Show more")
+                        }
+                    }
+                }
             }
 
             // Status indicators
@@ -601,17 +1167,18 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                 if (rocketConfig.reusable == true) {
                     StatusChip(text = "Reusable", color = Color(0xFF2196F3))
                 }
+                if (rocketConfig.isPlaceholder == true) {
+                    StatusChip(text = "Placeholder", color = MaterialTheme.colorScheme.outline)
+                }
             }
 
-            // Specifications section
+            // Specifications section - Dimensions & Mass
             Text(
                 text = "Specifications",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 4.dp)
             )
-
-            // Specifications grid
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -633,15 +1200,34 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                         )
                     }
                 }
+                rocketConfig.launchMass?.let { mass ->
+                    item {
+                        SpecCard(
+                            label = "Launch Mass",
+                            value = "${mass.toInt()}kg",
+                            icon = Icons.Filled.Scale
+                        )
+                    }
+                }
+                rocketConfig.launchCost?.let { cost ->
+                    item {
+                        SpecCard(
+                            label = "Launch Cost",
+                            value = "${cost}",
+                            icon = Icons.Filled.AttachMoney
+                        )
+                    }
+                }
             }
 
+            // Specifications section - Performance
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 rocketConfig.leoCapacity?.let { leo ->
                     item {
                         SpecCard(
-                            label = "LEO Capacity",
+                            label = "LEO",
                             value = "${leo.toInt()}kg",
                             icon = Icons.Filled.Public
                         )
@@ -650,27 +1236,89 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                 rocketConfig.gtoCapacity?.let { gto ->
                     item {
                         SpecCard(
-                            label = "GTO Capacity",
+                            label = "GTO",
                             value = "${gto.toInt()}kg",
                             icon = Icons.Filled.Satellite
                         )
                     }
                 }
+                rocketConfig.geoCapacity?.let { geo ->
+                    item {
+                        SpecCard(
+                            label = "GEO",
+                            value = "${geo.toInt()}kg",
+                            icon = Icons.Filled.SatelliteAlt
+                        )
+                    }
+                }
+                rocketConfig.ssoCapacity?.let { sso ->
+                    item {
+                        SpecCard(
+                            label = "SSO",
+                            value = "${sso.toInt()}kg",
+                            icon = Icons.Filled.AltRoute
+                        )
+                    }
+                }
+                rocketConfig.toThrust?.let { thrust ->
+                    item {
+                        SpecCard(
+                            label = "Thrust",
+                            value = "${thrust}",
+                            icon = Icons.Filled.Speed
+                        )
+                    }
+                }
+                rocketConfig.apogee?.let { apogee ->
+                    item {
+                        SpecCard(
+                            label = "Apogee",
+                            value = "$apogee",
+                            icon = Icons.Filled.TrendingUp
+                        )
+                    }
+                }
             }
 
-            // Success statistics
+            // Links (Info / Wiki)
+            if (!rocketConfig.infoUrl.isNullOrBlank() || !rocketConfig.wikiUrl.isNullOrBlank()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    rocketConfig.infoUrl?.let { url ->
+                        Button(
+                            onClick = { /* TODO: Open info URL */ },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                        ) { Text("INFO") }
+                    }
+                    rocketConfig.wikiUrl?.let { url ->
+                        Button(
+                            onClick = { /* TODO: Open wiki URL */ },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                        ) { Text("WIKI") }
+                    }
+                }
+            }
+
+            // Launch Statistics
             val totalLaunches = rocketConfig.totalLaunchCount ?: 0
             val successfulLaunches = rocketConfig.successfulLaunches ?: 0
+            val failedLaunches = rocketConfig.failedLaunches ?: 0
+            val pendingLaunches = rocketConfig.pendingLaunches ?: 0
+            val consecutiveSuccessful = rocketConfig.consecutiveSuccessfulLaunches ?: 0
             if (totalLaunches > 0) {
-                val successRate = (successfulLaunches * 100.0 / totalLaunches)
-
                 Text(
                     text = "Launch Statistics",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )
-
+                val successRate = (successfulLaunches * 100.0 / totalLaunches)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -679,16 +1327,122 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.TrendingUp,
                         value = "${successRate.toInt()}%",
-                        label = "Success\nRate"
+                        label = "Success\nRate",
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.BarChart,
                         value = "$totalLaunches",
-                        label = "Total\nLaunches"
+                        label = "Total\nLaunches",
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                     )
                 }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    StatCard(
+                        modifier = Modifier.weight(1f),
+                        icon = Icons.Filled.CheckCircle,
+                        value = "$successfulLaunches",
+                        label = "Successful\nLaunches",
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                    )
+                    StatCard(
+                        modifier = Modifier.weight(1f),
+                        icon = Icons.Filled.Cancel,
+                        value = "$failedLaunches",
+                        label = "Failed\nLaunches",
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (pendingLaunches > 0) {
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Filled.Pending,
+                            value = "$pendingLaunches",
+                            label = "Pending\nLaunches",
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        )
+                    }
+                    if (consecutiveSuccessful > 0) {
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Filled.ThumbUp,
+                            value = "$consecutiveSuccessful",
+                            label = "Consecutive\nSuccess",
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        )
+                    }
+                }
             }
+
+            // Landing Statistics
+            val attemptedLandings = rocketConfig.attemptedLandings ?: 0
+            val successfulLandings = rocketConfig.successfulLandings ?: 0
+            val failedLandings = rocketConfig.failedLandings ?: 0
+            val consecutiveSuccessfulLandings = rocketConfig.consecutiveSuccessfulLandings ?: 0
+            if (attemptedLandings + successfulLandings + failedLandings + consecutiveSuccessfulLandings > 0) {
+                Text(
+                    text = "Landing Statistics",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (attemptedLandings > 0) {
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Filled.Assessment,
+                            value = "$attemptedLandings",
+                            label = "Attempted\nLandings",
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        )
+                    }
+                    if (successfulLandings > 0) {
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Filled.Check,
+                            value = "$successfulLandings",
+                            label = "Successful\nLandings",
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (failedLandings > 0) {
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Filled.Close,
+                            value = "$failedLandings",
+                            label = "Failed\nLandings",
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        )
+                    }
+                    if (consecutiveSuccessfulLandings > 0) {
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Filled.ThumbUp,
+                            value = "$consecutiveSuccessfulLandings",
+                            label = "Consecutive\nSuccess",
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        )
+                    }
+                }
+            }
+
+            // Fastest turnaround (already shown in grid if present)
         }
     }
 }
@@ -780,26 +1534,162 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "🛬 Landing Details",
-                style = MaterialTheme.typography.titleMedium,
+                text = "Landing Details",
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
-            Divider(color = MaterialTheme.colorScheme.outlineVariant)
+            val stagesWithLanding = launcherStages.filter { it.landing != null }
 
-            if (launcherStages.isEmpty() || launcherStages.all { it.landing == null }) {
-                Text(
-                    text = "No landing information available for this mission.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 8.dp)
+            // Guard: if nothing to show, skip rendering content
+            if (stagesWithLanding.isEmpty()) return@Column
+
+            if (stagesWithLanding.size == 1) {
+                // Single landing: show a grid in a single inner card with description
+                val stage = stagesWithLanding.first()
+                Column(
+                    Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Header with stage index and serial if available
+                    val header = buildString {
+                        append("Stage 1")
+                        stage.launcher.serialNumber?.takeIf { it.isNotBlank() }?.let {
+                            append(" • ")
+                            append(it)
+                        }
+                    }
+                    Text(
+                        text = header,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    LandingStageGridContent(stage)
+                    stage.landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                        var expanded by remember { mutableStateOf(false) }
+                        var hasOverflow by remember { mutableStateOf(false) }
+                        Text(
+                            text = desc,
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = if (expanded) Int.MAX_VALUE else 4,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = 20.sp,
+                            onTextLayout = { result ->
+                                if (!expanded) hasOverflow = result.hasVisualOverflow
+                            }
+                        )
+                        if (hasOverflow || expanded) {
+                            TextButton(onClick = {
+                                expanded = !expanded
+                            }) { Text(if (expanded) "Read less" else "Read more") }
+                        }
+                    }
+                }
+            } else {
+                // Multiple landings: show a horizontal scroller of cards
+                val listState = rememberLazyListState()
+                val flingBehavior = rememberSnapFlingBehavior(
+                    lazyListState = listState,
+                    snapPosition = SnapPosition.Start
                 )
-                return@Column
+                LazyRow(
+                    state = listState,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                    flingBehavior = flingBehavior
+                ) {
+                    itemsIndexed(
+                        items = stagesWithLanding,
+                        key = { _, stage -> stage.id }
+                    ) { index, stage ->
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                            modifier = Modifier
+                                .widthIn(min = 260.dp)
+                        ) {
+                            Column(
+                                Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                // Header with stage index and serial if available
+                                val header = buildString {
+                                    append("Stage ${index + 1}")
+                                    stage.launcher.serialNumber?.takeIf { it.isNotBlank() }?.let {
+                                        append(" • ")
+                                        append(it)
+                                    }
+                                }
+                                Text(
+                                    text = header,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                LandingStageGridContent(stage)
+                                stage.landing?.description?.takeIf { it.isNotBlank() }
+                                    ?.let { desc ->
+                                        var expanded by remember { mutableStateOf(false) }
+                                        var hasOverflow by remember { mutableStateOf(false) }
+                                        Text(
+                                            text = desc,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            maxLines = if (expanded) 6 else 3,
+                                            overflow = TextOverflow.Ellipsis,
+                                            lineHeight = 18.sp,
+                                            onTextLayout = { result ->
+                                                if (!expanded) hasOverflow =
+                                                    result.hasVisualOverflow
+                                            }
+                                        )
+                                        if (hasOverflow || expanded) {
+                                            TextButton(onClick = { expanded = !expanded }) {
+                                                Text(if (expanded) "Read less" else "Read more")
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                }
             }
+        }
+    }
+}
 
-            launcherStages.forEach { stage ->
-                stage.landing?.let { landing ->
-                    LauncherStageItem(stage = stage, landing = landing)
+// Landing Details Style enum and implementations
+
+private enum class LandingDetailsStyle { Chips, Grid, Sections, Linear }
+
+@Composable
+private fun LandingStylePicker(
+    selected: LandingDetailsStyle,
+    onSelected: (LandingDetailsStyle) -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        val options = listOf(
+            LandingDetailsStyle.Chips to "Chips",
+            LandingDetailsStyle.Grid to "Grid",
+            LandingDetailsStyle.Sections to "Sections",
+            LandingDetailsStyle.Linear to "Linear",
+        )
+        options.forEach { (style, label) ->
+            val isSelected = style == selected
+            if (isSelected) {
+                FilledTonalButton(
+                    onClick = { onSelected(style) },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(label)
+                }
+            } else {
+                OutlinedButton(
+                    onClick = { onSelected(style) },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(label)
                 }
             }
         }
@@ -807,61 +1697,305 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
 }
 
 @Composable
-private fun LauncherStageItem(
-    stage: FirstStageNormal,
-    landing: Landing
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Landing attempt status
-        landing.attempt?.let { attempt ->
-            InfoRow(
-                icon = if (attempt) Icons.Filled.FlightTakeoff else Icons.Filled.Cancel,
-                label = "Landing Attempt",
-                value = if (attempt) "Yes" else "No"
-            )
+private fun LandingStageChipsContent(stage: FirstStageNormal) {
+    val landing = stage.landing
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            item { InfoChip(icon = Icons.Filled.Category, text = stage.type) }
+            stage.reused?.let { reused ->
+                item {
+                    InfoChip(
+                        icon = Icons.Filled.Repeat,
+                        text = if (reused) "Reused" else "New"
+                    )
+                }
+            }
+            stage.launcherFlightNumber?.let { num ->
+                item {
+                    InfoChip(
+                        icon = Icons.Filled.Label,
+                        text = "Flight #$num"
+                    )
+                }
+            }
+            landing?.type?.name?.let { typeName ->
+                item {
+                    InfoChip(
+                        icon = Icons.Filled.FlightLand,
+                        text = typeName
+                    )
+                }
+            }
+            landing?.success?.let { success ->
+                item {
+                    InfoChip(
+                        icon = if (success) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
+                        text = if (success) "Success" else "Failure"
+                    )
+                }
+            }
         }
-
-        // Landing location
-        landing.landingLocation?.name?.let { location ->
-            InfoRow(
-                icon = Icons.Filled.LocationOn,
-                label = "Landing Location",
-                value = location
-            )
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            landing?.landingLocation?.name?.let { name ->
+                item {
+                    InfoChip(
+                        icon = Icons.Filled.LocationOn,
+                        text = name
+                    )
+                }
+            }
+            landing?.downrangeDistance?.let { dr ->
+                item {
+                    InfoChip(
+                        icon = Icons.Filled.TrendingUp,
+                        text = "${dr} km"
+                    )
+                }
+            }
+            stage.previousFlightDate?.let { prev ->
+                item {
+                    InfoChip(
+                        icon = Icons.Filled.Schedule,
+                        text = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(
+                            prev
+                        )
+                    )
+                }
+            }
+            stage.turnAroundTime?.takeIf { it.isNotBlank() }
+                ?.let { tat -> item { InfoChip(icon = Icons.Filled.Timelapse, text = tat) } }
         }
-
-        // Landing type
-        landing.type?.name?.let { type ->
-            InfoRow(
-                icon = Icons.Filled.Category,
-                label = "Landing Type",
-                value = type
-            )
-        }
-
-        // Landing success
-        landing.success?.let { success ->
-            InfoRow(
-                icon = if (success) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
-                label = "Landing Status",
-                value = if (success) "Successful" else "Failed"
-            )
-        }
-
-        // Previous flights (if reused booster)
-        stage.launcher?.flights?.let { flights ->
-            if (flights > 1) {
-                InfoRow(
-                    icon = Icons.Filled.Repeat,
-                    label = "Previous Flights",
-                    value = "${flights - 1}"
+        landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
+            var expanded by remember { mutableStateOf(false) }
+            var hasOverflow by remember { mutableStateOf(false) }
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = desc,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = if (expanded) Int.MAX_VALUE else 4,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 20.sp,
+                    onTextLayout = { result ->
+                        if (!expanded) hasOverflow = result.hasVisualOverflow
+                    }
                 )
+                if (hasOverflow || expanded) {
+                    TextButton(onClick = {
+                        expanded = !expanded
+                    }) { Text(if (expanded) "Read less" else "Read more") }
+                }
             }
         }
     }
 }
+
+@Composable
+private fun LandingStageGridContent(stage: FirstStageNormal) {
+    val landing = stage.landing
+    val tiles = buildList {
+        add(Triple(Icons.Filled.Category, "Stage Type", stage.type))
+        stage.reused?.let { add(Triple(Icons.Filled.Repeat, "Reused", if (it) "Yes" else "No")) }
+        stage.launcherFlightNumber?.let { add(Triple(Icons.Filled.Label, "Flight #", "$it")) }
+        stage.previousFlightDate?.let {
+            add(
+                Triple(
+                    Icons.Filled.Schedule,
+                    "Prev. Flight",
+                    me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(it)
+                )
+            )
+        }
+        stage.turnAroundTime?.takeIf { it.isNotBlank() }
+            ?.let { add(Triple(Icons.Filled.Timelapse, "Turnaround", it)) }
+        landing?.landingLocation?.name?.let { add(Triple(Icons.Filled.LocationOn, "Location", it)) }
+        landing?.type?.name?.let { add(Triple(Icons.Filled.FlightLand, "Landing Type", it)) }
+        landing?.downrangeDistance?.let {
+            add(
+                Triple(
+                    Icons.Filled.TrendingUp,
+                    "Downrange",
+                    "${it} km"
+                )
+            )
+        }
+        landing?.attempt?.let {
+            add(
+                Triple(
+                    Icons.Filled.FlightTakeoff,
+                    "Attempt",
+                    if (it) "Yes" else "No"
+                )
+            )
+        }
+        landing?.success?.let {
+            add(
+                Triple(
+                    if (it) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
+                    "Result",
+                    if (it) "Success" else "Failure"
+                )
+            )
+        }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        tiles.chunked(2).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                row.forEach { (icon, label, value) ->
+                    InfoTile(
+                        icon = icon,
+                        label = label,
+                        value = value,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LandingStageSectionedContent(stage: FirstStageNormal) {
+    val landing = stage.landing
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
+            Text(
+                text = "Summary",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+            var expanded by remember { mutableStateOf(false) }
+            var hasOverflow by remember { mutableStateOf(false) }
+            Text(
+                text = desc,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = if (expanded) Int.MAX_VALUE else 5,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 20.sp,
+                onTextLayout = { result -> if (!expanded) hasOverflow = result.hasVisualOverflow }
+            )
+            if (hasOverflow || expanded) {
+                TextButton(onClick = {
+                    expanded = !expanded
+                }) { Text(if (expanded) "Show less" else "Show more") }
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        }
+
+        Text(
+            text = "Stage",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold
+        )
+        val stageDetails = listOfNotNull(
+            "Stage Type" to stage.type,
+            stage.reused?.let { "Reused" to if (it) "Yes" else "No" },
+            stage.launcherFlightNumber?.let { "Flight #" to "$it" },
+            stage.previousFlightDate?.let {
+                "Prev. Flight" to me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(
+                    it
+                )
+            },
+            stage.turnAroundTime?.takeIf { it.isNotBlank() }?.let { "Turnaround" to it },
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            stageDetails.forEach { (label, value) ->
+                InfoRow(icon = Icons.Filled.Label, label = label, value = value)
+            }
+        }
+
+        landing?.let { l ->
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Text(
+                text = "Landing",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+            val landingDetails = listOfNotNull(
+                l.landingLocation?.name?.let { "Location" to it },
+                l.type?.name?.let { "Type" to it },
+                l.downrangeDistance?.let { "Downrange" to "${it} km" },
+                l.attempt?.let { "Attempt" to if (it) "Yes" else "No" },
+                l.success?.let { "Result" to if (it) "Success" else "Failure" },
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                landingDetails.forEach { (label, value) ->
+                    InfoRow(icon = Icons.Filled.Label, label = label, value = value)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LandingStageLinearContent(stage: FirstStageNormal) {
+    val landing = stage.landing
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        InfoRow(icon = Icons.Filled.Category, label = "Stage Type", value = stage.type)
+        stage.reused?.let {
+            InfoRow(
+                icon = Icons.Filled.Repeat,
+                label = "Reused",
+                value = if (it) "Yes" else "No"
+            )
+        }
+        stage.launcherFlightNumber?.let {
+            InfoRow(
+                icon = Icons.Filled.Label,
+                label = "Flight #",
+                value = "$it"
+            )
+        }
+        stage.previousFlightDate?.let {
+            InfoRow(
+                icon = Icons.Filled.Schedule,
+                label = "Prev. Flight",
+                value = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(it)
+            )
+        }
+        stage.turnAroundTime?.takeIf { it.isNotBlank() }
+            ?.let { InfoRow(icon = Icons.Filled.Timelapse, label = "Turnaround", value = it) }
+        landing?.landingLocation?.name?.let {
+            InfoRow(
+                icon = Icons.Filled.LocationOn,
+                label = "Landing Location",
+                value = it
+            )
+        }
+        landing?.type?.name?.let {
+            InfoRow(
+                icon = Icons.Filled.FlightLand,
+                label = "Landing Type",
+                value = it
+            )
+        }
+        landing?.downrangeDistance?.let {
+            InfoRow(
+                icon = Icons.Filled.TrendingUp,
+                label = "Downrange",
+                value = "${it} km"
+            )
+        }
+        landing?.attempt?.let {
+            InfoRow(
+                icon = Icons.Filled.FlightTakeoff,
+                label = "Attempt",
+                value = if (it) "Yes" else "No"
+            )
+        }
+        landing?.success?.let {
+            InfoRow(
+                icon = if (it) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
+                label = "Result",
+                value = if (it) "Success" else "Failure"
+            )
+        }
+        landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
+            Text(text = desc, style = MaterialTheme.typography.bodyMedium, lineHeight = 20.sp)
+        }
+    }
+}
+
 
 @Composable
 private fun AgencyDetailsCard(agency: AgencyDetailed) {
@@ -875,12 +2009,10 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "🏢 Launch Service Provider",
-                style = MaterialTheme.typography.titleMedium,
+                text = "Launch Service Provider",
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-
-            Divider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // Agency header with logo
             Row(
@@ -914,34 +2046,39 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
                 }
             }
 
-            // Agency details
-            agency.type?.name?.let { type ->
-                InfoRow(
-                    icon = Icons.Filled.Business,
-                    label = "Type",
-                    value = type
-                )
+            // Grid of key details (above countries)
+            val infoTiles = buildList {
+                agency.type?.name?.takeIf { it.isNotBlank() }?.let {
+                    add(Triple(Icons.Filled.Business, "Type", it))
+                }
+                agency.foundingYear?.let { year ->
+                    add(Triple(Icons.Filled.CalendarToday, "Founded", year.toString()))
+                }
+                agency.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
+                    add(Triple(Icons.Filled.Person, "Administrator", admin))
+                }
+            }
+            if (infoTiles.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    infoTiles.chunked(2).forEach { row ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            row.forEach { (icon, label, value) ->
+                                InfoTile(
+                                    icon = icon,
+                                    label = label,
+                                    value = value,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
             }
 
-            // Country with flag
+            // Countries as chips (moved below grid)
             if (!agency.country.isNullOrEmpty()) {
                 CountryInfoRow(countries = agency.country)
-            }
-
-            agency.foundingYear?.let { year ->
-                InfoRow(
-                    icon = Icons.Filled.CalendarToday,
-                    label = "Founded",
-                    value = year.toString()
-                )
-            }
-
-            agency.administrator?.let { admin ->
-                InfoRow(
-                    icon = Icons.Filled.Person,
-                    label = "Administrator",
-                    value = admin
-                )
             }
 
             // Launch statistics
@@ -966,13 +2103,15 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.TrendingUp,
                         value = "${successRate.toInt()}%",
-                        label = "Success\nRate"
+                        label = "Success\nRate",
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.RocketLaunch,
                         value = "$totalLaunches",
-                        label = "Total\nLaunches"
+                        label = "Total\nLaunches",
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                     )
                 }
 
@@ -984,13 +2123,15 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.CheckCircle,
                         value = "$successfulLaunches",
-                        label = "Successful\nLaunches"
+                        label = "Successful\nLaunches",
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.Cancel,
                         value = "$failedLaunches",
-                        label = "Failed\nLaunches"
+                        label = "Failed\nLaunches",
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                     )
                 }
             }
@@ -1136,40 +2277,38 @@ private fun CountryInfoRow(countries: List<Country>) {
 
 @Composable
 private fun CountryChip(country: Country) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = Modifier.clip(RoundedCornerShape(12.dp))
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            // Country flag using flagcdn.com API
-            country.alpha2Code?.let { countryCode ->
-                val countryFlag = "https://flagcdn.com/w80/${countryCode.lowercase()}.png"
-                println(countryFlag)
+    val label = country.name ?: country.alpha2Code ?: "Unknown"
+    val flagUrl = country.alpha2Code?.let { code ->
+        "https://flagcdn.com/w40/${code.lowercase()}.png"
+    }
+
+    AssistChip(
+        onClick = {},
+        label = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium
+            )
+        },
+        leadingIcon = flagUrl?.let { url ->
+            {
                 AsyncImage(
-                    model = countryFlag,
+                    model = url,
                     contentDescription = "Flag of ${country.name}",
                     modifier = Modifier
-                        .width(24.dp)
-                        .height(18.dp)
+                        .width(18.dp)
+                        .height(12.dp)
                         .clip(RoundedCornerShape(2.dp)),
                     contentScale = ContentScale.Crop
                 )
             }
-
-            country.name?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
+        },
+        shape = RoundedCornerShape(16.dp),
+        colors = AssistChipDefaults.assistChipColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    )
 }
 
 @Composable
@@ -1216,7 +2355,7 @@ private fun ErrorCard(
 
             Text(
                 text = "Oops! Something went wrong",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
