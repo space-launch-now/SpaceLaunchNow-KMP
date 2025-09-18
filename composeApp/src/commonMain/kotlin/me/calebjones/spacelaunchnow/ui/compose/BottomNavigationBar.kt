@@ -9,18 +9,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Home
-import me.calebjones.spacelaunchnow.navigation.Other
+import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         Screen.Home,
-        Screen.Other,
+        Screen.Schedule,
         Screen.Settings
     )
-    
-    val routes = listOf(Home, Other, Settings)
+
+    val routes = listOf(Home, Schedule, Settings)
 
     NavigationBar {
         val navBackStackEntry = navController.currentBackStackEntryAsState()
