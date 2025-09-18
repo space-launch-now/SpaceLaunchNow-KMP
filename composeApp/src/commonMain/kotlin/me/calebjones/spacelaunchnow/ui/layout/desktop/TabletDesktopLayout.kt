@@ -36,7 +36,13 @@ import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.runtime.CompositionLocalProvider
+import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
+import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun TabletDesktopLayout() {
     val navController = rememberNavController()
@@ -44,84 +50,99 @@ fun TabletDesktopLayout() {
     val currentDestination = navBackStackEntry?.destination
     
     SpaceLaunchNowTheme {
-        val screens = listOf(Home, Schedule, Settings)
-        val items = listOf("Home", "Schedule", "Settings")
-        val selectedIcons = listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Settings)
+        SharedTransitionLayout {
+            CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+                val screens = listOf(Home, Other, Settings)
+                val items = listOf("Home", "Schedule", "Settings")
+                val selectedIcons =
+                    listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Settings)
 
-        Scaffold {
-            Row(Modifier.fillMaxSize()) {
-                // Sidebar Navigation using NavigationRail
-                Column(
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    NavigationRail(
-                        header = {
-                            Icon(
-                                Icons.Filled.RocketLaunch,
-                                contentDescription = "App",
-                                modifier = Modifier.absolutePadding(left = 8.dp, right = 8.dp, bottom = 32.dp, top = 16.dp)
-                            )
-                        },
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-                    ){
-                        screens.forEachIndexed { index, screen ->
-                            NavigationRailItem(
-                                modifier = Modifier.padding(8.dp),
-                                icon = {
+                Scaffold {
+                    Row(Modifier.fillMaxSize()) {
+                        // Sidebar Navigation using NavigationRail
+                        Column(
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            NavigationRail(
+                                header = {
                                     Icon(
-                                        selectedIcons[index], // Always use same icon for simplicity
-                                        contentDescription = items[index]
+                                        Icons.Filled.RocketLaunch,
+                                        contentDescription = "App",
+                                        modifier = Modifier.absolutePadding(
+                                            left = 8.dp,
+                                            right = 8.dp,
+                                            bottom = 32.dp,
+                                            top = 16.dp
+                                        )
                                     )
                                 },
-                                label = { Text(items[index], color = MaterialTheme.colorScheme.onSurface) },
-                                selected = currentDestination?.route == screen::class.qualifiedName,
-                                onClick = { 
-                                    navController.navigate(screen) {
-                                        // Avoid multiple copies of the same destination
-                                        launchSingleTop = true
-                                        // Restore state when returning to a previously selected screen
-                                        restoreState = true
-                                    }
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                            ) {
+                                screens.forEachIndexed { index, screen ->
+                                    NavigationRailItem(
+                                        modifier = Modifier.padding(8.dp),
+                                        icon = {
+                                            Icon(
+                                                selectedIcons[index], // Always use same icon for simplicity
+                                                contentDescription = items[index]
+                                            )
+                                        },
+                                        label = {
+                                            Text(
+                                                items[index],
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        },
+                                        selected = currentDestination?.route == screen::class.qualifiedName,
+                                        onClick = {
+                                            navController.navigate(screen) {
+                                                // Avoid multiple copies of the same destination
+                                                launchSingleTop = true
+                                                // Restore state when returning to a previously selected screen
+                                                restoreState = true
+                                            }
+                                        }
+                                    )
                                 }
-                            )
+                            }
                         }
-                    }
-                }
-                Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
-                // Main Content
-                Surface(
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    NavHost(
-                        navController = navController,
-                        startDestination = Home,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        composable<Home> {
-                            HomeScreen(navController = navController)
-                        }
-                        composable<Schedule> {
-                            ScheduleScreen(
-                                onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
-                            )
-                        }
-                        composable<Settings> {
-                            SettingsScreen()
-                        }
-                        composable<LaunchDetail> { backStackEntry ->
-                            val launchDetail = backStackEntry.toRoute<LaunchDetail>()
-                            LaunchDetailScreen(
-                                launchId = launchDetail.launchId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composable<EventDetail> { backStackEntry ->
-                            val eventDetail = backStackEntry.toRoute<EventDetail>()
-                            EventDetailScreen(
-                                eventId = eventDetail.eventId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
+                        Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
+                        // Main Content
+                        Surface(
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            NavHost(
+                                navController = navController,
+                                startDestination = Home,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                composableWithCompositionLocal<Home> {
+                                    HomeScreen(navController = navController)
+                                }
+                                composable<Schedule> {
+                                    ScheduleScreen(
+                                        onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
+                                    )
+                                }
+                                composableWithCompositionLocal<Settings> {
+                                    SettingsScreen()
+                                }
+                                composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
+                                    val launchDetail = backStackEntry.toRoute<LaunchDetail>()
+                                    LaunchDetailScreen(
+                                        launchId = launchDetail.launchId,
+                                        onNavigateBack = { navController.popBackStack() }
+                                    )
+                                }
+                                composableWithCompositionLocal<EventDetail> { backStackEntry ->
+                                    val eventDetail = backStackEntry.toRoute<EventDetail>()
+                                    EventDetailScreen(
+                                        eventId = eventDetail.eventId,
+                                        onNavigateBack = { navController.popBackStack() }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
