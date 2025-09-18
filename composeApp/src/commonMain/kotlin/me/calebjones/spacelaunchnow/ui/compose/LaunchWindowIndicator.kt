@@ -9,8 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -19,6 +21,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import kotlin.time.Duration
 
 @Composable
 fun LaunchWindowIndicator(
@@ -30,7 +33,7 @@ fun LaunchWindowIndicator(
     windowBarColor: Color = MaterialTheme.colorScheme.primary,
     dotColor: Color = MaterialTheme.colorScheme.inversePrimary,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    barThickness: Float = 8f
+    barThickness: Float = 14f
 ) {
     Column(
         modifier = modifier
@@ -43,12 +46,12 @@ fun LaunchWindowIndicator(
         ) {
             Text(
                 text = "Launch Window",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.onSurface
             )
             
             // Window duration info aligned to the right
-            val durationMinutes = (windowEnd.epochSeconds - windowStart.epochSeconds) / 60
+            val duration: Duration = windowEnd - windowStart
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 Text(
                     text = "Duration",
@@ -56,10 +59,11 @@ fun LaunchWindowIndicator(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = if (durationMinutes > 0) "$durationMinutes min" else "Instantaneous",
+                    text = if (duration <= Duration.ZERO) "Instantaneous" else formatDurationShort(
+                        duration
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
                 )
             }
         }
@@ -120,16 +124,26 @@ private fun LaunchWindowTimeline(
             cap = StrokeCap.Round
         )
 
-        // Draw window bar with enhanced thickness and gradient effect (active launch window)
+        // Draw window bar with enhanced thickness and subtle gradient (active launch window)
         val windowStartX = startRatio.coerceIn(0f, 1f) * width
         val windowEndX = endRatio.coerceIn(0f, 1f) * width
+
+        val gradientBrush = Brush.linearGradient(
+            colors = listOf(
+                lerp(windowBarColor, Color.White, 0.18f),
+                windowBarColor,
+                lerp(windowBarColor, Color.Black, 0.10f)
+            ),
+            start = Offset(windowStartX, barY),
+            end = Offset(windowEndX, barY)
+        )
         
         // Draw window bar with subtle enhancement
         drawLine(
-            color = windowBarColor,
+            brush = gradientBrush,
             start = Offset(windowStartX, barY),
             end = Offset(windowEndX, barY),
-            strokeWidth = barThickness * 1.2f,
+            strokeWidth = barThickness * 1.4f,
             cap = StrokeCap.Round
         )
 
@@ -139,21 +153,21 @@ private fun LaunchWindowTimeline(
         // Subtle outer glow
         drawCircle(
             color = dotColor.copy(alpha = 0.15f),
-            radius = barThickness * 1.6f,
+            radius = barThickness * 1.8f,
             center = Offset(dotX, barY)
         )
         
         // White highlight ring for contrast
         drawCircle(
             color = Color.White,
-            radius = barThickness * 1.0f,
+            radius = barThickness * 1.6f,
             center = Offset(dotX, barY)
         )
         
         // Main dot - slightly larger
         drawCircle(
             color = dotColor,
-            radius = barThickness * 0.75f,
+            radius = barThickness * 1.4f,
             center = Offset(dotX, barY)
         )        
 
@@ -198,6 +212,17 @@ private fun LaunchWindowTimeline(
                 textLayoutResult = launchTextLayout,
                 topLeft = Offset(launchX, barY + barThickness * 2f)
             )
+        }
+    }
+}
+
+private fun formatDurationShort(duration: Duration): String {
+    return duration.toComponents { days: Long, hours: Int, minutes: Int, seconds: Int, _: Int ->
+        when {
+            days > 0L -> if (hours > 0) "${days}d ${hours}h" else "${days}d"
+            hours > 0 -> if (minutes > 0) "${hours}h ${minutes}m" else "${hours}h"
+            minutes > 0 -> "${minutes}m"
+            else -> "${seconds}s"
         }
     }
 }
