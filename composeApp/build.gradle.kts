@@ -65,6 +65,8 @@ kotlin {
                 implementation(libs.koin.android)
                 implementation(libs.androidx.palette)
                 implementation(libs.coil.compose.android)
+                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+                implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
             }
         }
 
