@@ -114,8 +114,8 @@ fun LaunchCardHeader(
                     .size(logoSize)
                     .clip(CircleShape)
                     .border(
-                        2.dp, 
-                        StatusColorUtil.getLaunchStatusColor(launchData.status?.id), 
+                        2.dp,
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
                         CircleShape
                     ),
                 contentScale = ContentScale.Crop

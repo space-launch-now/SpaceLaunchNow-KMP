@@ -52,7 +52,7 @@ fun TabletDesktopLayout() {
     SpaceLaunchNowTheme {
         SharedTransitionLayout {
             CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-                val screens = listOf(Home, Other, Settings)
+                val screens = listOf(Home, Schedule, Settings)
                 val items = listOf("Home", "Schedule", "Settings")
                 val selectedIcons =
                     listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Settings)
