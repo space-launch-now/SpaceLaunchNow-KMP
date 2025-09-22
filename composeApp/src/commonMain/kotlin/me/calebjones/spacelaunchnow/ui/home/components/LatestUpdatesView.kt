@@ -43,7 +43,7 @@ fun LatestUpdatesView(
     Column(modifier = modifier) {
         when {
             error != null -> {
-                ErrorCard(error = error!!)
+                ErrorCard(error = error!!, onRetry = { homeViewModel.loadUpdates(10) })
             }
             updates.isNotEmpty() -> {
                 LazyRow(
@@ -222,7 +222,8 @@ fun UpdateLoadingCard(
 @Composable
 fun ErrorCard(
     error: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRetry: (() -> Unit)? = null
 ) {
     Card(
         modifier = modifier
@@ -236,18 +237,33 @@ fun ErrorCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
                 text = "Failed to load updates",
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
             Text(
                 text = error,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
             )
+
+            onRetry?.let { retry ->
+                Button(
+                    onClick = retry,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Text("Retry")
+                }
+            }
         }
     }
 }
