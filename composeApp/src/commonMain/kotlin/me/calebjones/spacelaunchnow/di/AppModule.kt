@@ -15,6 +15,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
@@ -23,6 +24,9 @@ import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
+import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 
 expect fun nativeConfig() : KoinAppDeclaration
@@ -45,4 +49,9 @@ val appModule = module {
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::LaunchCache)
+
+    // Notification dependencies
+    singleOf(::PushMessaging)
+    singleOf(::NotificationRepositoryImpl) { bind<NotificationRepository>() }
+    viewModelOf(::SettingsViewModel)
 }

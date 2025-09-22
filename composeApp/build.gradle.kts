@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.openApiGenerator)
+    id("com.google.gms.google-services")
 }
 
 
@@ -67,6 +68,10 @@ kotlin {
                 implementation(libs.coil.compose.android)
                 implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
                 implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+
+                // Firebase dependencies with explicit versions
+                implementation("com.google.firebase:firebase-messaging-ktx:24.1.0")
+                implementation("androidx.work:work-runtime-ktx:2.10.0")
             }
         }
 
