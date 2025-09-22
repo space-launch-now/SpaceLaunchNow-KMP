@@ -1,106 +1,382 @@
 package me.calebjones.spacelaunchnow.ui.detail.compose
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.BoundsTransform
-import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.material.icons.filled.AltRoute
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Details
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Factory
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.FlightLand
+import androidx.compose.material.icons.filled.FlightTakeoff
+import androidx.compose.material.icons.filled.Height
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Pending
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.Rocket
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.Satellite
+import androidx.compose.material.icons.filled.SatelliteAlt
+import androidx.compose.material.icons.filled.Scale
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Stairs
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.ViewColumn
+import androidx.compose.material.icons.filled.WbCloudy
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
-import androidx.compose.ui.unit.max
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.lerp
-import kotlin.math.max
-import kotlin.math.min
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.ui.SharedElementKey
-import me.calebjones.spacelaunchnow.ui.SharedElementType
-import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
-import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
-import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
-import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
-import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
-import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
-import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Landing
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
-import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
-import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
+import me.calebjones.spacelaunchnow.ui.SharedElementKey
+import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
+import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
+import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
+import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
-import kotlin.time.Duration.Companion.seconds
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
+import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
 
 // Keep only TitleHeight which is used for spacing
 private val TitleHeight = 128.dp
+
+@Composable
+private fun PrecisionInfoDialog(
+    netPrecision: NetPrecision?,
+    onDismiss: () -> Unit
+) {
+    val ui = remember(netPrecision) { mapNetPrecisionUi(netPrecision) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("OK") }
+        },
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "Launch Time Precision", style = MaterialTheme.typography.titleLarge)
+            }
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        ui.icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = ui.primary,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                ui.secondary?.let { secondary ->
+                    Text(
+                        text = secondary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = "The launch NET (No Earlier Than) value is supplied by the provider and precision may vary. NET can represent a fully scheduled time, an approximate window, only a year, only a month, etc. Some launches only have rough or placeholder NET values until closer to launch.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+    )
+}
+
+@Composable
+private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
+    var showPrecisionDialog by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Box {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Countdown and status (if NET known)
+                launch.net?.let { launchTime ->
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        LaunchCountdown(
+                            launchTime = launchTime,
+                            statusId = launch.status?.id,
+                            statusName = launch.status?.name
+                        )
+                    }
+                }
+
+                // Major launch info summary (like LaunchInfoCardHeroContent)
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    // Date/time surface (matches old hero band)
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                    ) {
+                        Box {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Column(
+                                        modifier = Modifier.weight(1f),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        launch.net?.let { net ->
+                                            val relativeDateText =
+                                                me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTimeRelative(
+                                                    net
+                                                )
+                                            // Extract just the date part (everything before the time)
+                                            // e.g., "Today at 12:31pm" -> "Today at"
+                                            val dateOnlyText =
+                                                if (relativeDateText.contains(" at ")) {
+                                                    relativeDateText.substringBefore(" at ") + " at"
+                                                } else {
+                                                    // Fallback for other formats
+                                                    relativeDateText.substringBeforeLast(" ")
+                                                }
+                                            Text(
+                                                text = dateOnlyText,
+                                                style = MaterialTheme.typography.labelLarge,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis,
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+                                        Text(
+                                            text = launch.net?.let { formatLaunchTime(it) }
+                                                ?: "TBD",
+                                            style = MaterialTheme.typography.headlineLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+
+                                }
+
+                                // Window indicator (if window exists) - now inside the same surface
+                                if (launch.windowStart != null && launch.windowEnd != null) {
+                                    LaunchWindowIndicator(
+                                        launchTime = launch.net ?: launch.windowStart,
+                                        windowStart = launch.windowStart,
+                                        windowEnd = launch.windowEnd,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 16.dp)
+                                    )
+                                } else {
+                                    // Add some bottom padding when there's no window indicator
+                                    Spacer(modifier = Modifier.height(0.dp))
+                                }
+                            }
+
+                            // Info icon in top-right corner of the surface
+                            launch.netPrecision?.let {
+                                IconButton(
+                                    onClick = { showPrecisionDialog = true },
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(8.dp)
+                                        .size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Info,
+                                        contentDescription = "Launch time precision info",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Metrics grid below
+                val tiles = buildList {
+                    launch.mission?.name?.takeIf { it.isNotBlank() }
+                        ?.let { add(Triple(Icons.Filled.Category, "Mission", it)) }
+                    launch.pad?.let { pad ->
+                        val site = pad.location?.name ?: pad.name ?: "Unknown"
+                        add(
+                            Triple(
+                                Icons.Filled.LocationOn,
+                                "Launch Site",
+                                site
+                            )
+                        )
+                    }
+                    launch.probability?.let { prob ->
+                        add(
+                            Triple(
+                                Icons.Filled.WbCloudy,
+                                "Weather",
+                                "$prob%")
+                        )
+                    }
+                }
+                if (tiles.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        tiles.chunked(2).forEach { row ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                row.forEach { (icon, label, value) ->
+                                    InfoTile(
+                                        icon = icon,
+                                        label = label,
+                                        value = value,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Precision dialog
+    if (showPrecisionDialog) {
+        PrecisionInfoDialog(
+            netPrecision = launch.netPrecision,
+            onDismiss = { showPrecisionDialog = false }
+        )
+    }
+}
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 val snackDetailBoundsTransform = BoundsTransform { _, _ ->
@@ -119,13 +395,13 @@ fun LaunchDetailView(
     SharedDetailScaffold(
         keyProvider = { type -> SharedElementKey(launch.id, type) },
         titleText = LaunchFormatUtil.formatLaunchTitle(launch),
-        taglineText = launch.launchServiceProvider.name,
+        taglineText = launch.mission?.name,
         imageUrl = launch.image?.imageUrl,
         onNavigateBack = onNavigateBack,
         backgroundColors = listOf(
+            getLaunchStatusColor(launch.status?.id),
             MaterialTheme.colorScheme.primaryContainer,
-            MaterialTheme.colorScheme.surfaceVariant,
-            getLaunchStatusColor(launch.status?.id)
+            MaterialTheme.colorScheme.surfaceVariant
         ),
     ) {
         // Render existing launch detail content inside the shared scaffold body
@@ -142,52 +418,40 @@ private fun LaunchDetailContentInBody(launch: LaunchDetailed) {
     ) {
         Spacer(Modifier.height(TitleHeight - 28.dp))
 
-        // 2. Countdown Card (if upcoming)
-        launch.net?.let { launchTime ->
-                CountdownCard(launch = launch)
-                Spacer(Modifier.height(16.dp))
-        }
-
-        // 2b. Launch Window Card (separate card if window exists)
-        launch.windowStart?.let { ws ->
-            launch.windowEnd?.let { we ->
-                LaunchWindowIndicatorCard(
-                    launchTime = launch.net ?: ws,
-                    windowStart = ws,
-                    windowEnd = we
-                )
-                Spacer(Modifier.height(16.dp))
-            }
-        }
+        // 1. Combined Launch Overview Card (replaces CountdownCard, LaunchWindowIndicatorCard, and LaunchInfoCard)
+        CombinedLaunchOverviewCard(launch = launch)
+        Spacer(Modifier.height(16.dp))
 
         // Now include all the detailed content - no null checks needed
-        // 1. Launch Info Card
-        LaunchInfoCard(launch = launch)
-        Spacer(Modifier.height(16.dp))
-
-        // 3. Quick Stats Grid
+        // 2. Quick Stats Grid
         QuickStatsGrid(launch = launch)
         Spacer(Modifier.height(16.dp))
-        
-        // 4. Mission Details Card
-        launch.mission?.let { mission ->
-            MissionDetailsCard(mission = mission)
+
+        // 3. Timeline Card
+        if (launch.timeline.isNotEmpty()) {
+            TimelineCard(timeline = launch.timeline)
             Spacer(Modifier.height(16.dp))
         }
-        
-        // 5. Launch Vehicle Details Card
+
+        // 4. Mission Details Card
+        launch.mission?.let { mission ->
+            MissionDetailsCard(mission = mission, launch = launch)
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // 4. Launch Vehicle Details Card
         launch.rocket?.configuration?.let { rocketConfig ->
             LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
             Spacer(Modifier.height(16.dp))
         }
-        
-        // 6. Spacecraft Details Card
+
+        // 5. Spacecraft Details Card
         if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
             SpacecraftDetailsCard(spacecraftStages = launch.rocket?.spacecraftStage ?: emptyList())
             Spacer(Modifier.height(16.dp))
         }
-        
-        // 7. Landing Details Card
+
+        // 6. Landing Details Card
         run {
             val landingStages = launch.rocket?.launcherStage ?: emptyList()
             if (landingStages.any { it.landing != null }) {
@@ -195,8 +459,8 @@ private fun LaunchDetailContentInBody(launch: LaunchDetailed) {
                 Spacer(Modifier.height(16.dp))
             }
         }
-        
-        // 8. Agency Card
+
+        // 7. Agency Card
         launch.launchServiceProvider?.let { agency ->
             AgencyDetailsCard(agency = agency)
             Spacer(Modifier.height(16.dp))
@@ -277,172 +541,9 @@ private fun InfoChip(icon: ImageVector, text: String) {
     }
 }
 
-@Composable
-private fun LaunchInfoCardHeroContent(launch: LaunchDetailed) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Hero band
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = launch.net?.let { formatLaunchTime(it) } ?: "TBD",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    launch.net?.let {
-                        Text(
-                            text = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTimeRelative(
-                                it
-                            ),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    PrecisionBadge(
-                        netPrecision = launch.netPrecision,
-                    )
-                }
-            }
-        }
 
-        // Metrics grid below
-        val tiles = buildList {
-            launch.mission?.name?.takeIf { it.isNotBlank() }
-                ?.let { add(Triple(Icons.Filled.Rocket, "Mission", it)) }
-            launch.launchDesignator?.takeIf { it.isNotBlank() }
-                ?.let { add(Triple(Icons.Filled.Tag, "Designation", it)) }
-            launch.pad?.let { pad ->
-                val site = listOfNotNull(pad.name, pad.location?.name).joinToString(" - ")
-                if (site.isNotBlank()) add(Triple(Icons.Filled.LocationOn, "Launch Site", site))
-            }
-        }
-        if (tiles.isNotEmpty()) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                tiles.chunked(2).forEach { row ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        row.forEach { (icon, label, value) ->
-                            InfoTile(
-                                icon = icon,
-                                label = label,
-                                value = value,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                        if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-            }
-        }
-    }
-}
 
-@Composable
-private fun LaunchInfoCard(launch: LaunchDetailed) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Hero layout selected by default
-            LaunchInfoCardHeroContent(launch)
-        }
-    }
-}
 
-@Composable
-private fun LaunchInfoCardLinearContent(launch: LaunchDetailed) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // Mission name
-        launch.mission?.name?.let { missionName ->
-            InfoRow(
-                icon = Icons.Filled.Rocket,
-                label = "Mission",
-                value = missionName
-            )
-        }
-
-        // Launch designation
-        launch.launchDesignator?.let { designator ->
-            InfoRow(
-                icon = Icons.Filled.Tag,
-                label = "Designation",
-                value = designator
-            )
-        }
-
-        // Launch site
-        launch.pad?.let { pad ->
-            InfoRow(
-                icon = Icons.Filled.LocationOn,
-                label = "Launch Site",
-                value = "${pad.name} - ${pad.location?.name ?: ""}"
-            )
-        }
-
-        // Launch time
-        launch.net?.let { launchTime ->
-            InfoRow(
-                icon = Icons.Filled.Schedule,
-                label = "Launch Time",
-                value = formatLaunchTime(launchTime)
-            )
-        }
-
-        // Status
-        launch.status?.let { status ->
-            InfoRow(
-                icon = Icons.Filled.Flag,
-                label = "Status",
-                value = status.name
-            )
-        }
-    }
-}
-
-@Composable
-private fun CountdownCard(launch: LaunchDetailed) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            launch.net?.let { launchTime ->
-                LaunchCountdown(
-                    launchTime = launchTime,
-                    statusId = launch.status?.id,
-                    statusName = launch.status?.name
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun QuickStatsGrid(launch: LaunchDetailed) {
@@ -452,9 +553,6 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
     val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
 
     val facts = buildList {
-        launch.probability?.let { prob ->
-            add(Fact(Icons.AutoMirrored.Filled.TrendingUp, "${prob}%", "Weather\nProb."))
-        }
         launch.orbitalLaunchAttemptCount?.let { count ->
             add(Fact(Icons.Filled.Public, "#${count}", "Launch\nAll Time"))
         }
@@ -505,7 +603,7 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
 }
 
 @Composable
-private fun MissionDetailsCard(mission: Mission) {
+private fun MissionDetailsCard(mission: Mission, launch: LaunchDetailed) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -522,53 +620,21 @@ private fun MissionDetailsCard(mission: Mission) {
             )
 
             // Locked to Chips layout
-            MissionDetailsChipsContent(mission)
+            MissionDetailsChipsContent(launch)
         }
     }
 }
-
-private enum class MissionDetailsStyle { Chips, Grid, Sections, Linear }
-
 @Composable
-private fun MissionStylePicker(
-    selected: MissionDetailsStyle,
-    onSelected: (MissionDetailsStyle) -> Unit
-) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        val options = listOf(
-            MissionDetailsStyle.Chips to "Chips",
-            MissionDetailsStyle.Grid to "Grid",
-            MissionDetailsStyle.Sections to "Sections",
-            MissionDetailsStyle.Linear to "Linear",
-        )
-        options.forEach { (style, label) ->
-            val isSelected = style == selected
-            if (isSelected) {
-                FilledTonalButton(
-                    onClick = { onSelected(style) },
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(label)
-                }
-            } else {
-                OutlinedButton(
-                    onClick = { onSelected(style) },
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(label)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MissionDetailsChipsContent(mission: Mission) {
+private fun MissionDetailsChipsContent(launch: LaunchDetailed) {
+    val mission = launch.mission ?: return
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Tag chips row for type and orbit
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            mission.type?.takeIf { it.isNotBlank() }?.let { type ->
+            mission.type.takeIf { it.isNotBlank() }?.let { type ->
                 item { InfoChip(icon = Icons.Filled.Category, text = type) }
+            }
+            launch.launchDesignator?.takeIf { it.isNotBlank() }?.let { launchDesignator ->
+                item { InfoChip(icon = Icons.Filled.Details, text = launchDesignator) }
             }
             mission.orbit?.name?.takeIf { it.isNotBlank() }?.let { orbitName ->
                 item { InfoChip(icon = Icons.Filled.Public, text = orbitName) }
@@ -872,44 +938,25 @@ private fun StatCard(
     }
 }
 
-@Composable
-private fun StatusBadge(
-    statusName: String,
-    statusId: Int?
-) {
-    val backgroundColor = when (statusId) {
-        1, 3 -> Color(0xFF4CAF50) // Go/Success - Green
-        2, 4 -> Color(0xFFF44336) // Hold/Failure - Red
-        6 -> Color(0xFF2196F3)    // In Flight - Blue
-        else -> Color(0xFFFF9800) // Default - Orange
-    }
 
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = backgroundColor,
-        modifier = Modifier.clip(RoundedCornerShape(12.dp))
-    ) {
-        Text(
-            text = statusName,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White,
-            fontWeight = FontWeight.Medium
-        )
-    }
-}
 
 @Composable
 private fun PrecisionBadge(
     netPrecision: NetPrecision?,
 ) {
-
     val ui = remember(netPrecision) { mapNetPrecisionUi(netPrecision) }
+    var expanded by remember { mutableStateOf(false) }
 
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.tertiaryContainer,
-        modifier = Modifier.clip(RoundedCornerShape(12.dp))
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable {
+                if (ui.secondary != null) {
+                    expanded = !expanded
+                }
+            }
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
@@ -924,21 +971,27 @@ private fun PrecisionBadge(
             )
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
-                    text = "NET: ${ui.primary}",
+                    text = ui.primary,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                ui.secondary?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.85f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                AnimatedVisibility(
+                    visible = expanded && ui.secondary != null,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { -it / 2 }),
+                    exit = fadeOut() + slideOutVertically(targetOffsetY = { -it / 2 })
+                ) {
+                    ui.secondary?.let { secondary ->
+                        Text(
+                            text = secondary,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.85f),
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }
@@ -953,8 +1006,8 @@ private data class PrecisionUi(
 
 private fun mapNetPrecisionUi(netPrecision: NetPrecision?): PrecisionUi {
     // Defaults
-    val defaultPrimary = netPrecision?.abbrev?.takeIf { it.isNotBlank() }
-        ?: netPrecision?.name?.takeIf { it.isNotBlank() }
+    val defaultPrimary = netPrecision?.name?.takeIf { it.isNotBlank() }
+        ?: netPrecision?.abbrev?.takeIf { it.isNotBlank() }
         ?: "Unknown"
     val fallbackSecondary = netPrecision?.description?.takeIf { it.isNotBlank() }
 
@@ -1036,25 +1089,6 @@ private fun LiveBadge() {
     }
 }
 
-@Composable
-private fun LaunchWindowIndicatorCard(
-    launchTime: Instant,
-    windowStart: Instant,
-    windowEnd: Instant,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        LaunchWindowIndicator(
-            launchTime = launchTime,
-            windowStart = windowStart,
-            windowEnd = windowEnd,
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
 
 @Composable
 private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
@@ -1117,17 +1151,30 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
             }
             if (infoTiles.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    infoTiles.chunked(2).forEach { row ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            row.forEach { (icon, label, value) ->
-                                InfoTile(
-                                    icon = icon,
-                                    label = label,
-                                    value = value,
-                                    modifier = Modifier.weight(1f)
-                                )
+                    infoTiles.chunked(2).forEachIndexed { rowIndex, row ->
+                        var visible by remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) {
+                            kotlinx.coroutines.delay(rowIndex * 150L)
+                            visible = true
+                        }
+                        AnimatedVisibility(
+                            visible = visible,
+                            enter = fadeIn(tween(300)) + slideInVertically(
+                                animationSpec = tween(300),
+                                initialOffsetY = { it / 3 }
+                            )
+                        ) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                row.forEach { (icon, label, value) ->
+                                    InfoTile(
+                                        icon = icon,
+                                        label = label,
+                                        value = value,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
                             }
-                            if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
                         }
                     }
                 }
@@ -2324,6 +2371,152 @@ private fun AgencyChip(agencyName: String) {
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Medium
         )
+    }
+}
+
+// TimelineCard: shows a vertical timeline with expand/collapse
+
+@Composable
+private fun TimelineCard(timeline: List<TimelineEvent>) {
+    var expanded by remember { mutableStateOf(false) }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Header with just the title
+            Text(
+                text = "Timeline",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Timeline vertical
+            Column(
+                verticalArrangement = Arrangement.spacedBy(0.dp)
+            ) {
+                val displayItems = if (expanded) timeline else timeline.take(4)
+                displayItems.forEachIndexed { idx, event ->
+                    TimelineEventRow(
+                        event = event,
+                        isFirst = idx == 0,
+                        isLast = idx == displayItems.lastIndex
+                    )
+                }
+            }
+
+            // Show more button centered at bottom (if there are more than 4 items)
+            if (timeline.size > 4) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(
+                        onClick = { expanded = !expanded }
+                    ) {
+                        Text(if (expanded) "Show less" else "Show more")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimelineEventRow(
+    event: TimelineEvent,
+    isFirst: Boolean,
+    isLast: Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.Top
+    ) {
+        // Timeline indicator column (dot and connecting lines)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(24.dp)
+        ) {
+            // Top connecting line (if not first item) - extends from previous item
+            if (!isFirst) {
+                Box(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .height(20.dp)
+                        .background(MaterialTheme.colorScheme.outline)
+                )
+            }
+
+            // Timeline dot
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(
+                        MaterialTheme.colorScheme.primary,
+                        CircleShape
+                    )
+            )
+
+            // Bottom connecting line (if not last item) - extends to next item
+            if (!isLast) {
+                Box(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .height(44.dp)
+                        .background(MaterialTheme.colorScheme.outline)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // Content column with event details
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(bottom = if (!isLast) 12.dp else 4.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // Event abbreviation/name
+                    Text(
+                        text = event.type?.abbrev ?: "Event",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    // Event description
+                    if (!event.type?.description.isNullOrEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = event.type?.description ?: "",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+
+                // Relative time at the end of the line
+                Text(
+                    text = formatTimelineRelativeTime(event.relativeTime),
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
     }
 }
 
