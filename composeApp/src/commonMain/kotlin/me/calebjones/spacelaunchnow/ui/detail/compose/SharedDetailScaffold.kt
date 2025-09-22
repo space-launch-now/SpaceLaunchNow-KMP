@@ -202,7 +202,7 @@ private fun SharedDetailBody(scroll: ScrollState, content: @Composable () -> Uni
             ) {
                 Spacer(Modifier.height(GradientScroll))
                 Spacer(Modifier.height(ImageOverlap))
-//                Spacer(Modifier.height(MinTitleOffset))
+//              Spacer(Modifier.height(MinTitleOffset))
                 Surface(
                     Modifier
                         .fillMaxWidth()
