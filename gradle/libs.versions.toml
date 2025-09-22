@@ -41,6 +41,8 @@ materialKolor = "3.0.1"
 
 composeIcons = "1.1.1"
 
+googleServices = "4.4.2"
+
 [libraries]
 materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 
@@ -122,3 +124,4 @@ openApiGenerator = { id = "org.openapi.generator", version = "7.15.0" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "compose" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "compose"}
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
