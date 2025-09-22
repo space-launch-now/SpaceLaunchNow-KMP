@@ -39,7 +39,7 @@ private val CARD_SPACING = 16.dp
 fun LaunchListView(viewModel: HomeViewModel) {
     val launches by viewModel.upcomingLaunches.collectAsState()
     val error by viewModel.upcomingLaunchesError.collectAsState()
-    val isLoading by viewModel.isFeaturedLaunchLoading.collectAsState()
+    val isLoading by viewModel.isUpcomingLaunchesLoading.collectAsState()
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     
@@ -47,11 +47,16 @@ fun LaunchListView(viewModel: HomeViewModel) {
     var isDragging by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadUpcomingLaunches(limit = 10)
+        if (launches.isEmpty() && !isLoading && error == null) {
+            viewModel.loadUpcomingLaunches(limit = 10)
+        }
     }
 
     if (error != null) {
-        Text(text = "Error: $error")
+        LaunchListErrorCard(
+            error = error!!,
+            onRetry = { viewModel.loadUpcomingLaunches(limit = 10, forceRefresh = true) }
+        )
     } else if (launches.isNotEmpty()) {
         val launchNormalList = launches
 
@@ -238,6 +243,52 @@ fun ProgramChip(
                 ),
                 maxLines = 1
             )
+        }
+    }
+}
+
+@Composable
+fun LaunchListErrorCard(
+    error: String,
+    onRetry: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Failed to load launches",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            Text(
+                text = error,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
+            )
+
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
+                ),
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                Text("Retry")
+            }
         }
     }
 }
