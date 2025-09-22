@@ -379,6 +379,49 @@ class HomeViewModel(
     }
 
     /**
+     * Retries only the failed network requests
+     * Useful for automatically retrying when app comes back from background
+     */
+    fun retryFailedRequests() {
+        viewModelScope.launch {
+            try {
+                clearErrors()
+
+                // Only retry requests that have errors
+                val retryTasks = mutableListOf<suspend () -> Unit>()
+
+                if (_featuredLaunchError.value != null || _upcomingLaunchesError.value != null) {
+                    retryTasks.add { loadUpcomingLaunches(forceRefresh = true) }
+                }
+
+                if (_updatesError.value != null) {
+                    retryTasks.add { loadUpdates(forceRefresh = true) }
+                }
+
+                if (_articlesError.value != null) {
+                    retryTasks.add { loadArticles(forceRefresh = true) }
+                }
+
+                if (_eventsError.value != null) {
+                    retryTasks.add { loadEvents(forceRefresh = true) }
+                }
+
+                // Execute all retry tasks in parallel
+                if (retryTasks.isNotEmpty()) {
+                    println("HomeViewModel: Retrying ${retryTasks.size} failed requests")
+                    val deferredTasks = retryTasks.map { task -> async { task() } }
+                    deferredTasks.forEach { it.await() }
+                    println("HomeViewModel: Retry completed")
+                }
+
+            } catch (exception: Exception) {
+                println("HomeViewModel: Error during retry: ${exception.message}")
+                _error.value = exception.message ?: "Unknown error occurred"
+            }
+        }
+    }
+
+    /**
      * Clears all error states
      */
     fun clearErrors() {

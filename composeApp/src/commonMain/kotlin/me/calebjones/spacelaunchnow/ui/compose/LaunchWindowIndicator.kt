@@ -36,40 +36,19 @@ fun LaunchWindowIndicator(
     barThickness: Float = 14f
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Title and duration row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Text(
-                text = "Launch Window",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            // Window duration info aligned to the right
-            val duration: Duration = windowEnd - windowStart
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                Text(
-                    text = "Duration",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = if (duration <= Duration.ZERO) "Instantaneous" else formatDurationShort(
-                        duration
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(12.dp))
-        
+
+
+
+        Text(
+            text = "Launch Window",
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(4.dp))
         // Timeline indicator
         LaunchWindowTimeline(
             launchTime = launchTime,
@@ -82,8 +61,24 @@ fun LaunchWindowIndicator(
             barThickness = barThickness,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(70.dp)
+                .height(24.dp)
         )
+        Spacer(modifier = Modifier.height(12.dp))
+        val duration: Duration = windowEnd - windowStart
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(
+                text = "Duration",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = if (duration <= Duration.ZERO) "Instantaneous" else formatDurationShort(
+                    duration
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
     }
 }
 
@@ -128,24 +123,52 @@ private fun LaunchWindowTimeline(
         val windowStartX = startRatio.coerceIn(0f, 1f) * width
         val windowEndX = endRatio.coerceIn(0f, 1f) * width
 
-        val gradientBrush = Brush.linearGradient(
-            colors = listOf(
-                lerp(windowBarColor, Color.White, 0.18f),
-                windowBarColor,
-                lerp(windowBarColor, Color.Black, 0.10f)
-            ),
-            start = Offset(windowStartX, barY),
-            end = Offset(windowEndX, barY)
-        )
-        
-        // Draw window bar with subtle enhancement
-        drawLine(
-            brush = gradientBrush,
-            start = Offset(windowStartX, barY),
-            end = Offset(windowEndX, barY),
-            strokeWidth = barThickness * 1.4f,
-            cap = StrokeCap.Round
-        )
+        // Only draw window bar if it's not instantaneous (has meaningful duration)
+        val isInstantaneous = windowStart.epochSeconds == windowEnd.epochSeconds
+        if (!isInstantaneous) {
+            // Ensure minimum window width and valid coordinates
+            val minWindowWidth = maxOf(barThickness * 2f, 2f) // At least 2 pixels
+            val actualWindowStartX = windowStartX.coerceIn(0f, width)
+            val actualWindowEndX = if (windowEndX - windowStartX < minWindowWidth) {
+                (windowStartX + minWindowWidth).coerceIn(0f, width)
+            } else {
+                windowEndX.coerceIn(0f, width)
+            }
+
+            // Only draw window bar if we have valid coordinates and meaningful width
+            if (actualWindowEndX > actualWindowStartX && actualWindowStartX.isFinite() && actualWindowEndX.isFinite()) {
+                try {
+                    // Try to create gradient brush
+                    val gradientBrush = Brush.linearGradient(
+                        colors = listOf(
+                            lerp(windowBarColor, Color.White, 0.18f),
+                            windowBarColor,
+                            lerp(windowBarColor, Color.Black, 0.10f)
+                        ),
+                        start = Offset(actualWindowStartX, barY),
+                        end = Offset(actualWindowEndX, barY)
+                    )
+
+                    // Draw window bar with gradient
+                    drawLine(
+                        brush = gradientBrush,
+                        start = Offset(actualWindowStartX, barY),
+                        end = Offset(actualWindowEndX, barY),
+                        strokeWidth = barThickness * 1.4f,
+                        cap = StrokeCap.Round
+                    )
+                } catch (e: Exception) {
+                    // Fallback to solid color if gradient fails
+                    drawLine(
+                        color = windowBarColor,
+                        start = Offset(actualWindowStartX, barY),
+                        end = Offset(actualWindowEndX, barY),
+                        strokeWidth = barThickness * 1.4f,
+                        cap = StrokeCap.Round
+                    )
+                }
+            }
+        }
 
         // Enhanced launch time indicator - more subtle but still prominent
         val dotX = launchRatio.coerceIn(0f, 1f) * width

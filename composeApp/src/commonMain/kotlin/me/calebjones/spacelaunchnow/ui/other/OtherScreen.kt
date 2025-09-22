@@ -88,6 +88,7 @@ import kotlinx.datetime.toLocalDateTime
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Rocket
+import androidx.compose.animation.core.tween
 
 @Composable
 fun ScheduleScreen(
@@ -283,14 +284,18 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
     )
 
     // Sync tab selection when user swipes pages
-    LaunchedEffect(pagerState.currentPage) {
-        val newTab = if (pagerState.currentPage == 0) ScheduleTab.Upcoming else ScheduleTab.Previous
-        if (newTab != selectedTab) {
-            selectedTab = newTab
-            if (hasValidCache(newTab)) {
-                restoreFromCache(newTab)
-            } else if (uiFor(newTab).items.isEmpty()) {
-                resetAndLoad(newTab)
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+        // Only update selectedTab when the page actually changes and we're not in the middle of scrolling
+        if (!pagerState.isScrollInProgress) {
+            val newTab =
+                if (pagerState.currentPage == 0) ScheduleTab.Upcoming else ScheduleTab.Previous
+            if (newTab != selectedTab) {
+                selectedTab = newTab
+                if (hasValidCache(newTab)) {
+                    restoreFromCache(newTab)
+                } else if (uiFor(newTab).items.isEmpty()) {
+                    resetAndLoad(newTab)
+                }
             }
         }
     }
@@ -299,8 +304,12 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
     fun onTabSelected(tab: ScheduleTab) {
         val target = if (tab == ScheduleTab.Upcoming) 0 else 1
         if (pagerState.currentPage != target) {
+            selectedTab = tab // Update immediately for responsive UI
             scope.launch {
-                pagerState.animateScrollToPage(target)
+                pagerState.animateScrollToPage(
+                    target,
+                    animationSpec = tween(durationMillis = 550)
+                )
             }
         }
     }

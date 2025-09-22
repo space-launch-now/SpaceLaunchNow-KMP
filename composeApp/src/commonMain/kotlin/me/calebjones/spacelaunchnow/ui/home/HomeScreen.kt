@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,8 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.ui.compose.LaunchListShimmer
 import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
 import me.calebjones.spacelaunchnow.ui.compose.UpdatesShimmer
@@ -50,16 +56,35 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(navController: NavController) {
     val homeViewModel = koinViewModel<HomeViewModel>()
     val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
     
     // Individual loading states to ensure ALL network calls are complete
-    val isFeaturedLaunchLoading by homeViewModel.isFeaturedLaunchLoading.collectAsState()
-    val isUpcomingLaunchesLoading by homeViewModel.isUpcomingLaunchesLoading.collectAsState()
-    val isUpdatesLoading by homeViewModel.isUpdatesLoading.collectAsState()
-    val isArticlesLoading by homeViewModel.isArticlesLoading.collectAsState()
-    
+    val isFeaturedLaunchLoading by homeViewModel.isFeaturedLaunchLoading.collectAsStateWithLifecycle()
+    val isUpcomingLaunchesLoading by homeViewModel.isUpcomingLaunchesLoading.collectAsStateWithLifecycle()
+    val isUpdatesLoading by homeViewModel.isUpdatesLoading.collectAsStateWithLifecycle()
+    val isArticlesLoading by homeViewModel.isArticlesLoading.collectAsStateWithLifecycle()
+
+    // Error states
+    val featuredLaunchError by homeViewModel.featuredLaunchError.collectAsStateWithLifecycle()
+    val upcomingLaunchesError by homeViewModel.upcomingLaunchesError.collectAsStateWithLifecycle()
+    val updatesError by homeViewModel.updatesError.collectAsStateWithLifecycle()
+    val articlesError by homeViewModel.articlesError.collectAsStateWithLifecycle()
+
+    // Data states
+    val featuredLaunch by homeViewModel.featuredLaunch.collectAsStateWithLifecycle()
+    val upcomingLaunches by homeViewModel.upcomingLaunches.collectAsStateWithLifecycle()
+    val updates by homeViewModel.updates.collectAsStateWithLifecycle()
+    val articles by homeViewModel.articles.collectAsStateWithLifecycle()
+
     // Wait for ALL network calls to complete (success or error)
     val allNetworkCallsComplete = !isFeaturedLaunchLoading && !isUpcomingLaunchesLoading && !isUpdatesLoading && !isArticlesLoading
-    
+
+    // Check if we have any data or if all failed
+    val hasAnyData =
+        featuredLaunch != null || upcomingLaunches.isNotEmpty() || updates.isNotEmpty() || articles.isNotEmpty()
+    val hasAnyErrors =
+        featuredLaunchError != null || upcomingLaunchesError != null || updatesError != null || articlesError != null
+
     // Animation states
     var showContent by remember { mutableStateOf(false) }
     var hasInitiallyLoaded by remember { mutableStateOf(false) }
@@ -80,7 +105,31 @@ fun HomeScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         homeViewModel.loadHomeScreenData()
     }
-    
+
+    // Monitor lifecycle and retry failed requests when app comes back to foreground
+    DisposableEffect(lifecycleOwner, hasAnyErrors, hasAnyData) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    // App came back to foreground - retry any failed requests
+                    if (hasAnyErrors && !hasAnyData) {
+                        println("HomeScreen: App resumed with errors and no data - retrying requests")
+                        homeViewModel.retryFailedRequests()
+                    } else if (hasAnyErrors) {
+                        println("HomeScreen: App resumed with some errors - retrying failed sections only")
+                        homeViewModel.retryFailedRequests()
+                    }
+                }
+                else -> { /* Handle other lifecycle events if needed */
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     // Handle completion of network calls
     LaunchedEffect(allNetworkCallsComplete) {
         if (allNetworkCallsComplete) {

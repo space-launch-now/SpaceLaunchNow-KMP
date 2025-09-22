@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -50,6 +53,13 @@ fun ArticlesView() {
     val isLoading by homeViewModel.isArticlesLoading.collectAsState()
     val error by homeViewModel.articlesError.collectAsState()
 
+    // Load articles if not already loaded and no error
+    LaunchedEffect(Unit) {
+        if (articles.isEmpty() && !isLoading && error == null) {
+            homeViewModel.loadArticles(5)
+        }
+    }
+
     when {
         isLoading && articles.isEmpty() -> {
             Column {
@@ -59,7 +69,10 @@ fun ArticlesView() {
             }
         }
         error != null -> {
-            ArticleErrorCard(error = error!!)
+            ArticleErrorCard(
+                error = error!!,
+                onRetry = { homeViewModel.loadArticles(5, forceRefresh = true) }
+            )
         }
         articles.isNotEmpty() -> {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
@@ -170,7 +183,10 @@ fun ArticleItem(article: Article) {
 }
 
 @Composable
-fun ArticleErrorCard(error: String) {
+fun ArticleErrorCard(
+    error: String,
+    onRetry: (() -> Unit)? = null
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -183,18 +199,33 @@ fun ArticleErrorCard(error: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
                 text = "Failed to load articles",
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
             Text(
                 text = error,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
             )
+
+            onRetry?.let { retry ->
+                Button(
+                    onClick = retry,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Text("Retry")
+                }
+            }
         }
     }
 }
