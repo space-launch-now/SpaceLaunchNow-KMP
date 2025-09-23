@@ -76,7 +76,7 @@ fun EventDetailView(
         backgroundColors = listOf(
             MaterialTheme.colorScheme.secondary,
             MaterialTheme.colorScheme.secondaryContainer,
-            MaterialTheme.colorScheme.secondaryFixedDim
+            MaterialTheme.colorScheme.onSecondaryContainer
         ),
     ) {
         EventDetailContentInBody(event)

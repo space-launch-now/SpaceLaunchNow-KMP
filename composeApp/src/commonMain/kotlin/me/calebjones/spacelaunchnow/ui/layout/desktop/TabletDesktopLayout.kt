@@ -16,7 +16,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -25,7 +24,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
@@ -33,7 +31,7 @@ import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
-import me.calebjones.spacelaunchnow.ui.other.ScheduleScreen
+import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
@@ -79,7 +77,7 @@ fun TabletDesktopLayout(navController: NavHostController = rememberNavController
                                         )
                                     )
                                 },
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
                             ) {
                                 screens.forEachIndexed { index, screen ->
                                     NavigationRailItem(

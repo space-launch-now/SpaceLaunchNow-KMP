@@ -17,7 +17,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +28,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -63,6 +67,9 @@ import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.ui.SharedElementType
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
+import me.calebjones.spacelaunchnow.isTablet
+import me.calebjones.spacelaunchnow.isLandscape
+import me.calebjones.spacelaunchnow.isDesktop
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -103,6 +110,10 @@ fun SharedDetailScaffold(
     val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
         ?: throw IllegalStateException("No Scope found")
 
+    val isTablet = isTablet()
+    val isLandscape = isLandscape()
+    val isDesktop = isDesktop()
+
     val roundedCornerAnim by animatedVisibilityScope.transition
         .animateDp(label = "rounded corner") { enterExit: EnterExitState ->
             when (enterExit) {
@@ -134,10 +145,72 @@ fun SharedDetailScaffold(
             SharedDetailBackground(keyProvider, bgColors)
 
             val scroll = rememberScrollState(0)
-            SharedDetailBody(scroll, content)
-            SharedDetailTitle(titleText, taglineText, keyProvider, scroll)
-            SharedDetailImage(imageUrl, keyProvider, scroll)
-            SharedDetailUp(onNavigateBack)
+
+            if (isDesktop || (isTablet && isLandscape)) {
+                // Responsive: Landscape/tablet/desktop -- two columns
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = MinTitleOffset)
+                ) {
+                    // Side column for image/title
+                    Column(
+                        modifier = Modifier
+                            .widthIn(min = 340.dp, max = 460.dp)
+                            .fillMaxHeight()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            SharedDetailImage(
+                                imageUrl = imageUrl,
+                                keyProvider = keyProvider,
+                                scroll = scroll,
+                                forceNoCollapse = true
+                            )
+                            SharedDetailUp(onNavigateBack)
+                        }
+                        SharedDetailTitle(
+                            title = titleText,
+                            tagline = taglineText,
+                            keyProvider = keyProvider,
+                            scroll = scroll,
+                            forceNoCollapse = true // desktop: always expanded
+                        )
+                    }
+                    // Main content column
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .verticalScroll(scroll)
+                                .padding(
+                                    top = GradientScroll + ImageOverlap,
+                                    start = HzPadding,
+                                    end = HzPadding
+                                )
+                        ) {
+                            content()
+                        }
+                    }
+                }
+            } else {
+                // Phone: original collapsing layout
+                SharedDetailBody(scroll, content)
+                SharedDetailTitle(
+                    titleText,
+                    taglineText,
+                    keyProvider,
+                    scroll,
+                    forceNoCollapse = false
+                )
+                SharedDetailImage(imageUrl, keyProvider, scroll, forceNoCollapse = false)
+                SharedDetailUp(onNavigateBack)
+            }
         }
     }
 }
@@ -223,7 +296,8 @@ private fun SharedDetailTitle(
     title: String,
     tagline: String?,
     keyProvider: SharedKeyProvider,
-    scroll: ScrollState
+    scroll: ScrollState,
+    forceNoCollapse: Boolean = false,
 ) {
     val maxOffset = with(LocalDensity.current) { MaxTitleOffset.toPx() }
     val minOffset = with(LocalDensity.current) { MinTitleOffset.toPx() }
@@ -234,7 +308,8 @@ private fun SharedDetailTitle(
 
     // Calculate collapse fraction to determine image size and position
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
-    val collapseFraction = (scroll.value / collapseRange).coerceIn(0f, 1f)
+    val collapseFraction =
+        if (forceNoCollapse) 0f else (scroll.value / collapseRange).coerceIn(0f, 1f)
 
     // Calculate current image size and position
     val imageMaxSize = with(LocalDensity.current) { ExpandedImageSize.toPx() }
@@ -243,7 +318,7 @@ private fun SharedDetailTitle(
 
     // Calculate horizontal padding needed to avoid overlap with collapsed image
     val horizontalPaddingPx = with(LocalDensity.current) { HzPadding.toPx() }
-    val rightPaddingPx = if (collapseFraction > 0.5f) {
+    val rightPaddingPx = if (!forceNoCollapse && collapseFraction > 0.5f) {
         horizontalPaddingPx + currentImageSize + with(LocalDensity.current) { 16.dp.toPx() }
     } else {
         horizontalPaddingPx
@@ -256,9 +331,11 @@ private fun SharedDetailTitle(
                 .fillMaxWidth()
                 .heightIn(min = TitleHeight)
                 .statusBarsPadding()
-                .offset {
-                    val offset = (maxOffset - scroll.value).coerceAtLeast(minOffset)
-                    IntOffset(x = 0, y = offset.toInt())
+                .let {
+                    if (forceNoCollapse) it else it.offset {
+                        val offset = (maxOffset - scroll.value).coerceAtLeast(minOffset)
+                        IntOffset(x = 0, y = offset.toInt())
+                    }
                 }
                 .background(MaterialTheme.colorScheme.surfaceContainer),
         ) {
@@ -308,7 +385,8 @@ private fun SharedDetailTitle(
 private fun SharedDetailImage(
     imageUrl: String?,
     keyProvider: SharedKeyProvider,
-    scroll: ScrollState
+    scroll: ScrollState,
+    forceNoCollapse: Boolean = false,
 ) {
     val sharedTransitionScope = LocalSharedTransitionScope.current
         ?: throw IllegalStateException("No sharedTransitionScope found")
@@ -316,7 +394,8 @@ private fun SharedDetailImage(
         ?: throw IllegalStateException("No animatedVisibilityScope found")
 
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
-    val collapseFractionProvider = { (scroll.value / collapseRange).coerceIn(0f, 1f) }
+    val collapseFractionProvider =
+        { if (forceNoCollapse) 0f else (scroll.value / collapseRange).coerceIn(0f, 1f) }
 
     CollapsingImageLayout(
         collapseFractionProvider = collapseFractionProvider,

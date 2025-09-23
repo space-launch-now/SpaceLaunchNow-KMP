@@ -39,7 +39,7 @@ actual fun formatLocalDate(localDateTime: LocalDateTime): String {
         )
         
         // Use Android's locale-aware date formatting
-        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
             .withLocale(Locale.getDefault())
         
         javaDate.format(formatter)
