@@ -122,6 +122,9 @@ kotlin {
                 implementation(libs.dotenv)
 
                 implementation(libs.materialKolor)
+
+                // Compose Multiplatform Media Player
+                implementation(libs.compose.media.player)
             }
         }
         

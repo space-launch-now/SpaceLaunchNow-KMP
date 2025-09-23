@@ -1,8 +1,8 @@
 [versions]
 agp = "8.10.1"
-android-compileSdk = "35"
+android-compileSdk = "36"
 android-minSdk = "26"
-android-targetSdk = "35"
+android-targetSdk = "36"
 androidx-activityCompose = "1.10.1"
 androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
@@ -42,6 +42,9 @@ materialKolor = "3.0.1"
 composeIcons = "1.1.1"
 
 googleServices = "4.4.2"
+
+# Compose Multiplatform Media Player
+composeMediaPlayer = "1.0.46"
 
 [libraries]
 materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
@@ -110,6 +113,7 @@ compose-icons-linea = { module = "br.com.devsrsouza.compose.icons:linea", versio
 compose-icons-octicons = { module = "br.com.devsrsouza.compose.icons:octicons", version.ref = "composeIcons" }
 compose-icons-simpleIcons = { module = "br.com.devsrsouza.compose.icons:simple-icons", version.ref = "composeIcons" }
 compose-icons-tablerIcons = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "composeIcons" }
+compose-media-player = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "composeMediaPlayer" }
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
