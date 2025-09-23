@@ -28,6 +28,7 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         mavenLocal()
+        maven("https://www.jogamp.org/deployment/maven/") // JOGAMP repository for OpenGL dependencies
     }
 }
 

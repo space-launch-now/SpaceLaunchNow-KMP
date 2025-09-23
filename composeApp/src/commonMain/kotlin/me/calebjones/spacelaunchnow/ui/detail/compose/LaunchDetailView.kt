@@ -95,7 +95,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -293,6 +292,14 @@ private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                                             overflow = TextOverflow.Ellipsis,
                                             textAlign = TextAlign.Center
                                         )
+                                        launch.probability?.let { prob ->
+                                            InfoTile(
+                                                icon = Icons.Filled.WbCloudy,
+                                                label = "Weather",
+                                                value = "$prob%",
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
                                     }
 
                                 }
@@ -392,7 +399,8 @@ val snackDetailBoundsTransform = BoundsTransform { _, _ ->
     spring(dampingRatio = 0.8f, stiffness = 380f)
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
+@OptIn(
+    ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class
 )
 @Composable
@@ -1415,14 +1423,14 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                         icon = Icons.Filled.TrendingUp,
                         value = "${successRate.toInt()}%",
                         label = "Success\nRate",
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.BarChart,
                         value = "$totalLaunches",
                         label = "Total\nLaunches",
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
                 Row(
@@ -1434,14 +1442,14 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                         icon = Icons.Filled.CheckCircle,
                         value = "$successfulLaunches",
                         label = "Successful\nLaunches",
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.Cancel,
                         value = "$failedLaunches",
                         label = "Failed\nLaunches",
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
                 Row(
@@ -1454,7 +1462,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                             icon = Icons.Filled.Pending,
                             value = "$pendingLaunches",
                             label = "Pending\nLaunches",
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     }
                     if (consecutiveSuccessful > 0) {
@@ -1463,7 +1471,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                             icon = Icons.Filled.ThumbUp,
                             value = "$consecutiveSuccessful",
                             label = "Consecutive\nSuccess",
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     }
                 }
@@ -1491,7 +1499,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                             icon = Icons.Filled.Assessment,
                             value = "$attemptedLandings",
                             label = "Attempted\nLandings",
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     }
                     if (successfulLandings > 0) {
@@ -1500,7 +1508,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                             icon = Icons.Filled.Check,
                             value = "$successfulLandings",
                             label = "Successful\nLandings",
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     }
                 }
@@ -1514,7 +1522,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                             icon = Icons.Filled.Close,
                             value = "$failedLandings",
                             label = "Failed\nLandings",
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     }
                     if (consecutiveSuccessfulLandings > 0) {
@@ -1523,7 +1531,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                             icon = Icons.Filled.ThumbUp,
                             value = "$consecutiveSuccessfulLandings",
                             label = "Consecutive\nSuccess",
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     }
                 }
@@ -1692,7 +1700,7 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
                     ) { index, stage ->
                         Card(
                             shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                             modifier = Modifier
                                 .widthIn(min = 260.dp)
@@ -2191,14 +2199,14 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
                         icon = Icons.Filled.TrendingUp,
                         value = "${successRate.toInt()}%",
                         label = "Success\nRate",
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.RocketLaunch,
                         value = "$totalLaunches",
                         label = "Total\nLaunches",
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
 
@@ -2211,14 +2219,14 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
                         icon = Icons.Filled.CheckCircle,
                         value = "$successfulLaunches",
                         label = "Successful\nLaunches",
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.Cancel,
                         value = "$failedLaunches",
                         label = "Failed\nLaunches",
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
             }
@@ -2772,35 +2780,93 @@ private fun ErrorCard(
 }
 
 @Composable
-private fun LaunchDetailShimmer() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 16.dp)
+private fun LaunchDetailLoadingContent() {
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        Spacer(Modifier.height(TitleHeight - 28.dp))
+
+        // 1. Combined Launch Overview Card shimmer
+        LoadingCard(height = 200.dp)
+        Spacer(Modifier.height(16.dp))
+
+        // 2. Quick Stats Grid shimmer
+        Text(
+            text = "Quick Facts",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(Modifier.height(16.dp))
+
+        // Two rows of stat cards
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Info card shimmer - With padding
-            repeat(1) {
-                item {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(120.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                            }
-                        }
-                    }
-                }
-            }
+            LoadingCard(modifier = Modifier.weight(1f), height = 96.dp)
+            LoadingCard(modifier = Modifier.weight(1f), height = 96.dp)
+        }
+        Spacer(Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            LoadingCard(modifier = Modifier.weight(1f), height = 96.dp)
+            LoadingCard(modifier = Modifier.weight(1f), height = 96.dp)
+        }
+        Spacer(Modifier.height(16.dp))
+
+        // 3. Video Player Card shimmer (optional)
+        LoadingCard(height = 250.dp)
+        Spacer(Modifier.height(16.dp))
+
+        // 4. Timeline Card shimmer
+        LoadingCard(height = 180.dp)
+        Spacer(Modifier.height(16.dp))
+
+        // 5. Mission Details Card shimmer
+        LoadingCard(height = 150.dp)
+        Spacer(Modifier.height(16.dp))
+
+        // 6. Launch Vehicle Details Card shimmer
+        LoadingCard(height = 200.dp)
+        Spacer(Modifier.height(16.dp))
+
+        // 7. Agency Details Card shimmer
+        LoadingCard(height = 180.dp)
+        Spacer(Modifier.height(16.dp))
+
+        // Bottom spacing
+        Spacer(Modifier.height(200.dp))
+    }
+}
+
+@Composable
+private fun LoadingCard(
+    modifier: Modifier = Modifier,
+    height: androidx.compose.ui.unit.Dp
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+            )
         }
     }
 }
@@ -2844,30 +2910,19 @@ fun LaunchDetailErrorView(
 
 @Composable
 fun LaunchDetailLoadingView(onNavigateBack: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    // Use SharedDetailScaffold to match the responsive behavior of the actual detail view
+    SharedDetailScaffold(
+        keyProvider = { type -> "loading_${type.name}" }, // Use dummy keys for loading
+        titleText = "Loading...",
+        taglineText = null,
+        imageUrl = null, // No image for loading state
+        onNavigateBack = onNavigateBack,
+        backgroundColors = listOf(
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
     ) {
-//        // Back button
-//        IconButton(
-//            onClick = onNavigateBack,
-//            modifier = Modifier
-//                .align(Alignment.TopStart)
-//                .statusBarsPadding()
-//                .padding(16.dp)
-//                .size(36.dp)
-//                .background(
-//                    color = Color(0xff121212).copy(alpha = 0.32f),
-//                    shape = CircleShape,
-//                ),
-//        ) {
-//            Icon(
-//                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-//                contentDescription = "Back",
-//            )
-//        }
-        
-        // Loading content
-        LaunchDetailShimmer()
+        // Loading content that matches the structure of LaunchDetailContentInBody
+        LaunchDetailLoadingContent()
     }
 }

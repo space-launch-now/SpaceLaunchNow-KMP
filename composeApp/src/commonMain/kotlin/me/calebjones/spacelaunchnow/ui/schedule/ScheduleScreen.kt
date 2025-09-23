@@ -1,9 +1,8 @@
 @file:OptIn(ExperimentalMaterialApi::class)
 
-package me.calebjones.spacelaunchnow.ui.other
+package me.calebjones.spacelaunchnow.ui.schedule
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,10 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,17 +21,14 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Surface
@@ -50,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import io.ktor.client.call.body
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -60,11 +54,8 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
-import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeader
-import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
-import me.calebjones.spacelaunchnow.util.StatusColorUtil
 import org.koin.compose.koinInject
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.HorizontalPager
@@ -72,14 +63,12 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.MutableState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.Clock
@@ -89,6 +78,9 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Rocket
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.ui.text.style.TextAlign
+import kotlinx.datetime.Instant
 
 @Composable
 fun ScheduleScreen(
@@ -386,7 +378,7 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
 
             // Tabs
             val selectedTabIndex = if (selectedTab == ScheduleTab.Upcoming) 0 else 1
-            SecondaryTabRow(
+            TabRow(
                 selectedTabIndex = selectedTabIndex,
                 divider = { HorizontalDivider() }
             ) {
@@ -413,9 +405,9 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
                 // Content list for the tab
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 24.dp),
+                    contentPadding = PaddingValues(bottom = 24.dp, top = 8.dp),
                     state = ui.listState,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (ui.error.value != null && ui.items.isEmpty()) {
                         item {
@@ -451,11 +443,14 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
                         }
                     }
 
-                    items(ui.items) { launch ->
+                    itemsIndexed(ui.items) { index, launch ->
                         ScheduleLaunchCard(
                             launch = launch,
                             onClick = { onLaunchClick(launch.id) }
                         )
+                        if (index < ui.items.size - 1) {
+                            HorizontalDivider(thickness = 1.dp, color = DividerDefaults.color)
+                        }
                     }
 
                     if (ui.isLoading.value && ui.items.isNotEmpty()) {
@@ -496,124 +491,87 @@ private fun ScheduleLaunchCard(
     launch: LaunchBasic,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Row(
+    Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
+                .clickable(onClick = onClick),
+        verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Launch Image/Icon
             val imageUrl = launch.image?.thumbnailUrl ?: launch.image?.imageUrl
 
             if (imageUrl != null) {
-                Surface(
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = null,
+                    placeholder = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
+                    error = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
+                    fallback = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
                     modifier = Modifier
-                        .size(64.dp)
-                ) {
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = null,
-                        placeholder = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
-                        error = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
-                        fallback = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(2.dp)
-                            .clip(CircleShape),
-//                            .border(
-//                                width = 2.dp,
-//                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-//                                shape = CircleShape
-//                            ),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                    contentScale = ContentScale.Crop
+                )
             } else {
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "🚀",
-                        style = MaterialTheme.typography.titleMedium
+                    Icon(
+                        imageVector = FontAwesomeIcons.Solid.Rocket,
+                        contentDescription = "placeholder",
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.size(12.dp))
-
+            // Main Content Column
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                // Launch Title
                 Text(
                     text = LaunchFormatUtil.formatLaunchTitle(launch),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
+                // Launch Service Provider
+                Text(
+                    text = launch.launchServiceProvider.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            // Date Column (Right Side)
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Top
+            ) {
                 val dateText = formatDateWithPrecisionFallback(launch)
                 Text(
                     text = dateText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.End
                 )
             }
-
-            Spacer(modifier = Modifier.size(8.dp))
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                launch.status?.let { status ->
-                    InfoChip(
-                        text = status.abbrev ?: status.name,
-                        background = StatusColorUtil.getLaunchStatusColor(status.id)
-                    )
-                }
-
-                launch.netPrecision?.abbrev?.let { abbrev ->
-                    InfoChip(text = abbrev)
-                }
-            }
         }
-    }
-}
-
-@Composable
-private fun InfoChip(text: String, background: Color = MaterialTheme.colorScheme.surfaceVariant) {
-    Surface(
-        color = background,
-        shape = MaterialTheme.shapes.large,
-        shadowElevation = 0.dp
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = if (background == MaterialTheme.colorScheme.surfaceVariant) MaterialTheme.colorScheme.onSurface else Color.White,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
 }
 
 private fun formatDateWithPrecisionFallback(launch: LaunchBasic): String {
@@ -621,7 +579,7 @@ private fun formatDateWithPrecisionFallback(launch: LaunchBasic): String {
     val precisionId = launch.netPrecision?.id
 
     return when (precisionId) {
-        2 -> "NET ${DateTimeUtil.formatLaunchDate(net)}"
+        2 -> DateTimeUtil.formatLaunchDate(net)
         7 -> formatMonthYear(net)
         8, 9, 10, 11 -> "${formatQuarter(net)} ${formatYear(net)}"
         12 -> "H1 ${formatYear(net)}"
@@ -633,7 +591,7 @@ private fun formatDateWithPrecisionFallback(launch: LaunchBasic): String {
     }
 }
 
-private fun formatYear(instant: kotlinx.datetime.Instant): String {
+private fun formatYear(instant: Instant): String {
     return try {
         val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
         ldt.year.toString()
@@ -642,7 +600,7 @@ private fun formatYear(instant: kotlinx.datetime.Instant): String {
     }
 }
 
-private fun formatMonthYear(instant: kotlinx.datetime.Instant): String {
+private fun formatMonthYear(instant: Instant): String {
     return try {
         val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
         val monthYear = DateTimeUtil.formatLaunchDate(instant)
@@ -657,7 +615,7 @@ private fun formatMonthYear(instant: kotlinx.datetime.Instant): String {
     }
 }
 
-private fun formatQuarter(instant: kotlinx.datetime.Instant): String {
+private fun formatQuarter(instant: Instant): String {
     return try {
         val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
         val month = ldt.monthNumber
