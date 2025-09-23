@@ -16,6 +16,21 @@ expect fun getScreenWidth(): Dp
 @Composable
 expect fun getScreenHeight(): Dp
 
+// Orientation management
+expect fun setOrientationLandscape()
+expect fun setOrientationPortrait()
+expect fun setOrientationSensor()
+
+// Orientation management with context (for Composables)
+@Composable
+expect fun setOrientationLandscapeFromComposable()
+
+@Composable
+expect fun setOrientationPortraitFromComposable()
+
+@Composable
+expect fun setOrientationSensorFromComposable()
+
 @Composable
 fun isLandscape(): Boolean {
     return getScreenWidth() > getScreenHeight()

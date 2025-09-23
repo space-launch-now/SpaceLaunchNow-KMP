@@ -10,8 +10,16 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.cache.LaunchCache
+
+data class VideoPlayerState(
+    val selectedVideoIndex: Int = 0,
+    val isPlayerVisible: Boolean = false,
+    val isFullscreen: Boolean = false,
+    val availableVideos: List<VidURL> = emptyList()
+)
 
 class LaunchViewModel(
     private val repository: LaunchRepository,
@@ -36,6 +44,10 @@ class LaunchViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    // Video Player State
+    private val _videoPlayerState = MutableStateFlow(VideoPlayerState())
+    val videoPlayerState: StateFlow<VideoPlayerState> = _videoPlayerState
+
     fun fetchUpcomingLaunchesNormal(limit: Int) {
         viewModelScope.launch {
             val result = repository.getUpcomingLaunchesNormal(limit = limit)
@@ -56,6 +68,7 @@ class LaunchViewModel(
             val cachedDetailed = launchCache.getCachedLaunchDetailed(id)
             if (cachedDetailed != null) {
                 _launchDetails.value = cachedDetailed
+                updateVideoPlayerState(cachedDetailed)
                 _isLoading.value = false
                 return@launch
             }
@@ -65,6 +78,7 @@ class LaunchViewModel(
             val result = repository.getLaunchDetails(id)
             result.onSuccess { launch ->
                 _launchDetails.value = launch
+                updateVideoPlayerState(launch)
                 // Cache the detailed data for future use
                 launchCache.cacheLaunchDetailed(launch)
             }.onFailure { exception ->
@@ -79,6 +93,7 @@ class LaunchViewModel(
      */
     fun setLaunchDetails(launchDetailed: LaunchDetailed) {
         _launchDetails.value = launchDetailed
+        updateVideoPlayerState(launchDetailed)
         _error.value = null
         _isLoading.value = false
     }
@@ -107,5 +122,63 @@ class LaunchViewModel(
                 _error.value = exception.message
             }
         }
+    }
+
+    // Video Player State Management
+
+    private fun updateVideoPlayerState(launch: LaunchDetailed) {
+        val youTubeVideos = launch.vidUrls.filter {
+            me.calebjones.spacelaunchnow.util.VideoUtil.isYouTubeUrl(it.url)
+        }
+
+        _videoPlayerState.value = _videoPlayerState.value.copy(
+            availableVideos = youTubeVideos,
+            selectedVideoIndex = if (youTubeVideos.isNotEmpty())
+                _videoPlayerState.value.selectedVideoIndex.coerceAtMost(youTubeVideos.size - 1)
+            else 0
+        )
+    }
+
+    /**
+     * Select a different video by index
+     */
+    fun selectVideo(index: Int) {
+        val currentState = _videoPlayerState.value
+        if (index >= 0 && index < currentState.availableVideos.size) {
+            _videoPlayerState.value = currentState.copy(
+                selectedVideoIndex = index,
+                isPlayerVisible = false // Reset player when changing videos
+            )
+        }
+    }
+
+    /**
+     * Show/hide the video player
+     */
+    fun setPlayerVisible(visible: Boolean) {
+        _videoPlayerState.value = _videoPlayerState.value.copy(
+            isPlayerVisible = visible
+        )
+    }
+
+    fun setFullscreen(fullscreen: Boolean) {
+        _videoPlayerState.value = _videoPlayerState.value.copy(isFullscreen = fullscreen)
+    }
+
+    /**
+     * Get the currently selected video
+     */
+    fun getCurrentVideo(): VidURL? {
+        val state = _videoPlayerState.value
+        return if (state.selectedVideoIndex < state.availableVideos.size) {
+            state.availableVideos[state.selectedVideoIndex]
+        } else null
+    }
+
+    /**
+     * Check if there are multiple videos available
+     */
+    fun hasMultipleVideos(): Boolean {
+        return _videoPlayerState.value.availableVideos.size > 1
     }
 }

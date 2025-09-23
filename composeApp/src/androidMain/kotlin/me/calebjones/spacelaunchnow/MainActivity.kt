@@ -9,10 +9,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import chaintech.videoplayer.util.PlaybackPreference
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PlaybackPreference.initialize(this)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(
                 Color.TRANSPARENT,

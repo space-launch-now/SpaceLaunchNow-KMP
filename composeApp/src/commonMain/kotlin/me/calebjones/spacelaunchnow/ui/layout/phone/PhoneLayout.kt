@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,19 +29,19 @@ import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.ui.compose.BottomNavigationBar
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.other.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
+import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun PhoneLayout() {
-    val navController = rememberNavController()
-    
+fun PhoneLayout(navController: NavHostController = rememberNavController()) {
     // Observe the current back stack entry
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     
@@ -48,11 +49,14 @@ fun PhoneLayout() {
     val showBottomBar = when (navBackStackEntry?.destination?.route) {
         LaunchDetail::class.qualifiedName -> false // Hide for LaunchDetail
         EventDetail::class.qualifiedName -> false // Hide for EventDetail
+        FullscreenVideo::class.qualifiedName -> false // Hide for FullscreenVideo
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern
             val currentRoute = navBackStackEntry?.destination?.route
-            // If the route contains LaunchDetail class name or pattern, hide bottom bar
-            currentRoute?.contains("LaunchDetail") != true && currentRoute?.contains("EventDetail") != true
+            // If the route contains LaunchDetail, EventDetail, or FullscreenVideo, hide bottom bar
+            currentRoute?.contains("LaunchDetail") != true && currentRoute?.contains("EventDetail") != true && currentRoute?.contains(
+                "FullscreenVideo"
+            ) != true
         }
     }
     
@@ -97,13 +101,22 @@ fun PhoneLayout() {
                             // LaunchDetailScreen gets full screen access (no padding)
                             LaunchDetailScreen(
                                 launchId = launchDetail.launchId,
-                                onNavigateBack = { navController.popBackStack() }
+                                onNavigateBack = { navController.popBackStack() },
+                                navController = navController
                             )
                         }
                         composableWithCompositionLocal<EventDetail> { backStackEntry ->
                             val eventDetail = backStackEntry.toRoute<EventDetail>()
                             EventDetailScreen(
                                 eventId = eventDetail.eventId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
+                            val fullscreenVideo = backStackEntry.toRoute<FullscreenVideo>()
+                            FullscreenVideoScreen(
+                                videoUrl = fullscreenVideo.videoUrl,
+                                launchName = fullscreenVideo.launchName,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

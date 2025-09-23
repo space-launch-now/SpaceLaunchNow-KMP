@@ -11,6 +11,33 @@ class DesktopPlatform: Platform {
 
 actual fun getPlatform(): Platform = DesktopPlatform()
 
+actual fun setOrientationLandscape() {
+    // Desktop doesn't have orientation changes
+}
+
+actual fun setOrientationPortrait() {
+    // Desktop doesn't have orientation changes
+}
+
+actual fun setOrientationSensor() {
+    // Desktop doesn't have orientation changes
+}
+
+@Composable
+actual fun setOrientationLandscapeFromComposable() {
+    // Desktop doesn't have orientation changes
+}
+
+@Composable
+actual fun setOrientationPortraitFromComposable() {
+    // Desktop doesn't have orientation changes
+}
+
+@Composable
+actual fun setOrientationSensorFromComposable() {
+    // Desktop doesn't have orientation changes
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun getScreenWidth() = LocalWindowInfo.current

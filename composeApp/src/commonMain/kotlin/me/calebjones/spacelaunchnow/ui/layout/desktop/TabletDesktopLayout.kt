@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -30,11 +31,13 @@ import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.other.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
+import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -44,8 +47,7 @@ import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLoc
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun TabletDesktopLayout() {
-    val navController = rememberNavController()
+fun TabletDesktopLayout(navController: NavHostController = rememberNavController()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     
@@ -132,13 +134,22 @@ fun TabletDesktopLayout() {
                                     val launchDetail = backStackEntry.toRoute<LaunchDetail>()
                                     LaunchDetailScreen(
                                         launchId = launchDetail.launchId,
-                                        onNavigateBack = { navController.popBackStack() }
+                                        onNavigateBack = { navController.popBackStack() },
+                                        navController = navController
                                     )
                                 }
                                 composableWithCompositionLocal<EventDetail> { backStackEntry ->
                                     val eventDetail = backStackEntry.toRoute<EventDetail>()
                                     EventDetailScreen(
                                         eventId = eventDetail.eventId,
+                                        onNavigateBack = { navController.popBackStack() }
+                                    )
+                                }
+                                composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
+                                    val fullscreenVideo = backStackEntry.toRoute<FullscreenVideo>()
+                                    FullscreenVideoScreen(
+                                        videoUrl = fullscreenVideo.videoUrl,
+                                        launchName = fullscreenVideo.launchName,
                                         onNavigateBack = { navController.popBackStack() }
                                     )
                                 }

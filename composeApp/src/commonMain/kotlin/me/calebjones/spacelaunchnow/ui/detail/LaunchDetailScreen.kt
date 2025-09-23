@@ -5,7 +5,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.navigation.NavHostController
 import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailView
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailErrorView
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailLoadingView
@@ -16,7 +18,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun LaunchDetailScreen(
     launchId: String,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    navController: NavHostController? = null
 ) {
     val viewModel = koinViewModel<LaunchViewModel>()
     val launchCache = koinInject<LaunchCache>()
@@ -26,6 +29,7 @@ fun LaunchDetailScreen(
     val launchDetails by viewModel.launchDetails.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    val videoPlayerState by viewModel.videoPlayerState.collectAsState()
     
     // Determine current launch data
     val currentLaunch = cachedLaunchDetailed ?: launchDetails
@@ -51,13 +55,28 @@ fun LaunchDetailScreen(
                 onNavigateBack = onNavigateBack
             )
         }
+
         currentLaunch != null -> {
             // We have launch data, pass non-null launch to view
             LaunchDetailView(
                 launch = currentLaunch,
-                onNavigateBack = onNavigateBack
+                videoPlayerState = videoPlayerState,
+                onSelectVideo = viewModel::selectVideo,
+                onSetPlayerVisible = viewModel::setPlayerVisible,
+                onNavigateBack = onNavigateBack,
+                onNavigateToFullscreen = { videoUrl, launchName ->
+                    navController?.navigate(
+                        FullscreenVideo(
+                            launchId = launchId,
+                            videoUrl = videoUrl,
+                            launchName = launchName
+                        )
+                    )
+                },
+                onVideoSelected = viewModel::selectVideo
             )
         }
+
         else -> {
             // Show loading state
             LaunchDetailLoadingView(onNavigateBack = onNavigateBack)
