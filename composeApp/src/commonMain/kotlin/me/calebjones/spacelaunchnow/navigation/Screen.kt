@@ -23,6 +23,14 @@ data class LaunchDetail(val launchId: String)
 @Serializable
 data class EventDetail(val eventId: Int)
 
+@Serializable
+data class FullscreenVideo(
+    val launchId: String,
+    val videoUrl: String,
+    val launchName: String,
+    val videoIndex: Int = 0
+)
+
 // Legacy sealed class for UI metadata only
 sealed class Screen(val label: String, val icon: ImageVector) {
     data object Home : Screen("Home", Icons.Filled.Home)

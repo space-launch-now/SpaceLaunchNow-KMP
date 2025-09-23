@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.SnapPosition
@@ -38,6 +39,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.AltRoute
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Badge
@@ -58,6 +60,8 @@ import androidx.compose.material.icons.filled.FlightLand
 import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.Height
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Pending
@@ -88,6 +92,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
@@ -116,6 +122,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -136,6 +143,8 @@ import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
+import me.calebjones.spacelaunchnow.util.VideoUtil
+import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 
 // Keep only TitleHeight which is used for spacing
 private val TitleHeight = 128.dp
@@ -384,12 +393,17 @@ val snackDetailBoundsTransform = BoundsTransform { _, _ ->
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
-    ExperimentalSharedTransitionApi::class
+    ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class
 )
 @Composable
 fun LaunchDetailView(
     launch: LaunchDetailed,
-    onNavigateBack: () -> Unit
+    videoPlayerState: me.calebjones.spacelaunchnow.ui.viewmodel.VideoPlayerState,
+    onSelectVideo: (Int) -> Unit,
+    onSetPlayerVisible: (Boolean) -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateToFullscreen: (String, String) -> Unit,
+    onVideoSelected: (Int) -> Unit
 ) {
     // Use the shared detail scaffold to unify behavior
     SharedDetailScaffold(
@@ -405,14 +419,28 @@ fun LaunchDetailView(
         ),
     ) {
         // Render existing launch detail content inside the shared scaffold body
-        LaunchDetailContentInBody(launch = launch)
+        LaunchDetailContentInBody(
+            launch = launch,
+            videoPlayerState = videoPlayerState,
+            onSelectVideo = onSelectVideo,
+            onSetPlayerVisible = onSetPlayerVisible,
+            onNavigateToFullscreen = onNavigateToFullscreen,
+            onVideoSelected = onVideoSelected
+        )
     }
 }
 
 
 // This composable contains all the detailed launch information
 @Composable
-private fun LaunchDetailContentInBody(launch: LaunchDetailed) {
+private fun LaunchDetailContentInBody(
+    launch: LaunchDetailed,
+    videoPlayerState: me.calebjones.spacelaunchnow.ui.viewmodel.VideoPlayerState,
+    onSelectVideo: (Int) -> Unit,
+    onSetPlayerVisible: (Boolean) -> Unit,
+    onNavigateToFullscreen: (String, String) -> Unit,
+    onVideoSelected: (Int) -> Unit
+) {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
@@ -427,31 +455,43 @@ private fun LaunchDetailContentInBody(launch: LaunchDetailed) {
         QuickStatsGrid(launch = launch)
         Spacer(Modifier.height(16.dp))
 
-        // 3. Timeline Card
+        // 3. Video Player Card - positioned above timeline
+        if (videoPlayerState.availableVideos.isNotEmpty()) {
+            VideoPlayerCard(
+                videoPlayerState = videoPlayerState,
+                launchName = launch.mission?.name ?: "Space Launch",
+                onSetPlayerVisible = onSetPlayerVisible,
+                onNavigateToFullscreen = onNavigateToFullscreen,
+                onVideoSelected = onVideoSelected
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // 4. Timeline Card
         if (launch.timeline.isNotEmpty()) {
             TimelineCard(timeline = launch.timeline)
             Spacer(Modifier.height(16.dp))
         }
 
-        // 4. Mission Details Card
+        // 5. Mission Details Card
         launch.mission?.let { mission ->
             MissionDetailsCard(mission = mission, launch = launch)
             Spacer(Modifier.height(16.dp))
         }
 
-        // 4. Launch Vehicle Details Card
+        // 6. Launch Vehicle Details Card
         launch.rocket?.configuration?.let { rocketConfig ->
             LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
             Spacer(Modifier.height(16.dp))
         }
 
-        // 5. Spacecraft Details Card
+        // 7. Spacecraft Details Card
         if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
             SpacecraftDetailsCard(spacecraftStages = launch.rocket?.spacecraftStage ?: emptyList())
             Spacer(Modifier.height(16.dp))
         }
 
-        // 6. Landing Details Card
+        // 8. Landing Details Card
         run {
             val landingStages = launch.rocket?.launcherStage ?: emptyList()
             if (landingStages.any { it.landing != null }) {
@@ -460,12 +500,12 @@ private fun LaunchDetailContentInBody(launch: LaunchDetailed) {
             }
         }
 
-        // 7. Agency Card
+        // 9. Agency Card
         launch.launchServiceProvider?.let { agency ->
             AgencyDetailsCard(agency = agency)
             Spacer(Modifier.height(16.dp))
         }
-        
+
         // Bottom spacing
         Spacer(Modifier.height(200.dp))
     }
@@ -2374,6 +2414,160 @@ private fun AgencyChip(agencyName: String) {
     }
 }
 
+// Video Player Card composable (wraps LaunchVideoPlayer or LaunchVideoPickerPlayer in a Card)
+@Composable
+private fun VideoPlayerCard(
+    videoPlayerState: me.calebjones.spacelaunchnow.ui.viewmodel.VideoPlayerState,
+    launchName: String,
+    onSetPlayerVisible: (Boolean) -> Unit,
+    onNavigateToFullscreen: (String, String) -> Unit,
+    onVideoSelected: (Int) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "Launch Video",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            if (videoPlayerState.availableVideos.size == 1) {
+                LaunchVideoPlayer(
+                    vidUrl = videoPlayerState.availableVideos.first(),
+                    launchName = launchName,
+                    isPlayerVisible = videoPlayerState.isPlayerVisible,
+                    onSetPlayerVisible = onSetPlayerVisible,
+                    onNavigateToFullscreen = onNavigateToFullscreen,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                LaunchVideoPickerPlayer(
+                    videos = videoPlayerState.availableVideos,
+                    selectedIndex = videoPlayerState.selectedVideoIndex,
+                    launchName = launchName,
+                    isPlayerVisible = videoPlayerState.isPlayerVisible,
+                    onSetPlayerVisible = onSetPlayerVisible,
+                    onVideoSelected = onVideoSelected,
+                    onNavigateToFullscreen = onNavigateToFullscreen,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+// Picker for multiple YouTube videos
+
+@Composable
+private fun LaunchVideoPickerPlayer(
+    videos: List<me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL>,
+    selectedIndex: Int,
+    launchName: String,
+    isPlayerVisible: Boolean,
+    onSetPlayerVisible: (Boolean) -> Unit,
+    onVideoSelected: (Int) -> Unit,
+    onNavigateToFullscreen: (String, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val selectedVideo = videos[selectedIndex]
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Current Video Player
+        LaunchVideoPlayer(
+            vidUrl = selectedVideo,
+            launchName = launchName,
+            isPlayerVisible = isPlayerVisible,
+            onSetPlayerVisible = onSetPlayerVisible,
+            onNavigateToFullscreen = onNavigateToFullscreen
+        )
+
+        // Video Selector Dropdown
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = { isDropdownExpanded = !isDropdownExpanded },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = VideoUtil.getVideoTitle(selectedVideo, launchName),
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    Icon(
+                        imageVector = if (isDropdownExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = if (isDropdownExpanded) "Close menu" else "Open menu"
+                    )
+                }
+            }
+
+            DropdownMenu(
+                expanded = isDropdownExpanded,
+                onDismissRequest = { isDropdownExpanded = false },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                videos.forEachIndexed { index, video ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = VideoUtil.getVideoTitle(video, launchName),
+                                    modifier = Modifier.weight(1f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+
+                                if (index == selectedIndex) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = "Selected",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        },
+                        onClick = {
+                            onVideoSelected(index)
+                            isDropdownExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
 // TimelineCard: shows a vertical timeline with expand/collapse
 
 @Composable
@@ -2425,6 +2619,7 @@ private fun TimelineCard(timeline: List<TimelineEvent>) {
         }
     }
 }
+
 
 @Composable
 private fun TimelineEventRow(
