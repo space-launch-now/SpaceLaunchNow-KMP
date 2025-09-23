@@ -1,10 +1,13 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -84,17 +88,41 @@ fun UpdateCard(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Author profile image
-                AsyncImage(
+                // Author profile image with proper error, placeholder, and loading states
+                SubcomposeAsyncImage(
                     model = update.profileImage ?: "",
                     contentDescription = "Author profile",
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop,
-                    fallback = rememberAsyncImagePainter(
-                        model = "https://via.placeholder.com/48x48/CCCCCC/000000?text=${update.createdBy?.firstOrNull()?.uppercaseChar() ?: "?"}"
-                    )
+                    loading = {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    error = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surfaceContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Person,
+                                contentDescription = "Profile placeholder",
+                                modifier = Modifier.size(32.dp),
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
                 )
                 
                 Column(
