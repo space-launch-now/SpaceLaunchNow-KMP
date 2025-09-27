@@ -1,0 +1,170 @@
+name: Promote to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      promote_from:
+        description: 'Track to promote from'
+        required: true
+        default: 'alpha'
+        type: choice
+        options:
+          - alpha
+          - beta
+          - internal
+      promote_to:
+        description: 'Track to promote to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - beta
+          - production
+      rollout_percentage:
+        description: 'Rollout percentage (1-100)'
+        required: false
+        default: '10'
+        type: string
+      release_notes:
+        description: 'Additional release notes'
+        required: false
+        type: string
+
+jobs:
+  promote:
+    name: Promote Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Read current version
+        run: |
+          VERSION_MAJOR=$(grep "versionMajor=" version.properties | cut -d'=' -f2)
+          VERSION_MINOR=$(grep "versionMinor=" version.properties | cut -d'=' -f2)
+          VERSION_PATCH=$(grep "versionPatch=" version.properties | cut -d'=' -f2)
+          BUILD_NUMBER=$(grep "versionBuildNumber=" version.properties | cut -d'=' -f2)
+          
+          echo "VERSION_NAME=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${BUILD_NUMBER}" >> $GITHUB_ENV
+          echo "VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + BUILD_NUMBER))" >> $GITHUB_ENV
+
+      - name: Validate promotion path
+        run: |
+          FROM_TRACK="${{ github.event.inputs.promote_from }}"
+          TO_TRACK="${{ github.event.inputs.promote_to }}"
+          
+          # Validate promotion is moving forward
+          if [[ "$FROM_TRACK" == "production" ]]; then
+            echo "❌ Cannot promote from production track"
+            exit 1
+          fi
+          
+          if [[ "$FROM_TRACK" == "beta" && "$TO_TRACK" == "alpha" ]]; then
+            echo "❌ Cannot promote backwards from beta to alpha"
+            exit 1
+          fi
+          
+          echo "✅ Valid promotion: $FROM_TRACK → $TO_TRACK"
+
+      - name: Create release notes
+        run: |
+          mkdir -p docs/release-notes/en-US/
+          
+          NOTES="${{ github.event.inputs.release_notes }}"
+          if [ -z "$NOTES" ]; then
+            NOTES="Version ${{ env.VERSION_NAME }} promoted from ${{ github.event.inputs.promote_from }} to ${{ github.event.inputs.promote_to }}"
+          fi
+          
+          echo "$NOTES" > docs/release-notes/en-US/default.txt
+
+      - name: Promote to Beta
+        if: github.event.inputs.promote_to == 'beta'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+          packageName: me.calebjones.spacelaunchnow
+          track: ${{ github.event.inputs.promote_from }}
+          promoteTrack: beta
+          status: completed
+          userFraction: 1.0
+          whatsNewDirectory: docs/release-notes/
+
+      - name: Promote to Production (Staged)
+        if: github.event.inputs.promote_to == 'production'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+          packageName: me.calebjones.spacelaunchnow
+          track: ${{ github.event.inputs.promote_from }}
+          promoteTrack: production
+          status: inProgress
+          userFraction: ${{ format('{0}', github.event.inputs.rollout_percentage / 100.0) }}
+          whatsNewDirectory: docs/release-notes/
+
+      - name: Create Production Release Tag
+        if: github.event.inputs.promote_to == 'production'
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          
+          TAG_NAME="v${{ env.VERSION_NAME }}-prod"
+          git tag -a "$TAG_NAME" -m "Production release ${{ env.VERSION_NAME }}"
+          git push origin "$TAG_NAME"
+
+      - name: Create GitHub Release
+        if: github.event.inputs.promote_to == 'production'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION_NAME }}-prod
+          release_name: Production Release ${{ env.VERSION_NAME }}
+          body: |
+            ## 🚀 Space Launch Now ${{ env.VERSION_NAME }} - Production Release
+            
+            ### Deployment Info
+            - Promoted from: **${{ github.event.inputs.promote_from }}**
+            - Promoted to: **${{ github.event.inputs.promote_to }}**
+            - Rollout: **${{ github.event.inputs.rollout_percentage }}%**
+            
+            ### Release Notes
+            ${{ github.event.inputs.release_notes }}
+            
+            ### Version Info
+            - Version Code: ${{ env.VERSION_CODE }}
+            - Version Name: ${{ env.VERSION_NAME }}
+            
+            ---
+            *This production release was promoted via GitHub Actions*
+          draft: false
+          prerelease: false
+
+      - name: Notify promotion status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const version = '${{ env.VERSION_NAME }}';
+            const fromTrack = '${{ github.event.inputs.promote_from }}';
+            const toTrack = '${{ github.event.inputs.promote_to }}';
+            const rollout = '${{ github.event.inputs.rollout_percentage }}';
+            const emoji = status === 'success' ? '✅' : '❌';
+            
+            let message = `${emoji} Promotion ${status}: Version ${version}\n`;
+            message += `${fromTrack} → ${toTrack}`;
+            
+            if (toTrack === 'production' && status === 'success') {
+              message += ` (${rollout}% rollout)`;
+            }
+            
+            console.log(message);
