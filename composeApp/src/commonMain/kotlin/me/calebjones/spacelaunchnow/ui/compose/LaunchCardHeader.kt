@@ -1,10 +1,21 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -12,10 +23,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.*
-import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
-import me.calebjones.spacelaunchnow.util.StatusColorUtil
 
 /**
  * Common interface to extract launch data needed for the card header
@@ -27,7 +40,7 @@ sealed interface LaunchCardData {
     val image: Image?
     val locationName: String?
     val agencyLogoUrl: String?
-    
+
     fun getFormattedTitle(): String
 }
 
@@ -41,8 +54,8 @@ data class BasicLaunchCardData(val launch: LaunchBasic) : LaunchCardData {
     override val image: Image? = launch.image
     override val locationName: String? = null // LaunchBasic doesn't have pad/location
     override val agencyLogoUrl: String? = null // LaunchBasic doesnt have a agencyLogo
-    
-    override fun getFormattedTitle(): String = LaunchFormatUtil.formatLaunchTitle(launch)
+
+    override fun getFormattedTitle(): String = launch.name ?: "Unknown Launch"
 }
 
 /**
@@ -54,10 +67,10 @@ data class NormalLaunchCardData(val launch: LaunchNormal) : LaunchCardData {
     override val net: Instant? = launch.net
     override val image: Image? = launch.image
     override val locationName: String? = launch.pad?.location?.name
-    override val agencyLogoUrl: String? = launch.launchServiceProvider.socialLogo?.imageUrl 
+    override val agencyLogoUrl: String? = launch.launchServiceProvider.socialLogo?.imageUrl
         ?: launch.launchServiceProvider.logo?.imageUrl
-    
-    override fun getFormattedTitle(): String = LaunchFormatUtil.formatLaunchTitle(launch)
+
+    override fun getFormattedTitle(): String = launch.name ?: "Unknown Launch"
 }
 
 /**
@@ -69,96 +82,14 @@ data class DetailedLaunchCardData(val launch: LaunchDetailed) : LaunchCardData {
     override val net: Instant? = launch.net
     override val image: Image? = launch.image
     override val locationName: String? = launch.pad?.location?.name
-    override val agencyLogoUrl: String? = launch.launchServiceProvider.socialLogo?.imageUrl 
+    override val agencyLogoUrl: String? = launch.launchServiceProvider.socialLogo?.imageUrl
         ?: launch.launchServiceProvider.logo?.imageUrl
-    
-    override fun getFormattedTitle(): String = LaunchFormatUtil.formatLaunchTitle(launch)
+
+    override fun getFormattedTitle(): String = launch.name ?: "Unknown Launch"
 }
 
 /**
- * Common composable for the top portion of launch cards that handles all launch types
- * 
- * @param launchData The launch data wrapped in LaunchCardData interface
- * @param showAgencyLogo Whether to show the circular agency logo on the left
- * @param logoSize Size of the agency logo
- * @param contentPadding Padding around the content
- */
-@Composable
-fun LaunchCardHeader(
-    launchData: LaunchCardData,
-    showAgencyLogo: Boolean = true,
-    logoSize: androidx.compose.ui.unit.Dp = 56.dp,
-    contentPadding: PaddingValues = PaddingValues(16.dp),
-    modifier: Modifier = Modifier
-) {
-    // Compute formatted values
-    val title by remember(launchData) {
-        mutableStateOf(launchData.getFormattedTitle())
-    }
-    
-    val formattedDate by remember(launchData.net) {
-        mutableStateOf(
-            launchData.net?.let { DateTimeUtil.formatLaunchDateTime(it) } ?: "TBD"
-        )
-    }
-
-    Row(
-        modifier = modifier.padding(contentPadding)
-    ) {
-        // Circular Agency Logo (if enabled and available)
-        if (showAgencyLogo && launchData.agencyLogoUrl != null) {
-            AsyncImage(
-                model = launchData.agencyLogoUrl,
-                contentDescription = "Agency Logo",
-                modifier = Modifier
-                    .size(logoSize)
-                    .clip(CircleShape)
-                    .border(
-                        2.dp,
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-                        CircleShape
-                    ),
-                contentScale = ContentScale.Crop
-            )
-            
-            Spacer(modifier = Modifier.width(12.dp))
-        }
-
-        // Launch Information Column
-        Column(
-            modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            // Standardized Launch Title (LSP | Rocket Configuration)
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            // Launch Location (if available)
-            launchData.locationName?.let { locationName ->
-                Text(
-                    text = locationName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // Human Readable Date
-            Text(
-                text = formattedDate,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-/**
- * Specialized version of LaunchCardHeader for overlay on images with drop shadows
- * Used primarily in NextUpView where text is overlaid on background images
- * 
+ *
  * @param launchData The launch data wrapped in LaunchCardData interface
  * @param showAgencyLogo Whether to show the circular agency logo on the left
  * @param logoSize Size of the agency logo
@@ -178,10 +109,10 @@ fun LaunchCardHeaderOverlay(
     val title by remember(launchData) {
         mutableStateOf(launchData.getFormattedTitle())
     }
-    
+
     val formattedDate by remember(launchData.net, useRelativeTime) {
         mutableStateOf(
-            launchData.net?.let { 
+            launchData.net?.let {
                 if (useRelativeTime) {
                     DateTimeUtil.formatLaunchDateTimeRelative(it)
                 } else {
@@ -195,7 +126,7 @@ fun LaunchCardHeaderOverlay(
         modifier = modifier.padding(contentPadding),
         verticalAlignment = Alignment.Top,
     ) {
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Circular Agency Logo (if enabled and available) with drop shadow effect
@@ -208,7 +139,7 @@ fun LaunchCardHeaderOverlay(
                         .clip(CircleShape)
                         .border(
                             2.dp,
-                            StatusColorUtil.getLaunchStatusColor(launchData.status?.id),
+                            MaterialTheme.colorScheme.surfaceContainer,
                             CircleShape
                         ),
                     contentScale = ContentScale.Crop

@@ -15,7 +15,11 @@ class NotificationTestUtils(
      */
     suspend fun subscribeToAllTopics(): Result<Unit> {
         return try {
-            NotificationTopic.values().forEach { topic ->
+            val defaultTopics = listOf(
+                NotificationTopic.LAUNCHES_ALL,
+                NotificationTopic.EVENTS
+            )
+            defaultTopics.forEach { topic ->
                 notificationRepository.subscribeToTopic(topic)
             }
             Result.success(Unit)
@@ -29,7 +33,11 @@ class NotificationTestUtils(
      */
     suspend fun unsubscribeFromAllTopics(): Result<Unit> {
         return try {
-            NotificationTopic.values().forEach { topic ->
+            val defaultTopics = listOf(
+                NotificationTopic.LAUNCHES_ALL,
+                NotificationTopic.EVENTS
+            )
+            defaultTopics.forEach { topic ->
                 notificationRepository.unsubscribeFromTopic(topic)
             }
             Result.success(Unit)
@@ -54,8 +62,8 @@ class NotificationTestUtils(
         notifyBeforeLaunch = true,
         notifyMinutesBefore = 30,
         subscribedTopics = setOf(
-            NotificationTopic.LAUNCHES_ALL.topicName,
-            NotificationTopic.DAILY_SUMMARY.topicName
+            NotificationTopic.LAUNCHES_ALL.id,
+            NotificationTopic.EVENTS.id
         )
     )
 }

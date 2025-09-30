@@ -11,8 +11,11 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlinx.coroutines.runBlocking
 
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
+import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -56,6 +59,21 @@ val networkModule = module {
 
     // Provide the base URL as a named dependency
     single<String>(named("BaseUrl")) {
-        "https://spacelaunchnow.app"
+        if (BuildConfig.DEBUG) {
+            // In debug mode, try to get custom URL from debug preferences
+            try {
+                val debugPreferences = getOrNull<DebugPreferences>()
+                if (debugPreferences != null) {
+                    runBlocking { debugPreferences.getEffectiveApiBaseUrl() }
+                } else {
+                    "https://spacelaunchnow.app"
+                }
+            } catch (e: Exception) {
+                // Fallback to default if debug preferences not available
+                "https://spacelaunchnow.app"
+            }
+        } else {
+            "https://spacelaunchnow.app"
+        }
     }
 }

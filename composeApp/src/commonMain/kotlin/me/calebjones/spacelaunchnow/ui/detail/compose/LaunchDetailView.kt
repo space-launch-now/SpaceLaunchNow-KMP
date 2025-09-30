@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -39,7 +38,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.AltRoute
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Badge
@@ -121,7 +119,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -134,16 +131,15 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetai
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
 import me.calebjones.spacelaunchnow.ui.SharedElementKey
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
+import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
-import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
-import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
+import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import me.calebjones.spacelaunchnow.util.VideoUtil
-import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 
 // Keep only TitleHeight which is used for spacing
 private val TitleHeight = 128.dp
@@ -360,7 +356,8 @@ private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                             Triple(
                                 Icons.Filled.WbCloudy,
                                 "Weather",
-                                "$prob%")
+                                "$prob%"
+                            )
                         )
                     }
                 }
@@ -416,8 +413,8 @@ fun LaunchDetailView(
     // Use the shared detail scaffold to unify behavior
     SharedDetailScaffold(
         keyProvider = { type -> SharedElementKey(launch.id, type) },
-        titleText = LaunchFormatUtil.formatLaunchTitle(launch),
-        taglineText = launch.mission?.name,
+        titleText = launch.name ?: "Unknown Launch",
+        taglineText = launch.launchServiceProvider?.name ?: "Unknown Provider",
         imageUrl = launch.image?.imageUrl,
         onNavigateBack = onNavigateBack,
         backgroundColors = listOf(
@@ -590,9 +587,6 @@ private fun InfoChip(icon: ImageVector, text: String) {
 }
 
 
-
-
-
 @Composable
 private fun QuickStatsGrid(launch: LaunchDetailed) {
     // Build a dynamic list of facts that are available
@@ -611,7 +605,13 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
             add(Fact(Icons.Filled.CalendarToday, "#${count}", "Total\n$currentYear"))
         }
         launch.agencyLaunchAttemptCountYear?.let { count ->
-            add(Fact(Icons.Filled.Business, "#${count}", "${launch.launchServiceProvider.name}\n$currentYear"))
+            add(
+                Fact(
+                    Icons.Filled.Business,
+                    "#${count}",
+                    "${launch.launchServiceProvider.name}\n$currentYear"
+                )
+            )
         }
     }
 
@@ -672,6 +672,7 @@ private fun MissionDetailsCard(mission: Mission, launch: LaunchDetailed) {
         }
     }
 }
+
 @Composable
 private fun MissionDetailsChipsContent(launch: LaunchDetailed) {
     val mission = launch.mission ?: return
@@ -985,7 +986,6 @@ private fun StatCard(
         }
     }
 }
-
 
 
 @Composable
@@ -2122,7 +2122,7 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape),
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Crop
                 )
 
                 Column(modifier = Modifier.weight(1f)) {
@@ -2188,7 +2188,8 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
 
                 val successfulLaunches = agency.successfulLaunches ?: 0
                 val failedLaunches = agency.failedLaunches ?: 0
-                val successRate = if (totalLaunches > 0) (successfulLaunches * 100.0 / totalLaunches) else 0.0
+                val successRate =
+                    if (totalLaunches > 0) (successfulLaunches * 100.0 / totalLaunches) else 0.0
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -2899,7 +2900,7 @@ fun LaunchDetailErrorView(
                 contentDescription = "Back",
             )
         }
-        
+
         // Error content
         ErrorCard(
             errorMessage = errorMessage,
