@@ -12,6 +12,9 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
+import me.calebjones.spacelaunchnow.data.storage.createDataStore
+import kotlinx.coroutines.runBlocking
 
 class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -28,6 +31,32 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+
+        // Check notificationsEnabled, and return early if false
+        val notificationsEnabled = runBlocking {
+            val prefs = NotificationPreferences(createDataStore(applicationContext))
+            prefs.getNotificationSettings().enableNotifications
+        }
+        if (!notificationsEnabled) {
+            println("Notifications are disabled by user preference. Suppressing notification.")
+            return
+        }
+
+        println("Received FCM message: ${remoteMessage.data}")
+        println("Received FCM notification: ${remoteMessage.notification}")
+        println("Received FCM data: ${remoteMessage.data}")
+        println("Received FCM from: ${remoteMessage.from}")
+        println("Received FCM messageId: ${remoteMessage.messageId}")
+        println("Received FCM sentTime: ${remoteMessage.sentTime}")
+        println("Received FCM ttl: ${remoteMessage.ttl}")
+        println("Received FCM collapseKey: ${remoteMessage.collapseKey}")
+        println("Received FCM messageType: ${remoteMessage.messageType}")
+        println("Received FCM to: ${remoteMessage.to}")
+        println("Received FCM originalPriority: ${remoteMessage.originalPriority}")
+        println("Received FCM priority: ${remoteMessage.priority}")
+        println("Received FCM notification.title: ${remoteMessage.notification?.title}")
+        println("Received FCM notification.body: ${remoteMessage.notification?.body}")
+        println("Received FCM notification.icon: ${remoteMessage.notification?.icon}")
 
         // Handle FCM message
         remoteMessage.notification?.let { notification ->
@@ -107,11 +136,6 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
                 // Handle launch-specific data
                 val launchId = data["launch_id"]
                 // TODO: Update launch data or trigger in-app refresh
-            }
-
-            "daily_summary" -> {
-                // Handle daily summary data
-                // TODO: Update daily summary data
             }
         }
     }

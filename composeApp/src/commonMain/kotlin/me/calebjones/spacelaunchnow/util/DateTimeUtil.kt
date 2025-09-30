@@ -4,6 +4,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 
 /**
  * Utility object for formatting dates and times in a locale-appropriate way using platform-specific formatters
@@ -141,12 +142,69 @@ object DateTimeUtil {
             "T + 0s"
         }
     }
+
+    /**
+     * Formats a LaunchBasic's NET date with custom precision fallback logic used in ScheduleScreen. Now shared for reuse.
+     */
+    fun formatDateWithPrecisionFallback(launch: LaunchBasic): String {
+        val net = launch.net ?: return "TBD"
+        val precisionId = launch.netPrecision?.id
+
+        return when (precisionId) {
+            2 -> formatLaunchDate(net)
+            7 -> formatMonthYear(net)
+            8, 9, 10, 11 -> "${formatQuarter(net)} ${formatYear(net)}"
+            12 -> "H1 ${formatYear(net)}"
+            13 -> "H2 ${formatYear(net)}"
+            14 -> "NET ${formatYear(net)}"
+            15 -> "FY ${formatYear(net)}"
+            16 -> "Decade ${formatYear(net)}"
+            else -> formatLaunchDate(net)
+        }
+    }
+
+    fun formatYear(instant: Instant): String {
+        return try {
+            val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+            ldt.year.toString()
+        } catch (e: Throwable) {
+            ""
+        }
+    }
+
+    fun formatMonthYear(instant: Instant): String {
+        return try {
+            val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+            val monthYear = formatLaunchDate(instant)
+            val year = ldt.year.toString()
+            val idx = monthYear.indexOf(year)
+            if (idx > 0) {
+                val beforeYear = monthYear.substring(0, idx).trim().trimEnd(',')
+                "$beforeYear $year"
+            } else monthYear
+        } catch (_: Throwable) {
+            formatLaunchDate(instant)
+        }
+    }
+
+    fun formatQuarter(instant: Instant): String {
+        return try {
+            val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+            val month = ldt.monthNumber
+            val quarter = when (month) {
+                in 1..3 -> "Q1"
+                in 4..6 -> "Q2"
+                in 7..9 -> "Q3"
+                else -> "Q4"
+            }
+            quarter
+        } catch (_: Throwable) {
+            "Q?"
+        }
+    }
 }
 
-/**
- * Platform-specific date/time formatting functions
- * These will be implemented differently for each platform to use native locale formatting
- */
+// Top-level expect declarations for multiplatform date/time formatting
 expect fun formatLocalDateTime(localDateTime: LocalDateTime): String
-expect fun formatLocalDate(localDateTime: LocalDateTime): String  
+expect fun formatLocalDate(localDateTime: LocalDateTime): String
 expect fun formatLocalTime(localDateTime: LocalDateTime): String

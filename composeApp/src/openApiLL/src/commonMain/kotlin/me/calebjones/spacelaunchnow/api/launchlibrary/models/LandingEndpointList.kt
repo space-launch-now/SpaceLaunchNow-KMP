@@ -59,11 +59,11 @@ data class LandingEndpointList (
 
     @SerialName(value = "response_mode") @Required val responseMode: kotlin.String = "list",
 
-    @SerialName(value = "firststage") @Required val firststage: FirstStageMini,
+    @SerialName(value = "firststage") @Required val firststage: FirstStageMini?,
 
-    @SerialName(value = "spacecraftflight") @Required val spacecraftflight: SpacecraftFlightMiniSerializerNoLanding,
+    @SerialName(value = "spacecraftflight") @Required val spacecraftflight: SpacecraftFlightMiniSerializerNoLanding?,
 
-    @SerialName(value = "payloadflight") @Required val payloadflight: PayloadFlightMiniSerializerNoLanding,
+    @SerialName(value = "payloadflight") @Required val payloadflight: PayloadFlightMiniSerializerNoLanding?,
 
     @SerialName(value = "attempt") val attempt: kotlin.Boolean? = null,
 

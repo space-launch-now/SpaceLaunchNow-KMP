@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +26,7 @@ fun ResponsiveHomeContent(
 ) {
     if ((isTablet() && isLandscape()) || isDesktop()) {
         // Landscape layout - side-by-side content
-        Column(modifier = modifier.padding(top = 16.dp)) {
+        Column {
             HomeTopBar()
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -49,8 +50,13 @@ fun ResponsiveHomeContent(
                         .weight(0.7f)
                         .fillMaxHeight(),
                 ) {
-                    item { SectionTitle(title = "Upcoming Launches", hasAction = true) }
-                    item { UpcomingHorizontalScrollableList() }
+                    item {
+                        SectionTitle(
+                            title = "Upcoming Launches",
+                            hasAction = true,
+                            onActionClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Screen.Schedule) })
+                    }
+                    item { UpcomingHorizontalScrollableList(navController = navController) }
                     item { SectionTitle(title = "Latest Updates", hasAction = true) }
                     item { LatestUpdatesView() }
                     item { SectionTitle(title = "Latest News", hasAction = false) }
@@ -62,21 +68,25 @@ fun ResponsiveHomeContent(
             }
         }
     } else {
-        // Portrait layout - standard vertical layout
-        LazyColumn(
-            modifier = modifier,
-        ) {
-            item { HomeTopBar() }
-            item { NextLaunchView(navController = navController) }
-            item { SectionTitle(title = "Upcoming Launches", hasAction = true) }
-            item { UpcomingHorizontalScrollableList() }
-            item { SectionTitle(title = "Latest Updates", hasAction = true) }
-            item { LatestUpdatesView() }
-            item { SectionTitle(title = "Latest News", hasAction = false) }
-            item { ArticlesView() }
-            item { SectionTitle(title = "Upcoming Events", hasAction = true) }
-            item { EventsView(navController = navController) }
-            item { Spacer(modifier = Modifier.height(32.dp))}
+            LazyColumn(
+                modifier = modifier,
+            ) {
+                item { HomeTopBar()}
+                item { NextLaunchView(navController = navController) }
+                item {
+                    SectionTitle(
+                        title = "Upcoming Launches",
+                        hasAction = true,
+                        onActionClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Screen.Schedule) })
+                }
+                item { UpcomingHorizontalScrollableList(navController = navController) }
+                item { SectionTitle(title = "Latest Updates", hasAction = true) }
+                item { LatestUpdatesView() }
+                item { SectionTitle(title = "Latest News", hasAction = false) }
+                item { ArticlesView() }
+                item { SectionTitle(title = "Upcoming Events", hasAction = true) }
+                item { EventsView(navController = navController) }
+                item { Spacer(modifier = Modifier.height(32.dp)) }
+            }
         }
-    }
 }

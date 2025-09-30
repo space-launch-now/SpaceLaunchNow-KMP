@@ -1,22 +1,22 @@
 package me.calebjones.spacelaunchnow.util
 
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 
 /**
  * Utility object for formatting launch information consistently across the application
  */
 object LaunchFormatUtil {
-    
+
     /**
      * Formats a launch title using the standard format: "<LSP> | <Launch Vehicle>"
      * If rocket configuration is not available, falls back to launch name or "Unknown Name"
-     * 
+     *
      * For LSP (Launch Service Provider):
      * - Uses abbreviation if name is longer than 15 characters and abbreviation exists
      * - Otherwise uses full name
-     * 
+     *
      * @param launchServiceProviderName The full name of the launch service provider
      * @param launchServiceProviderAbbrev The abbreviation of the launch service provider (nullable)
      * @param rocketConfigurationName The name of the rocket configuration (nullable)
@@ -45,7 +45,7 @@ object LaunchFormatUtil {
             "Unknown Name"
         }
     }
-    
+
     /**
      * Formats a LaunchDetailed title using the standard format
      */
@@ -57,7 +57,7 @@ object LaunchFormatUtil {
             launchName = launch.name
         )
     }
-    
+
     /**
      * Formats a LaunchNormal title using the standard format
      */
@@ -69,7 +69,7 @@ object LaunchFormatUtil {
             launchName = launch.name
         )
     }
-    
+
     /**
      * Formats a LaunchBasic title using the standard format
      */
@@ -77,7 +77,7 @@ object LaunchFormatUtil {
         return formatLaunchTitle(
             launchServiceProviderName = launch.launchServiceProvider.name,
             launchServiceProviderAbbrev = launch.launchServiceProvider.abbrev,
-            rocketConfigurationName = null,
+            rocketConfigurationName = launch.name?.split("|")?.last(),
             launchName = launch.name
         )
     }

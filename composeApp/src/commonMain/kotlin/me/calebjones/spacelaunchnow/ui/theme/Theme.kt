@@ -1,27 +1,33 @@
 package me.calebjones.spacelaunchnow.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
+import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.rememberDynamicMaterialThemeState
 import me.calebjones.spacelaunchnow.Primary
-import me.calebjones.spacelaunchnow.Secondary
-import androidx.compose.runtime.Composable
-import com.materialkolor.dynamiccolor.ColorSpec
+import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 
 @Composable
 fun SpaceLaunchNowTheme(
-    isDarkTheme: Boolean = true,
+    themeOption: ThemeOption = ThemeOption.System,
     content: @Composable () -> Unit,
 ) {
+    val isDarkTheme = when (themeOption) {
+        ThemeOption.System -> isSystemInDarkTheme()
+        ThemeOption.Light -> false
+        ThemeOption.Dark -> true
+    }
+
     val dynamicThemeState = rememberDynamicMaterialThemeState(
         isDark = isDarkTheme,
-        style = PaletteStyle.Vibrant,
-        contrastLevel = 0.1,
+        style = if (isDarkTheme) PaletteStyle.Vibrant else PaletteStyle.Fidelity,
+        contrastLevel = 0.3,
         specVersion = ColorSpec.SpecVersion.SPEC_2025,
-        primary = Primary,
-        secondary = Secondary,
+        seedColor = Primary
     )
-    
+
     DynamicMaterialTheme(
         state = dynamicThemeState,
         animate = true,
