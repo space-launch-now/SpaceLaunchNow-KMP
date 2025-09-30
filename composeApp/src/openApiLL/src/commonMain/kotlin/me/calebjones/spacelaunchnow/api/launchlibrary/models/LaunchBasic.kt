@@ -37,6 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param image 
  * @param launchServiceProvider 
  * @param infographic 
+ * @param locationName 
  * @param name 
  * @param lastUpdated 
  * @param net 
@@ -66,6 +67,8 @@ data class LaunchBasic (
     @SerialName(value = "launch_service_provider") @Required val launchServiceProvider: AgencyMini,
 
     @SerialName(value = "infographic") @Required val infographic: kotlin.String?,
+
+    @SerialName(value = "location_name") @Required val locationName: kotlin.String?,
 
     @SerialName(value = "name") val name: kotlin.String? = null,
 

@@ -59,11 +59,11 @@ data class LandingEndpointDetailed (
 
     @SerialName(value = "response_mode") @Required val responseMode: kotlin.String = "detailed",
 
-    @SerialName(value = "firststage") @Required val firststage: FirstStageDetailedSerializerNoLanding,
+    @SerialName(value = "firststage") @Required val firststage: FirstStageDetailedSerializerNoLanding?,
 
-    @SerialName(value = "spacecraftflight") @Required val spacecraftflight: SpacecraftFlightDetailedSerializerNoLanding,
+    @SerialName(value = "spacecraftflight") @Required val spacecraftflight: SpacecraftFlightDetailedSerializerNoLanding?,
 
-    @SerialName(value = "payloadflight") @Required val payloadflight: PayloadFlightDetailedSerializerNoLanding,
+    @SerialName(value = "payloadflight") @Required val payloadflight: PayloadFlightDetailedSerializerNoLanding?,
 
     @SerialName(value = "attempt") val attempt: kotlin.Boolean? = null,
 

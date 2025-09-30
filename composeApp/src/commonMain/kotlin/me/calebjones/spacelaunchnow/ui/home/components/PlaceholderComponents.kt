@@ -30,9 +30,9 @@ fun HorizontalScrollableList() {
 }
 
 @Composable
-fun UpcomingHorizontalScrollableList() {
+fun UpcomingHorizontalScrollableList(navController: androidx.navigation.NavController) {
     val homeViewModel = koinViewModel<HomeViewModel>()
-    LaunchListView(homeViewModel)
+    LaunchListView(viewModel = homeViewModel, navController = navController)
 }
 
 @Composable
