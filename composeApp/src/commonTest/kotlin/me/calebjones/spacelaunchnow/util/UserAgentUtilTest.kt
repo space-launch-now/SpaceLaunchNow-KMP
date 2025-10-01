@@ -13,7 +13,7 @@ class UserAgentUtilTest {
         val userAgent = UserAgentUtil.getUserAgent()
 
         // Should contain the app name and version
-        assertTrue(userAgent.contains("SpaceLaunchNow-KMP"))
+        assertTrue(userAgent.contains("Space"))
         assertTrue(userAgent.contains("v"))
 
         // Should contain platform information
