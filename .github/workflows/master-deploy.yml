@@ -97,7 +97,6 @@ jobs:
           echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
 
       - name: Create version-specific release notes
-      - name: Create version-specific release notes
         run: |
           # Create release notes directory
           mkdir -p docs/release-notes
