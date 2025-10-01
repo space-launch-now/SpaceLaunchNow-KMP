@@ -86,6 +86,14 @@ jobs:
           
           echo "$NOTES" > docs/release-notes/en-US/default.txt
 
+      - name: Calculate rollout fraction
+        if: github.event.inputs.promote_to == 'production'
+        id: rollout
+        run: |
+          PERCENTAGE="${{ github.event.inputs.rollout_percentage }}"
+          FRACTION=$(echo "scale=2; $PERCENTAGE / 100" | bc -l)
+          echo "fraction=$FRACTION" >> $GITHUB_OUTPUT
+
       - name: Promote to Beta
         if: github.event.inputs.promote_to == 'beta'
         uses: r0adkll/upload-google-play@v1
@@ -107,7 +115,7 @@ jobs:
           track: ${{ github.event.inputs.promote_from }}
           promoteTrack: production
           status: inProgress
-          userFraction: ${{ format('{0}', github.event.inputs.rollout_percentage / 100.0) }}
+          userFraction: ${{ steps.rollout.outputs.fraction }}
           whatsNewDirectory: docs/release-notes/
 
       - name: Create Production Release Tag
