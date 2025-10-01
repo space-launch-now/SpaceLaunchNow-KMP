@@ -1,32 +1,58 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.RocketLaunch
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini
-import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeader
+import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.LaunchListShimmer
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
@@ -38,13 +64,13 @@ private val CARD_HEIGHT = 240.dp
 private val CARD_SPACING = 16.dp
 
 @Composable
-fun LaunchListView(viewModel: HomeViewModel) {
+fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
     val launches by viewModel.upcomingLaunches.collectAsState()
     val error by viewModel.upcomingLaunchesError.collectAsState()
     val isLoading by viewModel.isUpcomingLaunchesLoading.collectAsState()
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    
+
     // Track if we're currently dragging
     var isDragging by remember { mutableStateOf(false) }
 
@@ -78,10 +104,10 @@ fun LaunchListView(viewModel: HomeViewModel) {
                         val itemWidth = 340 + 16 // Card width (340dp) + spacing (16dp)
                         val firstVisibleItemIndex = scrollState.firstVisibleItemIndex
                         val firstVisibleItemOffset = scrollState.firstVisibleItemScrollOffset
-                        
+
                         // Calculate if we should snap forward or backward
                         val snapForward = firstVisibleItemOffset > itemWidth / 2
-                        
+
                         if (snapForward) {
                             // Snap to the next item
                             scrollState.animateScrollToItem(firstVisibleItemIndex + 1)
@@ -95,10 +121,10 @@ fun LaunchListView(viewModel: HomeViewModel) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(horizontal = 16.dp),
             state = scrollState,
-                
-        ) {
+
+            ) {
             items(launchNormalList) { launch ->
-                LaunchItemView(launch)
+                LaunchItemView(launch = launch, navController = navController)
             }
         }
     } else if (isLoading) {
@@ -107,10 +133,13 @@ fun LaunchListView(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun LaunchItemView(launch: LaunchNormal) {
+fun LaunchItemView(launch: LaunchNormal, navController: NavController) {
     Card(
         modifier = Modifier
-            .size(width = 340.dp, height = 240.dp),
+            .size(width = 340.dp, height = 240.dp)
+            .clickable {
+                navController.navigate(LaunchDetail(launch.id))
+            },
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -171,15 +200,15 @@ fun LaunchItemView(launch: LaunchNormal) {
                 }
             }
 
-            // Semi-transparent overlay for better text readability
+            // Stronger semi-transparent overlay for better readability
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+                    .background(Color.Black.copy(alpha = 0.4f))
             )
 
             // Use the common LaunchCardHeader composable
-            LaunchCardHeader(
+            LaunchCardHeaderOverlay(
                 launchData = launch.toLaunchCardData(),
                 showAgencyLogo = true,
                 logoSize = 56.dp,
@@ -199,13 +228,13 @@ fun LaunchItemView(launch: LaunchNormal) {
                     programs = launch.program,
                     modifier = Modifier
                 )
-                
+
                 // Mission type chip (middle)
                 MissionTypeChip(
                     mission = launch.mission,
                     modifier = Modifier
                 )
-                
+
                 // Status chip (right side)
                 LaunchStatusChip(
                     status = launch.status,
@@ -223,7 +252,7 @@ fun LaunchStatusChip(
 ) {
     if (status != null) {
         val statusColor = getLaunchStatusColor(status.id)
-        
+
         Surface(
             modifier = modifier,
             shape = RoundedCornerShape(12.dp),

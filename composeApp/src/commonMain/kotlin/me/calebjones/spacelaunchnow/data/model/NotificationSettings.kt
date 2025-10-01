@@ -8,7 +8,22 @@ data class NotificationSettings(
     val notifyDailySummary: Boolean = false,
     val notifyBeforeLaunch: Boolean = true,
     val notifyMinutesBefore: Int = 30,
-    val subscribedTopics: Set<String> = emptySet()
+    val subscribedTopics: Set<String> = emptySet(),
+    val subscribedAgencies: Set<Int> = emptySet(),
+    val subscribedLocations: Set<Int> = emptySet(),
+    val useStrictMatching: Boolean = false, // false = inclusive (OR), true = strict (AND)
+    val followAllLaunches: Boolean = true,
+    val hideTbdLaunches: Boolean = false,
+    val keepLaunchesFor24Hours: Boolean = true,
+    val eventNotifications: Boolean = true,
+    val netstampChanged: Boolean = true,
+    val webcastOnly: Boolean = false,
+    val twentyFourHour: Boolean = true,
+    val oneHour: Boolean = false,
+    val tenMinutes: Boolean = true,
+    val oneMinute: Boolean = false,
+    val inFlight: Boolean = true,
+    val success: Boolean = true
 )
 
 @Serializable
@@ -18,9 +33,28 @@ data class PushMessage(
     val data: Map<String, String> = emptyMap()
 )
 
-enum class NotificationTopic(val topicName: String) {
-    LAUNCHES_ALL("launches_all"),
-    LAUNCHES_SPACEX("launches_spacex"),
-    LAUNCHES_NASA("launches_nasa"),
-    DAILY_SUMMARY("daily_summary")
+@Serializable
+data class NotificationTopic(
+    val id: String,
+    val name: String,
+    val description: String? = null
+) {
+    companion object {
+        val LAUNCHES_ALL = NotificationTopic("launches", "Launches")
+        val EVENTS = NotificationTopic("events", "Events")
+    }
 }
+
+@Serializable
+data class NotificationAgency(
+    val id: Int,
+    val name: String,
+    val abbreviation: String? = null
+)
+
+@Serializable
+data class NotificationLocation(
+    val id: Int,
+    val name: String,
+    val countryCode: String? = null
+)

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun SectionTitle(title: String, hasAction: Boolean) {
+fun SectionTitle(title: String, hasAction: Boolean, onActionClick: (() -> Unit)? = null) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -23,7 +23,7 @@ fun SectionTitle(title: String, hasAction: Boolean) {
     ) {
         Text(text = title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
         if (hasAction) {
-            TextButton(onClick = { /* Handle action click */ }) {
+            TextButton(onClick = { onActionClick?.invoke() }) {
                 Text(text = "See All", color = MaterialTheme.colorScheme.primary)
             }
         }
