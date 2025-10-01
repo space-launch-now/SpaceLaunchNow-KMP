@@ -1,6 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -164,7 +165,15 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 4000000
-        versionName = "4.0"
+        versionName = "4.0.0-alpha01"
+        val envFile = rootProject.file(".env")
+        val envProps = Properties().apply {
+            if (envFile.exists()) {
+                envFile.inputStream().use { load(it) }
+            }
+        }
+        val apiKey = envProps.getProperty("API_KEY") ?: ""
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
     packaging {
         resources {
@@ -186,6 +195,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     dependencies {
         debugImplementation(compose.uiTooling)
@@ -230,4 +240,33 @@ tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("gen
 tasks.register("generateAllApiClients") {
     dependsOn("openApiGenerate", "generateSnapiClient")
     description = "Generate both Launch Library 2.4.0 and SNAPI v4 API clients"
+}
+
+tasks.whenTaskAdded {
+    if (name.startsWith("package") && name.endsWith("Debug")) {
+        doLast {
+            val buildType = "debug"
+            val versionName = android.defaultConfig.versionName
+            val apkDir = file("$buildDir/outputs/apk/$buildType/")
+            apkDir.listFiles()?.forEach { apk ->
+                if (apk.name.endsWith(".apk")) {
+                    val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}.apk"
+                    apk.renameTo(File(apkDir, newName))
+                }
+            }
+        }
+    }
+    if (name.startsWith("package") && name.endsWith("Release")) {
+        doLast {
+            val buildType = "release"
+            val versionName = android.defaultConfig.versionName
+            val apkDir = file("$buildDir/outputs/apk/$buildType/")
+            apkDir.listFiles()?.forEach { apk ->
+                if (apk.name.endsWith(".apk")) {
+                    val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}.apk"
+                    apk.renameTo(File(apkDir, newName))
+                }
+            }
+        }
+    }
 }

@@ -17,3 +17,4 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 .env
+composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/util/DesktopSecret.kt

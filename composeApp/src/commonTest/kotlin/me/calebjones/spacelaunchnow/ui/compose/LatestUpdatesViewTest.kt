@@ -1,14 +1,15 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.api.models.PaginatedUpdateEndpointList
-import me.calebjones.spacelaunchnow.api.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
  * Tests for UI components related to Updates
- * 
+ *
  * Note: These are unit tests for the UI logic.
  * For full Compose UI testing, you would need the Compose testing framework.
  */
@@ -119,11 +120,11 @@ class LatestUpdatesViewTest {
         val longComment = "This is a very long update comment that would exceed the maximum " +
                 "display length in the UI and should be truncated to prevent layout issues " +
                 "while still providing meaningful information to the user about the launch status."
-        
+
         val update = createMockUpdate(comment = longComment)
-        
+
         assertEquals(longComment, update.comment)
-        
+
         // Test truncation logic (this would be in the actual UI component)
         val maxLength = 150
         val shouldTruncate = longComment.length > maxLength
@@ -132,7 +133,7 @@ class LatestUpdatesViewTest {
         } else {
             longComment
         }
-        
+
         assertEquals(true, shouldTruncate)
         assertEquals(153, displayComment.length) // 150 + "..."
     }
@@ -151,7 +152,7 @@ class LatestUpdatesViewTest {
 
         // Test sorting by creation date (newest first)
         val sortedUpdates = updates.sortedByDescending { it.createdOn }
-        
+
         assertEquals(instant2, sortedUpdates[0].createdOn) // Newest
         assertEquals(instant1, sortedUpdates[1].createdOn) // Middle
         assertEquals(instant3, sortedUpdates[2].createdOn) // Oldest
@@ -163,20 +164,20 @@ class LatestUpdatesViewTest {
             createdBy = "UserA",
             profileImage = "https://example.com/profile.jpg"
         )
-        
+
         val updateWithoutImage = createMockUpdate(
-            createdBy = "UserB", 
+            createdBy = "UserB",
             profileImage = null
         )
 
         // Test that we have the expected data for fallback logic
         assertEquals("https://example.com/profile.jpg", updateWithImage.profileImage)
         assertEquals(null, updateWithoutImage.profileImage)
-        
+
         // The actual fallback logic would be in the UI component
         val fallbackImageUrl = "https://via.placeholder.com/48x48/CCCCCC/000000?text=" +
                 (updateWithoutImage.createdBy?.firstOrNull()?.uppercaseChar() ?: "?")
-        
+
         assertEquals("https://via.placeholder.com/48x48/CCCCCC/000000?text=U", fallbackImageUrl)
     }
 }

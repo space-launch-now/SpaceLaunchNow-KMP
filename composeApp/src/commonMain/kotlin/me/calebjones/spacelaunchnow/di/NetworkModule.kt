@@ -22,7 +22,7 @@ import org.koin.dsl.module
 val networkModule = module {
     // Provide the API_KEY
     single(named("API_KEY")) {
-        EnvironmentManager.getEnv("API_KEY", "***REMOVED***")
+        EnvironmentManager.getEnv("API_KEY", "")
     }
     
     // Provide the HttpClientEngine (CIO for JVM)

@@ -12,6 +12,6 @@ object UserAgentUtil {
      */
     fun getUserAgent(): String {
         val platform = getPlatform()
-        return "${BuildConfig.APP_NAME}/${BuildConfig.VERSION_NAME} (${platform.name})"
+        return "${BuildConfig.APP_NAME}-v${BuildConfig.VERSION_NAME} (${platform.name})"
     }
 }
