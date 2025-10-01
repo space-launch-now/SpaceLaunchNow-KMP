@@ -75,6 +75,8 @@ kotlin {
                 implementation(libs.android.firebase.auth)
                 implementation(libs.android.firebase.analytics)
                 implementation(libs.android.firebase.messaging)
+
+                implementation(libs.androidx.core.splashscreen)
             }
         }
 

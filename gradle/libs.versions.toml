@@ -21,6 +21,7 @@ compose = "2.2.20"
 compose-material3 = "1.4.0"
 compose-material3-adaptive = "1.1.0" # Or the latest version
 compose-hot-reload = "1.0.0-beta08"
+coreSplashscreen = "1.0.1"
 insetsx = "0.1.0-alpha10"
 junit = "4.13.2"
 kotlin = "2.2.20"
@@ -57,6 +58,7 @@ composeMediaPlayer = "1.0.47"
 workRuntime = "2.10.5"
 
 [libraries]
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash Theme -->
+    <style name="Theme.SpaceLaunchNow.Splash" parent="Theme.SpaceLaunchNow">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_icon_bg</item>
+    </style>
+    <!-- Main App Theme -->
+    <style name="Theme.SpaceLaunchNow" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

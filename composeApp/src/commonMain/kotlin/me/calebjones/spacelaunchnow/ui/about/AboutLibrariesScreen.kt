@@ -3,8 +3,10 @@ package me.calebjones.spacelaunchnow.ui.about
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,11 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Brands
+import compose.icons.fontawesomeicons.brands.Discord
+import compose.icons.fontawesomeicons.brands.Github
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.launcher
 import me.calebjones.spacelaunchnow.util.BuildConfig
@@ -87,7 +95,6 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
             ) {
                 Box(
                     modifier = Modifier
-                        .size(120.dp)
                         .clip(CircleShape)
                         .border(4.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
                         .background(Color(0xFF1565C0), CircleShape),
@@ -98,14 +105,54 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
                         painter = painter,
                         contentDescription = "App Logo",
                         modifier = Modifier
-                            .size(96.dp)
+                            .size(150.dp)
                             .clip(CircleShape),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.Inside
                     )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
+                Text("Space Launch Now")
                 Text("Version: ${BuildConfig.VERSION_NAME}-${BuildConfig.VERSION_CODE}")
+                val uriHandler = LocalUriHandler.current
+                Row(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        IconButton(onClick = { uriHandler.openUri("https://github.com/ItsCalebJones/SpaceLaunchNow-KMP") }) {
+                            Icon(
+                                imageVector = FontAwesomeIcons.Brands.Github,
+                                contentDescription = "GitHub",
+                                modifier = Modifier.size(40.dp).padding(4.dp)
+                            )
+                        }
+                        Text("GitHub", fontSize = 12.sp)
+                    }
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        IconButton(onClick = { uriHandler.openUri("https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/releases") }) {
+                            Icon(
+                                imageVector = Icons.Filled.List,
+                                contentDescription = "Changelog",
+                                modifier = Modifier.size(40.dp).padding(4.dp)
+                            )
+                        }
+                        Text("Changelog", fontSize = 12.sp)
+                    }
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        IconButton(onClick = { uriHandler.openUri("https://discord.gg/WVfzEDW") }) {
+                            Icon(
+                                imageVector = FontAwesomeIcons.Brands.Discord,
+                                contentDescription = "Discord",
+                                modifier = Modifier.size(40.dp).padding(4.dp)
+                            )
+                        }
+                        Text("Discord", fontSize = 12.sp)
+                    }
+                }
                 Text(
                     "Open Source Libraries",
                     modifier = Modifier.padding(16.dp),
@@ -114,7 +161,6 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
                 LibrariesContainer(
                     libraries = libs,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = contentPadding,
                     showAuthor = true,
                     showDescription = true,
                     showVersion = true,
