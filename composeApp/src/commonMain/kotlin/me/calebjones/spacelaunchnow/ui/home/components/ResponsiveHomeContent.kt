@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,7 @@ import androidx.navigation.NavController
 import me.calebjones.spacelaunchnow.isDesktop
 import me.calebjones.spacelaunchnow.isLandscape
 import me.calebjones.spacelaunchnow.isTablet
+import me.calebjones.spacelaunchnow.navigation.Schedule
 
 @Composable
 fun ResponsiveHomeContent(
@@ -43,7 +42,7 @@ fun ResponsiveHomeContent(
                 ) {
                     NextLaunchView(navController = navController)
                 }
-                
+
                 // Right side - Other content
                 LazyColumn(
                     modifier = Modifier
@@ -54,7 +53,15 @@ fun ResponsiveHomeContent(
                         SectionTitle(
                             title = "Upcoming Launches",
                             hasAction = true,
-                            onActionClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Screen.Schedule) })
+                            onActionClick = {
+                                navController.navigate(Schedule) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            })
                     }
                     item { UpcomingHorizontalScrollableList(navController = navController) }
                     item { SectionTitle(title = "Latest Updates", hasAction = true) }
@@ -63,30 +70,37 @@ fun ResponsiveHomeContent(
                     item { ArticlesView() }
                     item { SectionTitle(title = "Upcoming Events", hasAction = true) }
                     item { EventsView(navController = navController) }
-                    item { Spacer(modifier = Modifier.height(32.dp))}
+                    item { Spacer(modifier = Modifier.height(32.dp)) }
                 }
             }
         }
     } else {
-            LazyColumn(
-                modifier = modifier,
-            ) {
-                item { HomeTopBar()}
-                item { NextLaunchView(navController = navController) }
-                item {
-                    SectionTitle(
-                        title = "Upcoming Launches",
-                        hasAction = true,
-                        onActionClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Screen.Schedule) })
-                }
-                item { UpcomingHorizontalScrollableList(navController = navController) }
-                item { SectionTitle(title = "Latest Updates", hasAction = true) }
-                item { LatestUpdatesView() }
-                item { SectionTitle(title = "Latest News", hasAction = false) }
-                item { ArticlesView() }
-                item { SectionTitle(title = "Upcoming Events", hasAction = true) }
-                item { EventsView(navController = navController) }
-                item { Spacer(modifier = Modifier.height(32.dp)) }
+        LazyColumn(
+            modifier = modifier,
+        ) {
+            item { HomeTopBar() }
+            item { NextLaunchView(navController = navController) }
+            item {
+                SectionTitle(
+                    title = "Upcoming Launches",
+                    hasAction = true,
+                    onActionClick = {
+                        navController.navigate(Schedule) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
+            item { UpcomingHorizontalScrollableList(navController = navController) }
+            item { SectionTitle(title = "Latest Updates", hasAction = true) }
+            item { LatestUpdatesView() }
+            item { SectionTitle(title = "Latest News", hasAction = false) }
+            item { ArticlesView() }
+            item { SectionTitle(title = "Upcoming Events", hasAction = true) }
+            item { EventsView(navController = navController) }
+            item { Spacer(modifier = Modifier.height(32.dp)) }
         }
+    }
 }

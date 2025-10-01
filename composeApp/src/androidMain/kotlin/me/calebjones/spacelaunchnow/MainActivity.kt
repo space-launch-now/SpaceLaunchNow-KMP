@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.edit
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chaintech.videoplayer.util.PlaybackPreference
 import kotlinx.coroutines.CoroutineScope
@@ -28,8 +29,10 @@ import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     private val appPreferences: AppPreferences by inject()
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+        setTheme(android.R.style.Theme_Material_NoActionBar)
         super.onCreate(savedInstanceState)
 
         // Initialize BuildConfig to set DEBUG flag
@@ -63,14 +66,14 @@ class MainActivity : ComponentActivity() {
                 initialValue = ThemeOption.System,
                 lifecycle = this.lifecycle
             )
-            
+
             // Determine if we should use dark theme for system bars
             val isDarkTheme = when (themeOption) {
                 ThemeOption.System -> isSystemInDarkTheme()
                 ThemeOption.Light -> false
                 ThemeOption.Dark -> true
             }
-            
+
             // Update edge-to-edge based on theme
             LaunchedEffect(isDarkTheme) {
                 enableEdgeToEdge(
@@ -86,7 +89,7 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
-            
+
             SpaceLaunchNowApp()
         }
     }

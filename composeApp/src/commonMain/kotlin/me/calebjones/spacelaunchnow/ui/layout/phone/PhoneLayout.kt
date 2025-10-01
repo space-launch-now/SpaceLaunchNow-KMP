@@ -159,7 +159,7 @@ fun PhoneLayout(
                             )
                         }
                         composableWithCompositionLocal<AboutLibraries> {
-                            AboutLibrariesScreen()
+                            AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
                         }
                     }
                 }
