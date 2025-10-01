@@ -52,7 +52,7 @@ data class FirstStageDetailedSerializerNoLanding (
 
     @SerialName(value = "turn_around_time") @Required val turnAroundTime: kotlin.String?,
 
-    @SerialName(value = "previous_flight") @Required val previousFlight: LaunchNormal
+    @SerialName(value = "previous_flight") @Required val previousFlight: LaunchNormal?
 
 ) {
 

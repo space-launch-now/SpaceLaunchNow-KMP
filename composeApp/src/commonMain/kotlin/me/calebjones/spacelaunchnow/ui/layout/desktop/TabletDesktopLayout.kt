@@ -1,55 +1,72 @@
 package me.calebjones.spacelaunchnow.ui.layout.desktop
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
-import androidx.compose.material3.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.Text
 import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import me.calebjones.spacelaunchnow.navigation.Home
-import me.calebjones.spacelaunchnow.navigation.Schedule
-import me.calebjones.spacelaunchnow.navigation.Settings
-import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.AboutLibraries
+import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
-import me.calebjones.spacelaunchnow.ui.home.HomeScreen
-import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
-import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
-import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
+import me.calebjones.spacelaunchnow.navigation.Home
+import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.Schedule
+import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
-import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
-import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.runtime.CompositionLocalProvider
+import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
+import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
+import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
+import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
+import me.calebjones.spacelaunchnow.ui.settings.NotificationSettingsScreen
+import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
+import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
+import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun TabletDesktopLayout(navController: NavHostController = rememberNavController()) {
+fun TabletDesktopLayout(
+    navController: NavHostController = rememberNavController(),
+    themeOption: ThemeOption = ThemeOption.System
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    
-    SpaceLaunchNowTheme {
+
+    SpaceLaunchNowTheme(themeOption = themeOption) {
         SharedTransitionLayout {
             CompositionLocalProvider(LocalSharedTransitionScope provides this) {
                 val screens = listOf(Home, Schedule, Settings)
@@ -122,11 +139,38 @@ fun TabletDesktopLayout(navController: NavHostController = rememberNavController
                                 }
                                 composable<Schedule> {
                                     ScheduleScreen(
-                                        onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
+                                        onLaunchClick = { id ->
+                                            navController.navigate(
+                                                LaunchDetail(
+                                                    id
+                                                )
+                                            )
+                                        }
                                     )
                                 }
                                 composableWithCompositionLocal<Settings> {
-                                    SettingsScreen()
+                                    SettingsScreen(
+                                        navController = navController,
+                                        onOpenNotificationSettings = {
+                                            navController.navigate(NotificationSettings)
+                                        },
+                                        onOpenDebugSettings = {
+                                            navController.navigate(DebugSettings)
+                                        },
+                                        onOpenAboutLibraries = {
+                                            navController.navigate(AboutLibraries)
+                                        }
+                                    )
+                                }
+                                composableWithCompositionLocal<NotificationSettings> {
+                                    NotificationSettingsScreen(
+                                        onNavigateBack = { navController.popBackStack() }
+                                    )
+                                }
+                                composableWithCompositionLocal<DebugSettings> {
+                                    DebugSettingsScreen(
+                                        onNavigateBack = { navController.popBackStack() }
+                                    )
                                 }
                                 composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
                                     val launchDetail = backStackEntry.toRoute<LaunchDetail>()

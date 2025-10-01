@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -135,7 +137,6 @@ fun HomeScreen(navController: NavController) {
         if (allNetworkCallsComplete) {
             if (isRefreshing) {
                 // Pull-to-refresh completed - trigger pulse animation
-                delay(200) // Brief delay to show refresh completed
                 isRefreshing = false
                 
                 // Pulse animation
@@ -148,15 +149,11 @@ fun HomeScreen(navController: NavController) {
                     animationSpec = tween(durationMillis = 150)
                 )
             } else if (!hasInitiallyLoaded) {
-                // Initial load - show content with fade-in animation
-                delay(100)
                 showContent = true
                 hasInitiallyLoaded = true
             }
         }
     }
-
-    Scaffold {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -168,12 +165,7 @@ fun HomeScreen(navController: NavController) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    item { HomeTopBar() }
-                    
-                    item {
-                        NextUpShimmerBox()
-                    }
-
+                    item { NextUpShimmerBox() }
                     item { SectionTitle(title = "Upcoming Launches", hasAction = true) }
                     item { LaunchListShimmer(cardCount = 3) }
 
@@ -209,27 +201,26 @@ fun HomeScreen(navController: NavController) {
                         visible = showContent,
                         enter = fadeIn(
                             animationSpec = tween(
-                                durationMillis = 500,
-                                delayMillis = 0
+                                durationMillis = 800,
                             )
                         ) + slideInVertically(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessMedium
+                                stiffness = Spring.StiffnessLow
                             ),
-                            initialOffsetY = { it / 3 }
+                            initialOffsetY = { it / 2 }
                         ),
                         exit = fadeOut(
                             animationSpec = tween(
-                                durationMillis = 300,
+                                durationMillis = 400,
                                 delayMillis = 0
                             )
                         ) + slideOutVertically(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessMedium
+                                stiffness = Spring.StiffnessLow
                             ),
-                            targetOffsetY = { it / 3 }
+                            targetOffsetY = { it / 2 }
                         )
                     ) {
                         ResponsiveHomeContent(
@@ -247,5 +238,4 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
-    }
 }

@@ -36,7 +36,7 @@ data class DockingLocationSerializerForSpacestation (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "currently_docked") @Required val currentlyDocked: DockingEventDetailedSerializerForSpacestation
+    @SerialName(value = "currently_docked") @Required val currentlyDocked: DockingEventDetailedSerializerForSpacestation?
 
 ) {
 

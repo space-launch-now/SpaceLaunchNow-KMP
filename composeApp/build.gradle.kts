@@ -33,6 +33,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.openApiGenerator)
+    alias(libs.plugins.aboutLibraries)
     id("com.google.gms.google-services")
 }
 
@@ -51,7 +52,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -62,7 +63,7 @@ kotlin {
             isStatic = true
         }
     }
-      sourceSets {
+    sourceSets {
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -72,7 +73,7 @@ kotlin {
                 implementation(compose.ui)
 
                 implementation(compose.materialIconsExtended)
-            
+
                 implementation(libs.kotlinx.coroutines.swing)
 
                 implementation(libs.slf4j.simple)
@@ -81,7 +82,7 @@ kotlin {
                 implementation(libs.coil.compose.jvm)
             }
         }
-        
+
         val androidMain by getting {
             dependencies {
                 implementation(compose.preview)
@@ -89,22 +90,26 @@ kotlin {
                 implementation(libs.koin.android)
                 implementation(libs.androidx.palette)
                 implementation(libs.coil.compose.android)
-                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-                implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+                implementation(libs.lifecycle.viewmodel.ktx)
+                implementation(libs.androidx.lifecycle.runtime.ktx)
+                implementation(libs.androidx.work.runtime)
 
-                // Firebase dependencies with explicit versions
-                implementation("com.google.firebase:firebase-messaging-ktx:24.1.0")
-                implementation("androidx.work:work-runtime-ktx:2.10.0")
+                implementation(project.dependencies.platform(libs.firebase.bom))
+                implementation(libs.android.firebase.auth)
+                implementation(libs.android.firebase.analytics)
+                implementation(libs.android.firebase.messaging)
+
+                implementation(libs.androidx.core.splashscreen)
             }
         }
 
-          iosMain {
+        iosMain {
 
-              dependencies{
-                  implementation(libs.coil.compose.ios)
-              }
-          }
-        
+            dependencies {
+                implementation(libs.coil.compose.ios)
+            }
+        }
+
         commonMain {
             kotlin.srcDir("$projectDir/src/openApiLL/src/commonMain/kotlin")
             kotlin.srcDir("$projectDir/src/openApiSNAPI/src/commonMain/kotlin")
@@ -148,14 +153,21 @@ kotlin {
 
                 // Compose Multiplatform Media Player
                 implementation(libs.compose.media.player)
+
+                // DataStore for persistent storage
+                implementation(libs.androidx.datastore.preferences)
+
+                implementation(libs.aboutlibraries.core)
+                implementation(libs.aboutlibraries.compose.m2)
+                implementation(libs.aboutlibraries.compose.m3)
             }
         }
-        
+
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
-                implementation("io.ktor:ktor-client-mock:2.3.12")
+                implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.ktor.client.mock)
             }
         }
     }
@@ -168,14 +180,15 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-    
+
 
     defaultConfig {
-        applicationId = "me.calebjones.spacelaunchnow.kmp"
+        applicationId = "me.calebjones.spacelaunchnow"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = computeVersionCode()
         versionName = computeVersionName()
+
     }
     packaging {
         resources {
@@ -185,6 +198,10 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+        }
+        getByName("debug") {
+            applicationIdSuffix = ".kmpdebug"
+            versionNameSuffix = "-DEBUG"
         }
     }
     compileOptions {
@@ -207,7 +224,8 @@ tasks.withType<ProcessResources> {
 
 compose.desktop {
     application {
-        mainClass = "me.calebjones.spacelaunchnow.MainKt" // Correct path to the Kotlin file containing the main function
+        mainClass =
+            "me.calebjones.spacelaunchnow.MainKt" // Correct path to the Kotlin file containing the main function
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "SpaceLaunchNow"
