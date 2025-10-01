@@ -1,5 +1,21 @@
 This is a Kotlin Multiplatform application for Space Launch Now based off Launch Library data from The Space Devs.
 
+## 🚀 CI/CD Pipeline
+
+This project uses an automated CI/CD pipeline with:
+- ✅ Automated version bumping via [Conventional Commits](https://www.conventionalcommits.org/)
+- ✅ Automatic changelog generation
+- ✅ Firebase Distribution for testers
+- ✅ GitHub Releases with artifacts
+- ✅ PR validation and testing
+
+**Quick Start:**
+- 📘 [CI/CD Quick Reference](docs/CICD_QUICK_REFERENCE.md) - Fast commands and examples
+- 📝 [Conventional Commits Guide](docs/CONVENTIONAL_COMMITS.md) - How to write commit messages
+- 📚 [Full CI/CD Documentation](docs/CICD_PIPELINE.md) - Complete pipeline details
+
+**TL;DR:** Use `feat:` for features, `fix:` for bugs. Merges to master auto-deploy! 🎉
+
 ## Prerequisites
 
 ### Java 21 Requirement

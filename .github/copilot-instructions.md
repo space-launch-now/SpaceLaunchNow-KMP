@@ -1,5 +1,37 @@
 # Copilot Instructions for SpaceLaunchNow KMP
 
+## CI/CD Pipeline & Conventional Commits
+
+**IMPORTANT:** This project uses automated CI/CD with conventional commits.
+
+**Commit Message Format:**
+```
+<type>(<scope>): <subject>
+
+Examples:
+feat: add event detail page          → Minor version bump (4.0.0 → 4.1.0)
+fix: resolve crash on null           → Patch version bump (4.0.0 → 4.0.1)
+feat!: redesign homepage             → Major version bump (4.0.0 → 5.0.0)
+chore: update dependencies           → Patch version bump (4.0.0 → 4.0.1)
+```
+
+**When Suggesting Commits:**
+- ✅ Always use conventional commit format
+- ✅ Choose appropriate type: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`
+- ✅ Add scope when relevant: `feat(ui):`, `fix(api):`, `chore(deps):`
+- ✅ Use `!` for breaking changes: `feat!:` or include `BREAKING CHANGE:` in footer
+- ❌ Never suggest plain messages like "Update files" or "Fix bug"
+- ❌ Avoid bumping major version without human review
+
+**Pipeline Triggers:**
+- **PR to master:** Runs tests and builds debug APK (no deployment)
+- **Merge to master:** Bumps version, generates changelog, builds signed release, deploys to Firebase Distribution, creates GitHub Release
+
+**Documentation:**
+- [CI/CD Quick Reference](../docs/CICD_QUICK_REFERENCE.md)
+- [Conventional Commits Guide](../docs/CONVENTIONAL_COMMITS.md)
+- [Full CI/CD Pipeline](../docs/CICD_PIPELINE.md)
+
 ## Project Goals - MVP Application
 
 **Priority Platform**: Android (primary focus)
