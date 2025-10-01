@@ -2,38 +2,52 @@
 
 package me.calebjones.spacelaunchnow.ui.schedule
 
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,44 +57,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.Rocket
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
-import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import org.koin.compose.koinInject
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.MutableState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.Rocket
-import androidx.compose.animation.core.tween
-import androidx.compose.material3.DividerDefaults
-import androidx.compose.ui.text.style.TextAlign
-import kotlinx.datetime.Instant
 
 @Composable
 fun ScheduleScreen(
@@ -118,6 +120,8 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
 
     var selectedTab by remember { mutableStateOf(ScheduleTab.Upcoming) }
     var searchQuery by remember { mutableStateOf("") }
+    var isSearchExpanded by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
     val upcomingItems = remember { mutableStateListOf<LaunchBasic>() }
     val previousItems = remember { mutableStateListOf<LaunchBasic>() }
@@ -133,6 +137,8 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
 
     val upcomingEndReached = remember { mutableStateOf(false) }
     val previousEndReached = remember { mutableStateOf(false) }
+
+    var hasAttemptedInitialLoad by remember { mutableStateOf(false) }
 
     fun uiFor(tab: ScheduleTab) = when (tab) {
         ScheduleTab.Upcoming -> TabUiState(
@@ -157,7 +163,7 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
     var queryVersion by remember { mutableStateOf(0) }
 
     // Simple per-tab cache with TTL
-    val cacheTtlMillis = 600_000L // 10 minute TTL
+    val cacheTtlMillis = 900_000L // 15 minute TTL
     var upcomingCache by remember { mutableStateOf<TabCache?>(null) }
     var previousCache by remember { mutableStateOf<TabCache?>(null) }
 
@@ -178,7 +184,10 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
     fun hasValidCache(tab: ScheduleTab): Boolean {
         val cache = cacheFor(tab) ?: return false
         val fresh = (now() - cache.timestamp) < cacheTtlMillis
-        return fresh && cache.query == searchQuery && cache.results.isNotEmpty()
+        // Cache is valid if fresh and query matches (empty search matches empty cache query)
+        val queryMatches =
+            cache.query == searchQuery || (cache.query.isEmpty() && searchQuery.isEmpty())
+        return fresh && queryMatches && cache.results.isNotEmpty()
     }
 
     fun restoreFromCache(tab: ScheduleTab) {
@@ -258,13 +267,28 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
     // Native pull-to-refresh (same style as HomeScreen)
     var isRefreshing by remember { mutableStateOf(false) }
     fun bustCacheAndRefresh(tab: ScheduleTab = selectedTab) {
-        setCache(tab, null)
+        // Clear cache for the current tab only if searching, otherwise clear both tabs
+        if (searchQuery.isNotBlank()) {
+            setCache(tab, null)
+        } else {
+            // For general refresh, clear both caches to get fresh data
+            setCache(ScheduleTab.Upcoming, null)
+            setCache(ScheduleTab.Previous, null)
+        }
         isRefreshing = true
         scope.launch {
-            resetAndLoad(tab)
+            if (searchQuery.isNotBlank()) {
+                // Only refresh current tab if searching
+                resetAndLoad(tab)
+            } else {
+                // Refresh both tabs for general refresh
+                resetAndLoad(ScheduleTab.Upcoming)
+                resetAndLoad(ScheduleTab.Previous)
+            }
             isRefreshing = false
         }
     }
+
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = { bustCacheAndRefresh() }
@@ -311,11 +335,26 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
         delay(400)
         // Bump version so any in-flight requests from the previous query are ignored
         queryVersion++
-        // Always refresh both tabs so search is shared
-        setCache(ScheduleTab.Upcoming, null)
-        setCache(ScheduleTab.Previous, null)
-        resetAndLoad(ScheduleTab.Upcoming)
-        resetAndLoad(ScheduleTab.Previous)
+        // Only clear caches if search query is not empty or has actually changed
+        if (searchQuery.isNotBlank()) {
+            // Clear caches only for search queries
+            setCache(ScheduleTab.Upcoming, null)
+            setCache(ScheduleTab.Previous, null)
+            resetAndLoad(ScheduleTab.Upcoming)
+            resetAndLoad(ScheduleTab.Previous)
+        } else {
+            // For empty search, check if we need to reload from cache or fetch fresh data
+            val currentUi = uiFor(selectedTab)
+            if (!hasValidCache(selectedTab) && currentUi.items.isEmpty()) {
+                resetAndLoad(selectedTab)
+            }
+            val otherTab =
+                if (selectedTab == ScheduleTab.Upcoming) ScheduleTab.Previous else ScheduleTab.Upcoming
+            val otherUi = uiFor(otherTab)
+            if (!hasValidCache(otherTab) && otherUi.items.isEmpty()) {
+                resetAndLoad(otherTab)
+            }
+        }
     }
 
     // Infinite scroll for each tab
@@ -347,40 +386,100 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
     // Initial load + preload other page
     LaunchedEffect(Unit) {
         val current = selectedTab
-        if (hasValidCache(current)) restoreFromCache(current) else if (uiFor(current).items.isEmpty()) resetAndLoad(
-            current
-        )
+        // Ensure loading is marked to true immediately to avoid UI flicker.
+        val currentUi = uiFor(current)
+        if (!hasValidCache(current) && currentUi.items.isEmpty()) {
+            currentUi.isLoading.value = true
+        }
+        if (hasValidCache(current)) {
+            restoreFromCache(current)
+        } else if (currentUi.items.isEmpty()) {
+            resetAndLoad(current)
+        }
         val other =
             if (current == ScheduleTab.Upcoming) ScheduleTab.Previous else ScheduleTab.Upcoming
-        if (hasValidCache(other)) restoreFromCache(other) else if (uiFor(other).items.isEmpty()) resetAndLoad(
-            other
-        )
+        val otherUi = uiFor(other)
+        if (!hasValidCache(other) && otherUi.items.isEmpty()) {
+            otherUi.isLoading.value = true
+        }
+        if (hasValidCache(other)) {
+            restoreFromCache(other)
+        } else if (otherUi.items.isEmpty()) {
+            resetAndLoad(other)
+        }
+        // Mark after first load attempt is done
+        hasAttemptedInitialLoad = true
+    }
+
+    // Clear search when collapsed
+    LaunchedEffect(isSearchExpanded) {
+        if (!isSearchExpanded && searchQuery.isNotBlank()) {
+            // Don't immediately trigger the search debounce by clearing query
+            // Instead, set to empty without triggering cache clear
+            searchQuery = ""
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Search bar moved above tabs and made rounder
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            // Title bar with expandable search
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                placeholder = { Text("Search launches") },
-                singleLine = true,
-                shape = RoundedCornerShape(28.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                )
-            )
+                    .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp)
+            ) {
+                if (isSearchExpanded) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                isSearchExpanded = false
+                                searchQuery = ""
+                            }) {
+                                Icon(Icons.Default.Close, contentDescription = "Close search")
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
+                        placeholder = { Text("Search launches") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(28.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        )
+                    )
+                    LaunchedEffect(Unit) {
+                        focusRequester.requestFocus()
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Launch Schedule",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 36.sp,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = { isSearchExpanded = true }) {
+                            Icon(Icons.Default.Search, contentDescription = "Search")
+                        }
+                    }
+                }
+            }
 
             // Tabs
             val selectedTabIndex = if (selectedTab == ScheduleTab.Upcoming) 0 else 1
             TabRow(
                 selectedTabIndex = selectedTabIndex,
-                divider = { HorizontalDivider() }
+//                divider = { HorizontalDivider() }
             ) {
                 Tab(
                     selected = selectedTab == ScheduleTab.Upcoming,
@@ -432,7 +531,8 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
                         }
                     }
 
-                    if (ui.items.isEmpty() && ui.isLoading.value) {
+                    // Only show initial loading indicator if no error and not refreshing
+                    if (ui.items.isEmpty() && ui.isLoading.value && ui.error.value == null && !isRefreshing) {
                         item {
                             Box(
                                 Modifier.fillMaxWidth().padding(24.dp),
@@ -448,9 +548,6 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
                             launch = launch,
                             onClick = { onLaunchClick(launch.id) }
                         )
-                        if (index < ui.items.size - 1) {
-                            HorizontalDivider(thickness = 1.dp, color = DividerDefaults.color)
-                        }
                     }
 
                     if (ui.isLoading.value && ui.items.isNotEmpty()) {
@@ -464,7 +561,9 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
                         }
                     }
 
-                    if (!ui.isLoading.value && ui.items.isEmpty() && ui.error.value == null) {
+                    // Only show empty state if not loading and either not currently refreshing or finished refreshing.
+                    // Prevents flicker during initial load.
+                    if (hasAttemptedInitialLoad && !ui.isLoading.value && ui.items.isEmpty() && ui.error.value == null && !isRefreshing) {
                         item {
                             Box(
                                 Modifier.fillMaxWidth().padding(24.dp),
@@ -475,6 +574,7 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
                         }
                     }
                 }
+
             }
         }
 
@@ -491,16 +591,32 @@ private fun ScheduleLaunchCard(
     launch: LaunchBasic,
     onClick: () -> Unit
 ) {
-    Row(
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .clickable(onClick = onClick),
-        verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Launch Image/Icon
             val imageUrl = launch.image?.thumbnailUrl ?: launch.image?.imageUrl
+            val dateText = DateTimeUtil.formatDateWithPrecisionFallback(launch)
+            val title = launch.name ?: "Unknown Launch"
+            val location = launch.locationName ?: "Unknown Location"
+            val mission = launch.launchServiceProvider.name
 
             if (imageUrl != null) {
                 AsyncImage(
@@ -510,7 +626,7 @@ private fun ScheduleLaunchCard(
                     error = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
                     fallback = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(64.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                     contentScale = ContentScale.Crop
@@ -518,7 +634,7 @@ private fun ScheduleLaunchCard(
             } else {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(64.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
@@ -526,8 +642,8 @@ private fun ScheduleLaunchCard(
                     Icon(
                         imageVector = FontAwesomeIcons.Solid.Rocket,
                         contentDescription = "placeholder",
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
                     )
                 }
             }
@@ -535,21 +651,28 @@ private fun ScheduleLaunchCard(
             // Main Content Column
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 // Launch Title
                 Text(
-                    text = LaunchFormatUtil.formatLaunchTitle(launch),
-                    style = MaterialTheme.typography.titleMedium,
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+                Text(
+                    text = mission,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
                 // Launch Service Provider
                 Text(
-                    text = launch.launchServiceProvider.name,
+                    text = location,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -559,10 +682,10 @@ private fun ScheduleLaunchCard(
 
             // Date Column (Right Side)
             Column(
+                modifier = Modifier.fillMaxHeight(),
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.Top
             ) {
-                val dateText = formatDateWithPrecisionFallback(launch)
                 Text(
                     text = dateText,
                     style = MaterialTheme.typography.labelSmall,
@@ -572,61 +695,5 @@ private fun ScheduleLaunchCard(
                 )
             }
         }
-}
-
-private fun formatDateWithPrecisionFallback(launch: LaunchBasic): String {
-    val net = launch.net ?: return "TBD"
-    val precisionId = launch.netPrecision?.id
-
-    return when (precisionId) {
-        2 -> DateTimeUtil.formatLaunchDate(net)
-        7 -> formatMonthYear(net)
-        8, 9, 10, 11 -> "${formatQuarter(net)} ${formatYear(net)}"
-        12 -> "H1 ${formatYear(net)}"
-        13 -> "H2 ${formatYear(net)}"
-        14 -> "NET ${formatYear(net)}"
-        15 -> "FY ${formatYear(net)}"
-        16 -> "Decade ${formatYear(net)}"
-        else -> DateTimeUtil.formatLaunchDate(net)
-    }
-}
-
-private fun formatYear(instant: Instant): String {
-    return try {
-        val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        ldt.year.toString()
-    } catch (e: Throwable) {
-        ""
-    }
-}
-
-private fun formatMonthYear(instant: Instant): String {
-    return try {
-        val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        val monthYear = DateTimeUtil.formatLaunchDate(instant)
-        val year = ldt.year.toString()
-        val idx = monthYear.indexOf(year)
-        if (idx > 0) {
-            val beforeYear = monthYear.substring(0, idx).trim().trimEnd(',')
-            "$beforeYear $year"
-        } else monthYear
-    } catch (_: Throwable) {
-        DateTimeUtil.formatLaunchDate(instant)
-    }
-}
-
-private fun formatQuarter(instant: Instant): String {
-    return try {
-        val ldt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        val month = ldt.monthNumber
-        val quarter = when (month) {
-            in 1..3 -> "Q1"
-            in 4..6 -> "Q2"
-            in 7..9 -> "Q3"
-            else -> "Q4"
-        }
-        quarter
-    } catch (_: Throwable) {
-        "Q?"
     }
 }

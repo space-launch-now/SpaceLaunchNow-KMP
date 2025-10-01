@@ -44,11 +44,11 @@ data class DockingEventDetailedSerializerForSpacestation (
 
     @SerialName(value = "docking") @Required val docking: kotlinx.datetime.Instant,
 
-    @SerialName(value = "flight_vehicle_chaser") @Required val flightVehicleChaser: SpacecraftFlightForDockingEvent,
+    @SerialName(value = "flight_vehicle_chaser") @Required val flightVehicleChaser: SpacecraftFlightForDockingEvent?,
 
-    @SerialName(value = "space_station_chaser") @Required val spaceStationChaser: SpaceStationNormal,
+    @SerialName(value = "space_station_chaser") @Required val spaceStationChaser: SpaceStationNormal?,
 
-    @SerialName(value = "payload_flight_chaser") @Required val payloadFlightChaser: PayloadFlightNormal,
+    @SerialName(value = "payload_flight_chaser") @Required val payloadFlightChaser: PayloadFlightNormal?,
 
     @SerialName(value = "departure") val departure: kotlinx.datetime.Instant? = null
 

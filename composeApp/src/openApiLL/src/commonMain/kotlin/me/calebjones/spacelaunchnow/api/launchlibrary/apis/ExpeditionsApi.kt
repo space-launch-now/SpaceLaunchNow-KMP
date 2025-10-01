@@ -46,13 +46,14 @@ open class ExpeditionsApi : ApiClient {
 
     /**
      * 
-     * #### Filters Parameters - &#x60;crew__astronaut&#x60;, &#x60;crew__astronaut__agency&#x60;, &#x60;end__gt&#x60;, &#x60;end__gte&#x60;, &#x60;end__lt&#x60;, &#x60;end__lte&#x60;, &#x60;name&#x60;, &#x60;space_station&#x60;, &#x60;start__gt&#x60;, &#x60;start__gte&#x60;, &#x60;start__lt&#x60;, &#x60;start__lte&#x60;  Example - [/expeditions/detailed/?space_station&#x3D;18](./?space_station&#x3D;18)  #### Search Fields searched - &#x60;crew__astronaut__agency__abbrev&#x60;, &#x60;crew__astronaut__agency__name&#x60;, &#x60;crew__astronaut__name&#x60;, &#x60;crew__astronaut__nationality__nationality_name&#x60;, &#x60;name&#x60;  Example - [/expeditions/detailed/?search&#x3D;Kelly](./?search&#x3D;Kelly)  #### Ordering Fields - &#x60;end&#x60;, &#x60;id&#x60;, &#x60;start&#x60;  Example - [/expeditions/detailed/?ordering&#x3D;-start](./?ordering&#x3D;-start)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/expeditions/detailed/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/expeditions/detailed/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Filters Parameters - &#x60;crew__astronaut&#x60;, &#x60;crew__astronaut__agency&#x60;, &#x60;end__gt&#x60;, &#x60;end__gte&#x60;, &#x60;end__lt&#x60;, &#x60;end__lte&#x60;, &#x60;is_active&#x60;, &#x60;name&#x60;, &#x60;space_station&#x60;, &#x60;start__gt&#x60;, &#x60;start__gte&#x60;, &#x60;start__lt&#x60;, &#x60;start__lte&#x60;  Example - [/expeditions/detailed/?space_station&#x3D;18](./?space_station&#x3D;18)  #### Search Fields searched - &#x60;crew__astronaut__agency__abbrev&#x60;, &#x60;crew__astronaut__agency__name&#x60;, &#x60;crew__astronaut__name&#x60;, &#x60;crew__astronaut__nationality__nationality_name&#x60;, &#x60;name&#x60;  Example - [/expeditions/detailed/?search&#x3D;Kelly](./?search&#x3D;Kelly)  #### Ordering Fields - &#x60;end&#x60;, &#x60;id&#x60;, &#x60;start&#x60;  Example - [/expeditions/detailed/?ordering&#x3D;-start](./?ordering&#x3D;-start)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/expeditions/detailed/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/expeditions/detailed/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
      * @param crewAstronaut  (optional)
      * @param crewAstronautAgency  (optional)
      * @param endGt End is greater than (optional)
      * @param endGte End is greater than or equal to (optional)
      * @param endLt End is less than (optional)
      * @param endLte End is greater than or equal to (optional)
+     * @param isActive  (optional)
      * @param limit Number of results to return per page. (optional)
      * @param name  (optional)
      * @param offset The initial index from which to return the results. (optional)
@@ -66,7 +67,7 @@ open class ExpeditionsApi : ApiClient {
      * @return PaginatedExpeditionDetailedList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun expeditionsDetailedList(crewAstronaut: kotlin.Int? = null, crewAstronautAgency: kotlin.Int? = null, endGt: kotlinx.datetime.Instant? = null, endGte: kotlinx.datetime.Instant? = null, endLt: kotlinx.datetime.Instant? = null, endLte: kotlinx.datetime.Instant? = null, limit: kotlin.Int? = null, name: kotlin.String? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStation: kotlin.Int? = null, startGt: kotlinx.datetime.Instant? = null, startGte: kotlinx.datetime.Instant? = null, startLt: kotlinx.datetime.Instant? = null, startLte: kotlinx.datetime.Instant? = null): HttpResponse<PaginatedExpeditionDetailedList> {
+    open suspend fun expeditionsDetailedList(crewAstronaut: kotlin.Int? = null, crewAstronautAgency: kotlin.Int? = null, endGt: kotlinx.datetime.Instant? = null, endGte: kotlinx.datetime.Instant? = null, endLt: kotlinx.datetime.Instant? = null, endLte: kotlinx.datetime.Instant? = null, isActive: kotlin.Boolean? = null, limit: kotlin.Int? = null, name: kotlin.String? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStation: kotlin.Int? = null, startGt: kotlinx.datetime.Instant? = null, startGte: kotlinx.datetime.Instant? = null, startLt: kotlinx.datetime.Instant? = null, startLte: kotlinx.datetime.Instant? = null): HttpResponse<PaginatedExpeditionDetailedList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 
@@ -80,6 +81,7 @@ open class ExpeditionsApi : ApiClient {
         endGte?.apply { localVariableQuery["end__gte"] = listOf("$endGte") }
         endLt?.apply { localVariableQuery["end__lt"] = listOf("$endLt") }
         endLte?.apply { localVariableQuery["end__lte"] = listOf("$endLte") }
+        isActive?.apply { localVariableQuery["is_active"] = listOf("$isActive") }
         limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
         name?.apply { localVariableQuery["name"] = listOf("$name") }
         offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
@@ -110,13 +112,14 @@ open class ExpeditionsApi : ApiClient {
 
     /**
      * 
-     * #### Filters Parameters - &#x60;crew__astronaut&#x60;, &#x60;crew__astronaut__agency&#x60;, &#x60;end__gt&#x60;, &#x60;end__gte&#x60;, &#x60;end__lt&#x60;, &#x60;end__lte&#x60;, &#x60;name&#x60;, &#x60;space_station&#x60;, &#x60;start__gt&#x60;, &#x60;start__gte&#x60;, &#x60;start__lt&#x60;, &#x60;start__lte&#x60;  Example - [/expeditions/?space_station&#x3D;18](./?space_station&#x3D;18)  #### Search Fields searched - &#x60;crew__astronaut__agency__abbrev&#x60;, &#x60;crew__astronaut__agency__name&#x60;, &#x60;crew__astronaut__name&#x60;, &#x60;crew__astronaut__nationality__nationality_name&#x60;, &#x60;name&#x60;  Example - [/expeditions/?search&#x3D;Kelly](./?search&#x3D;Kelly)  #### Ordering Fields - &#x60;end&#x60;, &#x60;id&#x60;, &#x60;start&#x60;  Example - [/expeditions/?ordering&#x3D;-start](./?ordering&#x3D;-start)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/expeditions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/expeditions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Filters Parameters - &#x60;crew__astronaut&#x60;, &#x60;crew__astronaut__agency&#x60;, &#x60;end__gt&#x60;, &#x60;end__gte&#x60;, &#x60;end__lt&#x60;, &#x60;end__lte&#x60;, &#x60;is_active&#x60;, &#x60;name&#x60;, &#x60;space_station&#x60;, &#x60;start__gt&#x60;, &#x60;start__gte&#x60;, &#x60;start__lt&#x60;, &#x60;start__lte&#x60;  Example - [/expeditions/?space_station&#x3D;18](./?space_station&#x3D;18)  #### Search Fields searched - &#x60;crew__astronaut__agency__abbrev&#x60;, &#x60;crew__astronaut__agency__name&#x60;, &#x60;crew__astronaut__name&#x60;, &#x60;crew__astronaut__nationality__nationality_name&#x60;, &#x60;name&#x60;  Example - [/expeditions/?search&#x3D;Kelly](./?search&#x3D;Kelly)  #### Ordering Fields - &#x60;end&#x60;, &#x60;id&#x60;, &#x60;start&#x60;  Example - [/expeditions/?ordering&#x3D;-start](./?ordering&#x3D;-start)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/expeditions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/expeditions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
      * @param crewAstronaut  (optional)
      * @param crewAstronautAgency  (optional)
      * @param endGt End is greater than (optional)
      * @param endGte End is greater than or equal to (optional)
      * @param endLt End is less than (optional)
      * @param endLte End is greater than or equal to (optional)
+     * @param isActive  (optional)
      * @param limit Number of results to return per page. (optional)
      * @param name  (optional)
      * @param offset The initial index from which to return the results. (optional)
@@ -130,7 +133,7 @@ open class ExpeditionsApi : ApiClient {
      * @return PaginatedExpeditionNormalList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun expeditionsList(crewAstronaut: kotlin.Int? = null, crewAstronautAgency: kotlin.Int? = null, endGt: kotlinx.datetime.Instant? = null, endGte: kotlinx.datetime.Instant? = null, endLt: kotlinx.datetime.Instant? = null, endLte: kotlinx.datetime.Instant? = null, limit: kotlin.Int? = null, name: kotlin.String? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStation: kotlin.Int? = null, startGt: kotlinx.datetime.Instant? = null, startGte: kotlinx.datetime.Instant? = null, startLt: kotlinx.datetime.Instant? = null, startLte: kotlinx.datetime.Instant? = null): HttpResponse<PaginatedExpeditionNormalList> {
+    open suspend fun expeditionsList(crewAstronaut: kotlin.Int? = null, crewAstronautAgency: kotlin.Int? = null, endGt: kotlinx.datetime.Instant? = null, endGte: kotlinx.datetime.Instant? = null, endLt: kotlinx.datetime.Instant? = null, endLte: kotlinx.datetime.Instant? = null, isActive: kotlin.Boolean? = null, limit: kotlin.Int? = null, name: kotlin.String? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStation: kotlin.Int? = null, startGt: kotlinx.datetime.Instant? = null, startGte: kotlinx.datetime.Instant? = null, startLt: kotlinx.datetime.Instant? = null, startLte: kotlinx.datetime.Instant? = null): HttpResponse<PaginatedExpeditionNormalList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 
@@ -144,6 +147,7 @@ open class ExpeditionsApi : ApiClient {
         endGte?.apply { localVariableQuery["end__gte"] = listOf("$endGte") }
         endLt?.apply { localVariableQuery["end__lt"] = listOf("$endLt") }
         endLte?.apply { localVariableQuery["end__lte"] = listOf("$endLte") }
+        isActive?.apply { localVariableQuery["is_active"] = listOf("$isActive") }
         limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
         name?.apply { localVariableQuery["name"] = listOf("$name") }
         offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
@@ -174,7 +178,7 @@ open class ExpeditionsApi : ApiClient {
 
     /**
      * 
-     * #### Filters Parameters - &#x60;crew__astronaut&#x60;, &#x60;crew__astronaut__agency&#x60;, &#x60;end__gt&#x60;, &#x60;end__gte&#x60;, &#x60;end__lt&#x60;, &#x60;end__lte&#x60;, &#x60;name&#x60;, &#x60;space_station&#x60;, &#x60;start__gt&#x60;, &#x60;start__gte&#x60;, &#x60;start__lt&#x60;, &#x60;start__lte&#x60;  Example - [/expeditions/?space_station&#x3D;18](./?space_station&#x3D;18)  #### Search Fields searched - &#x60;crew__astronaut__agency__abbrev&#x60;, &#x60;crew__astronaut__agency__name&#x60;, &#x60;crew__astronaut__name&#x60;, &#x60;crew__astronaut__nationality__nationality_name&#x60;, &#x60;name&#x60;  Example - [/expeditions/?search&#x3D;Kelly](./?search&#x3D;Kelly)  #### Ordering Fields - &#x60;end&#x60;, &#x60;id&#x60;, &#x60;start&#x60;  Example - [/expeditions/?ordering&#x3D;-start](./?ordering&#x3D;-start)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/expeditions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/expeditions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Filters Parameters - &#x60;crew__astronaut&#x60;, &#x60;crew__astronaut__agency&#x60;, &#x60;end__gt&#x60;, &#x60;end__gte&#x60;, &#x60;end__lt&#x60;, &#x60;end__lte&#x60;, &#x60;is_active&#x60;, &#x60;name&#x60;, &#x60;space_station&#x60;, &#x60;start__gt&#x60;, &#x60;start__gte&#x60;, &#x60;start__lt&#x60;, &#x60;start__lte&#x60;  Example - [/expeditions/?space_station&#x3D;18](./?space_station&#x3D;18)  #### Search Fields searched - &#x60;crew__astronaut__agency__abbrev&#x60;, &#x60;crew__astronaut__agency__name&#x60;, &#x60;crew__astronaut__name&#x60;, &#x60;crew__astronaut__nationality__nationality_name&#x60;, &#x60;name&#x60;  Example - [/expeditions/?search&#x3D;Kelly](./?search&#x3D;Kelly)  #### Ordering Fields - &#x60;end&#x60;, &#x60;id&#x60;, &#x60;start&#x60;  Example - [/expeditions/?ordering&#x3D;-start](./?ordering&#x3D;-start)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/expeditions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/expeditions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this expedition.
      * @return ExpeditionDetailed
      */

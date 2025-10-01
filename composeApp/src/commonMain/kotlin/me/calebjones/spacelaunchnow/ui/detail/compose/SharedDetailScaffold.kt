@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -38,7 +37,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,12 +62,12 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil3.compose.SubcomposeAsyncImage
+import me.calebjones.spacelaunchnow.isDesktop
+import me.calebjones.spacelaunchnow.isLandscape
+import me.calebjones.spacelaunchnow.isTablet
 import me.calebjones.spacelaunchnow.ui.SharedElementType
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
-import me.calebjones.spacelaunchnow.isTablet
-import me.calebjones.spacelaunchnow.isLandscape
-import me.calebjones.spacelaunchnow.isDesktop
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -344,7 +342,7 @@ private fun SharedDetailTitle(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                maxLines = 3,
+                maxLines = 1,
                 modifier = Modifier
                     .padding(
                         start = with(LocalDensity.current) { horizontalPaddingPx.toDp() },
@@ -360,8 +358,8 @@ private fun SharedDetailTitle(
             tagline?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 2,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 1,
                     modifier = Modifier
                         .padding(
                             start = with(LocalDensity.current) { horizontalPaddingPx.toDp() },

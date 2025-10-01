@@ -57,7 +57,7 @@ fun NextLaunchView(navController: NavController) {
 
     LaunchedEffect(Unit) {
         homeViewModel.loadFeaturedLaunch()
-    }    
+    }
     if (error != null) {
         ErrorMessageView(
             errorMessage = error ?: "Unknown error occurred",
@@ -65,11 +65,9 @@ fun NextLaunchView(navController: NavController) {
         )
     } else if (nextLaunch != null) {
         NextLaunchItemView(nextLaunch!!, navController)
-    } else if (isLoading) {
+    } else if (isLoading || nextLaunch == null) {
         // Show shimmer loading effect while loading
         NextUpShimmerBox()
-    } else {
-        Text(text = "No upcoming launches found.")
     }
 }
 
@@ -220,13 +218,13 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                 ) {
                     // Explore button
                     Button(
-                        onClick = { 
+                        onClick = {
                             // Navigate to detailed view - data should already be pre-fetched and cached!
                             navController.navigate(LaunchDetail(launch.id))
                         },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
                         )
                     ) {
                         Icon(
@@ -237,7 +235,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Explore",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -249,7 +247,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                         onClick = { /* Handle share action */ },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary
+                            containerColor = MaterialTheme.colorScheme.errorContainer
                         )
                     ) {
                         Icon(
@@ -260,7 +258,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Share",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -309,14 +307,14 @@ fun ErrorMessageView(
                     text = "API Request Error",
                     style = MaterialTheme.typography.headlineSmall,
                 )
-                
+
                 // Error message
                 Text(
                     text = errorMessage,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-                
+
                 // Retry button
                 Button(
                     onClick = onRetry,
