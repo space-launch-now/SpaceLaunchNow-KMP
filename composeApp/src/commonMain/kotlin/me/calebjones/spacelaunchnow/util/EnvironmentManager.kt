@@ -12,8 +12,9 @@ object EnvironmentManager {
      */
     fun getEnv(key: String, defaultValue: String = ""): String {
         return when (key) {
-            "API_KEY" -> "***REMOVED***"
+            "API_KEY" -> AppSecrets.apiKey
             else -> defaultValue
         }
     }
 }
+
