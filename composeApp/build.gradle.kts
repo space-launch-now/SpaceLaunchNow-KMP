@@ -3,6 +3,29 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
+
+// Load version properties
+val versionProps = Properties().apply {
+    file("../version.properties").inputStream().use { load(it) }
+}
+
+// Version management functions
+fun computeVersionName(): String {
+    val major = versionProps["versionMajor"].toString().toInt()
+    val minor = versionProps["versionMinor"].toString().toInt()
+    val patch = versionProps["versionPatch"].toString().toInt()
+    val buildNumber = versionProps["versionBuildNumber"].toString().toInt()
+    return String.format("%d.%d.%d-b%d", major, minor, patch, buildNumber)
+}
+
+fun computeVersionCode(): Int {
+    val major = versionProps["versionMajor"].toString().toInt()
+    val minor = versionProps["versionMinor"].toString().toInt()
+    val patch = versionProps["versionPatch"].toString().toInt()
+    val buildNumber = versionProps["versionBuildNumber"].toString().toInt()
+    return (major * 1000000) + (minor * 100000) + (patch * 10000) + buildNumber
+}
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -164,8 +187,6 @@ android {
         applicationId = "me.calebjones.spacelaunchnow"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 4000000
-        versionName = "4.0.0-alpha01"
         val envFile = rootProject.file(".env")
         val envProps = Properties().apply {
             if (envFile.exists()) {
@@ -174,6 +195,9 @@ android {
         }
         val apiKey = envProps.getProperty("API_KEY") ?: ""
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
+
+        versionCode = computeVersionCode()
+        versionName = computeVersionName()
     }
     packaging {
         resources {
