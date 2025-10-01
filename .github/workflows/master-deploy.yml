@@ -8,6 +8,11 @@ on:
 env:
   CI: true
 
+permissions:
+  contents: write
+  checks: write
+  pull-requests: write
+
 jobs:
   build-and-deploy:
     name: Build, Test, and Deploy Production Release
