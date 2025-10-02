@@ -180,14 +180,35 @@ jobs:
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
             -Pandroid.injected.signing.key.password=$KEY_PASSWORD
 
+      - name: Resolve APK path
+        id: apk
+        run: |
+          echo "Listing release APKs:"
+          ls -la composeApp/build/outputs/apk/release/ || true
+          APK_PATH=$(ls composeApp/build/outputs/apk/release/*.apk | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "No APK found in composeApp/build/outputs/apk/release/" >&2
+            exit 1
+          fi
+          echo "Resolved APK path: $APK_PATH"
+          echo "apk=$APK_PATH" >> $GITHUB_OUTPUT
+
+      - name: Decode Service Account for Firebase
+        env:
+          PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          echo "Decoding service account credentials for Firebase..."
+          echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
+          test -s service-account.json || { echo "Service account file is empty or missing" >&2; exit 1; }
+
       # Step 2e: Deploy to Firebase Distribution
       - name: Deploy to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
-          token: ${{ secrets.FIREBASE_TOKEN }}
+          serviceCredentialsFile: service-account.json
           groups: testers
-          file: composeApp/build/outputs/apk/release/composeApp-release.apk
+          file: ${{ steps.apk.outputs.apk }}
           releaseNotes: |
             🚀 Space Launch Now ${{ env.VERSION_NAME }}
             
@@ -209,7 +230,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            composeApp/build/outputs/apk/release/composeApp-release.apk
+            ${{ steps.apk.outputs.apk }}
             composeApp/build/outputs/bundle/release/composeApp-release.aab
             composeApp/build/outputs/mapping/release/mapping.txt
         env:
@@ -219,7 +240,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-apk-${{ env.VERSION_NAME }}
-          path: composeApp/build/outputs/apk/release/composeApp-release.apk
+          path: ${{ steps.apk.outputs.apk }}
           retention-days: 90
 
       - name: Upload AAB artifact
