@@ -1,4 +1,4 @@
-name: Master Deploy - Production Release
+name: Master Deploy - Production Release (Parallel)
 
 on:
   push:
@@ -14,9 +14,15 @@ permissions:
   pull-requests: write
 
 jobs:
-  build-and-deploy:
-    name: Build, Test, and Deploy Production Release
+  # Job 1: Version bump and validation
+  version:
+    name: Version Bump & Changelog
     runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_code: ${{ steps.version.outputs.version_code }}
+      changelog: ${{ steps.changelog.outputs.clean_changelog }}
+      skipped: ${{ steps.changelog.outputs.skipped }}
     
     steps:
       - name: Checkout code
@@ -25,36 +31,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-          cache-read-only: false
-
-      - name: Create .env file
-        run: |
-          echo "API_KEY=${{ secrets.API_KEY }}" > .env
-
-      - name: Decode Google Services JSON
-        env:
-          FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
-        run: |
-          echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
-
-      - name: Decode Keystore
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
-          echo "KEYSTORE_FILE=$(pwd)/release.keystore" >> $GITHUB_ENV
-
-      # Step 2a & 2c: Bump version and generate changelog using conventional commits
       - name: Conventional Changelog Action
         id: changelog
         uses: TriPSs/conventional-changelog-action@v5
@@ -72,23 +48,17 @@ jobs:
       - name: Update version.properties with new version
         id: version
         run: |
-          # Get the version from conventional changelog action (already updated in version.properties)
           NEW_VERSION="${{ steps.changelog.outputs.version }}"
-          
-          # Read current build number
           BUILD_NUMBER=$(grep "versionBuildNumber=" version.properties | cut -d'=' -f2)
           NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
           
-          # Parse version (format: major.minor.patch)
           VERSION_MAJOR=$(echo $NEW_VERSION | cut -d'.' -f1)
           VERSION_MINOR=$(echo $NEW_VERSION | cut -d'.' -f2)
           VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3)
           
-          # Create version name with build number
           VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${NEW_BUILD_NUMBER}"
           VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + NEW_BUILD_NUMBER))
           
-          # Update version.properties with all fields
           cat > version.properties << EOF
           # Version configuration for Space Launch Now KMP
           # Format: major.minor.patch-buildNumber
@@ -99,18 +69,14 @@ jobs:
           versionBuildNumber=${NEW_BUILD_NUMBER}
           EOF
           
-          echo "Version updated to: ${VERSION_NAME}"
           echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
           echo "VERSION_CODE=${VERSION_CODE}" >> $GITHUB_ENV
           echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
           echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
 
-      - name: Create version-specific release notes
+      - name: Create release notes
         run: |
-          # Create release notes directory
           mkdir -p docs/release-notes
-          
-          # Copy the changelog content for this version to release notes
           cat > docs/release-notes/v${{ env.VERSION_NAME }}.md << 'EOF'
           ## 🚀 Space Launch Now ${{ env.VERSION_NAME }}
           
@@ -123,115 +89,243 @@ jobs:
           *This release was automatically created by GitHub Actions*
           EOF
           
-          # Save for GitHub release
           echo "## 🚀 Space Launch Now ${{ env.VERSION_NAME }}" > release-notes.txt
           echo "" >> release-notes.txt
           echo "**Release Date:** $(date +%Y-%m-%d)" >> release-notes.txt
           echo "**Version Code:** ${{ env.VERSION_CODE }}" >> release-notes.txt
           echo "" >> release-notes.txt
           echo "${{ steps.changelog.outputs.clean_changelog }}" >> release-notes.txt
-          echo "" >> release-notes.txt
-          echo "---" >> release-notes.txt
-          echo "*This release was automatically created by GitHub Actions*" >> release-notes.txt
 
-      - name: Commit version and changelog
+      - name: Commit version changes
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git add version.properties CHANGELOG.md docs/release-notes/
           git commit -m "chore(release): bump version to ${{ env.VERSION_NAME }} [skip ci]"
           git tag -a "v${{ env.VERSION_NAME }}" -m "Release ${{ env.VERSION_NAME }}"
+          git push origin HEAD:${{ github.ref_name }}
+          git push origin "v${{ env.VERSION_NAME }}"
 
-      - name: Grant execute permission for gradlew
+      - name: Upload version artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: version-files
+          path: |
+            version.properties
+            release-notes.txt
+          retention-days: 1
+
+  # Job 2: Run tests (parallel with version)
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - name: Create .env file
+        run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
+
+      - name: Decode Google Services JSON
+        env:
+          FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
+        run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
+
+      - name: Grant execute permission
         run: chmod +x gradlew
 
-      # Step 2b: Run tests
       - name: Run unit tests
         run: ./gradlew test
+
       - name: Generate test report
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: Production Test Results
+          name: Test Results
           path: "**/build/test-results/**/TEST-*.xml"
           reporter: java-junit
           fail-on-error: true
 
-      # Step 2b: Build signed release APK and AAB
-      - name: Build Release Bundle (AAB)
+  # Job 3: Build APK (parallel with AAB, after tests pass)
+  build-apk:
+    name: Build Release APK
+    needs: [version, test]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download version files
+        uses: actions/download-artifact@v4
+        with:
+          name: version-files
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - name: Create .env file
+        run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
+
+      - name: Decode Google Services JSON
         env:
-          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
+        run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
+
+      - name: Decode Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          ./gradlew :composeApp:bundleRelease \
-            -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
-            -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
-            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
-            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          echo "KEYSTORE_FILE=$(pwd)/release.keystore" >> $GITHUB_ENV
 
       - name: Build Release APK
         env:
-          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
+          chmod +x gradlew
           ./gradlew :composeApp:assembleRelease \
             -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
             -Pandroid.injected.signing.key.password=$KEY_PASSWORD
 
-      - name: Resolve APK path
-        id: apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: composeApp/build/outputs/apk/release/*.apk
+          retention-days: 90
+
+  # Job 4: Build AAB (parallel with APK, after tests pass)
+  build-aab:
+    name: Build Release AAB
+    needs: [version, test]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download version files
+        uses: actions/download-artifact@v4
+        with:
+          name: version-files
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - name: Create .env file
+        run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
+
+      - name: Decode Google Services JSON
+        env:
+          FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
+        run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
+
+      - name: Decode Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          echo "Listing release APKs:"
-          ls -la composeApp/build/outputs/apk/release/ || true
-          APK_PATH=$(ls composeApp/build/outputs/apk/release/*.apk | head -n 1)
-          if [ -z "$APK_PATH" ]; then
-            echo "No APK found in composeApp/build/outputs/apk/release/" >&2
-            exit 1
-          fi
-          echo "Resolved APK path: $APK_PATH"
+          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          echo "KEYSTORE_FILE=$(pwd)/release.keystore" >> $GITHUB_ENV
+
+      - name: Build Release AAB
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew :composeApp:bundleRelease \
+            -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
+            -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+
+      - name: Upload AAB and mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: |
+            composeApp/build/outputs/bundle/release/*.aab
+            composeApp/build/outputs/mapping/release/mapping.txt
+          retention-days: 90
+
+  # Job 5: Deploy to Firebase and GitHub (after builds complete)
+  deploy:
+    name: Deploy Release
+    needs: [version, build-apk, build-aab]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download version files
+        uses: actions/download-artifact@v4
+        with:
+          name: version-files
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: release-apk
+          path: apk/
+
+      - name: Download AAB
+        uses: actions/download-artifact@v4
+        with:
+          name: release-aab
+          path: aab/
+
+      - name: Resolve artifact paths
+        id: artifacts
+        run: |
+          APK_PATH=$(ls apk/*.apk | head -n 1)
+          AAB_PATH=$(ls aab/*.aab | head -n 1)
+          MAPPING_PATH=$(ls aab/mapping.txt | head -n 1)
           echo "apk=$APK_PATH" >> $GITHUB_OUTPUT
-
-      - name: Resolve AAB path
-        id: aab
-        run: |
-          echo "Listing release AABs:"
-          ls -la composeApp/build/outputs/bundle/release/ || true
-          AAB_PATH=$(ls composeApp/build/outputs/bundle/release/*.aab | head -n 1)
-          if [ -z "$AAB_PATH" ]; then
-            echo "No AAB found in composeApp/build/outputs/bundle/release/" >&2
-            exit 1
-          fi
-          echo "Resolved AAB path: $AAB_PATH"
           echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
+          echo "mapping=$MAPPING_PATH" >> $GITHUB_OUTPUT
 
-      - name: Decode Service Account for Firebase
+      - name: Decode Service Account
         env:
           PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
-        run: |
-          echo "Decoding service account credentials for Firebase..."
-          echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
-          test -s service-account.json || { echo "Service account file is empty or missing" >&2; exit 1; }
-
-      # Step 2e: Deploy to Firebase Distribution
-      - name: Deploy APK to Firebase Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFile: service-account.json
-          groups: vip_testers
-          file: ${{ steps.apk.outputs.apk }}
-          releaseNotes: |
-            🚀 Space Launch Now ${{ env.VERSION_NAME }} (APK)
-            
-            ${{ steps.changelog.outputs.clean_changelog }}
-            
-            See full details at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
+        run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
 
       - name: Deploy AAB to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -239,73 +333,43 @@ jobs:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFile: service-account.json
           groups: vip_testers
-          file: ${{ steps.aab.outputs.aab }}
+          file: ${{ steps.artifacts.outputs.aab }}
           releaseNotes: |
-            🚀 Space Launch Now ${{ env.VERSION_NAME }} (AAB)
+            🚀 Space Launch Now ${{ needs.version.outputs.version_name }} (AAB)
             
-            ${{ steps.changelog.outputs.clean_changelog }}
+            ${{ needs.version.outputs.changelog }}
             
-            See full details at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
-
-      # Step 2d: Create GitHub Release with artifacts
-      - name: Push version bump and tags
-        run: |
-          git push origin HEAD:${{ github.ref_name }}
-          git push origin "v${{ env.VERSION_NAME }}"
+            See full details at: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.version.outputs.version_name }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.VERSION_NAME }}
-          name: "🚀 Space Launch Now ${{ env.VERSION_NAME }}"
+          tag_name: v${{ needs.version.outputs.version_name }}
+          name: "🚀 Space Launch Now ${{ needs.version.outputs.version_name }}"
           body_path: release-notes.txt
           draft: false
           prerelease: false
           files: |
-            ${{ steps.apk.outputs.apk }}
-            ${{ steps.aab.outputs.aab }}
-            composeApp/build/outputs/mapping/release/mapping.txt
+            ${{ steps.artifacts.outputs.apk }}
+            ${{ steps.artifacts.outputs.mapping }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-apk-${{ env.VERSION_NAME }}
-          path: ${{ steps.apk.outputs.apk }}
-          retention-days: 90
-
-      - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-aab-${{ env.VERSION_NAME }}
-          path: ${{ steps.aab.outputs.aab }}
-          retention-days: 90
-
-      - name: Upload ProGuard mapping
-        uses: actions/upload-artifact@v4
-        with:
-          name: proguard-mapping-${{ env.VERSION_NAME }}
-          path: composeApp/build/outputs/mapping/release/mapping.txt
-          retention-days: 90
-
       - name: Deployment Summary
-        if: always()
         run: |
           echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** ${{ env.VERSION_NAME }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Version Code:** ${{ env.VERSION_CODE }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Skipped:** ${{ steps.changelog.outputs.skipped }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version Code:** ${{ needs.version.outputs.version_code }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📦 Artifacts Generated" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Artifacts" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Release APK" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Release AAB" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ ProGuard Mapping" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🎯 Deployment Targets" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Firebase Distribution" >> $GITHUB_STEP_SUMMARY
+          echo "### 🎯 Deployments" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Firebase Distribution (APK + AAB)" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ GitHub Release" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Release URL:** https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Release URL:** https://github.com/${{ github.repository }}/releases/tag/v${{ needs.version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
