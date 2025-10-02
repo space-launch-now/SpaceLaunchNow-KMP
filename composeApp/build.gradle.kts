@@ -293,4 +293,30 @@ tasks.whenTaskAdded {
             }
         }
     }
+    if (name.startsWith("bundle") && name.endsWith("Debug")) {
+        doLast {
+            val buildType = "debug"
+            val versionName = android.defaultConfig.versionName
+            val bundleDir = file("$buildDir/outputs/bundle/$buildType/")
+            bundleDir.listFiles()?.forEach { bundle ->
+                if (bundle.name.endsWith(".aab")) {
+                    val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}.aab"
+                    bundle.renameTo(File(bundleDir, newName))
+                }
+            }
+        }
+    }
+    if (name.startsWith("bundle") && name.endsWith("Release")) {
+        doLast {
+            val buildType = "release"
+            val versionName = android.defaultConfig.versionName
+            val bundleDir = file("$buildDir/outputs/bundle/$buildType/")
+            bundleDir.listFiles()?.forEach { bundle ->
+                if (bundle.name.endsWith(".aab")) {
+                    val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}.aab"
+                    bundle.renameTo(File(bundleDir, newName))
+                }
+            }
+        }
+    }
 }
