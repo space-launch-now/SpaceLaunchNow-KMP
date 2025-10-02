@@ -229,8 +229,9 @@ jobs:
           releaseNotes: |
             🚀 Space Launch Now ${{ env.VERSION_NAME }} (APK)
             
-            This is an automated release from the master branch.
-            See full changelog at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
+            ${{ steps.changelog.outputs.clean_changelog }}
+            
+            See full details at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
 
       - name: Deploy AAB to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -242,8 +243,9 @@ jobs:
           releaseNotes: |
             🚀 Space Launch Now ${{ env.VERSION_NAME }} (AAB)
             
-            This is an automated release from the master branch.
-            See full changelog at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
+            ${{ steps.changelog.outputs.clean_changelog }}
+            
+            See full details at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
 
       # Step 2d: Create GitHub Release with artifacts
       - name: Push version bump and tags
