@@ -1,4 +1,4 @@
-# 0.1.0 (2025-10-02)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b1...v4.0.0) (2025-10-02)
 
 
 ### Bug Fixes
@@ -7,6 +7,9 @@
 * **ci:** remove duplicate step name in master-deploy workflow ([607782f](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/607782f3a06807afbb15047e3c104cd444883a19))
 * **ci:** working on CI issues ([dd1256a](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/dd1256a7841cf0357232d81f53d665495f6e4119))
 * enhance APK resolution and Firebase deployment steps in master-deploy workflow ([fad2e8d](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/fad2e8d5638e30982b7bff8d288ce2a639fb0d06))
+* enhance master-deploy workflow to support AAB deployment and versioning improvements ([7853b8a](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/7853b8aee50e674b328c4938f23429a61821c883))
+* remove pre-release flag from version update step in master-deploy workflow ([c342963](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/c342963c31e48599b5e59f205add2ac90ffb4642))
+* standardize formatting in version.properties ([752f8ba](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/752f8babe8c5c9b2e0024518128ae0fb58847a10))
 * update test report path pattern to include all subdirectories ([36d4449](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/36d4449ebb8beb4a37f073d96e992b64a9eb8f60))
 * update versioning logic in master-deploy workflow and version.properties ([0528d92](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/0528d924c22568d7083df5952b03d2762f2785bb))
 
