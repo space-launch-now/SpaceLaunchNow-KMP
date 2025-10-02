@@ -61,12 +61,14 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           output-file: "CHANGELOG.md"
-          version-file: "version.properties"
+          version-file: "./version.properties"
           version-path: "version"
           skip-version-file: "false"
           skip-commit: "true"
           skip-tag: "true"
           git-push: "false"
+          fallback-version: "4.0.0"
+          pre-release: "true"
 
       - name: Update version.properties with new version
         id: version
@@ -196,6 +198,19 @@ jobs:
           echo "Resolved APK path: $APK_PATH"
           echo "apk=$APK_PATH" >> $GITHUB_OUTPUT
 
+      - name: Resolve AAB path
+        id: aab
+        run: |
+          echo "Listing release AABs:"
+          ls -la composeApp/build/outputs/bundle/release/ || true
+          AAB_PATH=$(ls composeApp/build/outputs/bundle/release/*.aab | head -n 1)
+          if [ -z "$AAB_PATH" ]; then
+            echo "No AAB found in composeApp/build/outputs/bundle/release/" >&2
+            exit 1
+          fi
+          echo "Resolved AAB path: $AAB_PATH"
+          echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
+
       - name: Decode Service Account for Firebase
         env:
           PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
@@ -205,7 +220,7 @@ jobs:
           test -s service-account.json || { echo "Service account file is empty or missing" >&2; exit 1; }
 
       # Step 2e: Deploy to Firebase Distribution
-      - name: Deploy to Firebase Distribution
+      - name: Deploy APK to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
@@ -213,7 +228,20 @@ jobs:
           groups: vip_testers
           file: ${{ steps.apk.outputs.apk }}
           releaseNotes: |
-            🚀 Space Launch Now ${{ env.VERSION_NAME }}
+            🚀 Space Launch Now ${{ env.VERSION_NAME }} (APK)
+            
+            This is an automated release from the master branch.
+            See full changelog at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
+
+      - name: Deploy AAB to Firebase Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFile: service-account.json
+          groups: vip_testers
+          file: ${{ steps.aab.outputs.aab }}
+          releaseNotes: |
+            🚀 Space Launch Now ${{ env.VERSION_NAME }} (AAB)
             
             This is an automated release from the master branch.
             See full changelog at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
@@ -234,7 +262,7 @@ jobs:
           prerelease: false
           files: |
             ${{ steps.apk.outputs.apk }}
-            composeApp/build/outputs/bundle/release/composeApp-release.aab
+            ${{ steps.aab.outputs.aab }}
             composeApp/build/outputs/mapping/release/mapping.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -250,7 +278,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-aab-${{ env.VERSION_NAME }}
-          path: composeApp/build/outputs/bundle/release/composeApp-release.aab
+          path: ${{ steps.aab.outputs.aab }}
           retention-days: 90
 
       - name: Upload ProGuard mapping
