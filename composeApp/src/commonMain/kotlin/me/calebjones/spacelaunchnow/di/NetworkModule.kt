@@ -2,15 +2,11 @@ package me.calebjones.spacelaunchnow.di
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 import kotlinx.coroutines.runBlocking
 
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
@@ -19,15 +15,18 @@ import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
+// Expect function to provide platform-specific HTTP engine
+expect fun createHttpClientEngine(): HttpClientEngine
+
 val networkModule = module {
     // Provide the API_KEY
     single(named("API_KEY")) {
         EnvironmentManager.getEnv("API_KEY", "")
     }
     
-    // Provide the HttpClientEngine (CIO for JVM)
+    // Provide the HttpClientEngine (platform-specific)
     single<HttpClientEngine> {
-        CIO.create()
+        createHttpClientEngine()
     }
 
     // Provide the HttpClient with necessary plugins
@@ -59,7 +58,7 @@ val networkModule = module {
 
     // Provide the base URL as a named dependency
     single<String>(named("BaseUrl")) {
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.IS_DEBUG) {
             // In debug mode, try to get custom URL from debug preferences
             try {
                 val debugPreferences = getOrNull<DebugPreferences>()

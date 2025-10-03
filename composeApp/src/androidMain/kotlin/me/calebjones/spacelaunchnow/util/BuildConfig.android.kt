@@ -6,9 +6,9 @@ actual fun initializeBuildConfig() {
     try {
         val buildConfigClass = Class.forName("me.calebjones.spacelaunchnow.BuildConfig")
         val debugField = buildConfigClass.getField("DEBUG")
-        BuildConfig.DEBUG = debugField.getBoolean(null)
+        BuildConfig.IS_DEBUG = debugField.getBoolean(null)
     } catch (e: Exception) {
         // Fallback: assume debug if we can't determine
-        BuildConfig.DEBUG = true
+        BuildConfig.IS_DEBUG = true
     }
 }
