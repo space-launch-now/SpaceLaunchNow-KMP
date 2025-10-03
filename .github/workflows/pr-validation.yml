@@ -66,7 +66,7 @@ jobs:
         run: ./gradlew :composeApp:assembleDebug
 
       - name: Upload Debug APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: debug-apk
           path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
