@@ -39,16 +39,29 @@ jobs:
           output-file: "CHANGELOG.md"
           version-file: "./version.properties"
           version-path: "version"
-          skip-version-file: "false"
+          skip-version-file: "true"
           skip-commit: "true"
           skip-tag: "true"
           git-push: "false"
-          fallback-version: "4.0.0"
+          # During pre-release, we manage versioning manually below
+          # This action only generates the changelog
 
       - name: Update version.properties with new version
         id: version
+        env:
+          # Set FORCE_VERSION to override automatic versioning (e.g., "4.0.0")
+          # Leave empty to use automatic semantic versioning
+          # During pre-release, lock at 4.0.0 to only increment build number
+          FORCE_VERSION: "4.0.0"
         run: |
-          NEW_VERSION="${{ steps.changelog.outputs.version }}"
+          if [ -n "$FORCE_VERSION" ]; then
+            NEW_VERSION="$FORCE_VERSION"
+            echo "🔒 Using forced version: $NEW_VERSION (pre-release mode)"
+          else
+            NEW_VERSION="${{ steps.changelog.outputs.version }}"
+            echo "Using semantic version: $NEW_VERSION"
+          fi
+          
           BUILD_NUMBER=$(grep "versionBuildNumber=" version.properties | cut -d'=' -f2)
           NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
           
