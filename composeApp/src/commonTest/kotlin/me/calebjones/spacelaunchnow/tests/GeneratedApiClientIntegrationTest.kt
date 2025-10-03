@@ -1,7 +1,6 @@
 package me.calebjones.spacelaunchnow.tests
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -21,22 +20,16 @@ import kotlin.test.assertTrue
  * 1. Make HTTP requests successfully
  * 2. Deserialize responses correctly
  * 3. Handle authentication properly
+ *
+ * Note: Uses platform-specific HTTP engine via expect/actual pattern
  */
+
+// Expect function to get platform-specific HTTP client
+expect fun createTestHttpClient(): HttpClient
+
 class GeneratedApiClientIntegrationTest {
 
-    private val httpClient = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-                isLenient = true
-            })
-        }
-        install(Logging) {
-            level = LogLevel.INFO
-        }
-    }
-
+    private val httpClient = createTestHttpClient()
     private val baseUrl = "https://spacelaunchnow.app"
 
     @Test
