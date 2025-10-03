@@ -1,5 +1,8 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,7 +25,16 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     val routes = listOf(Home, Schedule, Settings)
 
-    NavigationBar {
+    // Wrap NavigationBar in a Box with background to fill safe area below
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .navigationBarsPadding()
+    ) {
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ) {
         val navBackStackEntry = navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry.value?.destination
 
@@ -48,5 +60,6 @@ fun BottomNavigationBar(navController: NavHostController) {
                 }
             )
         }
-    }
+    } // End NavigationBar
+} // End Box wrapper
 }

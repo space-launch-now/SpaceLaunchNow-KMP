@@ -35,7 +35,6 @@ import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 
@@ -77,7 +76,7 @@ val appModule = module {
     }
     
     single<NotificationRepository> {
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.IS_DEBUG) {
             NotificationRepositoryImpl(
                 pushMessaging = get(),
                 notificationPreferences = get(),
@@ -94,7 +93,7 @@ val appModule = module {
     viewModelOf(::SettingsViewModel)
 }
 
-// Debug-only module - dependencies are always provided but only used when BuildConfig.DEBUG is true
+// Debug-only module - dependencies are always provided but only used when BuildConfig.isDebug is true
 val debugModule = module {
     single {
         // Use a separate qualifier for debug DataStore

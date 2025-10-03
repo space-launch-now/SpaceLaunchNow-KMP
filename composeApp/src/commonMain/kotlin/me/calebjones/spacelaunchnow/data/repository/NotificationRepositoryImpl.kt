@@ -1,7 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import me.calebjones.spacelaunchnow.data.model.NotificationSettings
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
@@ -192,7 +191,7 @@ class NotificationRepositoryImpl(
         val baseTopics = mutableSetOf<String>()
 
         // Determine which topic version to use based on debug preferences
-        val topicVersion = if (BuildConfig.DEBUG && debugPreferences != null) {
+        val topicVersion = if (BuildConfig.IS_DEBUG && debugPreferences != null) {
             val debugSettings = try {
                 debugPreferences.getDebugSettings()
             } catch (e: Exception) {

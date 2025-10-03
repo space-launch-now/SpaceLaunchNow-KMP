@@ -29,7 +29,7 @@ class DebugSettingsViewModel(
     private val _statusMessage = MutableStateFlow<String?>(null)
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
-    val isDebugMode: Boolean = BuildConfig.DEBUG
+    val isDebugMode: Boolean = BuildConfig.IS_DEBUG
 
     init {
         if (debugPreferences != null) {

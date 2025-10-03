@@ -35,9 +35,11 @@ gh pr merge --merge
 1. ✅ Version bumped based on commit messages
 2. ✅ Changelog generated
 3. ✅ Tests run
-4. ✅ Signed APK + AAB built
-5. ✅ Deployed to Firebase Distribution
-6. ✅ GitHub Release created
+4. ✅ Signed APK + AAB built (Android)
+5. ✅ Signed IPA built (iOS)
+6. ✅ Deployed to Firebase Distribution (Android)
+7. ✅ Deployed to TestFlight (iOS)
+8. ✅ GitHub Release created
 
 ## 📝 Commit Message Cheat Sheet
 
@@ -80,16 +82,32 @@ git commit -m "docs: fix typo [skip ci]"
 
 Set these in GitHub: **Settings → Secrets → Actions**
 
+### Android Secrets
 | Secret | How to Get |
 |--------|-----------|
 | `API_KEY` | Get from Space Devs |
 | `FIREBASE_APP_ID` | Firebase Console → Project Settings |
 | `FIREBASE_GOOGLE_SERVICES_JSON` | `base64 google-services.json` |
-| `FIREBASE_TOKEN` | Run `firebase login:ci` |
 | `KEYSTORE_BASE64` | `base64 release.keystore` |
 | `KEYSTORE_PASSWORD` | Your keystore password |
 | `KEY_ALIAS` | Your key alias |
 | `KEY_PASSWORD` | Your key password |
+| `PLAY_CONSOLE_SERVICE_ACCOUNT_JSON` | Google Play service account JSON (base64) |
+
+### iOS Secrets
+| Secret | How to Get |
+|--------|-----------|
+| `APPLE_CERTIFICATES_P12` | `base64 distribution.p12` |
+| `APPLE_CERTIFICATES_PASSWORD` | P12 export password |
+| `APPLE_PROVISIONING_PROFILE` | `base64 profile.mobileprovision` |
+| `APPLE_TEAM_ID` | Apple Developer Account |
+| `IOS_BUNDLE_ID` | Your iOS bundle identifier |
+| `APPLE_API_KEY_ID` | App Store Connect API Key ID |
+| `APPLE_API_ISSUER_ID` | App Store Connect Issuer ID |
+| `APPLE_API_KEY_CONTENT` | `base64 AuthKey_XXXXX.p8` |
+| `IOS_EXPORT_OPTIONS_PLIST` | `base64 ExportOptions.plist` |
+
+**See [IOS_CICD_SETUP.md](./IOS_CICD_SETUP.md) for detailed iOS setup**
 
 ## 🎯 Workflows
 
@@ -101,10 +119,10 @@ Set these in GitHub: **Settings → Secrets → Actions**
 
 ### Master Deploy
 - **Triggers:** Merge to main/master
-- **Duration:** ~10 minutes
-- **Actions:** Version bump + Test + Build signed + Deploy
-- **Artifacts:** APK, AAB, mapping (90 days)
-- **Deploys to:** Firebase Distribution + GitHub Release
+- **Duration:** ~15-20 minutes
+- **Actions:** Version bump + Test + Build signed (Android + iOS) + Deploy
+- **Artifacts:** APK, AAB, IPA, mapping (90 days)
+- **Deploys to:** Firebase Distribution (Android) + TestFlight (iOS) + GitHub Release
 
 ## 📦 Version Format
 
@@ -121,14 +139,29 @@ Example: 4.1.2-b15
 
 ## 🔍 Troubleshooting
 
-### "Build failed: google-services.json not found"
+### Android Issues
+
+#### "Build failed: google-services.json not found"
 → Check `FIREBASE_GOOGLE_SERVICES_JSON` secret is set
 
-### "Signing failed"
+#### "Signing failed"
 → Verify keystore secrets: `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`
 
-### "Firebase Distribution failed"
-→ Check `FIREBASE_APP_ID` and `FIREBASE_TOKEN`
+#### "Firebase Distribution failed"
+→ Check `FIREBASE_APP_ID` and service account JSON
+
+### iOS Issues
+
+#### "No matching provisioning profiles found"
+→ Check `APPLE_PROVISIONING_PROFILE` secret and `IOS_BUNDLE_ID` match
+
+#### "Code signing error"
+→ Verify `APPLE_CERTIFICATES_P12` and `APPLE_CERTIFICATES_PASSWORD`
+
+#### "TestFlight upload failed"
+→ Check App Store Connect API secrets: `APPLE_API_KEY_ID`, `APPLE_API_ISSUER_ID`, `APPLE_API_KEY_CONTENT`
+
+### General Issues
 
 ### "Version didn't bump"
 → Use conventional commit format: `feat:`, `fix:`, etc.
@@ -140,6 +173,7 @@ Example: 4.1.2-b15
 
 - **Conventional Commits Guide:** `docs/CONVENTIONAL_COMMITS.md`
 - **Full CI/CD Pipeline:** `docs/CICD_PIPELINE.md`
+- **iOS CI/CD Setup:** `docs/IOS_CICD_SETUP.md`
 - **Copilot Instructions:** `.github/copilot-instructions.md`
 
 ## 🎓 Example Workflow
@@ -171,8 +205,9 @@ gh pr merge --merge
 # - Version bumped: 4.0.0 → 4.1.0-b6 (feat = minor)
 # - Changelog updated with features and fixes
 # - Tests passed
-# - Signed release built
-# - Deployed to Firebase Distribution
+# - Signed release built (Android + iOS)
+# - Deployed to Firebase Distribution (Android)
+# - Deployed to TestFlight (iOS)
 # - GitHub Release v4.1.0-b6 created
 ```
 
@@ -180,8 +215,9 @@ gh pr merge --merge
 
 | Location | What | Retention |
 |----------|------|-----------|
-| **Firebase Distribution** | Latest release APK for testers | Until replaced |
-| **GitHub Releases** | All releases with APK/AAB/mapping | Forever |
+| **Firebase Distribution** | Latest release AAB for Android testers | Until replaced |
+| **TestFlight** | Latest release IPA for iOS beta testers | Until replaced |
+| **GitHub Releases** | All releases with APK/AAB/IPA/mapping | Forever |
 | **GitHub Actions Artifacts** | Workflow artifacts | 90 days |
 
 ## 🎉 Tips

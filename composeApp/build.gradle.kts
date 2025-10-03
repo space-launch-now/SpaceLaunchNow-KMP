@@ -81,6 +81,9 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.logger.slf4j)
                 implementation(libs.coil.compose.jvm)
+                
+                // Desktop-specific HTTP client engine (CIO)
+                implementation(libs.ktor.client.cio)
             }
         }
 
@@ -101,6 +104,9 @@ kotlin {
                 implementation(libs.android.firebase.messaging)
 
                 implementation(libs.androidx.core.splashscreen)
+                
+                // Android-specific HTTP client engine
+                implementation(libs.ktor.client.android)
             }
         }
 
@@ -108,6 +114,9 @@ kotlin {
 
             dependencies {
                 implementation(libs.coil.compose.ios)
+                
+                // iOS-specific HTTP client engine (Darwin)
+                implementation(libs.ktor.client.darwin)
             }
         }
 
@@ -131,7 +140,10 @@ kotlin {
                 implementation(libs.koin.compose.viewmodel.nav)
 
                 implementation(libs.ktor.client.core)          // Core client dependency
-                implementation(libs.ktor.client.cio)           // CIO engine for Ktor
+                // NOTE: Platform-specific engines are added in platform sourcesets
+                // Android uses ktor-client-android
+                // iOS uses ktor-client-darwin  
+                // Desktop uses ktor-client-cio
                 implementation(libs.ktor.client.serialization) // Serialization support
                 implementation(libs.ktor.client.logging)       // Logging support
                 implementation(libs.ktor.utils)                // Utilities (for IOException)

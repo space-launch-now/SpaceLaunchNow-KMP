@@ -169,7 +169,7 @@ fun SettingsScreen(
                     }
                 }
                 // DEBUG
-                if (BuildConfig.DEBUG) {
+                if (BuildConfig.IS_DEBUG) {
                     item {
                         SectionHeaderText("Developer")
                         Spacer(Modifier.height(2.dp))

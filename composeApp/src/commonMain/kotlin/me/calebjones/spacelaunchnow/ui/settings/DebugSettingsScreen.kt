@@ -27,7 +27,7 @@ fun DebugSettingsScreen(
     debugViewModel: DebugSettingsViewModel = koinInject(),
     settingsViewModel: SettingsViewModel = koinInject()
 ) {
-    if (!BuildConfig.DEBUG) {
+    if (!BuildConfig.IS_DEBUG) {
         // Show a message that debug settings are not available
         Box(
             modifier = Modifier.fillMaxSize(),
