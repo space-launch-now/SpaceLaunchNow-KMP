@@ -1,4 +1,20 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b1...v4.0.0) (2025-10-02)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b2...v4.0.0) (2025-10-03)
+
+
+### Bug Fixes
+
+* cicd [skip ci] ([d5ebab7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/d5ebab71c2dcc83f5312e94a411e4c7cc2ad8c5a))
+* **test:** update to properly use the correct HTTP client per platform ([af6f691](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/af6f691fee67e5b07732ba410949c09c48dde27a))
+* **workflow:** update versioning logic for pre-release [skip ci] ([7122daf](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/7122daff919af00ae0f8e5c82e0d87413b5dfc5b))
+
+
+### Features
+
+* initial work to support iOS app ([e3be566](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/e3be56648f2dcbd2f86cb82afbd37590bbad3054))
+
+
+
+# [4.0.0-b2](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b1...v4.0.0-b2) (2025-10-02)
 
 
 ### Bug Fixes
