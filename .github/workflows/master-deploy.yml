@@ -285,10 +285,168 @@ jobs:
             composeApp/build/outputs/mapping/release/mapping.txt
           retention-days: 90
 
-  # Job 5: Deploy to Firebase and GitHub (after builds complete)
+  # Job 5: Build iOS (parallel with Android builds, after tests pass)
+  build-ios:
+    name: Build iOS Release
+    needs: [version, test]
+    runs-on: macos-14
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download version files
+        uses: actions/download-artifact@v4
+        with:
+          name: version-files
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - name: Create .env file
+        run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+      - name: Import Apple certificates
+        env:
+          APPLE_CERTIFICATES_P12: ${{ secrets.APPLE_CERTIFICATES_P12 }}
+          APPLE_CERTIFICATES_PASSWORD: ${{ secrets.APPLE_CERTIFICATES_PASSWORD }}
+        run: |
+          # Create temporary keychain
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+          
+          # Create and unlock keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          # Import certificate
+          echo "$APPLE_CERTIFICATES_P12" | base64 --decode > certificate.p12
+          security import certificate.p12 \
+            -P "$APPLE_CERTIFICATES_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+          rm certificate.p12
+          
+          # Set keychain as default
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+      - name: Import provisioning profile
+        env:
+          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+        run: |
+          # Decode and install provisioning profile
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > "$PP_PATH"
+          
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Update Info.plist version
+        run: |
+          # Read version from version files
+          VERSION_NAME="${{ needs.version.outputs.version_name }}"
+          VERSION_CODE="${{ needs.version.outputs.version_code }}"
+          
+          # Extract marketing version (without build number suffix)
+          MARKETING_VERSION=$(echo $VERSION_NAME | sed 's/-b[0-9]*$//')
+          
+          # Update Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $MARKETING_VERSION" iosApp/iosApp/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION_CODE" iosApp/iosApp/Info.plist
+
+      - name: Build Kotlin framework for iOS
+        run: |
+          chmod +x gradlew
+          ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode
+
+      - name: Build iOS app
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
+        run: |
+          cd iosApp
+          
+          # Update Config.xcconfig with team and bundle ID
+          cat > Configuration/Config.xcconfig << EOF
+          TEAM_ID=$TEAM_ID
+          BUNDLE_ID=$BUNDLE_ID
+          APP_NAME=SpaceLaunchNow
+          EOF
+          
+          # Build archive
+          xcodebuild -project iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Release \
+            -archivePath $RUNNER_TEMP/SpaceLaunchNow.xcarchive \
+            -sdk iphoneos \
+            -destination generic/platform=iOS \
+            clean archive
+
+      - name: Export IPA
+        env:
+          EXPORT_OPTIONS_PLIST: ${{ secrets.IOS_EXPORT_OPTIONS_PLIST }}
+        run: |
+          # Create export options plist
+          echo "$EXPORT_OPTIONS_PLIST" | base64 --decode > $RUNNER_TEMP/ExportOptions.plist
+          
+          # Export archive to IPA
+          xcodebuild -exportArchive \
+            -archivePath $RUNNER_TEMP/SpaceLaunchNow.xcarchive \
+            -exportPath $RUNNER_TEMP/export \
+            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist
+
+      - name: Upload to TestFlight
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
+        run: |
+          # Save API key
+          mkdir -p ~/private_keys
+          echo "$APPLE_API_KEY_CONTENT" | base64 --decode > ~/private_keys/AuthKey_$APPLE_API_KEY_ID.p8
+          
+          # Upload to TestFlight
+          xcrun altool --upload-app \
+            --type ios \
+            --file $RUNNER_TEMP/export/*.ipa \
+            --apiKey $APPLE_API_KEY_ID \
+            --apiIssuer $APPLE_API_ISSUER_ID
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-ipa
+          path: ${{ runner.temp }}/export/*.ipa
+          retention-days: 90
+
+      - name: Cleanup keychain
+        if: always()
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          if [ -f "$KEYCHAIN_PATH" ]; then
+            security delete-keychain "$KEYCHAIN_PATH"
+          fi
+
+  # Job 6: Deploy to Firebase and GitHub (after builds complete)
   deploy:
     name: Deploy Release
-    needs: [version, build-apk, build-aab]
+    needs: [version, build-apk, build-aab, build-ios]
     runs-on: ubuntu-latest
     
     steps:
@@ -312,15 +470,23 @@ jobs:
           name: release-aab
           path: aab/
 
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: release-ipa
+          path: ipa/
+
       - name: Resolve artifact paths
         id: artifacts
         run: |
           APK_PATH=$(ls apk/*.apk | head -n 1)
           AAB_PATH=$(ls aab/*.aab | head -n 1)
           MAPPING_PATH=$(ls aab/mapping.txt | head -n 1)
+          IPA_PATH=$(ls ipa/*.ipa | head -n 1)
           echo "apk=$APK_PATH" >> $GITHUB_OUTPUT
           echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
           echo "mapping=$MAPPING_PATH" >> $GITHUB_OUTPUT
+          echo "ipa=$IPA_PATH" >> $GITHUB_OUTPUT
 
       - name: Decode Service Account
         env:
@@ -351,6 +517,7 @@ jobs:
           prerelease: false
           files: |
             ${{ steps.artifacts.outputs.apk }}
+            ${{ steps.artifacts.outputs.ipa }}
             ${{ steps.artifacts.outputs.mapping }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -364,12 +531,14 @@ jobs:
           echo "**Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📦 Artifacts" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Release APK" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Release AAB" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Release APK (Android)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Release AAB (Android)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Release IPA (iOS)" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ ProGuard Mapping" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🎯 Deployments" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Firebase Distribution (APK + AAB)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Firebase Distribution (Android AAB)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ TestFlight (iOS)" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ GitHub Release" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Release URL:** https://github.com/${{ github.repository }}/releases/tag/v${{ needs.version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY

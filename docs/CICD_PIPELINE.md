@@ -4,10 +4,30 @@ This document describes the complete CI/CD pipeline for Space Launch Now KMP.
 
 ## Overview
 
-The CI/CD pipeline consists of two main workflows:
+The CI/CD pipeline consists of two mai#### Phase 7: Deployment
+15. ✅ **Deploy to Firebase Distribution** - Distributes AAB to Android testers
+16. ✅ **Deploy to TestFlight** - Distributes IPA to iOS beta testers (handled in build-ios job)
 
-1. **PR Validation** (`pr-validation.yml`) - Validates pull requests
-2. **Master Deploy** (`master-deploy.yml`) - Deploys production releases
+**Firebase Distribution:**
+- **Groups:** `vip_testers`
+- **File:** Release AAB
+- **Release Notes:** Auto-generated with version and link
+
+**TestFlight Distribution:**
+- **Method:** App Store Connect API
+- **Automatic:** Uploaded during iOS build step
+- **Beta Testing:** Available to TestFlight beta testers
+
+#### Phase 8: GitHub Release
+17. ✅ **Push version bump and tags** - Pushes commits and tags to repository
+18. ✅ **Create GitHub Release** - Creates public release with artifacts
+
+**Release Includes:**
+- 📱 Release APK (Android)
+- 🍎 Release IPA (iOS)
+- 🗺️ ProGuard mapping file (Android)
+- 📝 Generated release notes**PR Validation** (`pr-validation.yml`) - Validates pull requests
+2. **Master Deploy** (`master-deploy.yml`) - Deploys production releases for **Android and iOS**
 
 ## Workflow 1: PR Validation
 
@@ -48,6 +68,8 @@ The CI/CD pipeline consists of two main workflows:
 ## Workflow 2: Master Deploy (Production Release)
 
 **Trigger:** Merges to `master` or `main` branch (also supports manual trigger)
+
+**Purpose:** Automated production release with versioning and deployment to Android & iOS
 
 **Purpose:** Automated production release with versioning and deployment
 
@@ -117,6 +139,8 @@ The action generates a well-formatted changelog following the [Keep a Changelog]
 11. ✅ **Generate test report** - JUnit report (fails build on test failure)
 
 #### Phase 6: Build Production Release
+
+##### Android Builds (Ubuntu Runner)
 12. ✅ **Build Release Bundle (AAB)** - Signed Android App Bundle
 13. ✅ **Build Release APK** - Signed Android APK
 
@@ -129,54 +153,105 @@ The action generates a well-formatted changelog following the [Keep a Changelog]
   -Pandroid.injected.signing.key.password=$KEY_PASSWORD
 ```
 
-#### Phase 7: Firebase Distribution
-14. ✅ **Deploy to Firebase Distribution** - Distributes APK to testers
+##### iOS Build (macOS Runner)
+14. ✅ **Build iOS Release** - Builds, signs, and exports iOS app
 
-**Configuration:**
-- **Groups:** `testers`
-- **File:** Release APK
+**iOS Build Steps:**
+1. Set up Xcode 15.2 environment
+2. Import Apple Distribution certificates into temporary keychain
+3. Install App Store provisioning profile
+4. Update Info.plist with version numbers
+5. Build Kotlin Multiplatform framework for iOS
+6. Build and archive iOS app with Xcode
+7. Export IPA with App Store configuration
+8. Upload to TestFlight via App Store Connect API
+9. Clean up temporary keychain and certificates
+
+**Required Secrets:**
+- `APPLE_CERTIFICATES_P12` - Distribution certificate (base64)
+- `APPLE_CERTIFICATES_PASSWORD` - P12 password
+- `APPLE_PROVISIONING_PROFILE` - App Store profile (base64)
+- `APPLE_TEAM_ID` - Apple Developer Team ID
+- `IOS_BUNDLE_ID` - iOS bundle identifier
+- `APPLE_API_KEY_ID` - App Store Connect API Key ID
+- `APPLE_API_ISSUER_ID` - App Store Connect Issuer ID
+- `APPLE_API_KEY_CONTENT` - API Key .p8 file (base64)
+- `IOS_EXPORT_OPTIONS_PLIST` - Export configuration (base64)
+
+See [IOS_CICD_SETUP.md](./IOS_CICD_SETUP.md) for detailed setup instructions.
+
+#### Phase 7: Deployment
+15. ✅ **Deploy to Firebase Distribution** - Distributes AAB to Android testers
+16. ✅ **Deploy to TestFlight** - Distributes IPA to iOS beta testers (handled in build-ios job)
+
+**Firebase Distribution:**
+- **Groups:** `vip_testers`
+- **File:** Release AAB
 - **Release Notes:** Auto-generated with version and link
 
+**TestFlight Distribution:**
+- **Method:** App Store Connect API
+- **Automatic:** Uploaded during iOS build step
+- **Beta Testing:** Available to TestFlight beta testers
+
 #### Phase 8: GitHub Release
-15. ✅ **Push version bump and tags** - Pushes commits and tags to repository
-16. ✅ **Create GitHub Release** - Creates public release with artifacts
+17. ✅ **Push version bump and tags** - Pushes commits and tags to repository
+18. ✅ **Create GitHub Release** - Creates public release with artifacts
 
 **Release Includes:**
-- 📱 Release APK
-- 📦 Release AAB (Android App Bundle)
-- 🗺️ ProGuard mapping file
+- 📱 Release APK (Android)
+- 🍎 Release IPA (iOS)
+- 🗺️ ProGuard mapping file (Android)
 - 📝 Generated release notes
 
 #### Phase 9: Artifacts & Summary
-17. ✅ **Upload APK artifact** - Stores APK (90 days retention)
-18. ✅ **Upload AAB artifact** - Stores AAB (90 days retention)
-19. ✅ **Upload ProGuard mapping** - Stores mapping file (90 days retention)
+19. ✅ **Upload artifacts** - Stores APK, AAB, IPA, and mapping (90 days retention)
 20. ✅ **Deployment Summary** - Generates workflow summary
 
 ### Required Secrets
 
 All secrets must be configured in GitHub repository settings:
 
+#### Android Secrets
 | Secret | Type | Description |
 |--------|------|-------------|
 | `API_KEY` | string | Space Devs API key |
 | `FIREBASE_APP_ID` | string | Firebase app ID for distribution |
 | `FIREBASE_GOOGLE_SERVICES_JSON` | base64 | Firebase google-services.json (base64 encoded) |
-| `FIREBASE_TOKEN` | string | Firebase CI token |
 | `KEYSTORE_BASE64` | base64 | Release keystore file (base64 encoded) |
 | `KEYSTORE_PASSWORD` | string | Keystore password |
 | `KEY_ALIAS` | string | Key alias in keystore |
 | `KEY_PASSWORD` | string | Key password |
-| `PLAY_CONSOLE_SERVICE_ACCOUNT_JSON` | base64 | Google Play service account JSON (reserved for future use) |
+| `PLAY_CONSOLE_SERVICE_ACCOUNT_JSON` | base64 | Google Play service account JSON |
+
+#### iOS Secrets
+| Secret | Type | Description |
+|--------|------|-------------|
+| `APPLE_CERTIFICATES_P12` | base64 | Distribution certificate (base64 encoded) |
+| `APPLE_CERTIFICATES_PASSWORD` | string | Password for P12 file |
+| `APPLE_PROVISIONING_PROFILE` | base64 | App Store provisioning profile (base64 encoded) |
+| `APPLE_TEAM_ID` | string | Apple Developer Team ID |
+| `IOS_BUNDLE_ID` | string | iOS app bundle identifier |
+| `APPLE_API_KEY_ID` | string | App Store Connect API Key ID |
+| `APPLE_API_ISSUER_ID` | string | App Store Connect Issuer ID |
+| `APPLE_API_KEY_CONTENT` | base64 | API Key .p8 file (base64 encoded) |
+| `IOS_EXPORT_OPTIONS_PLIST` | base64 | Export configuration plist (base64 encoded) |
+
+#### General Secrets
+| Secret | Type | Description |
+|--------|------|-------------|
 | `GITHUB_TOKEN` | auto | Automatically provided by GitHub Actions |
+
+See [IOS_CICD_SETUP.md](./IOS_CICD_SETUP.md) for iOS secrets setup guide.
 
 ### Artifacts
 
 All artifacts retained for 90 days:
 
-- `release-apk-{VERSION}` - Signed release APK
-- `release-aab-{VERSION}` - Signed release AAB
-- `proguard-mapping-{VERSION}` - ProGuard mapping for crash analysis
+- `release-apk` - Signed release APK (Android)
+- `release-aab` - Signed release AAB (Android)
+- `release-ipa` - Signed release IPA (iOS)
+- `proguard-mapping` - ProGuard mapping for crash analysis (Android)
 
 ### Outputs
 
@@ -188,14 +263,18 @@ All artifacts retained for 90 days:
 - ✅ Commit: `chore(release): bump version to {VERSION} [skip ci]`
 
 #### Firebase Distribution
-- ✅ APK distributed to `testers` group
+- ✅ AAB distributed to `vip_testers` group
 - ✅ Release notes with version and GitHub link
+
+#### TestFlight Distribution
+- ✅ IPA uploaded to TestFlight
+- ✅ Available for beta testing
 
 #### GitHub Release
 - ✅ Public release with tag `v{VERSION_NAME}`
 - ✅ Title: `🚀 Space Launch Now {VERSION}`
 - ✅ Markdown-formatted release notes
-- ✅ APK, AAB, and mapping files attached
+- ✅ APK, IPA, and mapping files attached
 
 #### GitHub Actions
 - ✅ Workflow artifacts (90 days)

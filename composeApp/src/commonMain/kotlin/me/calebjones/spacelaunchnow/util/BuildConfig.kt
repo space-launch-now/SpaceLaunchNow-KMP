@@ -9,7 +9,7 @@ object BuildConfig {
     const val APP_NAME = "SpaceLaunchNow"
 
     // This will be set by platform-specific implementations
-    var DEBUG: Boolean = false
+    var IS_DEBUG: Boolean = false
 }
 
 // Platform-specific initialization function

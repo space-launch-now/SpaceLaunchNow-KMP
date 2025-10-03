@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.di
 
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.HttpClientEngine
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -34,7 +34,7 @@ val apiModule = module {
     single<LaunchesApi> {
         LaunchesApi(
             baseUrl = get<String>(named("BaseUrl")),
-            httpClientEngine = CIO.create(),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,
         ).apply {
             // Use tokenAuth specifically (header-based auth, not cookieAuth query param)
@@ -46,7 +46,7 @@ val apiModule = module {
     single<LauncherConfigurationsApi> {
         LauncherConfigurationsApi(
             baseUrl = get<String>(named("BaseUrl")),
-            httpClientEngine = CIO.create(),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,
         ).apply {
             setApiKey(get<String>(named("API_KEY")), "Authorization")
@@ -57,7 +57,7 @@ val apiModule = module {
     single<LaunchersApi> {
         LaunchersApi(
             baseUrl = get<String>(named("BaseUrl")),
-            httpClientEngine = CIO.create(),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,
         ).apply {
             setApiKey(get<String>(named("API_KEY")), "Authorization")
@@ -68,7 +68,7 @@ val apiModule = module {
     single<AgenciesApi> {
         AgenciesApi(
             baseUrl = get<String>(named("BaseUrl")),
-            httpClientEngine = CIO.create(),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,
         ).apply {
             setApiKey(get<String>(named("API_KEY")), "Authorization")
@@ -79,7 +79,7 @@ val apiModule = module {
     single<UpdatesApi> {
         UpdatesApi(
             baseUrl = get<String>(named("BaseUrl")),
-            httpClientEngine = CIO.create(),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,
         ).apply {
             setApiKey(get<String>(named("API_KEY")), "Authorization")
@@ -90,7 +90,7 @@ val apiModule = module {
     single<EventsApi> {
         EventsApi(
             baseUrl = get<String>(named("BaseUrl")),
-            httpClientEngine = CIO.create(),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,
         ).apply {
             setApiKey(get<String>(named("API_KEY")), "Authorization")
@@ -102,7 +102,7 @@ val apiModule = module {
     single<ArticlesApi> {
         ArticlesApi(
             baseUrl = "https://api.spaceflightnewsapi.net",
-            httpClientEngine = CIO.create(),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,
         )
         // No API key required for SNAPI
