@@ -26,16 +26,42 @@ The iOS CI/CD pipeline automatically:
 
 ### 3. Required Certificates & Profiles
 
-#### Distribution Certificate
+#### Distribution Certificate (Code Signing)
+
+**Step 1: Generate Certificate Signing Request (CSR) on macOS**
+
+1. Open **Keychain Access** on your Mac
+2. Go to **Keychain Access → Certificate Assistant → Request a Certificate from a Certificate Authority**
+3. Fill in the form:
+   - **User Email Address**: Your email
+   - **Common Name**: Your name or company name
+   - **CA Email Address**: Leave empty
+   - **Request is**: Select "Saved to disk"
+4. Click **Continue** and save the `CertificateSigningRequest.certSigningRequest` file
+
+**Step 2: Create Distribution Certificate on Apple Developer**
+
 1. Go to [Apple Developer Certificates](https://developer.apple.com/account/resources/certificates/list)
-2. Create a new **iOS Distribution** certificate
-3. Download the certificate (`.cer` file)
-4. Import into Keychain Access on macOS
-5. Export as `.p12` file:
-   - Right-click certificate in Keychain Access
-   - Export "Apple Distribution: [Your Name]"
-   - Save as `.p12` with a password
-   - This is your `APPLE_CERTIFICATES_P12`
+2. Click the **+** button to create a new certificate
+3. Select **iOS Distribution** (under Production section)
+4. Click **Continue**
+5. Upload the `CertificateSigningRequest.certSigningRequest` file you created in Step 1
+6. Click **Continue**
+7. Download the certificate (`.cer` file)
+
+**Step 3: Import and Export as P12**
+
+1. Double-click the downloaded `.cer` file to import into **Keychain Access**
+2. In Keychain Access, find the certificate under "My Certificates"
+   - It will be named "Apple Distribution: [Your Name]" or "Apple Distribution: [Company Name]"
+   - Make sure the private key is shown below it (with a key icon)
+3. Right-click the certificate (not the private key)
+4. Select **Export "Apple Distribution: [Your Name]"**
+5. Choose file format: **Personal Information Exchange (.p12)**
+6. Save with a strong password (you'll need this for `APPLE_CERTIFICATES_PASSWORD`)
+7. The exported `.p12` file is your `APPLE_CERTIFICATES_P12`
+
+**Why P12?** The `.p12` file contains both your certificate AND private key, which is needed to code sign the iOS app in CI/CD.
 
 #### Provisioning Profile
 1. Go to [Apple Developer Profiles](https://developer.apple.com/account/resources/profiles/list)
