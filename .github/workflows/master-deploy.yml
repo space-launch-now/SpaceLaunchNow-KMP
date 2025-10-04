@@ -416,7 +416,7 @@ jobs:
           SDK_NAME: iphoneos
           ARCHS: arm64
           # Gradle memory settings for iOS framework compilation
-          GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError"
+          GRADLE_OPTS: "-Xmx8192M -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError"
         run: |
           chmod +x gradlew
           # Build the framework for iOS device (arm64)
