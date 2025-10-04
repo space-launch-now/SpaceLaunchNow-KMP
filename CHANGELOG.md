@@ -1,4 +1,13 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b6...v4.0.0) (2025-10-04)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b7...v4.0.0) (2025-10-04)
+
+
+### Bug Fixes
+
+* **build:** increase Gradle heap size for iOS framework compilation ([bb796fb](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/bb796fb8aa69e269dce381379c589d39f1d5d556))
+
+
+
+# [4.0.0-b7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b6...v4.0.0-b7) (2025-10-04)
 
 
 ### Bug Fixes
@@ -26,22 +35,6 @@
 
 
 # [4.0.0-b4](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b3...v4.0.0-b4) (2025-10-04)
-
-
-
-# [4.0.0-b3](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b2...v4.0.0-b3) (2025-10-03)
-
-
-### Bug Fixes
-
-* cicd [skip ci] ([d5ebab7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/d5ebab71c2dcc83f5312e94a411e4c7cc2ad8c5a))
-* **test:** update to properly use the correct HTTP client per platform ([af6f691](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/af6f691fee67e5b07732ba410949c09c48dde27a))
-* **workflow:** update versioning logic for pre-release [skip ci] ([7122daf](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/7122daff919af00ae0f8e5c82e0d87413b5dfc5b))
-
-
-### Features
-
-* initial work to support iOS app ([e3be566](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/e3be56648f2dcbd2f86cb82afbd37590bbad3054))
 
 
 
