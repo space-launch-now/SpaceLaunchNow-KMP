@@ -18,6 +18,7 @@ jobs:
   version:
     name: Calculate Version & Changelog
     runs-on: ubuntu-latest
+    if: false  # DISABLED FOR TESTING
     outputs:
       version_name: ${{ steps.version.outputs.version_name }}
       version_code: ${{ steps.version.outputs.version_code }}
@@ -125,6 +126,7 @@ jobs:
     name: Run Tests
     needs: [version]
     runs-on: ubuntu-latest
+    if: false  # DISABLED FOR TESTING
     
     steps:
       - name: Checkout code
@@ -175,6 +177,7 @@ jobs:
     name: Commit Version & Tag
     needs: [version, test]
     runs-on: ubuntu-latest
+    if: false  # DISABLED FOR TESTING
     
     steps:
       - name: Checkout code
@@ -203,6 +206,7 @@ jobs:
     name: Build Release APK
     needs: [version, commit]
     runs-on: ubuntu-latest
+    if: false  # DISABLED FOR TESTING
     
     steps:
       - name: Checkout code
@@ -265,6 +269,7 @@ jobs:
     name: Build Release AAB
     needs: [version, commit]
     runs-on: ubuntu-latest
+    if: false  # DISABLED FOR TESTING
     
     steps:
       - name: Checkout code
@@ -326,18 +331,18 @@ jobs:
 
   # Job 6: Build iOS (parallel with Android, after commit)
   build-ios:
-    name: Build iOS Release
-    needs: [version, commit]
+    name: Build iOS Release (TESTING MEMORY OPTIMIZATION)
+    # needs: [version, commit]  # DISABLED FOR TESTING
     runs-on: macos-14
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download version files
-        uses: actions/download-artifact@v4
-        with:
-          name: version-files
+      # - name: Download version files  # DISABLED FOR TESTING
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: version-files
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -396,18 +401,18 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
 
-      - name: Update Info.plist version
-        run: |
-          # Read version from version files
-          VERSION_NAME="${{ needs.version.outputs.version_name }}"
-          VERSION_CODE="${{ needs.version.outputs.version_code }}"
-          
-          # Extract marketing version (without build number suffix)
-          MARKETING_VERSION=$(echo $VERSION_NAME | sed 's/-b[0-9]*$//')
-          
-          # Update Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $MARKETING_VERSION" iosApp/iosApp/Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION_CODE" iosApp/iosApp/Info.plist
+      # - name: Update Info.plist version  # DISABLED FOR TESTING
+      #   run: |
+      #     # Read version from version files
+      #     VERSION_NAME="${{ needs.version.outputs.version_name }}"
+      #     VERSION_CODE="${{ needs.version.outputs.version_code }}"
+      #     
+      #     # Extract marketing version (without build number suffix)
+      #     MARKETING_VERSION=$(echo $VERSION_NAME | sed 's/-b[0-9]*$//')
+      #     
+      #     # Update Info.plist
+      #     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $MARKETING_VERSION" iosApp/iosApp/Info.plist
+      #     /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION_CODE" iosApp/iosApp/Info.plist
 
       - name: Build Kotlin framework for iOS
         env:
@@ -415,16 +420,21 @@ jobs:
           CONFIGURATION: Release
           SDK_NAME: iphoneos
           ARCHS: arm64
-          # Gradle memory settings for iOS framework compilation
-          GRADLE_OPTS: "-Xmx8192M -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError"
+          # Optimized Gradle memory settings for CI/CD
+          # Lower max heap to leave room for LLVM and other native processes
+          GRADLE_OPTS: "-Xmx6144M -XX:MaxMetaspaceSize=512M -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=1 -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
         run: |
           chmod +x gradlew
           # Build the framework for iOS device (arm64)
-          # Use --no-daemon to avoid daemon memory issues in CI
-          # Specify bundle ID to avoid compiler warning
+          # --no-daemon: Avoid daemon overhead
+          # --max-workers=2: Limit parallel compilation
+          # -Pkotlin.native.cacheKind=none: Disable caching to save memory
           ./gradlew :composeApp:linkReleaseFrameworkIosArm64 \
             --no-daemon \
-            -Pkotlin.native.binary.bundleId="me.spacelaunchnow.spacelaunchnow"
+            --max-workers=2 \
+            -Pkotlin.native.binary.bundleId="me.spacelaunchnow.spacelaunchnow" \
+            -Pkotlin.native.cacheKind=none \
+            -Dorg.gradle.jvmargs="-Xmx6144M -XX:MaxMetaspaceSize=512M"
 
       - name: Build iOS app
         env:
@@ -501,6 +511,7 @@ jobs:
     name: Deploy Release
     needs: [version, build-apk, build-aab, build-ios]
     runs-on: ubuntu-latest
+    if: false  # DISABLED FOR TESTING
     
     steps:
       - name: Checkout code
