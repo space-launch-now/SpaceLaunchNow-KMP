@@ -1,4 +1,13 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b5...v4.0.0) (2025-10-04)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b6...v4.0.0) (2025-10-04)
+
+
+### Bug Fixes
+
+* **build:** increase Gradle heap size for iOS framework compilation in CI/CD ([2deae2a](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/2deae2a3ec8838122880008a6d559efb0310a23d))
+
+
+
+# [4.0.0-b6](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b5...v4.0.0-b6) (2025-10-04)
 
 
 ### Bug Fixes
@@ -33,16 +42,6 @@
 ### Features
 
 * initial work to support iOS app ([e3be566](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/e3be56648f2dcbd2f86cb82afbd37590bbad3054))
-
-
-
-# [4.0.0-b2](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b1...v4.0.0-b2) (2025-10-02)
-
-
-### Bug Fixes
-
-* remove pre-release flag from version update step in master-deploy workflow ([c342963](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/c342963c31e48599b5e59f205add2ac90ffb4642))
-* standardize formatting in version.properties ([752f8ba](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/752f8babe8c5c9b2e0024518128ae0fb58847a10))
 
 
 
