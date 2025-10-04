@@ -415,10 +415,16 @@ jobs:
           CONFIGURATION: Release
           SDK_NAME: iphoneos
           ARCHS: arm64
+          # Gradle memory settings for iOS framework compilation
+          GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError"
         run: |
           chmod +x gradlew
           # Build the framework for iOS device (arm64)
-          ./gradlew :composeApp:linkReleaseFrameworkIosArm64
+          # Use --no-daemon to avoid daemon memory issues in CI
+          # Specify bundle ID to avoid compiler warning
+          ./gradlew :composeApp:linkReleaseFrameworkIosArm64 \
+            --no-daemon \
+            -Pkotlin.native.binary.bundleId="me.spacelaunchnow.spacelaunchnow"
 
       - name: Build iOS app
         env:
