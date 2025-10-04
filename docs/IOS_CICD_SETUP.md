@@ -58,8 +58,8 @@ The iOS CI/CD pipeline automatically:
 3. Right-click the certificate (not the private key)
 4. Select **Export "Apple Distribution: [Your Name]"**
 5. Choose file format: **Personal Information Exchange (.p12)**
-6. Save with a strong password (you'll need this for `APPLE_CERTIFICATES_PASSWORD`)
-7. The exported `.p12` file is your `APPLE_CERTIFICATES_P12`
+6. Save with a strong password (you'll need this for `APPLE_CERTIFICATE_PASSWORD`)
+7. The exported `.p12` file is your `APPLE_CERTIFICATE_BASE64`
 
 **Why P12?** The `.p12` file contains both your certificate AND private key, which is needed to code sign the iOS app in CI/CD.
 
@@ -86,8 +86,8 @@ Go to **Repository Settings → Secrets and variables → Actions** and add:
 
 | Secret Name | Description | How to Generate |
 |-------------|-------------|-----------------|
-| `APPLE_CERTIFICATES_P12` | Distribution certificate | `base64 -i distribution.p12` (macOS) |
-| `APPLE_CERTIFICATES_PASSWORD` | Password for P12 file | Password you set when exporting |
+| `APPLE_CERTIFICATE_BASE64` | Distribution certificate | `base64 -i distribution.p12` (macOS) |
+| `APPLE_CERTIFICATE_PASSWORD` | Password for P12 file | Password you set when exporting |
 | `APPLE_PROVISIONING_PROFILE` | App Store provisioning profile | `base64 -i profile.mobileprovision` |
 | `APPLE_TEAM_ID` | Your Apple Developer Team ID | Find in [Apple Developer Account](https://developer.apple.com/account) |
 | `IOS_BUNDLE_ID` | iOS app bundle identifier | e.g., `me.calebjones.spacelaunchnow` |
@@ -163,7 +163,7 @@ Save the output as `IOS_EXPORT_OPTIONS_PLIST` secret.
 
 # 2. Encode the certificate
 base64 -i distribution.p12 | pbcopy
-# Paste as APPLE_CERTIFICATES_P12 secret
+# Paste as APPLE_CERTIFICATE_BASE64 secret
 ```
 
 ### Step 2: Encode Provisioning Profile
@@ -197,8 +197,8 @@ base64 -i ExportOptions.plist | pbcopy
 1. Go to your repository on GitHub
 2. Navigate to **Settings → Secrets and variables → Actions**
 3. Click **New repository secret** for each:
-   - `APPLE_CERTIFICATES_P12`
-   - `APPLE_CERTIFICATES_PASSWORD`
+   - `APPLE_CERTIFICATE_BASE64`
+   - `APPLE_CERTIFICATE_PASSWORD`
    - `APPLE_PROVISIONING_PROFILE`
    - `APPLE_TEAM_ID`
    - `IOS_BUNDLE_ID`
@@ -255,8 +255,8 @@ The pipeline will:
 - Ensure Team ID in ExportOptions.plist matches `APPLE_TEAM_ID`
 
 ### "Code signing error"
-- Verify `APPLE_CERTIFICATES_P12` is base64 encoded correctly
-- Check `APPLE_CERTIFICATES_PASSWORD` is correct
+- Verify `APPLE_CERTIFICATE_BASE64` is base64 encoded correctly
+- Check `APPLE_CERTIFICATE_PASSWORD` is correct
 - Ensure certificate hasn't expired
 
 ### "Invalid API Key"

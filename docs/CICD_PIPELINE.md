@@ -168,8 +168,8 @@ The action generates a well-formatted changelog following the [Keep a Changelog]
 9. Clean up temporary keychain and certificates
 
 **Required Secrets:**
-- `APPLE_CERTIFICATES_P12` - Distribution certificate (base64)
-- `APPLE_CERTIFICATES_PASSWORD` - P12 password
+- `APPLE_CERTIFICATE_BASE64` - Distribution certificate (base64)
+- `APPLE_CERTIFICATE_PASSWORD` - P12 password
 - `APPLE_PROVISIONING_PROFILE` - App Store profile (base64)
 - `APPLE_TEAM_ID` - Apple Developer Team ID
 - `IOS_BUNDLE_ID` - iOS bundle identifier
@@ -227,8 +227,8 @@ All secrets must be configured in GitHub repository settings:
 #### iOS Secrets
 | Secret | Type | Description |
 |--------|------|-------------|
-| `APPLE_CERTIFICATES_P12` | base64 | Distribution certificate (base64 encoded) |
-| `APPLE_CERTIFICATES_PASSWORD` | string | Password for P12 file |
+| `APPLE_CERTIFICATE_BASE64` | base64 | Distribution certificate (base64 encoded) |
+| `APPLE_CERTIFICATE_PASSWORD` | string | Password for P12 file |
 | `APPLE_PROVISIONING_PROFILE` | base64 | App Store provisioning profile (base64 encoded) |
 | `APPLE_TEAM_ID` | string | Apple Developer Team ID |
 | `IOS_BUNDLE_ID` | string | iOS app bundle identifier |
