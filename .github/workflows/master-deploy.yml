@@ -410,9 +410,15 @@ jobs:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION_CODE" iosApp/iosApp/Info.plist
 
       - name: Build Kotlin framework for iOS
+        env:
+          # Set Xcode environment variables that Kotlin Multiplatform expects
+          CONFIGURATION: Release
+          SDK_NAME: iphoneos
+          ARCHS: arm64
         run: |
           chmod +x gradlew
-          ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode
+          # Build the framework for iOS device (arm64)
+          ./gradlew :composeApp:linkReleaseFrameworkIosArm64
 
       - name: Build iOS app
         env:
@@ -429,12 +435,14 @@ jobs:
           EOF
           
           # Build archive
+          # The framework is built in composeApp/build/bin/iosArm64/releaseFramework/
           xcodebuild -project iosApp.xcodeproj \
             -scheme iosApp \
             -configuration Release \
             -archivePath $RUNNER_TEMP/SpaceLaunchNow.xcarchive \
             -sdk iphoneos \
             -destination generic/platform=iOS \
+            FRAMEWORK_SEARCH_PATHS="../composeApp/build/bin/iosArm64/releaseFramework" \
             clean archive
 
       - name: Export IPA
