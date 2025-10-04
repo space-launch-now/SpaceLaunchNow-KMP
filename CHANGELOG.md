@@ -1,4 +1,17 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b2...v4.0.0) (2025-10-03)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b4...v4.0.0) (2025-10-04)
+
+
+### Bug Fixes
+
+* **cicd:** update cicd process ([0877c30](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/0877c30dc60a4ddcec0eefaddfaa0aa18692b727))
+
+
+
+# [4.0.0-b4](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b3...v4.0.0-b4) (2025-10-04)
+
+
+
+# [4.0.0-b3](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b2...v4.0.0-b3) (2025-10-03)
 
 
 ### Bug Fixes
