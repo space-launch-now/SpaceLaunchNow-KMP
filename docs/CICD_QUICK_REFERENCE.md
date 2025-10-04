@@ -97,8 +97,8 @@ Set these in GitHub: **Settings → Secrets → Actions**
 ### iOS Secrets
 | Secret | How to Get |
 |--------|-----------|
-| `APPLE_CERTIFICATES_P12` | `base64 distribution.p12` |
-| `APPLE_CERTIFICATES_PASSWORD` | P12 export password |
+| `APPLE_CERTIFICATE_BASE64` | `base64 distribution.p12` |
+| `APPLE_CERTIFICATE_PASSWORD` | P12 export password |
 | `APPLE_PROVISIONING_PROFILE` | `base64 profile.mobileprovision` |
 | `APPLE_TEAM_ID` | Apple Developer Account |
 | `IOS_BUNDLE_ID` | Your iOS bundle identifier |
@@ -156,7 +156,7 @@ Example: 4.1.2-b15
 → Check `APPLE_PROVISIONING_PROFILE` secret and `IOS_BUNDLE_ID` match
 
 #### "Code signing error"
-→ Verify `APPLE_CERTIFICATES_P12` and `APPLE_CERTIFICATES_PASSWORD`
+→ Verify `APPLE_CERTIFICATE_BASE64` and `APPLE_CERTIFICATE_PASSWORD`
 
 #### "TestFlight upload failed"
 → Check App Store Connect API secrets: `APPLE_API_KEY_ID`, `APPLE_API_ISSUER_ID`, `APPLE_API_KEY_CONTENT`
