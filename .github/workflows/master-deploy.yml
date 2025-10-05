@@ -368,6 +368,13 @@ jobs:
       - name: Create .env file
         run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
 
+      - name: Generate iOS Secrets.plist
+        run: |
+          chmod +x scripts/generate-ios-secrets.sh
+          ./scripts/generate-ios-secrets.sh
+          # Copy to where Xcode expects it during CI builds
+          cp iosApp/iosApp/Secrets.plist iosApp/Secrets.plist
+
       - name: Set Xcode version
         uses: maxim-lobanov/setup-xcode@v1
         with:
