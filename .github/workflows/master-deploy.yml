@@ -491,19 +491,20 @@ jobs:
             fi
           done
           
-          # TESTING EXPORT SETUP - Skip actual export for now
-          echo "WOULD EXPORT WITH THESE OPTIONS:"
+          # Export archive to IPA - re-enabled for testing
+          echo "EXPORTING WITH THESE OPTIONS:"
           echo "Archive path: $RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive"
           echo "Export path: $RUNNER_TEMP/Build/Archives/"
           echo "Export options file: $RUNNER_TEMP/ExportOptions.plist"
           
-          # xcrun xcodebuild \
-          #   -exportArchive \
-          #   -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
-          #   -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
-          #   -exportPath "$RUNNER_TEMP/Build/Archives/"
+          # Note: This will fail because we don't have a real archive, but let's see the error
+          xcrun xcodebuild \
+            -exportArchive \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
+            -exportPath "$RUNNER_TEMP/Build/Archives/" || echo "Export failed as expected (no real archive)"
           
-          # Create mock IPA for testing
+          # Create mock IPA for subsequent steps
           mkdir -p "$RUNNER_TEMP/Build/Archives/"
           echo "mock ipa content" > "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.ipa"
           echo "ipa_path=$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.ipa" >> $GITHUB_ENV
