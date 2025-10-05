@@ -379,13 +379,26 @@ jobs:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
+      - name: Decode API Key for provisioning profiles
+        env:
+          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
+        run: |
+          # Decode the base64-encoded .p8 file
+          echo "$APPLE_API_KEY_CONTENT" | base64 --decode > /tmp/api_key.p8
+          echo "API_KEY_PATH=/tmp/api_key.p8" >> $GITHUB_ENV
+          # Also save the raw content for the action
+          cat /tmp/api_key.p8 > /tmp/api_key_raw.txt
+          echo "API_KEY_CONTENT<<EOF" >> $GITHUB_ENV
+          cat /tmp/api_key_raw.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
       - name: Download provisioning profiles
         uses: apple-actions/download-provisioning-profiles@v2
         with:
           bundle-id: ${{ secrets.IOS_BUNDLE_ID }}
           issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
           api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPLE_API_KEY_CONTENT }}
+          api-private-key: ${{ env.API_KEY_CONTENT }}
 
       # - name: Update Info.plist version  # DISABLED FOR TESTING
       #   run: |
@@ -460,7 +473,7 @@ jobs:
           app-path: ${{ env.ipa_path }}
           issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
           api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPLE_API_KEY_CONTENT }}
+          api-private-key: ${{ env.API_KEY_CONTENT }}
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4

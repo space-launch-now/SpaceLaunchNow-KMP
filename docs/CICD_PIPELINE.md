@@ -5,7 +5,12 @@ This document describes the complete CI/CD pipeline for Space Launch Now KMP.
 ## Overview
 
 The CI/CD pipeline consists of two mai#### Phase 7: Deployment
-15. ✅ **Deploy to Firebase Distribution** - Distributes AAB to Android testers
+15. ✅ **Deploy to Firebase Distributio| `APPLE_TEAM_ID` | string | Apple Developer Team ID |
+| `IOS_BUNDLE_ID` | string | iOS app bundle identifier |
+| `APPLE_API_KEY_ID` | string | App Store Connect API Key ID |
+| `APPLE_API_ISSUER_ID` | string | App Store Connect Issuer ID |
+| `APPLE_API_KEY_CONTENT` | base64 | API Key .p8 file (base64 encoded - workflow decodes it) |
+| `IOS_EXPORT_OPTIONS_PLIST` | base64 | Export configuration plist (base64 encoded) |Distributes AAB to Android testers
 16. ✅ **Deploy to TestFlight** - Distributes IPA to iOS beta testers (handled in build-ios job)
 
 **Firebase Distribution:**
