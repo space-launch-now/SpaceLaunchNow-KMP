@@ -387,16 +387,6 @@ jobs:
           echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-          
-          # Also decode the API key for TestFlight upload
-          echo "${{ secrets.APPLE_API_KEY_CONTENT }}" | base64 --decode > /tmp/api_key.p8
-          echo "API_KEY_PATH=/tmp/api_key.p8" >> $GITHUB_ENV
-          # Set API key content for TestFlight upload
-          {
-            echo "API_KEY_CONTENT<<EOF"
-            cat /tmp/api_key.p8
-            echo "EOF"
-          } >> $GITHUB_ENV
 
       # - name: Update Info.plist version  # DISABLED FOR TESTING
       #   run: |
@@ -464,6 +454,12 @@ jobs:
             PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID"
           
           echo "ipa_path=$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive/SpaceLaunchNow.ipa" >> $GITHUB_ENV
+
+      - name: Decode API key for TestFlight
+        run: |
+          echo "${{ secrets.APPLE_API_KEY_CONTENT }}" | base64 --decode > /tmp/api_key.p8
+          # Store the decoded content in a way the action can use
+          printf '%s\n' "API_KEY_CONTENT<<EOFAPIKEY" "$(cat /tmp/api_key.p8)" "EOFAPIKEY" >> $GITHUB_ENV
 
       - name: Upload to TestFlight
         uses: Apple-Actions/upload-testflight-build@v1
