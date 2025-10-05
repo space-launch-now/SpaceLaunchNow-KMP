@@ -438,32 +438,42 @@ jobs:
           # Build archive with optimized xcodebuild flags
           # The Kotlin framework will be built automatically by Xcode's "Compile Kotlin Framework" build phase
           # which calls: ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode
-          # DISABLED FOR TESTING - Skip the actual build and create mock archive
-          echo "SKIPPING BUILD FOR TESTING - Creating mock archive directory"
-          mkdir -p "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive"
+          # Build archive with optimized xcodebuild flags
+          # The Kotlin framework will be built automatically by Xcode's "Compile Kotlin Framework" build phase
+          # which calls: ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode
           
           # Find the correct certificate identity for debugging
-          CERT_IDENTITY=$(security find-identity -v -p codesigning | grep "Apple Distribution" | head -n1 | grep -o '"[^"]*"' | tr -d '"')
-          echo "Using certificate identity: $CERT_IDENTITY"
+          echo "Available code signing identities:"
+          security find-identity -v -p codesigning
           
-          # xcrun xcodebuild \
-          #   -project iosApp.xcodeproj \
-          #   -scheme iosApp \
-          #   -configuration Release \
-          #   -sdk iphoneos \
-          #   -parallelizeTargets \
-          #   -showBuildTimingSummary \
-          #   -disableAutomaticPackageResolution \
-          #   -derivedDataPath "$RUNNER_TEMP/Build/DerivedData" \
-          #   -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
-          #   -resultBundlePath "$RUNNER_TEMP/Build/Artifacts/SpaceLaunchNow.xcresult" \
-          #   -destination "generic/platform=iOS" \
-          #   DEVELOPMENT_TEAM="$TEAM_ID" \
-          #   PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
-          #   CODE_SIGN_STYLE="Manual" \
-          #   PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID" \
-          #   CODE_SIGN_IDENTITY="$CERT_IDENTITY" \
-          #   archive
+          CERT_IDENTITY=$(security find-identity -v -p codesigning | grep -E "(Apple Distribution|iOS Distribution)" | head -n1 | grep -o '"[^"]*"' | tr -d '"')
+          echo "Using certificate identity: '$CERT_IDENTITY'"
+          
+          # If no Apple Distribution found, try other distribution certificates
+          if [ -z "$CERT_IDENTITY" ]; then
+            echo "No Apple Distribution found, checking for other certificates..."
+            CERT_IDENTITY=$(security find-identity -v -p codesigning | grep -iE "(distribution|production)" | head -n1 | grep -o '"[^"]*"' | tr -d '"')
+            echo "Alternative certificate identity: '$CERT_IDENTITY'"
+          fi
+          
+          xcrun xcodebuild \
+            -project iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -parallelizeTargets \
+            -showBuildTimingSummary \
+            -disableAutomaticPackageResolution \
+            -derivedDataPath "$RUNNER_TEMP/Build/DerivedData" \
+            -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
+            -resultBundlePath "$RUNNER_TEMP/Build/Artifacts/SpaceLaunchNow.xcresult" \
+            -destination "generic/platform=iOS" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+            CODE_SIGN_STYLE="Manual" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID" \
+            CODE_SIGN_IDENTITY="$CERT_IDENTITY" \
+            archive
 
       - name: Export IPA
         env:
@@ -491,22 +501,13 @@ jobs:
             fi
           done
           
-          # Export archive to IPA - re-enabled for testing
-          echo "EXPORTING WITH THESE OPTIONS:"
-          echo "Archive path: $RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive"
-          echo "Export path: $RUNNER_TEMP/Build/Archives/"
-          echo "Export options file: $RUNNER_TEMP/ExportOptions.plist"
-          
-          # Note: This will fail because we don't have a real archive, but let's see the error
+          # Export archive to IPA
           xcrun xcodebuild \
             -exportArchive \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
-            -exportPath "$RUNNER_TEMP/Build/Archives/" || echo "Export failed as expected (no real archive)"
+            -exportPath "$RUNNER_TEMP/Build/Archives/"
           
-          # Create mock IPA for subsequent steps
-          mkdir -p "$RUNNER_TEMP/Build/Archives/"
-          echo "mock ipa content" > "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.ipa"
           echo "ipa_path=$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.ipa" >> $GITHUB_ENV
 
       - name: Decode API key for TestFlight
@@ -515,14 +516,13 @@ jobs:
           # Store the decoded content in a way the action can use
           printf '%s\n' "API_KEY_CONTENT<<EOFAPIKEY" "$(cat /tmp/api_key.p8)" "EOFAPIKEY" >> $GITHUB_ENV
 
-      # DISABLED FOR TESTING - TestFlight upload works, focusing on provisioning profiles
-      # - name: Upload to TestFlight
-      #   uses: Apple-Actions/upload-testflight-build@v1
-      #   with:
-      #     app-path: ${{ env.ipa_path }}
-      #     issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
-      #     api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
-      #     api-private-key: ${{ env.API_KEY_CONTENT }}
+      - name: Upload to TestFlight
+        uses: Apple-Actions/upload-testflight-build@v1
+        with:
+          app-path: ${{ env.ipa_path }}
+          issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
+          api-private-key: ${{ env.API_KEY_CONTENT }}
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
