@@ -379,21 +379,24 @@ jobs:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
-      - name: Decode API Key for provisioning profiles
+      - name: Install provisioning profile
         env:
-          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
+          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
         run: |
-          # Decode the base64-encoded .p8 file
-          echo "$APPLE_API_KEY_CONTENT" | base64 --decode > /tmp/api_key.p8
+          # Install the provisioning profile directly from the secret
+          echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          
+          # Also decode the API key for TestFlight upload
+          echo "${{ secrets.APPLE_API_KEY_CONTENT }}" | base64 --decode > /tmp/api_key.p8
           echo "API_KEY_PATH=/tmp/api_key.p8" >> $GITHUB_ENV
-
-      - name: Download provisioning profiles
-        uses: apple-actions/download-provisioning-profiles@v2
-        with:
-          bundle-id: ${{ secrets.IOS_BUNDLE_ID }}
-          issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPLE_API_KEY_CONTENT }}
+          # Set API key content for TestFlight upload
+          {
+            echo "API_KEY_CONTENT<<EOF"
+            cat /tmp/api_key.p8
+            echo "EOF"
+          } >> $GITHUB_ENV
 
       # - name: Update Info.plist version  # DISABLED FOR TESTING
       #   run: |
