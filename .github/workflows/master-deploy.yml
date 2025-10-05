@@ -514,13 +514,14 @@ jobs:
           # Store the decoded content in a way the action can use
           printf '%s\n' "API_KEY_CONTENT<<EOFAPIKEY" "$(cat /tmp/api_key.p8)" "EOFAPIKEY" >> $GITHUB_ENV
 
-      - name: Upload to TestFlight
-        uses: Apple-Actions/upload-testflight-build@v1
-        with:
-          app-path: ${{ env.ipa_path }}
-          issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
-          api-private-key: ${{ env.API_KEY_CONTENT }}
+      # DISABLED FOR TESTING - TestFlight upload works, focusing on provisioning profiles
+      # - name: Upload to TestFlight
+      #   uses: Apple-Actions/upload-testflight-build@v1
+      #   with:
+      #     app-path: ${{ env.ipa_path }}
+      #     issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
+      #     api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
+      #     api-private-key: ${{ env.API_KEY_CONTENT }}
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
