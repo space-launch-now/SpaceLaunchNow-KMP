@@ -1,4 +1,19 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b7...v4.0.0) (2025-10-04)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b8...v4.0.0) (2025-10-06)
+
+
+### Bug Fixes
+
+* **ci:** disable all jobs but ios and bump memory ([0b718d4](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/0b718d4132ac63f34ec61e8c6cab03952e758890))
+* update TEAM_ID in iOS configuration ([9d885b0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/9d885b01a2ac5b8352aa17606c042e35f7913823))
+
+
+### Features
+
+* Add iOS and Android release workflows ([93519ea](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/93519eaef25f8b0462abf3508045b397eb043c19))
+
+
+
+# [4.0.0-b8](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b7...v4.0.0-b8) (2025-10-04)
 
 
 ### Bug Fixes
@@ -31,10 +46,6 @@
 ### Bug Fixes
 
 * **cicd:** update cicd process ([0877c30](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/0877c30dc60a4ddcec0eefaddfaa0aa18692b727))
-
-
-
-# [4.0.0-b4](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b3...v4.0.0-b4) (2025-10-04)
 
 
 
