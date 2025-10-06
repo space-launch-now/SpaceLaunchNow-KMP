@@ -404,6 +404,10 @@ jobs:
           echo "PROVISIONING_PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
           echo "Provisioning profile UUID: $PROFILE_UUID"
           echo "Provisioning profile Name: $PROFILE_NAME"
+          
+          # Debug: Show which certificates are included in this provisioning profile
+          echo "Certificates included in provisioning profile:"
+          echo "$PROFILE_CONTENT" | plutil -extract DeveloperCertificates xml1 - -o - | xmllint --format - | grep -A1 -B1 "<data>" || echo "Could not extract certificate data"
 
       # - name: Update Info.plist version  # DISABLED FOR TESTING
       #   run: |
