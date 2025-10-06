@@ -392,13 +392,15 @@ jobs:
         run: |
           # Install the provisioning profile
           echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
           
           # Extract profile UUID and name for build configuration
           PROFILE_CONTENT=$(security cms -D -i /tmp/profile.mobileprovision)
           PROFILE_UUID=$(echo "$PROFILE_CONTENT" | plutil -extract UUID xml1 - -o - | xmllint --xpath "//string/text()" -)
           PROFILE_NAME=$(echo "$PROFILE_CONTENT" | plutil -extract Name xml1 - -o - | xmllint --xpath "//string/text()" -)
+          
+          # Install with the correct filename (UUID.mobileprovision)
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
           
           echo "PROVISIONING_PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
           echo "PROVISIONING_PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
