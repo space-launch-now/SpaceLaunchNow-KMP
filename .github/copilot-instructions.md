@@ -25,9 +25,13 @@ chore: update dependencies           → Patch version bump (4.0.0 → 4.0.1)
 
 **Pipeline Triggers:**
 - **PR to master:** Runs tests and builds debug APK (no deployment)
-- **Merge to master:** Bumps version, generates changelog, builds signed release, deploys to Firebase Distribution, creates GitHub Release
+- **Merge to master:** Bumps version, generates changelog, builds signed Android release, deploys to Firebase Distribution, creates GitHub Release (~$0.50)
+- **Manual iOS:** Trigger iOS build manually via Actions tab (~$6.00, reads version from version.properties)
+
+**Why Hybrid?** iOS builds cost 12x more than Android ($6 vs $0.50). Automatic Android + manual iOS saves ~$192/month.
 
 **Documentation:**
+- [Hybrid Release Strategy](../docs/HYBRID_RELEASE_STRATEGY.md) - **START HERE**
 - [CI/CD Quick Reference](../docs/CICD_QUICK_REFERENCE.md)
 - [Conventional Commits Guide](../docs/CONVENTIONAL_COMMITS.md)
 - [Full CI/CD Pipeline](../docs/CICD_PIPELINE.md)

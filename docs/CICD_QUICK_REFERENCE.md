@@ -25,21 +25,40 @@ gh pr create --title "feat: Your Feature" --body "Description"
 - ❌ NO version bump
 - ❌ NO deployment
 
-#### After Merge to Master
+#### After Merge to Master (ANDROID AUTO-RELEASE)
 ```bash
 # Merge your PR
 gh pr merge --merge
 ```
 
-**What happens:**
+**What happens automatically:**
 1. ✅ Version bumped based on commit messages
 2. ✅ Changelog generated
 3. ✅ Tests run
 4. ✅ Signed APK + AAB built (Android)
-5. ✅ Signed IPA built (iOS)
-6. ✅ Deployed to Firebase Distribution (Android)
-7. ✅ Deployed to TestFlight (iOS)
-8. ✅ GitHub Release created
+5. ✅ Deployed to Firebase Distribution (Android)
+6. ✅ GitHub Release created
+7. ⏸️ iOS build NOT triggered (manual only - see below)
+
+**Cost:** ~$0.50 (5 minutes on Ubuntu runner)
+
+#### iOS Release (MANUAL TRIGGER)
+```bash
+# Go to Actions → "Release iOS" → Run workflow
+# OR use GitHub CLI:
+gh workflow run release-ios.yml -f deploy_to=testflight
+```
+
+**What happens manually:**
+1. ✅ Reads version from version.properties (same as Android)
+2. ✅ Updates Info.plist automatically
+3. ✅ Builds signed IPA
+4. ✅ Uploads to TestFlight
+5. ✅ Updates GitHub Release with IPA
+
+**Cost:** ~$6.00 (30 minutes on macOS runner)
+
+**Why manual?** iOS builds are 12x more expensive than Android ($6 vs $0.50). Trigger only when you need iOS beta testing.
 
 ## 📝 Commit Message Cheat Sheet
 
@@ -111,18 +130,34 @@ Set these in GitHub: **Settings → Secrets → Actions**
 
 ## 🎯 Workflows
 
-### PR Validation
+### PR Validation (`pr-validation.yml`)
 - **Triggers:** Any PR to main/master
 - **Duration:** ~5 minutes
+- **Cost:** ~$0.25
 - **Actions:** Test + Build debug APK
 - **Artifacts:** Debug APK (7 days)
 
-### Master Deploy
-- **Triggers:** Merge to main/master
-- **Duration:** ~15-20 minutes
-- **Actions:** Version bump + Test + Build signed (Android + iOS) + Deploy
-- **Artifacts:** APK, AAB, IPA, mapping (90 days)
-- **Deploys to:** Firebase Distribution (Android) + TestFlight (iOS) + GitHub Release
+### Android Release (`release-android.yml`)
+- **Triggers:** 
+  - ✅ Automatic on merge to main/master
+  - ✅ Manual via workflow_dispatch
+- **Duration:** ~5-7 minutes
+- **Cost:** ~$0.50
+- **Actions:** Version bump + Test + Build signed + Deploy
+- **Artifacts:** APK, AAB, mapping (90 days)
+- **Deploys to:** Firebase Distribution + GitHub Release
+
+### iOS Release (`release-ios.yml`)
+- **Triggers:** 
+  - ⏸️ Manual ONLY via workflow_dispatch
+  - ❌ NOT automatic on merge
+- **Duration:** ~30 minutes
+- **Cost:** ~$6.00
+- **Actions:** Build signed + Deploy
+- **Artifacts:** IPA (90 days)
+- **Deploys to:** TestFlight + GitHub Release (updated)
+
+**Why separate?** iOS builds cost 12x more than Android. Manual trigger saves money by letting you choose when iOS beta testing is needed.
 
 ## 📦 Version Format
 
