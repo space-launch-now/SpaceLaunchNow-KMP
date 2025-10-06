@@ -206,7 +206,7 @@ jobs:
           files: |
             ${{ env.ipa_path }}
           draft: false
-          prerelease: false
+          prerelease: true  # Mark as pre-release while in development
 
       # ==================== ARTIFACTS ====================
       - name: Upload iOS artifacts
