@@ -1,9 +1,9 @@
-name: Release Android (Auto on Master)
+name: Master Deploy - Production Release
 
 on:
   push:
-    branches: [master, main]
-  workflow_dispatch:  # Can also trigger manually
+    branches: [ master, main ]
+  workflow_dispatch:
 
 env:
   CI: true
@@ -11,10 +11,11 @@ env:
 permissions:
   contents: write
   checks: write
+  pull-requests: write
 
 jobs:
-  version-and-build:
-    name: Version Bump & Android Release
+  build-and-deploy:
+    name: Build, Test, and Deploy Production Release
     runs-on: ubuntu-latest
     
     steps:
@@ -32,261 +33,263 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
 
-      # ==================== VERSION BUMP ====================
-      - name: Bump version based on conventional commits
-        id: bump_version
-        run: |
-          # Read current version
-          VERSION_MAJOR=$(grep "versionMajor=" version.properties | cut -d'=' -f2)
-          VERSION_MINOR=$(grep "versionMinor=" version.properties | cut -d'=' -f2)
-          VERSION_PATCH=$(grep "versionPatch=" version.properties | cut -d'=' -f2)
-          BUILD_NUMBER=$(grep "versionBuildNumber=" version.properties | cut -d'=' -f2)
-          
-          echo "Current version: $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH-b$BUILD_NUMBER"
-          
-          # Get commits since last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [ -z "$LAST_TAG" ]; then
-            COMMITS=$(git log --pretty=format:"%s" HEAD)
-          else
-            COMMITS=$(git log --pretty=format:"%s" $LAST_TAG..HEAD)
-          fi
-          
-          echo "Commits to analyze:"
-          echo "$COMMITS"
-          
-          # Determine bump type
-          BUMP_TYPE="patch"
-          
-          if echo "$COMMITS" | grep -qE "^feat!:|^fix!:|^refactor!:|BREAKING CHANGE:"; then
-            BUMP_TYPE="major"
-          elif echo "$COMMITS" | grep -qE "^feat:"; then
-            BUMP_TYPE="minor"
-          fi
-          
-          echo "Bump type: $BUMP_TYPE"
-          
-          # Apply version bump
-          if [ "$BUMP_TYPE" = "major" ]; then
-            VERSION_MAJOR=$((VERSION_MAJOR + 1))
-            VERSION_MINOR=0
-            VERSION_PATCH=0
-          elif [ "$BUMP_TYPE" = "minor" ]; then
-            VERSION_MINOR=$((VERSION_MINOR + 1))
-            VERSION_PATCH=0
-          else
-            VERSION_PATCH=$((VERSION_PATCH + 1))
-          fi
-          
-          # Always increment build number
-          BUILD_NUMBER=$((BUILD_NUMBER + 1))
-          
-          NEW_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
-          VERSION_NAME="${NEW_VERSION}-b${BUILD_NUMBER}"
-          
-          # Calculate version code: (major * 1,000,000) + (minor * 100,000) + (patch * 10,000) + buildNumber
-          VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + BUILD_NUMBER))
-          
-          echo "New version: $VERSION_NAME (versionCode: $VERSION_CODE)"
-          
-          # Update version.properties
-          sed -i "s/^version=.*/version=$NEW_VERSION/" version.properties
-          sed -i "s/^versionMajor=.*/versionMajor=$VERSION_MAJOR/" version.properties
-          sed -i "s/^versionMinor=.*/versionMinor=$VERSION_MINOR/" version.properties
-          sed -i "s/^versionPatch=.*/versionPatch=$VERSION_PATCH/" version.properties
-          sed -i "s/^versionBuildNumber=.*/versionBuildNumber=$BUILD_NUMBER/" version.properties
-          
-          # Set outputs
-          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
-          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
-          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
-
-      # ==================== CHANGELOG ====================
-      - name: Generate changelog
-        id: changelog
-        run: |
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          
-          if [ -z "$LAST_TAG" ]; then
-            COMMITS=$(git log --pretty=format:"%h %s" HEAD)
-          else
-            COMMITS=$(git log --pretty=format:"%h %s" $LAST_TAG..HEAD)
-          fi
-          
-          # Generate changelog sections
-          BREAKING_CHANGES=$(echo "$COMMITS" | grep -E "^[a-f0-9]+ (feat!:|fix!:|refactor!:)" || true)
-          FEATURES=$(echo "$COMMITS" | grep -E "^[a-f0-9]+ feat:" | grep -v "!" || true)
-          FIXES=$(echo "$COMMITS" | grep -E "^[a-f0-9]+ fix:" | grep -v "!" || true)
-          CHORES=$(echo "$COMMITS" | grep -E "^[a-f0-9]+ (chore:|docs:|style:|refactor:|perf:|test:|ci:)" || true)
-          
-          # Build release notes
-          RELEASE_NOTES="## 🚀 Version ${{ steps.bump_version.outputs.version_name }}\n\n"
-          
-          if [ -n "$BREAKING_CHANGES" ]; then
-            RELEASE_NOTES="${RELEASE_NOTES}### 💥 Breaking Changes\n"
-            while IFS= read -r line; do
-              RELEASE_NOTES="${RELEASE_NOTES}- 💥 ${line}\n"
-            done <<< "$BREAKING_CHANGES"
-            RELEASE_NOTES="${RELEASE_NOTES}\n"
-          fi
-          
-          if [ -n "$FEATURES" ]; then
-            RELEASE_NOTES="${RELEASE_NOTES}### ✨ New Features\n"
-            while IFS= read -r line; do
-              RELEASE_NOTES="${RELEASE_NOTES}- ✨ ${line}\n"
-            done <<< "$FEATURES"
-            RELEASE_NOTES="${RELEASE_NOTES}\n"
-          fi
-          
-          if [ -n "$FIXES" ]; then
-            RELEASE_NOTES="${RELEASE_NOTES}### 🐛 Bug Fixes\n"
-            while IFS= read -r line; do
-              RELEASE_NOTES="${RELEASE_NOTES}- 🐛 ${line}\n"
-            done <<< "$FIXES"
-            RELEASE_NOTES="${RELEASE_NOTES}\n"
-          fi
-          
-          if [ -n "$CHORES" ]; then
-            RELEASE_NOTES="${RELEASE_NOTES}### 🔧 Maintenance\n"
-            while IFS= read -r line; do
-              RELEASE_NOTES="${RELEASE_NOTES}- 🔧 ${line}\n"
-            done <<< "$CHORES"
-          fi
-          
-          # Save to file
-          echo -e "$RELEASE_NOTES" > release-notes.txt
-          
-          # Update CHANGELOG.md
-          if [ -f "CHANGELOG.md" ]; then
-            TEMP_FILE=$(mktemp)
-            echo -e "$RELEASE_NOTES\n---\n" > "$TEMP_FILE"
-            cat CHANGELOG.md >> "$TEMP_FILE"
-            mv "$TEMP_FILE" CHANGELOG.md
-          else
-            echo -e "$RELEASE_NOTES" > CHANGELOG.md
-          fi
-          
-          # Save release notes for GitHub Release
-          mkdir -p docs/release-notes
-          echo -e "$RELEASE_NOTES" > "docs/release-notes/v${{ steps.bump_version.outputs.version_name }}.md"
-
-      # ==================== COMMIT & TAG ====================
-      - name: Commit version bump and changelog
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add version.properties CHANGELOG.md docs/release-notes/
-          git commit -m "chore(release): bump version to ${{ steps.bump_version.outputs.version_name }} [skip ci]"
-          git tag -a "v${{ steps.bump_version.outputs.version_name }}" -m "Release v${{ steps.bump_version.outputs.version_name }}"
-
-      # ==================== BUILD ANDROID ====================
       - name: Create .env file
-        run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
-
-      - name: Decode Google Services
+        run: |
+          echo "API_KEY=${{ secrets.API_KEY }}" > .env
+      - name: Decode Google Services JSON
         env:
           FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
         run: |
-          echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 --decode > composeApp/google-services.json
-
+          echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
       - name: Decode Keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > release.keystore
-
-      - name: Run unit tests
-        run: ./gradlew :composeApp:testReleaseUnitTest
-
-      - name: Generate test report
-        uses: dorny/test-reporter@v1
-        if: always()
+          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          echo "KEYSTORE_FILE=$(pwd)/release.keystore" >> $GITHUB_ENV
+      # Step 2a & 2c: Bump version and generate changelog using conventional commits
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v5
         with:
-          name: Android Test Results
-          path: '**/build/test-results/testReleaseUnitTest/*.xml'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          output-file: "CHANGELOG.md"
+          version-file: "./version.properties"
+          version-path: "version"
+          skip-version-file: "false"
+          skip-commit: "true"
+          skip-tag: "true"
+          git-push: "false"
+          fallback-version: "4.0.0"
+
+      - name: Update version.properties with new version
+        id: version
+        run: |
+          # Get the version from conventional changelog action (already updated in version.properties)
+          NEW_VERSION="${{ steps.changelog.outputs.version }}"
+          
+          # Read current build number
+          BUILD_NUMBER=$(grep "versionBuildNumber=" version.properties | cut -d'=' -f2)
+          NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+          
+          # Parse version (format: major.minor.patch)
+          VERSION_MAJOR=$(echo $NEW_VERSION | cut -d'.' -f1)
+          VERSION_MINOR=$(echo $NEW_VERSION | cut -d'.' -f2)
+          VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3)
+          
+          # Create version name with build number
+          VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${NEW_BUILD_NUMBER}"
+          VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + NEW_BUILD_NUMBER))
+          
+          # Update version.properties with all fields
+          cat > version.properties << EOF
+          # Version configuration for Space Launch Now KMP
+          # Format: major.minor.patch-buildNumber
+          version=${NEW_VERSION}
+          versionMajor=${VERSION_MAJOR}
+          versionMinor=${VERSION_MINOR}
+          versionPatch=${VERSION_PATCH}
+          versionBuildNumber=${NEW_BUILD_NUMBER}
+          EOF
+          
+          echo "Version updated to: ${VERSION_NAME}"
+          echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
+          echo "VERSION_CODE=${VERSION_CODE}" >> $GITHUB_ENV
+          echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
+          echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
+      - name: Create version-specific release notes
+        run: |
+          # Create release notes directory
+          mkdir -p docs/release-notes
+          
+          # Copy the changelog content for this version to release notes
+          cat > docs/release-notes/v${{ env.VERSION_NAME }}.md << 'EOF'
+          ## 🚀 Space Launch Now ${{ env.VERSION_NAME }}
+          
+          **Release Date:** $(date +%Y-%m-%d)
+          **Version Code:** ${{ env.VERSION_CODE }}
+          
+          ${{ steps.changelog.outputs.clean_changelog }}
+          
+          ---
+          *This release was automatically created by GitHub Actions*
+          EOF
+          
+          # Save for GitHub release
+          echo "## 🚀 Space Launch Now ${{ env.VERSION_NAME }}" > release-notes.txt
+          echo "" >> release-notes.txt
+          echo "**Release Date:** $(date +%Y-%m-%d)" >> release-notes.txt
+          echo "**Version Code:** ${{ env.VERSION_CODE }}" >> release-notes.txt
+          echo "" >> release-notes.txt
+          echo "${{ steps.changelog.outputs.clean_changelog }}" >> release-notes.txt
+          echo "" >> release-notes.txt
+          echo "---" >> release-notes.txt
+          echo "*This release was automatically created by GitHub Actions*" >> release-notes.txt
+      - name: Commit version and changelog
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add version.properties CHANGELOG.md docs/release-notes/
+          git commit -m "chore(release): bump version to ${{ env.VERSION_NAME }} [skip ci]"
+          git tag -a "v${{ env.VERSION_NAME }}" -m "Release ${{ env.VERSION_NAME }}"
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Step 2b: Run tests
+      - name: Run unit tests
+        run: ./gradlew test
+      - name: Generate test report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Production Test Results
+          path: "**/build/test-results/**/TEST-*.xml"
           reporter: java-junit
           fail-on-error: true
 
-      - name: Build Release APK
+      # Step 2b: Build signed release APK and AAB
+      - name: Build Release Bundle (AAB)
         env:
-          VERSION_NAME: ${{ steps.bump_version.outputs.version_name }}
-          VERSION_CODE: ${{ steps.bump_version.outputs.version_code }}
-        run: |
-          ./gradlew :composeApp:assembleRelease \
-            -Pandroid.injected.signing.store.file=${{ github.workspace }}/release.keystore \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
-
-      - name: Build Release AAB
-        env:
-          VERSION_NAME: ${{ steps.bump_version.outputs.version_name }}
-          VERSION_CODE: ${{ steps.bump_version.outputs.version_code }}
+          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           ./gradlew :composeApp:bundleRelease \
-            -Pandroid.injected.signing.store.file=${{ github.workspace }}/release.keystore \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
-
-      # ==================== DEPLOY ====================
-      - name: Deploy to Firebase Distribution
+            -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
+            -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+      - name: Build Release APK
+        env:
+          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew :composeApp:assembleRelease \
+            -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
+            -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+      - name: Resolve APK path
+        id: apk
+        run: |
+          echo "Listing release APKs:"
+          ls -la composeApp/build/outputs/apk/release/ || true
+          APK_PATH=$(ls composeApp/build/outputs/apk/release/*.apk | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "No APK found in composeApp/build/outputs/apk/release/" >&2
+            exit 1
+          fi
+          echo "Resolved APK path: $APK_PATH"
+          echo "apk=$APK_PATH" >> $GITHUB_OUTPUT
+      - name: Resolve AAB path
+        id: aab
+        run: |
+          echo "Listing release AABs:"
+          ls -la composeApp/build/outputs/bundle/release/ || true
+          AAB_PATH=$(ls composeApp/build/outputs/bundle/release/*.aab | head -n 1)
+          if [ -z "$AAB_PATH" ]; then
+            echo "No AAB found in composeApp/build/outputs/bundle/release/" >&2
+            exit 1
+          fi
+          echo "Resolved AAB path: $AAB_PATH"
+          echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
+      - name: Decode Service Account for Firebase
+        env:
+          PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          echo "Decoding service account credentials for Firebase..."
+          echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
+          test -s service-account.json || { echo "Service account file is empty or missing" >&2; exit 1; }
+      # Step 2e: Deploy to Firebase Distribution
+      - name: Deploy APK to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+          serviceCredentialsFile: service-account.json
           groups: vip_testers
-          file: composeApp/build/outputs/bundle/release/composeApp-release.aab
+          file: ${{ steps.apk.outputs.apk }}
           releaseNotes: |
-            🚀 Space Launch Now ${{ steps.bump_version.outputs.version_name }}
+            🚀 Space Launch Now ${{ env.VERSION_NAME }} (APK)
             
-            Download the latest version from GitHub Releases:
-            https://github.com/${{ github.repository }}/releases/tag/v${{ steps.bump_version.outputs.version_name }}
-
-      # ==================== PUSH & RELEASE ====================
+            This is an automated release from the master branch.
+            See full changelog at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
+      - name: Deploy AAB to Firebase Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFile: service-account.json
+          groups: vip_testers
+          file: ${{ steps.aab.outputs.aab }}
+          releaseNotes: |
+            🚀 Space Launch Now ${{ env.VERSION_NAME }} (AAB)
+            
+            This is an automated release from the master branch.
+            See full changelog at: https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}
+      # Step 2d: Create GitHub Release with artifacts
       - name: Push version bump and tags
         run: |
-          git push origin HEAD:${{ github.ref }}
-          git push origin "v${{ steps.bump_version.outputs.version_name }}"
-
+          git push origin HEAD:${{ github.ref_name }}
+          git push origin "v${{ env.VERSION_NAME }}"
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.bump_version.outputs.version_name }}
-          name: 🚀 Space Launch Now ${{ steps.bump_version.outputs.version_name }} (Android)
+          tag_name: v${{ env.VERSION_NAME }}
+          name: "🚀 Space Launch Now ${{ env.VERSION_NAME }}"
           body_path: release-notes.txt
-          files: |
-            composeApp/build/outputs/apk/release/*.apk
-            composeApp/build/outputs/bundle/release/*.aab
-            composeApp/build/outputs/mapping/release/mapping.txt
           draft: false
           prerelease: false
+          files: |
+            ${{ steps.apk.outputs.apk }}
+            ${{ steps.aab.outputs.aab }}
+            composeApp/build/outputs/mapping/release/mapping.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ==================== ARTIFACTS ====================
-      - name: Upload Android artifacts
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-release-v${{ steps.bump_version.outputs.version_name }}
-          path: |
-            composeApp/build/outputs/apk/release/*.apk
-            composeApp/build/outputs/bundle/release/*.aab
-            composeApp/build/outputs/mapping/release/mapping.txt
+          name: release-apk-${{ env.VERSION_NAME }}
+          path: ${{ steps.apk.outputs.apk }}
+          retention-days: 90
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aab-${{ env.VERSION_NAME }}
+          path: ${{ steps.aab.outputs.aab }}
+          retention-days: 90
+
+      - name: Upload ProGuard mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: proguard-mapping-${{ env.VERSION_NAME }}
+          path: composeApp/build/outputs/mapping/release/mapping.txt
           retention-days: 90
 
       - name: Deployment Summary
+        if: always()
         run: |
-          echo "### 🎉 Android Release Deployed!" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** ${{ steps.bump_version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Version Code:** ${{ steps.bump_version.outputs.version_code }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Bump Type:** ${{ steps.bump_version.outputs.bump_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ env.VERSION_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version Code:** ${{ env.VERSION_CODE }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Skipped:** ${{ steps.changelog.outputs.skipped }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployed to:**" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Firebase Distribution (vip_testers)" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Artifacts Generated" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Release APK" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Release AAB" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ ProGuard Mapping" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🎯 Deployment Targets" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Firebase Distribution" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ GitHub Release" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**iOS Release:**" >> $GITHUB_STEP_SUMMARY
-          echo "- 📱 Trigger manually via Actions → 'Release iOS' workflow" >> $GITHUB_STEP_SUMMARY
-          echo "- 💡 Uses same version: ${{ steps.bump_version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Release URL:** https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION_NAME }}" >> $GITHUB_STEP_SUMMARY
