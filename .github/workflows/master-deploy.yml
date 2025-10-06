@@ -390,24 +390,19 @@ jobs:
         env:
           APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
         run: |
-          # Install the provisioning profile directly from the secret
+          # Install the provisioning profile
           echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
           
-          # Extract profile information for debugging and configuration
+          # Extract profile UUID and name for build configuration
           PROFILE_CONTENT=$(security cms -D -i /tmp/profile.mobileprovision)
           PROFILE_UUID=$(echo "$PROFILE_CONTENT" | plutil -extract UUID xml1 - -o - | xmllint --xpath "//string/text()" -)
           PROFILE_NAME=$(echo "$PROFILE_CONTENT" | plutil -extract Name xml1 - -o - | xmllint --xpath "//string/text()" -)
           
           echo "PROVISIONING_PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
           echo "PROVISIONING_PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
-          echo "Provisioning profile UUID: $PROFILE_UUID"
-          echo "Provisioning profile Name: $PROFILE_NAME"
-          
-          # Debug: Show which certificates are included in this provisioning profile
-          echo "Certificates included in provisioning profile:"
-          echo "$PROFILE_CONTENT" | plutil -extract DeveloperCertificates xml1 - -o - | xmllint --format - | grep -A1 -B1 "<data>" || echo "Could not extract certificate data"
+          echo "Provisioning profile installed: $PROFILE_NAME (UUID: $PROFILE_UUID)"
 
       # - name: Update Info.plist version  # DISABLED FOR TESTING
       #   run: |
@@ -441,24 +436,16 @@ jobs:
           
           # Build archive with optimized xcodebuild flags
           # The Kotlin framework will be built automatically by Xcode's "Compile Kotlin Framework" build phase
-          # which calls: ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode
-          # Build archive with optimized xcodebuild flags
-          # The Kotlin framework will be built automatically by Xcode's "Compile Kotlin Framework" build phase
-          # which calls: ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode
           
-          # Find the correct certificate identity for debugging
-          echo "Available code signing identities:"
-          security find-identity -v -p codesigning
-          
+          # Find the correct certificate identity
           CERT_IDENTITY=$(security find-identity -v -p codesigning | grep -E "(Apple Distribution|iOS Distribution)" | head -n1 | grep -o '"[^"]*"' | tr -d '"')
-          echo "Using certificate identity: '$CERT_IDENTITY'"
           
-          # If no Apple Distribution found, try other distribution certificates
+          # Fallback to any distribution certificate if the above didn't find one
           if [ -z "$CERT_IDENTITY" ]; then
-            echo "No Apple Distribution found, checking for other certificates..."
             CERT_IDENTITY=$(security find-identity -v -p codesigning | grep -iE "(distribution|production)" | head -n1 | grep -o '"[^"]*"' | tr -d '"')
-            echo "Alternative certificate identity: '$CERT_IDENTITY'"
           fi
+          
+          echo "Using certificate identity: $CERT_IDENTITY"
           
           xcrun xcodebuild \
             -project iosApp.xcodeproj \
@@ -483,27 +470,8 @@ jobs:
         env:
           EXPORT_OPTIONS_PLIST: ${{ secrets.IOS_EXPORT_OPTIONS_PLIST }}
         run: |
-          # Create export options plist from base64 secret
+          # Decode export options plist
           echo "$EXPORT_OPTIONS_PLIST" | base64 --decode > $RUNNER_TEMP/ExportOptions.plist
-          
-          # Debug: Show the export options we're using
-          echo "Export Options Plist contents:"
-          cat $RUNNER_TEMP/ExportOptions.plist
-          
-          # Debug: List all installed provisioning profiles
-          echo "Installed provisioning profiles:"
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
-          
-          # Debug: Show details of installed profiles
-          echo "Profile details:"
-          for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
-            if [ -f "$profile" ]; then
-              echo "Profile: $profile"
-              security cms -D -i "$profile" | plutil -extract Name xml1 - -o - | xmllint --xpath "//string/text()" - 2>/dev/null || echo "Could not extract name"
-              security cms -D -i "$profile" | plutil -extract UUID xml1 - -o - | xmllint --xpath "//string/text()" - 2>/dev/null || echo "Could not extract UUID"
-              echo "---"
-            fi
-          done
           
           # Export archive to IPA
           xcrun xcodebuild \
@@ -516,8 +484,8 @@ jobs:
 
       - name: Decode API key for TestFlight
         run: |
+          # Decode the API key and store in environment variable for the upload action
           echo "${{ secrets.APPLE_API_KEY_CONTENT }}" | base64 --decode > /tmp/api_key.p8
-          # Store the decoded content in a way the action can use
           printf '%s\n' "API_KEY_CONTENT<<EOFAPIKEY" "$(cat /tmp/api_key.p8)" "EOFAPIKEY" >> $GITHUB_ENV
 
       - name: Upload to TestFlight
