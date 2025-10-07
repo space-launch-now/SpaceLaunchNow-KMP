@@ -50,15 +50,13 @@ struct LaunchListWidgetView: View {
             .padding(.top)
             
             // Launch list
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(Array(entry.launches.prefix(maxLaunches).enumerated()), id: \.element.id) { index, launch in
-                        LaunchRow(launch: launch, showDivider: index < entry.launches.count - 1)
-                    }
+            VStack(spacing: 12) {
+                ForEach(Array(entry.launches.prefix(maxLaunches).enumerated()), id: \.element.id) { index, launch in
+                    LaunchRow(launch: launch, showDivider: index < entry.launches.count - 1)
                 }
-                .padding(.horizontal)
-                .padding(.bottom)
             }
+            .padding(.horizontal)
+            .padding(.bottom)
         }
     }
     

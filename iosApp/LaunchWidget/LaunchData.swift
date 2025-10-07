@@ -32,19 +32,56 @@ struct LaunchData: Identifiable {
         let interval = launchTime.timeIntervalSinceNow
         
         if interval < 0 {
-            return "Launched"
+            // Launch has already happened - show time since launch
+            let timeSince = abs(interval)
+            let totalDays = Int(timeSince / 86400)
+            let hours = Int((timeSince.truncatingRemainder(dividingBy: 86400)) / 3600)
+            let minutes = Int((timeSince.truncatingRemainder(dividingBy: 3600)) / 60)
+            
+            if totalDays > 0 {
+                let dayText = totalDays == 1 ? "One day ago" : "\(totalDays) days ago"
+                if hours > 0 {
+                    return "\(dayText)"
+                } else {
+                    return "\(dayText)"
+                }
+            } else if hours > 0 {
+                if minutes > 0 {
+                    return "\(hours) hr, \(minutes) min ago"
+                } else {
+                    return "\(hours) hr ago"
+                }
+            } else if minutes > 0 {
+                return "\(minutes) min ago"
+            } else {
+                return "Just launched"
+            }
         }
         
-        let days = Int(interval / 86400)
+        let totalDays = Int(interval / 86400)
         let hours = Int((interval.truncatingRemainder(dividingBy: 86400)) / 3600)
         let minutes = Int((interval.truncatingRemainder(dividingBy: 3600)) / 60)
         
-        if days > 0 {
-            return "\(days)d \(hours)h"
+        // Format like "One day 2 hr, 45 min" or "2 days 5 hr, 30 min"
+        if totalDays > 0 {
+            let dayText = totalDays == 1 ? "One day" : "\(totalDays) days"
+            if hours > 0 && minutes > 0 {
+                return "\(dayText) \(hours) hr, \(minutes) min"
+            } else if hours > 0 {
+                return "\(dayText) \(hours) hr"
+            } else {
+                return "\(dayText)"
+            }
         } else if hours > 0 {
-            return "\(hours)h \(minutes)m"
+            if minutes > 0 {
+                return "\(hours) hr, \(minutes) min"
+            } else {
+                return "\(hours) hr"
+            }
+        } else if minutes > 0 {
+            return "\(minutes) min"
         } else {
-            return "\(minutes)m"
+            return "Less than 1 min"
         }
     }
     
@@ -149,7 +186,13 @@ struct LaunchProvider: TimelineProvider {
             // Convert Kotlinx_datetimeInstant to Date
             let launchDate = Date(timeIntervalSince1970: TimeInterval(net.epochSeconds))
             
+            // Try multiple image sources in order of preference
+            let primaryImageUrl = launch.image?.imageUrl
+            
+            let finalImageUrl = primaryImageUrl
+            
             print("🚀 Widget: Processing launch: \(name) at \(launchDate)")
+            print("🚀 Widget: Final image URL for \(name): \(finalImageUrl ?? "nil")")
             
             return LaunchData(
                 id: launch.id,
@@ -158,7 +201,7 @@ struct LaunchProvider: TimelineProvider {
                 location: launch.pad?.location?.name ?? "Unknown Location",
                 launchTime: launchDate,
                 status: launch.status?.name ?? "Unknown",
-                imageUrl: launch.image?.imageUrl
+                imageUrl: finalImageUrl
             )
         }
         
