@@ -2973,6 +2973,7 @@ fun LaunchDetailLoadingView(onNavigateBack: () -> Unit) {
             MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
+        scrollEnabled = false,
     ) {
         // Loading content that matches the structure of LaunchDetailContentInBody
         LaunchDetailLoadingContent()

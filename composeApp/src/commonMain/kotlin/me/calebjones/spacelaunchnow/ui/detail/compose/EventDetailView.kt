@@ -529,10 +529,23 @@ fun EventDetailErrorView(
 
 @Composable
 fun EventDetailLoadingView(onNavigateBack: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    SharedDetailScaffold(
+        titleText = "Loading...",
+        taglineText = null,
+        imageUrl = null,
+        onNavigateBack = onNavigateBack,
+        backgroundColors = listOf(
+            MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+        ),
+        scrollEnabled = false,
     ) {
-        CircularProgressIndicator()
+        // Loading content
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
     }
 }
