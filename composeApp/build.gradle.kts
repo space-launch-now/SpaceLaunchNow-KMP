@@ -98,6 +98,10 @@ kotlin {
                 implementation(libs.androidx.lifecycle.runtime.ktx)
                 implementation(libs.androidx.work.runtime)
 
+                // Glance for Android Widgets
+                implementation(libs.androidx.glance)
+                implementation(libs.androidx.glance.material3)
+
                 implementation(project.dependencies.platform(libs.firebase.bom))
                 implementation(libs.android.firebase.auth)
                 implementation(libs.android.firebase.analytics)
