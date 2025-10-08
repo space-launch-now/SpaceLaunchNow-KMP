@@ -327,7 +327,7 @@ jobs:
   # Job 6: Deploy to Firebase and GitHub (after all builds complete)
   deploy:
     name: Deploy Release
-    needs: [version, build-apk, build-aab, build-ios]
+    needs: [version, build-apk, build-aab]
     runs-on: ubuntu-latest
     
     steps:
