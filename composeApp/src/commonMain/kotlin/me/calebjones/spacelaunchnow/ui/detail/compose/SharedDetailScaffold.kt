@@ -92,6 +92,7 @@ fun SharedDetailScaffold(
     imageUrl: String?,
     onNavigateBack: () -> Unit,
     backgroundColors: List<Color>? = null,
+    scrollEnabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
 
@@ -156,7 +157,7 @@ fun SharedDetailScaffold(
                     ) {
                         Column(
                             modifier = Modifier
-                                .verticalScroll(scroll)
+                                .let { if (scrollEnabled) it.verticalScroll(scroll) else it }
                                 .padding(
                                     top = GradientScroll + ImageOverlap,
                                     start = HzPadding,
@@ -169,7 +170,7 @@ fun SharedDetailScaffold(
                 }
             } else {
                 // Phone: original collapsing layout
-                SharedDetailBody(scroll, content)
+                SharedDetailBody(scroll, scrollEnabled, content)
                 SharedDetailTitle(
                     titleText,
                     taglineText,
@@ -218,7 +219,7 @@ private fun SharedDetailBackground(colors: List<Color>) {
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedDetailBody(scroll: ScrollState, content: @Composable () -> Unit) {
+private fun SharedDetailBody(scroll: ScrollState, scrollEnabled: Boolean, content: @Composable () -> Unit) {
     val sharedTransitionScope = LocalSharedTransitionScope.current
         ?: throw IllegalStateException("No scope found")
     with(sharedTransitionScope) {
@@ -231,7 +232,8 @@ private fun SharedDetailBody(scroll: ScrollState, content: @Composable () -> Uni
             )
 
             Column(
-                modifier = Modifier.verticalScroll(scroll),
+                modifier = Modifier
+                    .let { if (scrollEnabled) it.verticalScroll(scroll) else it }
             ) {
                 Spacer(Modifier.height(GradientScroll))
                 Spacer(Modifier.height(ImageOverlap))
