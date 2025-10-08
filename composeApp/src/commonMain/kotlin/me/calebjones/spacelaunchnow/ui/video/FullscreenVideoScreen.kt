@@ -1,26 +1,49 @@
 package me.calebjones.spacelaunchnow.ui.video
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.FullscreenExit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import chaintech.videoplayer.host.MediaPlayerHost
+import chaintech.videoplayer.model.VideoPlayerConfig
+import chaintech.videoplayer.ui.video.VideoPlayerComposable
+import kotlinx.coroutines.delay
+import kotlinx.datetime.Clock
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.util.VideoUtil
-import chaintech.videoplayer.host.MediaPlayerHost
-import chaintech.videoplayer.ui.video.VideoPlayerComposable
-import chaintech.videoplayer.model.VideoPlayerConfig
 
 @Composable
 fun FullscreenVideoScreen(
@@ -32,14 +55,31 @@ fun FullscreenVideoScreen(
     onVideoSelected: ((Int) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    var showControls by remember { mutableStateOf(true) }
+    var lastInteractionTime by remember { mutableStateOf(Clock.System.now().toEpochMilliseconds()) }
+
+    // Auto-hide controls after 3 seconds of inactivity
+    LaunchedEffect(lastInteractionTime) {
+        delay(3000)
+        showControls = false
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
-            .systemBarsPadding() // Add system bars padding
+            .systemBarsPadding()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                // Toggle controls visibility on tap
+                showControls = !showControls
+                lastInteractionTime = Clock.System.now().toEpochMilliseconds()
+            }
     ) {
-        // Main video player
-        val playerHost = remember(vidUrl.url) {
+        // Main video player - use a stable key for better retention across rotations
+        val playerHost = remember("fullscreen_${vidUrl.url}") {
             MediaPlayerHost(mediaUrl = vidUrl.url)
         }
 
@@ -51,97 +91,109 @@ fun FullscreenVideoScreen(
             )
         )
 
-        // Top bar with back button and video info
-        Row(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .fillMaxWidth()
-                .background(
-                    Color.Black.copy(alpha = 0.7f)
-                )
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 16.dp
-                ), // Increased padding for better spacing
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        // Top bar with back button and video info - animated visibility
+        AnimatedVisibility(
+            visible = showControls,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.TopStart)
         ) {
-            // Back button
-            IconButton(
-                onClick = onNavigateBack,
+            Row(
                 modifier = Modifier
-                    .background(
-                        Color.Black.copy(alpha = 0.5f),
-                        RoundedCornerShape(4.dp)
-                    )
-                    .padding(4.dp) // Extra padding for the button itself
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Exit fullscreen",
-                    tint = Color.White
-                )
-            }
-
-            // Video title
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-            ) {
-                Text(
-                    text = VideoUtil.getVideoTitle(vidUrl, launchName),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = VideoUtil.getVideoSourceName(vidUrl),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.7f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            // Live indicator
-            if (vidUrl.live == true) {
-                Surface(
-                    color = Color.Red,
-                    shape = RoundedCornerShape(4.dp)
-                ) {
-                    Text(
-                        text = "LIVE",
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-
-        // Bottom controls for multiple videos
-        if (availableVideos.size > 1 && onVideoSelected != null) {
-            VideoSelectionControls(
-                videos = availableVideos,
-                selectedIndex = selectedVideoIndex,
-                launchName = launchName,
-                onVideoSelected = onVideoSelected,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .background(
                         Color.Black.copy(alpha = 0.7f)
                     )
                     .padding(
                         horizontal = 16.dp,
-                        vertical = 24.dp  // Increased bottom padding for system navigation
+                        vertical = 16.dp
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Back button
+                IconButton(
+                    onClick = onNavigateBack,
+                    modifier = Modifier
+                        .background(
+                            Color.Black.copy(alpha = 0.5f),
+                            RoundedCornerShape(4.dp)
+                        )
+                        .padding(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Exit fullscreen",
+                        tint = Color.White
                     )
-            )
+                }
+
+                // Video title
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = VideoUtil.getVideoTitle(vidUrl, launchName),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = VideoUtil.getVideoSourceName(vidUrl),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.7f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                // Live indicator
+                if (vidUrl.live == true) {
+                    Surface(
+                        color = Color.Red,
+                        shape = RoundedCornerShape(4.dp)
+                    ) {
+                        Text(
+                            text = "LIVE",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+
+        // Bottom controls for multiple videos - animated visibility
+        if (availableVideos.size > 1 && onVideoSelected != null) {
+            AnimatedVisibility(
+                visible = showControls,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+                VideoSelectionControls(
+                    videos = availableVideos,
+                    selectedIndex = selectedVideoIndex,
+                    launchName = launchName,
+                    onVideoSelected = onVideoSelected,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Color.Black.copy(alpha = 0.7f)
+                        )
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 24.dp
+                        )
+                )
+            }
         }
     }
 }
@@ -195,7 +247,7 @@ private fun VideoSelectionButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(48.dp),
+        modifier = modifier.height(24.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isSelected)
                 MaterialTheme.colorScheme.primary
@@ -237,8 +289,17 @@ fun FullscreenVideoScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showControls by remember { mutableStateOf(true) }
+    var lastInteractionTime by remember { mutableStateOf(Clock.System.now().toEpochMilliseconds()) }
+
+    // Auto-hide controls after 3 seconds of inactivity
+    LaunchedEffect(lastInteractionTime) {
+        delay(3000)
+        showControls = false
+    }
+
     // Create a simple VidURL object for the single video
-    val vidUrl = remember {
+    val vidUrl = remember(videoUrl) {
         VidURL(
             url = videoUrl,
             type = null,  // VidURLType is optional
@@ -256,11 +317,21 @@ fun FullscreenVideoScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
-            .systemBarsPadding() // Add system bars padding
+            .systemBarsPadding()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                // Toggle controls visibility on tap
+                showControls = !showControls
+                lastInteractionTime = Clock.System.now().toEpochMilliseconds()
+            }
     ) {
-        // Main video player
+        // Main video player - use a more stable approach to prevent recreation during rotation
         val playerHost = remember(videoUrl) {
-            MediaPlayerHost(mediaUrl = videoUrl)
+            MediaPlayerHost(mediaUrl = videoUrl).apply {
+                // Initialize any needed configuration here
+            }
         }
 
         VideoPlayerComposable(
@@ -271,50 +342,50 @@ fun FullscreenVideoScreen(
             )
         )
 
-        // Top bar with back button and video info
-        Row(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .fillMaxWidth()
-                .background(
-                    Color.Black.copy(alpha = 0.7f)
-                )
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 16.dp
-                ), // Increased padding for better spacing
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        // Top bar with back button and video info - animated visibility
+        AnimatedVisibility(
+            visible = showControls,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.TopStart)
         ) {
-            // Back button
-            IconButton(
-                onClick = onNavigateBack,
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .background(
-                        Color.Black.copy(alpha = 0.5f),
-                        RoundedCornerShape(4.dp)
+                        Color.Black.copy(alpha = 0.7f)
                     )
-                    .padding(4.dp) // Extra padding for the button itself
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 8.dp
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Exit fullscreen",
-                    tint = Color.White
+                // Back button
+                IconButton(
+                    onClick = onNavigateBack,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Exit fullscreen",
+                        tint = Color.White
+                    )
+                }
+
+                // Video title
+                Text(
+                    text = launchName,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)
                 )
             }
-
-            // Video title
-            Text(
-                text = launchName,
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-            )
         }
     }
 }

@@ -1,14 +1,17 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -20,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.coroutines.delay
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.util.StatusColorUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -34,6 +38,7 @@ fun BuildLaunchCountdown() {
         Card {
             LaunchCountdown(
                 launchTime = Clock.System.now().plus(6.hours),
+                status = LaunchStatus(1, "Go for Launch", "The launch is a go!")
             )
         }
     }
@@ -43,9 +48,10 @@ fun BuildLaunchCountdown() {
 @Composable
 fun LaunchCountdown(
     launchTime: Instant,
-    statusId: Int? = null,
-    statusName: String? = null
+    status: LaunchStatus?
 ) {
+    var showStatusDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -67,19 +73,21 @@ fun LaunchCountdown(
 
             // Pill-shaped Status Button
             Button(
-                onClick = { /* Handle click */ },
+                onClick = { showStatusDialog = true },
                 shape = RoundedCornerShape(25),
                 modifier = Modifier
                     .align(Alignment.Center)
                     .shadow(8.dp, RoundedCornerShape(25.dp)),
-                colors = StatusColorUtil.getLaunchStatusButtonColors(statusId)
+                colors = StatusColorUtil.getLaunchStatusButtonColors(status?.id)
             ) {
-                Text(
-                    text = statusName ?: "Unknown Status",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                status?.name?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
 
@@ -95,6 +103,66 @@ fun LaunchCountdown(
                 .fillMaxWidth()
         )
     }
+
+    // Status Information Dialog
+    if (showStatusDialog) {
+        LaunchStatusDialog(
+            statusName = status?.name,
+            statusDescription = status?.description,
+            onDismiss = { showStatusDialog = false }
+        )
+    }
+}
+
+@Composable
+fun LaunchStatusDialog(
+    statusName: String?,
+    statusDescription: String?,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "Launch Status", style = MaterialTheme.typography.titleLarge)
+            }
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "Status information"
+                    )
+                    Text(
+                        text = "Description",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                if (statusDescription != null) {
+                    Text(
+                        text = statusDescription,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "OK")
+            }
+        }
+    )
 }
 
 @Composable

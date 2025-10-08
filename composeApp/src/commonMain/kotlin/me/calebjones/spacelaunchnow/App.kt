@@ -4,13 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
+import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
-import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
-import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
-import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import org.koin.compose.koinInject
 
 @Composable
@@ -27,7 +28,7 @@ fun SpaceLaunchNowApp() {
     val notificationRepository = koinInject<NotificationRepository>()
     val pushMessaging = koinInject<PushMessaging>()
     val appPreferences = koinInject<AppPreferences>()
-    
+
     // Observe the theme setting
     val themeOption by appPreferences.themeFlow.collectAsState(initial = me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.System)
 
@@ -73,9 +74,13 @@ fun SpaceLaunchNowApp() {
     }
 
     val navController = rememberNavController()
-    val isTabletOrDesktop = isTabletOrDesktop()
 
-    if (isTabletOrDesktop) {
+    // Determine initial layout type and keep it stable - don't switch between layouts on rotation
+    // This preserves navigation state across configuration changes
+    val isTabletOrDesktopValue = isTabletOrDesktop()
+    val useTabletLayout = remember(navController) { isTabletOrDesktopValue }
+
+    if (useTabletLayout) {
         TabletDesktopLayout(navController = navController, themeOption = themeOption)
     } else {
         PhoneLayout(navController = navController, themeOption = themeOption)

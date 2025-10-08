@@ -60,7 +60,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun TabletDesktopLayout(
-    navController: NavHostController = rememberNavController(),
+    navController: NavHostController,
     themeOption: ThemeOption = ThemeOption.System
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()

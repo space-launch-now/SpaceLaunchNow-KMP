@@ -83,19 +83,10 @@ private val ExpandedImageSize = 300.dp
 private val CollapsedImageSize = 100.dp
 private val HzPadding = 24.dp
 
-// A reusable spring used for bounds transform
-@OptIn(ExperimentalSharedTransitionApi::class)
-val sharedDetailBoundsTransform = BoundsTransform { _, _ ->
-    spring(dampingRatio = 0.8f, stiffness = 380f)
-}
-
-// Provider for shared element keys; caller can return any key object (e.g., SharedElementKey or EventSharedElementKey)
-typealias SharedKeyProvider = (SharedElementType) -> Any
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedDetailScaffold(
-    keyProvider: SharedKeyProvider,
     titleText: String,
     taglineText: String?,
     imageUrl: String?,
@@ -103,44 +94,25 @@ fun SharedDetailScaffold(
     backgroundColors: List<Color>? = null,
     content: @Composable () -> Unit,
 ) {
-    val sharedTransitionScope = LocalSharedTransitionScope.current
-        ?: throw IllegalStateException("No Scope found")
-    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
-        ?: throw IllegalStateException("No Scope found")
 
     val isTablet = isTablet()
     val isLandscape = isLandscape()
     val isDesktop = isDesktop()
 
-    val roundedCornerAnim by animatedVisibilityScope.transition
-        .animateDp(label = "rounded corner") { enterExit: EnterExitState ->
-            when (enterExit) {
-                EnterExitState.PreEnter -> 20.dp
-                EnterExitState.Visible -> 0.dp
-                EnterExitState.PostExit -> 20.dp
-            }
-        }
 
     val bgColors = backgroundColors ?: listOf(
         MaterialTheme.colorScheme.primaryContainer,
         MaterialTheme.colorScheme.surfaceVariant
     )
 
-    with(sharedTransitionScope) {
         Box(
             Modifier
-                .clip(RoundedCornerShape(roundedCornerAnim))
-                .sharedBounds(
-                    rememberSharedContentState(key = keyProvider(SharedElementType.Bounds)),
-                    animatedVisibilityScope,
-                    clipInOverlayDuringTransition =
-                        OverlayClip(RoundedCornerShape(roundedCornerAnim)),
-                    boundsTransform = sharedDetailBoundsTransform,
-                )
+                .clip(RoundedCornerShape(20.dp))
+
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.surfaceContainer),
         ) {
-            SharedDetailBackground(keyProvider, bgColors)
+            SharedDetailBackground(bgColors)
 
             val scroll = rememberScrollState(0)
 
@@ -163,7 +135,7 @@ fun SharedDetailScaffold(
                         ) {
                             SharedDetailImage(
                                 imageUrl = imageUrl,
-                                keyProvider = keyProvider,
+
                                 scroll = scroll,
                                 forceNoCollapse = true
                             )
@@ -172,7 +144,6 @@ fun SharedDetailScaffold(
                         SharedDetailTitle(
                             title = titleText,
                             tagline = taglineText,
-                            keyProvider = keyProvider,
                             scroll = scroll,
                             forceNoCollapse = true // desktop: always expanded
                         )
@@ -202,24 +173,18 @@ fun SharedDetailScaffold(
                 SharedDetailTitle(
                     titleText,
                     taglineText,
-                    keyProvider,
                     scroll,
                     forceNoCollapse = false
                 )
-                SharedDetailImage(imageUrl, keyProvider, scroll, forceNoCollapse = false)
+                SharedDetailImage(imageUrl, scroll, forceNoCollapse = false)
                 SharedDetailUp(onNavigateBack)
             }
         }
     }
-}
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedDetailBackground(keyProvider: SharedKeyProvider, colors: List<Color>) {
-    val sharedTransitionScope = LocalSharedTransitionScope.current
-        ?: throw IllegalStateException("No Scope found")
-    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
-        ?: throw IllegalStateException("No Scope found")
+private fun SharedDetailBackground(colors: List<Color>) {
 
     val infiniteTransition = rememberInfiniteTransition(label = "background")
     val targetOffset = with(LocalDensity.current) { 5000.dp.toPx() }
@@ -232,29 +197,23 @@ private fun SharedDetailBackground(keyProvider: SharedKeyProvider, colors: List<
         label = "offset",
     )
 
-    with(sharedTransitionScope) {
-        Spacer(
-            modifier = Modifier
-                .sharedBounds(
-                    rememberSharedContentState(key = keyProvider(SharedElementType.Background)),
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    boundsTransform = sharedDetailBoundsTransform,
+    Spacer(
+        modifier = Modifier
+            .height(280.dp)
+            .fillMaxWidth()
+            .blur(40.dp)
+            .drawWithCache {
+                val brushSize = 1200f
+                val brush = Brush.linearGradient(
+                    colors = colors,
+                    start = Offset(offset, offset),
+                    end = Offset(offset + brushSize, offset + brushSize),
+                    tileMode = TileMode.Mirror,
                 )
-                .height(280.dp)
-                .fillMaxWidth()
-                .blur(40.dp)
-                .drawWithCache {
-                    val brushSize = 1200f
-                    val brush = Brush.linearGradient(
-                        colors = colors,
-                        start = Offset(offset, offset),
-                        end = Offset(offset + brushSize, offset + brushSize),
-                        tileMode = TileMode.Mirror,
-                    )
-                    onDrawBehind { drawRect(brush) }
-                },
-        )
-    }
+                onDrawBehind { drawRect(brush) }
+            },
+    )
+
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -276,7 +235,6 @@ private fun SharedDetailBody(scroll: ScrollState, content: @Composable () -> Uni
             ) {
                 Spacer(Modifier.height(GradientScroll))
                 Spacer(Modifier.height(ImageOverlap))
-//              Spacer(Modifier.height(MinTitleOffset))
                 Surface(
                     Modifier
                         .fillMaxWidth()
@@ -293,17 +251,11 @@ private fun SharedDetailBody(scroll: ScrollState, content: @Composable () -> Uni
 private fun SharedDetailTitle(
     title: String,
     tagline: String?,
-    keyProvider: SharedKeyProvider,
     scroll: ScrollState,
     forceNoCollapse: Boolean = false,
 ) {
     val maxOffset = with(LocalDensity.current) { MaxTitleOffset.toPx() }
     val minOffset = with(LocalDensity.current) { MinTitleOffset.toPx() }
-    val sharedTransitionScope = LocalSharedTransitionScope.current
-        ?: throw IllegalArgumentException("No Scope found")
-    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
-        ?: throw IllegalArgumentException("No Scope found")
-
     // Calculate collapse fraction to determine image size and position
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
     val collapseFraction =
@@ -322,7 +274,6 @@ private fun SharedDetailTitle(
         horizontalPaddingPx
     }
 
-    with(sharedTransitionScope) {
         Column(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier
@@ -348,11 +299,6 @@ private fun SharedDetailTitle(
                         start = with(LocalDensity.current) { horizontalPaddingPx.toDp() },
                         end = with(LocalDensity.current) { rightPaddingPx.toDp() },
                     )
-                    .sharedBounds(
-                        rememberSharedContentState(key = keyProvider(SharedElementType.Title)),
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        boundsTransform = sharedDetailBoundsTransform,
-                    )
                     .wrapContentWidth(),
             )
             tagline?.let {
@@ -365,31 +311,20 @@ private fun SharedDetailTitle(
                             start = with(LocalDensity.current) { horizontalPaddingPx.toDp() },
                             end = with(LocalDensity.current) { rightPaddingPx.toDp() },
                         )
-                        .sharedBounds(
-                            rememberSharedContentState(key = keyProvider(SharedElementType.Tagline)),
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            boundsTransform = sharedDetailBoundsTransform,
-                        )
                         .wrapContentWidth(),
                 )
             }
             Spacer(Modifier.height(16.dp))
         }
-    }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun SharedDetailImage(
     imageUrl: String?,
-    keyProvider: SharedKeyProvider,
     scroll: ScrollState,
     forceNoCollapse: Boolean = false,
 ) {
-    val sharedTransitionScope = LocalSharedTransitionScope.current
-        ?: throw IllegalStateException("No sharedTransitionScope found")
-    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
-        ?: throw IllegalStateException("No animatedVisibilityScope found")
 
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
     val collapseFractionProvider =
@@ -401,62 +336,54 @@ private fun SharedDetailImage(
             .statusBarsPadding()
             .padding(horizontal = HzPadding)
     ) {
-        with(sharedTransitionScope) {
-            SubcomposeAsyncImage(
-                model = imageUrl ?: "",
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .border(4.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape)
-                    .sharedBounds(
-                        rememberSharedContentState(key = keyProvider(SharedElementType.Image)),
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        boundsTransform = sharedDetailBoundsTransform,
+        SubcomposeAsyncImage(
+            model = imageUrl ?: "",
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .clip(CircleShape)
+                .border(4.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape)
+                .fillMaxSize(),
+            loading = {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    androidx.compose.material3.CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        strokeWidth = 4.dp,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    .fillMaxSize(),
-                loading = {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        androidx.compose.material3.CircularProgressIndicator(
-                            modifier = Modifier.size(48.dp),
-                            strokeWidth = 4.dp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                error = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceContainer),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Image,
-                            contentDescription = "Image placeholder",
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                        )
-                    }
                 }
-            )
-        }
+            },
+            error = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surfaceContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Image,
+                        contentDescription = "Image placeholder",
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                    )
+                }
+            }
+        )
     }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedTransitionScope.SharedDetailUp(upPress: () -> Unit) {
+private fun SharedDetailUp(upPress: () -> Unit) {
     val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
         ?: throw IllegalArgumentException("No Scope found")
     with(animatedVisibilityScope) {
         IconButton(
             onClick = upPress,
             modifier = Modifier
-                .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 3f)
                 .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 10.dp)
                 .clip(CircleShape)
