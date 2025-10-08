@@ -57,12 +57,4 @@ Closes #
 
 ---
 
-**Note:** When this PR is merged to master, the CI/CD pipeline will:
-1. ✅ Analyze commits and bump version
-2. ✅ Generate changelog
-3. ✅ Run tests
-4. ✅ Build signed release
-5. ✅ Deploy to Firebase Distribution
-6. ✅ Create GitHub Release
-
 See [CI/CD Pipeline](../docs/CICD_PIPELINE.md) for details.
