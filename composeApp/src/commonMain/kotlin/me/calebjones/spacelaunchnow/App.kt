@@ -1,8 +1,10 @@
 package me.calebjones.spacelaunchnow
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
@@ -13,6 +15,11 @@ import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import org.koin.compose.koinInject
+
+/**
+ * CompositionLocal to provide the useUtc setting throughout the app
+ */
+val LocalUseUtc = compositionLocalOf { false }
 
 @Composable
 fun isTabletOrDesktop(): Boolean {
@@ -31,6 +38,9 @@ fun SpaceLaunchNowApp() {
 
     // Observe the theme setting
     val themeOption by appPreferences.themeFlow.collectAsState(initial = me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.System)
+
+    // Observe the useUtc setting
+    val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
 
     LaunchedEffect(Unit) {
         println("=== APP START DEBUG INFO ===")
@@ -80,9 +90,12 @@ fun SpaceLaunchNowApp() {
     val isTabletOrDesktopValue = isTabletOrDesktop()
     val useTabletLayout = remember(navController) { isTabletOrDesktopValue }
 
-    if (useTabletLayout) {
-        TabletDesktopLayout(navController = navController, themeOption = themeOption)
-    } else {
-        PhoneLayout(navController = navController, themeOption = themeOption)
+    // Provide the useUtc setting throughout the app
+    CompositionLocalProvider(LocalUseUtc provides useUtc) {
+        if (useTabletLayout) {
+            TabletDesktopLayout(navController = navController, themeOption = themeOption)
+        } else {
+            PhoneLayout(navController = navController, themeOption = themeOption)
+        }
     }
 }

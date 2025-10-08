@@ -8,7 +8,7 @@ import java.util.Locale
 /**
  * Desktop/JVM-specific implementations using Java's DateTimeFormatter with locale support
  */
-actual fun formatLocalDateTime(localDateTime: LocalDateTime): String {
+actual fun formatLocalDateTime(localDateTime: LocalDateTime, useUtc: Boolean): String {
     return try {
         val javaDateTime = java.time.LocalDateTime.of(
             localDateTime.year,
@@ -22,15 +22,20 @@ actual fun formatLocalDateTime(localDateTime: LocalDateTime): String {
         // Use JVM's locale-aware formatting
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
             .withLocale(Locale.getDefault())
-        
-        javaDateTime.format(formatter)
+
+        val formatted = javaDateTime.format(formatter)
+        if (useUtc) "$formatted UTC" else formatted
     } catch (e: Exception) {
         // Fallback to simple format
-        "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year} ${localDateTime.hour}:${localDateTime.minute.toString().padStart(2, '0')}"
+        val formatted =
+            "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year} ${localDateTime.hour}:${
+                localDateTime.minute.toString().padStart(2, '0')
+            }"
+        if (useUtc) "$formatted UTC" else formatted
     }
 }
 
-actual fun formatLocalDate(localDateTime: LocalDateTime): String {
+actual fun formatLocalDate(localDateTime: LocalDateTime, useUtc: Boolean): String {
     return try {
         val javaDate = java.time.LocalDate.of(
             localDateTime.year,
@@ -41,15 +46,18 @@ actual fun formatLocalDate(localDateTime: LocalDateTime): String {
         // Use JVM's locale-aware date formatting
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
             .withLocale(Locale.getDefault())
-        
-        javaDate.format(formatter)
+
+        val formatted = javaDate.format(formatter)
+        if (useUtc) "$formatted UTC" else formatted
     } catch (e: Exception) {
         // Fallback to simple format
-        "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year}"
+        val formatted =
+            "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year}"
+        if (useUtc) "$formatted UTC" else formatted
     }
 }
 
-actual fun formatLocalTime(localDateTime: LocalDateTime): String {
+actual fun formatLocalTime(localDateTime: LocalDateTime, useUtc: Boolean): String {
     return try {
         val javaTime = java.time.LocalTime.of(
             localDateTime.hour,
@@ -59,10 +67,12 @@ actual fun formatLocalTime(localDateTime: LocalDateTime): String {
         // Use JVM's locale-aware time formatting
         val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
             .withLocale(Locale.getDefault())
-        
-        javaTime.format(formatter)
+
+        val formatted = javaTime.format(formatter)
+        if (useUtc) "$formatted UTC" else formatted
     } catch (e: Exception) {
         // Fallback to 24-hour format
-        "${localDateTime.hour}:${localDateTime.minute.toString().padStart(2, '0')}"
+        val formatted = "${localDateTime.hour}:${localDateTime.minute.toString().padStart(2, '0')}"
+        if (useUtc) "$formatted UTC" else formatted
     }
 }
