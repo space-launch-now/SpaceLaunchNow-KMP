@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -111,7 +112,9 @@ fun NotificationSettingsScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { viewModel.updateFollowAllLaunches(!uiState.notificationSettings.followAllLaunches) },
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -282,7 +285,15 @@ fun NotificationSettingsScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .let {
+                                    if (!uiState.notificationSettings.followAllLaunches) {
+                                        it.clickable { viewModel.updateStrictMatching(!uiState.notificationSettings.useStrictMatching) }
+                                    } else {
+                                        it
+                                    }
+                                },
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.Top
                         ) {
@@ -540,7 +551,8 @@ private fun AgencyCheckboxItem(
 ) {
     Row(
         modifier = modifier
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable { onCheckedChange(!isChecked) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -564,7 +576,8 @@ private fun LocationCheckboxItem(
 ) {
     Row(
         modifier = modifier
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable { onCheckedChange(!isChecked) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -588,7 +601,9 @@ fun NotificationTopicToggle(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

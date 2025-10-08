@@ -18,6 +18,13 @@ fun computeVersionName(): String {
     return String.format("%d.%d.%d-b%d", major, minor, patch, buildNumber)
 }
 
+fun computeVersionNameDesktop(): String {
+    val major = versionProps["versionMajor"].toString().toInt()
+    val minor = versionProps["versionMinor"].toString().toInt()
+    val patch = versionProps["versionPatch"].toString().toInt()
+    return String.format("%d.%d.%d", major, minor, patch)
+}
+
 fun computeVersionCode(): Int {
     val major = versionProps["versionMajor"].toString().toInt()
     val minor = versionProps["versionMinor"].toString().toInt()
@@ -81,7 +88,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.logger.slf4j)
                 implementation(libs.coil.compose.jvm)
-                
+
                 // Desktop-specific HTTP client engine (CIO)
                 implementation(libs.ktor.client.cio)
             }
@@ -108,7 +115,7 @@ kotlin {
                 implementation(libs.android.firebase.messaging)
 
                 implementation(libs.androidx.core.splashscreen)
-                
+
                 // Android-specific HTTP client engine
                 implementation(libs.ktor.client.android)
             }
@@ -118,7 +125,7 @@ kotlin {
 
             dependencies {
                 implementation(libs.coil.compose.ios)
-                
+
                 // iOS-specific HTTP client engine (Darwin)
                 implementation(libs.ktor.client.darwin)
             }
@@ -212,6 +219,10 @@ android {
         val apiKey = envProps.getProperty("API_KEY") ?: ""
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
 
+        // Add version information to BuildConfig
+        buildConfigField("String", "VERSION_NAME", "\"${computeVersionName()}\"")
+        buildConfigField("int", "VERSION_CODE", "${computeVersionCode()}")
+
         versionCode = computeVersionCode()
         versionName = computeVersionName()
     }
@@ -223,10 +234,12 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            buildConfigField("boolean", "IS_DEBUG", "false")
         }
         getByName("debug") {
             applicationIdSuffix = ".kmpdebug"
             versionNameSuffix = "-DEBUG"
+            buildConfigField("boolean", "IS_DEBUG", "true")
         }
     }
     compileOptions {
@@ -255,7 +268,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "SpaceLaunchNow"
-            packageVersion = "1.0.0"
+            packageVersion = computeVersionNameDesktop()
         }
     }
 }
