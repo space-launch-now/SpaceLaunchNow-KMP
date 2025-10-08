@@ -1,31 +1,25 @@
 package me.calebjones.spacelaunchnow.ui.detail.compose
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,19 +42,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
-import me.calebjones.spacelaunchnow.ui.SharedElementType
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationNormal
 import me.calebjones.spacelaunchnow.ui.EventSharedElementKey
-import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
-import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
-import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
+import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
+
+private val TitleHeight = 128.dp
 
 @Composable
 fun EventDetailView(
@@ -68,7 +61,6 @@ fun EventDetailView(
     onNavigateBack: () -> Unit
 ) {
     SharedDetailScaffold(
-        keyProvider = { type -> EventSharedElementKey(event.id, type) },
         titleText = event.name,
         taglineText = event.type.name,
         imageUrl = event.image?.imageUrl,
@@ -88,6 +80,8 @@ private fun EventDetailContentInBody(event: EventEndpointDetailed) {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
+        Spacer(Modifier.height(TitleHeight - 28.dp))
+
         // Meta card
         EventInfoCard(event)
 

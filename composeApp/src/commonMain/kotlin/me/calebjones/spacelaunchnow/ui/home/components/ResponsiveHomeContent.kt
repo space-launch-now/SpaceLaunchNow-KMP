@@ -64,13 +64,13 @@ fun ResponsiveHomeContent(
                             })
                     }
                     item { UpcomingHorizontalScrollableList(navController = navController) }
-                    item { SectionTitle(title = "Latest Updates", hasAction = true) }
-                    item { LatestUpdatesView() }
+                    item { SectionTitle(title = "Latest Updates", hasAction = false) }
+                    item { LatestUpdatesView(navController = navController) }
                     item { SectionTitle(title = "Latest News", hasAction = false) }
                     item { ArticlesView() }
-                    item { SectionTitle(title = "Upcoming Events", hasAction = true) }
+                    item { SectionTitle(title = "Upcoming Events", hasAction = false) }
                     item { EventsView(navController = navController) }
-                    item { Spacer(modifier = Modifier.height(32.dp)) }
+                    item { Spacer(modifier = Modifier.height(64.dp)) }
                 }
             }
         }
@@ -94,11 +94,11 @@ fun ResponsiveHomeContent(
                 )
             }
             item { UpcomingHorizontalScrollableList(navController = navController) }
-            item { SectionTitle(title = "Latest Updates", hasAction = true) }
-            item { LatestUpdatesView() }
+            item { SectionTitle(title = "Latest Updates", hasAction = false) }
+            item { LatestUpdatesView(navController = navController) }
             item { SectionTitle(title = "Latest News", hasAction = false) }
             item { ArticlesView() }
-            item { SectionTitle(title = "Upcoming Events", hasAction = true) }
+            item { SectionTitle(title = "Upcoming Events", hasAction = false) }
             item { EventsView(navController = navController) }
             item { Spacer(modifier = Modifier.height(32.dp)) }
         }

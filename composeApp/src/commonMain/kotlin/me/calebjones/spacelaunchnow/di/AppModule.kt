@@ -74,20 +74,15 @@ val appModule = module {
         val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
         AppPreferences(appDataStore)
     }
-    
+
+    // NotificationRepository - always pass debugPreferences with getOrNull()
+    // This avoids checking BuildConfig.IS_DEBUG during module initialization
     single<NotificationRepository> {
-        if (BuildConfig.IS_DEBUG) {
-            NotificationRepositoryImpl(
-                pushMessaging = get(),
-                notificationPreferences = get(),
-                debugPreferences = getOrNull<DebugPreferences>()
-            )
-        } else {
-            NotificationRepositoryImpl(
-                pushMessaging = get(),
-                notificationPreferences = get()
-            )
-        }
+        NotificationRepositoryImpl(
+            pushMessaging = get(),
+            notificationPreferences = get(),
+            debugPreferences = getOrNull<DebugPreferences>()
+        )
     }
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)

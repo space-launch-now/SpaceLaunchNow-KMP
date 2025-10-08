@@ -10,7 +10,24 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 @OptIn(ExperimentalForeignApi::class)
-private fun getDocumentsDirectory(): String {
+private fun getAppGroupDirectory(): String {
+    // Use App Group container for shared storage between main app and widget
+    val appGroupId = "group.me.spacelaunchnow.spacelaunchnow"
+    val fileManager = NSFileManager.defaultManager
+    val containerURL = fileManager.containerURLForSecurityApplicationGroupIdentifier(appGroupId)
+    
+    return if (containerURL != null) {
+        println("📱 Using App Group container: ${containerURL.path}")
+        containerURL.path!!
+    } else {
+        // Fallback to Documents directory if App Group is not available
+        println("⚠️ App Group not available, falling back to Documents directory")
+        getDocumentsDirectoryFallback()
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun getDocumentsDirectoryFallback(): String {
     val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
         directory = NSDocumentDirectory,
         inDomain = NSUserDomainMask,
@@ -22,15 +39,15 @@ private fun getDocumentsDirectory(): String {
 }
 
 actual fun createDataStore(name: String): DataStore<Preferences> {
-    val documentsPath = getDocumentsDirectory()
+    val containerPath = getAppGroupDirectory()
     return PreferenceDataStoreFactory.createWithPath(
-        produceFile = { "$documentsPath/$name.preferences_pb".toPath() }
+        produceFile = { "$containerPath/$name.preferences_pb".toPath() }
     )
 }
 
 actual fun createDebugDataStore(): DataStore<Preferences> {
-    val documentsPath = getDocumentsDirectory()
+    val containerPath = getAppGroupDirectory()
     return PreferenceDataStoreFactory.createWithPath(
-        produceFile = { "$documentsPath/debug_settings.preferences_pb".toPath() }
+        produceFile = { "$containerPath/debug_settings.preferences_pb".toPath() }
     )
 }
