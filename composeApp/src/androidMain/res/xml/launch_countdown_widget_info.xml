@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="180dp"
-    android:minHeight="110dp"
+    android:minWidth="200dp"
+    android:minHeight="120dp"
     android:targetCellWidth="3"
     android:targetCellHeight="2"
-    android:updatePeriodMillis="900000"
-    android:description="@string/next_up_widget_description"
+    android:updatePeriodMillis="60000"
+    android:description="@string/launch_countdown_widget_description"
     android:previewImage="@mipmap/ic_launcher_monochrome"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

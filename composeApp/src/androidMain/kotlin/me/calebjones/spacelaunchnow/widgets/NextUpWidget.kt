@@ -14,8 +14,8 @@ import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
@@ -27,7 +27,6 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
-import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -36,14 +35,11 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.MainActivity
+import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import kotlin.math.abs
 import org.koin.java.KoinJavaComponent.inject as koinInject
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 
 class NextUpWidget : GlanceAppWidget() {
 
@@ -85,7 +81,7 @@ fun NextUpWidgetContent(launch: LaunchNormal?) {
                     Intent(context, MainActivity::class.java)
                 )
             )
-            .padding(16.dp),
+            .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
         if (launch != null) {
@@ -93,28 +89,33 @@ fun NextUpWidgetContent(launch: LaunchNormal?) {
                 modifier = GlanceModifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title
-                Text(
-                    text = "🚀 NEXT LAUNCH",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = GlanceTheme.colors.onBackground
-                    )
-                )
-
-                Spacer(modifier = GlanceModifier.height(8.dp))
+                val launchName = launch.name ?: "Unknown Launch"
+                val parts = launchName.split(" | ")
+                val title = parts[0]
+                val subtitle = if (parts.size > 1) parts[1] else ""
 
                 // Launch Name
                 Text(
-                    text = launch.name ?: "Unknown Launch",
+                    text = title,
                     style = TextStyle(
-                        fontSize = 14.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = GlanceTheme.colors.primary
                     ),
-                    maxLines = 2
+                    maxLines = 1
                 )
+
+                if (subtitle.isNotEmpty()) {
+                    Text(
+                        text = subtitle,
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = GlanceTheme.colors.primary
+                        ),
+                        maxLines = 1
+                    )
+                }
 
                 Spacer(modifier = GlanceModifier.height(8.dp))
 
@@ -123,7 +124,7 @@ fun NextUpWidgetContent(launch: LaunchNormal?) {
                     Text(
                         text = agencyName,
                         style = TextStyle(
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             color = GlanceTheme.colors.onBackground
                         )
                     )
@@ -142,17 +143,9 @@ fun NextUpWidgetContent(launch: LaunchNormal?) {
                     Spacer(modifier = GlanceModifier.height(8.dp))
                 }
 
-                // Countdown
+                // Countdown Display - Main App Style
                 launch.net?.let { netTime ->
-                    val countdown = formatCountdown(netTime)
-                    Text(
-                        text = countdown,
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = GlanceTheme.colors.secondary
-                        )
-                    )
+                    CountdownDisplay(netTime)
                 }
 
                 Spacer(modifier = GlanceModifier.height(4.dp))
@@ -163,7 +156,7 @@ fun NextUpWidgetContent(launch: LaunchNormal?) {
                         text = status,
                         style = TextStyle(
                             fontSize = 10.sp,
-                            color = when (launch.status?.id) {
+                            color = when (launch.status.id) {
                                 1 -> GlanceTheme.colors.secondary // Go
                                 2 -> GlanceTheme.colors.error // TBD
                                 else -> GlanceTheme.colors.onBackground
@@ -177,9 +170,10 @@ fun NextUpWidgetContent(launch: LaunchNormal?) {
                 modifier = GlanceModifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "🚀",
-                    style = TextStyle(fontSize = 32.sp)
+                Image(
+                    provider = ImageProvider(R.mipmap.ic_launcher_monochrome),
+                    contentDescription = "Space Launch Now",
+                    modifier = GlanceModifier.size(32.dp)
                 )
                 Spacer(modifier = GlanceModifier.height(8.dp))
                 Text(
@@ -194,35 +188,75 @@ fun NextUpWidgetContent(launch: LaunchNormal?) {
     }
 }
 
-private fun formatCountdown(netTime: Instant): String {
+@Composable
+private fun CountdownDisplay(launchTime: Instant) {
     val now = Clock.System.now()
-    val duration = netTime - now
+    val duration = launchTime - now
+    val totalSeconds = duration.inWholeSeconds
+    val isPast = totalSeconds < 0
+    val absoluteSeconds = abs(totalSeconds)
 
-    return when {
-        duration.isNegative() -> "Launched"
-        duration < 1.minutes -> "Less than a minute"
-        duration < 1.hours -> {
-            val mins = duration.inWholeMinutes
-            "T-${mins}m"
-        }
+    val days = (absoluteSeconds / 86400).toInt()
+    val hours = ((absoluteSeconds % 86400) / 3600).toInt()
+    val minutes = ((absoluteSeconds % 3600) / 60).toInt()
 
-        duration < 1.days -> {
-            val hours = duration.inWholeHours
-            val mins = (duration - hours.hours).inWholeMinutes
-            "T-${hours}h ${mins}m"
-        }
-
-        duration < 7.days -> {
-            val days = duration.inWholeDays
-            val hours = (duration - days.days).inWholeHours
-            "T-${days}d ${hours}h"
-        }
-
-        else -> {
-            val days = duration.inWholeDays
-            "T-${days} days"
+    if (isPast) {
+        Text(
+            text = "Launched",
+            style = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = GlanceTheme.colors.tertiary
+            )
+        )
+    } else {
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CountdownUnit(value = days, label = "Days")
+            CountdownSeparator()
+            CountdownUnit(value = hours, label = "Hours")
+            CountdownSeparator()
+            CountdownUnit(value = minutes, label = "Minutes")
         }
     }
+}
+
+@Composable
+private fun CountdownUnit(value: Int, label: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = value.toString().padStart(2, '0'),
+            style = TextStyle(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = GlanceTheme.colors.tertiary
+            )
+        )
+        Text(
+            text = label,
+            style = TextStyle(
+                fontSize = 12.sp,
+                color = GlanceTheme.colors.onSurfaceVariant
+            )
+        )
+    }
+}
+
+@Composable
+private fun CountdownSeparator() {
+    Text(
+        text = ":",
+        style = TextStyle(
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = GlanceTheme.colors.tertiary
+        ),
+        modifier = GlanceModifier.padding(horizontal = 4.dp)
+    )
 }
 
 class NextUpWidgetReceiver : GlanceAppWidgetReceiver() {

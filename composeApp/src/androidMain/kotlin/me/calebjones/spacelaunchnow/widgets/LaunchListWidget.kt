@@ -8,6 +8,8 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -26,6 +28,7 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -35,6 +38,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.MainActivity
+import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import org.koin.core.component.KoinComponent
@@ -97,19 +101,11 @@ fun LaunchListWidgetContent(launches: List<LaunchNormal>) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "🚀 Upcoming Launches",
+                    text = "Upcoming Launches",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = GlanceTheme.colors.primary
-                    )
-                )
-                Spacer(modifier = GlanceModifier.defaultWeight())
-                Text(
-                    text = "${launches.size}",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant
                     )
                 )
             }
@@ -133,9 +129,10 @@ fun LaunchListWidgetContent(launches: List<LaunchNormal>) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "🚀",
-                            style = TextStyle(fontSize = 24.sp)
+                        Image(
+                            provider = ImageProvider(R.mipmap.ic_launcher_monochrome),
+                            contentDescription = "Space Launch Now",
+                            modifier = GlanceModifier.size(32.dp)
                         )
                         Spacer(modifier = GlanceModifier.height(8.dp))
                         Text(
@@ -181,47 +178,28 @@ fun LaunchListItem(launch: LaunchNormal) {
 
         Spacer(modifier = GlanceModifier.height(4.dp))
 
-        // Agency and Location Row
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Agency
-            launch.launchServiceProvider.name?.let { agencyName ->
-                Text(
-                    text = agencyName,
-                    style = TextStyle(
-                        fontSize = 10.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant
-                    ),
-                    maxLines = 1
-                )
-            }
-
-            Spacer(modifier = GlanceModifier.width(4.dp))
-
-            // Separator
+        // Agency
+        launch.launchServiceProvider.name.let { agencyName ->
             Text(
-                text = "•",
+                text = agencyName,
                 style = TextStyle(
                     fontSize = 10.sp,
                     color = GlanceTheme.colors.onSurfaceVariant
-                )
+                ),
+                maxLines = 1
             )
+        }
 
-            Spacer(modifier = GlanceModifier.width(4.dp))
-
-            // Location
-            launch.pad?.location?.name?.let { location ->
-                Text(
-                    text = location,
-                    style = TextStyle(
-                        fontSize = 10.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant
-                    ),
-                    maxLines = 1
-                )
-            }
+        // Location
+        launch.pad?.location?.name?.let { location ->
+            Text(
+                text = location,
+                style = TextStyle(
+                    fontSize = 10.sp,
+                    color = GlanceTheme.colors.onSurfaceVariant
+                ),
+                maxLines = 1
+            )
         }
 
         Spacer(modifier = GlanceModifier.height(4.dp))
@@ -247,13 +225,13 @@ fun LaunchListItem(launch: LaunchNormal) {
             Spacer(modifier = GlanceModifier.defaultWeight())
 
             // Status
-            launch.status?.abbrev?.let { status ->
+            launch.status?.name?.let { status ->
                 Text(
                     text = status,
                     style = TextStyle(
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = when (launch.status?.id) {
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = when (launch.status.id) {
                             1 -> GlanceTheme.colors.secondary // Go
                             2 -> GlanceTheme.colors.error // TBD
                             3, 4, 6 -> GlanceTheme.colors.tertiary // Success/Failure/Hold

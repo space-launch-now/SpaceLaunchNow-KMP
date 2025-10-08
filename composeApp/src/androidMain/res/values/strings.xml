@@ -2,4 +2,5 @@
     <string name="app_name">Space Launch Now</string>
     <string name="next_up_widget_description">Shows the next upcoming rocket launch with countdown</string>
     <string name="launch_list_widget_description">Shows a list of upcoming rocket launches</string>
+    <string name="launch_countdown_widget_description">Shows detailed countdown timer for the next rocket launch</string>
 </resources>
