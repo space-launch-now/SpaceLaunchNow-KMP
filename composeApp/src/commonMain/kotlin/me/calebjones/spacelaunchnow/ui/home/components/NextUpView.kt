@@ -176,8 +176,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                 // Comprehensive countdown section with status, timer, and launch window
                 LaunchCountdown(
                     launchTime = launch.net!!,
-                    statusId = launch.status?.id,
-                    statusName = launch.status?.name
+                    status = launch.status
                 )
 
                 // Mission information section

@@ -35,9 +35,6 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_Material_NoActionBar)
         super.onCreate(savedInstanceState)
 
-        // Initialize BuildConfig to set DEBUG flag
-        initializeBuildConfig()
-
         // Subscribe all notifications on first app launch (fresh install)
         val notificationRepository by inject<NotificationRepository>()
         CoroutineScope(Dispatchers.IO).launch {

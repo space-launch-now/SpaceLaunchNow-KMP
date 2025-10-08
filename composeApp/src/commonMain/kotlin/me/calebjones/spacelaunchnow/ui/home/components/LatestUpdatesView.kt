@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -18,12 +19,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.UpdatesShimmer
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -31,7 +35,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun LatestUpdatesView(
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = koinViewModel()
+    homeViewModel: HomeViewModel = koinViewModel(),
+    navController: NavController? = null
 ) {
     val updates by homeViewModel.updates.collectAsState()
     val isLoading by homeViewModel.isUpdatesLoading.collectAsState()
@@ -56,7 +61,7 @@ fun LatestUpdatesView(
                     contentPadding = PaddingValues(all = 16.dp)
                 ) {
                     items(updates) { update ->
-                        UpdateCard(update = update)
+                        UpdateCard(update = update, navController = navController)
                     }
                 }
             }
@@ -71,10 +76,21 @@ fun LatestUpdatesView(
 @Composable
 fun UpdateCard(
     update: UpdateEndpoint,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController? = null
 ) {
     Card(
-        modifier = modifier.size(280.dp, 120.dp),
+        modifier = modifier
+            .size(280.dp, 120.dp)
+            .clickable {
+                if (navController != null) {
+                    if (update.launch != null) {
+                        navController.navigate(LaunchDetail(update.launch.id))
+                    } else if (update.event != null) {
+                        navController.navigate(EventDetail(update.event.id))
+                    }
+                }
+            },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant

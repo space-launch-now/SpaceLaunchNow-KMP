@@ -1,11 +1,10 @@
 package me.calebjones.spacelaunchnow.di
 
+import android.content.Context
 import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
 import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
-import me.calebjones.spacelaunchnow.MainApplication
 import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.data.storage.createAppSettingsDataStore
@@ -17,7 +16,7 @@ val androidModule = module {
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {
-    androidLogger()
-    androidContext(MainApplication.instance ?: error("No Android application context set"))
+    // Android context is set in MainApplication.onCreate via androidContext()
+    // Just return the androidModule here
     modules(androidModule)
 }

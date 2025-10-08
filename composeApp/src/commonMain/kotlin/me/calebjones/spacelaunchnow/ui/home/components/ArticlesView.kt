@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -96,8 +97,9 @@ fun ArticlesView() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleItem(article: Article) {
+    val uriHandler = LocalUriHandler.current
     Card(
-        onClick = { /* TODO: Open article URL */ },
+        onClick = { uriHandler.openUri(article.url) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),
