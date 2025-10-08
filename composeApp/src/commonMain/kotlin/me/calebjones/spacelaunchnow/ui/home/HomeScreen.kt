@@ -169,7 +169,7 @@ fun HomeScreen(navController: NavController) {
                     item { SectionTitle(title = "Upcoming Launches", hasAction = true) }
                     item { LaunchListShimmer(cardCount = 3) }
 
-                    item { SectionTitle(title = "Latest Updates", hasAction = true) }
+                    item { SectionTitle(title = "Latest Updates", hasAction = false) }
                     item { UpdatesShimmer(cardCount = 4) }
 
                     item { SectionTitle(title = "News and Events", hasAction = false) }
