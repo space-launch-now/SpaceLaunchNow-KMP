@@ -141,6 +141,7 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import me.calebjones.spacelaunchnow.util.VideoUtil
+import me.calebjones.spacelaunchnow.LocalUseUtc
 
 // Keep only TitleHeight which is used for spacing
 private val TitleHeight = 128.dp
@@ -233,6 +234,7 @@ private fun PrecisionInfoDialog(
 @Composable
 private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
     var showPrecisionDialog by remember { mutableStateOf(false) }
+    val useUtc = LocalUseUtc.current
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -287,7 +289,8 @@ private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                                         launch.net?.let { net ->
                                             val relativeDateText =
                                                 me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTimeRelative(
-                                                    net
+                                                    net,
+                                                    useUtc
                                                 )
                                             // Extract just the date part (everything before the time)
                                             // e.g., "Today at 12:31pm" -> "Today at"
@@ -308,7 +311,7 @@ private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                                             )
                                         }
                                         Text(
-                                            text = launch.net?.let { formatLaunchTime(it) }
+                                            text = launch.net?.let { formatLaunchTime(it, useUtc) }
                                                 ?: "TBD",
                                             style = MaterialTheme.typography.headlineLarge,
                                             fontWeight = FontWeight.Bold,
@@ -1622,6 +1625,7 @@ private fun SpacecraftDetailsCard(spacecraftStages: List<SpacecraftFlightDetaile
 
 @Composable
 private fun SpacecraftItem(spacecraft: SpacecraftFlightDetailedSerializerNoLaunch) {
+    val useUtc = LocalUseUtc.current
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -1647,7 +1651,7 @@ private fun SpacecraftItem(spacecraft: SpacecraftFlightDetailedSerializerNoLaunc
             InfoRow(
                 icon = Icons.Filled.Schedule,
                 label = "Mission End",
-                value = formatLaunchTime(endDate)
+                value = formatLaunchTime(endDate, useUtc)
             )
         }
 
@@ -1834,6 +1838,7 @@ private fun LandingStylePicker(
 @Composable
 private fun LandingStageChipsContent(stage: FirstStageNormal) {
     val landing = stage.landing
+    val useUtc = LocalUseUtc.current
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             item { InfoChip(icon = Icons.Filled.Category, text = stage.type) }
@@ -1892,7 +1897,8 @@ private fun LandingStageChipsContent(stage: FirstStageNormal) {
                     InfoChip(
                         icon = Icons.Filled.Schedule,
                         text = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(
-                            prev
+                            prev,
+                            useUtc
                         )
                     )
                 }
@@ -1934,6 +1940,7 @@ private fun LandingStageChipsContent(stage: FirstStageNormal) {
 @Composable
 private fun LandingStageGridContent(stage: FirstStageNormal) {
     val landing = stage.landing
+    val useUtc = LocalUseUtc.current
     val tiles = buildList {
         add(Triple(Icons.Filled.Category, "Stage Type", stage.type))
         stage.reused?.let { add(Triple(Icons.Filled.Repeat, "Reused", if (it) "Yes" else "No")) }
@@ -1943,7 +1950,7 @@ private fun LandingStageGridContent(stage: FirstStageNormal) {
                 Triple(
                     Icons.Filled.Schedule,
                     "Prev. Flight",
-                    me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(it)
+                    me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(it, useUtc)
                 )
             )
         }
@@ -2007,6 +2014,7 @@ private fun LandingStageGridContent(stage: FirstStageNormal) {
 @Composable
 private fun LandingStageSectionedContent(stage: FirstStageNormal) {
     val landing = stage.landing
+    val useUtc = LocalUseUtc.current
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
             Text(
@@ -2043,7 +2051,8 @@ private fun LandingStageSectionedContent(stage: FirstStageNormal) {
             stage.launcherFlightNumber?.let { "Flight #" to "$it" },
             stage.previousFlightDate?.let {
                 "Prev. Flight" to me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(
-                    it
+                    it,
+                    useUtc
                 )
             },
             stage.turnAroundTime?.takeIf { it.isNotBlank() }
@@ -2081,6 +2090,7 @@ private fun LandingStageSectionedContent(stage: FirstStageNormal) {
 @Composable
 private fun LandingStageLinearContent(stage: FirstStageNormal) {
     val landing = stage.landing
+    val useUtc = LocalUseUtc.current
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         InfoRow(icon = Icons.Filled.Category, label = "Stage Type", value = stage.type)
         stage.reused?.let {
@@ -2101,7 +2111,10 @@ private fun LandingStageLinearContent(stage: FirstStageNormal) {
             InfoRow(
                 icon = Icons.Filled.Schedule,
                 label = "Prev. Flight",
-                value = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(it)
+                value = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(
+                    it,
+                    useUtc
+                )
             )
         }
         stage.turnAroundTime?.takeIf { it.isNotBlank() }

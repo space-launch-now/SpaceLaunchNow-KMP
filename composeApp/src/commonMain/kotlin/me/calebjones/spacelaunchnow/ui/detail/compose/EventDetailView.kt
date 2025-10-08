@@ -52,6 +52,7 @@ import me.calebjones.spacelaunchnow.ui.EventSharedElementKey
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
+import me.calebjones.spacelaunchnow.LocalUseUtc
 
 private val TitleHeight = 128.dp
 
@@ -129,6 +130,7 @@ private fun EventDetailContentInBody(event: EventEndpointDetailed) {
 
 @Composable
 private fun EventInfoCard(event: EventEndpointDetailed) {
+    val useUtc = LocalUseUtc.current
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -142,7 +144,7 @@ private fun EventInfoCard(event: EventEndpointDetailed) {
         ) {
             // Date, location, duration
             val meta = buildList {
-                event.date?.let { add(formatLaunchDateTime(it)) }
+                event.date?.let { add(formatLaunchDateTime(it, useUtc)) }
                 event.location?.let { add(it) }
                 if (event.duration != null) add("Duration: ${event.duration}")
                 if (event.webcastLive == true) add("Live Now")
@@ -347,6 +349,7 @@ private fun SpaceStationsCard(stations: List<SpaceStationNormal>) {
 
 @Composable
 private fun ExpeditionsCard(expeditions: List<ExpeditionNormal>) {
+    val useUtc = LocalUseUtc.current
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -361,7 +364,8 @@ private fun ExpeditionsCard(expeditions: List<ExpeditionNormal>) {
                 fontWeight = FontWeight.Bold
             )
             expeditions.forEach { exp ->
-                val subtitle = exp.end?.let { formatLaunchDateTime(it) } ?: exp.spacestation.name
+                val subtitle =
+                    exp.end?.let { formatLaunchDateTime(it, useUtc) } ?: exp.spacestation.name
                 RowWithImage(
                     title = exp.name ?: "Expedition",
                     subtitle = subtitle,
