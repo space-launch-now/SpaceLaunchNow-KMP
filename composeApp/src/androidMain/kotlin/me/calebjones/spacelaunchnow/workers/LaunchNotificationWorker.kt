@@ -63,7 +63,7 @@ class LaunchNotificationWorker(
 
         val pendingIntent = PendingIntent.getActivity(
             context,
-            0,
+            launchId?.hashCode() ?: 0,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -71,7 +71,7 @@ class LaunchNotificationWorker(
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("🚀 Launch Alert")
             .setContentText("$launchName is launching $launchTime")
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // TODO: Replace with app icon
+            .setSmallIcon(me.calebjones.spacelaunchnow.R.mipmap.ic_launcher_monochrome)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -80,6 +80,6 @@ class LaunchNotificationWorker(
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(launchId?.hashCode() ?: NOTIFICATION_ID, notification)
     }
 }

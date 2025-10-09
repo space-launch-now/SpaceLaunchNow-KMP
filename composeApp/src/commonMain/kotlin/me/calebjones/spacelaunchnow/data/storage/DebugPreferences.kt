@@ -29,7 +29,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         DebugSettings(
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
-            useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: true
+            useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false
         )
     }
 
@@ -108,5 +108,5 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
 data class DebugSettings(
     val useCustomApiUrl: Boolean = false,
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
-    val useDebugTopics: Boolean = true
+    val useDebugTopics: Boolean = false
 )

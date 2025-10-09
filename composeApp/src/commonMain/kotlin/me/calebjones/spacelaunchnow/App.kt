@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import org.koin.compose.koinInject
@@ -30,7 +31,10 @@ fun isTabletOrDesktop(): Boolean {
 }
 
 @Composable
-fun SpaceLaunchNowApp() {
+fun SpaceLaunchNowApp(
+    notificationLaunchId: String? = null,
+    onNotificationLaunchIdConsumed: () -> Unit = {}
+) {
     // Initialize notifications on app start and print debug info
     val notificationRepository = koinInject<NotificationRepository>()
     val pushMessaging = koinInject<PushMessaging>()
@@ -41,6 +45,22 @@ fun SpaceLaunchNowApp() {
 
     // Observe the useUtc setting
     val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
+
+    val navController = rememberNavController()
+
+    // Handle notification-based navigation
+    LaunchedEffect(notificationLaunchId) {
+        if (notificationLaunchId != null) {
+            println("Navigating to launch detail for ID: $notificationLaunchId")
+            navController.navigate(
+                me.calebjones.spacelaunchnow.navigation.LaunchDetail(
+                    notificationLaunchId
+                )
+            )
+            // Clear the notification launch ID after navigation
+            onNotificationLaunchIdConsumed()
+        }
+    }
 
     LaunchedEffect(Unit) {
         println("=== APP START DEBUG INFO ===")
@@ -55,35 +75,27 @@ fun SpaceLaunchNowApp() {
 
         try {
             // Initialize notifications
-            notificationRepository.initializeNotifications()
+            notificationRepository.initialize()
 
-            // Get and print current subscribed topics
-            val settings = notificationRepository.getNotificationSettings()
-            println("Current subscribed topics: ${settings.subscribedTopics}")
-            println("Subscribed agencies: ${settings.subscribedAgencies}")
-            println("Subscribed locations: ${settings.subscribedLocations}")
-            println("Notifications enabled: ${settings.enableNotifications}")
-            println("Follow all launches: ${settings.followAllLaunches}")
-            println("Use strict matching: ${settings.useStrictMatching}")
-            println("--- Additional Notification Topics ---")
-            println("Event notifications: ${settings.eventNotifications}")
-            println("Netstamp changed: ${settings.netstampChanged}")
-            println("Webcast only: ${settings.webcastOnly}")
-            println("24 hour: ${settings.twentyFourHour}")
-            println("1 hour: ${settings.oneHour}")
-            println("10 minutes: ${settings.tenMinutes}")
-            println("1 minute: ${settings.oneMinute}")
-            println("In flight: ${settings.inFlight}")
-            println("Success: ${settings.success}")
+            // Get and print current state (using the new state flow)
+            val currentState = notificationRepository.state.value
+            println("Current state:")
+            println("  - Notifications enabled: ${currentState.enableNotifications}")
+            println("  - Follow all launches: ${currentState.followAllLaunches}")
+            println("  - Use strict matching: ${currentState.useStrictMatching}")
+            println("  - Subscribed agencies: ${currentState.subscribedAgencies.size}")
+            println("  - Subscribed locations: ${currentState.subscribedLocations.size}")
+            println("  - Topic settings: ${currentState.topicSettings}")
+            println("  - Subscribed FCM topics: ${currentState.subscribedTopics.size}")
+
+            println("Settings loaded - state management handled by repository")
         } catch (e: Exception) {
-            println("Failed to get notification settings: ${e.message}")
+            println("Failed to initialize notifications: ${e.message}")
             e.printStackTrace()
         }
 
         println("=== END APP START DEBUG INFO ===")
     }
-
-    val navController = rememberNavController()
 
     // Determine initial layout type and keep it stable - don't switch between layouts on rotation
     // This preserves navigation state across configuration changes

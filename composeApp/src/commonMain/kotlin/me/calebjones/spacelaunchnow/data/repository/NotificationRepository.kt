@@ -1,26 +1,34 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.data.model.NotificationSettings
-import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import kotlinx.coroutines.flow.StateFlow
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
-import kotlinx.coroutines.flow.Flow
+import me.calebjones.spacelaunchnow.data.model.NotificationState
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 
 interface NotificationRepository {
-    suspend fun initializeNotifications()
-    suspend fun getNotificationSettings(): NotificationSettings
-    suspend fun updateNotificationSettings(settings: NotificationSettings)
-    suspend fun subscribeToTopic(topic: NotificationTopic): Result<Unit>
-    suspend fun unsubscribeFromTopic(topic: NotificationTopic): Result<Unit>
-    suspend fun requestNotificationPermission(): Boolean
-    fun getNotificationSettingsFlow(): Flow<NotificationSettings>
 
-    // Agency and Location management
+    // Single source of truth - all UI observes this
+    val state: StateFlow<NotificationState>
+
+    // App initialization
+    suspend fun initialize()
+
+    // Simple state updates (instant UI feedback)
+    suspend fun setNotificationsEnabled(enabled: Boolean)
+    suspend fun setFollowAllLaunches(enabled: Boolean)
+    suspend fun setUseStrictMatching(enabled: Boolean)
+    suspend fun setTopicEnabled(topic: NotificationTopic, enabled: Boolean)
+    suspend fun setAgencyEnabled(agency: NotificationAgency, enabled: Boolean)
+    suspend fun setAgencyEnabled(topicName: String, enabled: Boolean)
+    suspend fun setLocationEnabled(location: NotificationLocation, enabled: Boolean)
+    suspend fun setLocationEnabled(topicName: String, enabled: Boolean)
+
+    // Data access
     suspend fun getAvailableAgencies(): List<NotificationAgency>
     suspend fun getAvailableLocations(): List<NotificationLocation>
-    suspend fun subscribeToAgency(agency: NotificationAgency): Result<Unit>
-    suspend fun unsubscribeFromAgency(agency: NotificationAgency): Result<Unit>
-    suspend fun subscribeToLocation(location: NotificationLocation): Result<Unit>
-    suspend fun unsubscribeFromLocation(location: NotificationLocation): Result<Unit>
-    suspend fun updateTopicSubscriptions(): Result<Unit>
+
+    // Permission handling
+    suspend fun requestNotificationPermission(): Boolean
+    suspend fun hasNotificationPermission(): Boolean
 }
