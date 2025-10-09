@@ -52,6 +52,7 @@ import me.calebjones.spacelaunchnow.ui.SharedElementType
 import me.calebjones.spacelaunchnow.ui.EventSharedElementKey
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
+import me.calebjones.spacelaunchnow.LocalUseUtc
 
 @Composable
 fun EventsView(navController: NavController) {
@@ -103,6 +104,7 @@ fun EventsView(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun EventItem(event: EventEndpointNormal, navController: NavController) {
+    val useUtc = LocalUseUtc.current
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
     if (sharedTransitionScope != null && animatedVisibilityScope != null) {
@@ -225,7 +227,7 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
                     // Event date (if available)
                     event.date?.let { date ->
                         Text(
-                            text = formatLaunchDateTime(date),
+                            text = formatLaunchDateTime(date, useUtc),
                             fontSize = 10.sp,
                             color = MaterialTheme.colorScheme.secondary,
                             fontWeight = FontWeight.Medium,
@@ -324,7 +326,7 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
             // Event date (if available)
             event.date?.let { date ->
                 Text(
-                    text = formatLaunchDateTime(date),
+                    text = formatLaunchDateTime(date, useUtc),
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Medium,

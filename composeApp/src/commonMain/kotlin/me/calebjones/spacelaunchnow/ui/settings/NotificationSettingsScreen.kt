@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -111,7 +113,9 @@ fun NotificationSettingsScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { viewModel.updateFollowAllLaunches(!uiState.notificationSettings.followAllLaunches) },
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -180,7 +184,7 @@ fun NotificationSettingsScreen(
                                     AgencyCheckboxItem(
                                         agency = agency,
                                         isChecked = uiState.notificationSettings.subscribedAgencies.contains(
-                                            agency.id
+                                            agency.topicName
                                         ),
                                         onCheckedChange = {
                                             viewModel.toggleAgencySubscription(agency)
@@ -232,7 +236,7 @@ fun NotificationSettingsScreen(
                                     LocationCheckboxItem(
                                         location = location,
                                         isChecked = uiState.notificationSettings.subscribedLocations.contains(
-                                            location.id
+                                            location.topicName
                                         ),
                                         onCheckedChange = {
                                             viewModel.toggleLocationSubscription(location)
@@ -282,7 +286,15 @@ fun NotificationSettingsScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .let {
+                                    if (!uiState.notificationSettings.followAllLaunches) {
+                                        it.clickable { viewModel.updateStrictMatching(!uiState.notificationSettings.useStrictMatching) }
+                                    } else {
+                                        it
+                                    }
+                                },
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.Top
                         ) {
@@ -365,7 +377,7 @@ fun NotificationSettingsScreen(
                                 checked = if (uiState.notificationSettings.followAllLaunches) false else uiState.notificationSettings.useStrictMatching,
                                 onCheckedChange = {
                                     if (!uiState.notificationSettings.followAllLaunches) viewModel.updateStrictMatching(
-                                        it
+                                        !uiState.notificationSettings.useStrictMatching
                                     )
                                 },
                                 enabled = !uiState.notificationSettings.followAllLaunches
@@ -403,7 +415,7 @@ fun NotificationSettingsScreen(
                         NotificationTopicToggle(
                             title = "Event Notifications",
                             description = "Space events and featured news updates",
-                            checked = uiState.notificationSettings.eventNotifications,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.EVENTS),
                             onCheckedChange = viewModel::updateEventNotifications
                         )
                     }
@@ -434,35 +446,35 @@ fun NotificationSettingsScreen(
                         NotificationTopicToggle(
                             title = "Net Timestamp Changes",
                             description = "When launch times are updated",
-                            checked = uiState.notificationSettings.netstampChanged,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.NETSTAMP_CHANGED),
                             onCheckedChange = viewModel::updateNetstampChanged
                         )
 
                         NotificationTopicToggle(
                             title = "24 Hour Notice",
                             description = "24 hours before launch",
-                            checked = uiState.notificationSettings.twentyFourHour,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.TWENTY_FOUR_HOUR),
                             onCheckedChange = viewModel::updateTwentyFourHour
                         )
 
                         NotificationTopicToggle(
                             title = "1 Hour Notice",
                             description = "1 hour before launch",
-                            checked = uiState.notificationSettings.oneHour,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_HOUR),
                             onCheckedChange = viewModel::updateOneHour
                         )
 
                         NotificationTopicToggle(
                             title = "10 Minutes Notice",
                             description = "10 minutes before launch",
-                            checked = uiState.notificationSettings.tenMinutes,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.TEN_MINUTES),
                             onCheckedChange = viewModel::updateTenMinutes
                         )
 
                         NotificationTopicToggle(
                             title = "1 Minute Notice",
                             description = "1 minute before launch - for the most dedicated!",
-                            checked = uiState.notificationSettings.oneMinute,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_MINUTE),
                             onCheckedChange = viewModel::updateOneMinute
                         )
                     }
@@ -493,21 +505,21 @@ fun NotificationSettingsScreen(
                         NotificationTopicToggle(
                             title = "Webcast Only Launches",
                             description = "Launches that have live video streams",
-                            checked = uiState.notificationSettings.webcastOnly,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.WEBCAST_ONLY),
                             onCheckedChange = viewModel::updateWebcastOnly
                         )
 
                         NotificationTopicToggle(
                             title = "In-Flight Updates",
                             description = "Real-time updates during launch",
-                            checked = uiState.notificationSettings.inFlight,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.IN_FLIGHT),
                             onCheckedChange = viewModel::updateInFlight
                         )
 
                         NotificationTopicToggle(
                             title = "Mission Success",
                             description = "Celebrate successful launches!",
-                            checked = uiState.notificationSettings.success,
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.SUCCESS),
                             onCheckedChange = viewModel::updateSuccess
                         )
                     }
@@ -540,7 +552,8 @@ private fun AgencyCheckboxItem(
 ) {
     Row(
         modifier = modifier
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable { onCheckedChange(!isChecked) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -564,7 +577,8 @@ private fun LocationCheckboxItem(
 ) {
     Row(
         modifier = modifier
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable { onCheckedChange(!isChecked) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -588,7 +602,9 @@ fun NotificationTopicToggle(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

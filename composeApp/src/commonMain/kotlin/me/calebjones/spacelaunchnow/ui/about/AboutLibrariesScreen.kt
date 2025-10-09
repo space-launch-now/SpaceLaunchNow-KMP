@@ -113,7 +113,7 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Space Launch Now")
-                Text("Version: ${BuildConfig.VERSION_NAME}-${BuildConfig.VERSION_CODE}")
+                Text("Version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
                 val uriHandler = LocalUriHandler.current
                 Row(
                     modifier = Modifier.padding(vertical = 8.dp),

@@ -29,6 +29,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.LocalUseUtc
 
 /**
  * Common interface to extract launch data needed for the card header
@@ -105,18 +106,20 @@ fun LaunchCardHeaderOverlay(
     contentPadding: PaddingValues = PaddingValues(16.dp),
     modifier: Modifier = Modifier
 ) {
+    val useUtc = LocalUseUtc.current
+
     // Compute formatted values
     val title by remember(launchData) {
         mutableStateOf(launchData.getFormattedTitle())
     }
 
-    val formattedDate by remember(launchData.net, useRelativeTime) {
+    val formattedDate by remember(launchData.net, useRelativeTime, useUtc) {
         mutableStateOf(
             launchData.net?.let {
                 if (useRelativeTime) {
-                    DateTimeUtil.formatLaunchDateTimeRelative(it)
+                    DateTimeUtil.formatLaunchDateTimeRelative(it, useUtc)
                 } else {
-                    DateTimeUtil.formatLaunchDateTime(it)
+                    DateTimeUtil.formatLaunchDateTime(it, useUtc)
                 }
             } ?: "TBD"
         )

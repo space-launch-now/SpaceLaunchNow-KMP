@@ -259,6 +259,58 @@ fun DebugSettingsScreen(
                 }
             }
 
+            // Notification Permissions Section
+            item {
+                Text(
+                    text = "Notification Permissions (Android)",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "🔐 Permission Testing",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Button(
+                            onClick = { settingsViewModel.requestNotificationPermission() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("Request Notification Permission")
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                debugViewModel.resetNotificationPermissionFlag()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("Reset 'Asked Permission' Flag")
+                        }
+
+                        Text(
+                            text = "💡 First button triggers permission request. Second button resets the flag so permission will be requested on next app launch (like fresh install).",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
             // Info Section
             item {
                 Card(
