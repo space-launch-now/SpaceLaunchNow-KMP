@@ -161,7 +161,9 @@ fun LaunchListItem(launch: LaunchNormal) {
             .padding(8.dp)
             .clickable(
                 actionStartActivity(
-                    Intent(context, MainActivity::class.java)
+                    Intent(context, MainActivity::class.java).apply {
+                        putExtra("launch_id", launch.id)
+                    }
                 )
             )
     ) {

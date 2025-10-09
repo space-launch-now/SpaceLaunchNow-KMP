@@ -7,14 +7,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import me.calebjones.spacelaunchnow.MainActivity
-import me.calebjones.spacelaunchnow.R
-import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
-import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import kotlinx.coroutines.runBlocking
+import me.calebjones.spacelaunchnow.MainActivity
+import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
+import org.koin.android.ext.android.inject
 
 class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -23,6 +21,9 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         private const val CHANNEL_NAME = "Space Launch Notifications"
         private const val NOTIFICATION_ID = 1
     }
+
+    // Use Koin to inject the singleton NotificationPreferences
+    private val notificationPreferences: NotificationPreferences by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -33,12 +34,23 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         // Check notificationsEnabled, and return early if false
-        val notificationsEnabled = runBlocking {
-            val prefs = NotificationPreferences(createDataStore(applicationContext))
-            prefs.getNotificationSettings().enableNotifications
+        val notificationSettings = runBlocking {
+            notificationPreferences.getNotificationSettings()
         }
-        if (!notificationsEnabled) {
+
+        if (!notificationSettings.enableNotifications) {
             println("Notifications are disabled by user preference. Suppressing notification.")
+            return
+        }
+
+        // Check webcast filtering
+        val webcastOnly =
+            notificationSettings.isTopicEnabled(me.calebjones.spacelaunchnow.data.model.NotificationTopic.WEBCAST_ONLY)
+        val hasWebcast = remoteMessage.data["webcast"]?.lowercase() == "true"
+
+        println("webcast field: ${remoteMessage.data["webcast"]}, hasWebcast: $hasWebcast")
+        if (webcastOnly && !hasWebcast) {
+            println("Webcast-only filter enabled and launch has no webcast. Suppressing notification.")
             return
         }
 
@@ -100,17 +112,24 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         body: String,
         data: Map<String, String>
     ) {
+        // Extract launch_id from the notification data
+        val launchId = data["launch_id"]
+
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            // Add any data from the notification
+            // Add launch_id if available for direct navigation to launch detail
+            launchId?.let { putExtra("launch_id", it) }
+            // Add any additional data from the notification
             data.forEach { (key, value) ->
-                putExtra(key, value)
+                if (key != "launch_id") { // Avoid duplicate launch_id
+                    putExtra(key, value)
+                }
             }
         }
 
         val pendingIntent = PendingIntent.getActivity(
             this,
-            0,
+            launchId?.hashCode() ?: 0, // Use launch_id hash as unique request code
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -118,7 +137,7 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(body)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // TODO: Replace with app icon
+            .setSmallIcon(me.calebjones.spacelaunchnow.R.mipmap.ic_launcher_monochrome)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -126,7 +145,7 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(launchId?.hashCode() ?: NOTIFICATION_ID, notification)
     }
 
     private fun handleDataMessage(data: Map<String, String>) {
@@ -134,8 +153,9 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         when (data["type"]) {
             "launch" -> {
                 // Handle launch-specific data
-                val launchId = data["launch_id"]
-                // TODO: Update launch data or trigger in-app refresh
+                println("Received data-only launch message for launch_id: ${data["launch_id"]}")
+                // Data-only messages are typically used for in-app updates rather than notifications
+                // The main notification logic is handled in onMessageReceived
             }
         }
     }

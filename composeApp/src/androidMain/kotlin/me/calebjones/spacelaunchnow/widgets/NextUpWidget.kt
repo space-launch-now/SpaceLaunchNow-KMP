@@ -78,7 +78,11 @@ fun NextUpWidgetContent(launch: LaunchNormal?) {
             .background(GlanceTheme.colors.background)
             .clickable(
                 actionStartActivity(
-                    Intent(context, MainActivity::class.java)
+                    Intent(context, MainActivity::class.java).apply {
+                        launch?.id?.let { launchId ->
+                            putExtra("launch_id", launchId)
+                        }
+                    }
                 )
             )
             .padding(8.dp),

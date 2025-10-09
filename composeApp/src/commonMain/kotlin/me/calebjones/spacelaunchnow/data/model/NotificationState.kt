@@ -1,0 +1,346 @@
+package me.calebjones.spacelaunchnow.data.model
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class NotificationState(
+    val enableNotifications: Boolean = true,
+    val followAllLaunches: Boolean = true,
+    val useStrictMatching: Boolean = false,
+    val hideTbdLaunches: Boolean = false,
+    val keepLaunchesFor24Hours: Boolean = true,
+
+    // Topic settings (user-configurable notification timing)
+    val topicSettings: Map<String, Boolean> = NotificationTopic.getDefaultTopicSettings(),
+
+    // Agency/Location subscriptions with defaults
+    val subscribedAgencies: Set<String> = getDefaultAgencyIds(),
+    val subscribedLocations: Set<String> = getDefaultLocationIds(),
+
+    // FCM topics (managed by repository)
+    val subscribedTopics: Set<String> = emptySet(),
+
+    // UI state
+    val isLoading: Boolean = false,
+    val lastError: String? = null
+) {
+    companion object {
+        /**
+         * Get default agency IDs for major space agencies
+         * These correspond to: SpaceX, NASA, Blue Origin, Rocket Lab, ULA, Arianespace, Roscosmos, Northrop Grumman
+         */
+        fun getDefaultAgencyIds(): Set<String> {
+            return setOf(
+                NotificationAgency.SPACEX.topicName,
+                NotificationAgency.NASA.topicName,
+                NotificationAgency.BLUE_ORIGIN.topicName,
+                NotificationAgency.ROCKET_LAB.topicName,
+                NotificationAgency.ULA.topicName,
+                NotificationAgency.ARIANESPACE.topicName,
+                NotificationAgency.ROSCOSMOS.topicName,
+                NotificationAgency.NORTHROP_GRUMMAN.topicName
+            )
+        }
+
+        /**
+         * Get default location IDs for major launch sites
+         * These correspond to: Vandenberg, KSC, Wallops, Texas, Russia, French Guiana, New Zealand, Japan, India, China, Kodiak, Other
+         */
+        fun getDefaultLocationIds(): Set<String> {
+            return setOf(
+                NotificationLocation.VANDENBERG.topicName,
+                NotificationLocation.KSC.topicName,
+                NotificationLocation.WALLOPS.topicName,
+                NotificationLocation.TEXAS.topicName,
+                NotificationLocation.RUSSIA.topicName,
+                NotificationLocation.FRENCH_GUIANA.topicName,
+                NotificationLocation.NEW_ZEALAND.topicName,
+                NotificationLocation.JAPAN.topicName,
+                NotificationLocation.INDIA.topicName,
+                NotificationLocation.CHINA.topicName,
+                NotificationLocation.KODIAK.topicName,
+                NotificationLocation.OTHER.topicName
+            )
+        }
+
+        val DEFAULT = NotificationState()
+
+        /**
+         * Create default settings with all available agencies and locations subscribed
+         */
+        fun createWithAllSubscriptions(
+            availableAgencies: List<NotificationAgency>,
+            availableLocations: List<NotificationLocation>
+        ): NotificationState {
+            return DEFAULT.copy(
+                subscribedAgencies = availableAgencies.map { it.topicName }.toSet(),
+                subscribedLocations = availableLocations.map { it.topicName }.toSet()
+            )
+        }
+    }
+
+    // Type-safe accessors
+    fun isTopicEnabled(topic: NotificationTopic): Boolean {
+        return topicSettings[topic.id] ?: topic.defaultEnabled
+    }
+
+    fun isAgencyEnabled(agency: NotificationAgency): Boolean {
+        return subscribedAgencies.contains(agency.topicName)
+    }
+
+    fun isAgencyEnabled(agencyName: String): Boolean {
+        return subscribedAgencies.contains(agencyName)
+    }
+
+    fun isLocationEnabled(location: NotificationLocation): Boolean {
+        return subscribedLocations.contains(location.topicName)
+    }
+
+    fun isLocationEnabled(locationName: String): Boolean {
+        return subscribedLocations.contains(locationName)
+    }
+
+    // State update helpers
+    fun withTopicEnabled(topic: NotificationTopic, enabled: Boolean): NotificationState {
+        return copy(topicSettings = topicSettings + (topic.id to enabled))
+    }
+
+    fun withAgencyEnabled(agency: NotificationAgency, enabled: Boolean): NotificationState {
+        return withAgencyEnabled(agency.topicName, enabled)
+    }
+
+    fun withAgencyEnabled(agencyName: String, enabled: Boolean): NotificationState {
+        val updatedAgencies = if (enabled) {
+            subscribedAgencies + agencyName
+        } else {
+            subscribedAgencies - agencyName
+        }
+
+        // If disabling an agency while followAll is enabled, disable followAll
+        val updatedFollowAll = if (!enabled && followAllLaunches) false else followAllLaunches
+
+        return copy(
+            subscribedAgencies = updatedAgencies,
+            followAllLaunches = updatedFollowAll
+        )
+    }
+
+    fun withLocationEnabled(location: NotificationLocation, enabled: Boolean): NotificationState {
+        return withLocationEnabled(location.topicName, enabled)
+    }
+
+    fun withLocationEnabled(locationName: String, enabled: Boolean): NotificationState {
+        val updatedLocations = if (enabled) {
+            subscribedLocations + locationName
+        } else {
+            subscribedLocations - locationName
+        }
+
+        // If disabling a location while followAll is enabled, disable followAll
+        val updatedFollowAll = if (!enabled && followAllLaunches) false else followAllLaunches
+
+        return copy(
+            subscribedLocations = updatedLocations,
+            followAllLaunches = updatedFollowAll
+        )
+    }
+
+    fun withFollowAllLaunches(
+        enabled: Boolean,
+        allAgencies: List<NotificationAgency>,
+        allLocations: List<NotificationLocation>
+    ): NotificationState {
+        return if (enabled) {
+            // When enabling follow all, ensure all agencies and locations are subscribed
+            copy(
+                followAllLaunches = true,
+                useStrictMatching = false, // Auto-disable strict matching
+                subscribedAgencies = allAgencies.map { it.topicName }.toSet(),
+                subscribedLocations = allLocations.map { it.topicName }.toSet()
+            )
+        } else {
+            // When disabling, keep current subscriptions as they are
+            copy(followAllLaunches = false)
+        }
+    }
+
+    fun withError(error: String?): NotificationState {
+        return copy(lastError = error)
+    }
+
+    fun withLoading(loading: Boolean): NotificationState {
+        return copy(isLoading = loading)
+    }
+}
+
+@Serializable
+data class PushMessage(
+    val title: String,
+    val body: String,
+    val data: Map<String, String> = emptyMap()
+)
+
+@Serializable
+data class NotificationTopic(
+    val id: String,
+    val name: String,
+    val description: String? = null,
+    val defaultEnabled: Boolean = false
+) {
+    companion object {
+        // Core system topics
+        val LAUNCHES_ALL = NotificationTopic("launches", "Launches", defaultEnabled = true)
+        val EVENTS = NotificationTopic("events", "Events", defaultEnabled = true)
+        val FEATURED_NEWS =
+            NotificationTopic("featured_news", "Featured News", defaultEnabled = true)
+
+        // Version topics (automatically managed)
+        val PROD_V3 = NotificationTopic("prod_v3", "Production v3", defaultEnabled = true)
+        val DEBUG_V3 = NotificationTopic("debug_v3", "Debug v3", defaultEnabled = false)
+
+        // Matching topics (automatically managed)
+        val ALL_LAUNCHES = NotificationTopic("all", "All Launches", defaultEnabled = true)
+        val STRICT_MATCHING = NotificationTopic("strict", "Strict Matching", defaultEnabled = false)
+        val NOT_STRICT_MATCHING =
+            NotificationTopic("not_strict", "Flexible Matching", defaultEnabled = true)
+
+        // User-configurable notification timing topics
+        val NETSTAMP_CHANGED = NotificationTopic(
+            "netstampChanged",
+            "Launch Time Changes",
+            "Get notified when launch times change",
+            defaultEnabled = false
+        )
+        val WEBCAST_ONLY = NotificationTopic(
+            "webcastOnly",
+            "Webcast Only Launches",
+            "Only launches with webcast available",
+            defaultEnabled = true
+        )
+        val TWENTY_FOUR_HOUR = NotificationTopic(
+            "twentyFourHour",
+            "24 Hour Notice",
+            "24 hours before launch",
+            defaultEnabled = true
+        )
+        val ONE_HOUR = NotificationTopic(
+            "oneHour",
+            "1 Hour Notice",
+            "1 hour before launch",
+            defaultEnabled = false
+        )
+        val TEN_MINUTES = NotificationTopic(
+            "tenMinutes",
+            "10 Minute Notice",
+            "10 minutes before launch",
+            defaultEnabled = true
+        )
+        val ONE_MINUTE = NotificationTopic(
+            "oneMinute",
+            "1 Minute Notice",
+            "1 minute before launch",
+            defaultEnabled = false
+        )
+        val IN_FLIGHT = NotificationTopic(
+            "inFlight",
+            "In-Flight Updates",
+            "Launch status updates during flight",
+            defaultEnabled = false
+        )
+        val SUCCESS = NotificationTopic(
+            "success",
+            "Launch Success",
+            "When launches complete successfully",
+            defaultEnabled = true
+        )
+
+        // Agency topics
+        val AGENCY_NASA = NotificationTopic("nasa", "NASA", defaultEnabled = true)
+        val AGENCY_SPACEX = NotificationTopic("spacex", "SpaceX", defaultEnabled = true)
+        val AGENCY_BLUE_ORIGIN =
+            NotificationTopic("blueOrigin", "Blue Origin", defaultEnabled = true)
+        val AGENCY_ROCKET_LAB = NotificationTopic("rocketLab", "Rocket Lab", defaultEnabled = true)
+        val AGENCY_ULA = NotificationTopic("ula", "ULA", defaultEnabled = true)
+        val AGENCY_ARIANESPACE =
+            NotificationTopic("arianespace", "Arianespace", defaultEnabled = true)
+        val AGENCY_ROSCOSMOS = NotificationTopic("roscosmos", "Roscosmos", defaultEnabled = true)
+        val AGENCY_NORTHROP =
+            NotificationTopic("northrop", "Northrop Grumman", defaultEnabled = true)
+
+        // Location topics
+        val LOCATION_KSC = NotificationTopic("ksc", "Kennedy Space Center", defaultEnabled = true)
+        val LOCATION_VANDENBERG = NotificationTopic("van", "Vandenberg", defaultEnabled = true)
+        val LOCATION_WALLOPS = NotificationTopic("wallops", "Wallops", defaultEnabled = true)
+        val LOCATION_TEXAS = NotificationTopic("texas", "Texas", defaultEnabled = true)
+        val LOCATION_RUSSIA =
+            NotificationTopic("russia", "Russia & Kazakhstan", defaultEnabled = true)
+        val LOCATION_FRENCH_GUIANA =
+            NotificationTopic("frenchGuiana", "French Guiana", defaultEnabled = true)
+        val LOCATION_NEW_ZEALAND =
+            NotificationTopic("newZealand", "New Zealand", defaultEnabled = true)
+        val LOCATION_JAPAN = NotificationTopic("japan", "Japan", defaultEnabled = true)
+        val LOCATION_ISRO = NotificationTopic("isro", "India (ISRO)", defaultEnabled = true)
+        val LOCATION_CHINA = NotificationTopic("china", "China", defaultEnabled = true)
+        val LOCATION_KODIAK = NotificationTopic("kodiak", "Kodiak", defaultEnabled = true)
+        val LOCATION_OTHER = NotificationTopic("other", "Other Locations", defaultEnabled = true)
+
+        /**
+         * Get all user-configurable topics (timing topics that users can enable/disable)
+         */
+        fun getUserConfigurableTopics(): List<NotificationTopic> {
+            return listOf(
+                NETSTAMP_CHANGED, WEBCAST_ONLY, TWENTY_FOUR_HOUR, ONE_HOUR,
+                TEN_MINUTES, ONE_MINUTE, IN_FLIGHT, SUCCESS
+            )
+        }
+
+        /**
+         * Get default topic settings for user-configurable topics
+         */
+        fun getDefaultTopicSettings(): Map<String, Boolean> {
+            return getUserConfigurableTopics().associate { it.id to it.defaultEnabled }
+        }
+    }
+}
+
+@Serializable
+data class NotificationAgency(
+    val id: Int,
+    val topicName: String,
+    val name: String,
+    val abbreviation: String? = null
+) {
+    companion object {
+        val SPACEX = NotificationAgency(121, "spacex", "SpaceX")
+        val NASA = NotificationAgency(44, "nasa", "NASA")
+        val BLUE_ORIGIN = NotificationAgency(141, "blueOrigin", "Blue Origin")
+        val ROCKET_LAB = NotificationAgency(147, "rocketLab", "Rocket Lab")
+        val ULA = NotificationAgency(124, "ula", "United Launch Alliance")
+        val ARIANESPACE = NotificationAgency(115, "arianespace", "Arianespace")
+        val ROSCOSMOS = NotificationAgency(111, "roscosmos", "Roscosmos")
+        val NORTHROP_GRUMMAN = NotificationAgency(257, "northrop", "Northrop Grumman")
+    }
+}
+
+@Serializable
+data class NotificationLocation(
+    val id: Int,
+    val topicName: String,
+    val name: String,
+    val countryCode: String? = null
+) {
+    companion object {
+        val VANDENBERG = NotificationLocation(11, "van", "Vandenberg Space Force Base", "US")
+        val KSC = NotificationLocation(27, "ksc", "Kennedy Space Center", "US")
+        val WALLOPS = NotificationLocation(21, "wallops", "Wallops Flight Facility", "US")
+        val TEXAS = NotificationLocation(143, "texas", "Starbase Texas", "US")
+        val RUSSIA = NotificationLocation(15, "russia", "Baikonur Cosmodrome", "KZ")
+        val FRENCH_GUIANA = NotificationLocation(13, "frenchGuiana", "Guiana Space Centre", "GF")
+        val NEW_ZEALAND = NotificationLocation(10, "newZealand", "Rocket Lab Launch Complex", "NZ")
+        val JAPAN = NotificationLocation(24, "japan", "Tanegashima Space Center", "JP")
+        val INDIA = NotificationLocation(14, "isro", "Satish Dhawan Space Centre", "IN")
+        val CHINA = NotificationLocation(17, "china", "Jiuquan Satellite Launch Center", "CN")
+        val KODIAK = NotificationLocation(25, "kodiak", "Pacific Spaceport Complex", "US")
+        val OTHER = NotificationLocation(20, "other", "Other Locations", null)
+    }
+}
