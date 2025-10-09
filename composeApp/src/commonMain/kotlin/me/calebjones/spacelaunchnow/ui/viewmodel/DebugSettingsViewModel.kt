@@ -10,6 +10,8 @@ import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugSettings
 import me.calebjones.spacelaunchnow.util.BuildConfig
 
+expect fun resetNotificationPermissionAskedFlag()
+
 class DebugSettingsViewModel(
     private val debugPreferences: DebugPreferences? = null
 ) : ViewModel() {
@@ -18,7 +20,7 @@ class DebugSettingsViewModel(
         DebugSettings(
             useCustomApiUrl = false,
             customApiBaseUrl = DebugPreferences.PROD_API_URL,
-            useDebugTopics = true
+            useDebugTopics = false
         )
     )
     val debugSettings: StateFlow<DebugSettings> = _debugSettings.asStateFlow()
@@ -141,5 +143,17 @@ class DebugSettingsViewModel(
 
     fun clearStatusMessage() {
         _statusMessage.value = null
+    }
+
+    fun resetNotificationPermissionFlag() {
+        viewModelScope.launch {
+            try {
+                resetNotificationPermissionAskedFlag()
+                _statusMessage.value =
+                    "Notification permission flag reset - will be asked on next app launch"
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to reset permission flag: ${e.message}"
+            }
+        }
     }
 }

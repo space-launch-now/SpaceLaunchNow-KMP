@@ -35,6 +35,7 @@ import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 
@@ -68,19 +69,24 @@ val appModule = module {
     // Notification dependencies
     singleOf(::PushMessaging)
     singleOf(::NotificationPreferences)
-    
+
+    // New notification state storage
+    single {
+        val dataStore = get<DataStore<Preferences>>()
+        NotificationStateStorage(dataStore)
+    }
+
     // App settings dependencies
     single {
         val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
         AppPreferences(appDataStore)
     }
 
-    // NotificationRepository - always pass debugPreferences with getOrNull()
-    // This avoids checking BuildConfig.IS_DEBUG during module initialization
+    // NotificationRepository - new clean architecture
     single<NotificationRepository> {
         NotificationRepositoryImpl(
             pushMessaging = get(),
-            notificationPreferences = get(),
+            storage = get<NotificationStateStorage>(),
             debugPreferences = getOrNull<DebugPreferences>()
         )
     }

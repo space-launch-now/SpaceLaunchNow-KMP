@@ -16,11 +16,13 @@ class NotificationTestUtils(
     suspend fun subscribeToAllTopics(): Result<Unit> {
         return try {
             val defaultTopics = listOf(
-                NotificationTopic.LAUNCHES_ALL,
-                NotificationTopic.EVENTS
+                NotificationTopic.EVENTS,
+                NotificationTopic.TWENTY_FOUR_HOUR,
+                NotificationTopic.TEN_MINUTES,
+                NotificationTopic.SUCCESS
             )
             defaultTopics.forEach { topic ->
-                notificationRepository.subscribeToTopic(topic)
+                notificationRepository.setTopicEnabled(topic, true)
             }
             Result.success(Unit)
         } catch (e: Exception) {
@@ -34,11 +36,13 @@ class NotificationTestUtils(
     suspend fun unsubscribeFromAllTopics(): Result<Unit> {
         return try {
             val defaultTopics = listOf(
-                NotificationTopic.LAUNCHES_ALL,
-                NotificationTopic.EVENTS
+                NotificationTopic.EVENTS,
+                NotificationTopic.TWENTY_FOUR_HOUR,
+                NotificationTopic.TEN_MINUTES,
+                NotificationTopic.SUCCESS
             )
             defaultTopics.forEach { topic ->
-                notificationRepository.unsubscribeFromTopic(topic)
+                notificationRepository.setTopicEnabled(topic, false)
             }
             Result.success(Unit)
         } catch (e: Exception) {
@@ -50,20 +54,17 @@ class NotificationTestUtils(
      * Get the list of currently subscribed topics
      */
     suspend fun getSubscribedTopics(): Set<String> {
-        return notificationRepository.getNotificationSettings().subscribedTopics
+        return notificationRepository.state.value.subscribedTopics
     }
 
     /**
      * Helper function to create test notification settings
      */
-    fun createTestSettings() = me.calebjones.spacelaunchnow.data.model.NotificationSettings(
+    fun createTestSettings() = me.calebjones.spacelaunchnow.data.model.NotificationState(
         enableNotifications = true,
-        notifyDailySummary = true,
-        notifyBeforeLaunch = true,
-        notifyMinutesBefore = 30,
         subscribedTopics = setOf(
-            NotificationTopic.LAUNCHES_ALL.id,
-            NotificationTopic.EVENTS.id
+            NotificationTopic.EVENTS.id,
+            NotificationTopic.TWENTY_FOUR_HOUR.id
         )
     )
 }

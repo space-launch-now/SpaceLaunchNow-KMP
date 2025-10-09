@@ -7,41 +7,52 @@ import kotlinx.datetime.LocalDateTime
  * Note: For true iOS locale formatting, you'd need to use NSDateFormatter through cinterop
  * For now, using a reasonable fallback format
  */
-actual fun formatLocalDateTime(localDateTime: LocalDateTime): String {
+actual fun formatLocalDateTime(localDateTime: LocalDateTime, useUtc: Boolean): String {
     return try {
         // Format: "Dec 25, 2024 at 2:30 PM" style
         val month = getMonthName(localDateTime.monthNumber)
         val hour12 = if (localDateTime.hour == 0) 12 else if (localDateTime.hour > 12) localDateTime.hour - 12 else localDateTime.hour
         val amPm = if (localDateTime.hour < 12) "AM" else "PM"
         val minute = localDateTime.minute.toString().padStart(2, '0')
-        
-        "$month ${localDateTime.dayOfMonth}, ${localDateTime.year} at $hour12:$minute $amPm"
+
+        val formatted =
+            "$month ${localDateTime.dayOfMonth}, ${localDateTime.year} at $hour12:$minute $amPm"
+        if (useUtc) "$formatted UTC" else formatted
     } catch (e: Exception) {
         // Fallback to simple format
-        "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year} ${localDateTime.hour}:${localDateTime.minute.toString().padStart(2, '0')}"
+        val formatted =
+            "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year} ${localDateTime.hour}:${
+                localDateTime.minute.toString().padStart(2, '0')
+            }"
+        if (useUtc) "$formatted UTC" else formatted
     }
 }
 
-actual fun formatLocalDate(localDateTime: LocalDateTime): String {
+actual fun formatLocalDate(localDateTime: LocalDateTime, useUtc: Boolean): String {
     return try {
         val month = getMonthName(localDateTime.monthNumber)
-        "$month ${localDateTime.dayOfMonth}, ${localDateTime.year}"
+        val formatted = "$month ${localDateTime.dayOfMonth}, ${localDateTime.year}"
+        if (useUtc) "$formatted UTC" else formatted
     } catch (e: Exception) {
-        "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year}"
+        val formatted =
+            "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year}"
+        if (useUtc) "$formatted UTC" else formatted
     }
 }
 
-actual fun formatLocalTime(localDateTime: LocalDateTime): String {
+actual fun formatLocalTime(localDateTime: LocalDateTime, useUtc: Boolean): String {
     return try {
         // 12-hour format with AM/PM
         val hour12 = if (localDateTime.hour == 0) 12 else if (localDateTime.hour > 12) localDateTime.hour - 12 else localDateTime.hour
         val amPm = if (localDateTime.hour < 12) "AM" else "PM"
         val minute = localDateTime.minute.toString().padStart(2, '0')
-        
-        "$hour12:$minute $amPm"
+
+        val formatted = "$hour12:$minute $amPm"
+        if (useUtc) "$formatted UTC" else formatted
     } catch (e: Exception) {
         // Fallback to 24-hour format
-        "${localDateTime.hour}:${localDateTime.minute.toString().padStart(2, '0')}"
+        val formatted = "${localDateTime.hour}:${localDateTime.minute.toString().padStart(2, '0')}"
+        if (useUtc) "$formatted UTC" else formatted
     }
 }
 

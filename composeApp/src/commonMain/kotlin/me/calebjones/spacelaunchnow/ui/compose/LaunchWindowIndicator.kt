@@ -21,6 +21,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import kotlin.time.Duration
 
 @Composable
@@ -93,7 +94,8 @@ private fun LaunchWindowTimeline(
     textColor: Color,
     barThickness: Float,
     modifier: Modifier = Modifier
-) {    
+) {
+    val useUtc = LocalUseUtc.current
     val textMeasurer = rememberTextMeasurer()
     val fontSize = MaterialTheme.typography.labelSmall.fontSize
 
@@ -195,9 +197,9 @@ private fun LaunchWindowTimeline(
         )        
 
         // Format times as HOUR:MIN per users locale
-        val startText = DateTimeUtil.formatLaunchTime(windowStart)
-        val endText = DateTimeUtil.formatLaunchTime(windowEnd)
-        val launchText = DateTimeUtil.formatLaunchTime(launchTime)
+        val startText = DateTimeUtil.formatLaunchTime(windowStart, useUtc)
+        val endText = DateTimeUtil.formatLaunchTime(windowEnd, useUtc)
+        val launchText = DateTimeUtil.formatLaunchTime(launchTime, useUtc)
 
         val textStyle = TextStyle(color = textColor, fontSize = fontSize)// Draw window start text
         val startTextLayout = textMeasurer.measure(startText, style = textStyle)
