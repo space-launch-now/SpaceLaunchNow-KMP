@@ -1,4 +1,13 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b18...v4.0.0) (2025-10-10)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b19...v4.0.0) (2025-10-10)
+
+
+### Bug Fixes
+
+* **ci:** correct artifact path resolution for Firebase Distribution ([#21](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/issues/21)) ([5d645fa](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/5d645fa8fa3e0cfbca7c911f0c441693df52bbbe))
+
+
+
+# [4.0.0-b19](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b18...v4.0.0-b19) (2025-10-10)
 
 
 ### Bug Fixes
@@ -27,21 +36,6 @@
 
 * **ios:** widget ([b4e4983](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/b4e4983905c83da87edb59ecbd7704b3a0c84bdd))
 * **widget:** add android widget ([#13](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/issues/13)) ([8a7ecd0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/8a7ecd0f817dfb13939c651afa8346faaf36f2ff))
-
-
-
-# [4.0.0-b15](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b8...v4.0.0-b15) (2025-10-06)
-
-
-### Bug Fixes
-
-* **ci:** disable all jobs but ios and bump memory ([0b718d4](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/0b718d4132ac63f34ec61e8c6cab03952e758890))
-* update TEAM_ID in iOS configuration ([9d885b0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/9d885b01a2ac5b8352aa17606c042e35f7913823))
-
-
-### Features
-
-* Add iOS and Android release workflows ([93519ea](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/93519eaef25f8b0462abf3508045b397eb043c19))
 
 
 
