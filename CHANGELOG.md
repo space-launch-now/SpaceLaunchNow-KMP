@@ -1,4 +1,21 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b15...v4.0.0) (2025-10-08)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b18...v4.0.0) (2025-10-10)
+
+
+### Bug Fixes
+
+* remove iOS IPA handling from master deploy workflow ([#17](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/issues/17)) ([387f2db](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/387f2dbd7c57f3f7e149a0e0998edcec28981091))
+
+
+
+# [4.0.0-b18](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b17...v4.0.0-b18) (2025-10-10)
+
+
+
+# [4.0.0-b17](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b16...v4.0.0-b17) (2025-10-10)
+
+
+
+# [4.0.0-b16](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b15...v4.0.0-b16) (2025-10-08)
 
 
 ### Bug Fixes
@@ -25,33 +42,6 @@
 ### Features
 
 * Add iOS and Android release workflows ([93519ea](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/93519eaef25f8b0462abf3508045b397eb043c19))
-
-
-
-# [4.0.0-b8](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b7...v4.0.0-b8) (2025-10-04)
-
-
-### Bug Fixes
-
-* **build:** increase Gradle heap size for iOS framework compilation ([bb796fb](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/bb796fb8aa69e269dce381379c589d39f1d5d556))
-
-
-
-# [4.0.0-b7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b6...v4.0.0-b7) (2025-10-04)
-
-
-### Bug Fixes
-
-* **build:** increase Gradle heap size for iOS framework compilation in CI/CD ([2deae2a](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/2deae2a3ec8838122880008a6d559efb0310a23d))
-
-
-
-# [4.0.0-b6](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b5...v4.0.0-b6) (2025-10-04)
-
-
-### Bug Fixes
-
-* **build:** update iOS build process to include framework configuration and paths ([02f2c81](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/02f2c81aa39a050f5adc32ca6072c698df8d2610))
 
 
 
