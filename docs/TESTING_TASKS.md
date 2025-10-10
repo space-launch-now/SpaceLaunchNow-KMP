@@ -20,7 +20,7 @@ These pure functions are easiest to test and have no external dependencies.
 | ✅ | `util/UserAgentUtil.kt` | `util/UserAgentUtilTest.kt` | 1+ | - | Already exists |
 | ✅ | `util/DateTimeUtil.kt` | `util/DateTimeUtilTimelineTest.kt` | 10+ | - | Partially done, needs more |
 | ✅ | `util/EnvironmentManager.kt` | `util/EnvironmentManagerTest.kt` | 1+ | - | Already exists |
-| ⬜ | `util/LaunchFormatUtil.kt` | `util/LaunchFormatUtilTest.kt` | 15+ | - | **HIGH PRIORITY** |
+| ✅ | `util/LaunchFormatUtil.kt` | `util/LaunchFormatUtilTest.kt` | 24 | Copilot | Complete with all overloads and edge cases |
 | ⬜ | `util/StatusColorUtil.kt` | `util/StatusColorUtilTest.kt` | 8+ | - | Color mapping logic |
 | ⬜ | `util/VideoUtil.kt` | `util/VideoUtilTest.kt` | 6+ | - | URL parsing/validation |
 | ⬜ | `util/BuildConfig.kt` | `util/BuildConfigTest.kt` | 3+ | - | Version info access |
