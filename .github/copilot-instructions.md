@@ -39,7 +39,6 @@ saves ~$192/month.
 **Documentation:**
 
 - [Hybrid Release Strategy](../docs/HYBRID_RELEASE_STRATEGY.md) - **START HERE**
-- [CI/CD Quick Reference](../docs/CICD_QUICK_REFERENCE.md)
 - [Conventional Commits Guide](../docs/CONVENTIONAL_COMMITS.md)
 - [Full CI/CD Pipeline](../docs/CICD_PIPELINE.md)
 
