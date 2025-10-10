@@ -354,9 +354,9 @@ jobs:
       - name: Resolve artifact paths
         id: artifacts
         run: |
-          APK_PATH=$(ls apk/*.apk | head -n 1)
-          AAB_PATH=$(ls aab/*.aab | head -n 1)
-          MAPPING_PATH=$(ls aab/mapping.txt | head -n 1)
+          APK_PATH=$(ls apk/composeApp/build/outputs/apk/release/*.apk | head -n 1)
+          AAB_PATH=$(ls aab/composeApp/build/outputs/bundle/release/*.aab | head -n 1)
+          MAPPING_PATH=$(ls aab/composeApp/build/outputs/mapping/release/mapping.txt | head -n 1)
           echo "apk=$APK_PATH" >> $GITHUB_OUTPUT
           echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
           echo "mapping=$MAPPING_PATH" >> $GITHUB_OUTPUT

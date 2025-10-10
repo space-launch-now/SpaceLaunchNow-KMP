@@ -469,7 +469,10 @@ gh workflow run master-deploy.yml
 **Solution:** Check:
 - `FIREBASE_APP_ID` is correct (format: `1:123456789:android:abc123`)
 - `FIREBASE_TOKEN` is valid (regenerate with `firebase login:ci`)
-- APK file exists at expected path
+- AAB/APK files exist at expected paths:
+  - AAB: `composeApp/build/outputs/bundle/release/*.aab`
+  - APK: `composeApp/build/outputs/apk/release/*.apk`
+- Artifact path resolution is correct in the deploy job
 
 ### Version Not Bumping
 **Solution:** Check commit messages follow conventional format:
