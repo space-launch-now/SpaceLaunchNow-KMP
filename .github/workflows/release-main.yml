@@ -351,23 +351,15 @@ jobs:
           name: release-aab
           path: aab/
 
-      - name: Download IPA
-        uses: actions/download-artifact@v4
-        with:
-          name: release-ipa
-          path: ipa/
-
       - name: Resolve artifact paths
         id: artifacts
         run: |
           APK_PATH=$(ls apk/*.apk | head -n 1)
           AAB_PATH=$(ls aab/*.aab | head -n 1)
           MAPPING_PATH=$(ls aab/mapping.txt | head -n 1)
-          IPA_PATH=$(ls ipa/*.ipa | head -n 1)
           echo "apk=$APK_PATH" >> $GITHUB_OUTPUT
           echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
           echo "mapping=$MAPPING_PATH" >> $GITHUB_OUTPUT
-          echo "ipa=$IPA_PATH" >> $GITHUB_OUTPUT
 
       - name: Decode Service Account
         env:
@@ -398,7 +390,6 @@ jobs:
           prerelease: false
           files: |
             ${{ steps.artifacts.outputs.apk }}
-            ${{ steps.artifacts.outputs.ipa }}
             ${{ steps.artifacts.outputs.mapping }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
