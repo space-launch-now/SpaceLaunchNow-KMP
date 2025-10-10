@@ -5,8 +5,9 @@ Quick reference for writing tests in SpaceLaunchNow-KMP.
 ## 🚀 Getting Started in 30 Seconds
 
 1. **Pick a task**: Open [TESTING_TASKS.md](TESTING_TASKS.md)
-2. **Follow patterns**: Use [TESTING_GUIDE.md](TESTING_GUIDE.md)
-3. **Run tests**: `./gradlew :composeApp:jvmTest`
+2. **Use AI (optional)**: Copy prompt from [AI_AGENT_PROMPTS.md](AI_AGENT_PROMPTS.md)
+3. **Follow patterns**: Use [TESTING_GUIDE.md](TESTING_GUIDE.md)
+4. **Run tests**: `./gradlew :composeApp:jvmTest`
 
 ## 📁 File Structure
 

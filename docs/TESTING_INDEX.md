@@ -37,6 +37,13 @@ Central hub for all unit testing documentation in SpaceLaunchNow-KMP.
 - RepositoryTestTemplate.kt
 - ViewModelTestTemplate.kt
 
+### I want to use AI agents to write tests
+→ **[AI_AGENT_PROMPTS.md](AI_AGENT_PROMPTS.md)**
+- Ready-to-use prompts for any AI agent
+- Component-specific prompts
+- Batch task prompts
+- Copy-paste and customize
+
 ## 📋 Document Purpose Guide
 
 | Document | Use When You... | Reading Time |
@@ -46,6 +53,7 @@ Central hub for all unit testing documentation in SpaceLaunchNow-KMP.
 | [TESTING_PLAN_VISUAL.md](TESTING_PLAN_VISUAL.md) | Want to see the big picture | 3 min |
 | [TESTING_GUIDE.md](TESTING_GUIDE.md) | Need in-depth examples and patterns | 15 min |
 | [templates/](templates/) | Want ready-to-use code templates | 1 min |
+| [AI_AGENT_PROMPTS.md](AI_AGENT_PROMPTS.md) | Want to delegate to AI agents | 2 min |
 
 ## 🎯 Common Workflows
 
@@ -55,11 +63,28 @@ Central hub for all unit testing documentation in SpaceLaunchNow-KMP.
    ↓
 2. Check TESTING_TASKS.md (find easy task)
    ↓
-3. Copy from templates/ (get started)
+3. Copy prompt from AI_AGENT_PROMPTS.md OR template from templates/
    ↓
-4. Reference TESTING_QUICK_REF.md (while coding)
+4. Generate/write tests
    ↓
-5. Check TESTING_GUIDE.md (when stuck)
+5. Reference TESTING_QUICK_REF.md (while coding)
+   ↓
+6. Check TESTING_GUIDE.md (when stuck)
+```
+
+### AI-Assisted Workflow
+```
+1. Open AI_AGENT_PROMPTS.md
+   ↓
+2. Copy appropriate prompt for your task
+   ↓
+3. Customize placeholders [COMPONENT_NAME], etc.
+   ↓
+4. Paste into AI agent (Copilot, Claude, ChatGPT, etc.)
+   ↓
+5. Review generated tests
+   ↓
+6. Run tests, verify, commit
 ```
 
 ### Experienced Developer Workflow
