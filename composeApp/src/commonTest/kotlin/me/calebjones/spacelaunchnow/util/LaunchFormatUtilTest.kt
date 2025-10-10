@@ -435,7 +435,8 @@ class LaunchFormatUtilTest {
         val result = LaunchFormatUtil.formatLaunchTitle(launch)
         
         // Assert
-        // Should extract " Starlink Group 6-28" (with leading space)
+        // Note: split().last() preserves whitespace, resulting in double space after pipe
+        // This matches the actual implementation behavior
         assertEquals("SpaceX |  Starlink Group 6-28", result)
     }
     
