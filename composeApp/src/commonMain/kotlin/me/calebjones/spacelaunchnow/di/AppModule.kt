@@ -36,6 +36,12 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
+import me.calebjones.spacelaunchnow.data.billing.BillingClient
+import me.calebjones.spacelaunchnow.data.billing.createBillingClient
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
+import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 
@@ -90,6 +96,24 @@ val appModule = module {
             debugPreferences = getOrNull<DebugPreferences>()
         )
     }
+    
+    // Subscription dependencies
+    single {
+        val subscriptionDataStore = get<DataStore<Preferences>>(named("SubscriptionDataStore"))
+        SubscriptionStorage(subscriptionDataStore)
+    }
+
+    single { createBillingClient() }
+
+    single<SubscriptionRepository> {
+        SubscriptionRepositoryImpl(
+            billingClient = get(),
+            storage = get<SubscriptionStorage>(),
+            debugPreferences = get<DebugPreferences>()
+        )
+    }
+    viewModelOf(::SubscriptionViewModel)
+    
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
 }

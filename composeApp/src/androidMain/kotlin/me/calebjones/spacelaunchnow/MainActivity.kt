@@ -20,6 +20,7 @@ import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chaintech.videoplayer.util.PlaybackPreference
+import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.notifications.AndroidNotificationPermissionHandler
 import me.calebjones.spacelaunchnow.data.notifications.NotificationPermissionManager
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -28,6 +29,7 @@ import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     private val appPreferences: AppPreferences by inject()
+    private val billingClient: BillingClient by inject()
     private lateinit var notificationPermissionHandler: AndroidNotificationPermissionHandler
 
     // Use mutable state for notification launch ID to trigger recomposition
@@ -116,6 +118,47 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Set activity for purchase flows using reflection to avoid KMP import issues
+        try {
+            val setActivityMethod =
+                billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
+            setActivityMethod.invoke(billingClient, this)
+            println("MainActivity: Set billing client activity")
+        } catch (e: Exception) {
+            // Not an Android billing client or method doesn't exist - that's okay
+            println("MainActivity: Billing client doesn't support setActivity - ${e.message}")
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Clear activity reference using reflection
+        try {
+            val setActivityMethod =
+                billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
+            setActivityMethod.invoke(billingClient, null)
+            println("MainActivity: Cleared billing client activity")
+        } catch (e: Exception) {
+            println("MainActivity: Could not clear billing client activity - ${e.message}")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clear activity reference using reflection
+        try {
+            val setActivityMethod =
+                billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
+            setActivityMethod.invoke(billingClient, null)
+            println("MainActivity: Cleared billing client activity on destroy")
+        } catch (e: Exception) {
+            println("MainActivity: Could not clear billing client activity on destroy - ${e.message}")
+        }
+        NotificationPermissionManager.clearCurrentActivity()
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
@@ -169,11 +212,6 @@ class MainActivity : ComponentActivity() {
     private fun resetNotificationPermissionAsked(context: Context) {
         context.getSharedPreferences("onboarding_prefs", MODE_PRIVATE)
             .edit { putBoolean("hasAskedForNotificationPermission", false) }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        NotificationPermissionManager.clearCurrentActivity()
     }
 }
 
