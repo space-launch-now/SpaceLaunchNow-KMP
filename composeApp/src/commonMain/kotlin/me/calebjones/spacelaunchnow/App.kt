@@ -13,8 +13,10 @@ import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
+import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.koin.compose.koinInject
 
 /**
@@ -35,8 +37,9 @@ fun SpaceLaunchNowApp(
     notificationLaunchId: String? = null,
     onNotificationLaunchIdConsumed: () -> Unit = {}
 ) {
-    // Initialize notifications on app start and print debug info
+    // Initialize notifications and subscription on app start
     val notificationRepository = koinInject<NotificationRepository>()
+    val subscriptionRepository = koinInject<SubscriptionRepository>()
     val pushMessaging = koinInject<PushMessaging>()
     val appPreferences = koinInject<AppPreferences>()
 
@@ -91,6 +94,15 @@ fun SpaceLaunchNowApp(
             println("Settings loaded - state management handled by repository")
         } catch (e: Exception) {
             println("Failed to initialize notifications: ${e.message}")
+            e.printStackTrace()
+        }
+
+        try {
+            // Initialize subscription billing
+            subscriptionRepository.initialize()
+            println("Subscription repository initialized successfully")
+        } catch (e: Exception) {
+            println("Failed to initialize subscription repository: ${e.message}")
             e.printStackTrace()
         }
 

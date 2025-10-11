@@ -1,0 +1,445 @@
+package me.calebjones.spacelaunchnow.data.repository
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import me.calebjones.spacelaunchnow.data.billing.BillingClient
+import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
+import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.data.model.SubscriptionState
+import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
+import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
+import me.calebjones.spacelaunchnow.util.BuildConfig
+import kotlin.time.Duration.Companion.days
+
+/**
+ * Implementation of SubscriptionRepository
+ * 
+ * Architecture:
+ * 1. Load cached state from DataStore (instant UI)
+ * 2. Verify with platform billing in background
+ * 3. Update cache and emit new state
+ * 4. Re-verify periodically and on app resume
+ */
+class SubscriptionRepositoryImpl(
+    private val billingClient: BillingClient,
+    private val storage: SubscriptionStorage,
+    private val debugPreferences: DebugPreferences
+) : SubscriptionRepository {
+
+    // Repository scope for background work
+    private val repositoryScope = CoroutineScope(SupervisorJob())
+
+    // Single source of truth - all UI observes this
+    private val _state = MutableStateFlow(SubscriptionState.DEFAULT)
+    override val state: StateFlow<SubscriptionState> = _state.asStateFlow()
+
+    // Debug simulation state
+    private var debugSimulationState: SubscriptionState? = null
+
+    override suspend fun initialize() {
+        println("=== SubscriptionRepository: Initializing ===")
+
+        try {
+            // 1. Load cached state for instant UI
+            val cachedState = storage.getState()
+            _state.value = cachedState.copy(isLoading = false)
+            println("SubscriptionRepository: Loaded cached state - isSubscribed: ${cachedState.isSubscribed}")
+
+            // 2. Load debug simulation state if in debug mode
+            if (BuildConfig.IS_DEBUG) {
+                loadDebugSimulationState()
+            }
+
+            // 3. Initialize billing client
+            billingClient.initialize().onFailure { error ->
+                println("SubscriptionRepository: Failed to initialize billing - ${error.message}")
+                _state.value = SubscriptionState.error("Failed to initialize billing: ${error.message}")
+                return
+            }
+
+            // 4. Verify subscription in background (only if not using debug simulation)
+            if (debugSimulationState == null) {
+                repositoryScope.launch {
+                    verifySubscription(forceRefresh = false)
+                }
+            }
+
+            // 5. Listen for purchase updates
+            repositoryScope.launch {
+                billingClient.purchaseUpdates.collect { purchase ->
+                    println("SubscriptionRepository: Purchase update received - ${purchase.productId}")
+                    handlePurchaseUpdate(purchase)
+                }
+            }
+
+        } catch (e: Exception) {
+            println("SubscriptionRepository: Initialization error - ${e.message}")
+            _state.value = SubscriptionState.error("Initialization failed: ${e.message}")
+        }
+    }
+
+    /**
+     * Load debug simulation state from persistent storage
+     */
+    private suspend fun loadDebugSimulationState() {
+        if (!BuildConfig.IS_DEBUG) return
+
+        val debugSettings = debugPreferences.getDebugSettings()
+        if (debugSettings.debugSubscriptionActive) {
+            val subscriptionType = debugSettings.debugSubscriptionType?.let {
+                try {
+                    SubscriptionType.valueOf(it)
+                } catch (e: Exception) {
+                    SubscriptionType.FREE
+                }
+            } ?: SubscriptionType.FREE
+
+            val productId = debugSettings.debugSubscriptionProductId
+
+            println("SubscriptionRepository: Loading persisted debug simulation - type: $subscriptionType, productId: $productId")
+
+            simulateSubscriptionState(
+                isSubscribed = subscriptionType != SubscriptionType.FREE,
+                subscriptionType = subscriptionType,
+                productId = productId,
+                persist = false // Don't save again since we're loading
+            )
+        }
+    }
+
+    override suspend fun verifySubscription(forceRefresh: Boolean): Result<SubscriptionState> {
+        // If we have a debug simulation active and not forcing refresh, use it
+        if (BuildConfig.IS_DEBUG && debugSimulationState != null && !forceRefresh) {
+            println("SubscriptionRepository: Using persisted debug simulation state")
+            return Result.success(debugSimulationState!!)
+        }
+
+        // Otherwise, use normal verification logic
+        return super_verifySubscription(forceRefresh)
+    }
+
+    private suspend fun super_verifySubscription(forceRefresh: Boolean): Result<SubscriptionState> {
+        val currentState = _state.value
+
+        // Skip if recently verified and not forcing refresh
+        if (!forceRefresh && currentState.isRecentlyVerified() && !currentState.needsVerification) {
+            println("SubscriptionRepository: Using recently verified state")
+            return Result.success(currentState)
+        }
+
+        println("SubscriptionRepository: Verifying subscription with platform...")
+        _state.value = currentState.copy(isLoading = true)
+
+        return try {
+            // Query platform billing (Google Play / App Store)
+            val purchasesResult = billingClient.queryPurchases()
+            
+            purchasesResult.fold(
+                onSuccess = { purchases ->
+                    val newState = processVerifiedPurchases(purchases)
+                    
+                    // Update state and cache
+                    _state.value = newState
+                    storage.saveState(newState)
+                    
+                    println("SubscriptionRepository: Verification complete - isSubscribed: ${newState.isSubscribed}")
+                    Result.success(newState)
+                },
+                onFailure = { error ->
+                    println("SubscriptionRepository: Verification failed - ${error.message}")
+                    
+                    // Use cached state but mark as needing verification
+                    val errorState = currentState.copy(
+                        isLoading = false,
+                        needsVerification = true,
+                        verificationError = error.message
+                    )
+                    _state.value = errorState
+                    
+                    Result.failure(error)
+                }
+            )
+        } catch (e: Exception) {
+            println("SubscriptionRepository: Verification exception - ${e.message}")
+            val errorState = SubscriptionState.error(e.message ?: "Unknown error")
+            _state.value = errorState
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun launchPurchaseFlow(productId: String, basePlanId: String?): Result<String> {
+        println("SubscriptionRepository: Launching purchase flow for $productId (basePlan: $basePlanId)")
+        
+        _state.value = _state.value.copy(isLoading = true)
+        
+        return try {
+            val result = billingClient.launchPurchaseFlow(productId, basePlanId)
+            
+            result.fold(
+                onSuccess = { purchaseToken ->
+                    println("SubscriptionRepository: Purchase successful - $purchaseToken")
+                    
+                    // Verify subscription to update state
+                    verifySubscription(forceRefresh = true)
+                    
+                    Result.success(purchaseToken)
+                },
+                onFailure = { error ->
+                    println("SubscriptionRepository: Purchase failed - ${error.message}")
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        verificationError = "Purchase failed: ${error.message}"
+                    )
+                    Result.failure(error)
+                }
+            )
+        } catch (e: Exception) {
+            println("SubscriptionRepository: Purchase exception - ${e.message}")
+            _state.value = _state.value.copy(isLoading = false)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun restorePurchases(): Result<SubscriptionState> {
+        println("SubscriptionRepository: Restoring purchases...")
+        return verifySubscription(forceRefresh = true)
+    }
+
+    override suspend fun getProductPricing(productId: String): Result<List<me.calebjones.spacelaunchnow.data.model.ProductPricing>> {
+        println("SubscriptionRepository: Getting pricing for $productId")
+        return billingClient.getProductPricing(productId)
+    }
+
+    override suspend fun hasFeature(feature: PremiumFeature, verify: Boolean): Boolean {
+        if (verify) {
+            // Verify with platform before checking
+            val verifyResult = verifySubscription(forceRefresh = true)
+            return verifyResult.getOrNull()?.hasFeature(feature) ?: false
+        } else {
+            // Use cached state (faster but less secure)
+            return _state.value.hasFeature(feature)
+        }
+    }
+
+    override suspend fun getAvailableFeatures(): Set<PremiumFeature> {
+        return _state.value.features
+    }
+
+    override suspend fun cancelSubscription(): Result<Unit> {
+        // Platform-specific cancellation handled by platform implementations
+        // On mobile, this typically opens the subscription management page
+        println("SubscriptionRepository: Cancellation requested - redirecting to platform")
+        return Result.success(Unit)
+    }
+
+    override suspend fun clearSubscriptionCache() {
+        println("SubscriptionRepository: Clearing subscription cache")
+        storage.clearState()
+        _state.value = SubscriptionState.free()
+    }
+
+    /**
+     * Process purchases from platform and create verified state
+     */
+    private fun processVerifiedPurchases(purchases: List<PlatformPurchase>): SubscriptionState {
+        if (purchases.isEmpty()) {
+            println("SubscriptionRepository: No active purchases found")
+            return SubscriptionState.free().copy(
+                lastVerified = Clock.System.now().toEpochMilliseconds(),
+                needsVerification = false,
+                isLoading = false
+            )
+        }
+
+        // Find the most premium active purchase
+        val activePurchase = purchases
+            .filter { !it.isExpired() }
+            .maxByOrNull { it.subscriptionType.ordinal }
+
+        if (activePurchase == null) {
+            println("SubscriptionRepository: All purchases are expired")
+            return SubscriptionState.free().copy(
+                lastVerified = Clock.System.now().toEpochMilliseconds(),
+                needsVerification = false,
+                isLoading = false
+            )
+        }
+
+        println("SubscriptionRepository: Active purchase found - ${activePurchase.productId}")
+
+        val subscriptionType = SubscriptionProducts.getSubscriptionType(activePurchase.productId)
+        val features = SubscriptionProducts.getFeaturesForProduct(activePurchase.productId)
+
+        return SubscriptionState(
+            isSubscribed = true,
+            subscriptionType = subscriptionType,
+            subscriptionId = activePurchase.orderId,
+            productId = activePurchase.productId,
+            expiresAt = activePurchase.expiryTime,
+            purchasedAt = activePurchase.purchaseTime,
+            lastVerified = Clock.System.now().toEpochMilliseconds(),
+            needsVerification = false,
+            verificationError = null,
+            features = features,
+            isLoading = false,
+            isCached = false
+        )
+    }
+
+    /**
+     * Handle real-time purchase updates from billing client
+     */
+    private suspend fun handlePurchaseUpdate(purchase: PlatformPurchase) {
+        println("SubscriptionRepository: Handling purchase update - ${purchase.productId}")
+        
+        // Acknowledge purchase if not already acknowledged (required for Google Play)
+        if (!purchase.isAcknowledged) {
+            billingClient.acknowledgePurchase(purchase.purchaseToken)
+        }
+        
+        // Re-verify to update state
+        verifySubscription(forceRefresh = true)
+    }
+
+    /**
+     * Debug method to simulate different subscription states
+     * Only available in debug builds
+     */
+    fun simulateSubscriptionState(
+        isSubscribed: Boolean,
+        subscriptionType: SubscriptionType,
+        productId: String?,
+        persist: Boolean = true
+    ) {
+        if (!BuildConfig.IS_DEBUG) return
+
+        debugSimulationState = if (isSubscribed) {
+            SubscriptionState(
+                isSubscribed = true,
+                subscriptionType = subscriptionType,
+                subscriptionId = "debug_order_${Clock.System.now().toEpochMilliseconds()}",
+                productId = productId ?: "debug_product",
+                expiresAt = Clock.System.now().plus(30.days).toEpochMilliseconds(),
+                purchasedAt = Clock.System.now().minus(7.days).toEpochMilliseconds(),
+                lastVerified = Clock.System.now().toEpochMilliseconds(),
+                needsVerification = false,
+                verificationError = null,
+                features = if (productId != null) {
+                    SubscriptionProducts.getFeaturesForProduct(productId)
+                } else {
+                    PremiumFeature.getFeaturesForType(subscriptionType)
+                },
+                isLoading = false,
+                isCached = false
+            )
+        } else {
+            SubscriptionState.free()
+        }
+
+        _state.value = debugSimulationState!!
+
+        // Save to persistent storage if requested
+        if (persist) {
+            repositoryScope.launch {
+                debugPreferences.setDebugSubscriptionSimulation(
+                    isActive = true,
+                    subscriptionType = subscriptionType.name,
+                    productId = productId
+                )
+            }
+        }
+
+        println("SubscriptionRepository: Debug simulation set to ${debugSimulationState!!.subscriptionType} (${debugSimulationState!!.productId})")
+    }
+
+    /**
+     * Debug method to simulate needs verification state
+     */
+    fun simulateNeedsVerification(needsVerification: Boolean) {
+        if (!BuildConfig.IS_DEBUG) return
+
+        val currentState = _state.value
+        debugSimulationState = currentState.copy(
+            needsVerification = needsVerification,
+            verificationError = if (needsVerification) "Debug: Verification required" else null
+        )
+        _state.value = debugSimulationState!!
+        println("SubscriptionRepository: Debug simulation - needsVerification = $needsVerification")
+    }
+
+    /**
+     * Debug method to simulate expired subscription
+     */
+    fun simulateExpiredSubscription() {
+        if (!BuildConfig.IS_DEBUG) return
+
+        debugSimulationState = SubscriptionState(
+            isSubscribed = false,
+            subscriptionType = SubscriptionType.FREE,
+            subscriptionId = "debug_expired_${Clock.System.now().toEpochMilliseconds()}",
+            productId = "expired_premium",
+            expiresAt = Clock.System.now().minus(7.days)
+                .toEpochMilliseconds(), // Expired 7 days ago
+            purchasedAt = Clock.System.now().minus(365.days).toEpochMilliseconds(),
+            lastVerified = Clock.System.now().toEpochMilliseconds(),
+            needsVerification = false,
+            verificationError = "Subscription expired",
+            features = emptySet(),
+            isLoading = false,
+            isCached = false
+        )
+        _state.value = debugSimulationState!!
+
+        // Save to persistent storage
+        repositoryScope.launch {
+            debugPreferences.setDebugSubscriptionSimulation(
+                isActive = true,
+                subscriptionType = SubscriptionType.FREE.name,
+                productId = "expired_premium"
+            )
+        }
+
+        println("SubscriptionRepository: Debug simulation - expired subscription")
+    }
+
+    /**
+     * Clear debug simulation and return to real billing state
+     */
+    fun clearDebugSimulation() {
+        if (!BuildConfig.IS_DEBUG) return
+
+        debugSimulationState = null
+
+        // Clear persistent storage
+        repositoryScope.launch {
+            debugPreferences.clearDebugSubscriptionSimulation()
+        }
+
+        // Trigger real verification
+        repositoryScope.launch {
+            verifySubscription(forceRefresh = true)
+        }
+        println("SubscriptionRepository: Debug simulation cleared")
+    }
+}
+
+/**
+ * Extension: Check if platform purchase is expired
+ */
+private fun PlatformPurchase.isExpired(): Boolean {
+    val expiryTime = this.expiryTime ?: return false
+    return Clock.System.now().toEpochMilliseconds() > expiryTime
+}
+
+/**
+ * Extension: Get subscription type from purchase
+ */
+private val PlatformPurchase.subscriptionType: SubscriptionType
+    get() = SubscriptionProducts.getSubscriptionType(this.productId)

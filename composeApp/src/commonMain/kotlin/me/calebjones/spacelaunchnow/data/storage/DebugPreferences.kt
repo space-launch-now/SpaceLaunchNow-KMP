@@ -16,6 +16,12 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         private val USE_CUSTOM_API_URL = booleanPreferencesKey("debug_use_custom_api_url")
         private val USE_FCM_DEBUG_TOPICS = booleanPreferencesKey("debug_use_fcm_debug_topics")
 
+        // Debug subscription simulation keys
+        private val DEBUG_SUBSCRIPTION_ACTIVE = booleanPreferencesKey("debug_subscription_active")
+        private val DEBUG_SUBSCRIPTION_TYPE = stringPreferencesKey("debug_subscription_type")
+        private val DEBUG_SUBSCRIPTION_PRODUCT_ID =
+            stringPreferencesKey("debug_subscription_product_id")
+
         // Default URLs for quick switching
         const val PROD_API_URL = "https://spacelaunchnow.app"
         const val DEV_API_URL = "https://staging.spacelaunchnow.app"
@@ -29,7 +35,10 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         DebugSettings(
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
-            useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false
+            useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
+            debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
+            debugSubscriptionType = preferences[DEBUG_SUBSCRIPTION_TYPE],
+            debugSubscriptionProductId = preferences[DEBUG_SUBSCRIPTION_PRODUCT_ID]
         )
     }
 
@@ -100,6 +109,40 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
             PROD_API_URL
         }
     }
+
+    /**
+     * Enable debug subscription simulation
+     */
+    suspend fun setDebugSubscriptionSimulation(
+        isActive: Boolean,
+        subscriptionType: String? = null,
+        productId: String? = null
+    ) {
+        dataStore.edit { preferences ->
+            preferences[DEBUG_SUBSCRIPTION_ACTIVE] = isActive
+            if (subscriptionType != null) {
+                preferences[DEBUG_SUBSCRIPTION_TYPE] = subscriptionType
+            } else {
+                preferences.remove(DEBUG_SUBSCRIPTION_TYPE)
+            }
+            if (productId != null) {
+                preferences[DEBUG_SUBSCRIPTION_PRODUCT_ID] = productId
+            } else {
+                preferences.remove(DEBUG_SUBSCRIPTION_PRODUCT_ID)
+            }
+        }
+    }
+
+    /**
+     * Clear debug subscription simulation
+     */
+    suspend fun clearDebugSubscriptionSimulation() {
+        dataStore.edit { preferences ->
+            preferences.remove(DEBUG_SUBSCRIPTION_ACTIVE)
+            preferences.remove(DEBUG_SUBSCRIPTION_TYPE)
+            preferences.remove(DEBUG_SUBSCRIPTION_PRODUCT_ID)
+        }
+    }
 }
 
 /**
@@ -108,5 +151,8 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
 data class DebugSettings(
     val useCustomApiUrl: Boolean = false,
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
-    val useDebugTopics: Boolean = false
+    val useDebugTopics: Boolean = false,
+    val debugSubscriptionActive: Boolean = false,
+    val debugSubscriptionType: String? = null,
+    val debugSubscriptionProductId: String? = null
 )

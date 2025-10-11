@@ -118,6 +118,8 @@ kotlin {
 
                 // Android-specific HTTP client engine
                 implementation(libs.ktor.client.android)
+
+                implementation(libs.billing.ktx)
             }
         }
 
