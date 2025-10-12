@@ -305,6 +305,56 @@ fun SupportUsScreen(
                         }
                     )
                 }
+
+                // TEMPORARY: Test button for 2018 Founder purchase
+                item {
+                    Spacer(Modifier.height(24.dp))
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "🧪 TEST: 2018 Founder",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = "Test legacy founder purchase",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            Spacer(Modifier.height(12.dp))
+                            Button(
+                                onClick = {
+                                    viewModel.purchaseSubscription(
+                                        productId = SubscriptionProducts.FOUNDER_2018,
+                                        basePlanId = null
+                                    )
+                                },
+                                enabled = !uiState.isProcessing,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiary
+                                )
+                            ) {
+                                Text(
+                                    if (uiState.isProcessing) "Processing..." else "Test Purchase 2018 Founder"
+                                )
+                            }
+                        }
+                    }
+                }
             } else {
                 // Thank You Section for existing members
                 item {

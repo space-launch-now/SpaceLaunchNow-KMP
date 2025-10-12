@@ -96,8 +96,10 @@ object SubscriptionProducts {
     const val BASE_PLAN_MONTHLY = "base-plan"  // Monthly subscription
     const val BASE_PLAN_YEARLY = "yearly"      // Yearly subscription (better value)
 
-    // Legacy SKUs (for migration and compatibility)
-    // NOTE: We don't explicitly list legacy products here as there are hundreds of them.
+    // Legacy/Founder SKUs (for migration and compatibility)
+    const val FOUNDER_2018 = "2018_founder"     // 2018 Founder lifetime purchase
+    
+    // NOTE: We don't explicitly list all legacy products here as there are hundreds of them.
     // Any product ID that doesn't match current products or debug products is treated as legacy.
     // Legacy products get ad-free access only (BASIC subscription type).
     const val DEBUG_EXPIRED = "expired_premium" // Debug/test product for expired state
@@ -114,7 +116,8 @@ object SubscriptionProducts {
      * All available one-time purchase products
      */
     val ALL_INAPP_PRODUCTS = listOf(
-        PRO_LIFETIME
+        PRO_LIFETIME,
+        FOUNDER_2018  // Legacy founder SKU for testing
     )
     
     /**
