@@ -1,0 +1,28 @@
+feat(billing): implement iOS BillingClient with StoreKit integration
+
+- Implemented full StoreKit 1 integration for iOS in-app purchases
+- Added automatic product ID mapping between Android and iOS
+  - Android: PRODUCT_ID + BASE_PLAN_MONTHLY → iOS: "base_plan"
+  - Android: PRODUCT_ID + BASE_PLAN_YEARLY → iOS: "yearly"
+  - Android: PRO_LIFETIME → iOS: "spacelaunchnow_pro"
+- Implemented all BillingClient interface methods:
+  - initialize() with SKProductsRequest
+  - queryPurchases() with receipt reading
+  - launchPurchaseFlow() with SKPayment
+  - getProductPricing() with formatted prices
+  - purchaseUpdates Flow for real-time updates
+- Added SKPaymentTransactionObserver for purchase state monitoring
+- Created comprehensive documentation:
+  - IOS_BILLING_SETUP.md - App Store Connect configuration guide
+  - IOS_BILLING_PRODUCT_IDS.md - Product ID mapping reference
+  - IOS_BILLING_IMPLEMENTATION_SUMMARY.md - Implementation overview
+  - BILLING_USAGE_EXAMPLES.md - Code usage examples
+
+Breaking changes: None - maintains same interface as Android implementation
+
+IMPORTANT: iOS products must be configured in App Store Connect with IDs:
+- base_plan (monthly subscription)
+- yearly (yearly subscription)
+- spacelaunchnow_pro (lifetime purchase)
+
+Server-side receipt validation still required for production security.

@@ -103,7 +103,9 @@ val appModule = module {
         SubscriptionStorage(subscriptionDataStore)
     }
 
-    single { createBillingClient() }
+    // Note: Using factory instead of single to avoid KClass issues on iOS
+    // iOS BillingClient extends NSObject which isn't supported for KClass reflection
+    factory { createBillingClient() }
 
     single<SubscriptionRepository> {
         SubscriptionRepositoryImpl(
