@@ -72,6 +72,11 @@ kotlin {
         }
     }
     sourceSets {
+        named { it.lowercase().startsWith("ios") }.configureEach {
+            languageSettings {
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            }
+        }
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -186,6 +191,10 @@ kotlin {
                 implementation(libs.aboutlibraries.core)
                 implementation(libs.aboutlibraries.compose.m2)
                 implementation(libs.aboutlibraries.compose.m3)
+
+                // Add the purchases-kmp dependencies.
+                implementation(libs.purchases.core)
+                implementation(libs.purchases.ui)   // Optional
             }
         }
 

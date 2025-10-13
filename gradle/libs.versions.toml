@@ -59,6 +59,8 @@ about-libraries = "12.2.4"
 composeMediaPlayer = "1.0.47"
 workRuntime = "2.10.5"
 
+purchases-kmp = "2.2.2+17.10.0"
+
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -156,6 +158,9 @@ aboutlibraries-compose-m2 = { module = "com.mikepenz:aboutlibraries-compose", ve
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "about-libraries" }      # Material 3 UI
 # Deprecated View-based UI module
 aboutlibraries-view = { module = "com.mikepenz:aboutlibraries", version.ref = "about-libraries" }
+
+purchases-core = { module = "com.revenuecat.purchases:purchases-kmp-core", version.ref = "purchases-kmp" }
+purchases-ui = { module = "com.revenuecat.purchases:purchases-kmp-ui", version.ref = "purchases-kmp" }
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
