@@ -14,6 +14,7 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
@@ -35,11 +36,14 @@ fun isTabletOrDesktop(): Boolean {
 @Composable
 fun SpaceLaunchNowApp(
     notificationLaunchId: String? = null,
-    onNotificationLaunchIdConsumed: () -> Unit = {}
+    onNotificationLaunchIdConsumed: () -> Unit = {},
+    navigationDestination: String? = null,
+    onNavigationDestinationConsumed: () -> Unit = {}
 ) {
     // Initialize notifications and subscription on app start
     val notificationRepository = koinInject<NotificationRepository>()
     val subscriptionRepository = koinInject<SubscriptionRepository>()
+    val revenueCatManager = koinInject<RevenueCatManager>()
     val pushMessaging = koinInject<PushMessaging>()
     val appPreferences = koinInject<AppPreferences>()
 
@@ -62,6 +66,22 @@ fun SpaceLaunchNowApp(
             )
             // Clear the notification launch ID after navigation
             onNotificationLaunchIdConsumed()
+        }
+    }
+    
+    // Handle navigation destination (e.g., from widget)
+    LaunchedEffect(navigationDestination) {
+        when (navigationDestination) {
+            "subscription" -> {
+                println("Navigating to SupportUs screen from widget")
+                navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs)
+                onNavigationDestinationConsumed()
+            }
+            null -> {} // No navigation destination
+            else -> {
+                println("Unknown navigation destination: $navigationDestination")
+                onNavigationDestinationConsumed()
+            }
         }
     }
 
@@ -103,6 +123,15 @@ fun SpaceLaunchNowApp(
             println("Subscription repository initialized successfully")
         } catch (e: Exception) {
             println("Failed to initialize subscription repository: ${e.message}")
+            e.printStackTrace()
+        }
+
+        try {
+            // Initialize RevenueCat
+            revenueCatManager.initialize()
+            println("RevenueCat manager initialized successfully")
+        } catch (e: Exception) {
+            println("Failed to initialize RevenueCat: ${e.message}")
             e.printStackTrace()
         }
 

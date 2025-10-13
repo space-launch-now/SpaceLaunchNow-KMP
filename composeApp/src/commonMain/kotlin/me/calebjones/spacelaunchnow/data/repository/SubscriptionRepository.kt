@@ -8,11 +8,12 @@ import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 /**
  * Repository for managing subscription state
  * 
- * SECURITY MODEL:
+ * ARCHITECTURE:
+ * - RevenueCat entitlements as authoritative source of truth
  * - Cache in DataStore for instant UI feedback
- * - Verify with platform billing (Google Play / App Store) before granting access
- * - Re-verify periodically and on app resume
- * - Fall back to free tier if verification fails
+ * - Server-side receipt validation via RevenueCat
+ * - Automatic cross-platform sync
+ * - Falls back to cached state for offline scenarios
  */
 interface SubscriptionRepository {
     
@@ -31,8 +32,10 @@ interface SubscriptionRepository {
     suspend fun initialize()
     
     /**
-     * Verify subscription status with platform billing
-     * This is the ONLY authoritative check
+     * Verify subscription status with RevenueCat
+     * 
+     * Queries RevenueCat for active purchases and entitlements.
+     * Updates cached state with verified information.
      * 
      * @param forceRefresh Force verification even if recently verified
      * @return Result with verified subscription state
@@ -65,14 +68,13 @@ interface SubscriptionRepository {
     /**
      * Check if user has access to a specific feature
      * 
-     * CRITICAL: This checks the CACHED state only!
-     * For sensitive operations, call verifySubscription() first!
+     * Uses RevenueCat entitlements as the authoritative source of truth.
+     * Falls back to cached state for offline/debug scenarios.
      * 
      * @param feature The feature to check
-     * @param verify If true, verify with platform before returning (slower but secure)
-     * @return True if user has access (use with caution!)
+     * @return True if user has access to the feature
      */
-    suspend fun hasFeature(feature: PremiumFeature, verify: Boolean = false): Boolean
+    suspend fun hasFeature(feature: PremiumFeature): Boolean
     
     /**
      * Get all features available to current subscription

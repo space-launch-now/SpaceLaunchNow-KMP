@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
@@ -23,14 +24,17 @@ import kotlin.time.Duration.Companion.days
  * 
  * Architecture:
  * 1. Load cached state from DataStore (instant UI)
- * 2. Verify with platform billing in background
- * 3. Update cache and emit new state
- * 4. Re-verify periodically and on app resume
+ * 2. Check RevenueCat entitlements for feature access
+ * 3. Update cache when purchases complete
+ * 4. Fall back to cached state for offline scenarios
+ * 
+ * Phase 6: Simplified implementation using RevenueCat entitlements only
  */
 class SubscriptionRepositoryImpl(
     private val billingClient: BillingClient,
     private val storage: SubscriptionStorage,
-    private val debugPreferences: DebugPreferences
+    private val debugPreferences: DebugPreferences,
+    private val revenueCatManager: RevenueCatManager  // ADD: RevenueCat for entitlements
 ) : SubscriptionRepository {
 
     // Repository scope for background work
@@ -217,15 +221,20 @@ class SubscriptionRepositoryImpl(
         return billingClient.getProductPricing(productId)
     }
 
-    override suspend fun hasFeature(feature: PremiumFeature, verify: Boolean): Boolean {
-        if (verify) {
-            // Verify with platform before checking
-            val verifyResult = verifySubscription(forceRefresh = true)
-            return verifyResult.getOrNull()?.hasFeature(feature) ?: false
-        } else {
-            // Use cached state (faster but less secure)
-            return _state.value.hasFeature(feature)
+    override suspend fun hasFeature(feature: PremiumFeature): Boolean {
+        // Phase 6: Simplified - RevenueCat entitlements as source of truth
+        // Check if user has the "premium" entitlement (grants all features)
+        val hasPremiumEntitlement = revenueCatManager.hasEntitlement(SubscriptionProducts.RC_ENTITLEMENT_PREMIUM)
+        
+        if (hasPremiumEntitlement) {
+            println("SubscriptionRepository: User has premium entitlement - granting ${feature.name}")
+            return true
         }
+        
+        // Fallback to cached state for debug/offline scenarios
+        val cachedAccess = _state.value.hasFeature(feature)
+        println("SubscriptionRepository: No premium entitlement - cached access for ${feature.name}: $cachedAccess")
+        return cachedAccess
     }
 
     override suspend fun getAvailableFeatures(): Set<PremiumFeature> {

@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -78,16 +80,54 @@ fun DebugSettingsScreen(
     val debugSettings by debugViewModel.debugSettings.collectAsStateWithLifecycle()
     val isLoading by debugViewModel.isLoading.collectAsStateWithLifecycle()
     val statusMessage by debugViewModel.statusMessage.collectAsStateWithLifecycle()
+    val detailedMessage by debugViewModel.detailedMessage.collectAsStateWithLifecycle()
     val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptionState by subscriptionRepo.state.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var showDetailedDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(statusMessage) {
         statusMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
-            debugViewModel.clearStatusMessage()
+            // Show detailed dialog if there's a detailed message
+            if (detailedMessage != null) {
+                showDetailedDialog = true
+            }
         }
+    }
+
+    // Detailed message dialog
+    if (showDetailedDialog && detailedMessage != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = {
+                showDetailedDialog = false
+                debugViewModel.clearStatusMessage()
+            },
+            title = { Text(statusMessage ?: "Details") },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = detailedMessage ?: "",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        showDetailedDialog = false
+                        debugViewModel.clearStatusMessage()
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
     }
 
     var customUrlText by remember { mutableStateOf(debugSettings.customApiBaseUrl) }
@@ -489,7 +529,7 @@ fun DebugSettingsScreen(
                                 if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
                                     subscriptionRepo.simulateSubscriptionState(
                                         isSubscribed = true,
-                                        subscriptionType = SubscriptionType.PREMIUM,
+                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
                                         productId = "spacelaunchnow_premium_legacy"
                                     )
                                 }
@@ -507,7 +547,7 @@ fun DebugSettingsScreen(
                                 if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
                                     subscriptionRepo.simulateSubscriptionState(
                                         isSubscribed = true,
-                                        subscriptionType = SubscriptionType.PREMIUM,
+                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
                                         productId = "space_launch_now_pro_v1"
                                     )
                                 }
@@ -525,7 +565,7 @@ fun DebugSettingsScreen(
                                 if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
                                     subscriptionRepo.simulateSubscriptionState(
                                         isSubscribed = true,
-                                        subscriptionType = SubscriptionType.PREMIUM,
+                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
                                         productId = "unknown_premium_sku_12345"
                                     )
                                 }
@@ -625,6 +665,110 @@ fun DebugSettingsScreen(
                                     }
                             }
                         }
+                    }
+                }
+            }
+
+            // RevenueCat Integration Testing Section
+            item {
+                Text(
+                    text = "RevenueCat Integration Testing",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "🧪 RevenueCat SDK Testing",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = "Test RevenueCat integration before deploying to production. These buttons will query the SDK and display results in snackbars.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        // Check Initialization
+                        Button(
+                            onClick = { debugViewModel.checkRevenueCatInitialization() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("✅ Check Initialization Status")
+                        }
+
+                        // Query Products
+                        Button(
+                            onClick = { debugViewModel.queryRevenueCatProducts() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("📦 Query Products/Offerings")
+                        }
+
+                        // Check Entitlements
+                        Button(
+                            onClick = { debugViewModel.checkRevenueCatEntitlements() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("🔐 Check Customer Entitlements")
+                        }
+
+                        // Test Restore
+                        OutlinedButton(
+                            onClick = { debugViewModel.testRevenueCatRestore() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("🔄 Test Restore Purchases")
+                        }
+
+                        // View Offering Details
+                        OutlinedButton(
+                            onClick = { debugViewModel.viewRevenueCatOfferingDetails() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("🎁 View Offering Details")
+                        }
+
+                        HorizontalDivider()
+
+                        Text(
+                            text = "💡 Tips:",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = "• Run 'Check Initialization' first to verify SDK is configured\n" +
+                                    "• 'Query Products' shows available packages and their prices\n" +
+                                    "• 'Check Entitlements' shows what the user has access to\n" +
+                                    "• 'Test Restore' simulates restoring purchases from stores\n" +
+                                    "• Results will show in long snackbar messages at the bottom",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Text(
+                            text = "⚠️ Note: RevenueCat must be initialized in MainApplication for these tests to work.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
             }

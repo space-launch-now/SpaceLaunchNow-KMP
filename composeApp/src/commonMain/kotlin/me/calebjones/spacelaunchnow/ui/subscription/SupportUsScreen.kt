@@ -56,16 +56,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.launcher
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
@@ -92,12 +91,19 @@ fun SupportUsScreen(
     val subscriptionState by viewModel.subscriptionState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
+    // RevenueCat offerings for dynamic pricing
+    val currentOffering by viewModel.currentOffering.collectAsState()
+
     // Determine user status for different upgrade flows
     val subscriptionRepo = koinInject<SubscriptionRepository>()
     val fullSubscriptionState by subscriptionRepo.state.collectAsState()
     val isLegacy = subscriptionState.subscriptionType.isLegacy
     val hasCurrentSubscription = subscriptionState.isSubscribed && !isLegacy
     val canUpgrade = !subscriptionState.isSubscribed || isLegacy
+
+    // Determine which packages to show based on user's current state
+    val userState = determineUserState(subscriptionState)
+    val packagesToShow = getPackagesToShow(userState)
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -136,6 +142,26 @@ fun SupportUsScreen(
                 )
             }
 
+            // RevenueCat offerings status (subtle indicator)
+            if (currentOffering == null && canUpgrade) {
+                item {
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "💰 Loading pricing from store...",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
             // Current Plan Section (at the top for subscribers)
             if (subscriptionState.isSubscribed) {
                 item {
@@ -146,6 +172,14 @@ fun SupportUsScreen(
                         onRestorePurchases = { viewModel.restorePurchases() },
                         isProcessing = uiState.isProcessing
                     )
+                }
+            }
+
+            // Legacy User Upgrade Encouragement Banner (special message for legacy supporters)
+            if (isLegacy) {
+                item {
+                    Spacer(Modifier.height(16.dp))
+                    LegacyUserUpgradeBanner()
                 }
             }
 
@@ -238,120 +272,112 @@ fun SupportUsScreen(
                     Spacer(Modifier.height(16.dp))
                 }
 
-                // Pro Lifetime (Golden Premium Option)
-                item {
-                    ProLifetimeCard(
-                        price = uiState.getLifetimePrice(),
-                        isProcessing = uiState.isProcessing,
-                        onPurchase = {
-                            viewModel.purchaseSubscription(
-                                productId = SubscriptionProducts.PRO_LIFETIME,
-                                basePlanId = null
+                // Pro Lifetime (Golden Premium Option) - Show if available in packagesToShow
+                if (packagesToShow.showLifetime) {
+                    item {
+                        val lifetimePackage = currentOffering?.lifetime
+
+                        if (lifetimePackage != null) {
+                            ProLifetimeCard(
+                                price = lifetimePackage.storeProduct.price.formatted,
+                                isProcessing = uiState.isProcessing,
+                                onPurchase = {
+                                    viewModel.purchasePackage(lifetimePackage)
+                                }
+                            )
+                        } else {
+                            // Show loading or fallback UI
+                            ProLifetimeCard(
+                                price = uiState.getLifetimePrice(),
+                                isProcessing = true,
+                                onPurchase = { /* Disabled until offerings load */ }
                             )
                         }
-                    )
-                    Spacer(Modifier.height(20.dp))
 
-                    // "Or subscribe" divider
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        HorizontalDivider(modifier = Modifier.weight(1f))
-                        Text(
-                            text = "  Or subscribe  ",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        HorizontalDivider(modifier = Modifier.weight(1f))
-                    }
-                    Spacer(Modifier.height(16.dp))
-                }
+                        // Show divider only if there are subscription plans to show
+                        if (packagesToShow.showAnnual || packagesToShow.showMonthly) {
+                            Spacer(Modifier.height(20.dp))
 
-                // Yearly Plan (Recommended)
-                item {
-                    PricingCard(
-                        title = "Yearly",
-                        price = uiState.getYearlyPrice(),
-                        period = "/year",
-                        savings = uiState.getSavingsPercent(),
-                        isRecommended = true,
-                        isProcessing = uiState.isProcessing,
-                        onSubscribe = {
-                            viewModel.purchaseSubscription(
-                                productId = SubscriptionProducts.PRODUCT_ID,
-                                basePlanId = SubscriptionProducts.BASE_PLAN_YEARLY
-                            )
-                        }
-                    )
-                }
-
-                // Monthly Plan
-                item {
-                    Spacer(Modifier.height(12.dp))
-                    PricingCard(
-                        title = "Monthly",
-                        price = uiState.getMonthlyPrice(),
-                        period = "/month",
-                        isRecommended = false,
-                        isProcessing = uiState.isProcessing,
-                        onSubscribe = {
-                            viewModel.purchaseSubscription(
-                                productId = SubscriptionProducts.PRODUCT_ID,
-                                basePlanId = SubscriptionProducts.BASE_PLAN_MONTHLY
-                            )
-                        }
-                    )
-                }
-
-                // TEMPORARY: Test button for 2018 Founder purchase
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "🧪 TEST: 2018 Founder",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = "Test legacy founder purchase",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
-                            Spacer(Modifier.height(12.dp))
-                            Button(
-                                onClick = {
-                                    viewModel.purchaseSubscription(
-                                        productId = SubscriptionProducts.FOUNDER_2018,
-                                        basePlanId = null
-                                    )
-                                },
-                                enabled = !uiState.isProcessing,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.tertiary
-                                )
+                            // "Or subscribe" divider
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 24.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                HorizontalDivider(modifier = Modifier.weight(1f))
                                 Text(
-                                    if (uiState.isProcessing) "Processing..." else "Test Purchase 2018 Founder"
+                                    text = "  Or subscribe  ",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
+                                HorizontalDivider(modifier = Modifier.weight(1f))
                             }
+                            Spacer(Modifier.height(16.dp))
+                        }
+                    }
+                }
+
+                // Yearly Plan (Recommended) - Show if available in packagesToShow
+                if (packagesToShow.showAnnual) {
+                    item {
+                        val annualPackage = currentOffering?.annual
+
+                        if (annualPackage != null) {
+                            PricingCard(
+                                title = "Yearly",
+                                price = annualPackage.storeProduct.price.formatted,
+                                period = "/year",
+                                savings = uiState.getSavingsPercent(),
+                                isRecommended = true,
+                                isProcessing = uiState.isProcessing,
+                                onSubscribe = {
+                                    viewModel.purchasePackage(annualPackage)
+                                }
+                            )
+                        } else {
+                            // Show loading state
+                            PricingCard(
+                                title = "Yearly",
+                                price = uiState.getYearlyPrice(),
+                                period = "/year",
+                                savings = uiState.getSavingsPercent(),
+                                isRecommended = true,
+                                isProcessing = true,
+                                onSubscribe = { /* Disabled until offerings load */ }
+                            )
+                        }
+                    }
+                }
+
+                // Monthly Plan - Show if available in packagesToShow
+                if (packagesToShow.showMonthly) {
+                    item {
+                        Spacer(Modifier.height(12.dp))
+
+                        val monthlyPackage = currentOffering?.monthly
+
+                        if (monthlyPackage != null) {
+                            PricingCard(
+                                title = "Monthly",
+                                price = monthlyPackage.storeProduct.price.formatted,
+                                period = "/month",
+                                isRecommended = false,
+                                isProcessing = uiState.isProcessing,
+                                onSubscribe = {
+                                    viewModel.purchasePackage(monthlyPackage)
+                                }
+                            )
+                        } else {
+                            // Show loading state
+                            PricingCard(
+                                title = "Monthly",
+                                price = uiState.getMonthlyPrice(),
+                                period = "/month",
+                                isRecommended = false,
+                                isProcessing = true,
+                                onSubscribe = { /* Disabled until offerings load */ }
+                            )
                         }
                     }
                 }
@@ -363,40 +389,6 @@ fun SupportUsScreen(
                         subscriptionType = subscriptionState.subscriptionType,
                         viewModel = viewModel,
                         uiState = uiState
-                    )
-                }
-            }
-
-            // Show lifetime upgrade option for current subscribers (not legacy)
-            if (hasCurrentSubscription) {
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    Text(
-                        text = "Upgrade to Lifetime",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "Get lifetime access and never worry about renewals again!",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-
-                    Spacer(Modifier.height(16.dp))
-
-                    // Lifetime upgrade card for current subscribers
-                    ProLifetimeCard(
-                        price = uiState.getLifetimePrice(),
-                        isProcessing = uiState.isProcessing,
-                        onPurchase = {
-                            viewModel.purchaseSubscription(
-                                productId = SubscriptionProducts.PRO_LIFETIME,
-                                basePlanId = null
-                            )
-                        }
                     )
                 }
             }
@@ -998,110 +990,129 @@ private fun ProLifetimeCard(
         goldSurfaceColorDark
     }
 
-    Card(
+    // Golden glow color for shadow effect
+    val goldGlow = Color(0xFFFFD700)
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .drawWithContent {
-                drawContent()
-                drawRect(
-                    brush = goldGradient,
-                    style = Stroke(width = 4.dp.toPx())
-                )
-            },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = surfaceColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Crown Icon + Title Row
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Stars,
-                    contentDescription = null,
-                    tint = Color(0xFFFFD700), // Gold
-                    modifier = Modifier.size(32.dp)
+        // Glow background layer behind the card
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            goldGlow.copy(alpha = 0.3f),
+                            goldGlow.copy(alpha = 0.15f),
+                            Color.Transparent
+                        ),
+                        radius = 800f
+                    )
                 )
-                Column {
+                .align(Alignment.Center)
+        )
+
+        // Main card on top
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = surfaceColor),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Crown Icon + Title Row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Stars,
+                        contentDescription = null,
+                        tint = Color(0xFFFFD700), // Gold
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Column {
+                        Text(
+                            text = "Pro Lifetime",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFB8860B) // Dark goldenrod
+                        )
+                        Text(
+                            text = "Buy once, own forever",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // Price with shimmer effect
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
                     Text(
-                        text = "Pro Lifetime",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
+                        text = price,
+                        style = MaterialTheme.typography.displayLarge,
+                        fontWeight = FontWeight.ExtraBold,
                         color = Color(0xFFB8860B) // Dark goldenrod
                     )
                     Text(
-                        text = "Buy once, own forever",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "one time",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
-            }
 
-            // Price with shimmer effect
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = price,
-                    style = MaterialTheme.typography.displayLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFFB8860B) // Dark goldenrod
-                )
-                Text(
-                    text = "one time",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
+                // Best Value Badge
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color(0xFFFFD700).copy(alpha = 0.2f),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text(
+                        text = "✨ MAX SUPPORT ✨",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFB8860B),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
 
-            // Best Value Badge
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                color = Color(0xFFFFD700).copy(alpha = 0.2f),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text(
-                    text = "✨ BEST VALUE ✨",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFB8860B),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-            }
+                // Premium Features List
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    ProPerkCheckmark("Everything in subscriptions")
+                    ProPerkCheckmark("Lifetime updates")
+                    ProPerkCheckmark("Support independent development")
+                }
 
-            // Premium Features List
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ProPerkCheckmark("Everything in subscriptions")
-                ProPerkCheckmark("Lifetime updates")
-                ProPerkCheckmark("Support independent development")
-            }
-
-            // Purchase Button with Gold Gradient
-            Button(
-                onClick = onPurchase,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                enabled = !isProcessing,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFD700),
-                    contentColor = Color(0xFF1C1C1C)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Unlock Pro Forever",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.ExtraBold
-                )
+                // Purchase Button with Gold Gradient
+                Button(
+                    onClick = onPurchase,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    enabled = !isProcessing,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFFD700),
+                        contentColor = Color(0xFF1C1C1C)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Unlock Pro Forever",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
             }
         }
     }
@@ -1238,4 +1249,217 @@ private fun getProductDisplayName(productId: String): String {
     return me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.getProductDisplayName(
         productId
     )
+}
+
+/**
+ * Legacy User Upgrade Banner
+ *
+ * Compelling banner encouraging legacy supporters to upgrade to new subscription plans.
+ * Shows appreciation for past support while highlighting benefits of continuing support.
+ */
+@Composable
+private fun LegacyUserUpgradeBanner() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Header with heart icon
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onTertiaryFixedVariant,
+                    modifier = Modifier.size(28.dp)
+                )
+                Text(
+                    text = "Thank You, Early Supporter!",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                )
+            }
+
+            // Appreciation message
+            Text(
+                text = "Your legacy purchase helped build Space Launch Now into what it is today. We're incredibly grateful for your early support!",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                lineHeight = 22.sp
+            )
+
+            // Divider
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 4.dp),
+                color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.2f)
+            )
+
+            // Benefits of upgrading
+            Text(
+                text = "Continue Your Support",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
+
+            // Call to action
+            Text(
+                text = "Choose a plan below to continue supporting development!",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.padding(top = 8.dp),
+                lineHeight = 18.sp
+            )
+        }
+    }
+}
+
+/**
+ * Benefit Item for Legacy Banner
+ * Simple row showing an icon and benefit text
+ */
+@Composable
+private fun BenefitItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    color: androidx.compose.ui.graphics.Color
+) {
+    Row(
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(20.dp)
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = color,
+            lineHeight = 20.sp
+        )
+    }
+}
+
+/**
+ * User State enum - Represents the 5 different user states for package filtering
+ */
+enum class UserState {
+    NEW_USER,           // No previous SKUs
+    LEGACY_USER,        // Has legacy SKUs
+    MONTHLY_SUBSCRIBER, // Active monthly subscription
+    ANNUAL_SUBSCRIBER,  // Active annual subscription
+    LIFETIME_USER       // Has lifetime purchase
+}
+
+/**
+ * Packages to Show - Flags indicating which packages to display
+ */
+data class PackagesToShow(
+    val showLifetime: Boolean,
+    val showAnnual: Boolean,
+    val showMonthly: Boolean
+)
+
+/**
+ * Determine the user's current state based on their subscription
+ *
+ * @param subscriptionState Current subscription state from repository
+ * @return UserState enum representing user's subscription status
+ */
+private fun determineUserState(
+    subscriptionState: me.calebjones.spacelaunchnow.data.model.SubscriptionState
+): UserState {
+    // Check if user has lifetime purchase - match against actual lifetime product IDs
+    val hasLifetime = subscriptionState.productId?.let { productId ->
+        productId == SubscriptionProducts.PRO_LIFETIME ||  // Current lifetime: "spacelaunchnow_pro"
+                productId.contains("lifetime", ignoreCase = true)  // Other lifetime variants
+    } ?: false
+
+    if (hasLifetime) {
+        return UserState.LIFETIME_USER
+    }
+
+    // Check if user is a legacy user
+    if (subscriptionState.subscriptionType.isLegacy) {
+        return UserState.LEGACY_USER
+    }
+
+    // Check if user has an active subscription
+    if (subscriptionState.isSubscribed) {
+        // Determine if monthly or annual based on productId or basePlanId
+        val isMonthly = subscriptionState.productId?.let { productId ->
+            productId.contains("monthly", ignoreCase = true) ||
+                    productId.contains("base-plan", ignoreCase = true) ||
+                    productId.contains("base_plan", ignoreCase = true)
+        } ?: false
+
+        return if (isMonthly) UserState.MONTHLY_SUBSCRIBER else UserState.ANNUAL_SUBSCRIBER
+    }
+
+    // Default: New user with no subscriptions
+    return UserState.NEW_USER
+}
+
+/**
+ * Get packages to show based on user state
+ *
+ * Rules:
+ * 1) New User - Show all (lifetime, annual, monthly)
+ * 2) Legacy User - Show all (lifetime, annual, monthly)
+ * 3) Monthly Subscriber - Show annual and lifetime
+ * 4) Annual Subscriber - Show lifetime only
+ * 5) Lifetime User - Show nothing
+ *
+ * @param userState The user's current state
+ * @return PackagesToShow with boolean flags for each package type
+ */
+private fun getPackagesToShow(
+    userState: UserState
+): PackagesToShow {
+    return when (userState) {
+        UserState.NEW_USER -> PackagesToShow(
+            showLifetime = true,
+            showAnnual = true,
+            showMonthly = true
+        )
+
+        UserState.LEGACY_USER -> PackagesToShow(
+            showLifetime = true,
+            showAnnual = true,
+            showMonthly = true
+        )
+
+        UserState.MONTHLY_SUBSCRIBER -> PackagesToShow(
+            showLifetime = true,
+            showAnnual = true,
+            showMonthly = false
+        )
+
+        UserState.ANNUAL_SUBSCRIBER -> PackagesToShow(
+            showLifetime = true,
+            showAnnual = false,
+            showMonthly = false
+        )
+
+        UserState.LIFETIME_USER -> PackagesToShow(
+            showLifetime = false,
+            showAnnual = false,
+            showMonthly = false
+        )
+    }
 }

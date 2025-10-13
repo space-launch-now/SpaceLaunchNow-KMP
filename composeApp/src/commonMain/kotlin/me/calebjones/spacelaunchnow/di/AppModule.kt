@@ -44,6 +44,7 @@ import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 
 expect fun nativeConfig() : KoinAppDeclaration
 
@@ -103,19 +104,32 @@ val appModule = module {
         SubscriptionStorage(subscriptionDataStore)
     }
 
-    // Note: Using factory instead of single to avoid KClass issues on iOS
-    // iOS BillingClient extends NSObject which isn't supported for KClass reflection
-    factory { createBillingClient() }
+    // RevenueCat dependencies - initialize first
+    singleOf(::RevenueCatManager)
+
+    // BillingClient now uses RevenueCat instead of platform-specific implementations
+    // Note: Keeping as factory for now, can convert to single later
+    factory<BillingClient> {
+        createBillingClient()
+    }
 
     single<SubscriptionRepository> {
         SubscriptionRepositoryImpl(
             billingClient = get(),
             storage = get<SubscriptionStorage>(),
-            debugPreferences = get<DebugPreferences>()
+            debugPreferences = get<DebugPreferences>(),
+            revenueCatManager = get<RevenueCatManager>()  // ADD RevenueCatManager dependency
         )
     }
-    viewModelOf(::SubscriptionViewModel)
     
+    // SubscriptionViewModel with RevenueCatManager
+    single { 
+        SubscriptionViewModel(
+            repository = get(),
+            revenueCatManager = get()
+        )
+    }
+
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
 }
@@ -127,5 +141,5 @@ val debugModule = module {
         val debugDataStore = get<DataStore<Preferences>>(named("DebugDataStore"))
         DebugPreferences(debugDataStore)
     }
-    single { DebugSettingsViewModel(debugPreferences = get()) }
+    single { DebugSettingsViewModel(debugPreferences = get(), revenueCatManager = get()) }
 }

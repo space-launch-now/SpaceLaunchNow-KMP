@@ -6,15 +6,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import com.revenuecat.purchases.kmp.models.Offering
+import com.revenuecat.purchases.kmp.models.Package
 
 /**
  * ViewModel for subscription management
  */
 class SubscriptionViewModel(
-    private val repository: SubscriptionRepository
+    private val repository: SubscriptionRepository,
+    private val revenueCatManager: RevenueCatManager
 ) : ViewModel() {
 
     // Subscription state from repository
@@ -23,12 +27,15 @@ class SubscriptionViewModel(
     // UI-specific state
     private val _uiState = MutableStateFlow(SubscriptionUiState())
     val uiState: StateFlow<SubscriptionUiState> = _uiState.asStateFlow()
+    
+    // RevenueCat offerings - expose the manager's state directly
+    val currentOffering: StateFlow<Offering?> = revenueCatManager.currentOffering
 
     init {
         // Initialize repository on creation
         viewModelScope.launch {
             repository.initialize()
-            // Load pricing information
+            // Load pricing information (legacy)
             loadPricing()
         }
     }
@@ -111,7 +118,7 @@ class SubscriptionViewModel(
             _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
 
             repository.launchPurchaseFlow(productId, basePlanId).fold(
-                onSuccess = { purchaseToken ->
+                onSuccess = { _ ->
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
                         successMessage = "Purchase initiated successfully"
@@ -122,6 +129,40 @@ class SubscriptionViewModel(
                         isProcessing = false,
                         errorMessage = error.message ?: "Purchase failed"
                     )
+                }
+            )
+        }
+    }
+    
+    /**
+     * Purchase a RevenueCat package
+     *
+     * @param packageToPurchase The RevenueCat package to purchase
+     */
+    fun purchasePackage(packageToPurchase: Package) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
+            
+            println("SubscriptionViewModel: Initiating purchase for package: ${packageToPurchase.identifier}")
+            
+            // Use the package's product ID and identifier for the purchase
+            val productId = packageToPurchase.storeProduct.id
+            val basePlanId = packageToPurchase.identifier
+            
+            repository.launchPurchaseFlow(productId, basePlanId).fold(
+                onSuccess = { _ ->
+                    _uiState.value = _uiState.value.copy(
+                        isProcessing = false,
+                        successMessage = "Purchase completed successfully!"
+                    )
+                    println("SubscriptionViewModel: ✅ Purchase successful for ${packageToPurchase.identifier}")
+                },
+                onFailure = { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isProcessing = false,
+                        errorMessage = error.message ?: "Purchase failed"
+                    )
+                    println("SubscriptionViewModel: ❌ Purchase failed: ${error.message}")
                 }
             )
         }
@@ -157,12 +198,12 @@ class SubscriptionViewModel(
 
     /**
      * Check if user has access to a feature
+     * 
+     * Uses RevenueCat entitlements as authoritative source with cached state fallback.
      *
      * @param feature The feature to check
-     * @param verify If true, verify with platform first (slower but secure)
      */
-    fun hasFeature(feature: PremiumFeature, verify: Boolean = false): Boolean {
-        // For UI, use cached state unless explicitly requesting verification
+    fun hasFeature(feature: PremiumFeature): Boolean {
         return subscriptionState.value.hasFeature(feature)
     }
 
