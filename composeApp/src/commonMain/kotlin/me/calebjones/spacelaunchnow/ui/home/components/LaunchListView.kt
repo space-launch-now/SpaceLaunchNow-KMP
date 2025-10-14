@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -65,28 +67,42 @@ private val CARD_SPACING = 16.dp
 
 @Composable
 fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
-    val combinedLaunches by viewModel.combinedLaunches.collectAsState()
-    val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsState()
-    val error by viewModel.upcomingLaunchesError.collectAsState()
-    val isLoading by viewModel.isUpcomingLaunchesLoading.collectAsState()
-    val scrollState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
+    BoxWithConstraints {
+        val screenWidth = maxWidth
+        val density = LocalDensity.current
+        
+        val combinedLaunches by viewModel.combinedLaunches.collectAsState()
+        val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsState()
+        val error by viewModel.upcomingLaunchesError.collectAsState()
+        val isLoading by viewModel.isUpcomingLaunchesLoading.collectAsState()
+        val scrollState = rememberLazyListState()
+        val coroutineScope = rememberCoroutineScope()
 
-    // Track if we're currently dragging
-    var isDragging by remember { mutableStateOf(false) }
+        // Track if we're currently dragging
+        var isDragging by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        if (combinedLaunches.isEmpty() && !isLoading && error == null) {
-            viewModel.loadUpcomingLaunches(limit = 10)
+        LaunchedEffect(Unit) {
+            if (combinedLaunches.isEmpty() && !isLoading && error == null) {
+                viewModel.loadUpcomingLaunches(limit = 10)
+            }
         }
-    }
 
-    // Scroll to the first upcoming launch when data is loaded
-    LaunchedEffect(combinedLaunches, upcomingStartIndex) {
-        if (combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
-            scrollState.scrollToItem(upcomingStartIndex)
+        // Scroll to the first upcoming launch when data is loaded, centered with peek
+        LaunchedEffect(combinedLaunches, upcomingStartIndex, screenWidth) {
+            if (combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
+                // Calculate offset to center the card
+                // Card width = 340dp, spacing = 16dp, contentPadding = 16dp
+                val cardWidthPx = with(density) { 340.dp.toPx() }
+                val spacingPx = with(density) { 16.dp.toPx() }
+                val screenWidthPx = with(density) { screenWidth.toPx() }
+                
+                // Offset to center: (screenWidth - cardWidth) / 2 - contentPadding
+                // This centers the card and shows parts of adjacent cards
+                val centerOffset = ((screenWidthPx - cardWidthPx) / 2 - spacingPx).toInt()
+                
+                scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -centerOffset)
+            }
         }
-    }
 
     if (error != null) {
         LaunchListErrorCard(
@@ -135,6 +151,7 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
         }
     } else if (isLoading) {
         LaunchListShimmer()
+    }
     }
 }
 
