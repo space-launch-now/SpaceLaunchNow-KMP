@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.model.NotificationData
+import me.calebjones.spacelaunchnow.data.model.NotificationFilter
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugSettings
 import me.calebjones.spacelaunchnow.util.BuildConfig
@@ -16,7 +20,9 @@ expect fun resetNotificationPermissionAskedFlag()
 @OptIn(kotlin.time.ExperimentalTime::class)
 class DebugSettingsViewModel(
     private val debugPreferences: DebugPreferences? = null,
-    private val revenueCatManager: RevenueCatManager? = null
+    private val revenueCatManager: RevenueCatManager? = null,
+    private val launchRepository: LaunchRepository? = null,
+    private val notificationRepository: NotificationRepository? = null
 ) : ViewModel() {
 
     private val _debugSettings = MutableStateFlow(
@@ -373,6 +379,88 @@ class DebugSettingsViewModel(
                 _statusMessage.value = "Offering Details"
             } catch (e: Exception) {
                 _statusMessage.value = "❌ Error viewing offering details: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    // Test Notification Functions
+    fun triggerTestNotification(
+        agencyId: String,
+        locationId: String,
+        webcast: String,
+        notificationType: String,
+        launchImage: String
+    ) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                
+                // Create NotificationData with configurable fields
+                val notificationData = NotificationData(
+                    notificationType = notificationType,
+                    launchId = "test-launch-123",
+                    launchUuid = "550e8400-e29b-41d4-a716-446655440000",
+                    launchName = "Test Launch - Falcon 9 Block 5",
+                    launchImage = launchImage,
+                    launchNet = "2025-10-15T12:00:00Z",
+                    launchLocation = "Cape Canaveral, FL, USA",
+                    webcast = webcast,
+                    agencyId = agencyId,
+                    locationId = locationId
+                )
+
+                // Get current notification settings
+                val notificationState = notificationRepository?.state?.value
+                
+                if (notificationState == null) {
+                    _statusMessage.value = "❌ NotificationRepository not available"
+                    return@launch
+                }
+
+                // Run through the notification filter
+                val shouldShow = NotificationFilter.shouldShowNotification(
+                    data = notificationData,
+                    state = notificationState
+                )
+
+                if (shouldShow) {
+                    // Notification passed filters - show it
+                    showTestNotification(notificationData)
+                    _statusMessage.value = "✅ Test notification PASSED filters and was sent"
+                } else {
+                    // Notification was filtered out
+                    _statusMessage.value = "🔇 Test notification BLOCKED by filters"
+                }
+
+                val detailedInfo = buildString {
+                    appendLine("=== Filter Result: ${if (shouldShow) "ALLOWED ✅" else "BLOCKED 🔇"} ===")
+                    appendLine()
+                    appendLine("Notification Data Sent:")
+                    appendLine("• Type: $notificationType")
+                    appendLine("• Agency ID: $agencyId")
+                    appendLine("• Location ID: $locationId")
+                    appendLine("• Webcast: $webcast")
+                    appendLine()
+                    appendLine("Pre-filled Data:")
+                    appendLine("• Launch ID: ${notificationData.launchId}")
+                    appendLine("• Launch UUID: ${notificationData.launchUuid}")
+                    appendLine("• Launch Name: ${notificationData.launchName}")
+                    appendLine("• Launch Image: ${notificationData.launchImage}")
+                    appendLine("• Launch NET: ${notificationData.launchNet}")
+                    appendLine("• Launch Location: ${notificationData.launchLocation}")
+                    appendLine()
+                    appendLine("Current Filter Settings:")
+                    appendLine("• Notifications Enabled: ${notificationState.enableNotifications}")
+                    appendLine("• Follow All Launches: ${notificationState.followAllLaunches}")
+                    appendLine("• Strict Matching: ${notificationState.useStrictMatching}")
+                    appendLine("• Subscribed Agencies: ${notificationState.subscribedAgencies.size} (${notificationState.subscribedAgencies.take(3).joinToString(", ")}...)")
+                    appendLine("• Subscribed Locations: ${notificationState.subscribedLocations.size} (${notificationState.subscribedLocations.take(3).joinToString(", ")}...)")
+                }
+                _detailedMessage.value = detailedInfo
+            } catch (e: Exception) {
+                _statusMessage.value = "❌ Error triggering test notification: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

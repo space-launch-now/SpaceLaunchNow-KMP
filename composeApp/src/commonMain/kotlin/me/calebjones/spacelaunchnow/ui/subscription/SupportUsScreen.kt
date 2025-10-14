@@ -277,6 +277,7 @@ fun SupportUsScreen(
                     item {
                         val lifetimePackage = currentOffering?.lifetime
 
+                        // Only show if we have the actual package from RevenueCat
                         if (lifetimePackage != null) {
                             ProLifetimeCard(
                                 price = lifetimePackage.storeProduct.price.formatted,
@@ -285,36 +286,30 @@ fun SupportUsScreen(
                                     viewModel.purchasePackage(lifetimePackage)
                                 }
                             )
-                        } else {
-                            // Show loading or fallback UI
-                            ProLifetimeCard(
-                                price = uiState.getLifetimePrice(),
-                                isProcessing = true,
-                                onPurchase = { /* Disabled until offerings load */ }
-                            )
-                        }
 
-                        // Show divider only if there are subscription plans to show
-                        if (packagesToShow.showAnnual || packagesToShow.showMonthly) {
-                            Spacer(Modifier.height(20.dp))
+                            // Show divider only if lifetime was shown AND there are subscription plans to show
+                            if (packagesToShow.showAnnual || packagesToShow.showMonthly) {
+                                Spacer(Modifier.height(20.dp))
 
-                            // "Or subscribe" divider
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 24.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                HorizontalDivider(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = "  Or subscribe  ",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                HorizontalDivider(modifier = Modifier.weight(1f))
+                                // "Or subscribe" divider
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    HorizontalDivider(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = "  Or subscribe  ",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    HorizontalDivider(modifier = Modifier.weight(1f))
+                                }
+                                Spacer(Modifier.height(16.dp))
                             }
-                            Spacer(Modifier.height(16.dp))
                         }
+                        // Don't show fallback UI or divider - just hide until loaded
                     }
                 }
 
@@ -323,6 +318,7 @@ fun SupportUsScreen(
                     item {
                         val annualPackage = currentOffering?.annual
 
+                        // Only show if we have the actual package from RevenueCat
                         if (annualPackage != null) {
                             PricingCard(
                                 title = "Yearly",
@@ -335,18 +331,8 @@ fun SupportUsScreen(
                                     viewModel.purchasePackage(annualPackage)
                                 }
                             )
-                        } else {
-                            // Show loading state
-                            PricingCard(
-                                title = "Yearly",
-                                price = uiState.getYearlyPrice(),
-                                period = "/year",
-                                savings = uiState.getSavingsPercent(),
-                                isRecommended = true,
-                                isProcessing = true,
-                                onSubscribe = { /* Disabled until offerings load */ }
-                            )
                         }
+                        // Don't show fallback UI - just hide until loaded
                     }
                 }
 
@@ -357,6 +343,7 @@ fun SupportUsScreen(
 
                         val monthlyPackage = currentOffering?.monthly
 
+                        // Only show if we have the actual package from RevenueCat
                         if (monthlyPackage != null) {
                             PricingCard(
                                 title = "Monthly",
@@ -368,17 +355,8 @@ fun SupportUsScreen(
                                     viewModel.purchasePackage(monthlyPackage)
                                 }
                             )
-                        } else {
-                            // Show loading state
-                            PricingCard(
-                                title = "Monthly",
-                                price = uiState.getMonthlyPrice(),
-                                period = "/month",
-                                isRecommended = false,
-                                isProcessing = true,
-                                onSubscribe = { /* Disabled until offerings load */ }
-                            )
                         }
+                        // Don't show fallback UI - just hide until loaded
                     }
                 }
             } else {
@@ -1293,7 +1271,7 @@ private fun LegacyUserUpgradeBanner() {
 
             // Appreciation message
             Text(
-                text = "Your legacy purchase helped build Space Launch Now into what it is today. We're incredibly grateful for your early support!",
+                text = "Your legacy purchase helped build Space Launch Now into what it is today. I am incredibly grateful for your early support!",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
                 lineHeight = 22.sp

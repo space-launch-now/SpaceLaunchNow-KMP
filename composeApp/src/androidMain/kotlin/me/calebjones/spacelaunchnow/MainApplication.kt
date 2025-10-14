@@ -13,6 +13,7 @@ import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.workers.WidgetUpdateWorker
+import me.calebjones.spacelaunchnow.ui.viewmodel.NotificationDisplayHelper
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -24,7 +25,7 @@ import org.koin.dsl.includes
 
 class MainApplication : Application() {
 
-    // Inject RevenueCatManager for initialization
+    // Inject dependencies for initialization
     private val revenueCatManager: RevenueCatManager by inject()
 
     override fun onCreate() {
@@ -77,6 +78,10 @@ class MainApplication : Application() {
                 // Don't crash the app if RevenueCat fails
             }
         }
+
+        Log.d("MainApplication", "Creating notification channels...")
+        // Create notification channels for Android O+
+        NotificationDisplayHelper.createNotificationChannels(this)
 
         Log.d("MainApplication", "Scheduling widget updates...")
         // Schedule widget updates

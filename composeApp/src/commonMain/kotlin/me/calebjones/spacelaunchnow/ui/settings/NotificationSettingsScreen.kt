@@ -184,7 +184,7 @@ fun NotificationSettingsScreen(
                                     AgencyCheckboxItem(
                                         agency = agency,
                                         isChecked = uiState.notificationSettings.subscribedAgencies.contains(
-                                            agency.topicName
+                                            agency.id.toString()
                                         ),
                                         onCheckedChange = {
                                             viewModel.toggleAgencySubscription(agency)
@@ -236,7 +236,7 @@ fun NotificationSettingsScreen(
                                     LocationCheckboxItem(
                                         location = location,
                                         isChecked = uiState.notificationSettings.subscribedLocations.contains(
-                                            location.topicName
+                                            location.id.toString()
                                         ),
                                         onCheckedChange = {
                                             viewModel.toggleLocationSubscription(location)

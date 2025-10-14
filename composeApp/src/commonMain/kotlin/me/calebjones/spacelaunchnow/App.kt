@@ -46,6 +46,18 @@ fun SpaceLaunchNowApp(
     val revenueCatManager = koinInject<RevenueCatManager>()
     val pushMessaging = koinInject<PushMessaging>()
     val appPreferences = koinInject<AppPreferences>()
+    
+    // Warm up settings ViewModel to preload preferences (eagerly loads DataStore values)
+    // This singleton creation triggers all StateFlows to start collecting immediately,
+    // ensuring switches show correct state with no animation when settings screen loads
+    val appSettingsViewModel = koinInject<me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel>()
+    
+    // Trigger StateFlow collection by accessing a flow
+    LaunchedEffect(Unit) {
+        // Access the ViewModel to ensure it's fully initialized
+        appSettingsViewModel.themeFlow.value
+        println("✅ Settings ViewModels warmed up - preferences preloaded")
+    }
 
     // Observe the theme setting
     val themeOption by appPreferences.themeFlow.collectAsState(initial = me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.System)
