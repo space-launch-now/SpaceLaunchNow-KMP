@@ -8,11 +8,13 @@ import org.koin.dsl.module
 import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.data.storage.createAppSettingsDataStore
+import me.calebjones.spacelaunchnow.data.storage.createSubscriptionDataStore
 
 val androidModule = module {
     single { createDataStore(androidContext()) }
     single(named("DebugDataStore")) { createDebugDataStore(androidContext()) }
     single(named("AppSettingsDataStore")) { createAppSettingsDataStore(androidContext()) }
+    single(named("SubscriptionDataStore")) { createSubscriptionDataStore(androidContext()) }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {

@@ -1,14 +1,9 @@
 package me.calebjones.spacelaunchnow.tests
 
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
+import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -20,21 +15,19 @@ import kotlin.test.assertTrue
  * 1. Make HTTP requests successfully
  * 2. Deserialize responses correctly
  * 3. Handle authentication properly
- *
- * Note: Uses platform-specific HTTP engine via expect/actual pattern
  */
-
-// Expect function to get platform-specific HTTP client
-expect fun createTestHttpClient(): HttpClient
-
 class GeneratedApiClientIntegrationTest {
 
-    private val httpClient = createTestHttpClient()
     private val baseUrl = "https://spacelaunchnow.app"
+    private val apiKey = EnvironmentManager.getEnv("API_KEY", "")
 
     @Test
     fun testLaunchesApiConnection() = runBlocking {
-        val launchesApi = LaunchesApi(baseUrl, httpClient)
+        val launchesApi = LaunchesApi(baseUrl).apply {
+            // Configure API authentication
+            setApiKey(apiKey, "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
 
         try {
             val response = launchesApi.launchesList(
@@ -61,7 +54,11 @@ class GeneratedApiClientIntegrationTest {
 
     @Test
     fun testAgenciesApiConnection() = runBlocking {
-        val agenciesApi = AgenciesApi(baseUrl, httpClient)
+        val agenciesApi = AgenciesApi(baseUrl).apply {
+            // Configure API authentication
+            setApiKey(apiKey, "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
 
         try {
             val response = agenciesApi.agenciesList(
@@ -88,7 +85,11 @@ class GeneratedApiClientIntegrationTest {
 
     @Test
     fun testSerializationOfComplexObjects() = runBlocking {
-        val launchesApi = LaunchesApi(baseUrl, httpClient)
+        val launchesApi = LaunchesApi(baseUrl).apply {
+            // Configure API authentication
+            setApiKey(apiKey, "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
 
         try {
             // Get a detailed launch with nested objects
