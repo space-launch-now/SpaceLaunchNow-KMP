@@ -12,12 +12,9 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
-import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import coil3.ImageLoader
-import coil3.annotation.ExperimentalCoilApi
-import coil3.asImage
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.size.Size
@@ -122,7 +119,7 @@ object NotificationDisplayHelper {
     private fun loadImageFromUrlSync(context: Context, imageUrl: String?): Bitmap? {
         println("🖼️ [ImageLoader] Starting image load...")
         println("🖼️ [ImageLoader] URL: $imageUrl")
-        
+
         if (imageUrl.isNullOrBlank()) {
             println("🖼️ [ImageLoader] ❌ URL is null or blank, skipping image load")
             return null
@@ -134,7 +131,7 @@ object NotificationDisplayHelper {
                 println("🖼️ [ImageLoader] Running in IO dispatcher...")
                 val imageLoader = ImageLoader(context)
                 println("🖼️ [ImageLoader] ImageLoader created: $imageLoader")
-                
+
                 val request = ImageRequest.Builder(context)
                     .data(imageUrl)
                     .size(Size(512, 512)) // Limit size for notifications
@@ -147,7 +144,7 @@ object NotificationDisplayHelper {
                 println("🖼️ [ImageLoader] Result received")
                 println("🖼️ [ImageLoader] Result image: ${result.image}")
                 println("🖼️ [ImageLoader] Result image type: ${result.image?.javaClass?.simpleName}")
-                
+
                 // Coil3 returns a BitmapImage, extract the bitmap using toBitmap()
                 val bitmap = result.image?.toBitmap()
                 if (bitmap != null) {
@@ -158,13 +155,13 @@ object NotificationDisplayHelper {
                     null
                 }
             }
-            
+
             if (bitmap != null) {
                 println("🖼️ [ImageLoader] ✅ Final bitmap ready: ${bitmap.width}x${bitmap.height}, config: ${bitmap.config}")
             } else {
                 println("🖼️ [ImageLoader] ❌ Final bitmap is null")
             }
-            
+
             bitmap
         } catch (e: Exception) {
             println("🖼️ [ImageLoader] ❌ Exception during image load: ${e.javaClass.simpleName}: ${e.message}")
@@ -180,7 +177,7 @@ object NotificationDisplayHelper {
     private suspend fun loadImageFromUrl(context: Context, imageUrl: String?): Bitmap? {
         println("🖼️ [ImageLoader-Async] Starting async image load...")
         println("🖼️ [ImageLoader-Async] URL: $imageUrl")
-        
+
         if (imageUrl.isNullOrBlank()) {
             println("🖼️ [ImageLoader-Async] ❌ URL is null or blank")
             return null
@@ -199,7 +196,7 @@ object NotificationDisplayHelper {
 
                 val result = imageLoader.execute(request)
                 println("🖼️ [ImageLoader-Async] Result: ${result.image}")
-                
+
                 // Coil3 returns a BitmapImage, extract the bitmap using toBitmap()
                 val bitmap = result.image?.toBitmap()
                 if (bitmap != null) {
@@ -223,23 +220,23 @@ object NotificationDisplayHelper {
      */
     private fun drawLiveBadge(originalBitmap: Bitmap): Bitmap {
         println("🎨 [LiveBadge] Drawing LIVE badge on bitmap...")
-        
+
         // Create a mutable copy of the bitmap
         val mutableBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(mutableBitmap)
-        
+
         // Calculate badge dimensions (proportional to image size)
         val badgeWidth = (mutableBitmap.width * 0.25f).toInt() // 25% of image width
         val badgeHeight = (mutableBitmap.height * 0.08f).toInt() // 8% of image height
         val cornerRadius = badgeHeight * 0.3f
         val padding = (mutableBitmap.width * 0.02f).toInt() // 2% padding from edge
-        
+
         // Position in top-right corner
         val left = mutableBitmap.width - badgeWidth - padding
         val top = padding
         val right = mutableBitmap.width - padding
         val bottom = top + badgeHeight
-        
+
         // Draw red rounded rectangle background
         val backgroundPaint = Paint().apply {
             color = Color.parseColor("#E31B23") // Bright red for LIVE
@@ -248,7 +245,7 @@ object NotificationDisplayHelper {
         }
         val badgeRect = RectF(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
         canvas.drawRoundRect(badgeRect, cornerRadius, cornerRadius, backgroundPaint)
-        
+
         // Draw white border for contrast
         val borderPaint = Paint().apply {
             color = Color.WHITE
@@ -257,7 +254,7 @@ object NotificationDisplayHelper {
             isAntiAlias = true
         }
         canvas.drawRoundRect(badgeRect, cornerRadius, cornerRadius, borderPaint)
-        
+
         // Draw "🔴 LIVE" text
         val textPaint = Paint().apply {
             color = Color.WHITE
@@ -266,17 +263,17 @@ object NotificationDisplayHelper {
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
         }
-        
+
         val text = "🔴 LIVE"
         val textBounds = Rect()
         textPaint.getTextBounds(text, 0, text.length, textBounds)
-        
+
         // Center text in badge
         val textX = (left + right) / 2f
         val textY = (top + bottom) / 2f + textBounds.height() / 2f
-        
+
         canvas.drawText(text, textX, textY, textPaint)
-        
+
         println("🎨 [LiveBadge] ✅ LIVE badge drawn successfully")
         return mutableBitmap
     }
@@ -363,7 +360,7 @@ object NotificationDisplayHelper {
         } else {
             baseTitle
         }
-        
+
         val displayBody = getNotificationBody(
             context,
             notificationData.notificationType,
@@ -397,7 +394,7 @@ object NotificationDisplayHelper {
         println("📱 [Notification] Title: $displayTitle")
         println("📱 [Notification] Body: $displayBody")
         println("📱 [Notification] Channel: $channelId")
-        
+
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
             .setContentTitle(displayTitle)
             .setContentText(displayBody)
@@ -409,21 +406,21 @@ object NotificationDisplayHelper {
         // Load and display image if available using Coil
         println("📱 [Notification] Image URL from notificationData: ${notificationData.launchImage}")
         println("📱 [Notification] Webcast available: ${notificationData.webcast}")
-        
+
         var imageBitmap = loadImageFromUrlSync(context, notificationData.launchImage)
         println("📱 [Notification] Image bitmap result: $imageBitmap")
-        
+
         // Add LIVE badge if webcast is available
         if (imageBitmap != null && notificationData.webcast.equals("true", ignoreCase = true)) {
             println("📱 [Notification] 🔴 Adding LIVE badge (webcast available)")
             imageBitmap = drawLiveBadge(imageBitmap)
         }
-        
+
         if (imageBitmap != null) {
             println("📱 [Notification] ✅ Setting large icon and BigPictureStyle")
             println("📱 [Notification] Bitmap size: ${imageBitmap.width}x${imageBitmap.height}")
             println("📱 [Notification] Bitmap config: ${imageBitmap.config}")
-            
+
             notificationBuilder
                 .setLargeIcon(imageBitmap)
                 .setStyle(
@@ -454,7 +451,7 @@ object NotificationDisplayHelper {
         println("📱 [Notification] Showing notification with:")
         println("📱 [Notification]   - Tag: ${notificationData.launchId}")
         println("📱 [Notification]   - ID: ${notificationData.launchId.hashCode()}")
-        
+
         notificationManager.notify(
             notificationData.launchId, // Tag for collapsing notifications
             notificationData.launchId.hashCode(), // Notification ID
@@ -510,7 +507,7 @@ object NotificationDisplayHelper {
         val notification = NotificationCompat.Builder(context, CHANNEL_LAUNCHES_ID)
             .setContentTitle(title)
             .setContentText(body)
-            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
+            .setSmallIcon(R.drawable.ic_rocket_notification)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

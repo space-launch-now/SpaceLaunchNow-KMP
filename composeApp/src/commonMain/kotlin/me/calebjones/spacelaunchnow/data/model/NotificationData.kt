@@ -152,56 +152,67 @@ object NotificationFilter {
             return true
         }
 
-        // 5. Check agency filter
-        // Empty set means "don't filter by agency" (match all agencies)
-        val agencyMatch = state.subscribedAgencies.isEmpty() || 
-                         state.subscribedAgencies.contains(data.agencyId)
-        
-        // 6. Check location filter
-        // Empty set means "don't filter by location" (match all locations)
-        // Special case: locationId="0" (Other) acts as a wildcard - matches ANY location
-        val locationMatch = state.subscribedLocations.isEmpty() ||
-                            state.subscribedLocations.contains(data.locationId) || 
-                            state.subscribedLocations.contains("0")
+        // 5. Check if both filters are empty (block everything)
+        if (state.subscribedAgencies.isEmpty() && state.subscribedLocations.isEmpty()) {
+            println("🔇 BLOCKED: No agencies or locations subscribed (both filters empty)")
+            return false
+        }
 
-        // 7. Apply strict matching logic
-        // Strict: BOTH agency AND location must match (agencyMatch && locationMatch)
-        //         BUT if either set is empty, that criterion is ignored
-        // Flexible: EITHER agency OR location must match (agencyMatch || locationMatch)
-        //           If both sets are empty, show nothing (need at least one filter)
+        // 6. Determine which filters are active
+        val hasAgencyFilter = state.subscribedAgencies.isNotEmpty()
+        val hasLocationFilter = state.subscribedLocations.isNotEmpty()
+
+        // 7. Check agency filter (only if filter is active)
+        val agencyMatch = if (hasAgencyFilter) {
+            state.subscribedAgencies.contains(data.agencyId)
+        } else {
+            true // No agency filter, so don't block based on agency
+        }
+        
+        // 8. Check location filter (only if filter is active)
+        // Special case: locationId="0" (Other) in subscribed list acts as a wildcard - matches ANY location
+        val locationMatch = if (hasLocationFilter) {
+            state.subscribedLocations.contains(data.locationId) || 
+            state.subscribedLocations.contains("0")
+        } else {
+            true // No location filter, so don't block based on location
+        }
+
+        // 9. Apply strict vs flexible matching logic
         val shouldShow = if (state.useStrictMatching) {
-            // Strict mode with empty sets:
-            // - If both empty: block (need at least one filter)
-            // - If one empty: only check the non-empty one
-            // - If both non-empty: need both to match
-            if (state.subscribedAgencies.isEmpty() && state.subscribedLocations.isEmpty()) {
-                println("🔇 BLOCKED: Strict matching with no filters (need at least one agency or location)")
+            // Strict mode: BOTH agency AND location must match
+            // If either filter is inactive (empty), we can't satisfy "BOTH" requirement
+            if (!hasAgencyFilter || !hasLocationFilter) {
+                println("🔇 BLOCKED: Strict matching requires BOTH agency AND location filters to be active")
                 false
             } else {
                 val result = agencyMatch && locationMatch
                 if (!result) {
-                    println("🔇 BLOCKED: Strict matching - agency: $agencyMatch (${if (state.subscribedAgencies.isEmpty()) "empty" else "filtered"}), location: $locationMatch (${if (state.subscribedLocations.isEmpty()) "empty" else "filtered"}) (need BOTH)")
+                    println("🔇 BLOCKED: Strict matching - agency: $agencyMatch, location: $locationMatch (need BOTH)")
                 } else {
                     println("✅ ALLOWED: Strict matching - agency: $agencyMatch, location: $locationMatch (both match)")
                 }
                 result
             }
         } else {
-            // Flexible mode with empty sets:
-            // - If both empty: block (need at least one filter)
-            // - Otherwise: at least one must match
-            if (state.subscribedAgencies.isEmpty() && state.subscribedLocations.isEmpty()) {
-                println("🔇 BLOCKED: Flexible matching with no filters (need at least one agency or location)")
-                false
+            // Flexible mode: Use OR logic when both filters active, otherwise use the active filter
+            val result = if (hasAgencyFilter && hasLocationFilter) {
+                // Both filters active: EITHER must match
+                agencyMatch || locationMatch
+            } else if (hasAgencyFilter) {
+                // Only agency filter active: must match agency
+                agencyMatch
             } else {
-                val result = agencyMatch || locationMatch
-                if (!result) {
-                    println("🔇 BLOCKED: Flexible matching - agency: $agencyMatch, location: $locationMatch (need at least ONE)")
-                } else {
-                    println("✅ ALLOWED: Flexible matching - agency: $agencyMatch (${if (state.subscribedAgencies.isEmpty()) "empty" else "filtered"}), location: $locationMatch (${if (state.subscribedLocations.isEmpty()) "empty" else "filtered"}) (at least one matches)")
-                }
-                result
+                // Only location filter active: must match location
+                locationMatch
             }
+            
+            if (!result) {
+                println("🔇 BLOCKED: Flexible matching - agency: $agencyMatch (${if (hasAgencyFilter) "filtered" else "any"}), location: $locationMatch (${if (hasLocationFilter) "filtered" else "any"})")
+            } else {
+                println("✅ ALLOWED: Flexible matching - agency: $agencyMatch (${if (hasAgencyFilter) "filtered" else "any"}), location: $locationMatch (${if (hasLocationFilter) "filtered" else "any"})")
+            }
+            result
         }
 
         println("=== NotificationFilter: Result = $shouldShow ===")

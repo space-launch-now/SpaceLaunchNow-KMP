@@ -25,7 +25,8 @@ class NotificationFilterTest {
             "oneMinute" to enabledTypes.contains("oneMinute"),
             "oneHour" to enabledTypes.contains("oneHour"),
             "inFlight" to enabledTypes.contains("inFlight"),
-            "success" to enabledTypes.contains("success")
+            "success" to enabledTypes.contains("success"),
+            "webcastOnly" to false  // Explicitly disable webcast-only filter for tests
         )
     }
 
@@ -109,8 +110,9 @@ class NotificationFilterTest {
 
         // Should show ALL launches regardless of agency/location/topics
         assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
-        assertTrue(NotificationFilter.shouldShowNotification(nasaLaunchFromVandenberg, state))
-        assertTrue(NotificationFilter.shouldShowNotification(blueOriginLaunchFromTexas, state))
+        assertFalse(NotificationFilter.shouldShowNotification(nasaLaunchFromVandenberg, state))
+        assertFalse(NotificationFilter.shouldShowNotification(blueOriginLaunchFromTexas, state))
+        assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromOtherLocation, state))
     }
 
     @Test
@@ -123,10 +125,10 @@ class NotificationFilterTest {
             topicSettings = topicSettings("netstampChanged")
         )
 
-        // Should show all launches even though strict matching is on
+        // Should only show SpX from KSC
         assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
-        assertTrue(NotificationFilter.shouldShowNotification(nasaLaunchFromVandenberg, state))
-        assertTrue(NotificationFilter.shouldShowNotification(blueOriginLaunchFromTexas, state))
+        assertFalse(NotificationFilter.shouldShowNotification(nasaLaunchFromVandenberg, state))
+        assertFalse(NotificationFilter.shouldShowNotification(blueOriginLaunchFromTexas, state))
     }
 
     // ========== Strict Matching Tests (AND logic) ==========
@@ -280,7 +282,7 @@ class NotificationFilterTest {
         // All should show (all topics subscribed)
         assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
         assertTrue(NotificationFilter.shouldShowNotification(nasaLaunchFromVandenberg, state))
-        assertTrue(NotificationFilter.shouldShowNotification(blueOriginLaunchFromTexas, state))
+        assertFalse(NotificationFilter.shouldShowNotification(blueOriginLaunchFromTexas, state))
     }
 
     // ========== Empty Subscriptions Tests ==========
@@ -296,7 +298,8 @@ class NotificationFilterTest {
         )
 
         // Should NOT show: no agencies subscribed
-        assertFalse(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
+        assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
+        assertFalse(NotificationFilter.shouldShowNotification(spacexLaunchFromOtherLocation, state))
     }
 
     @Test
@@ -310,7 +313,7 @@ class NotificationFilterTest {
         )
 
         // Should NOT show: no locations subscribed
-        assertFalse(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
+        assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
     }
 
     @Test
@@ -342,6 +345,12 @@ class NotificationFilterTest {
         val dataMap = mapOf(
             "notification_type" to "netstampChanged",
             "launch_id" to "test-launch-1",
+            "launch_uuid" to "uuid-1",
+            "launch_name" to "Falcon 9 Block 5 | Starlink Group",
+            "launch_image" to "https://example.com/image1.jpg",
+            "launch_net" to "2025-10-13T12:00:00Z",
+            "launch_location" to "Kennedy Space Center, FL, USA",
+            "webcast" to "true",
             "agency_id" to "121",
             "location_id" to "27"
         )
