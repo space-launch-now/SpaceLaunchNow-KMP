@@ -44,7 +44,12 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Create .env file
-        run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
+        run: |
+          cat > .env << EOF
+          API_KEY=${{ secrets.API_KEY }}
+          REVENUECAT_ANDROID_KEY=${{ secrets.REVENUECAT_ANDROID_KEY }}
+          REVENUECAT_IOS_KEY=${{ secrets.REVENUECAT_IOS_KEY }}
+          EOF
 
       - name: Generate iOS Secrets.plist
         run: |
