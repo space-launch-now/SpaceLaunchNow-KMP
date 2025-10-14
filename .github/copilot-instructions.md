@@ -38,9 +38,7 @@ saves ~$192/month.
 
 **Documentation:**
 
-- [Hybrid Release Strategy](../docs/HYBRID_RELEASE_STRATEGY.md) - **START HERE**
-- [Conventional Commits Guide](../docs/CONVENTIONAL_COMMITS.md)
-- [Full CI/CD Pipeline](../docs/CICD_PIPELINE.md)
+Please use all of [docs](../docs) as context.
 
 ## Project Goals - MVP Application
 

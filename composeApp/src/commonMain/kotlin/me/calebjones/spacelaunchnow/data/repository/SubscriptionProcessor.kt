@@ -35,7 +35,7 @@ class SubscriptionProcessor(
     }
 
     private suspend fun updateFCMSubscriptions(state: NotificationState) {
-        println("=== SubscriptionProcessor: Starting FCM update ===")
+        println("=== SubscriptionProcessor: Starting FCM update (v4 simple topics) ===")
 
         try {
             // Master switch: if notifications disabled, unsubscribe from all
@@ -46,7 +46,7 @@ class SubscriptionProcessor(
                 return
             }
 
-            // Calculate required topics based on state
+            // Calculate required topics based on state (v4: just version topic)
             val requiredTopics = calculateRequiredTopics(state)
             println("Required topics: $requiredTopics")
 
@@ -104,45 +104,23 @@ class SubscriptionProcessor(
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private suspend fun calculateRequiredTopics(state: NotificationState): Set<String> {
+        /**
+         * v4 Notification System:
+         * - Subscribe to ONLY the version topic (k_prod_v4 or k_debug_v4)
+         * - Server sends ALL notifications to these topics with full data payload
+         * - Client filters notifications based on user preferences (agency, location, timing, etc.)
+         * 
+         * This eliminates the complex topic subscription logic and moves filtering to the client
+         */
         val topics = mutableSetOf<String>()
 
-        // Version topic (prod_v3 or debug_v3)
+        // Only subscribe to version topic - all filtering is done client-side
         val versionTopic = getVersionTopic()
         topics.add(versionTopic)
-
-        // Base notification type
-        topics.add(NotificationTopic.LAUNCHES_ALL.id)
-        topics.add(NotificationTopic.EVENTS.id)
-        topics.add(NotificationTopic.FEATURED_NEWS.id)
-
-        // Follow all or matching strategy
-        if (state.followAllLaunches) {
-            topics.add(NotificationTopic.ALL_LAUNCHES.id)
-        } else {
-            if (state.useStrictMatching) {
-                topics.add(NotificationTopic.STRICT_MATCHING.id)
-            } else {
-                topics.add(NotificationTopic.NOT_STRICT_MATCHING.id)
-            }
-        }
-
-        // User-configurable timing topics
-        state.topicSettings.forEach { (topicId, enabled) ->
-            if (enabled) {
-                topics.add(topicId)
-            }
-        }
-
-        // Agency topics - now using topic names directly
-        state.subscribedAgencies.forEach { agencyTopicName ->
-            topics.add(agencyTopicName)
-        }
-
-        // Location topics - now using topic names directly
-        state.subscribedLocations.forEach { locationTopicName ->
-            topics.add(locationTopicName)
-        }
+        
+        println("📡 v4 Simple Topics: Subscribing only to '$versionTopic' (client-side filtering enabled)")
 
         return topics
     }
@@ -151,12 +129,12 @@ class SubscriptionProcessor(
         return if (BuildConfig.IS_DEBUG && debugPreferences != null) {
             try {
                 val debugSettings = debugPreferences.getDebugSettings()
-                if (debugSettings.useDebugTopics) "debug_v3" else "prod_v3"
+                if (debugSettings.useDebugTopics) "k_debug_v4" else "k_prod_v4"
             } catch (e: Exception) {
-                "prod_v3"
+                "k_prod_v4"
             }
         } else {
-            "prod_v3"
+            "k_prod_v4"
         }
     }
 }

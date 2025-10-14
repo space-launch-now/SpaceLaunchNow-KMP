@@ -34,6 +34,9 @@ class MainActivity : ComponentActivity() {
 
     // Use mutable state for notification launch ID to trigger recomposition
     private var notificationLaunchIdState by mutableStateOf<String?>(null)
+    
+    // Use mutable state for navigation destination (e.g., from widget)
+    private var navigationDestinationState by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -79,6 +82,13 @@ class MainActivity : ComponentActivity() {
             println("App launched from notification with launch_id: $intentLaunchId")
             notificationLaunchIdState = intentLaunchId
         }
+        
+        // Extract navigation destination from intent (e.g., from widget)
+        val navigateTo = intent.getStringExtra("navigate_to")
+        if (navigateTo != null) {
+            println("App launched with navigation destination: $navigateTo")
+            navigationDestinationState = navigateTo
+        }
 
         PlaybackPreference.initialize(this)
 
@@ -113,7 +123,9 @@ class MainActivity : ComponentActivity() {
 
             SpaceLaunchNowApp(
                 notificationLaunchId = notificationLaunchIdState,
-                onNotificationLaunchIdConsumed = { notificationLaunchIdState = null }
+                onNotificationLaunchIdConsumed = { notificationLaunchIdState = null },
+                navigationDestination = navigationDestinationState,
+                onNavigationDestinationConsumed = { navigationDestinationState = null }
             )
         }
     }
@@ -167,6 +179,13 @@ class MainActivity : ComponentActivity() {
         if (newLaunchId != null) {
             notificationLaunchIdState = newLaunchId
             println("New notification intent received with launch_id: $newLaunchId")
+        }
+        
+        // Handle navigation destination from new intent (e.g., from widget)
+        val navigateTo = intent.getStringExtra("navigate_to")
+        if (navigateTo != null) {
+            navigationDestinationState = navigateTo
+            println("New intent received with navigation destination: $navigateTo")
         }
     }
 

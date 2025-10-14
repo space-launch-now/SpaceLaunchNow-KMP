@@ -5,19 +5,28 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +57,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
+import me.calebjones.spacelaunchnow.data.model.NotificationAgency
+import me.calebjones.spacelaunchnow.data.model.NotificationLocation
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
@@ -78,16 +90,54 @@ fun DebugSettingsScreen(
     val debugSettings by debugViewModel.debugSettings.collectAsStateWithLifecycle()
     val isLoading by debugViewModel.isLoading.collectAsStateWithLifecycle()
     val statusMessage by debugViewModel.statusMessage.collectAsStateWithLifecycle()
+    val detailedMessage by debugViewModel.detailedMessage.collectAsStateWithLifecycle()
     val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptionState by subscriptionRepo.state.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var showDetailedDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(statusMessage) {
         statusMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
-            debugViewModel.clearStatusMessage()
+            // Show detailed dialog if there's a detailed message
+            if (detailedMessage != null) {
+                showDetailedDialog = true
+            }
         }
+    }
+
+    // Detailed message dialog
+    if (showDetailedDialog && detailedMessage != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = {
+                showDetailedDialog = false
+                debugViewModel.clearStatusMessage()
+            },
+            title = { Text(statusMessage ?: "Details") },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = detailedMessage ?: "",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        showDetailedDialog = false
+                        debugViewModel.clearStatusMessage()
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
     }
 
     var customUrlText by remember { mutableStateOf(debugSettings.customApiBaseUrl) }
@@ -110,7 +160,7 @@ fun DebugSettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -244,7 +294,7 @@ fun DebugSettingsScreen(
             // Topics Section
             item {
                 Text(
-                    text = "Notification Topics",
+                    text = "Notification Topics (v4)",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
@@ -272,9 +322,9 @@ fun DebugSettingsScreen(
                                 )
                                 Text(
                                     text = if (debugSettings.useDebugTopics) {
-                                        "Using debug_v3 topics for testing"
+                                        "Using k_debug_v4 topic for testing"
                                     } else {
-                                        "Using prod_v3 topics for production"
+                                        "Using k_prod_v4 topic for production"
                                     },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -288,7 +338,7 @@ fun DebugSettingsScreen(
                         }
 
                         Text(
-                            text = "💡 Toggle between debug_v3 (test notifications) and prod_v3 (live notifications)",
+                            text = "💡 v4 uses simple topics: k_debug_v4 (test) or k_prod_v4 (production)\n📱 All filtering is now done on the device (client-side)",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -344,6 +394,234 @@ fun DebugSettingsScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                }
+            }
+
+            // Test Notification Section
+            item {
+                Text(
+                    text = "Test Notifications (v4)",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "🧪 Notification Testing",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        // Define available options
+                        val agencies = listOf(
+                            NotificationAgency.SPACEX,
+                            NotificationAgency.NASA,
+                            NotificationAgency.ROCKET_LAB,
+                            NotificationAgency.BLUE_ORIGIN,
+                            NotificationAgency.ULA,
+                            NotificationAgency.ARIANESPACE,
+                            NotificationAgency.ROSCOSMOS,
+                            NotificationAgency.NORTHROP_GRUMMAN
+                        )
+                        
+                        val locations = listOf(
+                            NotificationLocation.KSC,
+                            NotificationLocation.TEXAS,
+                            NotificationLocation.VANDENBERG,
+                            NotificationLocation.WALLOPS,
+                            NotificationLocation.NEW_ZEALAND,
+                            NotificationLocation.FRENCH_GUIANA,
+                            NotificationLocation.RUSSIA,
+                            NotificationLocation.JAPAN,
+                            NotificationLocation.INDIA,
+                            NotificationLocation.CHINA,
+                            NotificationLocation.KODIAK,
+                            NotificationLocation.OTHER
+                        )
+                        
+                        val notificationTypes = listOf(
+                            "netstampChanged" to "Launch Time Changed",
+                            "twentyFourHour" to "24 Hours Before",
+                            "oneHour" to "1 Hour Before",
+                            "tenMinutes" to "10 Minutes Before",
+                            "oneMinute" to "1 Minute Before",
+                            "inFlight" to "In-Flight Update",
+                            "success" to "Launch Success"
+                        )
+
+                        // Form state
+                        var selectedAgency by remember { mutableStateOf(agencies[0]) }
+                        var selectedLocation by remember { mutableStateOf(locations[0]) }
+                        var webcast by remember { mutableStateOf("true") }
+                        var selectedNotificationType by remember { mutableStateOf(notificationTypes[2].first) } // oneHour default
+                        var launchImage by remember { mutableStateOf("https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/starship_on_the_image_20250111100520.jpg") }
+
+                        // Dropdown states
+                        var agencyExpanded by remember { mutableStateOf(false) }
+                        var locationExpanded by remember { mutableStateOf(false) }
+                        var notificationTypeExpanded by remember { mutableStateOf(false) }
+
+                        // Agency Picker
+                        ExposedDropdownMenuBox(
+                            expanded = agencyExpanded,
+                            onExpandedChange = { agencyExpanded = !agencyExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = "${selectedAgency.name} (${selectedAgency.id})",
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Agency") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = agencyExpanded) },
+                                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                                enabled = !isLoading,
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+                            
+                            ExposedDropdownMenu(
+                                expanded = agencyExpanded,
+                                onDismissRequest = { agencyExpanded = false }
+                            ) {
+                                agencies.forEach { agency ->
+                                    DropdownMenuItem(
+                                        text = { Text("${agency.name} (ID: ${agency.id})") },
+                                        onClick = {
+                                            selectedAgency = agency
+                                            agencyExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Location Picker
+                        ExposedDropdownMenuBox(
+                            expanded = locationExpanded,
+                            onExpandedChange = { locationExpanded = !locationExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = "${selectedLocation.name} (${selectedLocation.id})",
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Location") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded) },
+                                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                                enabled = !isLoading,
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+                            
+                            ExposedDropdownMenu(
+                                expanded = locationExpanded,
+                                onDismissRequest = { locationExpanded = false }
+                            ) {
+                                locations.forEach { location ->
+                                    DropdownMenuItem(
+                                        text = { Text("${location.name} (ID: ${location.id})") },
+                                        onClick = {
+                                            selectedLocation = location
+                                            locationExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Webcast toggle
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Webcast Available")
+                            Switch(
+                                checked = webcast == "true",
+                                onCheckedChange = { webcast = if (it) "true" else "false" },
+                                enabled = !isLoading
+                            )
+                        }
+
+                        // Notification Type Picker
+                        ExposedDropdownMenuBox(
+                            expanded = notificationTypeExpanded,
+                            onExpandedChange = { notificationTypeExpanded = !notificationTypeExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = notificationTypes.find { it.first == selectedNotificationType }?.second ?: selectedNotificationType,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Notification Type") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = notificationTypeExpanded) },
+                                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                                enabled = !isLoading,
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+                            
+                            ExposedDropdownMenu(
+                                expanded = notificationTypeExpanded,
+                                onDismissRequest = { notificationTypeExpanded = false }
+                            ) {
+                                notificationTypes.forEach { (typeId, typeName) ->
+                                    DropdownMenuItem(
+                                        text = { Text(typeName) },
+                                        onClick = {
+                                            selectedNotificationType = typeId
+                                            notificationTypeExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Launch Image URL Field
+                        OutlinedTextField(
+                            value = launchImage,
+                            onValueChange = { launchImage = it },
+                            label = { Text("Launch Image URL") },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading,
+                            singleLine = false,
+                            maxLines = 3
+                        )
+
+                        Button(
+                            onClick = {
+                                debugViewModel.triggerTestNotification(
+                                    agencyId = selectedAgency.id.toString(),
+                                    locationId = selectedLocation.id.toString(),
+                                    webcast = webcast,
+                                    notificationType = selectedNotificationType,
+                                    launchImage = launchImage
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                                Spacer(Modifier.width(8.dp))
+                            }
+                            Text("Send Test Notification")
+                        }
+
+                        Text(
+                            text = "💡 Select from available agencies, locations, and notification types to test v4 client-side filtering. Test notifications go through the same filtering logic as real FCM notifications.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
                     }
                 }
             }
@@ -489,7 +767,7 @@ fun DebugSettingsScreen(
                                 if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
                                     subscriptionRepo.simulateSubscriptionState(
                                         isSubscribed = true,
-                                        subscriptionType = SubscriptionType.PREMIUM,
+                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
                                         productId = "spacelaunchnow_premium_legacy"
                                     )
                                 }
@@ -507,7 +785,7 @@ fun DebugSettingsScreen(
                                 if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
                                     subscriptionRepo.simulateSubscriptionState(
                                         isSubscribed = true,
-                                        subscriptionType = SubscriptionType.PREMIUM,
+                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
                                         productId = "space_launch_now_pro_v1"
                                     )
                                 }
@@ -525,7 +803,7 @@ fun DebugSettingsScreen(
                                 if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
                                     subscriptionRepo.simulateSubscriptionState(
                                         isSubscribed = true,
-                                        subscriptionType = SubscriptionType.PREMIUM,
+                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
                                         productId = "unknown_premium_sku_12345"
                                     )
                                 }
@@ -601,30 +879,152 @@ fun DebugSettingsScreen(
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(
-                            text = "FCM Topics (Device is currently subscribed to)",
+                            text = "FCM Topics (v4 Simple Subscription)",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
+                        
+                        Text(
+                            text = "v4 only subscribes to version topic. All filtering is client-side.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        
                         if (uiState.notificationSettings.subscribedTopics.isEmpty()) {
                             Text(
-                                text = "No active topics.",
-                                style = MaterialTheme.typography.bodySmall
+                                text = "⏳ Not yet subscribed (initializing...)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
                             )
                         } else {
                             Column(modifier = Modifier.padding(top = 8.dp)) {
                                 uiState.notificationSettings.subscribedTopics.sorted()
                                     .forEach { topic ->
-                                        Text(
-                                            text = topic,
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                                            ),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "✅",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                text = topic,
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                                    fontWeight = FontWeight.Bold
+                                                ),
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                             }
                         }
+                    }
+                }
+            }
+
+            // RevenueCat Integration Testing Section
+            item {
+                Text(
+                    text = "RevenueCat Integration Testing",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "🧪 RevenueCat SDK Testing",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = "Test RevenueCat integration before deploying to production. These buttons will query the SDK and display results in snackbars.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        // Check Initialization
+                        Button(
+                            onClick = { debugViewModel.checkRevenueCatInitialization() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("✅ Check Initialization Status")
+                        }
+
+                        // Query Products
+                        Button(
+                            onClick = { debugViewModel.queryRevenueCatProducts() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("📦 Query Products/Offerings")
+                        }
+
+                        // Check Entitlements
+                        Button(
+                            onClick = { debugViewModel.checkRevenueCatEntitlements() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("🔐 Check Customer Entitlements")
+                        }
+
+                        // Test Restore
+                        OutlinedButton(
+                            onClick = { debugViewModel.testRevenueCatRestore() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("🔄 Test Restore Purchases")
+                        }
+
+                        // View Offering Details
+                        OutlinedButton(
+                            onClick = { debugViewModel.viewRevenueCatOfferingDetails() },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading
+                        ) {
+                            Text("🎁 View Offering Details")
+                        }
+
+                        HorizontalDivider()
+
+                        Text(
+                            text = "💡 Tips:",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = "• Run 'Check Initialization' first to verify SDK is configured\n" +
+                                    "• 'Query Products' shows available packages and their prices\n" +
+                                    "• 'Check Entitlements' shows what the user has access to\n" +
+                                    "• 'Test Restore' simulates restoring purchases from stores\n" +
+                                    "• Results will show in long snackbar messages at the bottom",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Text(
+                            text = "⚠️ Note: RevenueCat must be initialized in MainApplication for these tests to work.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
             }
