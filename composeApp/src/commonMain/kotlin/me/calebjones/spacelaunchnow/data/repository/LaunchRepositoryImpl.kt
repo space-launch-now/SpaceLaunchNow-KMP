@@ -90,6 +90,23 @@ class LaunchRepositoryImpl(
         }
     }
 
+    override suspend fun getPreviousLaunchesNormal(limit: Int): Result<PaginatedLaunchNormalList> {
+        return try {
+            val response = launchesApi.getLaunchList(
+                limit = limit,
+                previous = true,
+                ordering = "-net" // Most recent first
+            )
+            Result.success(response.body())
+        } catch (e: ResponseException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getLaunchDetails(id: String): Result<LaunchDetailed> {
         return try {
             val response = launchesApi.launchesRetrieve(id)

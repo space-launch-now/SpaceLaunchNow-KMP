@@ -46,6 +46,18 @@ class HomeViewModel(
     private val _upcomingLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
     val upcomingLaunches: StateFlow<List<LaunchNormal>> = _upcomingLaunches.asStateFlow()
 
+    // Previous Launches List (for bidirectional carousel)
+    private val _previousLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
+    val previousLaunches: StateFlow<List<LaunchNormal>> = _previousLaunches.asStateFlow()
+
+    // Combined Launches (previous + upcoming for carousel)
+    private val _combinedLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
+    val combinedLaunches: StateFlow<List<LaunchNormal>> = _combinedLaunches.asStateFlow()
+
+    // Index where upcoming launches start in combined list
+    private val _upcomingStartIndex = MutableStateFlow<Int>(0)
+    val upcomingStartIndex: StateFlow<Int> = _upcomingStartIndex.asStateFlow()
+
     // Updates/News Feed (replaces UpdatesViewModel functionality)
     private val _updates = MutableStateFlow<List<UpdateEndpoint>>(emptyList())
     val updates: StateFlow<List<UpdateEndpoint>> = _updates.asStateFlow()
@@ -65,6 +77,9 @@ class HomeViewModel(
     private val _isUpcomingLaunchesLoading = MutableStateFlow(false)
     val isUpcomingLaunchesLoading: StateFlow<Boolean> = _isUpcomingLaunchesLoading.asStateFlow()
 
+    private val _isPreviousLaunchesLoading = MutableStateFlow(false)
+    val isPreviousLaunchesLoading: StateFlow<Boolean> = _isPreviousLaunchesLoading.asStateFlow()
+
     private val _isUpdatesLoading = MutableStateFlow(false)
     val isUpdatesLoading: StateFlow<Boolean> = _isUpdatesLoading.asStateFlow()
 
@@ -83,6 +98,9 @@ class HomeViewModel(
 
     private val _upcomingLaunchesError = MutableStateFlow<String?>(null)
     val upcomingLaunchesError: StateFlow<String?> = _upcomingLaunchesError.asStateFlow()
+
+    private val _previousLaunchesError = MutableStateFlow<String?>(null)
+    val previousLaunchesError: StateFlow<String?> = _previousLaunchesError.asStateFlow()
 
     private val _updatesError = MutableStateFlow<String?>(null)
     val updatesError: StateFlow<String?> = _updatesError.asStateFlow()
@@ -138,7 +156,7 @@ class HomeViewModel(
     }
 
     /**
-     * Loads the upcoming launches list
+     * Loads the upcoming launches list along with previous launches for bidirectional carousel
      * Incorporates LaunchViewModel.fetchUpcomingLaunchesNormal()
      */
     fun loadUpcomingLaunches(limit: Int = 10, forceRefresh: Boolean = false) {
@@ -150,11 +168,18 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 _isUpcomingLaunchesLoading.value = true
+                _isPreviousLaunchesLoading.value = true
                 _upcomingLaunchesError.value = null
+                _previousLaunchesError.value = null
 
-                val result = launchRepository.getUpcomingLaunchesNormal(limit = limit)
+                // Load both upcoming and previous launches in parallel
+                val upcomingDeferred = async { launchRepository.getUpcomingLaunchesNormal(limit = limit) }
+                val previousDeferred = async { launchRepository.getPreviousLaunchesNormal(limit = 5) }
+
+                val upcomingResult = upcomingDeferred.await()
+                val previousResult = previousDeferred.await()
                 
-                result.onSuccess { paginatedLaunches: PaginatedLaunchNormalList ->
+                upcomingResult.onSuccess { paginatedLaunches: PaginatedLaunchNormalList ->
                     println("=== HomeViewModel: Received Upcoming Launches ===")
                     println("Total launches: ${paginatedLaunches.results.size}")
                     
@@ -196,9 +221,35 @@ class HomeViewModel(
                     _isFeaturedLaunchLoading.value = false
                 }
 
+                previousResult.onSuccess { paginatedPreviousLaunches: PaginatedLaunchNormalList ->
+                    println("=== HomeViewModel: Received Previous Launches ===")
+                    println("Total previous launches: ${paginatedPreviousLaunches.results.size}")
+                    
+                    _previousLaunches.value = paginatedPreviousLaunches.results
+                    _isPreviousLaunchesLoading.value = false
+                }.onFailure { exception ->
+                    val errorMessage = formatErrorMessage(exception)
+                    println("Failed to get previous launches: $errorMessage")
+                    _previousLaunchesError.value = errorMessage
+                    _previousLaunches.value = emptyList()
+                    _isPreviousLaunchesLoading.value = false
+                }
+
+                // Combine previous and upcoming launches for the carousel
+                // Previous launches are in reverse chronological order (most recent first)
+                // We want them in chronological order (oldest first) so they appear before upcoming
+                val previousReversed = _previousLaunches.value.reversed()
+                _combinedLaunches.value = previousReversed + _upcomingLaunches.value
+                _upcomingStartIndex.value = previousReversed.size
+
+                println("=== Combined Launches ===")
+                println("Previous: ${previousReversed.size}, Upcoming: ${_upcomingLaunches.value.size}")
+                println("Upcoming start index: ${_upcomingStartIndex.value}")
+
             } catch (exception: Exception) {
                 _upcomingLaunchesError.value = exception.message
                 _isUpcomingLaunchesLoading.value = false
+                _isPreviousLaunchesLoading.value = false
             }
         }
     }
@@ -428,6 +479,7 @@ class HomeViewModel(
         _error.value = null
         _featuredLaunchError.value = null
         _upcomingLaunchesError.value = null
+        _previousLaunchesError.value = null
         _updatesError.value = null
         _articlesError.value = null
         _eventsError.value = null
