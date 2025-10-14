@@ -18,23 +18,26 @@
 ## After (New Behavior)
 
 ```
-[Combined Launches Carousel - Bidirectional Scrolling]
+[Combined Launches Carousel - Bidirectional Scrolling with Centered Positioning]
 ┌────────────────────────────────────────────────────────────────────────┐
 │                                                                        │
 │  ← Previous          |          Upcoming →                            │
 │                      |                                                │
-│  [P5] [P4] [P3] [P2] [P1] | [U1] [U2] [U3] [U4] [U5] ...             │
-│  SUCCESS SUCCESS SUCCESS  |  TBD   GO   TBD   TBD   TBD              │
-│                          ↑                                            │
-│                    Initial Position                                   │
-│                (First Upcoming Launch)                                │
+│     [P2] [P1]      [U1]      [U2] [U3] ...                           │
+│     peek  peek   CENTERED     peek  peek                              │
+│                     ↑                                                 │
+│              Initial Position                                         │
+│         (First Upcoming Launch)                                       │
+│              ** CENTERED **                                           │
+│        with adjacent cards peeking                                    │
 │                                                                        │
 └────────────────────────────────────────────────────────────────────────┘
 
 Legend:
 P1-P5: Previous launches (reversed, oldest to newest)
 U1-U5: Upcoming launches
-|: Initial scroll position
+CENTERED: Card is horizontally centered on screen
+peek: Partial views of adjacent cards visible on edges
 ```
 
 ## User Interaction Flow
@@ -45,9 +48,12 @@ User opens Home Screen
          ↓
 App loads 5 previous + 10 upcoming launches in parallel
          ↓
-Carousel automatically positions at first upcoming launch (U1)
+Carousel automatically centers first upcoming launch (U1)
          ↓
-User sees upcoming launches immediately
+User sees upcoming launch CENTERED with adjacent cards peeking
+         ↓
+Previous launch (P1) visible on LEFT edge (peek)
+Next launch (U2) visible on RIGHT edge (peek)
 ```
 
 ### 2. Scroll Left (View Previous)
