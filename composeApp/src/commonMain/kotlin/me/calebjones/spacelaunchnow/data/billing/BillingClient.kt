@@ -99,6 +99,15 @@ object SubscriptionProducts {
     // Legacy/Founder SKUs (for migration and compatibility)
     const val FOUNDER_2018 = "2018_founder"     // 2018 Founder lifetime purchase
     
+    // RevenueCat Package Identifiers (from offering configured in dashboard)
+    // These are the identifiers used in RevenueCat's Offering.availablePackages
+    const val RC_PACKAGE_LIFETIME = "\$rc_lifetime"  // Maps to spacelaunchnow_pro
+    const val RC_PACKAGE_MONTHLY = "\$rc_monthly"    // Maps to sln_production_yearly:base-plan
+    const val RC_PACKAGE_ANNUAL = "\$rc_annual"      // Maps to sln_production_yearly:yearly
+    
+    // RevenueCat entitlement identifier (configured in dashboard)
+    const val RC_ENTITLEMENT_PREMIUM = "premium"     // All features unlocked
+    
     // NOTE: We don't explicitly list all legacy products here as there are hundreds of them.
     // Any product ID that doesn't match current products or debug products is treated as legacy.
     // Legacy products get ad-free access only (BASIC subscription type).
@@ -138,13 +147,13 @@ object SubscriptionProducts {
      * Logic:
      * - Current products (PRODUCT_ID, PRO_LIFETIME) -> PREMIUM (all features)
      * - Debug products -> FREE (no features, for testing)
-     * - Everything else -> BASIC (legacy products, ad-free only)
+     * - Everything else -> LEGACY (legacy products, ad-free only)
      */
     fun getSubscriptionType(productId: String): SubscriptionType {
         return when {
             productId in ALL_PRODUCTS -> SubscriptionType.PREMIUM
             productId.startsWith("debug_") || productId in DEBUG_PRODUCTS -> SubscriptionType.FREE
-            else -> SubscriptionType.BASIC // All unrecognized products are legacy (ad-free only)
+            else -> SubscriptionType.LEGACY // All unrecognized products are legacy (ad-free only)
         }
     }
     

@@ -24,6 +24,8 @@ struct LaunchListWidgetView: View {
     var body: some View {
         if entry.isPlaceholder {
             placeholderView
+        } else if !entry.hasWidgetAccess {
+            lockedView  // Show paywall for non-premium users
         } else if let errorMessage = entry.errorMessage {
             errorView(message: errorMessage)
         } else if !entry.launches.isEmpty {
@@ -146,6 +148,40 @@ struct LaunchListWidgetView: View {
                 .foregroundStyle(.tertiary)
         }
         .padding()
+    }
+    
+    // MARK: - Locked View (Premium Paywall)
+    private var lockedView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 40))
+                .foregroundStyle(.orange)
+            
+            Text("Premium Widget")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundStyle(.primary)
+            
+            Text("Upgrade to Premium to unlock the Launch List widget")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(3)
+            
+            Divider()
+                .padding(.vertical, 4)
+            
+            HStack(spacing: 4) {
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.caption2)
+                Text("Tap to upgrade")
+                    .font(.caption2)
+                    .fontWeight(.medium)
+            }
+            .foregroundStyle(.blue)
+        }
+        .padding()
+        .widgetURL(URL(string: "spacelaunchnow://subscription"))  // Deep link to subscription screen
     }
 }
 

@@ -2,14 +2,19 @@ package me.calebjones.spacelaunchnow
 
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.lifecycleScope
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.workers.WidgetUpdateWorker
+import me.calebjones.spacelaunchnow.ui.viewmodel.NotificationDisplayHelper
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -19,6 +24,9 @@ import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import org.koin.dsl.includes
 
 class MainApplication : Application() {
+
+    // Inject dependencies for initialization
+    private val revenueCatManager: RevenueCatManager by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -56,6 +64,24 @@ class MainApplication : Application() {
             Log.e("MainApplication", "Failed to start Koin", e)
             throw e
         }
+
+        // Initialize RevenueCat after Koin is ready
+        Log.d("MainApplication", "Initializing RevenueCat...")
+        @Suppress("OPT_IN_USAGE")
+        kotlinx.coroutines.GlobalScope.launch {
+            try {
+                // Initialize with null appUserId to let RevenueCat create anonymous user
+                revenueCatManager.initialize(appUserId = null)
+                Log.d("MainApplication", "✅ RevenueCat initialized successfully")
+            } catch (e: Exception) {
+                Log.e("MainApplication", "❌ Failed to initialize RevenueCat", e)
+                // Don't crash the app if RevenueCat fails
+            }
+        }
+
+        Log.d("MainApplication", "Creating notification channels...")
+        // Create notification channels for Android O+
+        NotificationDisplayHelper.createNotificationChannels(this)
 
         Log.d("MainApplication", "Scheduling widget updates...")
         // Schedule widget updates

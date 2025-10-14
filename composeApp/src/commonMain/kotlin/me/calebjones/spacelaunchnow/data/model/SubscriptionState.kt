@@ -91,14 +91,15 @@ data class SubscriptionState(
 @Serializable
 enum class SubscriptionType(val isLegacy: Boolean = false) {
     FREE(isLegacy = false),
-    BASIC(isLegacy = true),  // Legacy subscriptions (ad-free only)
+    LEGACY(isLegacy = true),  // Legacy subscriptions (ad-free only)
     PREMIUM(isLegacy = false); // Current subscriptions (all features)
 
     companion object {
         fun fromProductId(productId: String): SubscriptionType {
             return when {
                 productId.contains("premium", ignoreCase = true) -> PREMIUM
-                productId.contains("basic", ignoreCase = true) -> BASIC
+                productId.contains("legacy", ignoreCase = true) -> LEGACY
+                productId.contains("basic", ignoreCase = true) -> LEGACY
                 else -> FREE
             }
         }
@@ -128,6 +129,8 @@ enum class PremiumFeature {
         fun getBasicFeatures(): Set<PremiumFeature> {
             return setOf(
                 AD_FREE,
+                ADVANCED_WIDGETS,
+                CUSTOM_THEMES
             )
         }
 
@@ -144,7 +147,7 @@ enum class PremiumFeature {
         fun getFeaturesForType(type: SubscriptionType): Set<PremiumFeature> {
             return when (type) {
                 SubscriptionType.FREE -> getFreeFeatures()
-                SubscriptionType.BASIC -> getBasicFeatures()
+                SubscriptionType.LEGACY -> getBasicFeatures()
                 SubscriptionType.PREMIUM -> getPremiumFeatures()
             }
         }
