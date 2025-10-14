@@ -20,6 +20,7 @@ import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chaintech.videoplayer.util.PlaybackPreference
+import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.notifications.AndroidNotificationPermissionHandler
 import me.calebjones.spacelaunchnow.data.notifications.NotificationPermissionManager
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -28,10 +29,14 @@ import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     private val appPreferences: AppPreferences by inject()
+    private val billingClient: BillingClient by inject()
     private lateinit var notificationPermissionHandler: AndroidNotificationPermissionHandler
 
     // Use mutable state for notification launch ID to trigger recomposition
     private var notificationLaunchIdState by mutableStateOf<String?>(null)
+    
+    // Use mutable state for navigation destination (e.g., from widget)
+    private var navigationDestinationState by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -77,6 +82,13 @@ class MainActivity : ComponentActivity() {
             println("App launched from notification with launch_id: $intentLaunchId")
             notificationLaunchIdState = intentLaunchId
         }
+        
+        // Extract navigation destination from intent (e.g., from widget)
+        val navigateTo = intent.getStringExtra("navigate_to")
+        if (navigateTo != null) {
+            println("App launched with navigation destination: $navigateTo")
+            navigationDestinationState = navigateTo
+        }
 
         PlaybackPreference.initialize(this)
 
@@ -111,9 +123,52 @@ class MainActivity : ComponentActivity() {
 
             SpaceLaunchNowApp(
                 notificationLaunchId = notificationLaunchIdState,
-                onNotificationLaunchIdConsumed = { notificationLaunchIdState = null }
+                onNotificationLaunchIdConsumed = { notificationLaunchIdState = null },
+                navigationDestination = navigationDestinationState,
+                onNavigationDestinationConsumed = { navigationDestinationState = null }
             )
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Set activity for purchase flows using reflection to avoid KMP import issues
+        try {
+            val setActivityMethod =
+                billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
+            setActivityMethod.invoke(billingClient, this)
+            println("MainActivity: Set billing client activity")
+        } catch (e: Exception) {
+            // Not an Android billing client or method doesn't exist - that's okay
+            println("MainActivity: Billing client doesn't support setActivity - ${e.message}")
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Clear activity reference using reflection
+        try {
+            val setActivityMethod =
+                billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
+            setActivityMethod.invoke(billingClient, null)
+            println("MainActivity: Cleared billing client activity")
+        } catch (e: Exception) {
+            println("MainActivity: Could not clear billing client activity - ${e.message}")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clear activity reference using reflection
+        try {
+            val setActivityMethod =
+                billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
+            setActivityMethod.invoke(billingClient, null)
+            println("MainActivity: Cleared billing client activity on destroy")
+        } catch (e: Exception) {
+            println("MainActivity: Could not clear billing client activity on destroy - ${e.message}")
+        }
+        NotificationPermissionManager.clearCurrentActivity()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -124,6 +179,13 @@ class MainActivity : ComponentActivity() {
         if (newLaunchId != null) {
             notificationLaunchIdState = newLaunchId
             println("New notification intent received with launch_id: $newLaunchId")
+        }
+        
+        // Handle navigation destination from new intent (e.g., from widget)
+        val navigateTo = intent.getStringExtra("navigate_to")
+        if (navigateTo != null) {
+            navigationDestinationState = navigateTo
+            println("New intent received with navigation destination: $navigateTo")
         }
     }
 
@@ -169,11 +231,6 @@ class MainActivity : ComponentActivity() {
     private fun resetNotificationPermissionAsked(context: Context) {
         context.getSharedPreferences("onboarding_prefs", MODE_PRIVATE)
             .edit { putBoolean("hasAskedForNotificationPermission", false) }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        NotificationPermissionManager.clearCurrentActivity()
     }
 }
 

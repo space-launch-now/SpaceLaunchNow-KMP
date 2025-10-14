@@ -13,11 +13,14 @@ data class NotificationState(
     // Topic settings (user-configurable notification timing)
     val topicSettings: Map<String, Boolean> = NotificationTopic.getDefaultTopicSettings(),
 
-    // Agency/Location subscriptions with defaults
+    // Agency/Location subscriptions (using IDs for v4 filtering)
+    // Changed from topic names to actual agency/location IDs for client-side filtering
+    // e.g., "121" for SpaceX, "143" for Texas
     val subscribedAgencies: Set<String> = getDefaultAgencyIds(),
     val subscribedLocations: Set<String> = getDefaultLocationIds(),
 
     // FCM topics (managed by repository)
+    // v4: Only contains version topic like "k_prod_v4" or "k_debug_v4"
     val subscribedTopics: Set<String> = emptySet(),
 
     // UI state
@@ -26,40 +29,40 @@ data class NotificationState(
 ) {
     companion object {
         /**
-         * Get default agency IDs for major space agencies
+         * Get default agency IDs for major space agencies (using numeric IDs for v4 filtering)
          * These correspond to: SpaceX, NASA, Blue Origin, Rocket Lab, ULA, Arianespace, Roscosmos, Northrop Grumman
          */
         fun getDefaultAgencyIds(): Set<String> {
             return setOf(
-                NotificationAgency.SPACEX.topicName,
-                NotificationAgency.NASA.topicName,
-                NotificationAgency.BLUE_ORIGIN.topicName,
-                NotificationAgency.ROCKET_LAB.topicName,
-                NotificationAgency.ULA.topicName,
-                NotificationAgency.ARIANESPACE.topicName,
-                NotificationAgency.ROSCOSMOS.topicName,
-                NotificationAgency.NORTHROP_GRUMMAN.topicName
+                NotificationAgency.SPACEX.id.toString(),
+                NotificationAgency.NASA.id.toString(),
+                NotificationAgency.BLUE_ORIGIN.id.toString(),
+                NotificationAgency.ROCKET_LAB.id.toString(),
+                NotificationAgency.ULA.id.toString(),
+                NotificationAgency.ARIANESPACE.id.toString(),
+                NotificationAgency.ROSCOSMOS.id.toString(),
+                NotificationAgency.NORTHROP_GRUMMAN.id.toString()
             )
         }
 
         /**
-         * Get default location IDs for major launch sites
+         * Get default location IDs for major launch sites (using numeric IDs for v4 filtering)
          * These correspond to: Vandenberg, KSC, Wallops, Texas, Russia, French Guiana, New Zealand, Japan, India, China, Kodiak, Other
          */
         fun getDefaultLocationIds(): Set<String> {
             return setOf(
-                NotificationLocation.VANDENBERG.topicName,
-                NotificationLocation.KSC.topicName,
-                NotificationLocation.WALLOPS.topicName,
-                NotificationLocation.TEXAS.topicName,
-                NotificationLocation.RUSSIA.topicName,
-                NotificationLocation.FRENCH_GUIANA.topicName,
-                NotificationLocation.NEW_ZEALAND.topicName,
-                NotificationLocation.JAPAN.topicName,
-                NotificationLocation.INDIA.topicName,
-                NotificationLocation.CHINA.topicName,
-                NotificationLocation.KODIAK.topicName,
-                NotificationLocation.OTHER.topicName
+                NotificationLocation.VANDENBERG.id.toString(),
+                NotificationLocation.KSC.id.toString(),
+                NotificationLocation.WALLOPS.id.toString(),
+                NotificationLocation.TEXAS.id.toString(),
+                NotificationLocation.RUSSIA.id.toString(),
+                NotificationLocation.FRENCH_GUIANA.id.toString(),
+                NotificationLocation.NEW_ZEALAND.id.toString(),
+                NotificationLocation.JAPAN.id.toString(),
+                NotificationLocation.INDIA.id.toString(),
+                NotificationLocation.CHINA.id.toString(),
+                NotificationLocation.KODIAK.id.toString(),
+                NotificationLocation.OTHER.id.toString()
             )
         }
 
@@ -73,8 +76,8 @@ data class NotificationState(
             availableLocations: List<NotificationLocation>
         ): NotificationState {
             return DEFAULT.copy(
-                subscribedAgencies = availableAgencies.map { it.topicName }.toSet(),
-                subscribedLocations = availableLocations.map { it.topicName }.toSet()
+                subscribedAgencies = availableAgencies.map { it.id.toString() }.toSet(),
+                subscribedLocations = availableLocations.map { it.id.toString() }.toSet()
             )
         }
     }
@@ -85,19 +88,19 @@ data class NotificationState(
     }
 
     fun isAgencyEnabled(agency: NotificationAgency): Boolean {
-        return subscribedAgencies.contains(agency.topicName)
+        return subscribedAgencies.contains(agency.id.toString())
     }
 
-    fun isAgencyEnabled(agencyName: String): Boolean {
-        return subscribedAgencies.contains(agencyName)
+    fun isAgencyEnabled(agencyId: String): Boolean {
+        return subscribedAgencies.contains(agencyId)
     }
 
     fun isLocationEnabled(location: NotificationLocation): Boolean {
-        return subscribedLocations.contains(location.topicName)
+        return subscribedLocations.contains(location.id.toString())
     }
 
-    fun isLocationEnabled(locationName: String): Boolean {
-        return subscribedLocations.contains(locationName)
+    fun isLocationEnabled(locationId: String): Boolean {
+        return subscribedLocations.contains(locationId)
     }
 
     // State update helpers
@@ -106,14 +109,14 @@ data class NotificationState(
     }
 
     fun withAgencyEnabled(agency: NotificationAgency, enabled: Boolean): NotificationState {
-        return withAgencyEnabled(agency.topicName, enabled)
+        return withAgencyEnabled(agency.id.toString(), enabled)
     }
 
-    fun withAgencyEnabled(agencyName: String, enabled: Boolean): NotificationState {
+    fun withAgencyEnabled(agencyId: String, enabled: Boolean): NotificationState {
         val updatedAgencies = if (enabled) {
-            subscribedAgencies + agencyName
+            subscribedAgencies + agencyId
         } else {
-            subscribedAgencies - agencyName
+            subscribedAgencies - agencyId
         }
 
         // If disabling an agency while followAll is enabled, disable followAll
@@ -126,14 +129,14 @@ data class NotificationState(
     }
 
     fun withLocationEnabled(location: NotificationLocation, enabled: Boolean): NotificationState {
-        return withLocationEnabled(location.topicName, enabled)
+        return withLocationEnabled(location.id.toString(), enabled)
     }
 
-    fun withLocationEnabled(locationName: String, enabled: Boolean): NotificationState {
+    fun withLocationEnabled(locationId: String, enabled: Boolean): NotificationState {
         val updatedLocations = if (enabled) {
-            subscribedLocations + locationName
+            subscribedLocations + locationId
         } else {
-            subscribedLocations - locationName
+            subscribedLocations - locationId
         }
 
         // If disabling a location while followAll is enabled, disable followAll
@@ -155,8 +158,8 @@ data class NotificationState(
             copy(
                 followAllLaunches = true,
                 useStrictMatching = false, // Auto-disable strict matching
-                subscribedAgencies = allAgencies.map { it.topicName }.toSet(),
-                subscribedLocations = allLocations.map { it.topicName }.toSet()
+                subscribedAgencies = allAgencies.map { it.id.toString() }.toSet(),
+                subscribedLocations = allLocations.map { it.id.toString() }.toSet()
             )
         } else {
             // When disabling, keep current subscriptions as they are

@@ -27,6 +27,9 @@ data object DebugSettings
 data object AboutLibraries
 
 @Serializable
+data object SupportUs
+
+@Serializable
 data class LaunchDetail(val launchId: String)
 
 @Serializable

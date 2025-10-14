@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -179,6 +180,21 @@ fun SettingsScreen(
                                 subtitle = "API URL switching, topic testing, and developer options",
                                 onClick = onOpenDebugSettings,
                                 icon = Icons.Filled.Warning
+                            )
+                        }
+                    }
+                }
+                // SUPPORT & MEMBERSHIP
+                item {
+                    SectionHeaderText("Support & Membership")
+                    Spacer(Modifier.height(2.dp))
+                    SettingsCardRow {
+                        Column(Modifier.fillMaxWidth()) {
+                            SettingsNavigationRow(
+                                title = "Support Us ✨",
+                                subtitle = "Premium features, golden card, and support development",
+                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs) },
+                                icon = Icons.Filled.Star
                             )
                         }
                     }
