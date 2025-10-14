@@ -33,7 +33,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
@@ -44,6 +43,7 @@ import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
+import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
@@ -192,6 +192,11 @@ fun TabletDesktopLayout(
                                     FullscreenVideoScreen(
                                         videoUrl = fullscreenVideo.videoUrl,
                                         launchName = fullscreenVideo.launchName,
+                                        onNavigateBack = { navController.popBackStack() }
+                                    )
+                                }
+                                composableWithCompositionLocal<SupportUs> {
+                                    me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen(
                                         onNavigateBack = { navController.popBackStack() }
                                     )
                                 }

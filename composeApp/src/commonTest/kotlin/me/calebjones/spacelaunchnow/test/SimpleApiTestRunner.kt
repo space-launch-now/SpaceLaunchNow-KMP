@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.test
 import kotlinx.coroutines.runBlocking
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
+import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import kotlin.test.Test
 
 /**
@@ -16,12 +17,18 @@ class SimpleApiTestRunner {
         println("=".repeat(50))
 
         val baseUrl = "https://spacelaunchnow.app/"
+        val apiKey = EnvironmentManager.getEnv("API_KEY", "")
 
         try {
             // Test 1: Try to create the API client
             println("\n1. Creating LaunchesApi client:")
-            val launchesApi = LaunchesApi(baseUrl)
+            val launchesApi = LaunchesApi(baseUrl).apply {
+                // Configure API authentication
+                setApiKey(apiKey, "Authorization")
+                setApiKeyPrefix("Token", "Authorization")
+            }
             println("✓ LaunchesApi created successfully")
+            println("✓ API Key configured: ${if (apiKey.isNotEmpty()) "Yes" else "No (using default)"}")
 
             // Test 2: Try different response modes
             println("\n2. Testing different response modes:")

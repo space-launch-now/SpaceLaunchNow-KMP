@@ -72,6 +72,11 @@ kotlin {
         }
     }
     sourceSets {
+        named { it.lowercase().startsWith("ios") }.configureEach {
+            languageSettings {
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            }
+        }
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -118,6 +123,8 @@ kotlin {
 
                 // Android-specific HTTP client engine
                 implementation(libs.ktor.client.android)
+
+                implementation(libs.billing.ktx)
             }
         }
 
@@ -184,6 +191,12 @@ kotlin {
                 implementation(libs.aboutlibraries.core)
                 implementation(libs.aboutlibraries.compose.m2)
                 implementation(libs.aboutlibraries.compose.m3)
+
+                // Add the purchases-kmp dependencies.
+                implementation(libs.purchases.core)
+                implementation(libs.purchases.ui)   // Optional
+                implementation(libs.purchases.either)     // Optional
+                implementation(libs.purchases.result)     // Optional
             }
         }
 
@@ -217,7 +230,12 @@ android {
             }
         }
         val apiKey = envProps.getProperty("API_KEY") ?: ""
+        val revenueCatAndroidKey = envProps.getProperty("REVENUECAT_ANDROID_KEY") ?: ""
+        val revenueCatIosKey = envProps.getProperty("REVENUECAT_IOS_KEY") ?: ""
+
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "REVENUECAT_ANDROID_KEY", "\"$revenueCatAndroidKey\"")
+        buildConfigField("String", "REVENUECAT_IOS_KEY", "\"$revenueCatIosKey\"")
 
         // Add version information to BuildConfig
         buildConfigField("String", "VERSION_NAME", "\"${computeVersionName()}\"")

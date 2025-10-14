@@ -21,7 +21,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
@@ -32,6 +31,7 @@ import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
+import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.about.AboutLibrariesScreen
 import me.calebjones.spacelaunchnow.ui.compose.BottomNavigationBar
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
@@ -62,6 +62,7 @@ fun PhoneLayout(
         NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
         DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
         AboutLibraries::class.qualifiedName -> false // Hide for AboutLibrariesScreen
+        SupportUs::class.qualifiedName -> false // Hide for SupportUsScreen
 
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern
@@ -160,6 +161,11 @@ fun PhoneLayout(
                         }
                         composableWithCompositionLocal<AboutLibraries> {
                             AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
+                        }
+                        composableWithCompositionLocal<SupportUs> {
+                            me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
                         }
                     }
                 }

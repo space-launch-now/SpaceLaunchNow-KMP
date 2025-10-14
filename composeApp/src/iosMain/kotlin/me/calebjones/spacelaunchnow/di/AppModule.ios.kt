@@ -10,6 +10,7 @@ val iosModule = module {
     single { createDataStore("notification_settings") }
     single(named("DebugDataStore")) { createDebugDataStore() }
     single(named("AppSettingsDataStore")) { createDataStore("app_settings") }
+    single(named("SubscriptionDataStore")) { createDataStore("subscription_settings") }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {
