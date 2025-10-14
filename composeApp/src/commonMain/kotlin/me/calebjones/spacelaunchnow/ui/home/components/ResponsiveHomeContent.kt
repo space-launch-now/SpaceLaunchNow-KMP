@@ -51,7 +51,7 @@ fun ResponsiveHomeContent(
                 ) {
                     item {
                         SectionTitle(
-                            title = "Upcoming Launches",
+                            title = "Launch Schedule",
                             hasAction = true,
                             onActionClick = {
                                 navController.navigate(Schedule) {
@@ -82,7 +82,7 @@ fun ResponsiveHomeContent(
             item { NextLaunchView(navController = navController) }
             item {
                 SectionTitle(
-                    title = "Upcoming Launches",
+                    title = "Launch Schedule",
                     hasAction = true,
                     onActionClick = {
                         navController.navigate(Schedule) {
