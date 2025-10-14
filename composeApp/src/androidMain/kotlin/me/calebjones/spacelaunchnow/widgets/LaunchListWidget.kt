@@ -40,7 +40,9 @@ import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.java.KoinJavaComponent.inject as koinInject
@@ -51,11 +53,30 @@ import kotlin.time.Duration.Companion.minutes
 class LaunchListWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val launches = fetchUpcomingLaunches()
+        // Check if user has premium entitlement for widgets
+        val hasWidgetAccess = checkWidgetAccess()
+        val launches = if (hasWidgetAccess) fetchUpcomingLaunches() else emptyList()
 
         provideContent {
             GlanceTheme {
-                LaunchListWidgetContent(launches)
+                if (hasWidgetAccess) {
+                    LaunchListWidgetContent(launches)
+                } else {
+                    LaunchListWidgetLockedContent()
+                }
+            }
+        }
+    }
+
+    private suspend fun checkWidgetAccess(): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val subscriptionRepository: SubscriptionRepository by koinInject(SubscriptionRepository::class.java)
+                subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
+            } catch (e: Exception) {
+                println("Widget: Failed to check widget access: ${e.message}")
+                e.printStackTrace()
+                false // Default to locked if check fails
             }
         }
     }
@@ -71,6 +92,70 @@ class LaunchListWidget : GlanceAppWidget() {
                 e.printStackTrace()
                 emptyList()
             }
+        }
+    }
+}
+
+@Composable
+fun LaunchListWidgetLockedContent() {
+    val context = LocalContext.current
+
+    Box(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .background(GlanceTheme.colors.background)
+            .clickable(
+                actionStartActivity(
+                    Intent(context, MainActivity::class.java).apply {
+                        putExtra("navigate_to", "subscription")
+                        // Clear back stack and bring to front if already running
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    }
+                )
+            )
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = GlanceModifier.fillMaxWidth()
+        ) {
+            Image(
+                provider = ImageProvider(R.mipmap.ic_launcher_monochrome),
+                contentDescription = "Space Launch Now",
+                modifier = GlanceModifier.size(64.dp)
+            )
+
+            Spacer(modifier = GlanceModifier.height(12.dp))
+
+            Text(
+                text = "🔒 Premium Widget",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = GlanceTheme.colors.primary
+                )
+            )
+
+            Spacer(modifier = GlanceModifier.height(8.dp))
+
+            Text(
+                text = "Upgrade to Premium to unlock the Launch List widget",
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = GlanceTheme.colors.onBackground
+                )
+            )
+
+            Spacer(modifier = GlanceModifier.height(8.dp))
+
+            Text(
+                text = "Tap to upgrade",
+                style = TextStyle(
+                    fontSize = 11.sp,
+                    color = GlanceTheme.colors.secondary
+                )
+            )
         }
     }
 }

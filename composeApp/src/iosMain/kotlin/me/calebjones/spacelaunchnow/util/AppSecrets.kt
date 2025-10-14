@@ -7,6 +7,12 @@ import platform.Foundation.dictionaryWithContentsOfFile
 actual object AppSecrets {
     actual val apiKey: String
         get() = getStringResource("Secrets", "plist", "apiKey") ?: ""
+
+    actual val revenueCatAndroidKey: String
+        get() = getStringResource("Secrets", "plist", "revenueCatAndroidKey") ?: ""
+
+    actual val revenueCatIosKey: String
+        get() = getStringResource("Secrets", "plist", "revenueCatIosKey") ?: ""
 }
 
 internal fun getStringResource(filename: String, fileType: String, valueKey: String): String? {
