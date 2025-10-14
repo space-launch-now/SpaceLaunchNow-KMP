@@ -8,13 +8,15 @@ struct LaunchEntry: TimelineEntry {
     let launches: [LaunchData]
     let isPlaceholder: Bool
     let errorMessage: String?
+    let hasWidgetAccess: Bool  // Premium entitlement check
     
     static var placeholder: LaunchEntry {
         LaunchEntry(
             date: Date(),
             launches: [LaunchData.placeholder],
             isPlaceholder: true,
-            errorMessage: nil
+            errorMessage: nil,
+            hasWidgetAccess: true  // Show placeholder as if they have access
         )
     }
 }
@@ -148,6 +150,23 @@ struct LaunchProvider: TimelineProvider {
             let helper = KoinHelper.Companion().instance()
             print("🚀 Widget: Got helper")
             
+            // Check if user has widget access (premium entitlement)
+            print("🚀 Widget: Checking widget access...")
+            let hasAccess = try await helper.hasWidgetAccess()
+            print("🚀 Widget: Widget access: \(hasAccess)")
+            
+            // If no access, return locked entry
+            if !hasAccess {
+                print("🚀 Widget: User does not have widget access - showing paywall")
+                return LaunchEntry(
+                    date: Date(),
+                    launches: [],
+                    isPlaceholder: false,
+                    errorMessage: nil,
+                    hasWidgetAccess: false
+                )
+            }
+            
             // Fetch launches - this calls the Kotlin wrapper that unwraps Result<T>
             print("🚀 Widget: Calling fetchUpcomingLaunchesOrNull...")
             let paginatedList = try await helper.fetchUpcomingLaunchesOrNull(limit: 10)
@@ -156,21 +175,21 @@ struct LaunchProvider: TimelineProvider {
             guard let paginatedList = paginatedList else {
                 let errorMsg = "fetchUpcomingLaunchesOrNull returned nil - API call failed"
                 print("🚀 Widget: \(errorMsg)")
-                return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: errorMsg)
+                return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: errorMsg, hasWidgetAccess: true)
             }
             
             print("🚀 Widget: Successfully got PaginatedLaunchNormalList with \(paginatedList.results.count) launches")
-            return processPaginatedList(paginatedList)
+            return processPaginatedList(paginatedList, hasAccess: hasAccess)
             
         } catch {
             let errorMsg = "Error: \(error.localizedDescription)"
             print("🚀 Widget error: \(errorMsg)")
-            return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: errorMsg)
+            return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: errorMsg, hasWidgetAccess: false)
         }
     }
     
     // Helper to process the paginated list
-    private func processPaginatedList(_ paginatedList: PaginatedLaunchNormalList) -> LaunchEntry {
+    private func processPaginatedList(_ paginatedList: PaginatedLaunchNormalList, hasAccess: Bool) -> LaunchEntry {
         let results = paginatedList.results
         print("🚀 Widget: Got \(results.count) launches")
         
@@ -208,9 +227,9 @@ struct LaunchProvider: TimelineProvider {
         print("🚀 Widget: Successfully processed \(launches.count) launches")
         
         if launches.isEmpty {
-            return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: "API returned \(results.count) items but 0 were valid")
+            return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: "API returned \(results.count) items but 0 were valid", hasWidgetAccess: hasAccess)
         }
         
-        return LaunchEntry(date: Date(), launches: launches, isPlaceholder: false, errorMessage: nil)
+        return LaunchEntry(date: Date(), launches: launches, isPlaceholder: false, errorMessage: nil, hasWidgetAccess: hasAccess)
     }
 }
