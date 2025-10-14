@@ -39,10 +39,29 @@ class AppSettingsViewModel(
     private val appPreferences: AppPreferences
 ) : ViewModel() {
 
-    val themeFlow = appPreferences.themeFlow
-    val useUtcFlow = appPreferences.useUtcFlow
-    val hideTbdLaunchesFlow = appPreferences.hideTbdLaunchesFlow
-    val keepLaunchesFor24HoursFlow = appPreferences.keepLaunchesFor24HoursFlow
+    val themeFlow = appPreferences.themeFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = ThemeOption.System
+    )
+    
+    val useUtcFlow = appPreferences.useUtcFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = false
+    )
+    
+    val hideTbdLaunchesFlow = appPreferences.hideTbdLaunchesFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = false
+    )
+    
+    val keepLaunchesFor24HoursFlow = appPreferences.keepLaunchesFor24HoursFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = true
+    )
 
     suspend fun updateHideTbdLaunches(hide: Boolean) {
         appPreferences.updateHideTbdLaunches(hide)
@@ -102,7 +121,7 @@ class SettingsViewModel(
         )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly, // Load immediately to avoid UI flicker
         initialValue = SettingsUiState()
     )
 

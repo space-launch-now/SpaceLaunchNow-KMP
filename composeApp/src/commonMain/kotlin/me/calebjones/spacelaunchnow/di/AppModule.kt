@@ -141,5 +141,5 @@ val debugModule = module {
         val debugDataStore = get<DataStore<Preferences>>(named("DebugDataStore"))
         DebugPreferences(debugDataStore)
     }
-    single { DebugSettingsViewModel(debugPreferences = get(), revenueCatManager = get()) }
+    single { DebugSettingsViewModel(debugPreferences = get(), revenueCatManager = get(), launchRepository = get(), notificationRepository = get()) }
 }

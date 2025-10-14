@@ -98,6 +98,7 @@ class NotificationRepositoryImpl(
     }
 
     override suspend fun setAgencyEnabled(topicName: String, enabled: Boolean) {
+        // Note: topicName parameter is kept for backward compatibility but now expects agency ID
         updateState { currentState ->
             currentState.withAgencyEnabled(topicName, enabled)
         }
@@ -110,6 +111,7 @@ class NotificationRepositoryImpl(
     }
 
     override suspend fun setLocationEnabled(topicName: String, enabled: Boolean) {
+        // Note: topicName parameter is kept for backward compatibility but now expects location ID
         updateState { currentState ->
             currentState.withLocationEnabled(topicName, enabled)
         }

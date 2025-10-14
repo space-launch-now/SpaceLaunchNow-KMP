@@ -255,7 +255,7 @@ android {
             buildConfigField("boolean", "IS_DEBUG", "false")
         }
         getByName("debug") {
-            // applicationIdSuffix = ".kmpdebug"
+            applicationIdSuffix = ".kmpdebug"
             versionNameSuffix = "-DEBUG"
             buildConfigField("boolean", "IS_DEBUG", "true")
         }

@@ -3,4 +3,15 @@
     <string name="next_up_widget_description">Shows the next upcoming rocket launch with countdown</string>
     <string name="launch_list_widget_description">Shows a list of upcoming rocket launches</string>
     <string name="launch_countdown_widget_description">Shows detailed countdown timer for the next rocket launch</string>
+    
+    <!-- Notification messages -->
+    <string name="notification_schedule_changed">SCHEDULE UPDATE: Next attempt no earlier than %s</string>
+    <string name="notification_launch_successful">The launch was successful!</string>
+    <string name="notification_launch_failure">A launch failure has occurred.</string>
+    <string name="notification_launch_partial_failure">The launch was a partial failure.</string>
+    <string name="notification_launch_liftoff">Liftoff! Launch vehicle is now in flight!</string>
+    <string name="notification_one_minute">Launch attempt in less than one minute at %s</string>
+    <string name="notification_ten_minutes">Launch attempt in less than ten minutes at %s</string>
+    <string name="notification_one_hour">Launch attempt in less than one hour at %s</string>
+    <string name="notification_twenty_four_hours">Launch attempt in less than 24 hours at %s</string>
 </resources>
