@@ -620,10 +620,11 @@ class LaunchFormatUtilTest {
         
         val rocket = rocketConfig?.let {
             RocketDetailed(
-                responseMode = "detailed",
                 id = 1,
                 configuration = it,
-                spacecraftStage = null
+                launcherStage = emptyList(),
+                spacecraftStage = emptyList(),
+                payloads = emptyList()
             )
         }
         
@@ -699,10 +700,8 @@ class LaunchFormatUtilTest {
         
         val rocket = rocketConfig?.let {
             RocketNormal(
-                responseMode = "normal",
                 id = 1,
-                configuration = it,
-                spacecraftStage = null
+                configuration = it
             )
         }
         
