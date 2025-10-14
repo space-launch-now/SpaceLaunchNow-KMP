@@ -148,7 +148,12 @@ jobs:
           cache-read-only: false
 
       - name: Create .env file
-        run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
+        run: |
+          cat > .env << EOF
+          API_KEY=${{ secrets.API_KEY }}
+          REVENUECAT_ANDROID_KEY=${{ secrets.REVENUECAT_ANDROID_KEY }}
+          REVENUECAT_IOS_KEY=${{ secrets.REVENUECAT_IOS_KEY }}
+          EOF
 
       - name: Decode Google Services JSON
         env:
@@ -226,7 +231,12 @@ jobs:
           cache-read-only: false
 
       - name: Create .env file
-        run: echo "API_KEY=${{ secrets.API_KEY }}" > .env
+        run: |
+          cat > .env << EOF
+          API_KEY=${{ secrets.API_KEY }}
+          REVENUECAT_ANDROID_KEY=${{ secrets.REVENUECAT_ANDROID_KEY }}
+          REVENUECAT_IOS_KEY=${{ secrets.REVENUECAT_IOS_KEY }}
+          EOF
 
       - name: Decode Google Services JSON
         env:
