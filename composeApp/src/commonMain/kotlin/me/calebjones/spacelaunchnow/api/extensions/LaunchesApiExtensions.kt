@@ -18,6 +18,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNorm
 suspend fun LaunchesApi.getLaunchMiniList(
     limit: Int? = null,
     upcoming: Boolean? = null,
+    previous: Boolean? = null,
     ordering: String? = null,
     status: Int? = null,
     statusIds: List<Int>? = null,
@@ -98,7 +99,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
     padLaunchAttemptCountYearGte = null,
     padLaunchAttemptCountYearLt = null,
     padLaunchAttemptCountYearLte = null,
-    previous = null,
+    previous = previous,
     program = null,
     relatedLspId = null,
     relatedLspName = null,
@@ -136,6 +137,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
 suspend fun LaunchesApi.getLaunchList(
     limit: Int? = null,
     upcoming: Boolean? = null,
+    previous: Boolean? = null,
     ordering: String? = null,
     status: Int? = null,
     statusIds: List<Int>? = null,
@@ -216,7 +218,7 @@ suspend fun LaunchesApi.getLaunchList(
     padLaunchAttemptCountYearGte = null,
     padLaunchAttemptCountYearLt = null,
     padLaunchAttemptCountYearLte = null,
-    previous = null,
+    previous = previous,
     program = null,
     relatedLspId = null,
     relatedLspName = null,

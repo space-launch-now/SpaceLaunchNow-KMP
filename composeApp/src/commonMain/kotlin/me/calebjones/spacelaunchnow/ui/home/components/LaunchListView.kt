@@ -65,7 +65,8 @@ private val CARD_SPACING = 16.dp
 
 @Composable
 fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
-    val launches by viewModel.upcomingLaunches.collectAsState()
+    val combinedLaunches by viewModel.combinedLaunches.collectAsState()
+    val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsState()
     val error by viewModel.upcomingLaunchesError.collectAsState()
     val isLoading by viewModel.isUpcomingLaunchesLoading.collectAsState()
     val scrollState = rememberLazyListState()
@@ -75,8 +76,15 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
     var isDragging by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (launches.isEmpty() && !isLoading && error == null) {
+        if (combinedLaunches.isEmpty() && !isLoading && error == null) {
             viewModel.loadUpcomingLaunches(limit = 10)
+        }
+    }
+
+    // Scroll to the first upcoming launch when data is loaded
+    LaunchedEffect(combinedLaunches, upcomingStartIndex) {
+        if (combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
+            scrollState.scrollToItem(upcomingStartIndex)
         }
     }
 
@@ -85,9 +93,7 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
             error = error!!,
             onRetry = { viewModel.loadUpcomingLaunches(limit = 10, forceRefresh = true) }
         )
-    } else if (launches.isNotEmpty()) {
-        val launchNormalList = launches
-
+    } else if (combinedLaunches.isNotEmpty()) {
         LazyRow(
             modifier = Modifier.fillMaxWidth().draggable(
                 orientation = Orientation.Horizontal,
@@ -123,7 +129,7 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
             state = scrollState,
 
             ) {
-            items(launchNormalList) { launch ->
+            items(combinedLaunches) { launch ->
                 LaunchItemView(launch = launch, navController = navController)
             }
         }
