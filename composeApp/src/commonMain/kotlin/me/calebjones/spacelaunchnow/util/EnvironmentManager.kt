@@ -13,6 +13,8 @@ object EnvironmentManager {
     fun getEnv(key: String, defaultValue: String = ""): String {
         return when (key) {
             "API_KEY" -> AppSecrets.apiKey
+            "REVENUECAT_ANDROID_KEY" -> AppSecrets.revenueCatAndroidKey
+            "REVENUECAT_IOS_KEY" -> AppSecrets.revenueCatIosKey
             else -> defaultValue
         }
     }

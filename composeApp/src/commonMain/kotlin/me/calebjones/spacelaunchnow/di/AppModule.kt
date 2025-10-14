@@ -36,8 +36,15 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
+import me.calebjones.spacelaunchnow.data.billing.BillingClient
+import me.calebjones.spacelaunchnow.data.billing.createBillingClient
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
+import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 
 expect fun nativeConfig() : KoinAppDeclaration
 
@@ -90,6 +97,39 @@ val appModule = module {
             debugPreferences = getOrNull<DebugPreferences>()
         )
     }
+    
+    // Subscription dependencies
+    single {
+        val subscriptionDataStore = get<DataStore<Preferences>>(named("SubscriptionDataStore"))
+        SubscriptionStorage(subscriptionDataStore)
+    }
+
+    // RevenueCat dependencies - initialize first
+    singleOf(::RevenueCatManager)
+
+    // BillingClient now uses RevenueCat instead of platform-specific implementations
+    // Note: Keeping as factory for now, can convert to single later
+    factory<BillingClient> {
+        createBillingClient()
+    }
+
+    single<SubscriptionRepository> {
+        SubscriptionRepositoryImpl(
+            billingClient = get(),
+            storage = get<SubscriptionStorage>(),
+            debugPreferences = get<DebugPreferences>(),
+            revenueCatManager = get<RevenueCatManager>()  // ADD RevenueCatManager dependency
+        )
+    }
+    
+    // SubscriptionViewModel with RevenueCatManager
+    single { 
+        SubscriptionViewModel(
+            repository = get(),
+            revenueCatManager = get()
+        )
+    }
+
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
 }
@@ -101,5 +141,5 @@ val debugModule = module {
         val debugDataStore = get<DataStore<Preferences>>(named("DebugDataStore"))
         DebugPreferences(debugDataStore)
     }
-    single { DebugSettingsViewModel(debugPreferences = get()) }
+    single { DebugSettingsViewModel(debugPreferences = get(), revenueCatManager = get(), launchRepository = get(), notificationRepository = get()) }
 }
