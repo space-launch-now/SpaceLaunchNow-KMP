@@ -16,6 +16,16 @@ This project uses an automated CI/CD pipeline with:
 
 **TL;DR:** Use `feat:` for features, `fix:` for bugs. Merges to master auto-deploy! 🎉
 
+## 🧪 Testing
+
+This project is actively building comprehensive unit test coverage:
+- 🎯 [Testing Quick Reference](docs/TESTING_QUICK_REF.md) - Get started in 30 seconds
+- 📋 [Testing Task List](docs/TESTING_TASKS.md) - Find tasks to work on
+- 📖 [Testing Guide](docs/TESTING_GUIDE.md) - Detailed patterns and examples
+- 🤖 [AI Agent Prompts](docs/AI_AGENT_PROMPTS.md) - Ready-to-use prompts for AI agents
+
+**Want to contribute tests?** Check the task list for available work, or use AI agent prompts to generate tests quickly!
+
 ## Prerequisites
 
 ### Java 21 Requirement
