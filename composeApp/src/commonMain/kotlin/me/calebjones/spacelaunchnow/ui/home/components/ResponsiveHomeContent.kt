@@ -1,85 +1,436 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.valentinilk.shimmer.shimmer
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.isDesktop
 import me.calebjones.spacelaunchnow.isLandscape
 import me.calebjones.spacelaunchnow.isTablet
 import me.calebjones.spacelaunchnow.navigation.Schedule
+import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ResponsiveHomeContent(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    if ((isTablet() && isLandscape()) || isDesktop()) {
-        // Landscape layout - side-by-side content
-        Column {
-            HomeTopBar()
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.Top
-            ) {
-                // Left side - Featured launch (smaller)
-                Column(
-                    modifier = Modifier
-                        .weight(0.3f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    NextLaunchView(navController = navController)
-                }
+    val homeViewModel = koinViewModel<HomeViewModel>()
 
-                // Right side - Other content
-                LazyColumn(
+    // Collect state for the new HomeQuickView
+    val previousLaunches by homeViewModel.previousLaunches.collectAsStateWithLifecycle()
+    val upcomingLaunches by homeViewModel.upcomingLaunches.collectAsStateWithLifecycle()
+    val historyLaunchesCount by homeViewModel.historyLaunchesCount.collectAsStateWithLifecycle()
+    val historyLaunches by homeViewModel.historyLaunches.collectAsStateWithLifecycle()
+
+    // Collect accurate quick stats counts
+    val next24HoursCount by homeViewModel.next24HoursCount.collectAsStateWithLifecycle()
+    val nextWeekCount by homeViewModel.nextWeekCount.collectAsStateWithLifecycle()
+    val nextMonthCount by homeViewModel.nextMonthCount.collectAsStateWithLifecycle()
+
+    // Get current day and month for "This Day in History"
+    val currentDate = remember {
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    }
+    val currentDay = currentDate.dayOfMonth
+    val currentMonth = currentDate.monthNumber
+
+    // Load history launches on composition
+    remember(currentDay, currentMonth) {
+        homeViewModel.loadHistoryLaunches(day = currentDay, month = currentMonth)
+        null
+    }
+
+    val isTabletOrDesktop = (isTablet() && isLandscape()) || isDesktop()
+
+    if (isTabletOrDesktop) {
+        // Tablet landscape layout - full width scrollable content
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+        ) {
+            item { HomeTopBar() }
+            // Hero cards row: Last Launch + Stats + Next Up (countdown)
+            item {
+                Row(
                     modifier = Modifier
-                        .weight(0.7f)
-                        .fillMaxHeight(),
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
-                    item {
-                        SectionTitle(
-                            title = "Launch Schedule",
-                            hasAction = true,
-                            onActionClick = {
-                                navController.navigate(Schedule) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+                    // Left column: Last Launch + Quick Stats
+
+                    Column(
+                        modifier = Modifier.weight(0.4f),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+
+                        // Last Launch - Always render
+                        Card {
+                            Column(modifier = Modifier.padding(8.dp)) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(bottom = 12.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        text = "Last Launch",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp
+                                    )
                                 }
-                            })
+                                if (previousLaunches.isNotEmpty()) {
+                                    val previousLaunch = previousLaunches.first()
+                                    LaunchItemView(
+                                        launch = previousLaunch,
+                                        navController = navController,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(240.dp)
+                                    )
+                                } else {
+                                    // Loading placeholder
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(240.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            "Loading...",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                                alpha = 0.6f
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // This Day in History Card - Always render
+                        Card {
+                            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(bottom = 12.dp, start = 8.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.History,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        text = "This Day in History",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp
+                                    )
+                                }
+
+                                if (historyLaunches.isNotEmpty()) {
+                                    // Scrollable carousel of history launches
+                                    LazyRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        contentPadding = PaddingValues(horizontal = 4.dp)
+                                    ) {
+                                        items(historyLaunches) { launch ->
+                                            LaunchItemView(
+                                                launch = launch,
+                                                navController = navController,
+                                                modifier = Modifier
+                                                    .width(320.dp)
+                                                    .height(240.dp)
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    // Loading placeholder
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            if (historyLaunchesCount > 0) "Loading launches..." else "No launches on this day",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
-                    item { UpcomingHorizontalScrollableList(navController = navController) }
-                    item { SectionTitle(title = "Latest Updates", hasAction = false) }
-                    item { LatestUpdatesView(navController = navController) }
-                    item { SectionTitle(title = "Latest News", hasAction = false) }
-                    item { ArticlesView() }
-                    item { SectionTitle(title = "Upcoming Events", hasAction = false) }
-                    item { EventsView(navController = navController) }
-                    item { Spacer(modifier = Modifier.height(64.dp)) }
+
+                    // Right: Next Up with countdown - larger to accommodate countdown
+                    Box(modifier = Modifier.weight(0.6f)) {
+                        NextLaunchView(navController = navController)
+                    }
                 }
             }
+            item { Spacer(modifier = Modifier.height(12.dp)) }
+            item {                         // Quick Stats
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(
+                        text = "Quick Stats",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+
+                    // Stats Grid (2x2)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        StatItem(
+                            icon = Icons.Default.Today,
+                            label = "Next 24 Hours",
+                            value = next24HoursCount.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatItem(
+                            icon = Icons.Default.DateRange,
+                            label = "Next 7 Days",
+                            value = nextWeekCount.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatItem(
+                            icon = Icons.Default.Schedule,
+                            label = "Next 30 Days",
+                            value = nextMonthCount.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatItem(
+                            icon = Icons.Default.History,
+                            label = "This Day in History",
+                            value = historyLaunchesCount.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+            item {
+                SectionTitle(
+                    title = "Launch Schedule",
+                    hasAction = true,
+                    onActionClick = {
+                        navController.navigate(Schedule) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    })
+            }
+            // Bidirectional scrollable launch list
+            item {
+                LaunchListView(
+                    viewModel = homeViewModel,
+                    navController = navController
+                )
+            }
+            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { SectionTitle(title = "Latest Updates", hasAction = false) }
+            item { LatestUpdatesView(navController = navController) }
+            item { SectionTitle(title = "Latest News", hasAction = false) }
+            item { ArticlesView() }
+            item { SectionTitle(title = "Upcoming Events", hasAction = false) }
+            item { EventsView(navController = navController) }
+            item { Spacer(modifier = Modifier.height(64.dp)) }
         }
     } else {
+        // Phone layout - use bidirectional carousel
         LazyColumn(
             modifier = modifier,
         ) {
             item { HomeTopBar() }
             item { NextLaunchView(navController = navController) }
+
+            // Last Launch Card
+            item {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Text(
+                        text = "Last Launch",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (previousLaunches.isNotEmpty()) {
+                        val previousLaunch = previousLaunches.first()
+                        LaunchItemView(
+                            launch = previousLaunch,
+                            navController = navController,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp)
+                        )
+                    } else {
+                        // Loading placeholder
+                        Box(
+                            modifier = Modifier
+                                .shimmer()
+                                .fillMaxWidth()
+                                .height(220.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "Loading...",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+
+                }
+            }
+
+            // Quick Stats
+            item {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Text(
+                        text = "Quick Stats",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Stats Grid (2x2)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        StatItem(
+                            icon = Icons.Default.Today,
+                            label = "Next 24 Hours",
+                            value = next24HoursCount.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatItem(
+                            icon = Icons.Default.DateRange,
+                            label = "Next 7 Days",
+                            value = nextWeekCount.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        StatItem(
+                            icon = Icons.Default.Schedule,
+                            label = "Next 30 Days",
+                            value = nextMonthCount.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatItem(
+                            icon = Icons.Default.History,
+                            label = "This Day in History",
+                            value = historyLaunchesCount.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
+            // This Day in History Card
+            item {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Text(
+                        text = "This Day in History",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (historyLaunches.isNotEmpty()) {
+                        // Scrollable carousel of history launches
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp)
+                        ) {
+                            items(historyLaunches) { launch ->
+                                LaunchItemView(
+                                    launch = launch,
+                                    navController = navController,
+                                    modifier = Modifier
+                                        .width(300.dp)
+                                        .height(220.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        // Loading placeholder
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "No launches on this day",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+                }
+            }
+
             item {
                 SectionTitle(
                     title = "Launch Schedule",
@@ -93,7 +444,16 @@ fun ResponsiveHomeContent(
                     }
                 )
             }
-            item { UpcomingHorizontalScrollableList(navController = navController) }
+            // Use new HomeQuickView for phone (bidirectional carousel)
+            item {
+                HomeQuickView(
+                    viewModel = homeViewModel,
+                    previousLaunches = previousLaunches,
+                    upcomingLaunches = upcomingLaunches,
+                    isTabletOrDesktop = false,
+                    navController = navController
+                )
+            }
             item { SectionTitle(title = "Latest Updates", hasAction = false) }
             item { LatestUpdatesView(navController = navController) }
             item { SectionTitle(title = "Latest News", hasAction = false) }
@@ -101,6 +461,67 @@ fun ResponsiveHomeContent(
             item { SectionTitle(title = "Upcoming Events", hasAction = false) }
             item { EventsView(navController = navController) }
             item { Spacer(modifier = Modifier.height(32.dp)) }
+        }
+    }
+}
+
+/**
+ * Individual stat item for the quick stats card - matches detail page StatCard style
+ */
+@Composable
+private fun StatItem(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceVariant
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+                .defaultMinSize(minHeight = 96.dp)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                modifier = Modifier.size(64.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
+                )
+            }
         }
     }
 }
