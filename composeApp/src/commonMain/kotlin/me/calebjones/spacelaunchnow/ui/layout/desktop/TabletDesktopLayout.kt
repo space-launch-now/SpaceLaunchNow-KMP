@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.layout.desktop
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,13 +10,13 @@ import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,12 +29,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
+import kotlinproject.composeapp.generated.resources.Res
+import kotlinproject.composeapp.generated.resources.launcher
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
@@ -56,6 +60,7 @@ import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -83,15 +88,18 @@ fun TabletDesktopLayout(
                         ) {
                             NavigationRail(
                                 header = {
-                                    Icon(
-                                        Icons.Filled.RocketLaunch,
-                                        contentDescription = "App",
-                                        modifier = Modifier.absolutePadding(
-                                            left = 8.dp,
-                                            right = 8.dp,
-                                            bottom = 32.dp,
-                                            top = 16.dp
-                                        )
+                                    Image(
+                                        painter = painterResource(Res.drawable.launcher),
+                                        contentDescription = "App Icon",
+                                        contentScale = ContentScale.Fit,
+                                        modifier = Modifier
+                                            .size(96.dp)
+                                            .absolutePadding(
+                                                left = 8.dp,
+                                                right = 8.dp,
+                                                bottom = 32.dp,
+                                                top = 16.dp
+                                            )
                                     )
                                 },
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant

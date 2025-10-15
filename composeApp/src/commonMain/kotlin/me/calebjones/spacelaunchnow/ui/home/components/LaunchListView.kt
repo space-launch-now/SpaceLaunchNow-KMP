@@ -16,8 +16,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -31,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.CardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -70,7 +71,7 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
     BoxWithConstraints {
         val screenWidth = maxWidth
         val density = LocalDensity.current
-        
+
         val combinedLaunches by viewModel.combinedLaunches.collectAsState()
         val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsState()
         val error by viewModel.upcomingLaunchesError.collectAsState()
@@ -87,79 +88,106 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
             }
         }
 
-        // Scroll to the first upcoming launch when data is loaded, centered with peek
+        // Scroll to the separator when data is loaded, centered with peek
         LaunchedEffect(combinedLaunches, upcomingStartIndex, screenWidth) {
             if (combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
-                // Calculate offset to center the card
-                // Card width = 340dp, spacing = 16dp, contentPadding = 16dp
-                val cardWidthPx = with(density) { 340.dp.toPx() }
+                // Calculate offset to center the separator
+                // Separator width = 120dp, spacing = 16dp, contentPadding = 16dp
+                val separatorWidthPx = with(density) { 120.dp.toPx() }
                 val spacingPx = with(density) { 16.dp.toPx() }
                 val screenWidthPx = with(density) { screenWidth.toPx() }
-                
-                // Offset to center: (screenWidth - cardWidth) / 2 - contentPadding
-                // This centers the card and shows parts of adjacent cards
-                val centerOffset = ((screenWidthPx - cardWidthPx) / 2 - spacingPx).toInt()
-                
+
+                // Offset to center: (screenWidth - separatorWidth) / 2 - contentPadding
+                // This centers the separator and shows parts of adjacent cards
+                val centerOffset = ((screenWidthPx - separatorWidthPx) / 2 - spacingPx).toInt()
+
+                // Scroll to the separator (which is at upcomingStartIndex in the items list)
                 scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -centerOffset)
             }
         }
 
-    if (error != null) {
-        LaunchListErrorCard(
-            error = error!!,
-            onRetry = { viewModel.loadUpcomingLaunches(limit = 10, forceRefresh = true) }
-        )
-    } else if (combinedLaunches.isNotEmpty()) {
-        LazyRow(
-            modifier = Modifier.fillMaxWidth().draggable(
-                orientation = Orientation.Horizontal,
-                state = rememberDraggableState { delta ->
-                    isDragging = true
-                    coroutineScope.launch {
-                        scrollState.scrollBy(-delta)
+        if (error != null) {
+            LaunchListErrorCard(
+                error = error!!,
+                onRetry = { viewModel.loadUpcomingLaunches(limit = 10, forceRefresh = true) }
+            )
+        } else if (combinedLaunches.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth().draggable(
+                    orientation = Orientation.Horizontal,
+                    state = rememberDraggableState { delta ->
+                        isDragging = true
+                        coroutineScope.launch {
+                            scrollState.scrollBy(-delta)
+                        }
+                    },
+                    onDragStopped = {
+                        // When dragging stops, snap to the closest item
+                        isDragging = false
+                        coroutineScope.launch {
+                            val itemWidth = 340 + 16 // Card width (340dp) + spacing (16dp)
+                            val firstVisibleItemIndex = scrollState.firstVisibleItemIndex
+                            val firstVisibleItemOffset = scrollState.firstVisibleItemScrollOffset
+
+                            // Calculate if we should snap forward or backward
+                            val snapForward = firstVisibleItemOffset > itemWidth / 2
+
+                            if (snapForward) {
+                                // Snap to the next item
+                                scrollState.animateScrollToItem(firstVisibleItemIndex + 1)
+                            } else {
+                                // Snap to the current item
+                                scrollState.animateScrollToItem(firstVisibleItemIndex)
+                            }
+                        }
                     }
-                },
-                onDragStopped = {
-                    // When dragging stops, snap to the closest item
-                    isDragging = false
-                    coroutineScope.launch {
-                        val itemWidth = 340 + 16 // Card width (340dp) + spacing (16dp)
-                        val firstVisibleItemIndex = scrollState.firstVisibleItemIndex
-                        val firstVisibleItemOffset = scrollState.firstVisibleItemScrollOffset
+                ),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                state = scrollState,
 
-                        // Calculate if we should snap forward or backward
-                        val snapForward = firstVisibleItemOffset > itemWidth / 2
-
-                        if (snapForward) {
-                            // Snap to the next item
-                            scrollState.animateScrollToItem(firstVisibleItemIndex + 1)
-                        } else {
-                            // Snap to the current item
-                            scrollState.animateScrollToItem(firstVisibleItemIndex)
+                ) {
+                items(combinedLaunches.size + 1) { index ->
+                    when {
+                        // Before separator: previous launches
+                        index < upcomingStartIndex -> {
+                            LaunchItemView(
+                                launch = combinedLaunches[index],
+                                navController = navController,
+                                modifier = Modifier.size(width = 340.dp, height = 240.dp)
+                            )
+                        }
+                        // Separator at the transition point
+                        index == upcomingStartIndex -> {
+                            TimelineSeparator(
+                                modifier = Modifier.size(width = 120.dp, height = 240.dp)
+                            )
+                        }
+                        // After separator: upcoming launches
+                        else -> {
+                            LaunchItemView(
+                                launch = combinedLaunches[index - 1], // Offset by 1 due to separator
+                                navController = navController,
+                                modifier = Modifier.size(width = 340.dp, height = 240.dp)
+                            )
                         }
                     }
                 }
-            ),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            state = scrollState,
-
-            ) {
-            items(combinedLaunches) { launch ->
-                LaunchItemView(launch = launch, navController = navController)
             }
+        } else if (isLoading) {
+            LaunchListShimmer()
         }
-    } else if (isLoading) {
-        LaunchListShimmer()
-    }
     }
 }
 
 @Composable
-fun LaunchItemView(launch: LaunchNormal, navController: NavController) {
+fun LaunchItemView(
+    launch: LaunchNormal,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
-            .size(width = 340.dp, height = 240.dp)
+        modifier = modifier
             .clickable {
                 navController.navigate(LaunchDetail(launch.id))
             },
@@ -385,6 +413,43 @@ fun LaunchListErrorCard(
             ) {
                 Text("Retry")
             }
+        }
+    }
+}
+
+/**
+ * Timeline separator between past and future launches - vertical line with "NOW" text
+ */
+@Composable
+private fun TimelineSeparator(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        // Vertical line
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .fillMaxSize()
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(2.dp)
+                )
+        )
+
+        // "NOW" text centered on the line
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Text(
+                text = "NOW",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+            )
         }
     }
 }
