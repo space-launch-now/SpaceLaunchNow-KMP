@@ -78,7 +78,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Top
     ) {
         // Image card with fixed height for LazyColumn compatibility

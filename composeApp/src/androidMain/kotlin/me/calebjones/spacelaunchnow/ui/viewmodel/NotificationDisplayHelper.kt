@@ -369,9 +369,10 @@ object NotificationDisplayHelper {
         )
 
         // Create intent with launch data
+        // Use launchUuid for navigation since API 2.4.0 requires UUID for launch details
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("launch_id", notificationData.launchId)
+            putExtra("launch_id", notificationData.launchUuid) // Use UUID for API 2.4.0
             putExtra("launch_uuid", notificationData.launchUuid)
             putExtra("launch_name", notificationData.launchName)
             putExtra("launch_net", notificationData.launchNet)

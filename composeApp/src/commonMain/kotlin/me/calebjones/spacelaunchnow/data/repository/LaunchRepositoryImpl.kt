@@ -5,9 +5,11 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
+import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
@@ -81,6 +83,60 @@ class LaunchRepositoryImpl(
                 launches
             }
             Result.success(filtered)
+        } catch (e: ResponseException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getUpcomingLaunchesList(limit: Int, netGt: Instant?, netLt: Instant?): Result<PaginatedLaunchBasicList> {
+        return try {
+            val response = launchesApi.getLaunchMiniList(
+                limit = limit,
+                netGt = netGt,
+                netLt = netLt,
+                ordering = "net"
+            )
+            Result.success(response.body())
+        } catch (e: ResponseException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getPreviousLaunchesNormal(limit: Int): Result<PaginatedLaunchNormalList> {
+        return try {
+            val response = launchesApi.getLaunchList(
+                limit = limit,
+                previous = true,
+                ordering = "-net" // Most recent first
+            )
+            Result.success(response.body())
+        } catch (e: ResponseException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getLaunchesByDayAndMonth(day: Int, month: Int, limit: Int): Result<PaginatedLaunchNormalList> {
+        return try {
+            val response = launchesApi.getLaunchList(
+                limit = limit,
+                previous = true,
+                netDay = listOf(day.toDouble()),
+                netMonth = listOf(month.toDouble()),
+                ordering = "-net" // Most recent first
+            )
+            Result.success(response.body())
         } catch (e: ResponseException) {
             Result.failure(e)
         } catch (e: IOException) {
