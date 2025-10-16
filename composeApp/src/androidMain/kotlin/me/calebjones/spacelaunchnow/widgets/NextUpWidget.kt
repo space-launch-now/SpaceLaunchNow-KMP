@@ -16,8 +16,20 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
+import androidx.glance.color.ColorProvider
+import androidx.glance.currentState
+import androidx.compose.ui.graphics.Color
 import androidx.glance.layout.Alignment
+import androidx.glance.state.GlanceStateDefinition
+import androidx.glance.state.PreferencesGlanceStateDefinition
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -38,17 +50,46 @@ import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.ui.theme.getWidgetAppearanceBlocking
 import kotlin.math.abs
 import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class NextUpWidget : GlanceAppWidget() {
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val launch = fetchNextLaunch()
+    // CRITICAL: Must set state definition to use preferences state for force updates
+    override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
 
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        println("=== NextUpWidget: provideGlance START for id: $id ===")
+        
+        val launch = fetchNextLaunch()
+        
         provideContent {
-            GlanceTheme {
-                NextUpWidgetContent(launch)
+            // Read appearance from Glance state (written by WidgetUpdater)
+            val prefs = currentState<Preferences>()
+            val forceUpdateTimestamp = prefs[longPreferencesKey("force_update_timestamp")]
+            val themeSourceName = prefs[stringPreferencesKey("widget_theme_source")] ?: "FOLLOW_APP_THEME"
+            val appThemeMode = prefs[stringPreferencesKey("app_theme_mode")] ?: "System"
+            val backgroundAlpha = prefs[floatPreferencesKey("widget_background_alpha")] ?: 1.0f
+            val cornerRadius = prefs[intPreferencesKey("widget_corner_radius")] ?: 16
+            
+            val themeSource = WidgetThemeSource.fromString(themeSourceName)
+            println("NextUpWidget: Glance state - timestamp=$forceUpdateTimestamp, source=$themeSource, appTheme=$appThemeMode, alpha=$backgroundAlpha, radius=$cornerRadius")
+            
+            // Select appropriate ColorProviders based on theme source with alpha applied
+            val useDynamicColors = themeSource == WidgetThemeSource.DYNAMIC_COLORS
+            val colorProviders = WidgetGlanceColorScheme.getColorProvidersWithAlpha(
+                context = context,
+                useDynamicColors = useDynamicColors,
+                alpha = backgroundAlpha,
+                appThemeMode = if (themeSource == WidgetThemeSource.FOLLOW_APP_THEME) appThemeMode else "System"
+            )
+            
+            GlanceTheme(colors = colorProviders) {
+                NextUpWidgetContent(
+                    launch = launch,
+                    cornerRadius = cornerRadius
+                )
             }
         }
     }
@@ -69,13 +110,17 @@ class NextUpWidget : GlanceAppWidget() {
 }
 
 @Composable
-fun NextUpWidgetContent(launch: LaunchNormal?) {
+fun NextUpWidgetContent(
+    launch: LaunchNormal?,
+    cornerRadius: Int = 16
+) {
     val context = LocalContext.current
 
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(GlanceTheme.colors.background)
+            .background(GlanceTheme.colors.surface) // Use theme surface color (has alpha baked in)
+            .cornerRadius(cornerRadius.dp)
             .clickable(
                 actionStartActivity(
                     Intent(context, MainActivity::class.java).apply {

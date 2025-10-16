@@ -1,6 +1,19 @@
 import WidgetKit
 import SwiftUI
 
+// Helper extension to apply custom background with opacity (shared with NextUpWidget)
+extension View {
+    func widgetBackground(backgroundView: some View) -> some View {
+        if #available(iOSApplicationExtension 17.0, *) {
+            return containerBackground(for: .widget) {
+                backgroundView
+            }
+        } else {
+            return background(backgroundView)
+        }
+    }
+}
+
 // MARK: - Launch List Widget
 struct LaunchListWidget: Widget {
     let kind: String = "LaunchListWidget"
@@ -9,6 +22,7 @@ struct LaunchListWidget: Widget {
         StaticConfiguration(kind: kind, provider: LaunchProvider()) { entry in
             LaunchListWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetBackground(backgroundView: Color.clear)
         }
         .configurationDisplayName("Launch List")
         .description("Shows upcoming space launches")
@@ -22,17 +36,25 @@ struct LaunchListWidgetView: View {
     @Environment(\.widgetFamily) var family
     
     var body: some View {
-        if entry.isPlaceholder {
-            placeholderView
-        } else if !entry.hasWidgetAccess {
-            lockedView  // Show paywall for non-premium users
-        } else if let errorMessage = entry.errorMessage {
-            errorView(message: errorMessage)
-        } else if !entry.launches.isEmpty {
-            launchListView
-        } else {
-            emptyView
+        ZStack {
+            // Custom background with user-configured transparency
+            Color(white: 0.15)
+                .opacity(entry.backgroundAlpha)
+            
+            // Content
+            if entry.isPlaceholder {
+                placeholderView
+            } else if !entry.hasWidgetAccess {
+                lockedView  // Show paywall for non-premium users
+            } else if let errorMessage = entry.errorMessage {
+                errorView(message: errorMessage)
+            } else if !entry.launches.isEmpty {
+                launchListView
+            } else {
+                emptyView
+            }
         }
+        .cornerRadius(entry.cornerRadius)
     }
     
     // MARK: - Launch List View
