@@ -32,6 +32,7 @@ import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
+import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.ui.about.AboutLibrariesScreen
 import me.calebjones.spacelaunchnow.ui.compose.BottomNavigationBar
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
@@ -41,9 +42,11 @@ import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.NotificationSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
+import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
+import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -63,6 +66,7 @@ fun PhoneLayout(
         DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
         AboutLibraries::class.qualifiedName -> false // Hide for AboutLibrariesScreen
         SupportUs::class.qualifiedName -> false // Hide for SupportUsScreen
+        ThemeCustomization::class.qualifiedName -> false // Hide for ThemeCustomization
 
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern
@@ -163,8 +167,13 @@ fun PhoneLayout(
                             AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
                         }
                         composableWithCompositionLocal<SupportUs> {
-                            me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen(
+                            SupportUsScreen(
                                 onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<me.calebjones.spacelaunchnow.navigation.ThemeCustomization> {
+                            ThemeCustomizationScreen(
+                                navController = navController
                             )
                         }
                     }

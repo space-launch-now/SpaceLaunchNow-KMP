@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
@@ -10,6 +11,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.mp.KoinPlatform.getKoin
+import kotlinx.coroutines.flow.first
 
 // Global holder for Koin instance
 private var koinInstance: Koin? = null
@@ -32,6 +34,7 @@ fun initKoin() {
 class KoinHelper : KoinComponent {
     val launchRepository: LaunchRepository by inject()
     val subscriptionRepository: SubscriptionRepository by inject()
+    val widgetPreferences: WidgetPreferences by inject()
 
     /**
      * Fetch upcoming launches and unwrap the Result type
@@ -61,6 +64,32 @@ class KoinHelper : KoinComponent {
         } catch (e: Exception) {
             println("KoinHelper: Failed to check widget access: ${e.message}")
             false // Default to locked if check fails
+        }
+    }
+    
+    /**
+     * Get widget background alpha (0.0 to 1.0)
+     * Used by iOS widgets to set background transparency
+     */
+    suspend fun getWidgetBackgroundAlpha(): Float {
+        return try {
+            widgetPreferences.widgetBackgroundAlphaFlow.first()
+        } catch (e: Exception) {
+            println("KoinHelper: Failed to get widget background alpha: ${e.message}")
+            0.75f // Default value
+        }
+    }
+    
+    /**
+     * Get widget corner radius in dp (0 to 40)
+     * Used by iOS widgets to set corner radius
+     */
+    suspend fun getWidgetCornerRadius(): Float {
+        return try {
+            widgetPreferences.widgetCornerRadiusFlow.first()
+        } catch (e: Exception) {
+            println("KoinHelper: Failed to get widget corner radius: ${e.message}")
+            16f // Default value
         }
     }
 

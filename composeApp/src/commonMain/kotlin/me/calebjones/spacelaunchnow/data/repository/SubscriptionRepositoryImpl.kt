@@ -16,7 +16,10 @@ import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
+import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.days
 
 /**
@@ -34,7 +37,9 @@ class SubscriptionRepositoryImpl(
     private val billingClient: BillingClient,
     private val storage: SubscriptionStorage,
     private val debugPreferences: DebugPreferences,
-    private val revenueCatManager: RevenueCatManager  // ADD: RevenueCat for entitlements
+    private val revenueCatManager: RevenueCatManager,  // RevenueCat for entitlements
+    private val widgetPreferences: WidgetPreferences,  // Cache widget access for widgets
+    private val platformWidgetUpdater: PlatformWidgetUpdater? = null  // Optional: for triggering widget updates
 ) : SubscriptionRepository {
 
     // Repository scope for background work
@@ -228,7 +233,22 @@ class SubscriptionRepositoryImpl(
         
         if (hasPremiumEntitlement) {
             println("SubscriptionRepository: User has premium entitlement - granting ${feature.name}")
+            
+            // Cache widget access for widgets (they can't call RevenueCat)
+            if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+                widgetPreferences.updateWidgetAccessGranted(true)
+                // Trigger widget update after granting access
+                updateWidgetsAfterAccessChange("access granted")
+            }
+            
             return true
+        }
+        
+        // No entitlement - revoke widget access
+        if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+            widgetPreferences.updateWidgetAccessGranted(false)
+            // Trigger widget update after revoking access
+            updateWidgetsAfterAccessChange("access revoked")
         }
         
         // Fallback to cached state for debug/offline scenarios
@@ -436,6 +456,31 @@ class SubscriptionRepositoryImpl(
             verifySubscription(forceRefresh = true)
         }
         println("SubscriptionRepository: Debug simulation cleared")
+    }
+
+    /**
+     * Triggers widget updates after widget access changes (premium granted/revoked).
+     * Uses a longer delay to ensure DataStore writes complete before widget refresh.
+     */
+    private fun updateWidgetsAfterAccessChange(reason: String) {
+        if (platformWidgetUpdater == null) {
+            println("SubscriptionRepository: PlatformWidgetUpdater not available, skipping widget update for: $reason")
+            return
+        }
+        
+        repositoryScope.launch {
+            println("SubscriptionRepository: Widget $reason - scheduling widget update in 750ms")
+            try {
+                // Longer delay for access changes to ensure DataStore write completes
+                delay(750)
+                println("SubscriptionRepository: Triggering widget update after $reason")
+                platformWidgetUpdater.updateAllWidgets()
+                println("SubscriptionRepository: Widget update completed for: $reason")
+            } catch (e: Exception) {
+                println("SubscriptionRepository: ERROR updating widgets after $reason: ${e.message}")
+                e.printStackTrace()
+            }
+        }
     }
 }
 

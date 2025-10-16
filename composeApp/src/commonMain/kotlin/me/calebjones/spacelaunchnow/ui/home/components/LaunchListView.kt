@@ -88,21 +88,15 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
             }
         }
 
-        // Scroll to the separator when data is loaded, centered with peek
-        LaunchedEffect(combinedLaunches, upcomingStartIndex, screenWidth) {
+        // Scroll to show first upcoming launch with a small peek of the previous card
+        LaunchedEffect(combinedLaunches, upcomingStartIndex) {
             if (combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
-                // Calculate offset to center the separator
-                // Separator width = 120dp, spacing = 16dp, contentPadding = 16dp
-                val separatorWidthPx = with(density) { 120.dp.toPx() }
-                val spacingPx = with(density) { 16.dp.toPx() }
-                val screenWidthPx = with(density) { screenWidth.toPx() }
-
-                // Offset to center: (screenWidth - separatorWidth) / 2 - contentPadding
-                // This centers the separator and shows parts of adjacent cards
-                val centerOffset = ((screenWidthPx - separatorWidthPx) / 2 - spacingPx).toInt()
-
-                // Scroll to the separator (which is at upcomingStartIndex in the items list)
-                scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -centerOffset)
+                // Show just a small peek (40dp) of the previous card on the left
+                val peekAmount = with(density) { 40.dp.toPx() }.toInt()
+                
+                // Scroll to the first upcoming launch
+                // Using negative offset to show a bit of the previous card
+                scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -peekAmount)
             }
         }
 
@@ -147,31 +141,12 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
                 state = scrollState,
 
                 ) {
-                items(combinedLaunches.size + 1) { index ->
-                    when {
-                        // Before separator: previous launches
-                        index < upcomingStartIndex -> {
-                            LaunchItemView(
-                                launch = combinedLaunches[index],
-                                navController = navController,
-                                modifier = Modifier.size(width = 340.dp, height = 240.dp)
-                            )
-                        }
-                        // Separator at the transition point
-                        index == upcomingStartIndex -> {
-                            TimelineSeparator(
-                                modifier = Modifier.size(width = 120.dp, height = 240.dp)
-                            )
-                        }
-                        // After separator: upcoming launches
-                        else -> {
-                            LaunchItemView(
-                                launch = combinedLaunches[index - 1], // Offset by 1 due to separator
-                                navController = navController,
-                                modifier = Modifier.size(width = 340.dp, height = 240.dp)
-                            )
-                        }
-                    }
+                items(combinedLaunches.size) { index ->
+                    LaunchItemView(
+                        launch = combinedLaunches[index],
+                        navController = navController,
+                        modifier = Modifier.size(width = 340.dp, height = 240.dp)
+                    )
                 }
             }
         } else if (isLoading) {
@@ -413,43 +388,6 @@ fun LaunchListErrorCard(
             ) {
                 Text("Retry")
             }
-        }
-    }
-}
-
-/**
- * Timeline separator between past and future launches - vertical line with "NOW" text
- */
-@Composable
-private fun TimelineSeparator(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        // Vertical line
-        Box(
-            modifier = Modifier
-                .width(4.dp)
-                .fillMaxSize()
-                .background(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(2.dp)
-                )
-        )
-
-        // "NOW" text centered on the line
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-        ) {
-            Text(
-                text = "NOW",
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
-            )
         }
     }
 }

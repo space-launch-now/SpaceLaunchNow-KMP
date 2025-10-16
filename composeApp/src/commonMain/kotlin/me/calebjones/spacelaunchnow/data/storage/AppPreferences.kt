@@ -14,6 +14,11 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         private val USE_UTC = booleanPreferencesKey("use_utc")
         private val HIDE_TBD_LAUNCHES = booleanPreferencesKey("hide_tbd_launches")
         private val KEEP_LAUNCHES_FOR_24_HOURS = booleanPreferencesKey("keep_launches_for_24_hours")
+        
+        // Premium theme customization
+        private val CUSTOM_PRIMARY_COLOR = longPreferencesKey("custom_primary_color")
+        private val CUSTOM_SECONDARY_COLOR = longPreferencesKey("custom_secondary_color")
+        private val PALETTE_STYLE = stringPreferencesKey("palette_style")
     }
 
     val themeFlow: Flow<ThemeOption> = dataStore.data.map { preferences ->
@@ -31,6 +36,18 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
     val keepLaunchesFor24HoursFlow: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[KEEP_LAUNCHES_FOR_24_HOURS] ?: true
+    }
+
+    val customPrimaryColorFlow: Flow<Long?> = dataStore.data.map { preferences ->
+        preferences[CUSTOM_PRIMARY_COLOR]
+    }
+
+    val customSecondaryColorFlow: Flow<Long?> = dataStore.data.map { preferences ->
+        preferences[CUSTOM_SECONDARY_COLOR]
+    }
+
+    val paletteStyleFlow: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[PALETTE_STYLE]
     }
 
     suspend fun updateTheme(theme: ThemeOption) {
