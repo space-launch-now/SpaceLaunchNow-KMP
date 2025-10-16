@@ -208,6 +208,11 @@ fun TabletDesktopLayout(
                                         onNavigateBack = { navController.popBackStack() }
                                     )
                                 }
+                                composableWithCompositionLocal<me.calebjones.spacelaunchnow.navigation.ThemeCustomization> {
+                                    me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationScreen(
+                                        navController = navController
+                                    )
+                                }
                             }
                         }
                     }

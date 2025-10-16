@@ -9,12 +9,16 @@ import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.data.storage.createAppSettingsDataStore
 import me.calebjones.spacelaunchnow.data.storage.createSubscriptionDataStore
+import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
 
 val androidModule = module {
     single { createDataStore(androidContext()) }
     single(named("DebugDataStore")) { createDebugDataStore(androidContext()) }
     single(named("AppSettingsDataStore")) { createAppSettingsDataStore(androidContext()) }
     single(named("SubscriptionDataStore")) { createSubscriptionDataStore(androidContext()) }
+    
+    // Platform-specific widget updater (Android only)
+    single { PlatformWidgetUpdater(context = androidContext()) }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {

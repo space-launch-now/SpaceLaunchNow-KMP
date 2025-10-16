@@ -9,10 +9,24 @@ struct NextUpWidget: Widget {
         StaticConfiguration(kind: kind, provider: LaunchProvider()) { entry in
             NextUpWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetBackground(backgroundView: Color.clear)
         }
         .configurationDisplayName("Next Launch")
         .description("Shows the next upcoming space launch")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+    }
+}
+
+// Helper extension to apply custom background with opacity
+extension View {
+    func widgetBackground(backgroundView: some View) -> some View {
+        if #available(iOSApplicationExtension 17.0, *) {
+            return containerBackground(for: .widget) {
+                backgroundView
+            }
+        } else {
+            return background(backgroundView)
+        }
     }
 }
 
@@ -21,15 +35,23 @@ struct NextUpWidgetView: View {
     var entry: LaunchEntry
     
     var body: some View {
-        if entry.isPlaceholder {
-            placeholderView
-        } else if let errorMessage = entry.errorMessage {
-            errorView(message: errorMessage)
-        } else if let launch = entry.launches.first {
-            launchView(launch: launch)
-        } else {
-            emptyView
+        ZStack {
+            // Custom background with user-configured transparency
+            Color(white: 0.15)
+                .opacity(entry.backgroundAlpha)
+            
+            // Content
+            if entry.isPlaceholder {
+                placeholderView
+            } else if let errorMessage = entry.errorMessage {
+                errorView(message: errorMessage)
+            } else if let launch = entry.launches.first {
+                launchView(launch: launch)
+            } else {
+                emptyView
+            }
         }
+        .cornerRadius(entry.cornerRadius)
     }
     
     // MARK: - Launch View

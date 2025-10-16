@@ -3,8 +3,14 @@ package me.calebjones.spacelaunchnow.widgets
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
@@ -14,12 +20,16 @@ import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
+import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.color.ColorProvider
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
+import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -29,7 +39,8 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
-import androidx.glance.layout.width
+import androidx.glance.state.GlanceStateDefinition
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -40,46 +51,64 @@ import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.java.KoinJavaComponent.inject as koinInject
+import me.calebjones.spacelaunchnow.ui.theme.getWidgetAppearanceBlocking
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class LaunchListWidget : GlanceAppWidget() {
 
+    // CRITICAL: Must set state definition to use preferences state for force updates
+    override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        // Check if user has premium entitlement for widgets
-        val hasWidgetAccess = checkWidgetAccess()
-        val launches = if (hasWidgetAccess) fetchUpcomingLaunches() else emptyList()
+        println("=== LaunchListWidget: provideGlance START for id: $id ===")
+
+        // Pre-fetch launches outside composable (need to check access first from state)
+        // We'll fetch optimistically - if no access, we just won't show them
+        val launches = fetchUpcomingLaunches()
 
         provideContent {
-            GlanceTheme {
+            // Read appearance from Glance state (written by WidgetUpdater)
+            val prefs = currentState<Preferences>()
+            val forceUpdateTimestamp = prefs[longPreferencesKey("force_update_timestamp")]
+            val themeSourceName = prefs[stringPreferencesKey("widget_theme_source")] ?: "FOLLOW_APP_THEME"
+            val appThemeMode = prefs[stringPreferencesKey("app_theme_mode")] ?: "System"
+            val backgroundAlpha = prefs[floatPreferencesKey("widget_background_alpha")] ?: 1.0f
+            val cornerRadius = prefs[intPreferencesKey("widget_corner_radius")] ?: 16
+            val hasAccessStr = prefs[stringPreferencesKey("widget_has_access")] ?: "false"
+            val hasWidgetAccess = hasAccessStr.toBoolean()
+            
+            val themeSource = WidgetThemeSource.fromString(themeSourceName)
+            println("LaunchListWidget: Glance state - timestamp=$forceUpdateTimestamp, source=$themeSource, appTheme=$appThemeMode, alpha=$backgroundAlpha, radius=$cornerRadius, access=$hasWidgetAccess")
+            
+            // Get appropriate color providers based on theme source with alpha applied
+            val useDynamicColors = themeSource == WidgetThemeSource.DYNAMIC_COLORS
+            val colorProviders = WidgetGlanceColorScheme.getColorProvidersWithAlpha(
+                context = context,
+                useDynamicColors = useDynamicColors,
+                alpha = backgroundAlpha,
+                appThemeMode = if (themeSource == WidgetThemeSource.FOLLOW_APP_THEME) appThemeMode else "System"
+            )
+            
+            GlanceTheme(colors = colorProviders) {
                 if (hasWidgetAccess) {
-                    LaunchListWidgetContent(launches)
+                    LaunchListWidgetContent(
+                        launches = launches,
+                        cornerRadius = cornerRadius
+                    )
                 } else {
-                    LaunchListWidgetLockedContent()
+                    LaunchListWidgetLockedContent(
+                        cornerRadius = cornerRadius
+                    )
                 }
             }
         }
     }
 
-    private suspend fun checkWidgetAccess(): Boolean {
-        return withContext(Dispatchers.IO) {
-            try {
-                val subscriptionRepository: SubscriptionRepository by koinInject(SubscriptionRepository::class.java)
-                subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
-            } catch (e: Exception) {
-                println("Widget: Failed to check widget access: ${e.message}")
-                e.printStackTrace()
-                false // Default to locked if check fails
-            }
-        }
-    }
+    // Removed checkWidgetAccess() - now reads from cached DataStore value
 
     private suspend fun fetchUpcomingLaunches(): List<LaunchNormal> {
         return withContext(Dispatchers.IO) {
@@ -97,13 +126,16 @@ class LaunchListWidget : GlanceAppWidget() {
 }
 
 @Composable
-fun LaunchListWidgetLockedContent() {
+fun LaunchListWidgetLockedContent(
+    cornerRadius: Int = 16
+) {
     val context = LocalContext.current
 
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(GlanceTheme.colors.background)
+            .background(GlanceTheme.colors.surface) // Use theme surface color (has alpha baked in)
+            .cornerRadius(cornerRadius.dp)
             .clickable(
                 actionStartActivity(
                     Intent(context, MainActivity::class.java).apply {
@@ -161,14 +193,18 @@ fun LaunchListWidgetLockedContent() {
 }
 
 @Composable
-fun LaunchListWidgetContent(launches: List<LaunchNormal>) {
+fun LaunchListWidgetContent(
+    launches: List<LaunchNormal>,
+    cornerRadius: Int = 16
+) {
     val context = LocalContext.current
 
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(GlanceTheme.colors.background)
-            .padding(8.dp)
+            .background(GlanceTheme.colors.surface) // Use theme surface color (has alpha baked in)
+            .cornerRadius(cornerRadius.dp)
+            .padding(16.dp)
     ) {
         Column(
             modifier = GlanceModifier.fillMaxSize()
@@ -342,16 +378,19 @@ private fun formatCountdownCompact(netTime: Instant): String {
             val mins = duration.inWholeMinutes
             "${mins}m"
         }
+
         duration < 1.days -> {
             val hours = duration.inWholeHours
             val mins = (duration - hours.hours).inWholeMinutes
             "${hours}h ${mins}m"
         }
+
         duration < 7.days -> {
             val days = duration.inWholeDays
             val hours = (duration - days.days).inWholeHours
             "${days}d ${hours}h"
         }
+
         else -> {
             val days = duration.inWholeDays
             "${days}d"

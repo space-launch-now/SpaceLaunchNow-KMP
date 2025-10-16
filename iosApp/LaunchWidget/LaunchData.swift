@@ -9,6 +9,8 @@ struct LaunchEntry: TimelineEntry {
     let isPlaceholder: Bool
     let errorMessage: String?
     let hasWidgetAccess: Bool  // Premium entitlement check
+    let backgroundAlpha: Double  // Widget background transparency (0.0 to 1.0)
+    let cornerRadius: Double  // Widget corner radius in dp
     
     static var placeholder: LaunchEntry {
         LaunchEntry(
@@ -16,7 +18,9 @@ struct LaunchEntry: TimelineEntry {
             launches: [LaunchData.placeholder],
             isPlaceholder: true,
             errorMessage: nil,
-            hasWidgetAccess: true  // Show placeholder as if they have access
+            hasWidgetAccess: true,  // Show placeholder as if they have access
+            backgroundAlpha: 0.75,
+            cornerRadius: 16.0
         )
     }
 }
@@ -150,6 +154,12 @@ struct LaunchProvider: TimelineProvider {
             let helper = KoinHelper.Companion().instance()
             print("🚀 Widget: Got helper")
             
+            // Fetch widget preferences
+            print("🚀 Widget: Fetching widget preferences...")
+            let backgroundAlpha = try await helper.getWidgetBackgroundAlpha()
+            let cornerRadius = try await helper.getWidgetCornerRadius()
+            print("🚀 Widget: Got preferences - alpha: \(backgroundAlpha), cornerRadius: \(cornerRadius)")
+            
             // Check if user has widget access (premium entitlement)
             print("🚀 Widget: Checking widget access...")
             let hasAccess = try await helper.hasWidgetAccess()
@@ -163,7 +173,9 @@ struct LaunchProvider: TimelineProvider {
                     launches: [],
                     isPlaceholder: false,
                     errorMessage: nil,
-                    hasWidgetAccess: false
+                    hasWidgetAccess: false,
+                    backgroundAlpha: Double(backgroundAlpha),
+                    cornerRadius: Double(cornerRadius)
                 )
             }
             
@@ -175,21 +187,47 @@ struct LaunchProvider: TimelineProvider {
             guard let paginatedList = paginatedList else {
                 let errorMsg = "fetchUpcomingLaunchesOrNull returned nil - API call failed"
                 print("🚀 Widget: \(errorMsg)")
-                return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: errorMsg, hasWidgetAccess: true)
+                return LaunchEntry(
+                    date: Date(),
+                    launches: [],
+                    isPlaceholder: false,
+                    errorMessage: errorMsg,
+                    hasWidgetAccess: true,
+                    backgroundAlpha: Double(backgroundAlpha),
+                    cornerRadius: Double(cornerRadius)
+                )
             }
             
             print("🚀 Widget: Successfully got PaginatedLaunchNormalList with \(paginatedList.results.count) launches")
-            return processPaginatedList(paginatedList, hasAccess: hasAccess)
+            return processPaginatedList(
+                paginatedList,
+                hasAccess: hasAccess,
+                backgroundAlpha: Double(backgroundAlpha),
+                cornerRadius: Double(cornerRadius)
+            )
             
         } catch {
             let errorMsg = "Error: \(error.localizedDescription)"
             print("🚀 Widget error: \(errorMsg)")
-            return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: errorMsg, hasWidgetAccess: false)
+            return LaunchEntry(
+                date: Date(),
+                launches: [],
+                isPlaceholder: false,
+                errorMessage: errorMsg,
+                hasWidgetAccess: false,
+                backgroundAlpha: 0.75,
+                cornerRadius: 16.0
+            )
         }
     }
     
     // Helper to process the paginated list
-    private func processPaginatedList(_ paginatedList: PaginatedLaunchNormalList, hasAccess: Bool) -> LaunchEntry {
+    private func processPaginatedList(
+        _ paginatedList: PaginatedLaunchNormalList,
+        hasAccess: Bool,
+        backgroundAlpha: Double,
+        cornerRadius: Double
+    ) -> LaunchEntry {
         let results = paginatedList.results
         print("🚀 Widget: Got \(results.count) launches")
         
@@ -227,9 +265,25 @@ struct LaunchProvider: TimelineProvider {
         print("🚀 Widget: Successfully processed \(launches.count) launches")
         
         if launches.isEmpty {
-            return LaunchEntry(date: Date(), launches: [], isPlaceholder: false, errorMessage: "API returned \(results.count) items but 0 were valid", hasWidgetAccess: hasAccess)
+            return LaunchEntry(
+                date: Date(),
+                launches: [],
+                isPlaceholder: false,
+                errorMessage: "API returned \(results.count) items but 0 were valid",
+                hasWidgetAccess: hasAccess,
+                backgroundAlpha: backgroundAlpha,
+                cornerRadius: cornerRadius
+            )
         }
         
-        return LaunchEntry(date: Date(), launches: launches, isPlaceholder: false, errorMessage: nil, hasWidgetAccess: hasAccess)
+        return LaunchEntry(
+            date: Date(),
+            launches: launches,
+            isPlaceholder: false,
+            errorMessage: nil,
+            hasWidgetAccess: hasAccess,
+            backgroundAlpha: backgroundAlpha,
+            cornerRadius: cornerRadius
+        )
     }
 }
