@@ -7,8 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,7 +31,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -107,9 +105,9 @@ fun ThemeCustomizationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {                     
+                title = {
                     Text(
-                        text = "Theme Customization",
+                        text = "Theme",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 36.sp,
@@ -137,36 +135,19 @@ fun ThemeCustomizationScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Theme Selection (FREE - Available to all users)
             item {
-                Text(
-                    "Appearance",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "Choose between light, dark, or system theme",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            item {
-                ThemeSettingRow(
-                    selected = selectedTheme,
-                    onSelected = viewModel::updateTheme
-                )
-            }
-
-            // Premium Features Section
-            item {
-                Spacer(Modifier.height(8.dp))
-                HorizontalDivider()
-                Spacer(Modifier.height(8.dp))
+                SectionHeaderText("Appearance")
+                SectionSubHeaderText("Choose between light, dark, or system theme")
+                SettingsCardRow {
+                    ThemeSettingRow(
+                        selected = selectedTheme,
+                        onSelected = viewModel::updateTheme,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
 
             // Premium Prompt or Premium Features
@@ -184,12 +165,12 @@ fun ThemeCustomizationScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        "Primary Color",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f)
-                    )
+                    Column {
+                        SectionHeaderText("Primary Color")
+                        SectionSubHeaderText(
+                            "Choose the primary color for your theme."
+                        )
+                    }
                     if (!isPremium) {
                         Icon(
                             Icons.Default.Lock,
@@ -206,188 +187,180 @@ fun ThemeCustomizationScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            }
-
-            item {
-                ColorPalette(
-                    selectedColor = selectedPrimaryColor,
-                    onColorSelected = if (isPremium) {
-                        { viewModel.updatePrimaryColor(it) }
-                    } else {
-                        { /* Disabled */ }
-                    },
-                    enabled = isPremium
-                )
-            }
-
-            // Palette Style Selection (PREMIUM - Disabled for free users)
-            item {
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            "Palette Style",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            "Choose how colors are generated from your primary color",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    if (!isPremium) {
-                        Icon(
-                            Icons.Default.Lock,
-                            contentDescription = "Premium",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                SettingsCardRow {
+                    ColorPalette(
+                        selectedColor = selectedPrimaryColor,
+                        onColorSelected = if (isPremium) {
+                            { viewModel.updatePrimaryColor(it) }
+                        } else {
+                            { /* Disabled */ }
+                        },
+                        enabled = isPremium,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
 
-            items(ThemePreferences.AVAILABLE_PALETTE_STYLES) { style ->
-                PaletteStyleItem(
-                    name = style,
-                    description = getPaletteStyleDescription(style),
-                    isSelected = selectedPaletteStyle == style,
-                    onClick = if (isPremium) {
-                        { viewModel.updatePaletteStyle(style) }
-                    } else {
-                        { /* Disabled */ }
-                    },
-                    enabled = isPremium
+            item {
+                SectionHeaderText("Palette Style")
+                SectionSubHeaderText(
+                    "Choose how colors are generated from your primary color"
                 )
+                SettingsCardRow {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ThemePreferences.AVAILABLE_PALETTE_STYLES.chunked(2).forEach { rowItems ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                rowItems.forEach { style ->
+                                    PaletteStyleItem(
+                                        name = style,
+                                        description = getPaletteStyleDescription(style),
+                                        isSelected = selectedPaletteStyle == style,
+                                        onClick = if (isPremium) {
+                                            { viewModel.updatePaletteStyle(style) }
+                                        } else {
+                                            { /* Disabled */ }
+                                        },
+                                        enabled = isPremium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                // Fill remaining space if odd number of items in last row
+                                if (rowItems.size < 2) {
+                                    Spacer(Modifier.weight(1f))
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             // Widget Appearance Customization (PREMIUM only)
             if (isPremium) {
                 item {
-                    Spacer(Modifier.height(24.dp))
-                    HorizontalDivider()
-                    Spacer(Modifier.height(16.dp))
-                }
-
-                item {
-                    Text(
-                        "Widget Appearance",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        "Customize the look of your home screen widgets",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(Modifier.height(16.dp))
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(start = 20.dp),
+                    ) {
+                        Text(
+                            "Widget Appearance",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "Customize the look of your home screen widgets",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
 
                 // Widget Theme Source Selection (Android only - iOS doesn't support Material 3 dynamic colors)
                 if (getPlatform().name.contains("Android")) {
                     item {
-                        Text(
-                            "Widget Theme",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                        SectionHeaderText("Widget Theme")
+                        SectionSubHeaderText(
+                            "Choose where widget colors come from"
                         )
-                        Text(
-                            "Choose where widget colors come from",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(Modifier.height(12.dp))
                     }
 
                     item {
                         val widgetThemeSource by viewModel.widgetThemeSource.collectAsStateWithLifecycle()
-                        WidgetThemeSourceSelector(
-                            selectedSource = widgetThemeSource,
-                            onSourceSelected = { viewModel.updateWidgetThemeSource(it) }
-                        )
+                        SettingsCardRow {
+                            WidgetThemeSourceSelector(
+                                selectedSource = widgetThemeSource,
+                                onSourceSelected = { viewModel.updateWidgetThemeSource(it) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
 
                 // Widget Background Transparency
                 item {
-                    Spacer(Modifier.height(16.dp))
                     val widgetBackgroundAlpha by viewModel.widgetBackgroundAlpha.collectAsStateWithLifecycle()
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                    SettingsCardRow {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Background Transparency",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    "${(widgetBackgroundAlpha * 100).toInt()}%",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             Text(
-                                "Background Transparency",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                "0% = Fully transparent, 100% = Fully opaque",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Text(
-                                "${(widgetBackgroundAlpha * 100).toInt()}%",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
+                            Spacer(Modifier.height(8.dp))
+                            Slider(
+                                value = widgetBackgroundAlpha,
+                                onValueChange = { viewModel.updateWidgetBackgroundAlpha(it) },
+                                valueRange = 0f..1f,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
-                        Text(
-                            "0% = Fully transparent, 100% = Fully opaque",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Slider(
-                            value = widgetBackgroundAlpha,
-                            onValueChange = { viewModel.updateWidgetBackgroundAlpha(it) },
-                            valueRange = 0f..1f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
                 }
 
                 // Widget Corner Radius
                 item {
-                    Spacer(Modifier.height(16.dp))
                     val widgetCornerRadius by viewModel.widgetCornerRadius.collectAsStateWithLifecycle()
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                    SettingsCardRow {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Corner Radius",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    "${widgetCornerRadius}dp",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             Text(
-                                "Corner Radius",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                "Rounded corners for widget background (0-40dp, increments of 4dp)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Text(
-                                "${widgetCornerRadius}dp",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
+                            Spacer(Modifier.height(8.dp))
+                            Slider(
+                                value = widgetCornerRadius.toFloat(),
+                                onValueChange = {
+                                    // Round to nearest multiple of 4
+                                    val roundedValue = ((it / 4f).toInt() * 4).coerceIn(0, 40)
+                                    viewModel.updateWidgetCornerRadius(roundedValue)
+                                },
+                                valueRange = 0f..40f,
+                                steps = 9, // 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 = 11 positions, so 9 steps between them
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
-                        Text(
-                            "Rounded corners for widget background (0-40dp, increments of 4dp)",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Slider(
-                            value = widgetCornerRadius.toFloat(),
-                            onValueChange = {
-                                // Round to nearest multiple of 4
-                                val roundedValue = ((it / 4f).toInt() * 4).coerceIn(0, 40)
-                                viewModel.updateWidgetCornerRadius(roundedValue)
-                            },
-                            valueRange = 0f..40f,
-                            steps = 9, // 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 = 11 positions, so 9 steps between them
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
                 }
             }
@@ -397,12 +370,12 @@ fun ThemeCustomizationScreen(
                 item {
                     Spacer(Modifier.height(8.dp))
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(12.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = if (hasUnappliedWidgetChanges) {
-                                MaterialTheme.colorScheme.primaryContainer
-                            } else {
                                 MaterialTheme.colorScheme.surfaceVariant
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)
                             }
                         )
                     ) {
@@ -487,7 +460,6 @@ private fun PremiumPromptCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
@@ -760,12 +732,14 @@ private fun PaletteStyleItem(
                     name,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
-                    color = titleTextColor
+                    color = titleTextColor,
+                    maxLines = 1
                 )
                 Text(
                     description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = secondaryTextColor
+                    color = secondaryTextColor,
+                    maxLines = 1
                 )
             }
             if (isSelected) {
@@ -1001,6 +975,27 @@ class ThemeCustomizationViewModel(
             _selectedPrimaryColor.value = null
             _selectedPaletteStyle.value = null
         }
+    }
+}
+
+@Composable
+private fun SettingsCardRow(
+    content: @Composable RowScope.() -> Unit
+) {
+    Card(
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            content = content
+        )
     }
 }
 

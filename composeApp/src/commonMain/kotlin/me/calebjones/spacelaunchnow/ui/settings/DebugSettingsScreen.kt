@@ -75,13 +75,16 @@ fun DebugSettingsScreen(
     debugViewModel: DebugSettingsViewModel = koinInject(),
     settingsViewModel: SettingsViewModel = koinInject()
 ) {
-    if (!BuildConfig.IS_DEBUG) {
+    val appPreferences = koinInject<me.calebjones.spacelaunchnow.data.storage.AppPreferences>()
+    val debugMenuUnlocked by appPreferences.debugMenuUnlockedFlow.collectAsState(initial = false)
+    
+    if (!BuildConfig.IS_DEBUG && !debugMenuUnlocked) {
         // Show a message that debug settings are not available
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("Debug settings are only available in debug builds")
+            Text("Debug settings are only available in debug builds or when unlocked")
         }
         return
     }
