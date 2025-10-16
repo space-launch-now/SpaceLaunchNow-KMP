@@ -19,6 +19,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         private val CUSTOM_PRIMARY_COLOR = longPreferencesKey("custom_primary_color")
         private val CUSTOM_SECONDARY_COLOR = longPreferencesKey("custom_secondary_color")
         private val PALETTE_STYLE = stringPreferencesKey("palette_style")
+        
+        // Debug menu unlock (for release builds)
+        private val DEBUG_MENU_UNLOCKED = booleanPreferencesKey("debug_menu_unlocked")
     }
 
     val themeFlow: Flow<ThemeOption> = dataStore.data.map { preferences ->
@@ -89,5 +92,20 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
     suspend fun getKeepLaunchesFor24Hours(): Boolean {
         return dataStore.data.map { it[KEEP_LAUNCHES_FOR_24_HOURS] }.first() ?: true
+    }
+    
+    // Debug menu unlock methods
+    val debugMenuUnlockedFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[DEBUG_MENU_UNLOCKED] ?: false
+    }
+    
+    suspend fun setDebugMenuUnlocked(unlocked: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[DEBUG_MENU_UNLOCKED] = unlocked
+        }
+    }
+    
+    suspend fun isDebugMenuUnlocked(): Boolean {
+        return dataStore.data.map { it[DEBUG_MENU_UNLOCKED] }.first() ?: false
     }
 }
