@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.valentinilk.shimmer.shimmer
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -298,45 +297,6 @@ fun ResponsiveHomeContent(
             item { HomeTopBar() }
             item { NextLaunchView(navController = navController) }
 
-            // Last Launch Card
-            item {
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    Text(
-                        text = "Last Launch",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    if (previousLaunches.isNotEmpty()) {
-                        val previousLaunch = previousLaunches.first()
-                        LaunchItemView(
-                            launch = previousLaunch,
-                            navController = navController,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp)
-                        )
-                    } else {
-                        // Loading placeholder
-                        Box(
-                            modifier = Modifier
-                                .shimmer()
-                                .fillMaxWidth()
-                                .height(220.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                "Loading...",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
-                        }
-                    }
-
-                }
-            }
-
             // Quick Stats
             item {
                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
@@ -446,11 +406,8 @@ fun ResponsiveHomeContent(
             }
             // Use new HomeQuickView for phone (bidirectional carousel)
             item {
-                HomeQuickView(
+                LaunchListView(
                     viewModel = homeViewModel,
-                    previousLaunches = previousLaunches,
-                    upcomingLaunches = upcomingLaunches,
-                    isTabletOrDesktop = false,
                     navController = navController
                 )
             }

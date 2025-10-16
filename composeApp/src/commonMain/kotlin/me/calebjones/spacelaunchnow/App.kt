@@ -9,15 +9,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
-import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
-import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.koin.compose.koinInject
 
 /**
@@ -28,9 +26,9 @@ val LocalUseUtc = compositionLocalOf { false }
 @Composable
 fun isTabletOrDesktop(): Boolean {
     val screenWidthDp = getScreenWidth()
-    val isLargeScreen = screenWidthDp >= 600.dp // Example threshold for tablets
-    return isLargeScreen
-//    return getPlatform().name == "Desktop"
+    val isLargeScreen = screenWidthDp >= 720.dp // Example threshold for tablets
+    return isLargeScreen || getPlatform().name == "Desktop"
+
 }
 
 @Composable
@@ -46,12 +44,13 @@ fun SpaceLaunchNowApp(
     val revenueCatManager = koinInject<RevenueCatManager>()
     val pushMessaging = koinInject<PushMessaging>()
     val appPreferences = koinInject<AppPreferences>()
-    
+
     // Warm up settings ViewModel to preload preferences (eagerly loads DataStore values)
     // This singleton creation triggers all StateFlows to start collecting immediately,
     // ensuring switches show correct state with no animation when settings screen loads
-    val appSettingsViewModel = koinInject<me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel>()
-    
+    val appSettingsViewModel =
+        koinInject<me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel>()
+
     // Trigger StateFlow collection by accessing a flow
     LaunchedEffect(Unit) {
         // Access the ViewModel to ensure it's fully initialized
@@ -80,7 +79,7 @@ fun SpaceLaunchNowApp(
             onNotificationLaunchIdConsumed()
         }
     }
-    
+
     // Handle navigation destination (e.g., from widget)
     LaunchedEffect(navigationDestination) {
         when (navigationDestination) {
@@ -89,6 +88,7 @@ fun SpaceLaunchNowApp(
                 navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs)
                 onNavigationDestinationConsumed()
             }
+
             null -> {} // No navigation destination
             else -> {
                 println("Unknown navigation destination: $navigationDestination")

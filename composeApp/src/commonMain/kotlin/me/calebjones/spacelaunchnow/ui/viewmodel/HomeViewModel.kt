@@ -206,7 +206,8 @@ class HomeViewModel(
                 _previousLaunchesError.value = null
 
                 // Load both upcoming and previous launches in parallel
-                val upcomingDeferred = async { launchRepository.getUpcomingLaunchesNormal(limit = limit) }
+                // Explicitly set includeRecent = false to ensure we only get upcoming launches
+                val upcomingDeferred = async { launchRepository.getUpcomingLaunchesNormal(limit = limit, includeRecent = false) }
                 val previousDeferred = async { launchRepository.getPreviousLaunchesNormal(limit = 5) }
 
                 val upcomingResult = upcomingDeferred.await()
@@ -307,9 +308,9 @@ class HomeViewModel(
                     println("=== HomeViewModel: Received History Launches ===")
                     println("Total launches on $month/$day: ${paginatedLaunches.count}")
                     
-                    // Store both the count and the actual launches
+                    // Store both the count and the actual launches (reversed to show most recent first)
                     _historyLaunchesCount.value = paginatedLaunches.count
-                    _historyLaunches.value = paginatedLaunches.results
+                    _historyLaunches.value = paginatedLaunches.results.reversed()
                     _isHistoryLaunchesLoading.value = false
                 }.onFailure { exception ->
                     val errorMessage = formatErrorMessage(exception)

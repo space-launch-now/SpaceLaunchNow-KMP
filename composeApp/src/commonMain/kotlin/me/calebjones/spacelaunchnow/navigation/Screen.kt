@@ -30,6 +30,9 @@ data object AboutLibraries
 data object SupportUs
 
 @Serializable
+data object ThemeCustomization
+
+@Serializable
 data class LaunchDetail(val launchId: String)
 
 @Serializable

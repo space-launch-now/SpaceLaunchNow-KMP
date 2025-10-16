@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
@@ -112,9 +113,11 @@ fun SettingsScreen(
                     Spacer(Modifier.height(2.dp))
                     SettingsCardRow {
                         Column(Modifier.fillMaxWidth()) {
-                            ThemeSettingRow(
-                                selected = uiState.theme,
-                                onSelected = viewModel::updateTheme
+                            SettingsNavigationRow(
+                                title = "Theme Settings",
+                                subtitle = "Appearance, colors, and palette customization",
+                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.ThemeCustomization) },
+                                icon = Icons.Filled.Palette
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             SettingsToggleRow(

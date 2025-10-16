@@ -35,6 +35,8 @@ import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
+import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
@@ -44,6 +46,7 @@ import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
+import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 
 expect fun nativeConfig() : KoinAppDeclaration
@@ -89,6 +92,18 @@ val appModule = module {
         AppPreferences(appDataStore)
     }
 
+    // Premium theme customization preferences
+    single {
+        val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
+        ThemePreferences(appDataStore)
+    }
+
+    // Widget appearance preferences
+    single {
+        val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
+        WidgetPreferences(appDataStore)
+    }
+
     // NotificationRepository - new clean architecture
     single<NotificationRepository> {
         NotificationRepositoryImpl(
@@ -118,7 +133,9 @@ val appModule = module {
             billingClient = get(),
             storage = get<SubscriptionStorage>(),
             debugPreferences = get<DebugPreferences>(),
-            revenueCatManager = get<RevenueCatManager>()  // ADD RevenueCatManager dependency
+            revenueCatManager = get<RevenueCatManager>(),  // RevenueCat dependency
+            widgetPreferences = get<WidgetPreferences>(),   // Cache widget access
+            platformWidgetUpdater = getOrNull()             // Android-only: trigger widget updates
         )
     }
     
@@ -132,6 +149,7 @@ val appModule = module {
 
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
+    viewModelOf(::ThemeCustomizationViewModel)
 }
 
 // Debug-only module - dependencies are always provided but only used when BuildConfig.isDebug is true
