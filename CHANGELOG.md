@@ -1,4 +1,13 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b22...v4.0.0) (2025-10-15)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b23...v4.0.0) (2025-10-16)
+
+
+### Features
+
+* **widgets:** implement theme and widget customization ([9e1898b](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/9e1898b2f6cd2002ea8b6cad320ec2c25fef3054))
+
+
+
+# [4.0.0-b23](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b22...v4.0.0-b23) (2025-10-15)
 
 
 ### Bug Fixes
@@ -47,15 +56,6 @@
 ### Bug Fixes
 
 * **ci:** correct artifact path resolution for Firebase Distribution ([#21](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/issues/21)) ([5d645fa](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/5d645fa8fa3e0cfbca7c911f0c441693df52bbbe))
-
-
-
-# [4.0.0-b19](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b18...v4.0.0-b19) (2025-10-10)
-
-
-### Bug Fixes
-
-* remove iOS IPA handling from master deploy workflow ([#17](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/issues/17)) ([387f2db](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/387f2dbd7c57f3f7e149a0e0998edcec28981091))
 
 
 
