@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,12 +62,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.Primary
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.getPlatform
+import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -92,7 +93,8 @@ fun ThemeCustomizationScreen(
     modifier: Modifier = Modifier
 ) {
     val viewModel = koinViewModel<ThemeCustomizationViewModel>()
-    val isPremium by viewModel.isPremium.collectAsStateWithLifecycle()
+    val hasCustomTheme by viewModel.hasCustomTheme.collectAsStateWithLifecycle()
+    val hasWidgetCustomization by viewModel.hasWidgetCustomization.collectAsStateWithLifecycle()
     val selectedTheme by viewModel.selectedTheme.collectAsStateWithLifecycle()
     val selectedPrimaryColor by viewModel.selectedPrimaryColor.collectAsStateWithLifecycle()
     val selectedPaletteStyle by viewModel.selectedPaletteStyle.collectAsStateWithLifecycle()
@@ -119,7 +121,7 @@ fun ThemeCustomizationScreen(
                     }
                 },
                 actions = {
-                    if (!isPremium) {
+                    if (!hasCustomTheme) {
                         Icon(
                             Icons.Default.Lock,
                             contentDescription = "Premium Feature",
@@ -151,10 +153,12 @@ fun ThemeCustomizationScreen(
             }
 
             // Premium Prompt or Premium Features
-            if (!isPremium) {
+            if (!hasCustomTheme) {
                 item {
                     PremiumPromptCard(
-                        onUpgradeClick = { /* Navigate to premium upgrade */ }
+                        onUpgradeClick = {
+                            navController.navigate(SupportUs)
+                        }
                     )
                 }
             }
@@ -171,31 +175,17 @@ fun ThemeCustomizationScreen(
                             "Choose the primary color for your theme."
                         )
                     }
-                    if (!isPremium) {
-                        Icon(
-                            Icons.Default.Lock,
-                            contentDescription = "Premium",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-                if (!isPremium) {
-                    Text(
-                        "Available with Premium",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+
                 }
                 SettingsCardRow {
                     ColorPalette(
                         selectedColor = selectedPrimaryColor,
-                        onColorSelected = if (isPremium) {
+                        onColorSelected = if (hasCustomTheme) {
                             { viewModel.updatePrimaryColor(it) }
                         } else {
                             { /* Disabled */ }
                         },
-                        enabled = isPremium,
+                        enabled = hasCustomTheme,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -221,12 +211,12 @@ fun ThemeCustomizationScreen(
                                         name = style,
                                         description = getPaletteStyleDescription(style),
                                         isSelected = selectedPaletteStyle == style,
-                                        onClick = if (isPremium) {
+                                        onClick = if (hasCustomTheme) {
                                             { viewModel.updatePaletteStyle(style) }
                                         } else {
                                             { /* Disabled */ }
                                         },
-                                        enabled = isPremium,
+                                        enabled = hasCustomTheme,
                                         modifier = Modifier.weight(1f)
                                     )
                                 }
@@ -240,214 +230,284 @@ fun ThemeCustomizationScreen(
                 }
             }
 
-            // Widget Appearance Customization (PREMIUM only)
-            if (isPremium) {
-                item {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(start = 20.dp),
-                    ) {
-                        Text(
-                            "Widget Appearance",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            "Customize the look of your home screen widgets",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                // Widget Theme Source Selection (Android only - iOS doesn't support Material 3 dynamic colors)
-                if (getPlatform().name.contains("Android")) {
-                    item {
-                        SectionHeaderText("Widget Theme")
+            // Widget Appearance Customization (Show all controls, disable for non-premium)
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column {
+                        SectionHeaderText("Widget Appearance")
                         SectionSubHeaderText(
-                            "Choose where widget colors come from"
+                            if (hasWidgetCustomization) {
+                                "Customize the look of your home screen widgets"
+                            } else {
+                                "Customize the look of your home screen widgets (Premium feature)"
+                            }
                         )
                     }
-
-                    item {
-                        val widgetThemeSource by viewModel.widgetThemeSource.collectAsStateWithLifecycle()
-                        SettingsCardRow {
-                            WidgetThemeSourceSelector(
-                                selectedSource = widgetThemeSource,
-                                onSourceSelected = { viewModel.updateWidgetThemeSource(it) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-                }
-
-                // Widget Background Transparency
-                item {
-                    val widgetBackgroundAlpha by viewModel.widgetBackgroundAlpha.collectAsStateWithLifecycle()
-                    SettingsCardRow {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    "Background Transparency",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    "${(widgetBackgroundAlpha * 100).toInt()}%",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Text(
-                                "0% = Fully transparent, 100% = Fully opaque",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Slider(
-                                value = widgetBackgroundAlpha,
-                                onValueChange = { viewModel.updateWidgetBackgroundAlpha(it) },
-                                valueRange = 0f..1f,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-                }
-
-                // Widget Corner Radius
-                item {
-                    val widgetCornerRadius by viewModel.widgetCornerRadius.collectAsStateWithLifecycle()
-                    SettingsCardRow {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    "Corner Radius",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    "${widgetCornerRadius}dp",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Text(
-                                "Rounded corners for widget background (0-40dp, increments of 4dp)",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Slider(
-                                value = widgetCornerRadius.toFloat(),
-                                onValueChange = {
-                                    // Round to nearest multiple of 4
-                                    val roundedValue = ((it / 4f).toInt() * 4).coerceIn(0, 40)
-                                    viewModel.updateWidgetCornerRadius(roundedValue)
-                                },
-                                valueRange = 0f..40f,
-                                steps = 9, // 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 = 11 positions, so 9 steps between them
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
+                    if (!hasWidgetCustomization) {
+                        Spacer(Modifier.weight(1f))
+                        Icon(
+                            Icons.Default.Lock,
+                            contentDescription = "Premium Feature",
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                 }
             }
 
-            // Apply to Widgets Button (PREMIUM only)
-            if (isPremium) {
+            // Widget Theme Source Selection (Android only - iOS doesn't support Material 3 dynamic colors)
+            if (getPlatform().name.contains("Android")) {
                 item {
-                    Spacer(Modifier.height(8.dp))
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (hasUnappliedWidgetChanges) {
-                                MaterialTheme.colorScheme.surfaceVariant
-                            } else {
-                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)
-                            }
+                    SectionHeaderText("Widget Theme")
+                    SectionSubHeaderText(
+                        "Choose where widget colors come from"
+                    )
+                    SettingsCardRow {
+                        val widgetThemeSource by viewModel.widgetThemeSource.collectAsStateWithLifecycle()
+                        WidgetThemeSourceSelector(
+                            selectedSource = widgetThemeSource,
+                            onSourceSelected = {
+                                if (hasCustomTheme) viewModel.updateWidgetThemeSource(
+                                    it
+                                )
+                            },
+                            enabled = hasWidgetCustomization,
+                            modifier = Modifier.fillMaxWidth()
                         )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                    }
+                }
+            }
+
+            // Widget Background Transparency
+            item {
+                val widgetBackgroundAlpha by viewModel.widgetBackgroundAlpha.collectAsStateWithLifecycle()
+                SettingsCardRow {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                Icons.Default.Palette,
-                                contentDescription = null,
-                                tint = if (hasUnappliedWidgetChanges) {
+                            Text(
+                                "Background Transparency",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = if (hasWidgetCustomization) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                },
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "${(widgetBackgroundAlpha * 100).toInt()}%",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (hasWidgetCustomization) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 },
-                                modifier = Modifier.size(32.dp)
+                                fontWeight = FontWeight.Bold
                             )
-                            Spacer(Modifier.height(8.dp))
+                        }
+                        Text(
+                            "0% = Fully transparent, 100% = Fully opaque",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (hasWidgetCustomization) {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            }
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Slider(
+                            value = widgetBackgroundAlpha,
+                            onValueChange = {
+                                if (hasWidgetCustomization) viewModel.updateWidgetBackgroundAlpha(
+                                    it
+                                )
+                            },
+                            valueRange = 0f..1f,
+                            enabled = hasWidgetCustomization,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            // Widget Corner Radius
+            item {
+                val widgetCornerRadius by viewModel.widgetCornerRadius.collectAsStateWithLifecycle()
+                SettingsCardRow {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                "Widget Appearance Changes",
+                                "Corner Radius",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                color = if (hasWidgetCustomization) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                },
+                                fontWeight = FontWeight.Bold
                             )
-                            Spacer(Modifier.height(4.dp))
                             Text(
+                                "${widgetCornerRadius}dp",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (hasWidgetCustomization) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                },
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Text(
+                            "Rounded corners for widget background (0-40dp, increments of 4dp)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (hasWidgetCustomization) {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            }
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Slider(
+                            value = widgetCornerRadius.toFloat(),
+                            onValueChange = {
+                                if (hasWidgetCustomization) {
+                                    // Round to nearest multiple of 4
+                                    val roundedValue = ((it / 4f).toInt() * 4).coerceIn(0, 40)
+                                    viewModel.updateWidgetCornerRadius(roundedValue)
+                                }
+                            },
+                            valueRange = 0f..40f,
+                            steps = 9, // 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 = 11 positions, so 9 steps between them
+                            enabled = hasWidgetCustomization,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            // Apply to Widgets Button (Show for all, but disable for non-premium)
+            item {
+                Spacer(Modifier.height(8.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (hasUnappliedWidgetChanges && hasWidgetCustomization) {
+                            MaterialTheme.colorScheme.surfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)
+                        }
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            if (hasWidgetCustomization) Icons.Default.Palette else Icons.Default.Lock,
+                            contentDescription = null,
+                            tint = if (hasUnappliedWidgetChanges && hasWidgetCustomization) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            },
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            if (hasWidgetCustomization) {
+                                "Widget Appearance Changes"
+                            } else {
+                                "Premium Feature"
+                            },
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            if (hasWidgetCustomization) {
                                 if (hasUnappliedWidgetChanges) {
                                     "You have unapplied changes. Tap below to update your widgets."
                                 } else {
                                     "Your widgets are up to date."
-                                },
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                }
+                            } else {
+                                "Upgrade to premium to customize widget appearance and apply changes."
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Button(
+                            onClick = {
+                                if (hasWidgetCustomization) {
+                                    viewModel.applyWidgetChanges()
+                                } else {
+                                    navController.navigate(SupportUs)
+                                }
+                            },
+                            enabled = if (hasWidgetCustomization) hasUnappliedWidgetChanges else true,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                if (hasWidgetCustomization) Icons.Default.Check else Icons.Default.Lock,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
                             )
-                            Spacer(Modifier.height(12.dp))
-                            Button(
-                                onClick = { viewModel.applyWidgetChanges() },
-                                enabled = hasUnappliedWidgetChanges,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Icon(
-                                    Icons.Default.Check,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                if (hasWidgetCustomization) {
                                     if (hasUnappliedWidgetChanges) {
                                         "Apply to Widgets"
                                     } else {
                                         "Already Applied"
                                     }
-                                )
-                            }
+                                } else {
+                                    "Upgrade to Premium"
+                                }
+                            )
                         }
                     }
                 }
             }
 
-            // Reset Button (PREMIUM only)
-            if (isPremium) {
-                item {
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = { viewModel.resetToDefaults() },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Reset to Defaults")
+            // Reset Button (Show for all, but disable for non-premium)
+            item {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        if (hasCustomTheme) {
+                            viewModel.resetToDefaults()
+                        } else {
+                            navController.navigate(SupportUs)
+                        }
+                    },
+                    enabled = hasCustomTheme,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (!hasCustomTheme) {
+                        Icon(
+                            Icons.Default.Lock,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
                     }
+                    Text(if (hasCustomTheme) "Reset to Defaults" else "Reset to Defaults (Premium)")
                 }
             }
         }
@@ -462,7 +522,8 @@ private fun PremiumPromptCard(
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+        ),
+        modifier = modifier.padding(16.dp),
     ) {
         Row(
             modifier = Modifier
@@ -474,20 +535,21 @@ private fun PremiumPromptCard(
                 Icons.Default.Palette,
                 contentDescription = null,
                 modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     "Unlock Premium Customization",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     "Customize colors and palette styles",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                 )
             }
         }
@@ -774,8 +836,11 @@ class ThemeCustomizationViewModel(
     private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
 
-    private val _isPremium = MutableStateFlow(false)
-    val isPremium: StateFlow<Boolean> = _isPremium.asStateFlow()
+    private val _hasCustomTheme = MutableStateFlow(false)
+    val hasCustomTheme: StateFlow<Boolean> = _hasCustomTheme.asStateFlow()
+
+    private val _hasWidgetCustomization = MutableStateFlow(false)
+    val hasWidgetCustomization: StateFlow<Boolean> = _hasWidgetCustomization.asStateFlow()
 
     private val _selectedTheme = MutableStateFlow(ThemeOption.System)
     val selectedTheme: StateFlow<ThemeOption> = _selectedTheme.asStateFlow()
@@ -817,8 +882,14 @@ class ThemeCustomizationViewModel(
             // Check premium status
             subscriptionRepository.state.collect { state ->
                 val isPremium = state.isSubscribed && !state.isExpired()
+                // IMPORTANT: Call subscriptionRepository.hasFeature() instead of state.hasFeature()
+                // This ensures widget access cache gets updated properly
+                val hasCustomTheme = subscriptionRepository.hasFeature(PremiumFeature.CUSTOM_THEMES)
+                val hasWidgetCustomization = subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
                 println("ThemeCustomizationViewModel: Subscription state changed - isSubscribed=${state.isSubscribed}, isExpired=${state.isExpired()}, isPremium=$isPremium")
-                _isPremium.value = isPremium
+                println("ThemeCustomizationViewModel: hasCustomTheme=$hasCustomTheme, hasWidgetCustomization=$hasWidgetCustomization")
+                _hasCustomTheme.value = hasCustomTheme
+                _hasWidgetCustomization.value = hasWidgetCustomization
             }
         }
 
@@ -869,7 +940,7 @@ class ThemeCustomizationViewModel(
         }
     }
 
-    private fun checkForUnappliedChanges() {
+    fun checkForUnappliedChanges() {
         val hasChanges =
             _widgetThemeSource.value != lastAppliedThemeSource ||
                     _widgetBackgroundAlpha.value != lastAppliedAlpha ||
@@ -979,30 +1050,10 @@ class ThemeCustomizationViewModel(
 }
 
 @Composable
-private fun SettingsCardRow(
-    content: @Composable RowScope.() -> Unit
-) {
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 0.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
-    }
-}
-
-@Composable
 private fun WidgetThemeSourceSelector(
     selectedSource: WidgetThemeSource,
     onSourceSelected: (WidgetThemeSource) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -1012,7 +1063,8 @@ private fun WidgetThemeSourceSelector(
             description = "Use your custom app theme colors in widgets",
             icon = "🎨",
             isSelected = selectedSource == WidgetThemeSource.FOLLOW_APP_THEME,
-            onClick = { onSourceSelected(WidgetThemeSource.FOLLOW_APP_THEME) }
+            onClick = { onSourceSelected(WidgetThemeSource.FOLLOW_APP_THEME) },
+            enabled = enabled
         )
 
         Spacer(Modifier.height(8.dp))
@@ -1023,7 +1075,8 @@ private fun WidgetThemeSourceSelector(
             description = "Auto light/dark based on system settings",
             icon = "⚙️",
             isSelected = selectedSource == WidgetThemeSource.FOLLOW_SYSTEM,
-            onClick = { onSourceSelected(WidgetThemeSource.FOLLOW_SYSTEM) }
+            onClick = { onSourceSelected(WidgetThemeSource.FOLLOW_SYSTEM) },
+            enabled = enabled
         )
 
         Spacer(Modifier.height(8.dp))
@@ -1034,7 +1087,8 @@ private fun WidgetThemeSourceSelector(
             description = "Match wallpaper colors (Android 12+)",
             icon = "🌈",
             isSelected = selectedSource == WidgetThemeSource.DYNAMIC_COLORS,
-            onClick = { onSourceSelected(WidgetThemeSource.DYNAMIC_COLORS) }
+            onClick = { onSourceSelected(WidgetThemeSource.DYNAMIC_COLORS) },
+            enabled = enabled
         )
     }
 }
@@ -1046,22 +1100,25 @@ private fun ThemeSourceOption(
     icon: String,
     isSelected: Boolean,
     onClick: () -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        color = if (isSelected) {
+        color = if (isSelected && enabled) {
             MaterialTheme.colorScheme.primaryContainer
-        } else {
+        } else if (enabled) {
             MaterialTheme.colorScheme.surfaceVariant
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
         },
-        border = if (isSelected) {
+        border = if (isSelected && enabled) {
             BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
         } else {
             null
         },
-        onClick = onClick
+        onClick = { if (enabled) onClick() }
     ) {
         Row(
             modifier = Modifier
@@ -1073,6 +1130,11 @@ private fun ThemeSourceOption(
             Text(
                 text = icon,
                 style = MaterialTheme.typography.headlineMedium,
+                color = if (enabled) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                },
                 modifier = Modifier.size(40.dp)
             )
 
@@ -1084,30 +1146,41 @@ private fun ThemeSourceOption(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (isSelected) {
+                    color = if (isSelected && enabled) {
                         MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
+                    } else if (enabled) {
                         MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     }
                 )
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (isSelected) {
+                    color = if (isSelected && enabled) {
                         MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
+                    } else if (enabled) {
                         MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     }
                 )
             }
 
-            // Checkmark
-            if (isSelected) {
+            // Checkmark or Lock
+            if (isSelected && enabled) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = "Selected",
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
+                )
+            } else if (!enabled) {
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = "Premium Feature",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

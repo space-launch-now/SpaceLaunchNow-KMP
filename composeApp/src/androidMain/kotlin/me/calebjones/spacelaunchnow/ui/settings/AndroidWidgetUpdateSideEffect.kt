@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.widgets.WidgetUpdater
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -18,16 +17,16 @@ import org.koin.compose.viewmodel.koinViewModel
 actual fun WidgetUpdateSideEffect() {
     val context = LocalContext.current
     val viewModel = koinViewModel<ThemeCustomizationViewModel>()
-    
+
     val applyTrigger by viewModel.widgetApplyTrigger.collectAsStateWithLifecycle()
-    
+
     LaunchedEffect(applyTrigger) {
         // Skip initial load (counter == 0)
         if (applyTrigger > 0) {
             println("WidgetUpdateSideEffect: Apply trigger detected (counter: $applyTrigger)")
             println("WidgetUpdateSideEffect: Context: ${context.javaClass.simpleName}")
             println("WidgetUpdateSideEffect: Thread: ${Thread.currentThread().name}")
-            
+
             try {
                 // No delay needed! Widget reads from Glance state that we write directly
                 // This eliminates cross-process DataStore timing issues

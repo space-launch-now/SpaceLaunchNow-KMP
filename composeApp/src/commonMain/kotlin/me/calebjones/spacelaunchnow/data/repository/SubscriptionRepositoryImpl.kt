@@ -2,35 +2,35 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
-import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
-import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
-import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
+import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
+import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
-import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.days
 
 /**
  * Implementation of SubscriptionRepository
- * 
+ *
  * Architecture:
  * 1. Load cached state from DataStore (instant UI)
  * 2. Check RevenueCat entitlements for feature access
  * 3. Update cache when purchases complete
  * 4. Fall back to cached state for offline scenarios
- * 
+ *
  * Phase 6: Simplified implementation using RevenueCat entitlements only
  */
 class SubscriptionRepositoryImpl(
@@ -69,7 +69,8 @@ class SubscriptionRepositoryImpl(
             // 3. Initialize billing client
             billingClient.initialize().onFailure { error ->
                 println("SubscriptionRepository: Failed to initialize billing - ${error.message}")
-                _state.value = SubscriptionState.error("Failed to initialize billing: ${error.message}")
+                _state.value =
+                    SubscriptionState.error("Failed to initialize billing: ${error.message}")
                 return
             }
 
@@ -149,21 +150,21 @@ class SubscriptionRepositoryImpl(
         return try {
             // Query platform billing (Google Play / App Store)
             val purchasesResult = billingClient.queryPurchases()
-            
+
             purchasesResult.fold(
                 onSuccess = { purchases ->
                     val newState = processVerifiedPurchases(purchases)
-                    
+
                     // Update state and cache
                     _state.value = newState
                     storage.saveState(newState)
-                    
+
                     println("SubscriptionRepository: Verification complete - isSubscribed: ${newState.isSubscribed}")
                     Result.success(newState)
                 },
                 onFailure = { error ->
                     println("SubscriptionRepository: Verification failed - ${error.message}")
-                    
+
                     // Use cached state but mark as needing verification
                     val errorState = currentState.copy(
                         isLoading = false,
@@ -171,7 +172,7 @@ class SubscriptionRepositoryImpl(
                         verificationError = error.message
                     )
                     _state.value = errorState
-                    
+
                     Result.failure(error)
                 }
             )
@@ -183,21 +184,24 @@ class SubscriptionRepositoryImpl(
         }
     }
 
-    override suspend fun launchPurchaseFlow(productId: String, basePlanId: String?): Result<String> {
+    override suspend fun launchPurchaseFlow(
+        productId: String,
+        basePlanId: String?
+    ): Result<String> {
         println("SubscriptionRepository: Launching purchase flow for $productId (basePlan: $basePlanId)")
-        
+
         _state.value = _state.value.copy(isLoading = true)
-        
+
         return try {
             val result = billingClient.launchPurchaseFlow(productId, basePlanId)
-            
+
             result.fold(
                 onSuccess = { purchaseToken ->
                     println("SubscriptionRepository: Purchase successful - $purchaseToken")
-                    
+
                     // Verify subscription to update state
                     verifySubscription(forceRefresh = true)
-                    
+
                     Result.success(purchaseToken)
                 },
                 onFailure = { error ->
@@ -227,33 +231,53 @@ class SubscriptionRepositoryImpl(
     }
 
     override suspend fun hasFeature(feature: PremiumFeature): Boolean {
-        // Phase 6: Simplified - RevenueCat entitlements as source of truth
-        // Check if user has the "premium" entitlement (grants all features)
-        val hasPremiumEntitlement = revenueCatManager.hasEntitlement(SubscriptionProducts.RC_ENTITLEMENT_PREMIUM)
-        
+        println("=== SubscriptionRepository.hasFeature(${feature.name}) ===")
+        println("  Debug build: ${BuildConfig.IS_DEBUG}")
+        println("  Debug simulation state: ${debugSimulationState?.subscriptionType}")
+
+        // Priority 1: Debug simulation state (debug builds only)
+        if (debugSimulationState != null) {
+            val debugAccess = debugSimulationState!!.hasFeature(feature)
+            println("  ✅ Debug simulation active - ${feature.name}: $debugAccess")
+
+            // Update widget preferences to match debug simulation
+            if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+                widgetPreferences.updateWidgetAccessGranted(debugAccess)
+                updateWidgetsAfterAccessChange(if (debugAccess) "debug access granted" else "debug access revoked")
+            }
+
+            return debugAccess
+        }
+
+        // Priority 2: RevenueCat entitlements (live verification)
+        val hasPremiumEntitlement =
+            revenueCatManager.hasEntitlement(SubscriptionProducts.RC_ENTITLEMENT_PREMIUM)
+        println("  RevenueCat premium entitlement: $hasPremiumEntitlement")
+
         if (hasPremiumEntitlement) {
-            println("SubscriptionRepository: User has premium entitlement - granting ${feature.name}")
-            
+            println("  ✅ User has premium entitlement - granting ${feature.name}")
+
             // Cache widget access for widgets (they can't call RevenueCat)
             if (feature == PremiumFeature.ADVANCED_WIDGETS) {
                 widgetPreferences.updateWidgetAccessGranted(true)
                 // Trigger widget update after granting access
                 updateWidgetsAfterAccessChange("access granted")
             }
-            
+
             return true
         }
-        
+
         // No entitlement - revoke widget access
         if (feature == PremiumFeature.ADVANCED_WIDGETS) {
             widgetPreferences.updateWidgetAccessGranted(false)
             // Trigger widget update after revoking access
             updateWidgetsAfterAccessChange("access revoked")
         }
-        
-        // Fallback to cached state for debug/offline scenarios
+
+        // Priority 3: Fallback to cached state for offline scenarios
         val cachedAccess = _state.value.hasFeature(feature)
-        println("SubscriptionRepository: No premium entitlement - cached access for ${feature.name}: $cachedAccess")
+        println("  ⚠️ No premium entitlement - cached access for ${feature.name}: $cachedAccess")
+        println("  Current state: ${_state.value.subscriptionType} with features: ${_state.value.features}")
         return cachedAccess
     }
 
@@ -327,12 +351,12 @@ class SubscriptionRepositoryImpl(
      */
     private suspend fun handlePurchaseUpdate(purchase: PlatformPurchase) {
         println("SubscriptionRepository: Handling purchase update - ${purchase.productId}")
-        
+
         // Acknowledge purchase if not already acknowledged (required for Google Play)
         if (!purchase.isAcknowledged) {
             billingClient.acknowledgePurchase(purchase.purchaseToken)
         }
-        
+
         // Re-verify to update state
         verifySubscription(forceRefresh = true)
     }
@@ -467,7 +491,7 @@ class SubscriptionRepositoryImpl(
             println("SubscriptionRepository: PlatformWidgetUpdater not available, skipping widget update for: $reason")
             return
         }
-        
+
         repositoryScope.launch {
             println("SubscriptionRepository: Widget $reason - scheduling widget update in 750ms")
             try {
