@@ -255,6 +255,24 @@ data class NotificationTopic(
             "When launches complete successfully",
             defaultEnabled = true
         )
+        val FAILURE = NotificationTopic(
+            "failure",
+            "Launch Failure",
+            "When launches fail to complete successfully",
+            defaultEnabled = true
+        )
+        val PARTIAL_FAILURE = NotificationTopic(
+            "partial_failure",
+            "Partial Launch Failure",
+            "When launches partially fail (some objectives met)",
+            defaultEnabled = true
+        )
+        val WEBCAST_LIVE = NotificationTopic(
+            "webcastLive",
+            "Webcast Started",
+            "When launch webcast goes live",
+            defaultEnabled = false
+        )
 
         // Agency topics
         val AGENCY_NASA = NotificationTopic("nasa", "NASA", defaultEnabled = true)
@@ -292,7 +310,8 @@ data class NotificationTopic(
         fun getUserConfigurableTopics(): List<NotificationTopic> {
             return listOf(
                 NETSTAMP_CHANGED, WEBCAST_ONLY, TWENTY_FOUR_HOUR, ONE_HOUR,
-                TEN_MINUTES, ONE_MINUTE, IN_FLIGHT, SUCCESS
+                TEN_MINUTES, ONE_MINUTE, IN_FLIGHT, SUCCESS, FAILURE,
+                PARTIAL_FAILURE, WEBCAST_LIVE
             )
         }
 

@@ -14,6 +14,7 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugSettings
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import kotlin.random.Random
 
 expect fun resetNotificationPermissionAskedFlag()
 
@@ -396,8 +397,9 @@ class DebugSettingsViewModel(
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                
+
                 // Create NotificationData with configurable fields
+                val webcastLiveValue = if (Random.nextBoolean()) webcast else ""
                 val notificationData = NotificationData(
                     notificationType = notificationType,
                     launchId = "test-launch-123",
@@ -407,13 +409,14 @@ class DebugSettingsViewModel(
                     launchNet = "2025-10-15T12:00:00Z",
                     launchLocation = "Cape Canaveral, FL, USA",
                     webcast = webcast,
+                    webcastLive = webcastLiveValue,
                     agencyId = agencyId,
                     locationId = locationId
                 )
 
                 // Get current notification settings
                 val notificationState = notificationRepository?.state?.value
-                
+
                 if (notificationState == null) {
                     _statusMessage.value = "❌ NotificationRepository not available"
                     return@launch
@@ -455,8 +458,20 @@ class DebugSettingsViewModel(
                     appendLine("• Notifications Enabled: ${notificationState.enableNotifications}")
                     appendLine("• Follow All Launches: ${notificationState.followAllLaunches}")
                     appendLine("• Strict Matching: ${notificationState.useStrictMatching}")
-                    appendLine("• Subscribed Agencies: ${notificationState.subscribedAgencies.size} (${notificationState.subscribedAgencies.take(3).joinToString(", ")}...)")
-                    appendLine("• Subscribed Locations: ${notificationState.subscribedLocations.size} (${notificationState.subscribedLocations.take(3).joinToString(", ")}...)")
+                    appendLine(
+                        "• Subscribed Agencies: ${notificationState.subscribedAgencies.size} (${
+                            notificationState.subscribedAgencies.take(
+                                3
+                            ).joinToString(", ")
+                        }...)"
+                    )
+                    appendLine(
+                        "• Subscribed Locations: ${notificationState.subscribedLocations.size} (${
+                            notificationState.subscribedLocations.take(
+                                3
+                            ).joinToString(", ")
+                        }...)"
+                    )
                 }
                 _detailedMessage.value = detailedInfo
             } catch (e: Exception) {
