@@ -25,8 +25,7 @@ data class SettingsUiState(
     val theme: ThemeOption = ThemeOption.System,
     val useUtc: Boolean = false,
     val notificationsEnabled: Boolean = true,
-    val hideTbdLaunches: Boolean = false,
-    val keepLaunchesFor24Hours: Boolean = true
+    val hideTbdLaunches: Boolean = false
 )
 
 enum class ThemeOption(val label: String) {
@@ -56,19 +55,9 @@ class AppSettingsViewModel(
         started = SharingStarted.Eagerly,
         initialValue = false
     )
-    
-    val keepLaunchesFor24HoursFlow = appPreferences.keepLaunchesFor24HoursFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = true
-    )
 
     suspend fun updateHideTbdLaunches(hide: Boolean) {
         appPreferences.updateHideTbdLaunches(hide)
-    }
-
-    suspend fun updateKeepLaunchesFor24Hours(keep: Boolean) {
-        appPreferences.updateKeepLaunchesFor24Hours(keep)
     }
 
     suspend fun updateTheme(theme: ThemeOption) {
@@ -96,8 +85,7 @@ class SettingsViewModel(
         _availableLocations,
         appSettingsViewModel.themeFlow,
         appSettingsViewModel.useUtcFlow,
-        appSettingsViewModel.hideTbdLaunchesFlow,
-        appSettingsViewModel.keepLaunchesFor24HoursFlow
+        appSettingsViewModel.hideTbdLaunchesFlow
     ) { flows ->
         val notificationState = flows[0] as NotificationState
         val agencies = flows[1] as List<NotificationAgency>
@@ -105,7 +93,6 @@ class SettingsViewModel(
         val theme = flows[3] as ThemeOption
         val useUtc = flows[4] as Boolean
         val hideTbdLaunches = flows[5] as Boolean
-        val keepLaunchesFor24Hours = flows[6] as Boolean
 
         SettingsUiState(
             notificationSettings = notificationState,
@@ -116,8 +103,7 @@ class SettingsViewModel(
             errorMessage = notificationState.lastError,
             theme = theme,
             useUtc = useUtc,
-            hideTbdLaunches = hideTbdLaunches,
-            keepLaunchesFor24Hours = keepLaunchesFor24Hours
+            hideTbdLaunches = hideTbdLaunches
         )
     }.stateIn(
         scope = viewModelScope,
@@ -243,16 +229,6 @@ class SettingsViewModel(
                 appSettingsViewModel.updateHideTbdLaunches(hide)
             } catch (e: Exception) {
                 println("Failed to update hide TBD launches: ${e.message}")
-            }
-        }
-    }
-
-    fun updateKeepLaunchesFor24Hours(keep: Boolean) {
-        viewModelScope.launch {
-            try {
-                appSettingsViewModel.updateKeepLaunchesFor24Hours(keep)
-            } catch (e: Exception) {
-                println("Failed to update keep launches setting: ${e.message}")
             }
         }
     }

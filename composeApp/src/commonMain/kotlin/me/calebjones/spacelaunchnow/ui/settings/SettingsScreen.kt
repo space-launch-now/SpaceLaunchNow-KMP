@@ -145,6 +145,13 @@ fun SettingsScreen(
                                 onCheckedChange = viewModel::updateUseUtc
                             )
                             Spacer(modifier = Modifier.height(12.dp))
+                            NotificationTopicToggle(
+                                title = "Hide TBD Launches",
+                                description = "Hide launches without confirmed dates",
+                                checked = uiState.hideTbdLaunches,
+                                onCheckedChange = viewModel::updateHideTbdLaunches
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
                             SettingsNavigationRow(
                                 title = "Theme Settings",
                                 subtitle = "Appearance, colors, and palette customization",
@@ -155,27 +162,6 @@ fun SettingsScreen(
                                 title = "Calendar Sync",
                                 subtitle = "Sync Launches and Events to your calendar",
                                 onClick = { },
-                            )
-                        }
-                    }
-                }
-                item {
-                    SectionHeaderText("Home Page Filters")
-                    Spacer(Modifier.height(2.dp))
-                    SettingsCardRow {
-                        Column(Modifier.fillMaxWidth()) {
-                            NotificationTopicToggle(
-                                title = "Hide TBD Launches",
-                                description = "Hide launches without confirmed dates",
-                                checked = uiState.hideTbdLaunches,
-                                onCheckedChange = viewModel::updateHideTbdLaunches
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            NotificationTopicToggle(
-                                title = "Keep Launches for 24 Hours",
-                                description = "Show past launches for one day after completion",
-                                checked = uiState.keepLaunchesFor24Hours,
-                                onCheckedChange = viewModel::updateKeepLaunchesFor24Hours
                             )
                         }
                     }

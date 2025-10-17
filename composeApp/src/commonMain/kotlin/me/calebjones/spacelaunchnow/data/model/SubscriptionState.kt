@@ -118,7 +118,9 @@ enum class SubscriptionType(val isLegacy: Boolean = false) {
 enum class PremiumFeature {
     AD_FREE,
     CUSTOM_THEMES,
-    ADVANCED_WIDGETS;
+    CAL_SYNC,
+    ADVANCED_WIDGETS,
+    WIDGETS_CUSTOMIZATION;
 
     companion object {
         /**
@@ -134,7 +136,9 @@ enum class PremiumFeature {
         fun getBasicFeatures(): Set<PremiumFeature> {
             return setOf(
                 AD_FREE,
-                ADVANCED_WIDGETS
+                ADVANCED_WIDGETS,
+                WIDGETS_CUSTOMIZATION,
+                CAL_SYNC
             )
         }
 

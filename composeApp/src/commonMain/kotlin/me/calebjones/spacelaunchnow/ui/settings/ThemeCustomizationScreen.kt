@@ -70,6 +70,7 @@ import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.navigation.SupportUs
+import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -109,10 +110,10 @@ fun ThemeCustomizationScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Theme",
+                        text = "Theme Settings",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 36.sp,
+                        fontSize = 24.sp,
                     )
                 },
                 navigationIcon = {
@@ -166,8 +167,9 @@ fun ThemeCustomizationScreen(
             // Color Customization (PREMIUM - Disabled for free users)
             item {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Column {
                         SectionHeaderText("Primary Color")
@@ -175,7 +177,9 @@ fun ThemeCustomizationScreen(
                             "Choose the primary color for your theme."
                         )
                     }
-
+                    if (!hasCustomTheme) {
+                        PremiumBadge()
+                    }
                 }
                 SettingsCardRow {
                     ColorPalette(
@@ -220,10 +224,10 @@ fun ThemeCustomizationScreen(
                                         modifier = Modifier.weight(1f)
                                     )
                                 }
-                                // Fill remaining space if odd number of items in last row
-                                if (rowItems.size < 2) {
-                                    Spacer(Modifier.weight(1f))
-                                }
+                                // // Fill remaining space if odd number of items in last row
+                                // if (rowItems.size < 2) {
+                                //     Spacer(Modifier.weight(1f))
+                                // }
                             }
                         }
                     }
@@ -233,27 +237,16 @@ fun ThemeCustomizationScreen(
             // Widget Appearance Customization (Show all controls, disable for non-premium)
             item {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
                         SectionHeaderText("Widget Appearance")
-                        SectionSubHeaderText(
-                            if (hasWidgetCustomization) {
-                                "Customize the look of your home screen widgets"
-                            } else {
-                                "Customize the look of your home screen widgets (Premium feature)"
-                            }
-                        )
+                        SectionSubHeaderText("Customize the look of your home screen widgets")
                     }
                     if (!hasWidgetCustomization) {
-                        Spacer(Modifier.weight(1f))
-                        Icon(
-                            Icons.Default.Lock,
-                            contentDescription = "Premium Feature",
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                            modifier = Modifier.size(20.dp)
-                        )
+                        PremiumBadge()
                     }
                 }
             }
@@ -261,10 +254,6 @@ fun ThemeCustomizationScreen(
             // Widget Theme Source Selection (Android only - iOS doesn't support Material 3 dynamic colors)
             if (getPlatform().name.contains("Android")) {
                 item {
-                    SectionHeaderText("Widget Theme")
-                    SectionSubHeaderText(
-                        "Choose where widget colors come from"
-                    )
                     SettingsCardRow {
                         val widgetThemeSource by viewModel.widgetThemeSource.collectAsStateWithLifecycle()
                         WidgetThemeSourceSelector(
@@ -885,7 +874,8 @@ class ThemeCustomizationViewModel(
                 // IMPORTANT: Call subscriptionRepository.hasFeature() instead of state.hasFeature()
                 // This ensures widget access cache gets updated properly
                 val hasCustomTheme = subscriptionRepository.hasFeature(PremiumFeature.CUSTOM_THEMES)
-                val hasWidgetCustomization = subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
+                val hasWidgetCustomization =
+                    subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
                 println("ThemeCustomizationViewModel: Subscription state changed - isSubscribed=${state.isSubscribed}, isExpired=${state.isExpired()}, isPremium=$isPremium")
                 println("ThemeCustomizationViewModel: hasCustomTheme=$hasCustomTheme, hasWidgetCustomization=$hasWidgetCustomization")
                 _hasCustomTheme.value = hasCustomTheme

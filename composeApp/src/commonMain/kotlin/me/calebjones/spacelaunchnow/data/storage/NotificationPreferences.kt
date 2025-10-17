@@ -23,7 +23,6 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
         private val USE_STRICT_MATCHING = booleanPreferencesKey("use_strict_matching")
         private val FOLLOW_ALL_LAUNCHES = booleanPreferencesKey("follow_all_launches")
         private val HIDE_TBD_LAUNCHES = booleanPreferencesKey("hide_tbd_launches")
-        private val KEEP_LAUNCHES_FOR_24_HOURS = booleanPreferencesKey("keep_launches_for_24_hours")
         private val TOPIC_SETTINGS = stringPreferencesKey("topic_settings")
 
         // New fields in NotificationState
@@ -58,8 +57,6 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
             useStrictMatching = preferences[USE_STRICT_MATCHING] ?: default.useStrictMatching,
             followAllLaunches = preferences[FOLLOW_ALL_LAUNCHES] ?: default.followAllLaunches,
             hideTbdLaunches = preferences[HIDE_TBD_LAUNCHES] ?: default.hideTbdLaunches,
-            keepLaunchesFor24Hours = preferences[KEEP_LAUNCHES_FOR_24_HOURS]
-                ?: default.keepLaunchesFor24Hours,
             topicSettings = topicSettings,
 
 
@@ -80,7 +77,6 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
             preferences[USE_STRICT_MATCHING] = settings.useStrictMatching
             preferences[FOLLOW_ALL_LAUNCHES] = settings.followAllLaunches
             preferences[HIDE_TBD_LAUNCHES] = settings.hideTbdLaunches
-            preferences[KEEP_LAUNCHES_FOR_24_HOURS] = settings.keepLaunchesFor24Hours
             preferences[TOPIC_SETTINGS] = Json.encodeToString(settings.topicSettings)
         }
     }
