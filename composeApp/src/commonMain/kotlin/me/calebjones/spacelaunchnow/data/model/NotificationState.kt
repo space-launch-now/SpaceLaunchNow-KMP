@@ -8,7 +8,6 @@ data class NotificationState(
     val followAllLaunches: Boolean = true,
     val useStrictMatching: Boolean = false,
     val hideTbdLaunches: Boolean = false,
-    val keepLaunchesFor24Hours: Boolean = true,
 
     // Topic settings (user-configurable notification timing)
     val topicSettings: Map<String, Boolean> = NotificationTopic.getDefaultTopicSettings(),

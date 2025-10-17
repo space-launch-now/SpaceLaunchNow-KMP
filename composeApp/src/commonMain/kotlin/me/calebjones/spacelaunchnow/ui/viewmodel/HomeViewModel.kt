@@ -206,8 +206,7 @@ class HomeViewModel(
                 _previousLaunchesError.value = null
 
                 // Load both upcoming and previous launches in parallel
-                // Explicitly set includeRecent = false to ensure we only get upcoming launches
-                val upcomingDeferred = async { launchRepository.getUpcomingLaunchesNormal(limit = limit, includeRecent = false) }
+                val upcomingDeferred = async { launchRepository.getUpcomingLaunchesNormal(limit = limit) }
                 val previousDeferred = async { launchRepository.getPreviousLaunchesNormal(limit = 5) }
 
                 val upcomingResult = upcomingDeferred.await()
