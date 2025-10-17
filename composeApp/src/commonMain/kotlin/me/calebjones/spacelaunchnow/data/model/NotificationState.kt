@@ -217,7 +217,7 @@ data class NotificationTopic(
             "webcastOnly",
             "Webcast Only Launches",
             "Only launches with webcast available",
-            defaultEnabled = true
+            defaultEnabled = false
         )
         val TWENTY_FOUR_HOUR = NotificationTopic(
             "twentyFourHour",

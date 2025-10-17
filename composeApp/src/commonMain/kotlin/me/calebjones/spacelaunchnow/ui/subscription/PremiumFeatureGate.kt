@@ -329,6 +329,7 @@ fun PremiumFeature.getDescription(): String {
         PremiumFeature.ADVANCED_WIDGETS -> "Access the launch list widget"
         PremiumFeature.WIDGETS_CUSTOMIZATION -> "Customize your widgets look and feel"
         PremiumFeature.CAL_SYNC -> "Access to Calendar Sync Link for syncing launches and events"
+        PremiumFeature.NOTIFICATION_CUSTOMIZATION -> "Customize your notification preferences"
     }
 }
 
@@ -340,5 +341,6 @@ fun PremiumFeature.getTitle(): String {
         PremiumFeature.ADVANCED_WIDGETS -> "Advanced Widget"
         PremiumFeature.WIDGETS_CUSTOMIZATION -> "Widget Customization"
         PremiumFeature.CAL_SYNC -> "Calendar Sync"
+        PremiumFeature.NOTIFICATION_CUSTOMIZATION -> "Notification Customization"
     }
 }
