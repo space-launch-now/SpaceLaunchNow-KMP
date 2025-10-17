@@ -120,7 +120,8 @@ enum class PremiumFeature {
     CUSTOM_THEMES,
     CAL_SYNC,
     ADVANCED_WIDGETS,
-    WIDGETS_CUSTOMIZATION;
+    WIDGETS_CUSTOMIZATION,
+    NOTIFICATION_CUSTOMIZATION;
 
     companion object {
         /**
@@ -138,7 +139,8 @@ enum class PremiumFeature {
                 AD_FREE,
                 ADVANCED_WIDGETS,
                 WIDGETS_CUSTOMIZATION,
-                CAL_SYNC
+                CAL_SYNC,
+                NOTIFICATION_CUSTOMIZATION
             )
         }
 

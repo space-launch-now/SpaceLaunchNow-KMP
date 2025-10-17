@@ -5,15 +5,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 
 data class SettingsUiState(
@@ -25,7 +27,8 @@ data class SettingsUiState(
     val theme: ThemeOption = ThemeOption.System,
     val useUtc: Boolean = false,
     val notificationsEnabled: Boolean = true,
-    val hideTbdLaunches: Boolean = false
+    val hideTbdLaunches: Boolean = false,
+    val hasNotificationCustomization: Boolean = false
 )
 
 enum class ThemeOption(val label: String) {
@@ -43,13 +46,13 @@ class AppSettingsViewModel(
         started = SharingStarted.Eagerly,
         initialValue = ThemeOption.System
     )
-    
+
     val useUtcFlow = appPreferences.useUtcFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = false
     )
-    
+
     val hideTbdLaunchesFlow = appPreferences.hideTbdLaunchesFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -71,12 +74,18 @@ class AppSettingsViewModel(
 
 class SettingsViewModel(
     private val notificationRepository: NotificationRepository,
-    private val appSettingsViewModel: AppSettingsViewModel
+    private val appSettingsViewModel: AppSettingsViewModel,
+    private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
 
     // Separate state flows for available options
     private val _availableAgencies = MutableStateFlow<List<NotificationAgency>>(emptyList())
     private val _availableLocations = MutableStateFlow<List<NotificationLocation>>(emptyList())
+
+    // Premium feature state
+    private val _hasNotificationCustomization = MutableStateFlow(false)
+    val hasNotificationCustomization: StateFlow<Boolean> =
+        _hasNotificationCustomization.asStateFlow()
 
     // Reactive state flow that updates when agencies/locations are loaded
     val uiState: StateFlow<SettingsUiState> = combine(
@@ -85,7 +94,8 @@ class SettingsViewModel(
         _availableLocations,
         appSettingsViewModel.themeFlow,
         appSettingsViewModel.useUtcFlow,
-        appSettingsViewModel.hideTbdLaunchesFlow
+        appSettingsViewModel.hideTbdLaunchesFlow,
+        _hasNotificationCustomization
     ) { flows ->
         val notificationState = flows[0] as NotificationState
         val agencies = flows[1] as List<NotificationAgency>
@@ -93,6 +103,7 @@ class SettingsViewModel(
         val theme = flows[3] as ThemeOption
         val useUtc = flows[4] as Boolean
         val hideTbdLaunches = flows[5] as Boolean
+        val hasNotificationCustomization = flows[6] as Boolean
 
         SettingsUiState(
             notificationSettings = notificationState,
@@ -103,7 +114,8 @@ class SettingsViewModel(
             errorMessage = notificationState.lastError,
             theme = theme,
             useUtc = useUtc,
-            hideTbdLaunches = hideTbdLaunches
+            hideTbdLaunches = hideTbdLaunches,
+            hasNotificationCustomization = hasNotificationCustomization
         )
     }.stateIn(
         scope = viewModelScope,
@@ -113,6 +125,14 @@ class SettingsViewModel(
 
     init {
         loadAvailableOptions()
+
+        // Collect subscription state and update premium features following ThemeCustomizationViewModel pattern
+        viewModelScope.launch {
+            subscriptionRepository.state.collect { subscriptionState ->
+                _hasNotificationCustomization.value =
+                    subscriptionRepository.hasFeature(PremiumFeature.NOTIFICATION_CUSTOMIZATION)
+            }
+        }
     }
 
     private fun loadAvailableOptions() {
