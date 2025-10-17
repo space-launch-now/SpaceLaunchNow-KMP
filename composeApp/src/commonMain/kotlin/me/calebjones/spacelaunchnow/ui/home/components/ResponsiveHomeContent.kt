@@ -48,6 +48,7 @@ import me.calebjones.spacelaunchnow.isDesktop
 import me.calebjones.spacelaunchnow.isLandscape
 import me.calebjones.spacelaunchnow.isTablet
 import me.calebjones.spacelaunchnow.navigation.Schedule
+import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -235,25 +236,25 @@ fun ResponsiveHomeContent(
                         StatItem(
                             icon = Icons.Default.Today,
                             label = "Next 24 Hours",
-                            value = next24HoursCount.toString(),
+                            value = if (next24HoursCount > 0) next24HoursCount.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                         StatItem(
                             icon = Icons.Default.DateRange,
                             label = "Next 7 Days",
-                            value = nextWeekCount.toString(),
+                            value = if (nextWeekCount > 0) nextWeekCount.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                         StatItem(
                             icon = Icons.Default.Schedule,
                             label = "Next 30 Days",
-                            value = nextMonthCount.toString(),
+                            value = if (nextMonthCount > 0) nextMonthCount.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                         StatItem(
                             icon = Icons.Default.History,
                             label = "This Day in History",
-                            value = historyLaunchesCount.toString(),
+                            value = if (historyLaunchesCount > 0) historyLaunchesCount.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -315,13 +316,13 @@ fun ResponsiveHomeContent(
                         StatItem(
                             icon = Icons.Default.Today,
                             label = "Next 24 Hours",
-                            value = next24HoursCount.toString(),
+                            value = if (next24HoursCount > 0) next24HoursCount.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                         StatItem(
                             icon = Icons.Default.DateRange,
                             label = "Next 7 Days",
-                            value = nextWeekCount.toString(),
+                            value = if (nextWeekCount > 0) nextWeekCount.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -333,13 +334,13 @@ fun ResponsiveHomeContent(
                         StatItem(
                             icon = Icons.Default.Schedule,
                             label = "Next 30 Days",
-                            value = nextMonthCount.toString(),
+                            value = if (nextMonthCount > 0) nextMonthCount.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                         StatItem(
                             icon = Icons.Default.History,
                             label = "This Day in History",
-                            value = historyLaunchesCount.toString(),
+                            value = if (historyLaunchesCount > 0) historyLaunchesCount.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -375,18 +376,7 @@ fun ResponsiveHomeContent(
                         }
                     } else {
                         // Loading placeholder
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(180.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                "No launches on this day",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
-                        }
+                        PlainShimmerCard()
                     }
                 }
             }

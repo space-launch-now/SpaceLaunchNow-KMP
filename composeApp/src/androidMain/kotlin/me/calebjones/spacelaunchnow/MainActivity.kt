@@ -25,6 +25,7 @@ import me.calebjones.spacelaunchnow.data.notifications.AndroidNotificationPermis
 import me.calebjones.spacelaunchnow.data.notifications.NotificationPermissionManager
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
+import me.calebjones.spacelaunchnow.util.NotificationSettingsHelper
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -42,6 +43,9 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         setTheme(android.R.style.Theme_Material_NoActionBar)
         super.onCreate(savedInstanceState)
+
+        // Initialize notification settings helper for Android
+        NotificationSettingsHelper.initialize(this)
 
         notificationPermissionHandler = AndroidNotificationPermissionHandler(this)
         NotificationPermissionManager.setCurrentActivity(this)

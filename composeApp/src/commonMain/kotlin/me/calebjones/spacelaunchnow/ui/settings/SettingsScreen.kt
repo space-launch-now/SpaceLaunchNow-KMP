@@ -60,6 +60,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.DebugUnlock
+import me.calebjones.spacelaunchnow.util.NotificationSettingsHelper
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -70,6 +71,7 @@ fun SettingsScreen(
     onOpenPrivacyPolicy: () -> Unit = {},
     onOpenTerms: () -> Unit = {},
     onOpenNotificationSettings: () -> Unit = {},
+    onOpenSystemNotificationSettings: () -> Unit = { NotificationSettingsHelper.openSystemNotificationSettings() },
     onOpenDebugSettings: () -> Unit = {},
     onOpenAboutLibraries: () -> Unit = {},
     viewModel: SettingsViewModel = koinViewModel()
@@ -180,9 +182,16 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             SettingsNavigationRow(
-                                title = "Notification Settings",
+                                title = "Notification Filters",
                                 subtitle = "Configure launch notifications and subscriptions",
                                 onClick = onOpenNotificationSettings,
+                                enabled = uiState.notificationsEnabled
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SettingsNavigationRow(
+                                title = "System Settings",
+                                subtitle = "Manage notification channels, sounds, and do-not-disturb",
+                                onClick = onOpenSystemNotificationSettings,
                                 enabled = uiState.notificationsEnabled
                             )
                         }

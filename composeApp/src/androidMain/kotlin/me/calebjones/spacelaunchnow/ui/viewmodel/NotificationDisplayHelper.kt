@@ -25,6 +25,8 @@ import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.data.model.NotificationData
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import me.calebjones.spacelaunchnow.data.model.SpaceLaunchNotificationChannel
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -35,68 +37,174 @@ import java.util.TimeZone
  */
 object NotificationDisplayHelper {
 
-    // Notification Channels
+    // Legacy channel constants for backward compatibility
+    @Deprecated("Use SpaceLaunchNotificationChannel enum instead")
     private const val CHANNEL_LAUNCHES_ID = "space_launch_notifications"
+
+    @Deprecated("Use SpaceLaunchNotificationChannel enum instead")
     private const val CHANNEL_LAUNCHES_NAME = "Launch Notifications"
 
+    @Deprecated("Use SpaceLaunchNotificationChannel enum instead")
     private const val CHANNEL_EVENTS_ID = "space_event_notifications"
+
+    @Deprecated("Use SpaceLaunchNotificationChannel enum instead")
     private const val CHANNEL_EVENTS_NAME = "Event Notifications"
 
+    @Deprecated("Use SpaceLaunchNotificationChannel enum instead")
     private const val CHANNEL_NEWS_ID = "space_news_notifications"
+
+    @Deprecated("Use SpaceLaunchNotificationChannel enum instead")
     private const val CHANNEL_NEWS_NAME = "News & Updates"
 
     private const val NOTIFICATION_ID = 1
 
     /**
+     * Get the notification channel ID for a specific NotificationTopic
+     * This provides the mapping between topics and channels
+     */
+    fun getChannelForTopic(topic: NotificationTopic): String {
+        return SpaceLaunchNotificationChannel.getChannelForTopic(topic).id
+    }
+
+    /**
      * Determine which notification channel to use based on notification type
+     * Maps notification types to appropriate channels with correct importance levels
      */
     private fun getChannelId(notificationType: String): String {
         return when {
-            notificationType.equals("event", ignoreCase = true) -> CHANNEL_EVENTS_ID
-            notificationType.equals("news", ignoreCase = true) -> CHANNEL_NEWS_ID
-            else -> CHANNEL_LAUNCHES_ID // Default to launches channel
+            // Critical/Imminent notifications (1-10 minutes)
+            notificationType.contains("tenMinutes", ignoreCase = true) ||
+                    notificationType.contains("oneMinute", ignoreCase = true) ->
+                SpaceLaunchNotificationChannel.LAUNCH_IMMINENT.id
+
+            // High priority status updates
+            notificationType.contains("inFlight", ignoreCase = true) ||
+                    notificationType.contains("success", ignoreCase = true) ||
+                    notificationType.contains("failure", ignoreCase = true) ||
+                    notificationType.contains("partial_failure", ignoreCase = true) ->
+                SpaceLaunchNotificationChannel.LAUNCH_STATUS_UPDATES.id
+
+            // High priority schedule changes
+            notificationType.contains("netstampChanged", ignoreCase = true) ||
+                    notificationType.contains("change", ignoreCase = true) ->
+                SpaceLaunchNotificationChannel.SCHEDULE_CHANGES.id
+
+            // Standard launch reminders (1-24 hours)
+            notificationType.contains("twentyFourHour", ignoreCase = true) ||
+                    notificationType.contains("oneHour", ignoreCase = true) ||
+                    notificationType.contains("hour", ignoreCase = true) ->
+                SpaceLaunchNotificationChannel.LAUNCH_REMINDERS.id
+
+            // Webcast notifications
+            notificationType.contains("webcastLive", ignoreCase = true) ||
+                    notificationType.contains("webcastOnly", ignoreCase = true) ||
+                    notificationType.contains("webcast", ignoreCase = true) ->
+                SpaceLaunchNotificationChannel.WEBCAST_NOTIFICATIONS.id
+
+            // Space events
+            notificationType.equals("event", ignoreCase = true) ->
+                SpaceLaunchNotificationChannel.SPACE_EVENTS.id
+
+            // News and updates
+            notificationType.equals("news", ignoreCase = true) ||
+                    notificationType.contains("featured_news", ignoreCase = true) ->
+                SpaceLaunchNotificationChannel.NEWS_UPDATES.id
+
+            // Default fallback to standard launch reminders
+            else -> SpaceLaunchNotificationChannel.LAUNCH_REMINDERS.id
         }
     }
 
     /**
      * Create all notification channels (Android O+)
+     * Now creates granular channels for each notification type
      * Should be called once during app initialization
      */
     fun createNotificationChannels(context: Context) {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Create all granular notification channels
+        SpaceLaunchNotificationChannel.values().forEach { channelConfig ->
+            val channel = NotificationChannel(
+                channelConfig.id,
+                channelConfig.displayName,
+                channelConfig.importance
+            ).apply {
+                description = channelConfig.description
+
+                // Enable lights and vibration with patterns based on channel type
+                when (channelConfig) {
+                    SpaceLaunchNotificationChannel.LAUNCH_IMMINENT -> {
+                        // Critical: Urgent, rapid pattern for imminent launches (1-10 minutes)
+                        enableLights(true)
+                        lightColor = Color.RED
+                        enableVibration(true)
+                        vibrationPattern = longArrayOf(0, 200, 100, 200, 100, 200, 100, 400) // Urgent triple-buzz
+                    }
+                    SpaceLaunchNotificationChannel.LAUNCH_STATUS_UPDATES -> {
+                        // High priority: Strong pattern for launch status (success/failure/in-flight)  
+                        enableLights(true)
+                        lightColor = Color.BLUE
+                        enableVibration(true)
+                        vibrationPattern = longArrayOf(0, 300, 200, 300, 200, 500) // Strong double-buzz
+                    }
+                    SpaceLaunchNotificationChannel.SCHEDULE_CHANGES -> {
+                        // High priority: Distinctive pattern for schedule changes
+                        enableLights(true)
+                        lightColor = Color.YELLOW
+                        enableVibration(true)
+                        vibrationPattern = longArrayOf(0, 100, 100, 100, 100, 100, 200, 400) // Triple tap + hold
+                    }
+                    SpaceLaunchNotificationChannel.LAUNCH_REMINDERS -> {
+                        // Default: Standard notification pattern (1-24 hours)
+                        enableLights(true)
+                        lightColor = Color.BLUE
+                        enableVibration(true)
+                        vibrationPattern = longArrayOf(0, 250, 250, 250) // Standard double-buzz
+                    }
+                    SpaceLaunchNotificationChannel.WEBCAST_NOTIFICATIONS -> {
+                        // Default: Gentle pattern for webcast notifications
+                        enableLights(true)
+                        lightColor = Color.GREEN
+                        enableVibration(true)
+                        vibrationPattern = longArrayOf(0, 200, 100, 200) // Gentle double-tap
+                    }
+                    else -> {
+                        // Low priority: Simple single vibration for events/news
+                        if (channelConfig.importance >= NotificationManager.IMPORTANCE_DEFAULT) {
+                            enableLights(true)
+                            lightColor = Color.BLUE
+                            enableVibration(true)
+                            vibrationPattern = longArrayOf(0, 250) // Simple single buzz
+                        }
+                    }
+                }
+            }
+
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        // Migration: Delete old channels if they exist
+        migrateLegacyChannels(notificationManager)
+    }
+
+    /**
+     * Remove old channels and migrate users to new granular channels
+     */
+    private fun migrateLegacyChannels(notificationManager: NotificationManager) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-            // Launch Notifications Channel
-            val launchChannel = NotificationChannel(
-                CHANNEL_LAUNCHES_ID,
-                CHANNEL_LAUNCHES_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Notifications for upcoming space launches and launch updates"
+            try {
+                // Delete old broad channels
+                @Suppress("DEPRECATION")
+                notificationManager.deleteNotificationChannel(CHANNEL_LAUNCHES_ID)
+                @Suppress("DEPRECATION")
+                notificationManager.deleteNotificationChannel(CHANNEL_EVENTS_ID)
+                @Suppress("DEPRECATION")
+                notificationManager.deleteNotificationChannel(CHANNEL_NEWS_ID)
+            } catch (e: Exception) {
+                // Channels may not exist, ignore
             }
-
-            // Event Notifications Channel
-            val eventChannel = NotificationChannel(
-                CHANNEL_EVENTS_ID,
-                CHANNEL_EVENTS_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Notifications for space-related events"
-            }
-
-            // News Notifications Channel
-            val newsChannel = NotificationChannel(
-                CHANNEL_NEWS_ID,
-                CHANNEL_NEWS_NAME,
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "News and updates about space launches and missions"
-            }
-
-            notificationManager.createNotificationChannel(launchChannel)
-            notificationManager.createNotificationChannel(eventChannel)
-            notificationManager.createNotificationChannel(newsChannel)
         }
     }
 
@@ -355,7 +463,7 @@ object NotificationDisplayHelper {
         // Use provided title/body or generate from notification data and strings
         // Add 🔴 emoji to title if webcast is available (like old app)
         val baseTitle = title ?: notificationData.launchName
-        val displayTitle = if (notificationData.webcast.equals("true", ignoreCase = true)) {
+        val displayTitle = if (notificationData.isWebcastLive()) {
             "🔴 $baseTitle"
         } else {
             baseTitle
@@ -412,7 +520,7 @@ object NotificationDisplayHelper {
         println("📱 [Notification] Image bitmap result: $imageBitmap")
 
         // Add LIVE badge if webcast is available
-        if (imageBitmap != null && notificationData.webcast.equals("true", ignoreCase = true)) {
+        if (imageBitmap != null && notificationData.isWebcastLive()) {
             println("📱 [Notification] 🔴 Adding LIVE badge (webcast available)")
             imageBitmap = drawLiveBadge(imageBitmap)
         }
@@ -505,15 +613,17 @@ object NotificationDisplayHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_LAUNCHES_ID)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setSmallIcon(R.drawable.ic_rocket_notification)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .build()
+        @Suppress("DEPRECATION")
+        val notification =
+            NotificationCompat.Builder(context, SpaceLaunchNotificationChannel.LAUNCH_REMINDERS.id)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setSmallIcon(R.drawable.ic_rocket_notification)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .build()
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
