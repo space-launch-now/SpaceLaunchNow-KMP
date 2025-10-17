@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -56,6 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
@@ -138,17 +138,23 @@ fun SettingsScreen(
                     Spacer(Modifier.height(2.dp))
                     SettingsCardRow {
                         Column(Modifier.fillMaxWidth()) {
-                            SettingsNavigationRow(
-                                title = "Theme Settings",
-                                subtitle = "Appearance, colors, and palette customization",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.ThemeCustomization) },
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
                             SettingsToggleRow(
                                 title = "Use UTC time",
                                 subtitle = "Show dates/times in UTC instead of local timezone",
                                 checked = uiState.useUtc,
                                 onCheckedChange = viewModel::updateUseUtc
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
+                                title = "Theme Settings",
+                                subtitle = "Appearance, colors, and palette customization",
+                                onClick = { navController.navigate(ThemeCustomization) },
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
+                                title = "Calendar Sync",
+                                subtitle = "Sync Launches and Events to your calendar",
+                                onClick = { },
                             )
                         }
                     }
@@ -351,27 +357,29 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SectionHeaderText(text: String) {
+fun SectionHeaderText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 20.dp, bottom = 4.dp, top = 10.dp)
+        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp, end = 8.dp)
+            .then(modifier)
     )
 }
 
 @Composable
-fun SectionSubHeaderText(text: String) {
+fun SectionSubHeaderText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 20.dp, bottom = 4.dp)
+        modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 8.dp, end = 8.dp)
+            .then(modifier)
     )
 }
 
 @Composable
-private fun SettingsCardRow(
+fun SettingsCardRow(
     content: @Composable RowScope.() -> Unit
 ) {
     Card(

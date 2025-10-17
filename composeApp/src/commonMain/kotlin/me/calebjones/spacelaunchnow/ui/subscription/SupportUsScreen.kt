@@ -28,6 +28,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DashboardCustomize
+import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FormatPaint
@@ -68,6 +70,7 @@ import androidx.compose.ui.unit.sp
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.launcher
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
+import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
@@ -211,10 +214,36 @@ fun SupportUsScreen(
                     PremiumPerkCard(
                         icon = Icons.Default.Widgets,
                         title = "Premium Widget",
-                        description = "Unlock the advanced home screen widget with customizable themes and layouts",
+                        description = "Unlock additional Launch List widget for your home screen",
                         gradient = listOf(
                             MaterialTheme.colorScheme.primary,
                             MaterialTheme.colorScheme.tertiary
+                        )
+                    )
+                }
+
+                item {
+                    Spacer(Modifier.height(24.dp))
+                    PremiumPerkCard(
+                        icon = Icons.Default.DashboardCustomize,
+                        title = "Widget Customization",
+                        description = "Customize widgets with customizable themes and layouts",
+                        gradient = listOf(
+                            MaterialTheme.colorScheme.primaryFixed,
+                            MaterialTheme.colorScheme.tertiaryFixed
+                        )
+                    )
+                }
+
+                item {
+                    Spacer(Modifier.height(24.dp))
+                    PremiumPerkCard(
+                        icon = Icons.Default.EditCalendar,
+                        title = "Calendar Sync",
+                        description = "Access to Calendar Sync link for Launch and Event calendar sync",
+                        gradient = listOf(
+                            MaterialTheme.colorScheme.secondary,
+                            MaterialTheme.colorScheme.inversePrimary
                         )
                     )
                 }
@@ -226,7 +255,7 @@ fun SupportUsScreen(
                         title = "Premium Themes",
                         description = "Utilize premium themes to customize your app experience",
                         gradient = listOf(
-                            MaterialTheme.colorScheme.tertiary,
+                            MaterialTheme.colorScheme.error,
                             MaterialTheme.colorScheme.inversePrimary
                         )
                     )
@@ -278,36 +307,38 @@ fun SupportUsScreen(
                         val lifetimePackage = currentOffering?.lifetime
 
                         // Only show if we have the actual package from RevenueCat
-                        if (lifetimePackage != null) {
-                            ProLifetimeCard(
-                                price = lifetimePackage.storeProduct.price.formatted,
-                                isProcessing = uiState.isProcessing,
-                                onPurchase = {
+
+                        ProLifetimeCard(
+                            price = lifetimePackage?.storeProduct?.price?.formatted ?: "$-.--",
+                            isProcessing = uiState.isProcessing,
+                            onPurchase = {
+                                if (lifetimePackage != null) {
                                     viewModel.purchasePackage(lifetimePackage)
                                 }
-                            )
+                            },
+                            enabled = lifetimePackage != null
+                        )
 
-                            // Show divider only if lifetime was shown AND there are subscription plans to show
-                            if (packagesToShow.showAnnual || packagesToShow.showMonthly) {
-                                Spacer(Modifier.height(20.dp))
+                        // Show divider only if lifetime was shown AND there are subscription plans to show
+                        if (packagesToShow.showAnnual || packagesToShow.showMonthly) {
+                            Spacer(Modifier.height(20.dp))
 
-                                // "Or subscribe" divider
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 24.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    HorizontalDivider(modifier = Modifier.weight(1f))
-                                    Text(
-                                        text = "  Or subscribe  ",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    HorizontalDivider(modifier = Modifier.weight(1f))
-                                }
-                                Spacer(Modifier.height(16.dp))
+                            // "Or subscribe" divider
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 24.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                HorizontalDivider(modifier = Modifier.weight(1f))
+                                Text(
+                                    text = "  Or subscribe  ",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                HorizontalDivider(modifier = Modifier.weight(1f))
                             }
+                            Spacer(Modifier.height(16.dp))
                         }
                         // Don't show fallback UI or divider - just hide until loaded
                     }
@@ -318,20 +349,20 @@ fun SupportUsScreen(
                     item {
                         val annualPackage = currentOffering?.annual
 
-                        // Only show if we have the actual package from RevenueCat
-                        if (annualPackage != null) {
-                            PricingCard(
-                                title = "Yearly",
-                                price = annualPackage.storeProduct.price.formatted,
-                                period = "/year",
-                                savings = uiState.getSavingsPercent(),
-                                isRecommended = true,
-                                isProcessing = uiState.isProcessing,
-                                onSubscribe = {
+                        PricingCard(
+                            title = "Yearly",
+                            price = annualPackage?.storeProduct?.price?.formatted ?: "$-.--",
+                            period = "/year",
+                            savings = uiState.getSavingsPercent(),
+                            isRecommended = true,
+                            isProcessing = uiState.isProcessing,
+                            onSubscribe = {
+                                if (annualPackage != null) {
                                     viewModel.purchasePackage(annualPackage)
                                 }
-                            )
-                        }
+                            },
+                            enabled = annualPackage != null
+                        )
                         // Don't show fallback UI - just hide until loaded
                     }
                 }
@@ -343,19 +374,19 @@ fun SupportUsScreen(
 
                         val monthlyPackage = currentOffering?.monthly
 
-                        // Only show if we have the actual package from RevenueCat
-                        if (monthlyPackage != null) {
-                            PricingCard(
-                                title = "Monthly",
-                                price = monthlyPackage.storeProduct.price.formatted,
-                                period = "/month",
-                                isRecommended = false,
-                                isProcessing = uiState.isProcessing,
-                                onSubscribe = {
+                        PricingCard(
+                            title = "Monthly",
+                            price = monthlyPackage?.storeProduct?.price?.formatted ?: "$-.--",
+                            period = "/month",
+                            isRecommended = false,
+                            isProcessing = uiState.isProcessing,
+                            onSubscribe = {
+                                if (monthlyPackage != null) {
                                     viewModel.purchasePackage(monthlyPackage)
                                 }
-                            )
-                        }
+                            },
+                            enabled = monthlyPackage != null
+                        )
                         // Don't show fallback UI - just hide until loaded
                     }
                 }
@@ -587,7 +618,8 @@ private fun PricingCard(
     savings: String? = null,
     isRecommended: Boolean = false,
     isProcessing: Boolean = false,
-    onSubscribe: () -> Unit
+    onSubscribe: () -> Unit,
+    enabled: Boolean = true
 ) {
     Card(
         modifier = Modifier
@@ -670,8 +702,10 @@ private fun PricingCard(
 
             // Features Quick List
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PerkCheckmark("Premium Widget")
                 PerkCheckmark("Premium Themes")
+                PerkCheckmark("Premium Widget")
+                PerkCheckmark("Widget Customization")
+                PerkCheckmark("Calendar Sync")
                 PerkCheckmark("No Ads")
                 PerkCheckmark("Support Development")
             }
@@ -680,7 +714,7 @@ private fun PricingCard(
             Button(
                 onClick = onSubscribe,
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isProcessing,
+                enabled = enabled && !isProcessing,
                 colors = if (isRecommended) {
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
@@ -949,7 +983,8 @@ private fun FinePrint() {
 private fun ProLifetimeCard(
     price: String,
     isProcessing: Boolean,
-    onPurchase: () -> Unit
+    onPurchase: () -> Unit,
+    enabled: Boolean = true
 ) {
     val goldGradient = Brush.linearGradient(
         colors = listOf(
@@ -1067,9 +1102,9 @@ private fun ProLifetimeCard(
 
                 // Premium Features List
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    ProPerkCheckmark("Everything in subscriptions")
-                    ProPerkCheckmark("Lifetime updates")
-                    ProPerkCheckmark("Support independent development")
+                    ProPerkCheckmark("Everything in Subscriptions")
+                    ProPerkCheckmark("Lifetime Access")
+                    ProPerkCheckmark("Support Independent Developer")
                 }
 
                 // Purchase Button with Gold Gradient
@@ -1078,7 +1113,7 @@ private fun ProLifetimeCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    enabled = !isProcessing,
+                    enabled = enabled && !isProcessing,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFFFD700),
                         contentColor = Color(0xFF1C1C1C)
@@ -1190,14 +1225,6 @@ private fun CurrentPlanCard(
 
             // Expiry/Product Info
             if (subscriptionState.isSubscribed) {
-                subscriptionState.expiresAt?.let { expiryTime ->
-                    Text(
-                        text = "Next renewal: ${formatDate(expiryTime)}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = textColor
-                    )
-                }
-
                 subscriptionState.productId?.let { productId ->
                     Text(
                         text = "Product: ${getProductDisplayName(productId)}",
@@ -1211,6 +1238,14 @@ private fun CurrentPlanCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor
                 )
+            }
+            subscriptionState.features.forEach { feature ->
+                BenefitItem(
+                    icon = Icons.Filled.CheckCircle,
+                    feature.getTitle(),
+                    color = textColor
+                )
+
             }
         }
     }
@@ -1360,7 +1395,7 @@ data class PackagesToShow(
  * @return UserState enum representing user's subscription status
  */
 private fun determineUserState(
-    subscriptionState: me.calebjones.spacelaunchnow.data.model.SubscriptionState
+    subscriptionState: SubscriptionState
 ): UserState {
     // Check if user has lifetime purchase - match against actual lifetime product IDs
     val hasLifetime = subscriptionState.productId?.let { productId ->

@@ -268,7 +268,7 @@ fun PremiumBadge(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier,
+        modifier = Modifier.padding(16.dp).then(modifier),
         color = MaterialTheme.colorScheme.primaryContainer,
         shape = MaterialTheme.shapes.small
     ) {
@@ -322,11 +322,23 @@ fun rememberHasFeature(feature: PremiumFeature): State<Boolean> {
 }
 
 // Extension: Get user-friendly description for features
-private fun PremiumFeature.getDescription(): String {
+fun PremiumFeature.getDescription(): String {
     return when (this) {
         PremiumFeature.AD_FREE -> "Enjoy an ad-free experience throughout the app"
         PremiumFeature.CUSTOM_THEMES -> "Personalize your app with custom color themes"
-        PremiumFeature.ADVANCED_WIDGETS -> "Access advanced widget layouts and configurations"
+        PremiumFeature.ADVANCED_WIDGETS -> "Access the launch list widget"
+        PremiumFeature.WIDGETS_CUSTOMIZATION -> "Customize your widgets look and feel"
+        PremiumFeature.CAL_SYNC -> "Access to Calendar Sync Link for syncing launches and events"
+    }
+}
 
+// Extension: Get user-friendly description for features
+fun PremiumFeature.getTitle(): String {
+    return when (this) {
+        PremiumFeature.AD_FREE -> "Ad-Free Experience"
+        PremiumFeature.CUSTOM_THEMES -> "Custom Themes"
+        PremiumFeature.ADVANCED_WIDGETS -> "Advanced Widget"
+        PremiumFeature.WIDGETS_CUSTOMIZATION -> "Widget Customization"
+        PremiumFeature.CAL_SYNC -> "Calendar Sync"
     }
 }
