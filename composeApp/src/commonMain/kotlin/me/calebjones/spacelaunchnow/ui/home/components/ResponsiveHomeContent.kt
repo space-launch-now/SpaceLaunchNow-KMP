@@ -90,7 +90,7 @@ fun ResponsiveHomeContent(
         LazyColumn(
             modifier = modifier.fillMaxSize(),
         ) {
-            item { HomeTopBar() }
+            item { HomeTopBar(navController = navController) }
             // Hero cards row: Last Launch + Stats + Next Up (countdown)
             item {
                 Row(
@@ -295,7 +295,7 @@ fun ResponsiveHomeContent(
         LazyColumn(
             modifier = modifier,
         ) {
-            item { HomeTopBar() }
+            item { HomeTopBar(navController = navController) }
             item { NextLaunchView(navController = navController) }
 
             // Quick Stats
