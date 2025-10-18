@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
+import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
@@ -39,14 +40,15 @@ import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
+import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.NotificationSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationScreen
+import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
-import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -67,6 +69,7 @@ fun PhoneLayout(
         AboutLibraries::class.qualifiedName -> false // Hide for AboutLibrariesScreen
         SupportUs::class.qualifiedName -> false // Hide for SupportUsScreen
         ThemeCustomization::class.qualifiedName -> false // Hide for ThemeCustomization
+        CalendarSync::class.qualifiedName -> false // Hide for CalendarSync
 
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern
@@ -171,8 +174,13 @@ fun PhoneLayout(
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
-                        composableWithCompositionLocal<me.calebjones.spacelaunchnow.navigation.ThemeCustomization> {
+                        composableWithCompositionLocal<ThemeCustomization> {
                             ThemeCustomizationScreen(
+                                navController = navController
+                            )
+                        }
+                        composableWithCompositionLocal<CalendarSync> {
+                            CalendarSyncScreen(
                                 navController = navController
                             )
                         }

@@ -28,7 +28,8 @@ data class SettingsUiState(
     val useUtc: Boolean = false,
     val notificationsEnabled: Boolean = true,
     val hideTbdLaunches: Boolean = false,
-    val hasNotificationCustomization: Boolean = false
+    val hasNotificationCustomization: Boolean = false,
+    val hasCalendarSync: Boolean = false
 )
 
 enum class ThemeOption(val label: String) {
@@ -86,6 +87,9 @@ class SettingsViewModel(
     private val _hasNotificationCustomization = MutableStateFlow(false)
     val hasNotificationCustomization: StateFlow<Boolean> =
         _hasNotificationCustomization.asStateFlow()
+    
+    private val _hasCalendarSync = MutableStateFlow(false)
+    val hasCalendarSync: StateFlow<Boolean> = _hasCalendarSync.asStateFlow()
 
     // Reactive state flow that updates when agencies/locations are loaded
     val uiState: StateFlow<SettingsUiState> = combine(
@@ -95,7 +99,8 @@ class SettingsViewModel(
         appSettingsViewModel.themeFlow,
         appSettingsViewModel.useUtcFlow,
         appSettingsViewModel.hideTbdLaunchesFlow,
-        _hasNotificationCustomization
+        _hasNotificationCustomization,
+        _hasCalendarSync
     ) { flows ->
         val notificationState = flows[0] as NotificationState
         val agencies = flows[1] as List<NotificationAgency>
@@ -104,6 +109,7 @@ class SettingsViewModel(
         val useUtc = flows[4] as Boolean
         val hideTbdLaunches = flows[5] as Boolean
         val hasNotificationCustomization = flows[6] as Boolean
+        val hasCalendarSync = flows[7] as Boolean
 
         SettingsUiState(
             notificationSettings = notificationState,
@@ -115,7 +121,8 @@ class SettingsViewModel(
             theme = theme,
             useUtc = useUtc,
             hideTbdLaunches = hideTbdLaunches,
-            hasNotificationCustomization = hasNotificationCustomization
+            hasNotificationCustomization = hasNotificationCustomization,
+            hasCalendarSync = hasCalendarSync
         )
     }.stateIn(
         scope = viewModelScope,
@@ -131,6 +138,8 @@ class SettingsViewModel(
             subscriptionRepository.state.collect { subscriptionState ->
                 _hasNotificationCustomization.value =
                     subscriptionRepository.hasFeature(PremiumFeature.NOTIFICATION_CUSTOMIZATION)
+                _hasCalendarSync.value =
+                    subscriptionRepository.hasFeature(PremiumFeature.CAL_SYNC)
             }
         }
     }

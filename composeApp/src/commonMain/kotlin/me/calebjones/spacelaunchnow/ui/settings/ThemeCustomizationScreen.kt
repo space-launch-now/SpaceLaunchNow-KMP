@@ -71,6 +71,7 @@ import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
+import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -157,6 +158,9 @@ fun ThemeCustomizationScreen(
             if (!hasCustomTheme) {
                 item {
                     PremiumPromptCard(
+                        title = "Unlock Custom Themes",
+                        description = "Customize your app's theme with custom colors and palette styles",
+                        icon = Icons.Default.Palette,
                         onUpgradeClick = {
                             navController.navigate(SupportUs)
                         }
@@ -486,7 +490,7 @@ fun ThemeCustomizationScreen(
                         }
                     },
                     enabled = hasCustomTheme,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 ) {
                     if (!hasCustomTheme) {
                         Icon(
@@ -498,58 +502,8 @@ fun ThemeCustomizationScreen(
                     }
                     Text(if (hasCustomTheme) "Reset to Defaults" else "Reset to Defaults (Premium)")
                 }
+                Spacer(Modifier.height(8.dp))
             }
-        }
-    }
-}
-
-@Composable
-private fun PremiumPromptCard(
-    onUpgradeClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        modifier = modifier.padding(16.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                Icons.Default.Palette,
-                contentDescription = null,
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-            Spacer(Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    "Unlock Premium Customization",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "Customize colors and palette styles",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                )
-            }
-        }
-        Button(
-            onClick = onUpgradeClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp)
-        ) {
-            Text("Upgrade to Premium")
         }
     }
 }
