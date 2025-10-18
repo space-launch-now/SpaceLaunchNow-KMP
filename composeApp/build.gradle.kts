@@ -96,6 +96,9 @@ kotlin {
 
                 // Desktop-specific HTTP client engine (CIO)
                 implementation(libs.ktor.client.cio)
+                
+                // JDK cryptography provider for Desktop
+                implementation(libs.cryptography.provider.jdk)
             }
         }
 
@@ -125,6 +128,9 @@ kotlin {
                 implementation(libs.ktor.client.android)
 
                 implementation(libs.billing.ktx)
+                
+                // JDK cryptography provider for Android
+                implementation(libs.cryptography.provider.jdk)
             }
         }
 
@@ -135,6 +141,9 @@ kotlin {
 
                 // iOS-specific HTTP client engine (Darwin)
                 implementation(libs.ktor.client.darwin)
+                
+                // Apple cryptography provider for iOS
+                implementation(libs.cryptography.provider.apple)
             }
         }
 
@@ -197,6 +206,9 @@ kotlin {
                 implementation(libs.purchases.ui)   // Optional
                 implementation(libs.purchases.either)     // Optional
                 implementation(libs.purchases.result)     // Optional
+                
+                // Cryptography library for secure hashing
+                implementation(libs.cryptography.core)
             }
         }
 

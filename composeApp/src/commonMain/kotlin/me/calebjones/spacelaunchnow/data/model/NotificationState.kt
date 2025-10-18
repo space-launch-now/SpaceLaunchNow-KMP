@@ -8,7 +8,6 @@ data class NotificationState(
     val followAllLaunches: Boolean = true,
     val useStrictMatching: Boolean = false,
     val hideTbdLaunches: Boolean = false,
-    val keepLaunchesFor24Hours: Boolean = true,
 
     // Topic settings (user-configurable notification timing)
     val topicSettings: Map<String, Boolean> = NotificationTopic.getDefaultTopicSettings(),
@@ -218,7 +217,7 @@ data class NotificationTopic(
             "webcastOnly",
             "Webcast Only Launches",
             "Only launches with webcast available",
-            defaultEnabled = true
+            defaultEnabled = false
         )
         val TWENTY_FOUR_HOUR = NotificationTopic(
             "twentyFourHour",
@@ -255,6 +254,24 @@ data class NotificationTopic(
             "Launch Success",
             "When launches complete successfully",
             defaultEnabled = true
+        )
+        val FAILURE = NotificationTopic(
+            "failure",
+            "Launch Failure",
+            "When launches fail to complete successfully",
+            defaultEnabled = true
+        )
+        val PARTIAL_FAILURE = NotificationTopic(
+            "partial_failure",
+            "Partial Launch Failure",
+            "When launches partially fail (some objectives met)",
+            defaultEnabled = true
+        )
+        val WEBCAST_LIVE = NotificationTopic(
+            "webcastLive",
+            "Webcast Started",
+            "When launch webcast goes live",
+            defaultEnabled = false
         )
 
         // Agency topics
@@ -293,7 +310,8 @@ data class NotificationTopic(
         fun getUserConfigurableTopics(): List<NotificationTopic> {
             return listOf(
                 NETSTAMP_CHANGED, WEBCAST_ONLY, TWENTY_FOUR_HOUR, ONE_HOUR,
-                TEN_MINUTES, ONE_MINUTE, IN_FLIGHT, SUCCESS
+                TEN_MINUTES, ONE_MINUTE, IN_FLIGHT, SUCCESS, FAILURE,
+                PARTIAL_FAILURE, WEBCAST_LIVE
             )
         }
 

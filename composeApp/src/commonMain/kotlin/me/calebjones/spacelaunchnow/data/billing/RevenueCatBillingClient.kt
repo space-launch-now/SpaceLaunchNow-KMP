@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import me.calebjones.spacelaunchnow.data.model.Platform
 import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
 import me.calebjones.spacelaunchnow.data.model.ProductPricing
-import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import kotlin.time.ExperimentalTime
 
 /**
@@ -186,20 +185,9 @@ class RevenueCatBillingClient(
         )
     }
 
-    private fun determineSubscriptionType(productId: String?): SubscriptionType {
-        return when {
-            productId == null -> SubscriptionType.FREE
-            productId.contains("premium", ignoreCase = true) -> SubscriptionType.PREMIUM
-            productId.contains("pro", ignoreCase = true) -> SubscriptionType.PREMIUM
-            productId.contains("yearly", ignoreCase = true) -> SubscriptionType.PREMIUM
-            productId.contains("monthly", ignoreCase = true) -> SubscriptionType.PREMIUM
-            else -> SubscriptionType.FREE
-        }
-    }
-
     /**
      * Find the RevenueCat package matching the requested product
-     * 
+     *
      * Maps legacy product IDs to RevenueCat package identifiers:
      * - spacelaunchnow_pro → $rc_lifetime
      * - sln_production_yearly:base-plan → $rc_monthly
@@ -215,24 +203,24 @@ class RevenueCatBillingClient(
         // Map legacy product IDs to RevenueCat package identifiers
         val packageIdentifier = when {
             // Lifetime purchase
-            productId == SubscriptionProducts.PRO_LIFETIME -> 
+            productId == SubscriptionProducts.PRO_LIFETIME ->
                 SubscriptionProducts.RC_PACKAGE_LIFETIME
-            
+
             // Monthly subscription (via base plan ID)
-            basePlanId == SubscriptionProducts.BASE_PLAN_MONTHLY -> 
+            basePlanId == SubscriptionProducts.BASE_PLAN_MONTHLY ->
                 SubscriptionProducts.RC_PACKAGE_MONTHLY
-            
+
             // Annual subscription (via base plan ID)
-            basePlanId == SubscriptionProducts.BASE_PLAN_YEARLY -> 
+            basePlanId == SubscriptionProducts.BASE_PLAN_YEARLY ->
                 SubscriptionProducts.RC_PACKAGE_ANNUAL
-            
+
             // If already a RevenueCat package identifier, use as-is
             basePlanId?.startsWith("\$rc_") == true -> basePlanId
-            
+
             // Default: try to match by product ID
             else -> null
         }
-        
+
         // If we have a mapped package identifier, find it
         if (packageIdentifier != null) {
             val matchedPackage = currentOffering.availablePackages.find { pkg ->
@@ -248,14 +236,14 @@ class RevenueCatBillingClient(
         val fallbackPackage = currentOffering.availablePackages.find { pkg ->
             matchesProduct(pkg.storeProduct, productId)
         }
-        
+
         if (fallbackPackage != null) {
             println("RevenueCat: Found package by product ID: ${fallbackPackage.identifier}")
         } else {
             println("RevenueCat: ⚠️ No package found for $productId:$basePlanId")
             println("  Available packages: ${currentOffering.availablePackages.map { it.identifier }}")
         }
-        
+
         return fallbackPackage
     }
 

@@ -16,6 +16,7 @@ data class NotificationData(
     val launchNet: String,                // Formatted date string
     val launchLocation: String,
     val webcast: String,                  // "true" or "false" as string
+    val webcastLive: String?,              // "true" or "false" as string (optional)
     val agencyId: String,                 // e.g., "121" for SpaceX
     val locationId: String                // e.g., "143" for Texas
 ) {
@@ -35,6 +36,7 @@ data class NotificationData(
                     launchNet = data["launch_net"] ?: return null,
                     launchLocation = data["launch_location"] ?: return null,
                     webcast = data["webcast"] ?: "false",
+                    webcastLive = data["webcast_live"],
                     agencyId = data["agency_id"] ?: return null,
                     locationId = data["location_id"] ?: return null
                 )
@@ -50,6 +52,13 @@ data class NotificationData(
      */
     fun hasWebcast(): Boolean {
         return webcast.lowercase() == "true"
+    }
+
+    /**
+     * Check if webcast is live
+     */
+    fun isWebcastLive(): Boolean {
+        return webcastLive?.lowercase() == "true"
     }
 
     /**

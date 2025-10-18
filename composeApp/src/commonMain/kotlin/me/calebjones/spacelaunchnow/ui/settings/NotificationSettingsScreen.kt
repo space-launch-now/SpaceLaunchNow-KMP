@@ -31,7 +31,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -67,7 +70,7 @@ fun NotificationSettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Notification Settings",
+                        text = "Notification Filters",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -431,23 +434,34 @@ fun NotificationSettingsScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "Launch Interval Notifications",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Text(
-                            text = "Get notified at specific times before launch",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Launch Interval Notifications",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "Get notified at specific times before launch",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (!uiState.hasNotificationCustomization) {
+                                PremiumBadge()
+                            }
+                        }
 
                         NotificationTopicToggle(
                             title = "Net Timestamp Changes",
                             description = "When launch times are updated",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.NETSTAMP_CHANGED),
-                            onCheckedChange = viewModel::updateNetstampChanged
+                            onCheckedChange = viewModel::updateNetstampChanged,
+                            enabled = uiState.hasNotificationCustomization
                         )
 
                         NotificationTopicToggle(
@@ -461,7 +475,8 @@ fun NotificationSettingsScreen(
                             title = "1 Hour Notice",
                             description = "1 hour before launch",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_HOUR),
-                            onCheckedChange = viewModel::updateOneHour
+                            onCheckedChange = viewModel::updateOneHour,
+                            enabled = uiState.hasNotificationCustomization
                         )
 
                         NotificationTopicToggle(
@@ -475,7 +490,8 @@ fun NotificationSettingsScreen(
                             title = "1 Minute Notice",
                             description = "1 minute before launch - for the most dedicated!",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_MINUTE),
-                            onCheckedChange = viewModel::updateOneMinute
+                            onCheckedChange = viewModel::updateOneMinute,
+                            enabled = uiState.hasNotificationCustomization
                         )
                     }
                 }
@@ -490,30 +506,42 @@ fun NotificationSettingsScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "Launch Status Notifications",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Text(
-                            text = "Stay updated on launch progress and outcomes",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Launch Status Notifications",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "Stay updated on launch progress and outcomes",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (!uiState.hasNotificationCustomization) {
+                                PremiumBadge()
+                            }
+                        }
 
                         NotificationTopicToggle(
                             title = "Webcast Only Launches",
                             description = "Launches that have live video streams",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.WEBCAST_ONLY),
-                            onCheckedChange = viewModel::updateWebcastOnly
+                            onCheckedChange = viewModel::updateWebcastOnly,
+                            enabled = uiState.hasNotificationCustomization
                         )
 
                         NotificationTopicToggle(
                             title = "In-Flight Updates",
                             description = "Real-time updates during launch",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.IN_FLIGHT),
-                            onCheckedChange = viewModel::updateInFlight
+                            onCheckedChange = viewModel::updateInFlight,
+                            enabled = uiState.hasNotificationCustomization
                         )
 
                         NotificationTopicToggle(
@@ -599,12 +627,19 @@ fun NotificationTopicToggle(
     description: String? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) },
+            .then(
+                if (enabled) {
+                    Modifier.clickable { onCheckedChange(!checked) }
+                } else {
+                    Modifier
+                }
+            ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -612,19 +647,29 @@ fun NotificationTopicToggle(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = if (enabled) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                }
             )
             if (description != null) {
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (enabled) {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    }
                 )
             }
         }
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = { if (enabled) onCheckedChange(it) else { } },
+            enabled = enabled
         )
     }
 }

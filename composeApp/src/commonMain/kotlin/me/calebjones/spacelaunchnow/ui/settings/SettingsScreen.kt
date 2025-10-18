@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -14,9 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -24,29 +27,41 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.util.DebugUnlock
+import me.calebjones.spacelaunchnow.util.NotificationSettingsHelper
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,11 +71,23 @@ fun SettingsScreen(
     onOpenPrivacyPolicy: () -> Unit = {},
     onOpenTerms: () -> Unit = {},
     onOpenNotificationSettings: () -> Unit = {},
+    onOpenSystemNotificationSettings: () -> Unit = { NotificationSettingsHelper.openSystemNotificationSettings() },
     onOpenDebugSettings: () -> Unit = {},
     onOpenAboutLibraries: () -> Unit = {},
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val appPreferences: AppPreferences = koinInject()
+    val debugMenuUnlocked by appPreferences.debugMenuUnlockedFlow.collectAsState(initial = false)
+    val coroutineScope = rememberCoroutineScope()
+
+    // Tap counter for debug unlock
+    var tapCount by remember { mutableStateOf(0) }
+    var showPasswordDialog by remember { mutableStateOf(false) }
+    var passwordInput by remember { mutableStateOf("") }
+    var showPasswordError by remember { mutableStateOf(false) }
+    var showPassword by remember { mutableStateOf(false) }
+
     val uriHandler = LocalUriHandler.current
     val onPrivacyPolicy = {
         uriHandler.openUri("https://spacelaunchnow.app/site/privacy")
@@ -113,39 +140,30 @@ fun SettingsScreen(
                     Spacer(Modifier.height(2.dp))
                     SettingsCardRow {
                         Column(Modifier.fillMaxWidth()) {
-                            SettingsNavigationRow(
-                                title = "Theme Settings",
-                                subtitle = "Appearance, colors, and palette customization",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.ThemeCustomization) },
-                                icon = Icons.Filled.Palette
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
                             SettingsToggleRow(
                                 title = "Use UTC time",
                                 subtitle = "Show dates/times in UTC instead of local timezone",
                                 checked = uiState.useUtc,
                                 onCheckedChange = viewModel::updateUseUtc
                             )
-                        }
-                    }
-                }
-                item {
-                    SectionHeaderText("Home Page Filters")
-                    Spacer(Modifier.height(2.dp))
-                    SettingsCardRow {
-                        Column(Modifier.fillMaxWidth()) {
+                            Spacer(modifier = Modifier.height(12.dp))
                             NotificationTopicToggle(
                                 title = "Hide TBD Launches",
                                 description = "Hide launches without confirmed dates",
                                 checked = uiState.hideTbdLaunches,
                                 onCheckedChange = viewModel::updateHideTbdLaunches
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            NotificationTopicToggle(
-                                title = "Keep Launches for 24 Hours",
-                                description = "Show past launches for one day after completion",
-                                checked = uiState.keepLaunchesFor24Hours,
-                                onCheckedChange = viewModel::updateKeepLaunchesFor24Hours
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
+                                title = "Theme Settings",
+                                subtitle = "Appearance, colors, and palette customization",
+                                onClick = { navController.navigate(ThemeCustomization) },
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
+                                title = "Calendar Sync",
+                                subtitle = "Sync Launches and Events to your calendar",
+                                onClick = { },
                             )
                         }
                     }
@@ -164,16 +182,23 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             SettingsNavigationRow(
-                                title = "Notification Settings",
+                                title = "Notification Filters",
                                 subtitle = "Configure launch notifications and subscriptions",
                                 onClick = onOpenNotificationSettings,
+                                enabled = uiState.notificationsEnabled
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SettingsNavigationRow(
+                                title = "System Settings",
+                                subtitle = "Manage notification channels, sounds, and do-not-disturb",
+                                onClick = onOpenSystemNotificationSettings,
                                 enabled = uiState.notificationsEnabled
                             )
                         }
                     }
                 }
                 // DEBUG
-                if (BuildConfig.IS_DEBUG) {
+                if (BuildConfig.IS_DEBUG || debugMenuUnlocked) {
                     item {
                         SectionHeaderText("Developer")
                         Spacer(Modifier.height(2.dp))
@@ -226,25 +251,130 @@ fun SettingsScreen(
                             onClick = onTerms
                         )
                     }
+
+
                     Spacer(Modifier.height(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .clickable {
+                                    tapCount++
+                                    if (tapCount >= 7) {
+                                        showPasswordDialog = true
+                                        tapCount = 0
+                                    }
+                                },
+                            text = "Version ${BuildConfig.VERSION_NAME}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Spacer(Modifier.height(32.dp))
                 }
             }
         }
     }
+
+    // Password dialog for debug unlock
+    if (showPasswordDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showPasswordDialog = false
+                passwordInput = ""
+                showPasswordError = false
+                showPassword = false
+            },
+            title = { Text("Enter Debug Password") },
+            text = {
+                Column {
+                    Text("Enter the password to unlock developer settings:")
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = passwordInput,
+                        onValueChange = {
+                            passwordInput = it
+                            showPasswordError = false
+                        },
+                        label = { Text("Password") },
+                        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { showPassword = !showPassword }) {
+                                Icon(
+                                    imageVector = if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                    contentDescription = if (showPassword) "Hide password" else "Show password"
+                                )
+                            }
+                        },
+                        isError = showPasswordError,
+                        supportingText = if (showPasswordError) {
+                            { Text("Incorrect password", color = MaterialTheme.colorScheme.error) }
+                        } else null,
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            if (DebugUnlock.verifyPassword(passwordInput)) {
+                                appPreferences.setDebugMenuUnlocked(true)
+                                showPasswordDialog = false
+                                passwordInput = ""
+                                showPasswordError = false
+                            } else {
+                                showPasswordError = true
+                            }
+                        }
+                    }
+                ) {
+                    Text("Unlock")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showPasswordDialog = false
+                        passwordInput = ""
+                        showPasswordError = false
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable
-private fun SectionHeaderText(text: String) {
+fun SectionHeaderText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 20.dp, bottom = 4.dp, top = 10.dp)
+        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp, end = 8.dp)
+            .then(modifier)
     )
 }
 
 @Composable
-private fun SettingsCardRow(
+fun SectionSubHeaderText(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 8.dp, end = 8.dp)
+            .then(modifier)
+    )
+}
+
+@Composable
+fun SettingsCardRow(
     content: @Composable RowScope.() -> Unit
 ) {
     Card(
