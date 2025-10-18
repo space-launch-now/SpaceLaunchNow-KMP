@@ -125,6 +125,7 @@ import coil3.compose.SubcomposeAsyncImage
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal
@@ -141,7 +142,6 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import me.calebjones.spacelaunchnow.util.VideoUtil
-import me.calebjones.spacelaunchnow.LocalUseUtc
 
 // Keep only TitleHeight which is used for spacing
 private val TitleHeight = 128.dp
@@ -579,7 +579,7 @@ private fun LaunchDetailContentInBody(
         }
 
         // 9. Agency Card
-        launch.launchServiceProvider?.let { agency ->
+        launch.launchServiceProvider.let { agency ->
             Text(
                 text = "Launch Service Provider",
                 style = MaterialTheme.typography.titleLarge,
@@ -747,6 +747,12 @@ private fun MissionDetailsCard(mission: Mission, launch: LaunchDetailed) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Text(
+                text = mission.name,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
             // Locked to Chips layout
             MissionDetailsChipsContent(launch)
