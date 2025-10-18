@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -31,25 +32,27 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
+import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationSettingsScreen(
+    navController: NavController,
     onNavigateBack: () -> Unit = {},
     viewModel: SettingsViewModel = koinViewModel()
 ) {
@@ -390,6 +393,20 @@ fun NotificationSettingsScreen(
                 }
             }
 
+            item {
+                if (!uiState.hasNotificationCustomization) {
+                    PremiumPromptCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = "Unlock Notification Customization",
+                        description = "Upgrade to Premium to customize your notification preferences.",
+                        icon = Icons.Default.Notifications,
+                        onUpgradeClick = {
+                            navController.navigate(SupportUs)
+                        }
+                    )
+                }
+            }
+
             // Notification Topics Card
             item {
                 Text(
@@ -668,7 +685,10 @@ fun NotificationTopicToggle(
         }
         Switch(
             checked = checked,
-            onCheckedChange = { if (enabled) onCheckedChange(it) else { } },
+            onCheckedChange = {
+                if (enabled) onCheckedChange(it) else {
+                }
+            },
             enabled = enabled
         )
     }
