@@ -40,6 +40,7 @@ class NotificationFilterTest {
         launchNet = "2025-10-13T12:00:00Z",
         launchLocation = "Kennedy Space Center, FL, USA",
         webcast = "true",
+        webcastLive = null,
         agencyId = "121", // SpaceX
         locationId = "27"  // Kennedy Space Center
     )
@@ -53,6 +54,7 @@ class NotificationFilterTest {
         launchNet = "2025-10-14T10:00:00Z",
         launchLocation = "Vandenberg SFB, CA, USA",
         webcast = "false",
+        webcastLive = null,
         agencyId = "44",  // NASA
         locationId = "11"  // Vandenberg
     )
@@ -66,6 +68,7 @@ class NotificationFilterTest {
         launchNet = "2025-10-15T08:00:00Z",
         launchLocation = "Starbase, TX, USA",
         webcast = "true",
+        webcastLive = null,
         agencyId = "141", // Blue Origin
         locationId = "16"  // Starbase, Texas
     )
@@ -79,6 +82,7 @@ class NotificationFilterTest {
         launchNet = "2025-10-16T14:00:00Z",
         launchLocation = "Unknown Location",
         webcast = "false",
+        webcastLive = null,
         agencyId = "121", // SpaceX
         locationId = "0"   // Other (unknown location)
     )
@@ -92,6 +96,7 @@ class NotificationFilterTest {
         launchNet = "2025-10-17T06:00:00Z",
         launchLocation = "Mahia Peninsula, New Zealand",
         webcast = "true",
+        webcastLive = null,
         agencyId = "147", // Rocket Lab
         locationId = "15"  // Mahia, New Zealand
     )

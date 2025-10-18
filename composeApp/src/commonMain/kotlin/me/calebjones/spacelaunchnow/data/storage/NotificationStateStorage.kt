@@ -23,7 +23,6 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
         private val NOTIFY_BEFORE_LAUNCH = booleanPreferencesKey("notify_before_launch")
         private val NOTIFY_MINUTES_BEFORE = intPreferencesKey("notify_minutes_before")
         private val HIDE_TBD_LAUNCHES = booleanPreferencesKey("hide_tbd_launches")
-        private val KEEP_LAUNCHES_FOR_24_HOURS = booleanPreferencesKey("keep_launches_for_24_hours")
 
         private val TOPIC_SETTINGS = stringPreferencesKey("topic_settings")
         private val SUBSCRIBED_AGENCIES = stringSetPreferencesKey("subscribed_agencies")
@@ -52,8 +51,6 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
             followAllLaunches = preferences[FOLLOW_ALL_LAUNCHES] ?: default.followAllLaunches,
             useStrictMatching = preferences[USE_STRICT_MATCHING] ?: default.useStrictMatching,
             hideTbdLaunches = preferences[HIDE_TBD_LAUNCHES] ?: default.hideTbdLaunches,
-            keepLaunchesFor24Hours = preferences[KEEP_LAUNCHES_FOR_24_HOURS]
-                ?: default.keepLaunchesFor24Hours,
 
             topicSettings = topicSettings,
             subscribedAgencies = (preferences[SUBSCRIBED_AGENCIES] ?: emptySet())
@@ -70,7 +67,6 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
             preferences[FOLLOW_ALL_LAUNCHES] = state.followAllLaunches
             preferences[USE_STRICT_MATCHING] = state.useStrictMatching
             preferences[HIDE_TBD_LAUNCHES] = state.hideTbdLaunches
-            preferences[KEEP_LAUNCHES_FOR_24_HOURS] = state.keepLaunchesFor24Hours
 
             preferences[TOPIC_SETTINGS] = Json.encodeToString(state.topicSettings)
             preferences[SUBSCRIBED_AGENCIES] =

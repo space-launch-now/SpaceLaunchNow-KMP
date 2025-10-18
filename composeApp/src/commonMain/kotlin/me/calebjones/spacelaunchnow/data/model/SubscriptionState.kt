@@ -57,7 +57,9 @@ data class SubscriptionState(
      * CRITICAL: Only use this for UI hints - always verify server-side before granting access
      */
     fun hasFeature(feature: PremiumFeature): Boolean {
-        return isSubscribed && !isExpired() && features.contains(feature)
+        val hasAccess = isSubscribed && !isExpired() && features.contains(feature)
+        println("SubscriptionState.hasFeature(${feature.name}): isSubscribed=$isSubscribed, isExpired=${isExpired()}, features=$features, hasAccess=$hasAccess")
+        return hasAccess
     }
 
     companion object {
@@ -91,17 +93,20 @@ data class SubscriptionState(
 @Serializable
 enum class SubscriptionType(val isLegacy: Boolean = false) {
     FREE(isLegacy = false),
-    LEGACY(isLegacy = true),  // Legacy subscriptions (ad-free only)
+    LEGACY(isLegacy = true),  // Legacy subscriptions (ad-free + widget only)
     PREMIUM(isLegacy = false); // Current subscriptions (all features)
 
     companion object {
         fun fromProductId(productId: String): SubscriptionType {
-            return when {
-                productId.contains("premium", ignoreCase = true) -> PREMIUM
-                productId.contains("legacy", ignoreCase = true) -> LEGACY
-                productId.contains("basic", ignoreCase = true) -> LEGACY
-                else -> FREE
+            val result = when {
+                productId.contains("pro", ignoreCase = true) -> PREMIUM
+                productId.contains("yearly", ignoreCase = true) -> PREMIUM
+                productId.contains("monthly", ignoreCase = true) -> PREMIUM
+                productId.contains("base-plan", ignoreCase = true) -> PREMIUM
+                else -> LEGACY
             }
+            println("SubscriptionType.fromProductId: '$productId' -> $result")
+            return result
         }
     }
 }
@@ -113,7 +118,10 @@ enum class SubscriptionType(val isLegacy: Boolean = false) {
 enum class PremiumFeature {
     AD_FREE,
     CUSTOM_THEMES,
-    ADVANCED_WIDGETS;
+    CAL_SYNC,
+    ADVANCED_WIDGETS,
+    WIDGETS_CUSTOMIZATION,
+    NOTIFICATION_CUSTOMIZATION;
 
     companion object {
         /**
@@ -130,7 +138,9 @@ enum class PremiumFeature {
             return setOf(
                 AD_FREE,
                 ADVANCED_WIDGETS,
-                CUSTOM_THEMES
+                WIDGETS_CUSTOMIZATION,
+                CAL_SYNC,
+                NOTIFICATION_CUSTOMIZATION
             )
         }
 

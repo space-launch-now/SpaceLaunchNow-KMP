@@ -55,30 +55,18 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getUpcomingLaunchesNormal(limit: Int, includeRecent: Boolean?): Result<PaginatedLaunchNormalList> {
+    override suspend fun getUpcomingLaunchesNormal(limit: Int): Result<PaginatedLaunchNormalList> {
         return try {
-            val keep24h =
-                withContext(Dispatchers.Default) { appPreferences.getKeepLaunchesFor24Hours() }
             val hideTbd = withContext(Dispatchers.Default) { appPreferences.getHideTbdLaunches() }
             
-            // Use the explicit includeRecent parameter if provided, otherwise fall back to keep24h preference
-            val shouldIncludeRecent = includeRecent ?: keep24h
+            // Always use upcoming only (no recent launches functionality)
+            print("Only upcoming launches (no recent)")
+            val response = launchesApi.launchesList(
+                limit = limit,
+                upcoming = true,
+                ordering = "net"
+            )
             
-            val response = if (shouldIncludeRecent) {
-                print("Including recent launches with upcoming")
-                launchesApi.launchesList(
-                    limit = limit,
-                    upcomingWithRecent = true,
-                    ordering = "net"
-                )
-            } else {
-                print("Only upcoming launches (no recent)")
-                launchesApi.launchesList(
-                    limit = limit,
-                    upcoming = true,
-                    ordering = "net"
-                )
-            }
             val launches = response.body()
             val filtered = if (hideTbd) {
                 println("HideTBD is true")
@@ -277,7 +265,7 @@ class LaunchRepositoryImpl(
         return try {
             val response = launchesApi.launchesDetailedList(
                 limit = limit,
-                upcomingWithRecent = true,
+                upcoming = true,
                 ordering = "net"
             )
 

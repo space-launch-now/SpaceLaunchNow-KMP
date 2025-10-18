@@ -88,15 +88,19 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
             }
         }
 
-        // Scroll to show first upcoming launch with a small peek of the previous card
-        LaunchedEffect(combinedLaunches, upcomingStartIndex) {
+        // Scroll to center the first upcoming launch card
+        LaunchedEffect(combinedLaunches, upcomingStartIndex, screenWidth) {
             if (combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
-                // Show just a small peek (40dp) of the previous card on the left
-                val peekAmount = with(density) { 40.dp.toPx() }.toInt()
+                // Calculate the offset to center the card
+                // Card width = 340dp, spacing = 16dp, contentPadding = 16dp
+                val cardWidthPx = with(density) { 340.dp.toPx() }
+                val screenWidthPx = with(density) { screenWidth.toPx() }
                 
-                // Scroll to the first upcoming launch
-                // Using negative offset to show a bit of the previous card
-                scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -peekAmount)
+                // Center offset: (screenWidth - cardWidth) / 2 - contentPadding
+                val centerOffset = ((screenWidthPx - cardWidthPx) / 2).toInt()
+                
+                // Scroll to the first upcoming launch, centered
+                scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -centerOffset)
             }
         }
 

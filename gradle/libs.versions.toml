@@ -47,6 +47,7 @@ dotenv = "6.5.1"
 compose-shimmer = "1.3.3"
 
 materialKolor = "3.0.1"
+cryptography-kotlin = "0.4.0"
 
 composeIcons = "1.1.1"
 
@@ -165,6 +166,11 @@ purchases-ui = { module = "com.revenuecat.purchases:purchases-kmp-ui", version.r
 purchases-either = { module = "com.revenuecat.purchases:purchases-kmp-either", version.ref = "purchases-kmp" }
 # Optional: adds suspending functions that return kotlin.Result to indicate success / failure.
 purchases-result = { module = "com.revenuecat.purchases:purchases-kmp-result", version.ref = "purchases-kmp" }
+
+# Cryptography library for secure hashing
+cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography-kotlin" }
+cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "cryptography-kotlin" }
+cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-apple", version.ref = "cryptography-kotlin" }
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]

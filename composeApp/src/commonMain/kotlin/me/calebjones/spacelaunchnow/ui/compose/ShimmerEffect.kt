@@ -130,3 +130,29 @@ fun UpdatesShimmer(cardCount: Int = 5){
         }
     }
 }
+
+@Composable
+fun PlainShimmerCard(
+    height: Int = 280,
+    width: Int? = null,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .height(height.dp)
+            .let { if (width != null) it.width(width.dp) else it.fillMaxWidth() }
+            .shimmer()
+            .clip(RoundedCornerShape(16.dp)),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        )
+    }
+}
