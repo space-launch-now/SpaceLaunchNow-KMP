@@ -176,6 +176,7 @@ fun TabletDesktopLayout(
                                 }
                                 composableWithCompositionLocal<NotificationSettings> {
                                     NotificationSettingsScreen(
+                                        navController = navController,
                                         onNavigateBack = { navController.popBackStack() }
                                     )
                                 }

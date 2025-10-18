@@ -157,6 +157,7 @@ fun PhoneLayout(
                         composableWithCompositionLocal<NotificationSettings> {
                             // NotificationSettingsScreen gets full screen access (no padding)
                             NotificationSettingsScreen(
+                                navController = navController,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
