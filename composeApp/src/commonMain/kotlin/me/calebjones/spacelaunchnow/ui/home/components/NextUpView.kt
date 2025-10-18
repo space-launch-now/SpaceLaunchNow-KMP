@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
+import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.api.extensions.launchUrl
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
@@ -46,6 +49,8 @@ import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.util.LaunchSharingService
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -74,6 +79,9 @@ fun NextLaunchView(navController: NavController) {
 
 @Composable
 fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
+    val sharingService = koinInject<LaunchSharingService>()
+    val coroutineScope = rememberCoroutineScope()
+
     // Main content column
     Column(
         modifier = Modifier
@@ -243,7 +251,11 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
 
                     // Share button
                     Button(
-                        onClick = { /* Handle share action */ },
+                        onClick = {
+                            coroutineScope.launch {
+                                sharingService.shareUrl(launch.launchUrl)
+                            }
+                        },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer
