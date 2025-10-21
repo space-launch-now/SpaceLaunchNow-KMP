@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -51,10 +50,10 @@ import me.calebjones.spacelaunchnow.isLandscape
 import me.calebjones.spacelaunchnow.isTablet
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.SupportUs
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
-
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(DependsOnGoogleMobileAds::class)
@@ -266,6 +265,22 @@ fun ResponsiveHomeContent(
                     }
                 }
             }
+
+            // Large Ad between This Day in History and Launch Schedule
+            item {
+                SmartBannerAd(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    placementType = AdPlacementType.INTERSTITIAL, // Between content sections
+                    showRemoveAdsButton = true,
+                    onRemoveAdsClick = {
+                        // Navigate to settings - navController is available in this scope
+                        navController.navigate(SupportUs)
+                    }
+                )
+            }
+
             item {
                 SectionTitle(
                     title = "Launch Schedule",
@@ -387,13 +402,14 @@ fun ResponsiveHomeContent(
                 }
             }
 
-            // Large Ad between This Day in History and Launch Schedule (Phone only)
+            // Large Ad between This Day in History and Launch Schedule
             item {
                 SmartBannerAd(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(300.dp)
                         .padding(horizontal = 16.dp, vertical = 12.dp),
-                    adSize = AdSize.MEDIUM_RECTANGLE,
+                    placementType = AdPlacementType.INTERSTITIAL, // Between content sections
                     showRemoveAdsButton = true,
                     onRemoveAdsClick = {
                         // Navigate to settings - navController is available in this scope

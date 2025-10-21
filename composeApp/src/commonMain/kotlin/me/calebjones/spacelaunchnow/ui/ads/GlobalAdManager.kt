@@ -12,10 +12,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import me.calebjones.spacelaunchnow.platform.ContextFactory
-import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.PlatformType
-import me.calebjones.spacelaunchnow.BuildConfig
+import me.calebjones.spacelaunchnow.getPlatform
+import me.calebjones.spacelaunchnow.platform.ContextFactory
+import me.calebjones.spacelaunchnow.util.BuildConfig
 
 /**
  * Global ad manager that provides optimized ad configuration and preloading strategies.
@@ -90,9 +90,7 @@ class GlobalAdManager(
             delay(200)
 
             isInitialized = true
-
-            // Start background optimization
-            launch { performBackgroundOptimizations() }
+            isOptimizationReady = true
 
             println("✅ GlobalAdManager: Initialization complete - ads will load optimally!")
         }
@@ -140,19 +138,6 @@ class GlobalAdManager(
         )
 
         println("📝 GlobalAdManager: Configured ${adConfigurations.size} ad sizes for optimization")
-    }
-
-    private suspend fun performBackgroundOptimizations() {
-        delay(1000) // Wait for app to settle
-
-        // Simulate optimization work
-        repeat(3) { cycle ->
-            delay(500)
-            println("🔧 GlobalAdManager: Optimization cycle ${cycle + 1}/3 complete")
-        }
-
-        isOptimizationReady = true
-        println("⚡ GlobalAdManager: Background optimizations complete - maximum performance ready!")
     }
 
     /**
@@ -276,20 +261,20 @@ class GlobalAdManager(
      */
     fun shouldShowInterstitialOnDetailView(): Boolean {
         detailViewVisitCount++
-        
+
         val shouldShowByCount = detailViewVisitCount % 4 == 0
         val currentTime = Clock.System.now().toEpochMilliseconds()
         val enoughTimeElapsed = (currentTime - lastInterstitialShownAt) >= minInterstitialInterval
-        
+
         val shouldShow = shouldShowByCount && enoughTimeElapsed
-        
+
         println("🎯 InterstitialAd: Visit #$detailViewVisitCount, ShouldShow: $shouldShow (Count: $shouldShowByCount, Time: $enoughTimeElapsed)")
-        
+
         if (shouldShow) {
             lastInterstitialShownAt = currentTime
             println("📅 InterstitialAd: Timestamp updated to $currentTime")
         }
-        
+
         return shouldShow
     }
 
@@ -323,15 +308,15 @@ class GlobalAdManager(
         // Production Banner Ad Unit IDs
         private const val ANDROID_BANNER_AD_UNIT_ID = "ca-app-pub-9824528399164059/1933117121"
         private const val IOS_BANNER_AD_UNIT_ID = "ca-app-pub-9824528399164059/9977653321"
-        
+
         // Production Interstitial Ad Unit IDs
         private const val ANDROID_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-9824528399164059/5046365625"
         private const val IOS_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-9824528399164059/3377033065"
-        
+
         // Production Rewarded Ad Unit IDs (Premium Trial = 1)
         private const val ANDROID_REWARDED_AD_UNIT_ID = "ca-app-pub-9824528399164059/7239809346"
         private const val IOS_REWARDED_AD_UNIT_ID = "ca-app-pub-9824528399164059/9865972681"
-        
+
         /**
          * Ad types supported by the app
          */
@@ -340,7 +325,7 @@ class GlobalAdManager(
             INTERSTITIAL,
             REWARDED
         }
-        
+
         /**
          * Get the correct Ad Unit ID for the current platform and ad type
          * Uses test Ad Unit IDs in debug builds, production IDs in release builds
@@ -354,7 +339,7 @@ class GlobalAdManager(
                     AdType.REWARDED -> AdUnitId.REWARDED_DEFAULT
                 }
             }
-            
+
             // Use production Ad Unit IDs in release builds
             return when (getPlatform().type) {
                 PlatformType.ANDROID -> when (adType) {
@@ -362,11 +347,13 @@ class GlobalAdManager(
                     AdType.INTERSTITIAL -> ANDROID_INTERSTITIAL_AD_UNIT_ID
                     AdType.REWARDED -> ANDROID_REWARDED_AD_UNIT_ID
                 }
+
                 PlatformType.IOS -> when (adType) {
                     AdType.BANNER -> IOS_BANNER_AD_UNIT_ID
                     AdType.INTERSTITIAL -> IOS_INTERSTITIAL_AD_UNIT_ID
                     AdType.REWARDED -> IOS_REWARDED_AD_UNIT_ID
                 }
+
                 else -> AdUnitId.BANNER_DEFAULT // Fallback for Desktop/other platforms (uses test ID)
             }
         }

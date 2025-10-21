@@ -6,9 +6,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,7 +39,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
-import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.launcher
@@ -52,6 +54,7 @@ import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
@@ -237,10 +240,13 @@ fun TabletDesktopLayout(
                         }
                     }
 
-                    // Smart banner ad for tablets/desktop - no "Remove Ads" button in bottom area
+                    // Smart banner ad for tablets/desktop - placement-aware sizing
                     SmartBannerAd(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        adSize = AdSize.FLUID,
+                        modifier = Modifier.padding(
+                            bottom = WindowInsets.navigationBars.asPaddingValues()
+                                .calculateBottomPadding()
+                        ),
+                        placementType = AdPlacementType.NAVIGATION, // Navigation context
                         showCard = false
                     )
                 }

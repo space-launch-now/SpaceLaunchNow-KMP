@@ -11,13 +11,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.BasicAds
-import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.DependsOnGoogleUserMessagingPlatform
 import app.lexilabs.basic.ads.ExperimentalBasicAds
-import app.lexilabs.basic.ads.InterstitialAdHandler
 import app.lexilabs.basic.ads.RequestConfiguration
-import app.lexilabs.basic.ads.RewardedAdHandler
 import app.lexilabs.basic.ads.composable.ConsentPopup
 import app.lexilabs.basic.ads.composable.rememberBannerAd
 import app.lexilabs.basic.ads.composable.rememberConsent
@@ -49,14 +46,28 @@ val LocalContextFactory =
  * CompositionLocal to provide preloaded banner ads throughout the app
  */
 val LocalPreloadedBannerAd = compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
-val LocalPreloadedLargeBannerAd = compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
-val LocalPreloadedMediumRectangleAd = compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+val LocalPreloadedLargeBannerAd =
+    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+val LocalPreloadedMediumRectangleAd =
+    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+
+/**
+ * CompositionLocal to provide preloaded tablet-specific ads throughout the app
+ */
+val LocalPreloadedLeaderboardAd =
+    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+val LocalPreloadedFullBannerAd =
+    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+val LocalPreloadedFluidAd =
+    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
 
 /**
  * CompositionLocal to provide preloaded interstitial and rewarded ads throughout the app
  */
-val LocalPreloadedInterstitialAd = compositionLocalOf<app.lexilabs.basic.ads.InterstitialAdHandler?> { null }
-val LocalPreloadedRewardedAd = compositionLocalOf<app.lexilabs.basic.ads.RewardedAdHandler?> { null }
+val LocalPreloadedInterstitialAd =
+    compositionLocalOf<app.lexilabs.basic.ads.InterstitialAdHandler?> { null }
+val LocalPreloadedRewardedAd =
+    compositionLocalOf<app.lexilabs.basic.ads.RewardedAdHandler?> { null }
 
 @Composable
 fun isTabletOrDesktop(): Boolean {
@@ -101,6 +112,25 @@ fun SpaceLaunchNowApp(
         activity = contextFactory.getActivity(),
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.MEDIUM_RECTANGLE
+    )
+
+    // 📱 TABLET-SPECIFIC ADS: Wider ads for tablets
+    val preloadedLeaderboardAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.LEADERBOARD  // 728x90 for tablets
+    )
+    val preloadedFullBannerAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.FULL_BANNER  // 468x60 for medium screens
+    )
+    
+    // 🌊 FLUID ADS: Adaptive/responsive ads that adjust to content
+    val preloadedFluidAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.FLUID  // Dynamic size that adapts to content
     )
 
     // 🚀 PRELOAD INTERSTITIAL & REWARDED ADS: For instant showing when needed
@@ -276,6 +306,9 @@ fun SpaceLaunchNowApp(
         LocalPreloadedBannerAd provides preloadedBannerAd,
         LocalPreloadedLargeBannerAd provides preloadedLargeBannerAd,
         LocalPreloadedMediumRectangleAd provides preloadedMediumRectangleAd,
+        LocalPreloadedLeaderboardAd provides preloadedLeaderboardAd,
+        LocalPreloadedFullBannerAd provides preloadedFullBannerAd,
+        LocalPreloadedFluidAd provides preloadedFluidAd,
         LocalPreloadedInterstitialAd provides preloadedInterstitialAd,
         LocalPreloadedRewardedAd provides preloadedRewardedAd
     ) {
