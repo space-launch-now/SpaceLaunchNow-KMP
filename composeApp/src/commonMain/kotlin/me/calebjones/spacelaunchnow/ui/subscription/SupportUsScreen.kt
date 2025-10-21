@@ -73,8 +73,8 @@ import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
-import me.trishiraj.shadowglow.shadowGlow
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
@@ -1009,7 +1009,7 @@ private fun ProLifetimeCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .shadowGlow(
+            .platformShadowGlow(
                 gradientColors = listOf(
                     Color(0xFFFFD700).copy(alpha = 0.6f), // Gold
                     Color(0xFFFFA500).copy(alpha = 0.5f), // Orange
