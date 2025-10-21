@@ -131,6 +131,9 @@ kotlin {
                 
                 // JDK cryptography provider for Android
                 implementation(libs.cryptography.provider.jdk)
+                
+                // ShadowGlow library for advanced drop shadows
+                implementation(libs.shadowglow)
             }
         }
 
