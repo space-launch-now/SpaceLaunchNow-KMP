@@ -16,6 +16,7 @@ import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -115,11 +116,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.lexilabs.basic.ads.AdSize
+import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import kotlinx.datetime.Clock
@@ -135,6 +139,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
@@ -460,13 +465,15 @@ fun LaunchDetailView(
             onSelectVideo = onSelectVideo,
             onSetPlayerVisible = onSetPlayerVisible,
             onNavigateToFullscreen = onNavigateToFullscreen,
-            onVideoSelected = onVideoSelected
+            onVideoSelected = onVideoSelected,
+            onNavigateToSettings = null // TODO: Pass from parent screen
         )
     }
 }
 
 
 // This composable contains all the detailed launch information
+@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 private fun LaunchDetailContentInBody(
     launch: LaunchDetailed,
@@ -474,7 +481,8 @@ private fun LaunchDetailContentInBody(
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
-    onVideoSelected: (Int) -> Unit
+    onVideoSelected: (Int) -> Unit,
+    onNavigateToSettings: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
@@ -488,6 +496,20 @@ private fun LaunchDetailContentInBody(
         // Now include all the detailed content - no null checks needed
         // 2. Quick Stats Grid
         QuickStatsGrid(launch = launch)
+        Spacer(Modifier.height(16.dp))
+
+        // Ad below Quick Facts
+        BoxWithConstraints {
+            val density = LocalDensity.current
+            val availableWidthPx = with(density) { maxWidth.toPx().toInt() }
+
+            SmartBannerAd(
+                modifier = Modifier.fillMaxWidth(),
+                adSize = AdSize.MEDIUM_RECTANGLE,
+                showRemoveAdsButton = true,
+                onRemoveAdsClick = onNavigateToSettings
+            )
+        }
         Spacer(Modifier.height(16.dp))
 
         // 3. Video Player Card - positioned above timeline
@@ -2873,6 +2895,10 @@ private fun LaunchDetailLoadingContent() {
             LoadingCard(modifier = Modifier.weight(1f), height = 96.dp)
             LoadingCard(modifier = Modifier.weight(1f), height = 96.dp)
         }
+        Spacer(Modifier.height(16.dp))
+
+        // Ad placeholder shimmer below Quick Facts
+        LoadingCard(height = 100.dp)
         Spacer(Modifier.height(16.dp))
 
         // 3. Video Player Card shimmer (optional)

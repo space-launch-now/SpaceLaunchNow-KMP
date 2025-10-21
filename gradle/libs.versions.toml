@@ -62,6 +62,11 @@ workRuntime = "2.10.5"
 
 purchases-kmp = "2.2.2+17.10.0"
 
+# Basic Ads (Google AdMob for KMP)
+basic-ads = "0.2.7"
+google-play-services-ads = "23.6.0"
+android-ump = "3.1.0"
+
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -171,6 +176,11 @@ purchases-result = { module = "com.revenuecat.purchases:purchases-kmp-result", v
 cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography-kotlin" }
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "cryptography-kotlin" }
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-apple", version.ref = "cryptography-kotlin" }
+
+# Basic Ads (Google AdMob for KMP)
+basicAds = { module = "app.lexilabs.basic:basic-ads", version.ref = "basic-ads" }
+googleAds = { module = "com.google.android.gms:play-services-ads", version.ref = "google-play-services-ads" }
+androidUmp = { module = "com.google.android.ump:user-messaging-platform", version.ref = "android-ump" }
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]

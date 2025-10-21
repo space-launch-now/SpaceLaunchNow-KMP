@@ -256,7 +256,7 @@ fun ThemeCustomizationScreen(
             }
 
             // Widget Theme Source Selection (Android only - iOS doesn't support Material 3 dynamic colors)
-            if (getPlatform().name.contains("Android")) {
+            if (getPlatform().type.isAndroid) {
                 item {
                     SettingsCardRow {
                         val widgetThemeSource by viewModel.widgetThemeSource.collectAsStateWithLifecycle()

@@ -10,12 +10,10 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,7 +33,7 @@ class MainActivity : ComponentActivity() {
 
     // Use mutable state for notification launch ID to trigger recomposition
     private var notificationLaunchIdState by mutableStateOf<String?>(null)
-    
+
     // Use mutable state for navigation destination (e.g., from widget)
     private var navigationDestinationState by mutableStateOf<String?>(null)
 
@@ -86,7 +84,7 @@ class MainActivity : ComponentActivity() {
             println("App launched from notification with launch_id: $intentLaunchId")
             notificationLaunchIdState = intentLaunchId
         }
-        
+
         // Extract navigation destination from intent (e.g., from widget)
         val navigateTo = intent.getStringExtra("navigate_to")
         if (navigateTo != null) {
@@ -126,6 +124,7 @@ class MainActivity : ComponentActivity() {
             }
 
             SpaceLaunchNowApp(
+                contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(this),
                 notificationLaunchId = notificationLaunchIdState,
                 onNotificationLaunchIdConsumed = { notificationLaunchIdState = null },
                 navigationDestination = navigationDestinationState,
@@ -184,7 +183,7 @@ class MainActivity : ComponentActivity() {
             notificationLaunchIdState = newLaunchId
             println("New notification intent received with launch_id: $newLaunchId")
         }
-        
+
         // Handle navigation destination from new intent (e.g., from widget)
         val navigateTo = intent.getStringExtra("navigate_to")
         if (navigateTo != null) {
@@ -236,10 +235,4 @@ class MainActivity : ComponentActivity() {
         context.getSharedPreferences("onboarding_prefs", MODE_PRIVATE)
             .edit { putBoolean("hasAskedForNotificationPermission", false) }
     }
-}
-
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    SpaceLaunchNowApp()
 }
