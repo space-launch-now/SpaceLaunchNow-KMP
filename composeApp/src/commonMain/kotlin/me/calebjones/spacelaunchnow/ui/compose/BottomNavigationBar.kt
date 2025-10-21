@@ -4,19 +4,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import me.calebjones.spacelaunchnow.navigation.Screen
+import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.Schedule
+import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 
+@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
@@ -32,8 +38,11 @@ fun BottomNavigationBar(navController: NavHostController) {
         modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
     ) {
         // Smart banner ad - no "Remove Ads" button in bottom nav area
-        SmartBannerAd(showCard = false)
-        
+        SmartBannerAd(
+            showCard = false,
+            placementType = AdPlacementType.NAVIGATION // Navigation context
+        )
+
         // Navigation Bar
         Box(modifier = Modifier.navigationBarsPadding()) {
             NavigationBar(

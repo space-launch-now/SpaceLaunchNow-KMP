@@ -41,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.LocalUseUtc
@@ -52,7 +51,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationNormal
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
-import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
@@ -92,10 +91,11 @@ private fun EventDetailContentInBody(event: EventEndpointDetailed) {
 
         Spacer(Modifier.height(16.dp))
 
+
         // Banner Ad - positioned after description
         SmartBannerAd(
             modifier = Modifier.fillMaxWidth(),
-            adSize = AdSize.MEDIUM_RECTANGLE
+            placementType = AdPlacementType.CONTENT // Content area ad
         )
 
         Spacer(Modifier.height(16.dp))
