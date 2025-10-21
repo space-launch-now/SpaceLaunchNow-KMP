@@ -9,13 +9,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import app.lexilabs.basic.ads.AdSize
+import app.lexilabs.basic.ads.BasicAds
+import app.lexilabs.basic.ads.BannerAdHandler
+import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
+import app.lexilabs.basic.ads.DependsOnGoogleUserMessagingPlatform
+import app.lexilabs.basic.ads.ExperimentalBasicAds
+import app.lexilabs.basic.ads.InterstitialAdHandler
+import app.lexilabs.basic.ads.RequestConfiguration
+import app.lexilabs.basic.ads.RewardedAdHandler
+import app.lexilabs.basic.ads.composable.ConsentPopup
+import app.lexilabs.basic.ads.composable.rememberBannerAd
+import app.lexilabs.basic.ads.composable.rememberConsent
+import app.lexilabs.basic.ads.composable.rememberInterstitialAd
+import app.lexilabs.basic.ads.composable.rememberRewardedAd
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
+import me.calebjones.spacelaunchnow.util.BuildConfig
 import org.koin.compose.koinInject
 
 /**
@@ -23,27 +39,79 @@ import org.koin.compose.koinInject
  */
 val LocalUseUtc = compositionLocalOf { false }
 
+/**
+ * CompositionLocal to provide the ContextFactory throughout the app
+ */
+val LocalContextFactory =
+    compositionLocalOf<me.calebjones.spacelaunchnow.platform.ContextFactory?> { null }
+
+/**
+ * CompositionLocal to provide preloaded banner ads throughout the app
+ */
+val LocalPreloadedBannerAd = compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+val LocalPreloadedLargeBannerAd = compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+val LocalPreloadedMediumRectangleAd = compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+
+/**
+ * CompositionLocal to provide preloaded interstitial and rewarded ads throughout the app
+ */
+val LocalPreloadedInterstitialAd = compositionLocalOf<app.lexilabs.basic.ads.InterstitialAdHandler?> { null }
+val LocalPreloadedRewardedAd = compositionLocalOf<app.lexilabs.basic.ads.RewardedAdHandler?> { null }
+
 @Composable
 fun isTabletOrDesktop(): Boolean {
     val screenWidthDp = getScreenWidth()
     val isLargeScreen = screenWidthDp >= 720.dp // Example threshold for tablets
-    return isLargeScreen || getPlatform().name == "Desktop"
-
+    return isLargeScreen || getPlatform().type.isDesktop
 }
 
+@OptIn(
+    DependsOnGoogleUserMessagingPlatform::class, ExperimentalBasicAds::class,
+    DependsOnGoogleMobileAds::class
+)
 @Composable
 fun SpaceLaunchNowApp(
+    contextFactory: me.calebjones.spacelaunchnow.platform.ContextFactory,
     notificationLaunchId: String? = null,
     onNotificationLaunchIdConsumed: () -> Unit = {},
     navigationDestination: String? = null,
     onNavigationDestinationConsumed: () -> Unit = {}
 ) {
     // Initialize notifications and subscription on app start
+    val consent by rememberConsent(activity = contextFactory.getActivity())
     val notificationRepository = koinInject<NotificationRepository>()
     val subscriptionRepository = koinInject<SubscriptionRepository>()
     val revenueCatManager = koinInject<RevenueCatManager>()
     val pushMessaging = koinInject<PushMessaging>()
     val appPreferences = koinInject<AppPreferences>()
+
+    // 🚀 PRELOAD BANNER ADS: Following KMP-Google-AdMob example pattern
+    // These ads will be preloaded and kept alive throughout the app lifecycle for instant rendering
+    val preloadedBannerAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.BANNER
+    )
+    val preloadedLargeBannerAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.LARGE_BANNER
+    )
+    val preloadedMediumRectangleAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.MEDIUM_RECTANGLE
+    )
+
+    // 🚀 PRELOAD INTERSTITIAL & REWARDED ADS: For instant showing when needed
+    val preloadedInterstitialAd by rememberInterstitialAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.INTERSTITIAL)
+    )
+    val preloadedRewardedAd by rememberRewardedAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.REWARDED)
+    )
 
     // Warm up settings ViewModel to preload preferences (eagerly loads DataStore values)
     // This singleton creation triggers all StateFlows to start collecting immediately,
@@ -101,6 +169,46 @@ fun SpaceLaunchNowApp(
         println("=== APP START DEBUG INFO ===")
 
         try {
+            // Initialize Basic-Ads with ContextFactory
+            val activity = contextFactory.getActivity()
+            println("🎯 Initializing Basic-Ads with activity: $activity")
+
+            BasicAds.initialize(activity)
+
+            // Configure for better ad loading (especially in development)
+            val testDeviceIds = if (BuildConfig.IS_DEBUG) {
+                listOf(
+                    "0BF9377651BCA3F62260F25FFC54F6A8",
+                )
+            } else {
+                emptyList()
+            }
+
+            BasicAds.configuration = RequestConfiguration(
+                maxAdContentRating = null,
+                publisherPrivacyPersonalizationState = RequestConfiguration.PublisherPrivacyPersonalizationState.DEFAULT,
+                tagForChildDirectedTreatment = 0,
+                tagForUnderAgeOfConsent = 0,
+                testDeviceIds = testDeviceIds
+            )
+
+            println("✅ Basic-Ads initialized successfully")
+            println("🧪 Test device IDs configured: $testDeviceIds")
+        } catch (e: Exception) {
+            println("❌ Failed to initialize Basic-Ads: ${e.message}")
+            e.printStackTrace()
+        }
+
+        // Initialize GlobalAdManager for optimized ad loading
+        try {
+            val globalAdManager = GlobalAdManager.getInstance(contextFactory)
+            println("🚀 GlobalAdManager initialized - optimizing ad performance...")
+        } catch (e: Exception) {
+            println("❌ Failed to initialize GlobalAdManager: ${e.message}")
+            e.printStackTrace()
+        }
+
+        try {
             // Get and print FCM token
             val token = pushMessaging.getToken()
             println("FCM Token: $token")
@@ -155,8 +263,22 @@ fun SpaceLaunchNowApp(
     val isTabletOrDesktopValue = isTabletOrDesktop()
     val useTabletLayout = remember(navController) { isTabletOrDesktopValue }
 
-    // Provide the useUtc setting throughout the app
-    CompositionLocalProvider(LocalUseUtc provides useUtc) {
+    // Try to show a consent popup
+    ConsentPopup(
+        consent = consent,
+        onFailure = { println("failure:${it.message}") }
+    )
+
+    // Provide the useUtc setting, contextFactory, and preloaded ads throughout the app
+    CompositionLocalProvider(
+        LocalUseUtc provides useUtc,
+        LocalContextFactory provides contextFactory,
+        LocalPreloadedBannerAd provides preloadedBannerAd,
+        LocalPreloadedLargeBannerAd provides preloadedLargeBannerAd,
+        LocalPreloadedMediumRectangleAd provides preloadedMediumRectangleAd,
+        LocalPreloadedInterstitialAd provides preloadedInterstitialAd,
+        LocalPreloadedRewardedAd provides preloadedRewardedAd
+    ) {
         if (useTabletLayout) {
             TabletDesktopLayout(navController = navController, themeOption = themeOption)
         } else {
