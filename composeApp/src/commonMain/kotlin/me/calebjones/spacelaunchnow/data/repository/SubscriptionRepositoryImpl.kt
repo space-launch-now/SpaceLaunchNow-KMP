@@ -19,6 +19,8 @@ import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
+import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
+import me.calebjones.spacelaunchnow.data.storage.TemporaryAccessStatus
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
 import kotlin.time.Duration.Companion.days
@@ -40,6 +42,7 @@ class SubscriptionRepositoryImpl(
     private val storage: SubscriptionStorage,
     private val debugPreferences: DebugPreferences,
     private val appPreferences: AppPreferences,
+    private val temporaryPremiumAccess: TemporaryPremiumAccess,
     private val revenueCatManager: RevenueCatManager,  // RevenueCat for entitlements
     private val widgetPreferences: WidgetPreferences,  // Cache widget access for widgets
     private val platformWidgetUpdater: PlatformWidgetUpdater? = null  // Optional: for triggering widget updates
@@ -259,7 +262,21 @@ class SubscriptionRepositoryImpl(
             return debugAccess
         }
 
-        // Priority 2: RevenueCat entitlements (live verification)
+        // Priority 2: Temporary premium access from rewarded ads
+        val hasTemporaryAccess = temporaryPremiumAccess.hasTemporaryAccess(feature)
+        if (hasTemporaryAccess) {
+            println("  🎁 Temporary access active for ${feature.name}")
+            
+            // Update widget preferences to match temporary access
+            if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+                widgetPreferences.updateWidgetAccessGranted(true)
+                updateWidgetsAfterAccessChange("temporary access granted")
+            }
+            
+            return true
+        }
+
+        // Priority 3: RevenueCat entitlements (live verification)
         val hasPremiumEntitlement =
             revenueCatManager.hasEntitlement(SubscriptionProducts.RC_ENTITLEMENT_PREMIUM)
         println("  RevenueCat premium entitlement: $hasPremiumEntitlement")
@@ -284,7 +301,7 @@ class SubscriptionRepositoryImpl(
             updateWidgetsAfterAccessChange("access revoked")
         }
 
-        // Priority 3: Fallback to cached state for offline scenarios
+        // Priority 4: Fallback to cached state for offline scenarios
         val cachedAccess = _state.value.hasFeature(feature)
         println("  ⚠️ No premium entitlement - cached access for ${feature.name}: $cachedAccess")
         println("  Current state: ${_state.value.subscriptionType} with features: ${_state.value.features}")
@@ -516,6 +533,43 @@ class SubscriptionRepositoryImpl(
                 e.printStackTrace()
             }
         }
+    }
+
+    /**
+     * Grant temporary premium access to a feature through rewarded ads
+     * This provides 24-hour access to premium features
+     */
+    suspend fun grantTemporaryPremiumAccess(feature: PremiumFeature) {
+        println("SubscriptionRepository: Granting temporary access to ${feature.name}")
+        
+        // Grant the temporary access
+        temporaryPremiumAccess.grantTemporaryAccess(feature)
+        
+        // Update widget access if needed
+        if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+            widgetPreferences.updateWidgetAccessGranted(true)
+            updateWidgetsAfterAccessChange("temporary access granted via rewarded ad")
+        }
+        
+        println("SubscriptionRepository: Temporary access granted to ${feature.name} for 24 hours")
+    }
+
+    /**
+     * Check if user has temporary access to a feature and get remaining time
+     */
+    suspend fun getTemporaryAccessStatus(feature: PremiumFeature): TemporaryAccessStatus {
+        val hasAccess = temporaryPremiumAccess.hasTemporaryAccess(feature)
+        val timeRemaining = if (hasAccess) {
+            temporaryPremiumAccess.getTimeRemaining(feature)
+        } else {
+            null
+        }
+        
+        return TemporaryAccessStatus(
+            hasAccess = hasAccess,
+            expiresAt = null, // Could be added if needed
+            timeRemaining = timeRemaining
+        )
     }
 }
 

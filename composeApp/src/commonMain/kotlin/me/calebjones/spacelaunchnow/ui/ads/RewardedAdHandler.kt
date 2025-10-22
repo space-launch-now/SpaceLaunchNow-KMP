@@ -13,13 +13,13 @@ import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
 /**
  * Rewarded ad handler that shows preloaded rewarded ads.
- * 
+ *
  * Usage: Call this composable when you want to show a rewarded ad
  * It will automatically:
  * - Check if the user has ad-free premium
  * - Use the preloaded rewarded ad for instant showing
  * - Only show on mobile platforms (Android/iOS)
- * 
+ *
  * @param shouldShow Whether to trigger showing the rewarded ad
  * @param onRewardEarned Called when the user earns a reward (with reward amount and type)
  * @param onAdShown Called when a rewarded ad is successfully shown
@@ -66,34 +66,44 @@ fun RewardedAdHandler(
                 if (shouldShow) {
                     println("🎯 RewardedAd: Ad loaded successfully, showing now...")
                     try {
-                        rewardedAd.show(onRewardEarned = { })
+                        rewardedAd.show(onRewardEarned = {
+                            println("🎉 RewardedAd: User earned reward!")
+                            onRewardEarned?.invoke(1, "reward") // Default reward values
+                        })
                     } catch (e: Exception) {
                         println("❌ RewardedAd: Failed to show ad: ${e.message}")
                         onAdFailed?.invoke("Failed to show: ${e.message}")
                     }
                 }
             }
+
             AdState.SHOWING -> {
                 println("✅ RewardedAd: Ad is showing!")
                 onAdShown?.invoke()
             }
+
             AdState.DISMISSED -> {
                 println("🎯 RewardedAd: Ad dismissed by user")
             }
+
             AdState.FAILING -> {
                 println("❌ RewardedAd: Ad failed to load")
                 onAdFailed?.invoke("Failed to load")
             }
+
             AdState.LOADING -> {
                 println("⏳ RewardedAd: Ad is loading...")
             }
+
             AdState.SHOWN -> {
                 println("✅ RewardedAd: Ad has finished showing")
-                onRewardEarned?.invoke(1, "reward") // Replace with actual values if available
+                // Reward is handled in the onRewardEarned callback passed to show()
             }
+
             AdState.NONE -> {
                 println("⚪ RewardedAd: Initial state")
             }
+
             else -> {
                 println("🔄 RewardedAd: State: ${rewardedAd.state}")
             }
