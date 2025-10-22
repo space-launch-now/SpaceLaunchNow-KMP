@@ -153,6 +153,12 @@ jobs:
           API_KEY=${{ secrets.API_KEY }}
           REVENUECAT_ANDROID_KEY=${{ secrets.REVENUECAT_ANDROID_KEY }}
           REVENUECAT_IOS_KEY=${{ secrets.REVENUECAT_IOS_KEY }}
+          ANDROID_BANNER_AD_UNIT_ID=${{ secrets.ANDROID_BANNER_AD_UNIT_ID }}
+          IOS_BANNER_AD_UNIT_ID=${{ secrets.IOS_BANNER_AD_UNIT_ID }}
+          ANDROID_INTERSTITIAL_AD_UNIT_ID=${{ secrets.ANDROID_INTERSTITIAL_AD_UNIT_ID }}
+          IOS_INTERSTITIAL_AD_UNIT_ID=${{ secrets.IOS_INTERSTITIAL_AD_UNIT_ID }}
+          ANDROID_REWARDED_AD_UNIT_ID=${{ secrets.ANDROID_REWARDED_AD_UNIT_ID }}
+          IOS_REWARDED_AD_UNIT_ID=${{ secrets.IOS_REWARDED_AD_UNIT_ID }}
           EOF
 
       - name: Decode Google Services JSON
@@ -236,6 +242,12 @@ jobs:
           API_KEY=${{ secrets.API_KEY }}
           REVENUECAT_ANDROID_KEY=${{ secrets.REVENUECAT_ANDROID_KEY }}
           REVENUECAT_IOS_KEY=${{ secrets.REVENUECAT_IOS_KEY }}
+          ANDROID_BANNER_AD_UNIT_ID=${{ secrets.ANDROID_BANNER_AD_UNIT_ID }}
+          IOS_BANNER_AD_UNIT_ID=${{ secrets.IOS_BANNER_AD_UNIT_ID }}
+          ANDROID_INTERSTITIAL_AD_UNIT_ID=${{ secrets.ANDROID_INTERSTITIAL_AD_UNIT_ID }}
+          IOS_INTERSTITIAL_AD_UNIT_ID=${{ secrets.IOS_INTERSTITIAL_AD_UNIT_ID }}
+          ANDROID_REWARDED_AD_UNIT_ID=${{ secrets.ANDROID_REWARDED_AD_UNIT_ID }}
+          IOS_REWARDED_AD_UNIT_ID=${{ secrets.IOS_REWARDED_AD_UNIT_ID }}
           EOF
 
       - name: Decode Google Services JSON
