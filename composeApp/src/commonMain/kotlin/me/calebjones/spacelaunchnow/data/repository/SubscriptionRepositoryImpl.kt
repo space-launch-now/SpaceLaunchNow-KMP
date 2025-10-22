@@ -16,11 +16,15 @@ import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
+import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
+import me.calebjones.spacelaunchnow.data.storage.TemporaryAccessStatus
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
 import kotlin.time.Duration.Companion.days
+import kotlinx.coroutines.flow.first
 
 /**
  * Implementation of SubscriptionRepository
@@ -37,6 +41,8 @@ class SubscriptionRepositoryImpl(
     private val billingClient: BillingClient,
     private val storage: SubscriptionStorage,
     private val debugPreferences: DebugPreferences,
+    private val appPreferences: AppPreferences,
+    private val temporaryPremiumAccess: TemporaryPremiumAccess,
     private val revenueCatManager: RevenueCatManager,  // RevenueCat for entitlements
     private val widgetPreferences: WidgetPreferences,  // Cache widget access for widgets
     private val platformWidgetUpdater: PlatformWidgetUpdater? = null  // Optional: for triggering widget updates
@@ -52,6 +58,13 @@ class SubscriptionRepositoryImpl(
     // Debug simulation state
     private var debugSimulationState: SubscriptionState? = null
 
+    /**
+     * Check if debug features are enabled (debug build OR debug menu unlocked in production)
+     */
+    private suspend fun isDebugEnabled(): Boolean {
+        return BuildConfig.IS_DEBUG || appPreferences.isDebugMenuUnlocked()
+    }
+
     override suspend fun initialize() {
         println("=== SubscriptionRepository: Initializing ===")
 
@@ -61,8 +74,8 @@ class SubscriptionRepositoryImpl(
             _state.value = cachedState.copy(isLoading = false)
             println("SubscriptionRepository: Loaded cached state - isSubscribed: ${cachedState.isSubscribed}")
 
-            // 2. Load debug simulation state if in debug mode
-            if (BuildConfig.IS_DEBUG) {
+            // 2. Load debug simulation state if debug features are enabled
+            if (isDebugEnabled()) {
                 loadDebugSimulationState()
             }
 
@@ -99,7 +112,7 @@ class SubscriptionRepositoryImpl(
      * Load debug simulation state from persistent storage
      */
     private suspend fun loadDebugSimulationState() {
-        if (!BuildConfig.IS_DEBUG) return
+        if (!isDebugEnabled()) return
 
         val debugSettings = debugPreferences.getDebugSettings()
         if (debugSettings.debugSubscriptionActive) {
@@ -126,7 +139,7 @@ class SubscriptionRepositoryImpl(
 
     override suspend fun verifySubscription(forceRefresh: Boolean): Result<SubscriptionState> {
         // If we have a debug simulation active and not forcing refresh, use it
-        if (BuildConfig.IS_DEBUG && debugSimulationState != null && !forceRefresh) {
+        if (isDebugEnabled() && debugSimulationState != null && !forceRefresh) {
             println("SubscriptionRepository: Using persisted debug simulation state")
             return Result.success(debugSimulationState!!)
         }
@@ -249,7 +262,21 @@ class SubscriptionRepositoryImpl(
             return debugAccess
         }
 
-        // Priority 2: RevenueCat entitlements (live verification)
+        // Priority 2: Temporary premium access from rewarded ads
+        val hasTemporaryAccess = temporaryPremiumAccess.hasTemporaryAccess(feature)
+        if (hasTemporaryAccess) {
+            println("  🎁 Temporary access active for ${feature.name}")
+            
+            // Update widget preferences to match temporary access
+            if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+                widgetPreferences.updateWidgetAccessGranted(true)
+                updateWidgetsAfterAccessChange("temporary access granted")
+            }
+            
+            return true
+        }
+
+        // Priority 3: RevenueCat entitlements (live verification)
         val hasPremiumEntitlement =
             revenueCatManager.hasEntitlement(SubscriptionProducts.RC_ENTITLEMENT_PREMIUM)
         println("  RevenueCat premium entitlement: $hasPremiumEntitlement")
@@ -274,7 +301,7 @@ class SubscriptionRepositoryImpl(
             updateWidgetsAfterAccessChange("access revoked")
         }
 
-        // Priority 3: Fallback to cached state for offline scenarios
+        // Priority 4: Fallback to cached state for offline scenarios
         val cachedAccess = _state.value.hasFeature(feature)
         println("  ⚠️ No premium entitlement - cached access for ${feature.name}: $cachedAccess")
         println("  Current state: ${_state.value.subscriptionType} with features: ${_state.value.features}")
@@ -363,7 +390,7 @@ class SubscriptionRepositoryImpl(
 
     /**
      * Debug method to simulate different subscription states
-     * Only available in debug builds
+     * Only available in debug builds or when debug menu is unlocked
      */
     fun simulateSubscriptionState(
         isSubscribed: Boolean,
@@ -371,115 +398,116 @@ class SubscriptionRepositoryImpl(
         productId: String?,
         persist: Boolean = true
     ) {
-        if (!BuildConfig.IS_DEBUG) return
+        repositoryScope.launch {
+            if (!isDebugEnabled()) return@launch
 
-        debugSimulationState = if (isSubscribed) {
-            SubscriptionState(
-                isSubscribed = true,
-                subscriptionType = subscriptionType,
-                subscriptionId = "debug_order_${Clock.System.now().toEpochMilliseconds()}",
-                productId = productId ?: "debug_product",
-                expiresAt = Clock.System.now().plus(30.days).toEpochMilliseconds(),
-                purchasedAt = Clock.System.now().minus(7.days).toEpochMilliseconds(),
-                lastVerified = Clock.System.now().toEpochMilliseconds(),
-                needsVerification = false,
-                verificationError = null,
-                features = if (productId != null) {
-                    SubscriptionProducts.getFeaturesForProduct(productId)
-                } else {
-                    PremiumFeature.getFeaturesForType(subscriptionType)
-                },
-                isLoading = false,
-                isCached = false
-            )
-        } else {
-            SubscriptionState.free()
-        }
+            debugSimulationState = if (isSubscribed) {
+                SubscriptionState(
+                    isSubscribed = true,
+                    subscriptionType = subscriptionType,
+                    subscriptionId = "debug_order_${Clock.System.now().toEpochMilliseconds()}",
+                    productId = productId ?: "debug_product",
+                    expiresAt = Clock.System.now().plus(30.days).toEpochMilliseconds(),
+                    purchasedAt = Clock.System.now().minus(7.days).toEpochMilliseconds(),
+                    lastVerified = Clock.System.now().toEpochMilliseconds(),
+                    needsVerification = false,
+                    verificationError = null,
+                    features = if (productId != null) {
+                        SubscriptionProducts.getFeaturesForProduct(productId)
+                    } else {
+                        PremiumFeature.getFeaturesForType(subscriptionType)
+                    },
+                    isLoading = false,
+                    isCached = false
+                )
+            } else {
+                SubscriptionState.free()
+            }
 
-        _state.value = debugSimulationState!!
+            _state.value = debugSimulationState!!
 
-        // Save to persistent storage if requested
-        if (persist) {
-            repositoryScope.launch {
+            // Save to persistent storage if requested
+            if (persist) {
                 debugPreferences.setDebugSubscriptionSimulation(
                     isActive = true,
                     subscriptionType = subscriptionType.name,
                     productId = productId
                 )
             }
-        }
 
-        println("SubscriptionRepository: Debug simulation set to ${debugSimulationState!!.subscriptionType} (${debugSimulationState!!.productId})")
+            println("SubscriptionRepository: Debug simulation set to ${debugSimulationState!!.subscriptionType} (${debugSimulationState!!.productId})")
+        }
     }
 
     /**
      * Debug method to simulate needs verification state
      */
     fun simulateNeedsVerification(needsVerification: Boolean) {
-        if (!BuildConfig.IS_DEBUG) return
+        repositoryScope.launch {
+            if (!isDebugEnabled()) return@launch
 
-        val currentState = _state.value
-        debugSimulationState = currentState.copy(
-            needsVerification = needsVerification,
-            verificationError = if (needsVerification) "Debug: Verification required" else null
-        )
-        _state.value = debugSimulationState!!
-        println("SubscriptionRepository: Debug simulation - needsVerification = $needsVerification")
+            val currentState = _state.value
+            debugSimulationState = currentState.copy(
+                needsVerification = needsVerification,
+                verificationError = if (needsVerification) "Debug: Verification required" else null
+            )
+            _state.value = debugSimulationState!!
+            println("SubscriptionRepository: Debug simulation - needsVerification = $needsVerification")
+        }
     }
 
     /**
      * Debug method to simulate expired subscription
      */
     fun simulateExpiredSubscription() {
-        if (!BuildConfig.IS_DEBUG) return
-
-        debugSimulationState = SubscriptionState(
-            isSubscribed = false,
-            subscriptionType = SubscriptionType.FREE,
-            subscriptionId = "debug_expired_${Clock.System.now().toEpochMilliseconds()}",
-            productId = "expired_premium",
-            expiresAt = Clock.System.now().minus(7.days)
-                .toEpochMilliseconds(), // Expired 7 days ago
-            purchasedAt = Clock.System.now().minus(365.days).toEpochMilliseconds(),
-            lastVerified = Clock.System.now().toEpochMilliseconds(),
-            needsVerification = false,
-            verificationError = "Subscription expired",
-            features = emptySet(),
-            isLoading = false,
-            isCached = false
-        )
-        _state.value = debugSimulationState!!
-
-        // Save to persistent storage
         repositoryScope.launch {
+            if (!isDebugEnabled()) return@launch
+
+            debugSimulationState = SubscriptionState(
+                isSubscribed = false,
+                subscriptionType = SubscriptionType.FREE,
+                subscriptionId = "debug_expired_${Clock.System.now().toEpochMilliseconds()}",
+                productId = "expired_premium",
+                expiresAt = Clock.System.now().minus(7.days)
+                    .toEpochMilliseconds(), // Expired 7 days ago
+                purchasedAt = Clock.System.now().minus(365.days).toEpochMilliseconds(),
+                lastVerified = Clock.System.now().toEpochMilliseconds(),
+                needsVerification = false,
+                verificationError = "Subscription expired",
+                features = emptySet(),
+                isLoading = false,
+                isCached = false
+            )
+            _state.value = debugSimulationState!!
+
+            // Save to persistent storage
             debugPreferences.setDebugSubscriptionSimulation(
                 isActive = true,
                 subscriptionType = SubscriptionType.FREE.name,
                 productId = "expired_premium"
             )
-        }
 
-        println("SubscriptionRepository: Debug simulation - expired subscription")
+            println("SubscriptionRepository: Debug simulation - expired subscription")
+        }
     }
 
     /**
      * Clear debug simulation and return to real billing state
      */
     fun clearDebugSimulation() {
-        if (!BuildConfig.IS_DEBUG) return
-
-        debugSimulationState = null
-
-        // Clear persistent storage
         repositoryScope.launch {
+            if (!isDebugEnabled()) return@launch
+
+            debugSimulationState = null
+
+            // Clear persistent storage
             debugPreferences.clearDebugSubscriptionSimulation()
-        }
 
-        // Trigger real verification
-        repositoryScope.launch {
+            // Trigger real verification
             verifySubscription(forceRefresh = true)
+            
+            println("SubscriptionRepository: Debug simulation cleared")
         }
-        println("SubscriptionRepository: Debug simulation cleared")
     }
 
     /**
@@ -505,6 +533,43 @@ class SubscriptionRepositoryImpl(
                 e.printStackTrace()
             }
         }
+    }
+
+    /**
+     * Grant temporary premium access to a feature through rewarded ads
+     * This provides 24-hour access to premium features
+     */
+    suspend fun grantTemporaryPremiumAccess(feature: PremiumFeature) {
+        println("SubscriptionRepository: Granting temporary access to ${feature.name}")
+        
+        // Grant the temporary access
+        temporaryPremiumAccess.grantTemporaryAccess(feature)
+        
+        // Update widget access if needed
+        if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+            widgetPreferences.updateWidgetAccessGranted(true)
+            updateWidgetsAfterAccessChange("temporary access granted via rewarded ad")
+        }
+        
+        println("SubscriptionRepository: Temporary access granted to ${feature.name} for 24 hours")
+    }
+
+    /**
+     * Check if user has temporary access to a feature and get remaining time
+     */
+    suspend fun getTemporaryAccessStatus(feature: PremiumFeature): TemporaryAccessStatus {
+        val hasAccess = temporaryPremiumAccess.hasTemporaryAccess(feature)
+        val timeRemaining = if (hasAccess) {
+            temporaryPremiumAccess.getTimeRemaining(feature)
+        } else {
+            null
+        }
+        
+        return TemporaryAccessStatus(
+            hasAccess = hasAccess,
+            expiresAt = null, // Could be added if needed
+            timeRemaining = timeRemaining
+        )
     }
 }
 

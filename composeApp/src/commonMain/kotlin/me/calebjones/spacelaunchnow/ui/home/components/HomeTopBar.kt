@@ -14,10 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar() {
+fun HomeTopBar(navController: NavController) {
     TopAppBar(
         title = {
             Text(
@@ -29,7 +31,9 @@ fun HomeTopBar() {
         },
         actions = {
             IconButton(
-                onClick = { /* Handle notifications click */ },
+                onClick = { 
+                    navController.navigate(NotificationSettings)
+                },
             ) {
                 Icon(
                     Icons.Default.Notifications,

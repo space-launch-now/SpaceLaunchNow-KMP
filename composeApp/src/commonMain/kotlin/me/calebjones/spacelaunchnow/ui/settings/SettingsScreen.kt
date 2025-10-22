@@ -55,6 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
@@ -163,7 +164,7 @@ fun SettingsScreen(
                             SettingsNavigationRow(
                                 title = "Calendar Sync",
                                 subtitle = "Sync Launches and Events to your calendar",
-                                onClick = { },
+                                onClick = { navController.navigate(CalendarSync) },
                             )
                         }
                     }

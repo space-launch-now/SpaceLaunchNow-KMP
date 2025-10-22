@@ -41,18 +41,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import coil3.compose.AsyncImage
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationNormal
-import me.calebjones.spacelaunchnow.ui.EventSharedElementKey
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
-import me.calebjones.spacelaunchnow.LocalUseUtc
 
 private val TitleHeight = 128.dp
 
@@ -76,6 +78,7 @@ fun EventDetailView(
     }
 }
 
+@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 private fun EventDetailContentInBody(event: EventEndpointDetailed) {
     Column(
@@ -85,6 +88,15 @@ private fun EventDetailContentInBody(event: EventEndpointDetailed) {
 
         // Meta card
         EventInfoCard(event)
+
+        Spacer(Modifier.height(16.dp))
+
+
+        // Banner Ad - positioned after description
+        SmartBannerAd(
+            modifier = Modifier.fillMaxWidth(),
+            placementType = AdPlacementType.CONTENT // Content area ad
+        )
 
         Spacer(Modifier.height(16.dp))
 
@@ -159,7 +171,11 @@ private fun EventInfoCard(event: EventEndpointDetailed) {
                 Text(desc, style = MaterialTheme.typography.bodyMedium, lineHeight = 20.sp)
             }
             if (meta.isNotEmpty()) {
-                Text(meta, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    meta,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

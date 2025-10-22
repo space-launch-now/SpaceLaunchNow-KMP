@@ -5,11 +5,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import platform.UIKit.UIDevice
 
-class IOSPlatform: Platform {
-    override val name: String = UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
+class IOSPlatform : Platform {
+    override val name: String =
+        UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
+    override val type: PlatformType = PlatformType.IOS
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()
+
 
 actual fun setOrientationLandscape() {
     // iOS orientation handling is done through MediaPlayerHost
@@ -48,4 +51,10 @@ actual fun getScreenWidth(): Dp {
 actual fun getScreenHeight(): Dp {
     // TODO: Implement platform-specific screen height for iOS
     return 667.dp // Default iPhone height as a stub
+}
+
+@Composable
+actual fun getOrientation(): Int {
+    // TODO: Implement platform-specific orientation handling for iOS
+    return 0 // Default to portrait as a stub
 }

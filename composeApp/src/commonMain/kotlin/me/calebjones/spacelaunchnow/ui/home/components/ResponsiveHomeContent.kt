@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -48,10 +49,14 @@ import me.calebjones.spacelaunchnow.isDesktop
 import me.calebjones.spacelaunchnow.isLandscape
 import me.calebjones.spacelaunchnow.isTablet
 import me.calebjones.spacelaunchnow.navigation.Schedule
+import me.calebjones.spacelaunchnow.navigation.SupportUs
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 fun ResponsiveHomeContent(
     navController: NavController,
@@ -90,7 +95,7 @@ fun ResponsiveHomeContent(
         LazyColumn(
             modifier = modifier.fillMaxSize(),
         ) {
-            item { HomeTopBar() }
+            item { HomeTopBar(navController = navController) }
             // Hero cards row: Last Launch + Stats + Next Up (countdown)
             item {
                 Row(
@@ -260,6 +265,22 @@ fun ResponsiveHomeContent(
                     }
                 }
             }
+
+            // Large Ad between This Day in History and Launch Schedule
+            item {
+                SmartBannerAd(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    placementType = AdPlacementType.INTERSTITIAL, // Between content sections
+                    showRemoveAdsButton = true,
+                    onRemoveAdsClick = {
+                        // Navigate to settings - navController is available in this scope
+                        navController.navigate(SupportUs)
+                    }
+                )
+            }
+
             item {
                 SectionTitle(
                     title = "Launch Schedule",
@@ -295,7 +316,7 @@ fun ResponsiveHomeContent(
         LazyColumn(
             modifier = modifier,
         ) {
-            item { HomeTopBar() }
+            item { HomeTopBar(navController = navController) }
             item { NextLaunchView(navController = navController) }
 
             // Quick Stats
@@ -379,6 +400,22 @@ fun ResponsiveHomeContent(
                         PlainShimmerCard()
                     }
                 }
+            }
+
+            // Large Ad between This Day in History and Launch Schedule
+            item {
+                SmartBannerAd(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    placementType = AdPlacementType.INTERSTITIAL, // Between content sections
+                    showRemoveAdsButton = true,
+                    onRemoveAdsClick = {
+                        // Navigate to settings - navController is available in this scope
+                        navController.navigate(SupportUs)
+                    }
+                )
             }
 
             item {
