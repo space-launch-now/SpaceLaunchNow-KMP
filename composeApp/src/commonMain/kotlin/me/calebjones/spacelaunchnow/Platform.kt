@@ -32,6 +32,11 @@ expect fun getScreenWidth(): Dp
 expect fun getScreenHeight(): Dp
 
 @Composable
+/**
+ * Returns the current screen orientation.
+ *
+ * @return 1 for portrait, 2 for landscape.
+ */
 expect fun getOrientation(): Int
 
 // Orientation management
