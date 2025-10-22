@@ -61,6 +61,7 @@ composeMediaPlayer = "1.0.47"
 workRuntime = "2.10.5"
 
 purchases-kmp = "2.2.2+17.10.0"
+shadowglow = "1.0.0"
 
 # Basic Ads (Google AdMob for KMP)
 basic-ads = "0.2.7"
@@ -177,10 +178,14 @@ cryptography-core = { module = "dev.whyoleg.cryptography:cryptography-core", ver
 cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-provider-jdk", version.ref = "cryptography-kotlin" }
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-apple", version.ref = "cryptography-kotlin" }
 
+# ShadowGlow library for advanced drop shadows
+shadowglow = { module = "me.trishiraj:shadowglow", version.ref = "shadowglow" }
+
 # Basic Ads (Google AdMob for KMP)
 basicAds = { module = "app.lexilabs.basic:basic-ads", version.ref = "basic-ads" }
 googleAds = { module = "com.google.android.gms:play-services-ads", version.ref = "google-play-services-ads" }
 androidUmp = { module = "com.google.android.ump:user-messaging-platform", version.ref = "android-ump" }
+
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]

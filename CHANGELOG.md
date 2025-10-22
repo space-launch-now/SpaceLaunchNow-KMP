@@ -1,4 +1,21 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b23...v4.0.0) (2025-10-16)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b24...v4.0.0) (2025-10-18)
+
+
+### Bug Fixes
+
+* remove 'keepLaunchesFor24Hours' setting and related functionality ([d5d2fcd](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/d5d2fcdd08a5a09e35af4647346711110c4a831e))
+* **ui:** settings and theme customization screens ([62228b0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/62228b0b877010ecfb2c54eee95b51618dade8a7))
+
+
+### Features
+
+* **debug:** implement secure debug menu unlock ([a271998](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/a2719981be368bbfcfb05acba7d25574bba37bc5))
+* **notifications:** add notification customization feature and update related UI components ([4ccf5e4](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/4ccf5e4cfde261045782934014a56c4c888adfbb))
+* **notifications:** implement granular notification channels and settings management ([b6cf88a](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/b6cf88af9dea91a13a7aa78a8b2968b108af43bb))
+
+
+
+# [4.0.0-b24](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b23...v4.0.0-b24) (2025-10-16)
 
 
 ### Features
@@ -47,15 +64,6 @@
 
 
 # [4.0.0-b21](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b20...v4.0.0-b21) (2025-10-10)
-
-
-
-# [4.0.0-b20](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b19...v4.0.0-b20) (2025-10-10)
-
-
-### Bug Fixes
-
-* **ci:** correct artifact path resolution for Firebase Distribution ([#21](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/issues/21)) ([5d645fa](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/5d645fa8fa3e0cfbca7c911f0c441693df52bbbe))
 
 
 
