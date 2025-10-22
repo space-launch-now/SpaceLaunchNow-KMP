@@ -83,6 +83,7 @@ val LocalPreloadedRewardedAd =
 fun isTabletOrDesktop(): Boolean {
     val screenWidthDp = getScreenWidth()
     val isLargeScreen = screenWidthDp >= 720.dp // Example threshold for tablets
+    println("Screen width: $screenWidthDp, isLargeScreen: $isLargeScreen")
     return isLargeScreen || getPlatform().type.isDesktop
 }
 
@@ -318,6 +319,7 @@ fun SpaceLaunchNowApp(
     // Determine initial layout type and keep it stable - don't switch between layouts on rotation
     // This preserves navigation state across configuration changes
     val isTabletOrDesktopValue = isTabletOrDesktop()
+    println("Device layout type: ${if (isTabletOrDesktopValue) "Tablet/Desktop" else "Phone"}")
     val useTabletLayout = remember(navController) { isTabletOrDesktopValue }
 
     // Try to show a consent popup

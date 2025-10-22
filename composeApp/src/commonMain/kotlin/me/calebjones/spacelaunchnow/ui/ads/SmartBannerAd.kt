@@ -231,9 +231,10 @@ fun SmartBannerAd(
         AdState.LOADING -> {
             // Ad is loading, show a placeholder or try to reload
             println("🔄 SmartBannerAd: Ad is loading for placement $placementType")
-            // For navigation ads, we can show a minimal placeholder or just wait
-            if (!showCard) {
-                // Navigation area: show minimal space to avoid layout jumps
+            // For navigation ads, don't show placeholder to avoid unnecessary space
+            // Content will show when ad actually loads
+            if (!showCard && placementType != AdPlacementType.NAVIGATION) {
+                // Only show placeholder for non-navigation areas
                 Box(
                     modifier = modifier
                         .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -247,8 +248,9 @@ fun SmartBannerAd(
             // Ad failed to load or was dismissed
             println("⚠️ SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType - ad may need reloading at app level")
             
-            // For navigation ads, reserve some space to avoid layout jumps
-            if (!showCard) {
+            // For navigation ads, don't reserve space when ads fail - prevents white gaps
+            if (!showCard && placementType != AdPlacementType.NAVIGATION) {
+                // Only show placeholder for non-navigation areas
                 Box(
                     modifier = modifier
                         .padding(horizontal = 8.dp, vertical = 4.dp)

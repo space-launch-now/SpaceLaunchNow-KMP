@@ -133,6 +133,7 @@ val appModule = module {
             billingClient = get(),
             storage = get<SubscriptionStorage>(),
             debugPreferences = get<DebugPreferences>(),
+            appPreferences = get<AppPreferences>(),      // Add AppPreferences injection
             revenueCatManager = get<RevenueCatManager>(),  // RevenueCat dependency
             widgetPreferences = get<WidgetPreferences>(),   // Cache widget access
             platformWidgetUpdater = getOrNull()             // Android-only: trigger widget updates

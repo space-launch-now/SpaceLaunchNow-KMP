@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -8,7 +9,6 @@ import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 
 class AndroidPlatform : Platform {
@@ -48,11 +48,13 @@ actual fun setOrientationSensorFromComposable() {
     context.findActivity()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
 }
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
-actual fun getScreenWidth() = LocalWindowInfo.current.containerSize.width.dp
+actual fun getScreenWidth() = LocalConfiguration.current.screenWidthDp.dp
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
-actual fun getScreenHeight() = LocalWindowInfo.current.containerSize.height.dp
+actual fun getScreenHeight() = LocalConfiguration.current.screenHeightDp.dp
 
 @Composable
 actual fun getOrientation() = LocalConfiguration.current.orientation
