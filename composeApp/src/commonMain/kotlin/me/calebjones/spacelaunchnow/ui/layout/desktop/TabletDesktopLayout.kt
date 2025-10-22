@@ -53,8 +53,8 @@ import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
-import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
@@ -247,7 +247,7 @@ fun TabletDesktopLayout(
                                 .calculateBottomPadding()
                         ),
                         placementType = AdPlacementType.NAVIGATION, // Navigation context
-                        showCard = false
+                        showCard = false,
                     )
                 }
             }

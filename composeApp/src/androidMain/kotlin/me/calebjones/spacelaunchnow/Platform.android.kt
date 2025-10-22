@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 
 class AndroidPlatform : Platform {
@@ -48,14 +49,13 @@ actual fun setOrientationSensorFromComposable() {
 }
 
 @Composable
-actual fun getScreenWidth() = LocalConfiguration.current
-    .screenWidthDp
-    .dp
+actual fun getScreenWidth() = LocalWindowInfo.current.containerSize.width.dp
 
 @Composable
-actual fun getScreenHeight() = LocalConfiguration.current
-    .screenHeightDp
-    .dp
+actual fun getScreenHeight() = LocalWindowInfo.current.containerSize.height.dp
+
+@Composable
+actual fun getOrientation() = LocalConfiguration.current.orientation
 
 // Helper function to get Activity from Context
 fun Context.findActivity(): Activity? = when (this) {
