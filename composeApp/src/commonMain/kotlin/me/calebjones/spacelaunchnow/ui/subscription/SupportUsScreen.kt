@@ -1013,15 +1013,15 @@ private fun ProLifetimeCard(
                 gradientColors = listOf(
                     Color(0xFFFFD700).copy(alpha = 0.6f), // Gold
                     Color(0xFFFFA500).copy(alpha = 0.5f), // Orange
-                    Color(0xFFFFD700).copy(alpha = 0.6f)  // Gold
+                    Color(0xFFFF9800).copy(alpha = 0.7f)  // Yellow
                 ),
-                borderRadius = 20.dp,
-                blurRadius = 24.dp,
+                borderRadius = 10.dp,
+                blurRadius = 12.dp,
                 offsetX = 0.dp,
                 offsetY = 0.dp,
                 spread = 8.dp,
                 enableBreathingEffect = true,
-                breathingEffectIntensity = 8.dp,
+                breathingEffectIntensity = 4.dp,
                 breathingDurationMillis = 3000
             ),
         shape = RoundedCornerShape(20.dp),
