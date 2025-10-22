@@ -3,8 +3,6 @@ package me.calebjones.spacelaunchnow.ui.compose
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,15 +28,15 @@ import com.valentinilk.shimmer.shimmer
 @Composable
 fun NextUpShimmerBox() {
     // Create shimmer effect
-    
+
     Column(
         modifier = Modifier
             .shimmer()
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
 
-        
+
         // Countdown card shimmer
         Card(
             modifier = Modifier
@@ -97,7 +94,7 @@ fun LaunchListShimmer(cardCount: Int = 5) {
 }
 
 @Composable
-fun UpdatesShimmer(cardCount: Int = 5){
+fun UpdatesShimmer(cardCount: Int = 5) {
     // Create shimmer effect for a row of n update items using LazyRow
     LazyRow(
         modifier = Modifier

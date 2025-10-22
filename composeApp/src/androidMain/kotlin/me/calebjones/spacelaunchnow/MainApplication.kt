@@ -2,7 +2,6 @@ package me.calebjones.spacelaunchnow
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.lifecycleScope
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -12,16 +11,16 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
-import me.calebjones.spacelaunchnow.workers.WidgetUpdateWorker
 import me.calebjones.spacelaunchnow.ui.viewmodel.NotificationDisplayHelper
+import me.calebjones.spacelaunchnow.util.initializeBuildConfig
+import me.calebjones.spacelaunchnow.workers.WidgetUpdateWorker
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
-import java.util.concurrent.TimeUnit
-import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import org.koin.dsl.includes
+import java.util.concurrent.TimeUnit
 
 class MainApplication : Application() {
 

@@ -34,6 +34,7 @@ fun MainViewController() = ComposeUIViewController {
     val navigationDestination by navigationDestinationState
     
     SpaceLaunchNowApp(
+        contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(null),
         navigationDestination = navigationDestination,
         onNavigationDestinationConsumed = {
             navigationDestinationState.value = null

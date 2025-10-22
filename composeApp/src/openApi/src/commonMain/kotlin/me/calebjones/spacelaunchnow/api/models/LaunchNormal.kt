@@ -29,44 +29,44 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param url 
- * @param responseMode 
- * @param slug 
- * @param launchDesignator 
- * @param status 
- * @param netPrecision 
- * @param image 
- * @param launchServiceProvider 
- * @param infographic 
- * @param probability 
- * @param weatherConcerns 
- * @param failreason 
- * @param hashtag 
- * @param rocket 
- * @param mission 
- * @param pad 
- * @param program 
- * @param orbitalLaunchAttemptCount 
- * @param locationLaunchAttemptCount 
- * @param padLaunchAttemptCount 
- * @param agencyLaunchAttemptCount 
- * @param orbitalLaunchAttemptCountYear 
- * @param locationLaunchAttemptCountYear 
- * @param padLaunchAttemptCountYear 
- * @param agencyLaunchAttemptCountYear 
- * @param name 
- * @param lastUpdated 
- * @param net 
- * @param windowEnd 
- * @param windowStart 
- * @param webcastLive 
+ *
+ * @param id
+ * @param url
+ * @param responseMode
+ * @param slug
+ * @param launchDesignator
+ * @param status
+ * @param netPrecision
+ * @param image
+ * @param launchServiceProvider
+ * @param infographic
+ * @param probability
+ * @param weatherConcerns
+ * @param failreason
+ * @param hashtag
+ * @param rocket
+ * @param mission
+ * @param pad
+ * @param program
+ * @param orbitalLaunchAttemptCount
+ * @param locationLaunchAttemptCount
+ * @param padLaunchAttemptCount
+ * @param agencyLaunchAttemptCount
+ * @param orbitalLaunchAttemptCountYear
+ * @param locationLaunchAttemptCountYear
+ * @param padLaunchAttemptCountYear
+ * @param agencyLaunchAttemptCountYear
+ * @param name
+ * @param lastUpdated
+ * @param net
+ * @param windowEnd
+ * @param windowStart
+ * @param webcastLive
  */
 @Serializable
 
-data class LaunchNormal (
+data class LaunchNormal(
 
     @SerialName(value = "id") @Required val id: kotlin.String,
 
@@ -134,6 +134,4 @@ data class LaunchNormal (
 
 ) {
 
-
 }
-
