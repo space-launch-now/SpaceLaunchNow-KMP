@@ -5,7 +5,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 
-class DesktopPlatform: Platform {
+class DesktopPlatform : Platform {
     override val name: String = "Desktop"
     override val type: PlatformType = PlatformType.DESKTOP
 }
@@ -52,3 +52,8 @@ actual fun getScreenHeight() = LocalWindowInfo.current
     .containerSize
     .height
     .dp
+
+@Composable
+actual fun getOrientation(): Int {
+    TODO("Not yet implemented")
+}

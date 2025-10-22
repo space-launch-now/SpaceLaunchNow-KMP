@@ -11,7 +11,7 @@ enum class PlatformType {
     ANDROID,
     IOS,
     DESKTOP;
-    
+
     val isAndroid: Boolean get() = this == ANDROID
     val isIOS: Boolean get() = this == IOS
     val isDesktop: Boolean get() = this == DESKTOP
@@ -30,6 +30,9 @@ expect fun getScreenWidth(): Dp
 
 @Composable
 expect fun getScreenHeight(): Dp
+
+@Composable
+expect fun getOrientation(): Int
 
 // Orientation management
 expect fun setOrientationLandscape()
@@ -83,4 +86,9 @@ fun isIOS(): Boolean {
 @Composable
 fun isMobile(): Boolean {
     return getPlatform().type.isMobile
+}
+
+@Composable
+fun isLargeScreen(): Boolean {
+    return (isTablet() && isLandscape()) || isDesktop()
 }

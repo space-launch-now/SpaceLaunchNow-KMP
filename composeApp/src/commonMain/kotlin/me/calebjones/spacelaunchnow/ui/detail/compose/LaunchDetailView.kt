@@ -16,7 +16,6 @@ import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -89,7 +88,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenu
@@ -109,6 +107,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -116,7 +115,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -126,6 +124,11 @@ import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
+import com.valentinilk.shimmer.shimmer
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Brands
+import compose.icons.fontawesomeicons.brands.WikipediaW
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -139,17 +142,21 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
+import me.calebjones.spacelaunchnow.isLargeScreen
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
+import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import me.calebjones.spacelaunchnow.util.VideoUtil
+import org.koin.compose.koinInject
 
 // Keep only TitleHeight which is used for spacing
-private val TitleHeight = 128.dp
+private val TitleHeight = 120.dp
+private val CompactHeight = 40.dp
 
 // Function to parse ISO 8601 duration to human readable format
 private fun parseIsoDurationToHumanReadable(isoDuration: String): String {
@@ -484,139 +491,276 @@ private fun LaunchDetailContentInBody(
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null
 ) {
+    val isLargeScreen = isLargeScreen()
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight - 28.dp))
+        Spacer(Modifier.height(if (isLargeScreen) CompactHeight else TitleHeight))
 
-        // 1. Combined Launch Overview Card (replaces CountdownCard, LaunchWindowIndicatorCard, and LaunchInfoCard)
-        CombinedLaunchOverviewCard(launch = launch)
-        Spacer(Modifier.height(16.dp))
-
-        // Now include all the detailed content - no null checks needed
-        // 2. Quick Stats Grid
-        QuickStatsGrid(launch = launch)
-        Spacer(Modifier.height(16.dp))
-
-        // Ad below Quick Facts
-        BoxWithConstraints {
-            val density = LocalDensity.current
-            val availableWidthPx = with(density) { maxWidth.toPx().toInt() }
-
-            SmartBannerAd(
+        // Split content into two columns on large screens
+        if (isLargeScreen) {
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                adSize = AdSize.MEDIUM_RECTANGLE,
-                showRemoveAdsButton = true,
-                onRemoveAdsClick = onNavigateToSettings
-            )
-        }
-        Spacer(Modifier.height(16.dp))
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Left Column
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // 1. Combined Launch Overview Card (always full width)
+                    Text(
+                        text = "Overview",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    CombinedLaunchOverviewCard(launch = launch)
+                    Spacer(Modifier.height(16.dp))
 
-        // 3. Video Player Card - positioned above timeline
-        if (videoPlayerState.availableVideos.isNotEmpty()) {
-            val videoTitle = launch.net?.let { net ->
-                val now = kotlinx.datetime.Clock.System.now()
-                if (net > now) "Watch Live" else "Watch Replay"
-            } ?: "Watch Launch"
+                    // 2. Quick Stats Grid (always full width)
+                    QuickStatsGrid(launch = launch)
+                    Spacer(Modifier.height(8.dp))
 
-            Text(
-                text = videoTitle,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(16.dp))
-            VideoPlayerCard(
-                videoPlayerState = videoPlayerState,
-                launchName = launch.mission?.name ?: "Space Launch",
-                onSetPlayerVisible = onSetPlayerVisible,
-                onNavigateToFullscreen = onNavigateToFullscreen,
-                onVideoSelected = onVideoSelected
-            )
-            Spacer(Modifier.height(16.dp))
-        }
+                    SmartBannerAd(
+                        modifier = Modifier.fillMaxWidth(),
+                        adSize = AdSize.MEDIUM_RECTANGLE,
+                        showRemoveAdsButton = true,
+                        onRemoveAdsClick = onNavigateToSettings
+                    )
 
-        // 4. Timeline Card
-        if (launch.timeline.isNotEmpty()) {
-            Text(
-                text = "Timeline",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(16.dp))
-            TimelineCard(timeline = launch.timeline)
-            Spacer(Modifier.height(16.dp))
-        }
+                    Spacer(Modifier.height(8.dp))
+                    // Timeline Card
+                    if (launch.timeline.isNotEmpty()) {
+                        Text(
+                            text = "Timeline",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        TimelineCard(timeline = launch.timeline)
+                    }
 
-        // 5. Mission Details Card
-        launch.mission?.let { mission ->
-            Text(
-                text = "Mission Details",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(16.dp))
-            MissionDetailsCard(mission = mission, launch = launch)
-            Spacer(Modifier.height(16.dp))
-        }
+                    // Mission Details Card
+                    launch.mission?.let { mission ->
+                        Text(
+                            text = "Mission Details",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        MissionDetailsCard(mission = mission, launch = launch)
+                    }
 
-        // 6. Launch Vehicle Details Card
-        launch.rocket?.configuration?.let { rocketConfig ->
-            Text(
-                text = "Launch Vehicle Details",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(16.dp))
-            LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
-            Spacer(Modifier.height(16.dp))
-            LaunchVehicleDetailedStatistics(rocketConfig = rocketConfig)
-            Spacer(Modifier.height(16.dp))
-        }
+                    // Spacecraft Details Card
+                    if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
+                        Text(
+                            text = "Spacecraft Details",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        SpacecraftDetailsCard(
+                            spacecraftStages = launch.rocket?.spacecraftStage ?: emptyList()
+                        )
+                    }
 
-        // 7. Spacecraft Details Card
-        if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
-            Text(
-                text = "Spacecraft Details",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(16.dp))
-            SpacecraftDetailsCard(spacecraftStages = launch.rocket?.spacecraftStage ?: emptyList())
-            Spacer(Modifier.height(16.dp))
-        }
+                    // Agency Card
+                    launch.launchServiceProvider.let { agency ->
+                        Text(
+                            text = "Launch Service Provider",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        AgencyDetailsCard(agency = agency)
+                    }
+                }
 
-        // 8. Landing Details Card
-        run {
-            val landingStages = launch.rocket?.launcherStage ?: emptyList()
-            if (landingStages.any { it.landing != null }) {
-                Text(
-                    text = "Landing Details",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                // Right Column
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Video Player Card
+                    if (videoPlayerState.availableVideos.isNotEmpty()) {
+                        val videoTitle = launch.net?.let { net ->
+                            val now = kotlinx.datetime.Clock.System.now()
+                            if (net > now) "Watch Live" else "Watch Replay"
+                        } ?: "Watch Launch"
+
+                        Text(
+                            text = videoTitle,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        VideoPlayerCard(
+                            videoPlayerState = videoPlayerState,
+                            launchName = launch.mission?.name ?: "Space Launch",
+                            onSetPlayerVisible = onSetPlayerVisible,
+                            onNavigateToFullscreen = onNavigateToFullscreen,
+                            onVideoSelected = onVideoSelected
+                        )
+                    }
+
+                    // Launch Vehicle Details Card
+                    launch.rocket?.configuration?.let { rocketConfig ->
+                        Text(
+                            text = "Launch Vehicle Details",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
+                        LaunchVehicleDetailedStatistics(rocketConfig = rocketConfig)
+                    }
+
+                    // Landing Details Card
+                    run {
+                        val landingStages = launch.rocket?.launcherStage ?: emptyList()
+                        if (landingStages.any { it.landing != null }) {
+                            Text(
+                                text = "Landing Details",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            LandingDetailsCard(launcherStages = landingStages)
+                        }
+                    }
+
+                    // Agency Statistics
+                    launch.launchServiceProvider.let { agency ->
+                        Text(
+                            text = "Launch Service Provider Statistics",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        AgencyLaunchStatistics(agency = agency)
+                    }
+                }
+            }
+        } else {
+            // Single column layout for small screens (existing layout)
+            Column {
+                // 1. Combined Launch Overview Card (always full width)
+                CombinedLaunchOverviewCard(launch = launch)
+                Spacer(Modifier.height(16.dp))
+
+                // 2. Quick Stats Grid (always full width)
+                QuickStatsGrid(launch = launch)
+                Spacer(Modifier.height(16.dp))
+
+                SmartBannerAd(
+                    modifier = Modifier.fillMaxWidth(),
+                    adSize = AdSize.MEDIUM_RECTANGLE,
+                    showRemoveAdsButton = true,
+                    onRemoveAdsClick = onNavigateToSettings
                 )
                 Spacer(Modifier.height(16.dp))
-                LandingDetailsCard(launcherStages = landingStages)
-                Spacer(Modifier.height(16.dp))
-            }
-        }
 
-        // 9. Agency Card
-        launch.launchServiceProvider.let { agency ->
-            Text(
-                text = "Launch Service Provider",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(16.dp))
-            AgencyDetailsCard(agency = agency)
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = "Launch Service Provider Statistics",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(16.dp))
-            AgencyLaunchStatistics(agency = agency)
+                // 3. Video Player Card - positioned above timeline
+                if (videoPlayerState.availableVideos.isNotEmpty()) {
+                    val videoTitle = launch.net?.let { net ->
+                        val now = kotlinx.datetime.Clock.System.now()
+                        if (net > now) "Watch Live" else "Watch Replay"
+                    } ?: "Watch Launch"
+
+                    Text(
+                        text = videoTitle,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    VideoPlayerCard(
+                        videoPlayerState = videoPlayerState,
+                        launchName = launch.mission?.name ?: "Space Launch",
+                        onSetPlayerVisible = onSetPlayerVisible,
+                        onNavigateToFullscreen = onNavigateToFullscreen,
+                        onVideoSelected = onVideoSelected
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                // 4. Timeline Card
+                if (launch.timeline.isNotEmpty()) {
+                    Text(
+                        text = "Timeline",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    TimelineCard(timeline = launch.timeline)
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                // 5. Mission Details Card
+                launch.mission?.let { mission ->
+                    Text(
+                        text = "Mission Details",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    MissionDetailsCard(mission = mission, launch = launch)
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                // 6. Launch Vehicle Details Card
+                launch.rocket?.configuration?.let { rocketConfig ->
+                    Text(
+                        text = "Launch Vehicle Details",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
+                    Spacer(Modifier.height(16.dp))
+                    LaunchVehicleDetailedStatistics(rocketConfig = rocketConfig)
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                // 7. Spacecraft Details Card
+                if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
+                    Text(
+                        text = "Spacecraft Details",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    SpacecraftDetailsCard(
+                        spacecraftStages = launch.rocket?.spacecraftStage ?: emptyList()
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                // 8. Landing Details Card
+                run {
+                    val landingStages = launch.rocket?.launcherStage ?: emptyList()
+                    if (landingStages.any { it.landing != null }) {
+                        Text(
+                            text = "Landing Details",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        LandingDetailsCard(launcherStages = landingStages)
+                        Spacer(Modifier.height(16.dp))
+                    }
+                }
+
+                // 9. Agency Card
+                launch.launchServiceProvider.let { agency ->
+                    Text(
+                        text = "Launch Service Provider",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    AgencyDetailsCard(agency = agency)
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = "Launch Service Provider Statistics",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    AgencyLaunchStatistics(agency = agency)
+                }
+            }
         }
 
         // Bottom spacing
@@ -1249,6 +1393,9 @@ private fun LiveBadge() {
 
 @Composable
 private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
+    val sharingService = koinInject<LaunchSharingService>()
+    val coroutineScope = rememberCoroutineScope()
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -1462,17 +1609,41 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                 ) {
                     rocketConfig.infoUrl?.let { url ->
                         Button(
-                            onClick = { /* TODO: Open info URL */ },
+                            onClick = {
+                                coroutineScope.launch {
+                                    sharingService.shareUrl(url)
+                                }
+                            },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-                        ) { Text("INFO") }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = "Information",
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Additional Information")
+                        }
                     }
                     rocketConfig.wikiUrl?.let { url ->
                         Button(
-                            onClick = { /* TODO: Open wiki URL */ },
+                            onClick = {
+                                coroutineScope.launch {
+                                    sharingService.shareUrl(url)
+                                }
+                            },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-                        ) { Text("WIKI") }
+                        ) {
+                            Icon(
+                                imageVector = FontAwesomeIcons.Brands.WikipediaW,
+                                contentDescription = "Wikipedia",
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Wikipedia")
+                        }
                     }
                 }
             }
@@ -2197,6 +2368,9 @@ private fun LandingStageLinearContent(stage: FirstStageNormal) {
 
 @Composable
 private fun AgencyDetailsCard(agency: AgencyDetailed) {
+    val sharingService = koinInject<LaunchSharingService>()
+    val coroutineScope = rememberCoroutineScope()
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -2269,7 +2443,7 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
             }
             if (infoTiles.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    infoTiles.chunked(2).forEach { row ->
+                    infoTiles.chunked(3).forEach { row ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             row.forEach { (icon, label, value) ->
                                 InfoTile(
@@ -2294,12 +2468,16 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(vertical = 8.dp, horizontal = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 agency.infoUrl?.let { infoUrl ->
                     Button(
-                        onClick = { /* TODO: Open info URL */ },
+                        onClick = {
+                            coroutineScope.launch {
+                                sharingService.shareUrl(infoUrl)
+                            }
+                        },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary
@@ -2311,7 +2489,11 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
 
                 agency.wikiUrl?.let { wikiUrl ->
                     Button(
-                        onClick = { /* TODO: Open wiki URL */ },
+                        onClick = {
+                            coroutineScope.launch {
+                                sharingService.shareUrl(wikiUrl)
+                            }
+                        },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary
@@ -2451,7 +2633,7 @@ private fun StatusChip(text: String, color: Color) {
 @Composable
 private fun CountryInfoRow(countries: List<Country>) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Header row with icon and label
@@ -2865,7 +3047,7 @@ private fun LaunchDetailLoadingContent() {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight - 28.dp))
+        Spacer(Modifier.height(TitleHeight))
 
         // 1. Combined Launch Overview Card shimmer
         LoadingCard(height = 200.dp)
@@ -2934,25 +3116,19 @@ private fun LoadingCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .shimmer()
             .height(height),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-            )
-        }
+        )
     }
 }
 

@@ -52,6 +52,16 @@ val LocalPreloadedMediumRectangleAd =
     compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
 
 /**
+ * CompositionLocal to provide dedicated navigation banner ad that doesn't conflict with content ads
+ */
+val LocalPreloadedNavigationBannerAd =
+    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+val LocalPreloadedNavigationLargeBannerAd =
+    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+val LocalPreloadedNavigationLeaderboardAd =
+    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+
+/**
  * CompositionLocal to provide preloaded tablet-specific ads throughout the app
  */
 val LocalPreloadedLeaderboardAd =
@@ -112,6 +122,23 @@ fun SpaceLaunchNowApp(
         activity = contextFactory.getActivity(),
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.MEDIUM_RECTANGLE
+    )
+
+    // 🧭 DEDICATED NAVIGATION ADS: Separate instances to avoid conflicts with content ads
+    val preloadedNavigationBannerAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.BANNER  // Standard banner for navigation (320x50)
+    )
+    val preloadedNavigationLargeBannerAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.LARGE_BANNER  // Large banner for navigation (320x100)
+    )
+    val preloadedNavigationLeaderboardAd by rememberBannerAd(
+        activity = contextFactory.getActivity(),
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        adSize = AdSize.LEADERBOARD  // Leaderboard for navigation (728x90)
     )
 
     // 📱 TABLET-SPECIFIC ADS: Wider ads for tablets
@@ -306,6 +333,9 @@ fun SpaceLaunchNowApp(
         LocalPreloadedBannerAd provides preloadedBannerAd,
         LocalPreloadedLargeBannerAd provides preloadedLargeBannerAd,
         LocalPreloadedMediumRectangleAd provides preloadedMediumRectangleAd,
+        LocalPreloadedNavigationBannerAd provides preloadedNavigationBannerAd,
+        LocalPreloadedNavigationLargeBannerAd provides preloadedNavigationLargeBannerAd,
+        LocalPreloadedNavigationLeaderboardAd provides preloadedNavigationLeaderboardAd,
         LocalPreloadedLeaderboardAd provides preloadedLeaderboardAd,
         LocalPreloadedFullBannerAd provides preloadedFullBannerAd,
         LocalPreloadedFluidAd provides preloadedFluidAd,
