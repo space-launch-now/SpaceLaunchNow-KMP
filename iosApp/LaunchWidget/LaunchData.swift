@@ -1,5 +1,6 @@
 import Foundation
 import WidgetKit
+import SwiftUI
 import ComposeApp
 
 // MARK: - Launch Data Models
@@ -163,10 +164,11 @@ struct LaunchProvider: TimelineProvider {
             // Check if user has widget access (premium entitlement)
             print("🚀 Widget: Checking widget access...")
             let hasAccess = try await helper.hasWidgetAccess()
-            print("🚀 Widget: Widget access: \(hasAccess)")
+            let hasAccessBool = hasAccess.boolValue // Convert KotlinBoolean to Bool
+            print("🚀 Widget: Widget access: \(hasAccessBool)")
             
             // If no access, return locked entry
-            if !hasAccess {
+            if !hasAccessBool {
                 print("🚀 Widget: User does not have widget access - showing paywall")
                 return LaunchEntry(
                     date: Date(),
@@ -201,7 +203,7 @@ struct LaunchProvider: TimelineProvider {
             print("🚀 Widget: Successfully got PaginatedLaunchNormalList with \(paginatedList.results.count) launches")
             return processPaginatedList(
                 paginatedList,
-                hasAccess: hasAccess,
+                hasAccess: hasAccessBool,
                 backgroundAlpha: Double(backgroundAlpha),
                 cornerRadius: Double(cornerRadius)
             )

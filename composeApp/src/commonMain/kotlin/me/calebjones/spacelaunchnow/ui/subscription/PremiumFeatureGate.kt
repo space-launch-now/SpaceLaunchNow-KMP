@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -371,16 +372,32 @@ fun rememberIsPremium(): State<Boolean> {
 
 /**
  * Helper to check if user has a specific feature
+ * Checks BOTH subscription state AND temporary access from rewarded ads
  */
 @Composable
 fun rememberHasFeature(feature: PremiumFeature): State<Boolean> {
     val subscriptionRepo = koinInject<SubscriptionRepository>()
     val subscriptionState by subscriptionRepo.state.collectAsState()
-    return remember(subscriptionState, feature) {
-        derivedStateOf {
-            subscriptionState.hasFeature(feature)
-        }
+    val temporaryAccess = koinInject<me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess>()
+    
+    // Observe the access change trigger to recompose when temporary access changes
+    val accessChangeTrigger by temporaryAccess.accessChangeTrigger.collectAsState()
+    
+    // Create a state that combines both subscription and temporary access
+    // Include accessChangeTrigger in the key to trigger recomposition when it changes
+    val hasAccess = produceState(initialValue = false, subscriptionState, feature, accessChangeTrigger) {
+        // Check subscription state
+        val hasSubscription = subscriptionState.hasFeature(feature)
+        
+        // Check temporary access
+        val hasTemporary = temporaryAccess.hasTemporaryAccess(feature)
+        
+        value = hasSubscription || hasTemporary
+        
+        println("🔍 rememberHasFeature(${feature.name}): subscription=$hasSubscription, temporary=$hasTemporary, result=${value}")
     }
+    
+    return hasAccess
 }
 
 // Extension: Get user-friendly description for features

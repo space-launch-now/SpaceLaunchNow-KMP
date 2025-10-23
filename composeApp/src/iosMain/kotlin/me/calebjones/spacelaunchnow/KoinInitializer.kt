@@ -57,14 +57,21 @@ class KoinHelper : KoinComponent {
     /**
      * Check if the user has access to the ADVANCED_WIDGETS premium feature
      * This is used by iOS widgets to gate content behind subscription
+     * 
+     * TEMPORARY: Returns true to allow widget development
+     * TODO: Re-enable RevenueCat check once framework linking is fixed
      */
     suspend fun hasWidgetAccess(): Boolean {
+        return true // Temporarily bypass RevenueCat to avoid linking issues in widget extension
+        
+        /* Original implementation - re-enable after adding RevenueCat frameworks to widget target
         return try {
             subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
         } catch (e: Exception) {
             println("KoinHelper: Failed to check widget access: ${e.message}")
             false // Default to locked if check fails
         }
+        */
     }
     
     /**
@@ -73,7 +80,7 @@ class KoinHelper : KoinComponent {
      */
     suspend fun getWidgetBackgroundAlpha(): Float {
         return try {
-            widgetPreferences.widgetBackgroundAlphaFlow.first()
+            widgetPreferences.widgetBackgroundAlphaFlow.first().toFloat()
         } catch (e: Exception) {
             println("KoinHelper: Failed to get widget background alpha: ${e.message}")
             0.75f // Default value
@@ -86,7 +93,7 @@ class KoinHelper : KoinComponent {
      */
     suspend fun getWidgetCornerRadius(): Float {
         return try {
-            widgetPreferences.widgetCornerRadiusFlow.first()
+            widgetPreferences.widgetCornerRadiusFlow.first().toFloat()
         } catch (e: Exception) {
             println("KoinHelper: Failed to get widget corner radius: ${e.message}")
             16f // Default value

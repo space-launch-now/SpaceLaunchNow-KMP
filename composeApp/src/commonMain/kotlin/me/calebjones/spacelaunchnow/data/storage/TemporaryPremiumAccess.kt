@@ -39,7 +39,9 @@ class TemporaryPremiumAccess(
     val accessChangeTrigger: StateFlow<Long> = _accessChangeTrigger.asStateFlow()
 
     private fun notifyAccessChanged() {
-        _accessChangeTrigger.value = Clock.System.now().toEpochMilliseconds()
+        val newValue = Clock.System.now().toEpochMilliseconds()
+        _accessChangeTrigger.value = newValue
+        println("🔔 TemporaryPremiumAccess: notifyAccessChanged() -> trigger = $newValue")
     }
 
     /**
@@ -48,7 +50,9 @@ class TemporaryPremiumAccess(
     suspend fun hasTemporaryAccess(feature: PremiumFeature): Boolean {
         val now = Clock.System.now()
         val expiresAt = getExpirationTime(feature)
-        return expiresAt?.let { now < it } ?: false
+        val hasAccess = expiresAt?.let { now < it } ?: false
+        println("🔍 TemporaryPremiumAccess.hasTemporaryAccess($feature): now=$now, expiresAt=$expiresAt, hasAccess=$hasAccess")
+        return hasAccess
     }
 
     /**
@@ -57,26 +61,35 @@ class TemporaryPremiumAccess(
     suspend fun grantTemporaryAccess(feature: PremiumFeature) {
         val expiresAt = Clock.System.now().plus(ACCESS_DURATION)
         
+        println("🎁 TemporaryPremiumAccess.grantTemporaryAccess($feature): granting until $expiresAt")
+        
         dataStore.edit { preferences ->
             when (feature) {
                 PremiumFeature.CUSTOM_THEMES -> {
                     preferences[TEMP_CUSTOM_THEMES_EXPIRES_AT] = expiresAt.toEpochMilliseconds()
+                    println("✅ Saved TEMP_CUSTOM_THEMES_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}")
                 }
                 PremiumFeature.ADVANCED_WIDGETS -> {
                     preferences[TEMP_ADVANCED_WIDGETS_EXPIRES_AT] = expiresAt.toEpochMilliseconds()
+                    println("✅ Saved TEMP_ADVANCED_WIDGETS_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}")
                 }
                 PremiumFeature.WIDGETS_CUSTOMIZATION -> {
                     preferences[TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT] = expiresAt.toEpochMilliseconds()
+                    println("✅ Saved TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}")
                 }
                 else -> {
                     // Only specific features are supported for temporary access
-                    println("TemporaryPremiumAccess: Feature $feature not supported for temporary access")
+                    println("❌ TemporaryPremiumAccess: Feature $feature not supported for temporary access")
                 }
             }
         }
         
-        println("TemporaryPremiumAccess: Granted 24h access to $feature until $expiresAt")
+        println("✅ TemporaryPremiumAccess: Granted 24h access to $feature until $expiresAt")
         notifyAccessChanged()  // Notify listeners that access has changed
+        
+        // Verify it was saved
+        val savedExpiresAt = getExpirationTime(feature)
+        println("🔍 TemporaryPremiumAccess: Verification read for $feature = $savedExpiresAt")
     }
 
     /**
@@ -91,6 +104,7 @@ class TemporaryPremiumAccess(
             else -> null
         }
         
+        println("📖 TemporaryPremiumAccess.getExpirationTime($feature): expiresAtMs=$expiresAtMs")
         return expiresAtMs?.let { Instant.fromEpochMilliseconds(it) }
     }
 

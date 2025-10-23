@@ -46,8 +46,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.isDesktop
-import me.calebjones.spacelaunchnow.isLandscape
-import me.calebjones.spacelaunchnow.isTablet
+import me.calebjones.spacelaunchnow.isLargeScreen
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
@@ -88,7 +87,7 @@ fun ResponsiveHomeContent(
         null
     }
 
-    val isTabletOrDesktop = (isTablet() && isLandscape()) || isDesktop()
+    val isTabletOrDesktop = isLargeScreen()
 
     if (isTabletOrDesktop) {
         // Tablet landscape layout - full width scrollable content

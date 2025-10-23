@@ -3,7 +3,7 @@ package me.calebjones.spacelaunchnow.platform
 import platform.Foundation.NSBundle
 import platform.UIKit.UIApplication
 
-actual class ContextFactory actual constructor(context: Any?) {
+actual class ContextFactory {
     // Bundle allows you to lookup resources
     actual fun getContext(): Any = NSBundle
     // UIApplication allows you to access all app info

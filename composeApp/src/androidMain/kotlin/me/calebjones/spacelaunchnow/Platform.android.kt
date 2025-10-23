@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
 import android.os.Build
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -47,14 +48,6 @@ actual fun setOrientationSensorFromComposable() {
     val context = LocalContext.current
     context.findActivity()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
 }
-
-@SuppressLint("ConfigurationScreenWidthHeight")
-@Composable
-actual fun getScreenWidth() = LocalConfiguration.current.screenWidthDp.dp
-
-@SuppressLint("ConfigurationScreenWidthHeight")
-@Composable
-actual fun getScreenHeight() = LocalConfiguration.current.screenHeightDp.dp
 
 @Composable
 actual fun getOrientation() = LocalConfiguration.current.orientation

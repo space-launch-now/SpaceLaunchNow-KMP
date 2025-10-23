@@ -30,6 +30,8 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
+import me.calebjones.spacelaunchnow.platform.ContextFactory
+import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
@@ -75,6 +77,13 @@ val appModule = module {
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::LaunchCache)
+
+    // Global Ad Manager - Singleton managed by Koin
+    single {
+        GlobalAdManager(contextFactory = getOrNull<ContextFactory>()).also {
+            it.initializeAndPreload()
+        }
+    }
 
     // Notification dependencies
     singleOf(::PushMessaging)

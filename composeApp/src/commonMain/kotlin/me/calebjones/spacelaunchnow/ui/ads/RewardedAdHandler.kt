@@ -3,8 +3,12 @@ package me.calebjones.spacelaunchnow.ui.ads
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
+import app.lexilabs.basic.ads.composable.RewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
 import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
@@ -58,22 +62,18 @@ fun RewardedAdHandler(
 
     // Use the preloaded rewarded ad
     val rewardedAd = preloadedRewardedAd
+    
+    // Track if reward has been granted to avoid duplicate grants
+    var rewardGranted by remember { mutableStateOf(false) }
 
     // Handle ad state changes
     LaunchedEffect(rewardedAd.state, shouldShow) {
         when (rewardedAd.state) {
             AdState.READY -> {
                 if (shouldShow) {
-                    println("🎯 RewardedAd: Ad loaded successfully, showing now...")
-                    try {
-                        rewardedAd.show(onRewardEarned = {
-                            println("🎉 RewardedAd: User earned reward!")
-                            onRewardEarned?.invoke(1, "reward") // Default reward values
-                        })
-                    } catch (e: Exception) {
-                        println("❌ RewardedAd: Failed to show ad: ${e.message}")
-                        onAdFailed?.invoke("Failed to show: ${e.message}")
-                    }
+                    println("🎯 RewardedAd: Ad loaded successfully and ready to show")
+                    // Reset reward granted flag when showing new ad
+                    rewardGranted = false
                 }
             }
 
@@ -97,7 +97,12 @@ fun RewardedAdHandler(
 
             AdState.SHOWN -> {
                 println("✅ RewardedAd: Ad has finished showing")
-                // Reward is handled in the onRewardEarned callback passed to show()
+                // Grant reward when ad completes (SHOWN state)
+                if (!rewardGranted) {
+                    println("🎉 RewardedAd: User earned reward!")
+                    onRewardEarned?.invoke(1, "reward")
+                    rewardGranted = true
+                }
             }
 
             AdState.NONE -> {
@@ -108,6 +113,17 @@ fun RewardedAdHandler(
                 println("🔄 RewardedAd: State: ${rewardedAd.state}")
             }
         }
+    }
+
+    // Show the rewarded ad using the Composable pattern (required by basic-ads)
+    if (shouldShow && rewardedAd.state == AdState.READY) {
+        RewardedAd(
+            loadedAd = rewardedAd,
+            onRewardEarned = {
+                println("🎉 RewardedAd: User earned reward!")
+                onRewardEarned?.invoke(1, "reward") // Default reward values
+            }
+        )
     }
 }
 

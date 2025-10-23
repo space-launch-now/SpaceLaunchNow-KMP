@@ -158,6 +158,11 @@ private class StoreKitHelper : NSObject(), SKProductsRequestDelegateProtocol, SK
                 
                 val platformPurchase = skTransaction.toPlatformPurchase()
                 purchases.add(platformPurchase)
+                
+                // IMPORTANT: Finish the transaction to prevent infinite re-processing
+                // This is critical for legacy purchases that aren't in the current product catalog
+                println("IosBillingClient: Finishing transaction for ${skTransaction.payment.productIdentifier}")
+                SKPaymentQueue.defaultQueue().finishTransaction(skTransaction)
             }
         }
         

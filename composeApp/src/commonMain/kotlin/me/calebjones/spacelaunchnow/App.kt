@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow
 
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -9,6 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.BasicAds
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
@@ -81,9 +84,16 @@ val LocalPreloadedRewardedAd =
 
 @Composable
 fun isTabletOrDesktop(): Boolean {
-    val screenWidthDp = getScreenWidth()
-    val isLargeScreen = screenWidthDp >= 720.dp // Example threshold for tablets
-    println("Screen width: $screenWidthDp, isLargeScreen: $isLargeScreen")
+    // Use WindowSizeClass for proper adaptive layout detection
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
+    // Check if width is MEDIUM or EXPANDED (not COMPACT)
+    // COMPACT: < 600dp (phones in portrait)
+    // MEDIUM: 600-839dp (tablets, foldables, phones in landscape) 
+    // EXPANDED: >= 840dp (large tablets, desktops)
+    val isLargeScreen = windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT
+    
+    println("WindowSizeClass width: ${windowSizeClass.windowWidthSizeClass}, isLargeScreen: $isLargeScreen")
     return isLargeScreen || getPlatform().type.isDesktop
 }
 
@@ -106,68 +116,72 @@ fun SpaceLaunchNowApp(
     val revenueCatManager = koinInject<RevenueCatManager>()
     val pushMessaging = koinInject<PushMessaging>()
     val appPreferences = koinInject<AppPreferences>()
+    val globalAdManager = koinInject<GlobalAdManager>()
+
+    // Determine activity parameter based on platform (iOS needs null, Android needs activity)
+    val activityOrNull = if (getPlatform().type == PlatformType.IOS) null else contextFactory.getActivity()
 
     // 🚀 PRELOAD BANNER ADS: Following KMP-Google-AdMob example pattern
     // These ads will be preloaded and kept alive throughout the app lifecycle for instant rendering
     val preloadedBannerAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.BANNER
     )
     val preloadedLargeBannerAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.LARGE_BANNER
     )
     val preloadedMediumRectangleAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.MEDIUM_RECTANGLE
     )
 
     // 🧭 DEDICATED NAVIGATION ADS: Separate instances to avoid conflicts with content ads
     val preloadedNavigationBannerAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.BANNER  // Standard banner for navigation (320x50)
     )
     val preloadedNavigationLargeBannerAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.LARGE_BANNER  // Large banner for navigation (320x100)
     )
     val preloadedNavigationLeaderboardAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.LEADERBOARD  // Leaderboard for navigation (728x90)
     )
 
     // 📱 TABLET-SPECIFIC ADS: Wider ads for tablets
     val preloadedLeaderboardAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.LEADERBOARD  // 728x90 for tablets
     )
     val preloadedFullBannerAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.FULL_BANNER  // 468x60 for medium screens
     )
     
     // 🌊 FLUID ADS: Adaptive/responsive ads that adjust to content
     val preloadedFluidAd by rememberBannerAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.FLUID  // Dynamic size that adapts to content
     )
 
     // 🚀 PRELOAD INTERSTITIAL & REWARDED ADS: For instant showing when needed
     val preloadedInterstitialAd by rememberInterstitialAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.INTERSTITIAL)
     )
     val preloadedRewardedAd by rememberRewardedAd(
-        activity = contextFactory.getActivity(),
+        activity = activityOrNull,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.REWARDED)
     )
 
@@ -227,11 +241,22 @@ fun SpaceLaunchNowApp(
         println("=== APP START DEBUG INFO ===")
 
         try {
-            // Initialize Basic-Ads with ContextFactory
-            val activity = contextFactory.getActivity()
-            println("🎯 Initializing Basic-Ads with activity: $activity")
-
-            BasicAds.initialize(activity)
+            // Initialize Basic-Ads (iOS doesn't require context, only Android does)
+            when (getPlatform().type) {
+                PlatformType.ANDROID -> {
+                    val activity = contextFactory.getActivity()
+                    println("🎯 Initializing Basic-Ads on Android with activity: $activity")
+                    BasicAds.initialize(activity)
+                }
+                PlatformType.IOS -> {
+                    println("🎯 Initializing Basic-Ads on iOS (no context required)")
+                    BasicAds.initialize(null)
+                }
+                PlatformType.DESKTOP -> {
+                    println("🎯 Basic-Ads not supported on Desktop")
+                    return@LaunchedEffect
+                }
+            }
 
             // Configure for better ad loading (especially in development)
             val testDeviceIds = if (BuildConfig.IS_DEBUG) {
@@ -257,14 +282,8 @@ fun SpaceLaunchNowApp(
             e.printStackTrace()
         }
 
-        // Initialize GlobalAdManager for optimized ad loading
-        try {
-            val globalAdManager = GlobalAdManager.getInstance(contextFactory)
-            println("🚀 GlobalAdManager initialized - optimizing ad performance...")
-        } catch (e: Exception) {
-            println("❌ Failed to initialize GlobalAdManager: ${e.message}")
-            e.printStackTrace()
-        }
+        // Log GlobalAdManager initialization (already injected via Koin at composable level)
+        println("🚀 GlobalAdManager injected via Koin - optimizing ad performance...")
 
         try {
             // Get and print FCM token
