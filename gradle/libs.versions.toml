@@ -21,7 +21,7 @@ coilCompose = "3.3.0"
 compose-plugin = "1.9.0"
 compose = "2.2.20"
 compose-material3 = "1.4.0"
-compose-material3-adaptive = "1.1.0" # Or the latest version
+compose-material3-adaptive = "1.1.2"
 compose-hot-reload = "1.0.0-beta08"
 coreSplashscreen = "1.0.1"
 insetsx = "0.1.0-alpha10"
@@ -125,7 +125,7 @@ ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.r
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 
 compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "compose-material3" }
-compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "compose-material3-adaptive" }
+compose-material3-adaptive = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive", version.ref = "compose-material3-adaptive" }
 androidx-palette = { group = "androidx.palette", name = "palette", version.ref = "androidx-palette" }
 
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }

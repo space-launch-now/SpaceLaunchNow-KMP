@@ -17,19 +17,6 @@ struct NextUpWidget: Widget {
     }
 }
 
-// Helper extension to apply custom background with opacity
-extension View {
-    func widgetBackground(backgroundView: some View) -> some View {
-        if #available(iOSApplicationExtension 17.0, *) {
-            return containerBackground(for: .widget) {
-                backgroundView
-            }
-        } else {
-            return background(backgroundView)
-        }
-    }
-}
-
 // MARK: - Next Up Widget View
 struct NextUpWidgetView: View {
     var entry: LaunchEntry
@@ -421,6 +408,7 @@ struct NextUpWidgetView: View {
 }
 
 // MARK: - Preview
+@available(iOS 17.0, *)
 #Preview("NextUpWidget", as: .systemSmall) {
     NextUpWidget()
 } timeline: {

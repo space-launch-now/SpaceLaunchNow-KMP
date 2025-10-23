@@ -3,15 +3,19 @@ package me.calebjones.spacelaunchnow.ui.ads
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
-import me.calebjones.spacelaunchnow.BuildConfig
+import app.lexilabs.basic.ads.composable.InterstitialAd
+import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.LocalContextFactory
 import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
+import org.koin.compose.koinInject
 
 /**
  * Interstitial ad handler that shows ads every 4th detail view visit.
@@ -52,16 +56,19 @@ fun InterstitialAdHandler(
         return
     }
 
-    // Get GlobalAdManager instance
-    val globalAdManager = remember { GlobalAdManager.getInstanceOrNull() }
+    // Get GlobalAdManager instance from Koin
+    val globalAdManager: GlobalAdManager = koinInject()
 
     // Check if we should show an interstitial ad
     val shouldShowAd = remember {
-        globalAdManager?.shouldShowInterstitialOnDetailView() ?: false
+        globalAdManager.shouldShowInterstitialOnDetailView()
     }
+    
+    // Track if ad has already been shown in this composition to prevent repeats
+    var adShownThisSession by remember { mutableStateOf(false) }
 
     // Show debug notification in debug builds
-    if (BuildConfig.IS_DEBUG && globalAdManager != null) {
+    if (BuildConfig.IS_DEBUG) {
         LaunchedEffect(Unit) {
             val currentCount = globalAdManager.getDetailViewVisitCount()
             val timeSinceLastMinutes = globalAdManager.getMinutesSinceLastInterstitial()
@@ -92,6 +99,11 @@ fun InterstitialAdHandler(
         println("⏭️ InterstitialAdHandler: Not time to show ad yet.")
         return
     }
+    
+    if (adShownThisSession) {
+        println("⏭️ InterstitialAdHandler: Ad already shown in this session.")
+        return
+    }
 
     // Use the preloaded interstitial ad
     val interstitialAd = preloadedInterstitialAd
@@ -100,13 +112,7 @@ fun InterstitialAdHandler(
     LaunchedEffect(interstitialAd.state) {
         when (interstitialAd.state) {
             AdState.READY -> {
-                println("🎯 InterstitialAd: Ad loaded successfully, showing now...")
-                try {
-                    interstitialAd.show()
-                } catch (e: Exception) {
-                    println("❌ InterstitialAd: Failed to show ad: ${e.message}")
-                    onAdFailed?.invoke("Failed to show: ${e.message}")
-                }
+                println("🎯 InterstitialAd: Ad loaded successfully and ready to show")
             }
 
             AdState.SHOWING -> {
@@ -116,11 +122,13 @@ fun InterstitialAdHandler(
 
             AdState.DISMISSED -> {
                 println("🎯 InterstitialAd: Ad dismissed by user")
+                adShownThisSession = true // Mark as shown
             }
 
             AdState.FAILING -> {
                 println("❌ InterstitialAd: Ad failed to load")
                 onAdFailed?.invoke("Failed to load")
+                adShownThisSession = true // Don't retry in this session
             }
 
             AdState.LOADING -> {
@@ -129,6 +137,7 @@ fun InterstitialAdHandler(
 
             AdState.SHOWN -> {
                 println("✅ InterstitialAd: Ad has finished showing")
+                adShownThisSession = true // Mark as shown
             }
 
             AdState.NONE -> {
@@ -139,6 +148,12 @@ fun InterstitialAdHandler(
                 println("🔄 InterstitialAd: State: ${interstitialAd.state}")
             }
         }
+    }
+
+    // Show the interstitial ad using the Composable pattern (required by basic-ads)
+    // Only show if ad hasn't been shown yet in this session
+    if (!adShownThisSession && interstitialAd.state == AdState.READY) {
+        InterstitialAd(loadedAd = interstitialAd)
     }
 }
 

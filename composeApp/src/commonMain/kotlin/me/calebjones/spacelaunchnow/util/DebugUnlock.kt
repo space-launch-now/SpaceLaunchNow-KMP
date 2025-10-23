@@ -35,7 +35,11 @@ object DebugUnlock {
         val bytes = password.encodeToByteArray()
         val digest = hasher.hash(bytes)
 
-        return digest.joinToString("") { "%02x".format(it) }
+        // KMP-compatible hex string conversion
+        return digest.joinToString("") { byte ->
+            val hex = (byte.toInt() and 0xFF).toString(16)
+            if (hex.length == 1) "0$hex" else hex
+        }
     }
 }
 

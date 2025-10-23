@@ -75,19 +75,17 @@ class GlobalAdManager(
      * Initialize the ad manager and prepare optimizations
      */
     fun initializeAndPreload() {
-        if (contextFactory == null) {
-            println("🚫 GlobalAdManager: No context factory, skipping initialization")
+        // Note: iOS doesn't require a context factory, only Android does
+        if (contextFactory == null && getPlatform().type == PlatformType.ANDROID) {
+            println("🚫 GlobalAdManager: No context factory on Android, skipping initialization")
             return
         }
 
-        println("🚀 GlobalAdManager: Initializing ad optimization system...")
+        println("🚀 GlobalAdManager: Initializing ad optimization system on ${getPlatform().type}...")
 
         scope.launch {
             // Initialize ad configurations for optimal performance
             setupAdConfigurations()
-
-            // Small delay to simulate optimization setup
-            delay(200)
 
             isInitialized = true
             isOptimizationReady = true
@@ -357,19 +355,5 @@ class GlobalAdManager(
                 else -> AdUnitId.BANNER_DEFAULT // Fallback for Desktop/other platforms (uses test ID)
             }
         }
-
-        @Volatile
-        private var INSTANCE: GlobalAdManager? = null
-
-        fun getInstance(contextFactory: ContextFactory?): GlobalAdManager {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: GlobalAdManager(contextFactory).also {
-                    INSTANCE = it
-                    it.initializeAndPreload()
-                }
-            }
-        }
-
-        fun getInstanceOrNull(): GlobalAdManager? = INSTANCE
     }
 }

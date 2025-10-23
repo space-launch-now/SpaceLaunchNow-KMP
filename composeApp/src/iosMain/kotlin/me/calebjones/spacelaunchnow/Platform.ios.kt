@@ -1,8 +1,6 @@
 package me.calebjones.spacelaunchnow
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import platform.UIKit.UIDevice
 
 class IOSPlatform : Platform {
@@ -39,18 +37,6 @@ actual fun setOrientationPortraitFromComposable() {
 @Composable
 actual fun setOrientationSensorFromComposable() {
     // iOS orientation handling is done through MediaPlayerHost or UIKit
-}
-
-@Composable
-actual fun getScreenWidth(): Dp {
-    // TODO: Implement platform-specific screen width for iOS
-    return 375.dp // Default iPhone width as a stub
-}
-
-@Composable
-actual fun getScreenHeight(): Dp {
-    // TODO: Implement platform-specific screen height for iOS
-    return 667.dp // Default iPhone height as a stub
 }
 
 @Composable

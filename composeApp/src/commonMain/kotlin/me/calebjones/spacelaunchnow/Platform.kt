@@ -1,8 +1,11 @@
 package me.calebjones.spacelaunchnow
 
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 
 /**
  * Platform types supported by the application
@@ -26,12 +29,6 @@ interface Platform {
 expect fun getPlatform(): Platform
 
 @Composable
-expect fun getScreenWidth(): Dp
-
-@Composable
-expect fun getScreenHeight(): Dp
-
-@Composable
 expect fun getOrientation(): Int
 
 // Orientation management
@@ -48,25 +45,6 @@ expect fun setOrientationPortraitFromComposable()
 
 @Composable
 expect fun setOrientationSensorFromComposable()
-
-@Composable
-fun isLandscape(): Boolean {
-    return getScreenWidth() > getScreenHeight()
-}
-
-@Composable
-fun isTablet(): Boolean {
-    val screenWidthDp = getScreenWidth()
-    val screenHeightDp = getScreenHeight()
-    val smallestWidth = if (screenWidthDp < screenHeightDp) screenWidthDp else screenHeightDp
-    // Use 720dp as the standard tablet threshold
-    return smallestWidth >= 720.dp
-}
-
-@Composable
-fun isPhone(): Boolean {
-    return !isTablet() && getPlatform().type.isMobile
-}
 
 @Composable
 fun isDesktop(): Boolean {
@@ -90,5 +68,13 @@ fun isMobile(): Boolean {
 
 @Composable
 fun isLargeScreen(): Boolean {
-    return (isTablet() && isLandscape()) || isDesktop()
+    val windowSize = getWindowSize()
+    val width = windowSize.windowWidthSizeClass
+
+    return width == WindowWidthSizeClass.MEDIUM || width == WindowWidthSizeClass.EXPANDED
+}
+
+@Composable
+fun getWindowSize(): WindowSizeClass {
+    return currentWindowAdaptiveInfo().windowSizeClass
 }

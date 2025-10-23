@@ -168,6 +168,9 @@ kotlin {
 
                 implementation(compose.material3)
                 implementation(compose.materialIconsExtended)
+                
+                // Adaptive layouts for responsive UI
+                implementation(libs.compose.material3.adaptive)
 
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)

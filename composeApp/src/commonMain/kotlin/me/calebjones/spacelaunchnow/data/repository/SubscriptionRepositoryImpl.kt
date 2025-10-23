@@ -248,21 +248,8 @@ class SubscriptionRepositoryImpl(
         println("  Debug build: ${BuildConfig.IS_DEBUG}")
         println("  Debug simulation state: ${debugSimulationState?.subscriptionType}")
 
-        // Priority 1: Debug simulation state (debug builds only)
-        if (debugSimulationState != null) {
-            val debugAccess = debugSimulationState!!.hasFeature(feature)
-            println("  ✅ Debug simulation active - ${feature.name}: $debugAccess")
-
-            // Update widget preferences to match debug simulation
-            if (feature == PremiumFeature.ADVANCED_WIDGETS) {
-                widgetPreferences.updateWidgetAccessGranted(debugAccess)
-                updateWidgetsAfterAccessChange(if (debugAccess) "debug access granted" else "debug access revoked")
-            }
-
-            return debugAccess
-        }
-
-        // Priority 2: Temporary premium access from rewarded ads
+        // Priority 1: Temporary premium access from rewarded ads (ALWAYS CHECK FIRST!)
+        // This allows users to get temporary access even in debug/free mode
         val hasTemporaryAccess = temporaryPremiumAccess.hasTemporaryAccess(feature)
         if (hasTemporaryAccess) {
             println("  🎁 Temporary access active for ${feature.name}")
@@ -274,6 +261,20 @@ class SubscriptionRepositoryImpl(
             }
             
             return true
+        }
+
+        // Priority 2: Debug simulation state (debug builds only)
+        if (debugSimulationState != null) {
+            val debugAccess = debugSimulationState!!.hasFeature(feature)
+            println("  ✅ Debug simulation active - ${feature.name}: $debugAccess")
+
+            // Update widget preferences to match debug simulation
+            if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+                widgetPreferences.updateWidgetAccessGranted(debugAccess)
+                updateWidgetsAfterAccessChange(if (debugAccess) "debug access granted" else "debug access revoked")
+            }
+
+            return debugAccess
         }
 
         // Priority 3: RevenueCat entitlements (live verification)

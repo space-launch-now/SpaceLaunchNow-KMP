@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +23,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowWidthSizeClass
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.BannerAdHandler
@@ -40,8 +42,6 @@ import me.calebjones.spacelaunchnow.LocalPreloadedNavigationLeaderboardAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getOrientation
 import me.calebjones.spacelaunchnow.getPlatform
-import me.calebjones.spacelaunchnow.getScreenWidth
-import me.calebjones.spacelaunchnow.isTablet
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
 /**
@@ -107,6 +107,8 @@ fun SmartBannerAd(
 
     // Determine the actual ad size to use - placementType overrides adSize
     val actualAdSize = placementType?.let { getAdSizeForPlacement(it) } ?: adSize
+    
+    println("🎯 SmartBannerAd: Using AdSize ${actualAdSize.width}x${actualAdSize.height} for placement $placementType")
 
     // Don't show ads if:
     // 1. User has ad-free premium feature
@@ -124,26 +126,29 @@ fun SmartBannerAd(
         return
     }
 
-    // Select the appropriate preloaded ad based on actual ad size and placement type
-    val bannerAd = if (placementType == AdPlacementType.NAVIGATION) {
-        // Use dedicated navigation ads to avoid conflicts with content ads
-        when (actualAdSize) {
-            AdSize.BANNER -> preloadedNavigationBannerAd
-            AdSize.LARGE_BANNER -> preloadedNavigationLargeBannerAd
-            AdSize.LEADERBOARD -> preloadedNavigationLeaderboardAd
-            AdSize.FULL_BANNER -> preloadedNavigationLargeBannerAd // Fallback to large banner
-            else -> preloadedNavigationBannerAd // Default to standard navigation banner
+    // Map AdSize dimensions directly to the appropriate preloaded ad
+    // This avoids iOS issues with AdSize constant comparisons
+    val bannerAd = when {
+        // NAVIGATION placement uses dedicated navigation ads
+        placementType == AdPlacementType.NAVIGATION -> {
+            when {
+                actualAdSize.width == 320 && actualAdSize.height == 50 -> preloadedNavigationBannerAd // BANNER
+                actualAdSize.width == 468 && actualAdSize.height == 60 -> preloadedNavigationLargeBannerAd // FULL_BANNER
+                actualAdSize.width == 728 && actualAdSize.height == 90 -> preloadedNavigationLeaderboardAd // LEADERBOARD
+                else -> preloadedNavigationBannerAd // Default fallback
+            }
         }
-    } else {
-        // Use regular ads for content areas
-        when (actualAdSize) {
-            AdSize.BANNER -> preloadedBannerAd
-            AdSize.LARGE_BANNER -> preloadedLargeBannerAd
-            AdSize.MEDIUM_RECTANGLE -> preloadedMediumRectangleAd
-            AdSize.LEADERBOARD -> preloadedLeaderboardAd
-            AdSize.FULL_BANNER -> preloadedFullBannerAd
-            AdSize.FLUID -> preloadedFluidAd
-            else -> preloadedBannerAd // Fallback to standard banner
+        // All other placements use regular content ads
+        else -> {
+            when {
+                actualAdSize.width == 320 && actualAdSize.height == 50 -> preloadedBannerAd // BANNER
+                actualAdSize.width == 320 && actualAdSize.height == 100 -> preloadedLargeBannerAd // LARGE_BANNER
+                actualAdSize.width == 300 && actualAdSize.height == 250 -> preloadedMediumRectangleAd // MEDIUM_RECTANGLE
+                actualAdSize.width == 468 && actualAdSize.height == 60 -> preloadedFullBannerAd // FULL_BANNER
+                actualAdSize.width == 728 && actualAdSize.height == 90 -> preloadedLeaderboardAd // LEADERBOARD
+                actualAdSize.height == -2 -> preloadedFluidAd // FLUID (WRAP_CONTENT)
+                else -> preloadedBannerAd // Default fallback
+            }
         }
     }
 
@@ -170,10 +175,12 @@ fun SmartBannerAd(
     // Debug logging for ad state
     println("🎯 SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType")
 
+    // IMPORTANT: Always render BannerAd Composable to trigger load on iOS
     // Show layout when ad is ready, showing, or loading
     when (availableAd.state) {
-        AdState.READY, AdState.SHOWING -> {
+        AdState.READY, AdState.SHOWING, AdState.LOADING -> {
             // Show the banner ad with optional remove ads button
+            // Note: We render even in LOADING state because iOS needs the Composable rendered to trigger load
             if (showCard) {
                 // Content area: wrapped in card
                 Column(
@@ -226,21 +233,10 @@ fun SmartBannerAd(
                     bannerAd = availableAd
                 )
             }
-        }
-
-        AdState.LOADING -> {
-            // Ad is loading, show a placeholder or try to reload
-            println("🔄 SmartBannerAd: Ad is loading for placement $placementType")
-            // For navigation ads, don't show placeholder to avoid unnecessary space
-            // Content will show when ad actually loads
-            if (!showCard && placementType != AdPlacementType.NAVIGATION) {
-                // Only show placeholder for non-navigation areas
-                Box(
-                    modifier = modifier
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .fillMaxWidth()
-                        .height(60.dp) // Standard banner height
-                )
+            
+            // Log loading state for debugging
+            if (availableAd.state == AdState.LOADING) {
+                println("🔄 SmartBannerAd: Ad is loading for placement $placementType - BannerAd Composable rendered to trigger load")
             }
         }
 
@@ -276,18 +272,9 @@ fun SmartBannerAdContent(
     onSizeChanged: ((Dp, Int) -> Unit)?,
     bannerAd: BannerAdHandler,
 ) {
-    println(
-        "SmartBannerAdContent: adSize = " + when (adSize) {
-            AdSize.BANNER -> "BANNER"
-            AdSize.LARGE_BANNER -> "LARGE_BANNER"
-            AdSize.MEDIUM_RECTANGLE -> "MEDIUM_RECTANGLE"
-            AdSize.FULL_BANNER -> "FULL_BANNER"
-            AdSize.LEADERBOARD -> "LEADERBOARD"
-            AdSize.WIDE_SKYSCRAPER -> "WIDE_SKYSCRAPER"
-            AdSize.FLUID -> "FLUID"
-            else -> "ADAPTIVE_OR_CUSTOM: $adSize"
-        }
-    )
+    // Log AdSize dimensions (can't rely on == comparison on iOS since AdSize constants aren't singletons)
+    println("SmartBannerAdContent: adSize dimensions = ${adSize.width}x${adSize.height}")
+    
     BoxWithConstraints {
         val availableWidthDp = maxWidth
         val availableHeightDp = maxHeight
@@ -302,30 +289,29 @@ fun SmartBannerAdContent(
                 tonalElevation = if (showRemoveAdsButton) 0.dp else 4.dp, // Only elevate if no card wrapper
                 shape = MaterialTheme.shapes.small
             ) {
+                // Use AdSize height directly - simple and works on all platforms
+                val bannerHeight = when {
+                    adSize.height > 0 -> adSize.height.dp // Use actual height if positive
+                    adSize.height == -2 -> 250.dp // FLUID (WRAP_CONTENT) - use medium rectangle height
+                    else -> 50.dp // Fallback to standard banner size
+                }
+                
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(
-                            when (adSize) {
-                                AdSize.BANNER -> 50.dp // 320x50 - Standard banner (phones & tablets)
-                                AdSize.LARGE_BANNER -> 100.dp // 320x100 - Large banner (phones & tablets)
-                                AdSize.MEDIUM_RECTANGLE -> 250.dp // 300x250 - IAB medium rectangle (phones & tablets)
-                                AdSize.FULL_BANNER -> 60.dp // 468x60 - IAB full-size banner (tablets)
-                                AdSize.LEADERBOARD -> 90.dp // 728x90 - IAB leaderboard (tablets)
-                                AdSize.WIDE_SKYSCRAPER -> 600.dp // 160x600 - IAB wide skyscraper
-                                AdSize.FLUID -> availableHeightDp // Dynamic size - start with reasonable default height
-                                else -> availableHeightDp // Default to standard banner size
-                            }
-                        )
+                        .height(bannerHeight)
                         .onSizeChanged { size ->
                             // Optional: Log the actual size for debugging
-                            println("SmartBannerAd: Available width: ${availableWidthDp}, Height: ${size.height}px")
+                            println("SmartBannerAd: Available width: ${availableWidthDp}, Height: ${size.height}px, Banner height: ${bannerHeight}")
                             // Call custom callback if provided
                             onSizeChanged?.invoke(availableWidthDp, size.height)
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    BannerAd(ad = bannerAd)
+                    // Constrain BannerAd to exact size to prevent expansion
+                    BannerAd(
+                        ad = bannerAd
+                    )
                 }
             }
         }
@@ -334,113 +320,50 @@ fun SmartBannerAdContent(
 
 /**
  * Get the appropriate ad size based on placement type and device characteristics
+ * Returns the actual AdSize constant to use (no comparisons needed)
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 fun getAdSizeForPlacement(placementType: AdPlacementType): AdSize {
-    val isTabletDevice = isTablet()
-    val screenWidthDp = getScreenWidth()
-    // 1 is portrait, 2 is landscape
-    val orientation = getOrientation()
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val widthSizeClass = windowSizeClass.windowWidthSizeClass
 
-    println("SmartBannerAd: isTabletDevice: $isTabletDevice, screenWidthDp: $screenWidthDp, orientation: $orientation")
-
-    // Cap the calculated max width to sensible ad breakpoints considering orientation
-    val maxWidth = if (isTabletDevice) {
-        if (orientation == 1) {
-            // Portrait mode: use more conservative ad sizes even on wide tablets
-            when {
-                screenWidthDp > 468.dp -> 468.dp // Max full banner size in portrait
-                screenWidthDp > 320.dp -> 320.dp // Standard banner size
-                else -> screenWidthDp
-            }
-        } else {
-            // Landscape mode: can use larger ad sizes
-            when {
-                screenWidthDp > 728.dp -> 728.dp // Leaderboard size
-                else -> screenWidthDp
-            }
-        }
-    } else {
-        // Phones: keep existing logic
-        if (screenWidthDp > 320.dp) 320.dp else screenWidthDp
-    }
+    println("SmartBannerAd: Placement=$placementType, WidthClass=$widthSizeClass")
 
     return when (placementType) {
         AdPlacementType.NAVIGATION -> {
-            // Navigation areas: compact, non-intrusive ads
-            when {
-                isTabletDevice -> {
-                    if (maxWidth >= 728.dp) {
-                        println("SmartBannerAdSize: Leaderboard")
-                        AdSize.LEADERBOARD // Use leaderboard if enough width
-                    } else if (maxWidth >= 468.dp) {
-                        println("SmartBannerAdSize: Full Banner")
-                        AdSize.FULL_BANNER // Use full banner if enough width
-                    } else {
-                        println("SmartBannerAdSize: Banner")
-                        AdSize.BANNER // Fallback to standard banner
-                    }
-                }
-
-                else -> {
-                    if (maxWidth >= 468.dp) {
-                        AdSize.FULL_BANNER // Use full banner if enough width
-                    } else {
-                        AdSize.BANNER // Fallback to standard banner
-                    }
-                }
+            when (widthSizeClass) {
+                WindowWidthSizeClass.COMPACT -> AdSize.BANNER // 320x50 for phones
+                WindowWidthSizeClass.MEDIUM -> AdSize.FULL_BANNER // 468x60 for medium tablets
+                WindowWidthSizeClass.EXPANDED -> AdSize.LEADERBOARD // 728x90 for large tablets/desktop
+                else -> AdSize.BANNER
             }
         }
 
         AdPlacementType.CONTENT -> {
-            // Content areas: larger, more prominent ads
-            when {
-                isTabletDevice -> {
-                    if (maxWidth >= 728.dp) {
-                        AdSize.MEDIUM_RECTANGLE // Use fluid ad size if enough width
-                    } else {
-                        AdSize.MEDIUM_RECTANGLE // Fallback to standard banner
-                    }
-                }
-
-                else -> {
-                    // Phones: medium rectangle for good content visibility
-                    AdSize.MEDIUM_RECTANGLE // 300x250 - ideal for content
-                }
+            when (widthSizeClass) {
+                WindowWidthSizeClass.COMPACT -> AdSize.BANNER // 320x50 for phones
+                WindowWidthSizeClass.MEDIUM -> AdSize.MEDIUM_RECTANGLE // 300x250 for tablets
+                WindowWidthSizeClass.EXPANDED -> AdSize.MEDIUM_RECTANGLE // 300x250 for large tablets
+                else -> AdSize.BANNER
             }
         }
 
         AdPlacementType.FEED -> {
-            // Feed areas: balanced visibility without being overwhelming
-            when {
-                isTabletDevice -> {
-                    // Tablets: adaptive leaderboard for feeds
-                    AdSize.MEDIUM_RECTANGLE
-                }
-
-                else -> {
-                    // Phones: large banner for good feed integration
-                    AdSize.LARGE_BANNER // 320x100 - visible but not overwhelming
-                }
+            when (widthSizeClass) {
+                WindowWidthSizeClass.COMPACT -> AdSize.LARGE_BANNER // 320x100 for phones
+                WindowWidthSizeClass.MEDIUM -> AdSize.MEDIUM_RECTANGLE // 300x250 for tablets
+                WindowWidthSizeClass.EXPANDED -> AdSize.MEDIUM_RECTANGLE // 300x250 for large tablets
+                else -> AdSize.LARGE_BANNER
             }
         }
 
         AdPlacementType.INTERSTITIAL -> {
-            // Between content sections: attention-grabbing but not too large
-            when {
-                isTabletDevice -> {
-                    if (maxWidth >= 728.dp) {
-                        AdSize.LEADERBOARD // Use leaderboard if enough width
-                    } else {
-                        AdSize.MEDIUM_RECTANGLE // Fallback to standard banner
-                    }
-                }
-
-                else -> {
-                    // Phones: medium rectangle for interstitial visibility
-                    AdSize.MEDIUM_RECTANGLE // 300x250 - good for breaking content
-                }
+            when (widthSizeClass) {
+                WindowWidthSizeClass.COMPACT -> AdSize.MEDIUM_RECTANGLE // 300x250 for phones
+                WindowWidthSizeClass.MEDIUM -> AdSize.MEDIUM_RECTANGLE // 300x250 for tablets
+                WindowWidthSizeClass.EXPANDED -> AdSize.LEADERBOARD // 728x90 for large tablets
+                else -> AdSize.MEDIUM_RECTANGLE
             }
         }
     }
@@ -472,52 +395,3 @@ fun getContentAdSize(): AdSize = getAdSizeForPlacement(AdPlacementType.CONTENT)
 @Composable
 @Deprecated("Use getAdSizeForPlacement with AdPlacementType.NAVIGATION instead")
 fun getNavigationAdSize(): AdSize = getAdSizeForPlacement(AdPlacementType.NAVIGATION)
-
-/**
- * Helper function to choose ad size based on available width using adaptive banners
- * @param availableWidthDp The available width in dp
- * @param context Optional context for adaptive banner creation
- * @return The most appropriate AdSize for the given width
- */
-@OptIn(DependsOnGoogleMobileAds::class)
-@Composable
-fun getAdSizeForWidth(availableWidthDp: Dp): AdSize {
-    val contextFactory = LocalContextFactory.current
-    val widthPx = with(LocalDensity.current) { availableWidthDp.roundToPx() }
-
-    return when {
-        availableWidthDp >= 728.dp -> {
-            // Very wide screens: use adaptive leaderboard
-            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-                context = contextFactory?.getActivity(),
-                width = 728
-            )
-        }
-
-        availableWidthDp >= 468.dp -> {
-            // Medium-wide screens: use adaptive full banner
-            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-                context = contextFactory?.getActivity(),
-                width = 468
-            )
-        }
-
-        availableWidthDp >= 320.dp -> {
-            // Standard screens: use adaptive banner
-            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-                context = contextFactory?.getActivity(),
-                width = 320
-            )
-        }
-
-        availableWidthDp >= 300.dp -> {
-            // Narrow but tall areas: use medium rectangle (non-adaptive)
-            AdSize.MEDIUM_RECTANGLE // 300x250 for content areas
-        }
-
-        else -> {
-            // Very narrow: fallback to basic banner
-            AdSize.BANNER // 320x50 default fallback
-        }
-    }
-}
