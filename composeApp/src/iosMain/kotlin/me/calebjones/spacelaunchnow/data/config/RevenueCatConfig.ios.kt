@@ -1,7 +1,5 @@
 package me.calebjones.spacelaunchnow.data.config
 
-package me.calebjones.spacelaunchnow.data.config
-
 import me.calebjones.spacelaunchnow.util.AppSecrets
 
 /**
@@ -14,7 +12,11 @@ actual object RevenueCatConfig {
      * Set revenueCatIosKey in Secrets.plist (generated from .env)
      */
     actual val apiKey: String
-        get() = AppSecrets.revenueCatIosKey
+        get() {
+            val key = AppSecrets.revenueCatIosKey
+            println("RevenueCatConfig.apiKey loaded: ${if (key.isNotEmpty()) "${key.take(10)}..." else "EMPTY"}")
+            return key
+        }
 
     actual val platform: String = "iOS"
 

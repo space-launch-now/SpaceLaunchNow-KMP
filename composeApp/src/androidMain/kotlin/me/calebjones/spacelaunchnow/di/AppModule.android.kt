@@ -10,6 +10,8 @@ import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.data.storage.createAppSettingsDataStore
 import me.calebjones.spacelaunchnow.data.storage.createSubscriptionDataStore
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
+import me.calebjones.spacelaunchnow.util.LaunchSharingService
+import me.calebjones.spacelaunchnow.util.AndroidSharingService
 
 val androidModule = module {
     single { createDataStore(androidContext()) }
@@ -19,6 +21,9 @@ val androidModule = module {
     
     // Platform-specific widget updater (Android only)
     single { PlatformWidgetUpdater(context = androidContext()) }
+    
+    // Sharing functionality
+    single<LaunchSharingService> { AndroidSharingService(androidContext()) }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {

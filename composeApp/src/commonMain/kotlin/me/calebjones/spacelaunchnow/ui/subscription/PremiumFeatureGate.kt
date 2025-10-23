@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -185,6 +188,66 @@ private fun DefaultPaywallCard(
     }
 }
 
+@Composable
+fun PremiumPromptCard(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    onUpgradeClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        modifier = modifier.padding(16.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp,
+            pressedElevation = 10.dp,
+            hoveredElevation = 12.dp,
+            focusedElevation = 16.dp
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                )
+            }
+        }
+        Button(
+            onClick = onUpgradeClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp)
+        ) {
+            Text("Upgrade to Premium")
+        }
+    }
+}
+
 /**
  * Button that shows premium badge and handles verification
  *
@@ -309,16 +372,32 @@ fun rememberIsPremium(): State<Boolean> {
 
 /**
  * Helper to check if user has a specific feature
+ * Checks BOTH subscription state AND temporary access from rewarded ads
  */
 @Composable
 fun rememberHasFeature(feature: PremiumFeature): State<Boolean> {
     val subscriptionRepo = koinInject<SubscriptionRepository>()
     val subscriptionState by subscriptionRepo.state.collectAsState()
-    return remember(subscriptionState, feature) {
-        derivedStateOf {
-            subscriptionState.hasFeature(feature)
-        }
+    val temporaryAccess = koinInject<me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess>()
+    
+    // Observe the access change trigger to recompose when temporary access changes
+    val accessChangeTrigger by temporaryAccess.accessChangeTrigger.collectAsState()
+    
+    // Create a state that combines both subscription and temporary access
+    // Include accessChangeTrigger in the key to trigger recomposition when it changes
+    val hasAccess = produceState(initialValue = false, subscriptionState, feature, accessChangeTrigger) {
+        // Check subscription state
+        val hasSubscription = subscriptionState.hasFeature(feature)
+        
+        // Check temporary access
+        val hasTemporary = temporaryAccess.hasTemporaryAccess(feature)
+        
+        value = hasSubscription || hasTemporary
+        
+        println("🔍 rememberHasFeature(${feature.name}): subscription=$hasSubscription, temporary=$hasTemporary, result=${value}")
     }
+    
+    return hasAccess
 }
 
 // Extension: Get user-friendly description for features

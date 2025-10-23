@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailView
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailErrorView
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailLoadingView
+import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -44,6 +45,16 @@ fun LaunchDetailScreen(
             viewModel.fetchLaunchDetails(launchId)
         }
     }
+
+    // 🎯 INTERSTITIAL AD: Show every 4th detail view visit
+    InterstitialAdHandler(
+        onAdShown = {
+            println("✅ LaunchDetail: Interstitial ad shown successfully")
+        },
+        onAdFailed = { error ->
+            println("❌ LaunchDetail: Interstitial ad failed: $error")
+        }
+    )
 
     // Only render the view when we have launch data, show loading/error states otherwise
     val errorMessage = error

@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import me.calebjones.spacelaunchnow.ui.detail.compose.EventDetailErrorView
 import me.calebjones.spacelaunchnow.ui.detail.compose.EventDetailLoadingView
 import me.calebjones.spacelaunchnow.ui.detail.compose.EventDetailView
+import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -25,6 +26,16 @@ fun EventDetailScreen(
             viewModel.fetchEventDetails(eventId)
         }
     }
+
+    // 🎯 INTERSTITIAL AD: Show every 4th detail view visit
+    InterstitialAdHandler(
+        onAdShown = {
+            println("✅ EventDetail: Interstitial ad shown successfully")
+        },
+        onAdFailed = { error ->
+            println("❌ LaunchDetail: Interstitial ad failed: $error")
+        }
+    )
 
     when {
         error != null -> {

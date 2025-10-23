@@ -19,7 +19,9 @@ fun main() {
             title = "Space Launch Now",
             onCloseRequest = ::exitApplication
         ) {
-            SpaceLaunchNowApp()
+            SpaceLaunchNowApp(
+                contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(null)
+            )
         }
     }
 }

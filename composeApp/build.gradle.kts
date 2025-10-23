@@ -96,7 +96,7 @@ kotlin {
 
                 // Desktop-specific HTTP client engine (CIO)
                 implementation(libs.ktor.client.cio)
-                
+
                 // JDK cryptography provider for Desktop
                 implementation(libs.cryptography.provider.jdk)
             }
@@ -128,9 +128,16 @@ kotlin {
                 implementation(libs.ktor.client.android)
 
                 implementation(libs.billing.ktx)
-                
+
+                // Google AdMob and UMP for Android
+                implementation(libs.googleAds)
+                implementation(libs.androidUmp)
+
                 // JDK cryptography provider for Android
                 implementation(libs.cryptography.provider.jdk)
+                
+                // ShadowGlow library for advanced drop shadows
+                implementation(libs.shadowglow)
             }
         }
 
@@ -141,7 +148,7 @@ kotlin {
 
                 // iOS-specific HTTP client engine (Darwin)
                 implementation(libs.ktor.client.darwin)
-                
+
                 // Apple cryptography provider for iOS
                 implementation(libs.cryptography.provider.apple)
             }
@@ -161,6 +168,9 @@ kotlin {
 
                 implementation(compose.material3)
                 implementation(compose.materialIconsExtended)
+                
+                // Adaptive layouts for responsive UI
+                implementation(libs.compose.material3.adaptive)
 
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
@@ -206,9 +216,12 @@ kotlin {
                 implementation(libs.purchases.ui)   // Optional
                 implementation(libs.purchases.either)     // Optional
                 implementation(libs.purchases.result)     // Optional
-                
+
                 // Cryptography library for secure hashing
                 implementation(libs.cryptography.core)
+
+                // Basic Ads (Google AdMob for KMP)
+                implementation(libs.basicAds)
             }
         }
 
@@ -267,7 +280,7 @@ android {
             buildConfigField("boolean", "IS_DEBUG", "false")
         }
         getByName("debug") {
-            applicationIdSuffix = ".kmpdebug"
+            // applicationIdSuffix = ".kmpdebug"
             versionNameSuffix = "-DEBUG"
             buildConfigField("boolean", "IS_DEBUG", "true")
         }
