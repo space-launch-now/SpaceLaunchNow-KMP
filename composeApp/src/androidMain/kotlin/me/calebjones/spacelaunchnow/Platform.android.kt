@@ -1,10 +1,12 @@
 package me.calebjones.spacelaunchnow
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
 import android.os.Build
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -12,6 +14,7 @@ import androidx.compose.ui.unit.dp
 
 class AndroidPlatform : Platform {
     override val name: String = "Android ${Build.VERSION.SDK_INT}"
+    override val type: PlatformType = PlatformType.ANDROID
 }
 
 actual fun getPlatform(): Platform = AndroidPlatform()
@@ -47,14 +50,7 @@ actual fun setOrientationSensorFromComposable() {
 }
 
 @Composable
-actual fun getScreenWidth() = LocalConfiguration.current
-    .screenWidthDp
-    .dp
-
-@Composable
-actual fun getScreenHeight() = LocalConfiguration.current
-    .screenHeightDp
-    .dp
+actual fun getOrientation() = LocalConfiguration.current.orientation
 
 // Helper function to get Activity from Context
 fun Context.findActivity(): Activity? = when (this) {

@@ -136,7 +136,7 @@ enum class PremiumFeature {
          */
         fun getBasicFeatures(): Set<PremiumFeature> {
             return setOf(
-                AD_FREE,
+                // AD_FREE,
                 ADVANCED_WIDGETS,
                 WIDGETS_CUSTOMIZATION,
                 CAL_SYNC,

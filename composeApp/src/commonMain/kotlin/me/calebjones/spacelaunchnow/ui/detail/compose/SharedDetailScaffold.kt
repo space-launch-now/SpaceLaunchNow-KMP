@@ -1,15 +1,10 @@
 package me.calebjones.spacelaunchnow.ui.detail.compose
 
-import androidx.compose.animation.BoundsTransform
-import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -17,9 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,7 +21,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -62,10 +54,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil3.compose.SubcomposeAsyncImage
-import me.calebjones.spacelaunchnow.isDesktop
-import me.calebjones.spacelaunchnow.isLandscape
-import me.calebjones.spacelaunchnow.isTablet
-import me.calebjones.spacelaunchnow.ui.SharedElementType
+import me.calebjones.spacelaunchnow.isLargeScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import kotlin.math.max
@@ -74,6 +63,7 @@ import kotlin.math.roundToInt
 
 // Shared Transition Layout Constants (scoped to this file)
 private val TitleHeight = 128.dp
+private val CompactTitleHeight = 88.dp // For landscape tablets
 private val GradientScroll = 180.dp
 private val ImageOverlap = 115.dp
 private val MinTitleOffset = 64.dp
@@ -96,96 +86,44 @@ fun SharedDetailScaffold(
     content: @Composable () -> Unit,
 ) {
 
-    val isTablet = isTablet()
-    val isLandscape = isLandscape()
-    val isDesktop = isDesktop()
+    val isLargeScreen = isLargeScreen()
 
+    // For tablets, always start collapsed and don't allow expansion
+    val forceNoCollapse = isLargeScreen
 
     val bgColors = backgroundColors ?: listOf(
         MaterialTheme.colorScheme.primaryContainer,
         MaterialTheme.colorScheme.surfaceVariant
     )
 
-        Box(
-            Modifier
-                .clip(RoundedCornerShape(20.dp))
+    Box(
+        Modifier
+            .clip(RoundedCornerShape(20.dp))
 
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surfaceContainer),
-        ) {
-            SharedDetailBackground(bgColors)
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.surfaceContainer),
+    ) {
+        SharedDetailBackground(bgColors, forceNoCollapse)
 
-            val scroll = rememberScrollState(0)
+        val scroll = rememberScrollState(0)
 
-            if (isDesktop || (isTablet && isLandscape)) {
-                // Responsive: Landscape/tablet/desktop -- two columns
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = MinTitleOffset)
-                ) {
-                    // Side column for image/title
-                    Column(
-                        modifier = Modifier
-                            .widthIn(min = 340.dp, max = 460.dp)
-                            .fillMaxHeight()
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            SharedDetailImage(
-                                imageUrl = imageUrl,
-
-                                scroll = scroll,
-                                forceNoCollapse = true
-                            )
-                            SharedDetailUp(onNavigateBack)
-                        }
-                        SharedDetailTitle(
-                            title = titleText,
-                            tagline = taglineText,
-                            scroll = scroll,
-                            forceNoCollapse = true // desktop: always expanded
-                        )
-                    }
-                    // Main content column
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1f)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .let { if (scrollEnabled) it.verticalScroll(scroll) else it }
-                                .padding(
-                                    top = GradientScroll + ImageOverlap,
-                                    start = HzPadding,
-                                    end = HzPadding
-                                )
-                        ) {
-                            content()
-                        }
-                    }
-                }
-            } else {
-                // Phone: original collapsing layout
-                SharedDetailBody(scroll, scrollEnabled, content)
-                SharedDetailTitle(
-                    titleText,
-                    taglineText,
-                    scroll,
-                    forceNoCollapse = false
-                )
-                SharedDetailImage(imageUrl, scroll, forceNoCollapse = false)
-                SharedDetailUp(onNavigateBack)
-            }
-        }
+        // For tablets: force collapsed layout, for phones: original collapsing layout
+        SharedDetailBody(scroll, scrollEnabled, forceNoCollapse, content)
+        SharedDetailTitle(
+            titleText,
+            taglineText,
+            scroll,
+            forceNoCollapse = forceNoCollapse
+        )
+        SharedDetailImage(imageUrl, scroll, forceNoCollapse = forceNoCollapse)
+        SharedDetailUp(onNavigateBack)
     }
+}
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedDetailBackground(colors: List<Color>) {
+private fun SharedDetailBackground(colors: List<Color>, forceNoCollapse: Boolean = false) {
+    val isLargeScreen = isLargeScreen()
 
     val infiniteTransition = rememberInfiniteTransition(label = "background")
     val targetOffset = with(LocalDensity.current) { 5000.dp.toPx() }
@@ -198,9 +136,14 @@ private fun SharedDetailBackground(colors: List<Color>) {
         label = "offset",
     )
 
+    // For collapsed layout, use smaller background height
+    val backgroundHeight = if (forceNoCollapse) {
+        if (isLargeScreen) CompactTitleHeight else TitleHeight
+    } else 280.dp
+
     Spacer(
         modifier = Modifier
-            .height(280.dp)
+            .height(backgroundHeight)
             .fillMaxWidth()
             .blur(40.dp)
             .drawWithCache {
@@ -219,24 +162,38 @@ private fun SharedDetailBackground(colors: List<Color>) {
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedDetailBody(scroll: ScrollState, scrollEnabled: Boolean, content: @Composable () -> Unit) {
+private fun SharedDetailBody(
+    scroll: ScrollState,
+    scrollEnabled: Boolean,
+    forceNoCollapse: Boolean,
+    content: @Composable () -> Unit
+) {
     val sharedTransitionScope = LocalSharedTransitionScope.current
         ?: throw IllegalStateException("No scope found")
+    val isLargeScreen = isLargeScreen()
+
     with(sharedTransitionScope) {
         Column {
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
-                    .height(MinTitleOffset),
+                    .height(
+                        if (forceNoCollapse) {
+                            if (isLargeScreen) CompactTitleHeight else TitleHeight
+                        } else MinTitleOffset
+                    ),
             )
 
             Column(
                 modifier = Modifier
                     .let { if (scrollEnabled) it.verticalScroll(scroll) else it }
             ) {
-                Spacer(Modifier.height(GradientScroll))
-                Spacer(Modifier.height(ImageOverlap))
+                // For collapsed layout, skip the gradient and image overlap space
+                if (!forceNoCollapse) {
+                    Spacer(Modifier.height(GradientScroll))
+                    Spacer(Modifier.height(ImageOverlap))
+                }
                 Surface(
                     Modifier
                         .fillMaxWidth()
@@ -256,68 +213,81 @@ private fun SharedDetailTitle(
     scroll: ScrollState,
     forceNoCollapse: Boolean = false,
 ) {
+    val isLargeScreen = isLargeScreen()
+
     val maxOffset = with(LocalDensity.current) { MaxTitleOffset.toPx() }
     val minOffset = with(LocalDensity.current) { MinTitleOffset.toPx() }
     // Calculate collapse fraction to determine image size and position
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
     val collapseFraction =
-        if (forceNoCollapse) 0f else (scroll.value / collapseRange).coerceIn(0f, 1f)
+        if (forceNoCollapse) 1f else (scroll.value / collapseRange).coerceIn(0f, 1f)
 
     // Calculate current image size and position
     val imageMaxSize = with(LocalDensity.current) { ExpandedImageSize.toPx() }
-    val imageMinSize = with(LocalDensity.current) { CollapsedImageSize.toPx() }
+    // Use smaller collapsed size for large screen devices
+    val baseCollapsedSize = if (isLargeScreen) 80.dp else CollapsedImageSize
+    val imageMinSize = with(LocalDensity.current) { baseCollapsedSize.toPx() }
     val currentImageSize = lerp(imageMaxSize, imageMinSize, collapseFraction)
 
-    // Calculate horizontal padding needed to avoid overlap with collapsed image
+    // Calculate horizontal padding needed to avoid overlap with collapsed image and back button
     val horizontalPaddingPx = with(LocalDensity.current) { HzPadding.toPx() }
-    val rightPaddingPx = if (!forceNoCollapse && collapseFraction > 0.5f) {
+    val leftPaddingPx = if (forceNoCollapse && isLargeScreen) {
+        horizontalPaddingPx + with(LocalDensity.current) { 48.dp.toPx() } // Space for back button
+    } else {
+        horizontalPaddingPx
+    }
+    val rightPaddingPx = if (forceNoCollapse || collapseFraction > 0.5f) {
         horizontalPaddingPx + currentImageSize + with(LocalDensity.current) { 16.dp.toPx() }
     } else {
         horizontalPaddingPx
     }
 
-        Column(
-            verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = TitleHeight)
-                .statusBarsPadding()
-                .let {
-                    if (forceNoCollapse) it else it.offset {
-                        val offset = (maxOffset - scroll.value).coerceAtLeast(minOffset)
-                        IntOffset(x = 0, y = offset.toInt())
-                    }
+    Column(
+        verticalArrangement = Arrangement.Bottom,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(
+                min = if (forceNoCollapse) {
+                    if (isLargeScreen) CompactTitleHeight else TitleHeight
+                } else TitleHeight
+            )
+            .statusBarsPadding()
+            .let {
+                if (forceNoCollapse) it else it.offset {
+                    val offset = (maxOffset - scroll.value).coerceAtLeast(minOffset)
+                    IntOffset(x = 0, y = offset.toInt())
                 }
-                .background(MaterialTheme.colorScheme.surfaceContainer),
-        ) {
-            Spacer(Modifier.height(16.dp))
+            }
+            .background(MaterialTheme.colorScheme.surfaceContainer),
+    ) {
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            modifier = Modifier
+                .padding(
+                    start = with(LocalDensity.current) { leftPaddingPx.toDp() },
+                    end = with(LocalDensity.current) { rightPaddingPx.toDp() },
+                )
+                .wrapContentWidth(),
+        )
+        tagline?.let {
             Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
+                text = it,
+                style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
                 modifier = Modifier
                     .padding(
-                        start = with(LocalDensity.current) { horizontalPaddingPx.toDp() },
+                        start = with(LocalDensity.current) { leftPaddingPx.toDp() },
                         end = with(LocalDensity.current) { rightPaddingPx.toDp() },
                     )
                     .wrapContentWidth(),
             )
-            tagline?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.titleLarge,
-                    maxLines = 1,
-                    modifier = Modifier
-                        .padding(
-                            start = with(LocalDensity.current) { horizontalPaddingPx.toDp() },
-                            end = with(LocalDensity.current) { rightPaddingPx.toDp() },
-                        )
-                        .wrapContentWidth(),
-                )
-            }
-            Spacer(Modifier.height(16.dp))
         }
+        Spacer(Modifier.height(16.dp))
+    }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -330,7 +300,7 @@ private fun SharedDetailImage(
 
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
     val collapseFractionProvider =
-        { if (forceNoCollapse) 0f else (scroll.value / collapseRange).coerceIn(0f, 1f) }
+        { if (forceNoCollapse) 1f else (scroll.value / collapseRange).coerceIn(0f, 1f) }
 
     CollapsingImageLayout(
         collapseFractionProvider = collapseFractionProvider,
@@ -382,19 +352,43 @@ private fun SharedDetailImage(
 private fun SharedDetailUp(upPress: () -> Unit) {
     val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
         ?: throw IllegalArgumentException("No Scope found")
+    val isLargeScreen = isLargeScreen()
+
     with(animatedVisibilityScope) {
         IconButton(
             onClick = upPress,
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .let {
+                    if (isLargeScreen) {
+                        // For landscape tablets, position relative to the compact title height
+                        it.offset(y = (CompactTitleHeight - 36.dp) / 2)
+                    } else {
+                        it
+                    }
+                }
+                .padding(
+                    horizontal = if (isLargeScreen) 12.dp else 16.dp,
+                    vertical = if (isLargeScreen) 0.dp else 10.dp
+                )
+                .size(if (isLargeScreen) 36.dp else 48.dp)
                 .clip(CircleShape)
-                .background(color = Color(0xff121212).copy(alpha = 0.32f), shape = CircleShape)
+                .background(
+                    color = if (isLargeScreen)
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)
+                    else
+                        Color(0xff121212).copy(alpha = 0.32f),
+                    shape = CircleShape
+                )
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                 contentDescription = "Back",
-                tint = Color.White
+                tint = if (isLargeScreen)
+                    MaterialTheme.colorScheme.onSurface
+                else
+                    Color.White,
+                modifier = Modifier.size(if (isLargeScreen) 20.dp else 24.dp)
             )
         }
     }
@@ -406,6 +400,8 @@ private fun CollapsingImageLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val isLargeScreen = isLargeScreen()
+
     Layout(
         modifier = modifier,
         content = content,
@@ -415,7 +411,9 @@ private fun CollapsingImageLayout(
         val collapseFraction = collapseFractionProvider()
 
         val imageMaxSize = min(ExpandedImageSize.roundToPx(), constraints.maxWidth)
-        val imageMinSize = max(CollapsedImageSize.roundToPx(), constraints.minWidth)
+        // Use smaller collapsed size for landscape tablets
+        val baseCollapsedSize = if (isLargeScreen) 80.dp else CollapsedImageSize
+        val imageMinSize = max(baseCollapsedSize.roundToPx(), constraints.minWidth)
         val imageWidth =
             lerp(imageMaxSize.toFloat(), imageMinSize.toFloat(), collapseFraction).roundToInt()
         val imagePlaceable = measurables[0].measure(
@@ -425,19 +423,34 @@ private fun CollapsingImageLayout(
             )
         )
 
-        val imageY = lerp(
-            MinTitleOffset.roundToPx().toFloat(),
-            MinImageOffset.roundToPx().toFloat(),
-            collapseFraction
-        ).roundToInt()
+        val imageY = if (isLargeScreen && collapseFraction == 1f) {
+            // For landscape tablets in collapsed state, center the image in the compact title area
+            val statusBarHeight = 0 // statusBarsPadding is handled by the parent
+            val titleAreaHeight = CompactTitleHeight.roundToPx()
+            statusBarHeight + (titleAreaHeight - imageWidth) / 2
+        } else {
+            lerp(
+                MinTitleOffset.roundToPx().toFloat(),
+                MinImageOffset.roundToPx().toFloat(),
+                collapseFraction
+            ).roundToInt()
+        }
+
         val imageX = lerp(
             ((constraints.maxWidth - imageWidth) / 2).toFloat(),
             (constraints.maxWidth - imageWidth).toFloat(),
             collapseFraction,
         ).roundToInt()
+
+        val layoutHeight = if (isLargeScreen && collapseFraction == 1f) {
+            CompactTitleHeight.roundToPx()
+        } else {
+            imageY + imageWidth
+        }
+
         layout(
             width = constraints.maxWidth,
-            height = imageY + imageWidth,
+            height = layoutHeight,
         ) {
             imagePlaceable.placeRelative(imageX, imageY)
         }

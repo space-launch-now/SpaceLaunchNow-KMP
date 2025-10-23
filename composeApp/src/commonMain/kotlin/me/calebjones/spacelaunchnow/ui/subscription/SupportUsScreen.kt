@@ -73,6 +73,7 @@ import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -1003,129 +1004,119 @@ private fun ProLifetimeCard(
         goldSurfaceColorDark
     }
 
-    // Golden glow color for shadow effect
-    val goldGlow = Color(0xFFFFD700)
-
-    Box(
+    // Main card with shadow glow effect
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
+            .platformShadowGlow(
+                gradientColors = listOf(
+                    Color(0xFFFFD700).copy(alpha = 0.6f), // Gold
+                    Color(0xFFFFA500).copy(alpha = 0.5f), // Orange
+                    Color(0xFFFF9800).copy(alpha = 0.7f)  // Yellow
+                ),
+                borderRadius = 10.dp,
+                blurRadius = 12.dp,
+                offsetX = 0.dp,
+                offsetY = 0.dp,
+                spread = 8.dp,
+                enableBreathingEffect = true,
+                breathingEffectIntensity = 4.dp,
+                breathingDurationMillis = 3000
+            ),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        // Glow background layer behind the card
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            goldGlow.copy(alpha = 0.3f),
-                            goldGlow.copy(alpha = 0.15f),
-                            Color.Transparent
-                        ),
-                        radius = 800f
-                    )
-                )
-                .align(Alignment.Center)
-        )
-
-        // Main card on top
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = surfaceColor),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            // Crown Icon + Title Row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Crown Icon + Title Row
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Stars,
-                        contentDescription = null,
-                        tint = Color(0xFFFFD700), // Gold
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Column {
-                        Text(
-                            text = "Pro Lifetime",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFB8860B) // Dark goldenrod
-                        )
-                        Text(
-                            text = "Buy once, own forever",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                // Price with shimmer effect
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
+                Icon(
+                    imageVector = Icons.Default.Stars,
+                    contentDescription = null,
+                    tint = Color(0xFFFFD700), // Gold
+                    modifier = Modifier.size(32.dp)
+                )
+                Column {
                     Text(
-                        text = price,
-                        style = MaterialTheme.typography.displayLarge,
-                        fontWeight = FontWeight.ExtraBold,
+                        text = "Pro Lifetime",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
                         color = Color(0xFFB8860B) // Dark goldenrod
                     )
                     Text(
-                        text = "one time",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        text = "Buy once, own forever",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
 
-                // Best Value Badge
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFFFFD700).copy(alpha = 0.2f),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Text(
-                        text = "✨ MAX SUPPORT ✨",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFB8860B),
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                }
+            // Price with shimmer effect
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = price,
+                    style = MaterialTheme.typography.displayLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFFB8860B) // Dark goldenrod
+                )
+                Text(
+                    text = "one time",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
 
-                // Premium Features List
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    ProPerkCheckmark("Everything in Subscriptions")
-                    ProPerkCheckmark("Lifetime Access")
-                    ProPerkCheckmark("Support Independent Developer")
-                }
+            // Best Value Badge
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFFFD700).copy(alpha = 0.2f),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "✨ MAX SUPPORT ✨",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFB8860B),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
 
-                // Purchase Button with Gold Gradient
-                Button(
-                    onClick = onPurchase,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    enabled = enabled && !isProcessing,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFD700),
-                        contentColor = Color(0xFF1C1C1C)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "Unlock Pro Forever",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                }
+            // Premium Features List
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                ProPerkCheckmark("Everything in Subscriptions")
+                ProPerkCheckmark("Lifetime Access")
+                ProPerkCheckmark("Support Independent Developer")
+            }
+
+            // Purchase Button with Gold Gradient
+            Button(
+                onClick = onPurchase,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                enabled = enabled && !isProcessing,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFFD700),
+                    contentColor = Color(0xFF1C1C1C)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "Unlock Pro Forever",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold
+                )
             }
         }
     }

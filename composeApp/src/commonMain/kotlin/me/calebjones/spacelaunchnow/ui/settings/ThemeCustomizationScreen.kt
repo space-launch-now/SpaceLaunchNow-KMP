@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -67,10 +68,13 @@ import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
+import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
+import me.calebjones.spacelaunchnow.ui.subscription.TemporaryPremiumCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -96,6 +100,7 @@ fun ThemeCustomizationScreen(
     val viewModel = koinViewModel<ThemeCustomizationViewModel>()
     val hasCustomTheme by viewModel.hasCustomTheme.collectAsStateWithLifecycle()
     val hasWidgetCustomization by viewModel.hasWidgetCustomization.collectAsStateWithLifecycle()
+    val hasPermanentPremium by viewModel.hasPermanentPremium.collectAsStateWithLifecycle()
     val selectedTheme by viewModel.selectedTheme.collectAsStateWithLifecycle()
     val selectedPrimaryColor by viewModel.selectedPrimaryColor.collectAsStateWithLifecycle()
     val selectedPaletteStyle by viewModel.selectedPaletteStyle.collectAsStateWithLifecycle()
@@ -153,15 +158,34 @@ fun ThemeCustomizationScreen(
                 }
             }
 
-            // Premium Prompt or Premium Features
+            // Premium Prompt (only show if no premium access at all)
             if (!hasCustomTheme) {
                 item {
                     PremiumPromptCard(
+                        title = "Unlock Custom Themes",
+                        description = "Customize your app's theme with custom colors and palette styles",
+                        icon = Icons.Default.Palette,
                         onUpgradeClick = {
                             navController.navigate(SupportUs)
                         }
                     )
                 }
+            }
+
+            // Temporary Premium Access via Rewarded Ads (always show)
+            item {
+                TemporaryPremiumCard(
+                    temporaryPremiumAccess = viewModel.temporaryPremiumAccess,
+                    features = listOf(
+                        PremiumFeature.CUSTOM_THEMES,
+                        PremiumFeature.ADVANCED_WIDGETS,
+                        PremiumFeature.WIDGETS_CUSTOMIZATION
+                    ),
+                    title = "24h Premium Access",
+                    description = "Watch an ad to unlock premium theme features for 24 hours",
+                    icon = Icons.Default.LockClock,
+                    hasPermanentPremium = hasPermanentPremium
+                )
             }
 
             // Color Customization (PREMIUM - Disabled for free users)
@@ -252,7 +276,7 @@ fun ThemeCustomizationScreen(
             }
 
             // Widget Theme Source Selection (Android only - iOS doesn't support Material 3 dynamic colors)
-            if (getPlatform().name.contains("Android")) {
+            if (getPlatform().type.isAndroid) {
                 item {
                     SettingsCardRow {
                         val widgetThemeSource by viewModel.widgetThemeSource.collectAsStateWithLifecycle()
@@ -486,7 +510,7 @@ fun ThemeCustomizationScreen(
                         }
                     },
                     enabled = hasCustomTheme,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 ) {
                     if (!hasCustomTheme) {
                         Icon(
@@ -498,58 +522,8 @@ fun ThemeCustomizationScreen(
                     }
                     Text(if (hasCustomTheme) "Reset to Defaults" else "Reset to Defaults (Premium)")
                 }
+                Spacer(Modifier.height(8.dp))
             }
-        }
-    }
-}
-
-@Composable
-private fun PremiumPromptCard(
-    onUpgradeClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        modifier = modifier.padding(16.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                Icons.Default.Palette,
-                contentDescription = null,
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-            Spacer(Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    "Unlock Premium Customization",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "Customize colors and palette styles",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                )
-            }
-        }
-        Button(
-            onClick = onUpgradeClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp)
-        ) {
-            Text("Upgrade to Premium")
         }
     }
 }
@@ -822,7 +796,8 @@ class ThemeCustomizationViewModel(
     private val themePreferences: ThemePreferences,
     private val appPreferences: AppPreferences,
     private val widgetPreferences: WidgetPreferences,
-    private val subscriptionRepository: SubscriptionRepository
+    private val subscriptionRepository: SubscriptionRepository,
+    val temporaryPremiumAccess: TemporaryPremiumAccess  // Make it public val instead of private
 ) : ViewModel() {
 
     private val _hasCustomTheme = MutableStateFlow(false)
@@ -830,6 +805,9 @@ class ThemeCustomizationViewModel(
 
     private val _hasWidgetCustomization = MutableStateFlow(false)
     val hasWidgetCustomization: StateFlow<Boolean> = _hasWidgetCustomization.asStateFlow()
+
+    private val _hasPermanentPremium = MutableStateFlow(false)
+    val hasPermanentPremium: StateFlow<Boolean> = _hasPermanentPremium.asStateFlow()
 
     private val _selectedTheme = MutableStateFlow(ThemeOption.System)
     val selectedTheme: StateFlow<ThemeOption> = _selectedTheme.asStateFlow()
@@ -868,19 +846,24 @@ class ThemeCustomizationViewModel(
 
     init {
         viewModelScope.launch {
-            // Check premium status
-            subscriptionRepository.state.collect { state ->
-                val isPremium = state.isSubscribed && !state.isExpired()
+            // Combine subscription state and temporary access changes
+            kotlinx.coroutines.flow.combine(
+                subscriptionRepository.state,
+                temporaryPremiumAccess.accessChangeTrigger
+            ) { subscriptionState, _ ->
+                val isPremium = subscriptionState.isSubscribed && !subscriptionState.isExpired()
                 // IMPORTANT: Call subscriptionRepository.hasFeature() instead of state.hasFeature()
-                // This ensures widget access cache gets updated properly
+                // This ensures widget access cache gets updated properly and includes temporary access
                 val hasCustomTheme = subscriptionRepository.hasFeature(PremiumFeature.CUSTOM_THEMES)
                 val hasWidgetCustomization =
                     subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
-                println("ThemeCustomizationViewModel: Subscription state changed - isSubscribed=${state.isSubscribed}, isExpired=${state.isExpired()}, isPremium=$isPremium")
+                println("ThemeCustomizationViewModel: State changed - isSubscribed=${subscriptionState.isSubscribed}, isExpired=${subscriptionState.isExpired()}, isPremium=$isPremium")
                 println("ThemeCustomizationViewModel: hasCustomTheme=$hasCustomTheme, hasWidgetCustomization=$hasWidgetCustomization")
                 _hasCustomTheme.value = hasCustomTheme
                 _hasWidgetCustomization.value = hasWidgetCustomization
-            }
+                _hasPermanentPremium.value =
+                    isPremium  // Set permanent premium status based on subscription
+            }.collect { }
         }
 
         viewModelScope.launch {

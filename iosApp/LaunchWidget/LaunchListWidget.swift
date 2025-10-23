@@ -302,6 +302,9 @@ struct LaunchRow: View {
             )
         ],
         isPlaceholder: false,
-        errorMessage: nil
+        errorMessage: nil,
+        hasWidgetAccess: true,
+        backgroundAlpha: 0.75,
+        cornerRadius: 16.0
     )
 }

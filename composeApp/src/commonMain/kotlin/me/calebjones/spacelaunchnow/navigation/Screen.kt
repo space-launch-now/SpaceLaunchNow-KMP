@@ -33,6 +33,9 @@ data object SupportUs
 data object ThemeCustomization
 
 @Serializable
+data object CalendarSync
+
+@Serializable
 data class LaunchDetail(val launchId: String)
 
 @Serializable

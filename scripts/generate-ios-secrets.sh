@@ -6,7 +6,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 ENV_FILE="$PROJECT_ROOT/.env"
-SECRETS_PLIST="$PROJECT_ROOT/iosApp/iosApp/Secrets.plist"
+SECRETS_PLIST="$PROJECT_ROOT/iosApp/Secrets.plist"
 TEMPLATE_FILE="$PROJECT_ROOT/iosApp/iosApp/Secrets.plist.template"
 
 # Check if .env file exists

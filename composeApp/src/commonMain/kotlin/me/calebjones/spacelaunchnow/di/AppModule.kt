@@ -2,6 +2,46 @@ package me.calebjones.spacelaunchnow.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import me.calebjones.spacelaunchnow.UserViewModel
+import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.data.UserRepository
+import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
+import me.calebjones.spacelaunchnow.data.billing.BillingClient
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.billing.createBillingClient
+import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
+import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
+import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
+import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.EventsRepository
+import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
+import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
+import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
+import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
+import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
+import me.calebjones.spacelaunchnow.platform.ContextFactory
+import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
+import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -10,46 +50,8 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.includes
 import org.koin.dsl.koinConfiguration
 import org.koin.dsl.module
-import me.calebjones.spacelaunchnow.UserViewModel
-import me.calebjones.spacelaunchnow.data.UserRepository
-import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
-import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
-import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
-import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.EventsRepository
-import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
-import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
-import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
-import me.calebjones.spacelaunchnow.cache.LaunchCache
-import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
-import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
-import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
-import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
-import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
-import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
-import me.calebjones.spacelaunchnow.data.billing.BillingClient
-import me.calebjones.spacelaunchnow.data.billing.createBillingClient
-import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
-import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
-import me.calebjones.spacelaunchnow.util.BuildConfig
-import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
-import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 
-expect fun nativeConfig() : KoinAppDeclaration
+expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
@@ -75,6 +77,13 @@ val appModule = module {
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::LaunchCache)
+
+    // Global Ad Manager - Singleton managed by Koin
+    single {
+        GlobalAdManager(contextFactory = getOrNull<ContextFactory>()).also {
+            it.initializeAndPreload()
+        }
+    }
 
     // Notification dependencies
     singleOf(::PushMessaging)
@@ -112,11 +121,21 @@ val appModule = module {
             debugPreferences = getOrNull<DebugPreferences>()
         )
     }
-    
+
     // Subscription dependencies
     single {
         val subscriptionDataStore = get<DataStore<Preferences>>(named("SubscriptionDataStore"))
         SubscriptionStorage(subscriptionDataStore)
+    }
+
+    // Temporary premium access for rewarded ads
+    single {
+        val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
+        TemporaryPremiumAccess(
+            dataStore = appDataStore,
+            themePreferences = get<ThemePreferences>(),
+            widgetPreferences = get<WidgetPreferences>()
+        )
     }
 
     // RevenueCat dependencies - initialize first
@@ -133,14 +152,16 @@ val appModule = module {
             billingClient = get(),
             storage = get<SubscriptionStorage>(),
             debugPreferences = get<DebugPreferences>(),
+            appPreferences = get<AppPreferences>(),      // Add AppPreferences injection
+            temporaryPremiumAccess = get<TemporaryPremiumAccess>(),  // Add temporary premium access
             revenueCatManager = get<RevenueCatManager>(),  // RevenueCat dependency
             widgetPreferences = get<WidgetPreferences>(),   // Cache widget access
             platformWidgetUpdater = getOrNull()             // Android-only: trigger widget updates
         )
     }
-    
+
     // SubscriptionViewModel with RevenueCatManager
-    single { 
+    single {
         SubscriptionViewModel(
             repository = get(),
             revenueCatManager = get()
@@ -159,5 +180,12 @@ val debugModule = module {
         val debugDataStore = get<DataStore<Preferences>>(named("DebugDataStore"))
         DebugPreferences(debugDataStore)
     }
-    single { DebugSettingsViewModel(debugPreferences = get(), revenueCatManager = get(), launchRepository = get(), notificationRepository = get()) }
+    single {
+        DebugSettingsViewModel(
+            debugPreferences = get(),
+            revenueCatManager = get(),
+            launchRepository = get(),
+            notificationRepository = get()
+        )
+    }
 }

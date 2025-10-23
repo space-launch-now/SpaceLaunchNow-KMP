@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -47,6 +48,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +58,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
@@ -683,7 +686,11 @@ fun DebugSettingsScreen(
                             fontWeight = FontWeight.SemiBold
                         )
 
-                        // Current state display
+                        // Get billing client and coroutine scope
+                        val billingClient = koinInject<me.calebjones.spacelaunchnow.data.billing.BillingClient>()
+                        val coroutineScope = rememberCoroutineScope()
+                        
+                        // Current simulated state display
                         Surface(
                             color = if (subscriptionState.isSubscribed) {
                                 MaterialTheme.colorScheme.primaryContainer
@@ -692,16 +699,169 @@ fun DebugSettingsScreen(
                             },
                             shape = MaterialTheme.shapes.small
                         ) {
-                            Text(
-                                text = "Current: ${
-                                    if (subscriptionState.isSubscribed)
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = "🎭 Simulated State:",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = if (subscriptionState.isSubscribed)
                                         "${subscriptionState.subscriptionType.name} (${subscriptionState.productId})"
-                                    else "FREE"
-                                }",
-                                modifier = Modifier.padding(12.dp),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
+                                    else "FREE",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+
+                        // Actual owned products from billing client
+                        var isQuerying by remember { mutableStateOf(false) }
+                        var ownedProducts by remember { mutableStateOf<List<me.calebjones.spacelaunchnow.data.model.PlatformPurchase>?>(null) }
+                        var queryError by remember { mutableStateOf<String?>(null) }
+                        
+                        LaunchedEffect(Unit) {
+                            // Auto-query on first load
+                            isQuerying = true
+                            queryError = null
+                            billingClient.queryPurchases().fold(
+                                onSuccess = { purchases ->
+                                    ownedProducts = purchases
+                                    isQuerying = false
+                                },
+                                onFailure = { error ->
+                                    queryError = error.message ?: "Unknown error"
+                                    isQuerying = false
+                                }
                             )
+                        }
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "🛒 Real Owned Products:",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                    
+                                    if (!isQuerying) {
+                                        IconButton(
+                                            onClick = {
+                                                coroutineScope.launch {
+                                                    isQuerying = true
+                                                    queryError = null
+                                                    billingClient.queryPurchases().fold(
+                                                        onSuccess = { purchases ->
+                                                            ownedProducts = purchases
+                                                            isQuerying = false
+                                                        },
+                                                        onFailure = { error ->
+                                                            queryError = error.message ?: "Unknown error"
+                                                            isQuerying = false
+                                                        }
+                                                    )
+                                                }
+                                            },
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Refresh,
+                                                contentDescription = "Refresh",
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
+                                }
+
+                                when {
+                                    isQuerying -> {
+                                        Text(
+                                            text = "⏳ Querying...",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                        )
+                                    }
+                                    queryError != null -> {
+                                        Text(
+                                            text = "❌ Error: $queryError",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                    }
+                                    ownedProducts?.isEmpty() == true -> {
+                                        Text(
+                                            text = "No products owned",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                        )
+                                    }
+                                    ownedProducts != null -> {
+                                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                            ownedProducts!!.forEach { purchase ->
+                                                val subscriptionType = me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.getSubscriptionType(purchase.productId)
+                                                
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Column(modifier = Modifier.weight(1f)) {
+                                                        Text(
+                                                            text = purchase.productId,
+                                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                                                            ),
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                                        )
+                                                        Text(
+                                                            text = subscriptionType.name,
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                                        )
+                                                    }
+                                                    
+                                                    val isExpired = purchase.expiryTime?.let { expiry ->
+                                                        kotlinx.datetime.Clock.System.now().toEpochMilliseconds() > expiry
+                                                    } ?: false
+                                                    
+                                                    Surface(
+                                                        color = if (isExpired) 
+                                                            MaterialTheme.colorScheme.error 
+                                                        else 
+                                                            MaterialTheme.colorScheme.tertiary,
+                                                        shape = MaterialTheme.shapes.extraSmall
+                                                    ) {
+                                                        Text(
+                                                            text = if (isExpired) "EXPIRED" else "ACTIVE",
+                                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                            fontSize = 10.sp,
+                                                            color = if (isExpired)
+                                                                MaterialTheme.colorScheme.onError
+                                                            else
+                                                                MaterialTheme.colorScheme.onTertiary
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         // Free state

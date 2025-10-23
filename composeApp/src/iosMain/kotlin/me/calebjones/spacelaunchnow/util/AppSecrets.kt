@@ -6,17 +6,53 @@ import platform.Foundation.dictionaryWithContentsOfFile
 
 actual object AppSecrets {
     actual val apiKey: String
-        get() = getStringResource("Secrets", "plist", "apiKey") ?: ""
+        get() {
+            val key = getStringResource("Secrets", "plist", "apiKey") ?: ""
+            println("🔑 AppSecrets.apiKey: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
 
     actual val revenueCatAndroidKey: String
-        get() = getStringResource("Secrets", "plist", "revenueCatAndroidKey") ?: ""
+        get() {
+            val key = getStringResource("Secrets", "plist", "revenueCatAndroidKey") ?: ""
+            println("🔑 AppSecrets.revenueCatAndroidKey: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
 
     actual val revenueCatIosKey: String
-        get() = getStringResource("Secrets", "plist", "revenueCatIosKey") ?: ""
+        get() {
+            println("🔍 AppSecrets: Attempting to load revenueCatIosKey...")
+            val key = getStringResource("Secrets", "plist", "revenueCatIosKey") ?: ""
+            println("🔑 AppSecrets.revenueCatIosKey result: ${if (key.isNotEmpty()) "✅ loaded (${key.take(15)}...)" else "❌ EMPTY"}")
+            return key
+        }
 }
 
 internal fun getStringResource(filename: String, fileType: String, valueKey: String): String? {
+    println("📂 AppSecrets: Looking for $filename.$fileType with key '$valueKey'")
+    
     val path = NSBundle.mainBundle.pathForResource(filename, fileType)
-    val dict = path?.let { NSDictionary.dictionaryWithContentsOfFile(it) }
-    return dict?.get(valueKey) as? String
+    println("📂 AppSecrets: Path result: ${path ?: "❌ FILE NOT FOUND IN BUNDLE"}")
+    
+    if (path == null) {
+        println("❌ AppSecrets: $filename.$fileType is NOT in the app bundle!")
+        println("💡 AppSecrets: Make sure Secrets.plist is added to 'Copy Bundle Resources' in Xcode")
+        return null
+    }
+    
+    val dict = NSDictionary.dictionaryWithContentsOfFile(path)
+    println("📖 AppSecrets: Dictionary loaded: ${if (dict != null) "✅ YES" else "❌ NO"}")
+    
+    if (dict == null) {
+        println("❌ AppSecrets: Failed to parse plist file!")
+        return null
+    }
+    
+    // Print dictionary info
+    println("🔑 AppSecrets: Dictionary info: $dict")
+    
+    val value = dict.get(valueKey) as? String
+    println("📖 AppSecrets: Value for '$valueKey': ${if (value != null) "✅ Found (${value.take(10)}...)" else "❌ NULL"}")
+    
+    return value
 }
