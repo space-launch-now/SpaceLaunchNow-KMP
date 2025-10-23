@@ -43,6 +43,36 @@ Configure these secrets in GitHub repository **Settings → Secrets and variable
 
 ---
 
+## 📺 AdMob Ad Unit IDs (⚠️ NEW - Required for Ad Revenue)
+
+| Secret Name | Type | Description |
+|------------|------|-------------|
+| `ANDROID_BANNER_AD_UNIT_ID` | string | AdMob Android banner ad unit ID |
+| `IOS_BANNER_AD_UNIT_ID` | string | AdMob iOS banner ad unit ID |
+| `ANDROID_INTERSTITIAL_AD_UNIT_ID` | string | AdMob Android interstitial ad unit ID |
+| `IOS_INTERSTITIAL_AD_UNIT_ID` | string | AdMob iOS interstitial ad unit ID |
+| `ANDROID_REWARDED_AD_UNIT_ID` | string | AdMob Android rewarded ad unit ID |
+| `IOS_REWARDED_AD_UNIT_ID` | string | AdMob iOS rewarded ad unit ID |
+
+**Where to get:**
+1. Go to https://admob.google.com/
+2. Select your app
+3. Navigate to **Ad units**
+4. Copy the Ad unit IDs for each platform and ad type:
+   - **Format:** `ca-app-pub-XXXXXXXXXXXXXXXXXX/XXXXXXXXXX`
+   - **Banner ads:** For standard banner placements
+   - **Interstitial ads:** For full-screen ads between content
+   - **Rewarded ads:** For video ads that grant rewards (premium access)
+
+**Important Notes:**
+- ✅ Use **Production Ad Unit IDs** for release builds
+- ✅ Test Ad Unit IDs are used automatically in debug builds
+- ✅ These IDs are platform-specific (Android/iOS)
+- ⚠️ Keep these IDs private - they control your ad revenue
+- 📱 Create separate ad units for each ad type and platform
+
+---
+
 ## 📱 Android Secrets
 
 ### Firebase
@@ -185,6 +215,14 @@ Use this checklist to verify all secrets are configured:
 - [ ] `API_KEY` - Space Devs Launch Library
 - [ ] `REVENUECAT_ANDROID_KEY` - Android premium features ⚠️ NEW
 - [ ] `REVENUECAT_IOS_KEY` - iOS premium features ⚠️ NEW
+
+### AdMob Ad Unit IDs (Required for Ad Revenue) ⚠️ NEW
+- [ ] `ANDROID_BANNER_AD_UNIT_ID` - Android banner ads
+- [ ] `IOS_BANNER_AD_UNIT_ID` - iOS banner ads
+- [ ] `ANDROID_INTERSTITIAL_AD_UNIT_ID` - Android interstitial ads
+- [ ] `IOS_INTERSTITIAL_AD_UNIT_ID` - iOS interstitial ads
+- [ ] `ANDROID_REWARDED_AD_UNIT_ID` - Android rewarded ads (premium access)
+- [ ] `IOS_REWARDED_AD_UNIT_ID` - iOS rewarded ads (premium access)
 
 ### Android Build Secrets
 - [ ] `FIREBASE_APP_ID`

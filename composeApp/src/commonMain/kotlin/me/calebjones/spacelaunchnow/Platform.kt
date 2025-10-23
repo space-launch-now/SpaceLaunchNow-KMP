@@ -29,6 +29,12 @@ interface Platform {
 expect fun getPlatform(): Platform
 
 @Composable
+/**
+ * Returns the current screen orientation.
+ *
+ * @return 1 for portrait, 2 for landscape.
+ */
+
 expect fun getOrientation(): Int
 
 // Orientation management
