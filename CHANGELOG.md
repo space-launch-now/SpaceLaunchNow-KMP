@@ -1,4 +1,31 @@
-# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b24...v4.0.0) (2025-10-18)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b25...v4.0.0) (2025-10-23)
+
+
+### Bug Fixes
+
+* update ProLifetimeCard styling with new color and reduced effects ([19f3074](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/19f3074f0222edc8f787855b8f8379aecddcd273))
+
+
+### Features
+
+* Add AdMob ad unit IDs to CI/CD workflows and documentation for ad revenue integration ([8c4a9d5](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/8c4a9d5cbe02b63422800b9dd2af8f75dd26474e))
+* add Calendar Sync feature with UI and navigation ([e9d4ca1](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/e9d4ca1e1a04bc2a868621d1f2e4547d159979d7))
+* add compose-ShadowGlow library with glow effect on Gold card ([a1c1f69](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/a1c1f695fd6178ceeab961a5def753e2116a91c3))
+* add expect/actual pattern for platform-specific shadow glow ([05bd5b1](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/05bd5b1bd85f1d997778c9f03511f67073c1aa0e))
+* add mission name display to detailed view ([5962bf2](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/5962bf21b78075fc55753f0989604a2b4d50564c))
+* Enhance ad integration with new ad placements and improved sizing logic ([9fde342](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/9fde342b9652836ae6bc5a337627f892360cb5f0))
+* Enhance debug feature handling and improve ad loading behavior ([4b08833](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/4b08833a7c120b2d0a5201a7cf73f63997e85b21))
+* implement platform-specific sharing functionality ([2bfdcc6](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/2bfdcc656b8c58728c9b35864110d1cd8e15470e))
+* implement premium upgrade prompt for NotificationSettingsScreen ([c262778](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/c262778f4e0b5b88c7c9247ac3d53196c1037319))
+* Implement temporary premium access via rewarded ads and update related UI components ([5ae4412](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/5ae441227d5163c1e7709028f1d566781526a92e))
+* Integrate ads into the app ([b7fa836](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/b7fa836fb97f0b7c37dd8047a5e8345040a0d248))
+* Integrate GlobalAdManager for improved ad handling and update widget access logic ([e72c9d7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/e72c9d78e3e7f057a8a55bb328fb87d10fb5938f))
+* route to notif page from home page ([cda1bd3](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/cda1bd34809478258c7303d2dfddeebe893dc744))
+* update splash background colors ([cf2d48b](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/cf2d48b92e7f0e8ed8c4677421fb029361683c3c))
+
+
+
+# [4.0.0-b25](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b24...v4.0.0-b25) (2025-10-18)
 
 
 ### Bug Fixes
@@ -60,10 +87,6 @@
 * implement the useUtc setting ([6f6b50f](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/6f6b50fc697f0e4730ded3cdb0f62496ebb9dbc9))
 * **notification:** update notification icon and improve filtering logic ([e96c8e8](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/e96c8e887b8f72557de02670e40a92b929aef6c8))
 * Refactor release workflow to support parallel jobs and version calculation ([35bf176](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/35bf176389f04267a15d4dd923a2961702656702))
-
-
-
-# [4.0.0-b21](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b20...v4.0.0-b21) (2025-10-10)
 
 
 
