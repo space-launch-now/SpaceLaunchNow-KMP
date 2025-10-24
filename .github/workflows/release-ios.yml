@@ -167,8 +167,8 @@ jobs:
           
           echo "Using certificate: $CERT_IDENTITY"
           
-          # Build archive with proper signing configuration
-          # Use automatic signing for dependencies, manual for our targets
+          # Build archive with automatic signing
+          # Let Xcode handle signing for all targets including SPM dependencies
           xcrun xcodebuild \
             -project iosApp.xcodeproj \
             -scheme iosApp \
@@ -176,6 +176,7 @@ jobs:
             -sdk iphoneos \
             -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
             -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates \
             DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_IDENTITY="$CERT_IDENTITY" \
             archive
