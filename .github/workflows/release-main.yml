@@ -284,9 +284,9 @@ jobs:
             composeApp/build/outputs/mapping/release/mapping.txt
           retention-days: 90
 
-  # Job 5: Deploy to Firebase and GitHub (after AAB build completes)
+  # Job 5: Deploy to Google Play Store and Firebase (after AAB build completes)
   deploy:
-    name: Deploy Release
+    name: Deploy to Play Store & Firebase
     needs: [version, build-aab]
     runs-on: ubuntu-latest
     
@@ -317,6 +317,22 @@ jobs:
         env:
           PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
         run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
+
+      - name: Create Play Store release notes
+        run: |
+          mkdir -p docs/release-notes/en-US/
+          echo "${{ needs.version.outputs.changelog }}" > docs/release-notes/en-US/default.txt
+
+      - name: Deploy AAB to Google Play Store (Alpha)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service-account.json
+          packageName: me.calebjones.spacelaunchnow
+          releaseFiles: ${{ steps.artifacts.outputs.aab }}
+          track: alpha
+          status: completed
+          mappingFile: ${{ steps.artifacts.outputs.mapping }}
+          whatsNewDirectory: docs/release-notes/
 
       - name: Deploy AAB to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -361,6 +377,7 @@ jobs:
           echo "- ✅ ProGuard Mapping" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🎯 Deployments" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Google Play Store (Alpha Track)" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Firebase Distribution (Android AAB)" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ GitHub Release" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
