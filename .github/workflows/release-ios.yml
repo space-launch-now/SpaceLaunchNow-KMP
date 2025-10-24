@@ -153,29 +153,20 @@ jobs:
         run: |
           cd iosApp
           
-          # Create config with provisioning profile variables
+          # Create config with team and bundle info
           cat > Configuration/Config.xcconfig << EOF
           TEAM_ID=$TEAM_ID
           BUNDLE_ID=$BUNDLE_ID
           APP_NAME=SpaceLaunchNow
-          APP_PROVISIONING_PROFILE=$APP_PROVISIONING_PROFILE_UUID
-          WIDGET_PROVISIONING_PROFILE=$WIDGET_PROVISIONING_PROFILE_UUID
           EOF
           
-          # Find certificate identity
-          CERT_IDENTITY=$(security find-identity -v -p codesigning | grep -E "(Apple Distribution|iOS Distribution)" | head -n1 | grep -o '"[^"]*"' | tr -d '"')
+          echo "Building archive with automatic signing..."
+          echo "Team ID: $TEAM_ID"
+          echo "App provisioning profile: $APP_PROVISIONING_PROFILE_NAME"
+          echo "Widget provisioning profile: $WIDGET_PROVISIONING_PROFILE_NAME"
           
-          if [ -z "$CERT_IDENTITY" ]; then
-            CERT_IDENTITY=$(security find-identity -v -p codesigning | grep -iE "(distribution|production)" | head -n1 | grep -o '"[^"]*"' | tr -d '"')
-          fi
-          
-          echo "Using certificate: $CERT_IDENTITY"
-          echo "Using app provisioning profile: $APP_PROVISIONING_PROFILE_NAME ($APP_PROVISIONING_PROFILE_UUID)"
-          echo "Using widget provisioning profile: $WIDGET_PROVISIONING_PROFILE_NAME ($WIDGET_PROVISIONING_PROFILE_UUID)"
-          
-          # Build archive with signing configuration
-          # Provisioning profiles are set via Config.xcconfig and project settings
-          # SPM packages will use automatic signing from their package definitions
+          # Build archive using automatic signing
+          # The export step will handle applying the correct provisioning profiles
           xcrun xcodebuild \
             -project iosApp.xcodeproj \
             -scheme iosApp \
@@ -183,22 +174,51 @@ jobs:
             -sdk iphoneos \
             -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
             -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="$CERT_IDENTITY" \
             archive
 
       - name: Export IPA
         env:
-          EXPORT_OPTIONS_PLIST: ${{ secrets.IOS_EXPORT_OPTIONS_PLIST }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
         run: |
-          echo "$EXPORT_OPTIONS_PLIST" | base64 --decode > $RUNNER_TEMP/ExportOptions.plist
+          # Create export options plist with provisioning profile mappings
+          cat > $RUNNER_TEMP/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>compileBitcode</key>
+              <false/>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>$APP_PROVISIONING_PROFILE_UUID</string>
+                  <key>$BUNDLE_ID.LaunchWidget</key>
+                  <string>$WIDGET_PROVISIONING_PROFILE_UUID</string>
+              </dict>
+          </dict>
+          </plist>
+          EOF
+          
+          echo "Export options:"
+          cat $RUNNER_TEMP/ExportOptions.plist
           
           xcrun xcodebuild \
             -exportArchive \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
-            -exportPath "$RUNNER_TEMP/Build/Export/"
+            -exportPath "$RUNNER_TEMP/Build/Export/" \
+            -allowProvisioningUpdates
           
           echo "ipa_path=$RUNNER_TEMP/Build/Export/SpaceLaunchNow.ipa" >> $GITHUB_ENV
 
