@@ -131,17 +131,6 @@ jobs:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" iosApp/iosApp/Info.plist
           
           echo "✅ Updated iOS version to $MARKETING_VERSION (Build $BUILD_NUMBER)"
-
-      # ==================== BUILD KMP FRAMEWORK ====================
-      - name: Build KMP Framework for iOS
-        env:
-          GRADLE_OPTS: "-Xmx6144M -XX:MaxMetaspaceSize=512M -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=1 -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-        run: |
-          echo "Building ComposeApp.framework for iOS..."
-          ./gradlew :composeApp:assembleComposeAppXCFramework
-          
-          echo "✅ KMP framework built successfully"
-
       # ==================== BUILD ====================
       - name: Build iOS archive
         env:
