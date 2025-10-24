@@ -236,26 +236,6 @@ jobs:
           echo "✅ Successfully uploaded to TestFlight!"
           echo "📱 Build will be available for testing once it completes processing"
 
-      # ==================== GITHUB RELEASE ====================
-      - name: Update GitHub Release with iOS build
-        if: inputs.deploy_to == 'testflight'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.version.outputs.full_version }}
-          name: 🚀 Space Launch Now ${{ steps.version.outputs.full_version }}
-          files: |
-            ${{ env.ipa_path }}
-          draft: false
-          prerelease: false
-          body: |
-            ## iOS Build
-            
-            - **Version:** ${{ steps.version.outputs.version_name }}
-            - **Build:** ${{ steps.version.outputs.build_number }}
-            - **Uploaded to:** TestFlight
-            
-            This release was built with automatic code signing via App Store Connect API.
-
       # ==================== ARTIFACTS ====================
       - name: Upload iOS artifacts
         uses: actions/upload-artifact@v4
@@ -283,8 +263,10 @@ jobs:
           if [ "${{ inputs.deploy_to }}" = "testflight" ]; then
             echo "**Deployment Status:**" >> $GITHUB_STEP_SUMMARY
             echo "- ✅ Uploaded to TestFlight" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ Added to GitHub Release \`v${{ steps.version.outputs.full_version }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- 💾 IPA available in workflow artifacts" >> $GITHUB_STEP_SUMMARY
             echo "- 📱 Build will be available for testing after App Store Connect processing" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Note:** GitHub releases are created by the main Android workflow. iOS builds are deployed directly to TestFlight." >> $GITHUB_STEP_SUMMARY
           else
             echo "**Build Status:**" >> $GITHUB_STEP_SUMMARY
             echo "- ✅ IPA built successfully" >> $GITHUB_STEP_SUMMARY
