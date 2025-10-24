@@ -157,7 +157,8 @@ jobs:
           echo "Using certificate: $CERT_IDENTITY"
           
           # Build archive with automatic signing
-          # Let Xcode handle signing for all targets including SPM dependencies
+          # Xcode will use the installed provisioning profile and certificates automatically
+          # Don't specify CODE_SIGN_IDENTITY to avoid conflicts with automatic signing
           xcrun xcodebuild \
             -project iosApp.xcodeproj \
             -scheme iosApp \
@@ -167,7 +168,6 @@ jobs:
             -destination "generic/platform=iOS" \
             -allowProvisioningUpdates \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_IDENTITY="$CERT_IDENTITY" \
             archive
 
       - name: Export IPA
