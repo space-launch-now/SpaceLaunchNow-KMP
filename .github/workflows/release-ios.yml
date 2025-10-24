@@ -100,27 +100,40 @@ jobs:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
-      - name: Install provisioning profile
+      - name: Install provisioning profiles
         env:
           APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+          APPLE_WIDGET_PROVISIONING_PROFILE: ${{ secrets.APPLE_WIDGET_PROVISIONING_PROFILE }}
         run: |
-          echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
-          
-          # Extract profile info
-          PROFILE_CONTENT=$(security cms -D -i /tmp/profile.mobileprovision)
-          PROFILE_UUID=$(echo "$PROFILE_CONTENT" | plutil -extract UUID xml1 - -o - | xmllint --xpath "//string/text()" -)
-          PROFILE_NAME=$(echo "$PROFILE_CONTENT" | plutil -extract Name xml1 - -o - | xmllint --xpath "//string/text()" -)
-          
-          echo "Installing provisioning profile:"
-          echo "  Name: $PROFILE_NAME"
-          echo "  UUID: $PROFILE_UUID"
-          
-          # Install with UUID filename (CRITICAL!)
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
           
-          echo "PROVISIONING_PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
-          echo "PROVISIONING_PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
+          # Install main app provisioning profile
+          echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > /tmp/app_profile.mobileprovision
+          PROFILE_CONTENT=$(security cms -D -i /tmp/app_profile.mobileprovision)
+          APP_PROFILE_UUID=$(echo "$PROFILE_CONTENT" | plutil -extract UUID xml1 - -o - | xmllint --xpath "//string/text()" -)
+          APP_PROFILE_NAME=$(echo "$PROFILE_CONTENT" | plutil -extract Name xml1 - -o - | xmllint --xpath "//string/text()" -)
+          
+          echo "Installing app provisioning profile:"
+          echo "  Name: $APP_PROFILE_NAME"
+          echo "  UUID: $APP_PROFILE_UUID"
+          cp /tmp/app_profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$APP_PROFILE_UUID.mobileprovision
+          
+          # Install widget provisioning profile
+          echo "$APPLE_WIDGET_PROVISIONING_PROFILE" | base64 --decode > /tmp/widget_profile.mobileprovision
+          PROFILE_CONTENT=$(security cms -D -i /tmp/widget_profile.mobileprovision)
+          WIDGET_PROFILE_UUID=$(echo "$PROFILE_CONTENT" | plutil -extract UUID xml1 - -o - | xmllint --xpath "//string/text()" -)
+          WIDGET_PROFILE_NAME=$(echo "$PROFILE_CONTENT" | plutil -extract Name xml1 - -o - | xmllint --xpath "//string/text()" -)
+          
+          echo "Installing widget provisioning profile:"
+          echo "  Name: $WIDGET_PROFILE_NAME"
+          echo "  UUID: $WIDGET_PROFILE_UUID"
+          cp /tmp/widget_profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$WIDGET_PROFILE_UUID.mobileprovision
+          
+          # Export for use in build step
+          echo "APP_PROVISIONING_PROFILE_UUID=$APP_PROFILE_UUID" >> $GITHUB_ENV
+          echo "APP_PROVISIONING_PROFILE_NAME=$APP_PROFILE_NAME" >> $GITHUB_ENV
+          echo "WIDGET_PROVISIONING_PROFILE_UUID=$WIDGET_PROFILE_UUID" >> $GITHUB_ENV
+          echo "WIDGET_PROVISIONING_PROFILE_NAME=$WIDGET_PROFILE_NAME" >> $GITHUB_ENV
 
       - name: Update Info.plist version
         run: |
@@ -140,11 +153,13 @@ jobs:
         run: |
           cd iosApp
           
-          # Create config
+          # Create config with provisioning profile variables
           cat > Configuration/Config.xcconfig << EOF
           TEAM_ID=$TEAM_ID
           BUNDLE_ID=$BUNDLE_ID
           APP_NAME=SpaceLaunchNow
+          APP_PROVISIONING_PROFILE=$APP_PROVISIONING_PROFILE_UUID
+          WIDGET_PROVISIONING_PROFILE=$WIDGET_PROVISIONING_PROFILE_UUID
           EOF
           
           # Find certificate identity
@@ -155,11 +170,12 @@ jobs:
           fi
           
           echo "Using certificate: $CERT_IDENTITY"
-          echo "Using provisioning profile: $PROVISIONING_PROFILE_NAME ($PROVISIONING_PROFILE_UUID)"
+          echo "Using app provisioning profile: $APP_PROVISIONING_PROFILE_NAME ($APP_PROVISIONING_PROFILE_UUID)"
+          echo "Using widget provisioning profile: $WIDGET_PROVISIONING_PROFILE_NAME ($WIDGET_PROVISIONING_PROFILE_UUID)"
           
           # Build archive with signing configuration
-          # Override CODE_SIGN_STYLE for our targets only (iosApp and LaunchWidgetExtension)
-          # SPM packages will still use automatic signing from their own package definitions
+          # Provisioning profiles are set via Config.xcconfig and project settings
+          # SPM packages will use automatic signing from their package definitions
           xcrun xcodebuild \
             -project iosApp.xcodeproj \
             -scheme iosApp \
@@ -169,7 +185,7 @@ jobs:
             -destination "generic/platform=iOS" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID" \
+            CODE_SIGN_IDENTITY="$CERT_IDENTITY" \
             archive
 
       - name: Export IPA
