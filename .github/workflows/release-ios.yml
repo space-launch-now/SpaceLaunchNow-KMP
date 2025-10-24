@@ -157,8 +157,9 @@ jobs:
           echo "Using certificate: $CERT_IDENTITY"
           echo "Using provisioning profile: $PROVISIONING_PROFILE_NAME ($PROVISIONING_PROFILE_UUID)"
           
-          # Build archive with automatic signing for all targets
-          # The export step will handle distribution signing via ExportOptions.plist
+          # Build archive with signing configuration
+          # Override CODE_SIGN_STYLE for our targets only (iosApp and LaunchWidgetExtension)
+          # SPM packages will still use automatic signing from their own package definitions
           xcrun xcodebuild \
             -project iosApp.xcodeproj \
             -scheme iosApp \
@@ -166,8 +167,9 @@ jobs:
             -sdk iphoneos \
             -archivePath "$RUNNER_TEMP/Build/Archives/SpaceLaunchNow.xcarchive" \
             -destination "generic/platform=iOS" \
-            -allowProvisioningUpdates \
             DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_UUID" \
             archive
 
       - name: Export IPA
