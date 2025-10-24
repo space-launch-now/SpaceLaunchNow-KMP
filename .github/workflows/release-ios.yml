@@ -155,10 +155,10 @@ jobs:
           fi
           
           echo "Using certificate: $CERT_IDENTITY"
+          echo "Using provisioning profile: $PROVISIONING_PROFILE_NAME ($PROVISIONING_PROFILE_UUID)"
           
-          # Build archive with automatic signing
-          # Xcode will use the installed provisioning profile and certificates automatically
-          # Don't specify CODE_SIGN_IDENTITY to avoid conflicts with automatic signing
+          # Build archive with automatic signing for all targets
+          # The export step will handle distribution signing via ExportOptions.plist
           xcrun xcodebuild \
             -project iosApp.xcodeproj \
             -scheme iosApp \
