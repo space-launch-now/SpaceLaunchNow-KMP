@@ -92,7 +92,7 @@ jobs:
       - name: Set Xcode version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '15.2'
+          xcode-version: '16.2'
 
       - name: Import Apple certificates
         uses: apple-actions/import-codesign-certs@v2
