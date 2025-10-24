@@ -23,3 +23,5 @@ composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/util/DesktopSecre
 iosApp/iosApp/Secrets.plist
 iosApp/Secrets.plist
 iosApp/iosApp/GoogleService-Info.plist
+
+**google-services.json**

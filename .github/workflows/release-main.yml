@@ -166,6 +166,9 @@ jobs:
           FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
         run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
 
+      - name: Print google-services.json
+        run: cat composeApp/google-services.json
+
       - name: Grant execute permission
         run: chmod +x gradlew
 
