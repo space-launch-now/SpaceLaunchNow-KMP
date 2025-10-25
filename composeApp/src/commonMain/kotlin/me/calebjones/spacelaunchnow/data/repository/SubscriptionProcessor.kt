@@ -1,16 +1,17 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.NotificationState
-import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.util.BuildConfig
 
+@OptIn(FlowPreview::class)
 class SubscriptionProcessor(
     private val pushMessaging: PushMessaging,
     private val debugPreferences: DebugPreferences?,
@@ -111,7 +112,7 @@ class SubscriptionProcessor(
          * - Subscribe to ONLY the version topic (k_prod_v4 or k_debug_v4)
          * - Server sends ALL notifications to these topics with full data payload
          * - Client filters notifications based on user preferences (agency, location, timing, etc.)
-         * 
+         *
          * This eliminates the complex topic subscription logic and moves filtering to the client
          */
         val topics = mutableSetOf<String>()
@@ -119,7 +120,7 @@ class SubscriptionProcessor(
         // Only subscribe to version topic - all filtering is done client-side
         val versionTopic = getVersionTopic()
         topics.add(versionTopic)
-        
+
         println("📡 v4 Simple Topics: Subscribing only to '$versionTopic' (client-side filtering enabled)")
 
         return topics

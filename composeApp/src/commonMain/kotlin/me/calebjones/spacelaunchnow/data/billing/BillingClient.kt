@@ -8,31 +8,30 @@ import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 /**
  * Platform-agnostic billing interface
  *
- * Implementations:
- * - Android: Google Play Billing Library
- * - iOS: StoreKit 2
- * - Desktop: Server-side only (no local billing)
+ * Now uses RevenueCat for unified billing across all platforms
  *
  * CRITICAL SECURITY:
  * - This is the ONLY source of truth for subscription status
  * - Never rely on cached values for access control
  * - Always verify purchases server-side for sensitive operations
  */
-expect class BillingClient {
+class BillingClient(
+    private val revenueCatClient: RevenueCatBillingClient
+) {
 
     /**
      * Initialize the billing client
      * Must be called before any other operations
      */
-    suspend fun initialize(): Result<Unit>
+    suspend fun initialize(): Result<Unit> = revenueCatClient.initialize()
 
     /**
      * Query current active purchases
-     * This directly queries Google Play or App Store
+     * This directly queries RevenueCat which syncs with Google Play or App Store
      *
      * @return List of active purchases from platform
      */
-    suspend fun queryPurchases(): Result<List<PlatformPurchase>>
+    suspend fun queryPurchases(): Result<List<PlatformPurchase>> = revenueCatClient.queryPurchases()
 
     /**
      * Start purchase flow for a subscription
@@ -41,21 +40,23 @@ expect class BillingClient {
      * @param basePlanId The base plan ID (e.g., "base-plan" for monthly, "yearly" for yearly)
      * @return Result with purchase token on success
      */
-    suspend fun launchPurchaseFlow(productId: String, basePlanId: String? = null): Result<String>
+    suspend fun launchPurchaseFlow(productId: String, basePlanId: String? = null): Result<String> = 
+        revenueCatClient.launchPurchaseFlow(productId, basePlanId)
 
     /**
-     * Acknowledge a purchase (required for Google Play)
+     * Acknowledge a purchase (handled automatically by RevenueCat)
      *
      * @param purchaseToken The purchase token to acknowledge
      */
-    suspend fun acknowledgePurchase(purchaseToken: String): Result<Unit>
+    suspend fun acknowledgePurchase(purchaseToken: String): Result<Unit> = 
+        revenueCatClient.acknowledgePurchase(purchaseToken)
 
     /**
      * Get available products for purchase
      *
      * @return List of product IDs that can be purchased
      */
-    suspend fun getAvailableProducts(): Result<List<String>>
+    suspend fun getAvailableProducts(): Result<List<String>> = revenueCatClient.getAvailableProducts()
 
     /**
      * Get product pricing details
@@ -63,18 +64,19 @@ expect class BillingClient {
      * @param productId The product ID to query
      * @return List of pricing information for all base plans of this product
      */
-    suspend fun getProductPricing(productId: String): Result<List<me.calebjones.spacelaunchnow.data.model.ProductPricing>>
+    suspend fun getProductPricing(productId: String): Result<List<me.calebjones.spacelaunchnow.data.model.ProductPricing>> = 
+        revenueCatClient.getProductPricing(productId)
 
     /**
      * Flow of purchase updates
      * Emits whenever a purchase is completed or updated
      */
-    val purchaseUpdates: Flow<PlatformPurchase>
+    val purchaseUpdates: Flow<PlatformPurchase> = revenueCatClient.purchaseUpdates
 
     /**
      * Disconnect and cleanup resources
      */
-    fun disconnect()
+    fun disconnect() = revenueCatClient.disconnect()
 }
 
 /**
@@ -262,8 +264,4 @@ object SubscriptionProducts {
     }
 }
 
-/**
- * Factory function to create platform-specific BillingClient
- * This is the proper KMP pattern for platform-specific constructors
- */
-expect fun createBillingClient(): BillingClient
+

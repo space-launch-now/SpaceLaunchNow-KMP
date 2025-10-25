@@ -24,6 +24,7 @@ chore: update dependencies           → Patch version bump (4.0.0 → 4.0.1)
 - ✅ Use `!` for breaking changes: `feat!:` or include `BREAKING CHANGE:` in footer
 - ❌ Never suggest plain messages like "Update files" or "Fix bug"
 - ❌ Avoid bumping major version without human review
+- ❌ Never decrease version codes - Google Play requires monotonically increasing version codes
 
 **Pipeline Triggers:**
 
@@ -353,6 +354,7 @@ launchesApi.getLaunchMiniList(limit = 10, upcoming = true)
 - **Desktop Main Class**: Ensure `mainClass` in build.gradle.kts points to correct `MainKt` file
 - **Koin Scoping**: ViewModels are automatically scoped; repositories are singletons across app
   lifecycle
+- **Proper Imports**: Always add proper imports at the top of the file and use short class names (e.g., `Purchases.sharedInstance`) instead of fully qualified names (e.g., `com.revenuecat.purchases.kmp.Purchases.sharedInstance`)
 
 ALWAYS avoid using magic ID's or magic strings, use a data class where ever you can.
 

@@ -8,16 +8,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
 import app.lexilabs.basic.ads.AdSize
+import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.BasicAds
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.DependsOnGoogleUserMessagingPlatform
 import app.lexilabs.basic.ads.ExperimentalBasicAds
+import app.lexilabs.basic.ads.InterstitialAdHandler
 import app.lexilabs.basic.ads.RequestConfiguration
+import app.lexilabs.basic.ads.RewardedAdHandler
 import app.lexilabs.basic.ads.composable.ConsentPopup
 import app.lexilabs.basic.ads.composable.rememberBannerAd
 import app.lexilabs.basic.ads.composable.rememberConsent
@@ -28,6 +29,7 @@ import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
@@ -43,56 +45,69 @@ val LocalUseUtc = compositionLocalOf { false }
  * CompositionLocal to provide the ContextFactory throughout the app
  */
 val LocalContextFactory =
-    compositionLocalOf<me.calebjones.spacelaunchnow.platform.ContextFactory?> { null }
+    compositionLocalOf<ContextFactory?> { null }
 
 /**
  * CompositionLocal to provide preloaded banner ads throughout the app
  */
-val LocalPreloadedBannerAd = compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+@OptIn(DependsOnGoogleMobileAds::class)
+val LocalPreloadedBannerAd = compositionLocalOf<BannerAdHandler?> { null }
+
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedLargeBannerAd =
-    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+    compositionLocalOf<BannerAdHandler?> { null }
+
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedMediumRectangleAd =
-    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+    compositionLocalOf<BannerAdHandler?> { null }
 
 /**
  * CompositionLocal to provide dedicated navigation banner ad that doesn't conflict with content ads
  */
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedNavigationBannerAd =
-    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+    compositionLocalOf<BannerAdHandler?> { null }
+
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedNavigationLargeBannerAd =
-    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+    compositionLocalOf<BannerAdHandler?> { null }
+
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedNavigationLeaderboardAd =
-    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+    compositionLocalOf<BannerAdHandler?> { null }
 
 /**
  * CompositionLocal to provide preloaded tablet-specific ads throughout the app
  */
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedLeaderboardAd =
-    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+    compositionLocalOf<BannerAdHandler?> { null }
+
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedFullBannerAd =
-    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+    compositionLocalOf<BannerAdHandler?> { null }
+
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedFluidAd =
-    compositionLocalOf<app.lexilabs.basic.ads.BannerAdHandler?> { null }
+    compositionLocalOf<BannerAdHandler?> { null }
 
 /**
  * CompositionLocal to provide preloaded interstitial and rewarded ads throughout the app
  */
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedInterstitialAd =
-    compositionLocalOf<app.lexilabs.basic.ads.InterstitialAdHandler?> { null }
+    compositionLocalOf<InterstitialAdHandler?> { null }
+
+@OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedRewardedAd =
-    compositionLocalOf<app.lexilabs.basic.ads.RewardedAdHandler?> { null }
+    compositionLocalOf<RewardedAdHandler?> { null }
 
 @Composable
 fun isTabletOrDesktop(): Boolean {
     // Use WindowSizeClass for proper adaptive layout detection
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    // Check if width is MEDIUM or EXPANDED (not COMPACT)
-    // COMPACT: < 600dp (phones in portrait)
-    // MEDIUM: 600-839dp (tablets, foldables, phones in landscape) 
-    // EXPANDED: >= 840dp (large tablets, desktops)
-    val isLargeScreen = windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT
-    
+    val isLargeScreen = (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED)
     println("WindowSizeClass width: ${windowSizeClass.windowWidthSizeClass}, isLargeScreen: $isLargeScreen")
     return isLargeScreen || getPlatform().type.isDesktop
 }
@@ -119,7 +134,8 @@ fun SpaceLaunchNowApp(
     val globalAdManager = koinInject<GlobalAdManager>()
 
     // Determine activity parameter based on platform (iOS needs null, Android needs activity)
-    val activityOrNull = if (getPlatform().type == PlatformType.IOS) null else contextFactory.getActivity()
+    val activityOrNull =
+        if (getPlatform().type == PlatformType.IOS) null else contextFactory.getActivity()
 
     // 🚀 PRELOAD BANNER ADS: Following KMP-Google-AdMob example pattern
     // These ads will be preloaded and kept alive throughout the app lifecycle for instant rendering
@@ -167,7 +183,7 @@ fun SpaceLaunchNowApp(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
         adSize = AdSize.FULL_BANNER  // 468x60 for medium screens
     )
-    
+
     // 🌊 FLUID ADS: Adaptive/responsive ads that adjust to content
     val preloadedFluidAd by rememberBannerAd(
         activity = activityOrNull,
@@ -248,10 +264,12 @@ fun SpaceLaunchNowApp(
                     println("🎯 Initializing Basic-Ads on Android with activity: $activity")
                     BasicAds.initialize(activity)
                 }
+
                 PlatformType.IOS -> {
                     println("🎯 Initializing Basic-Ads on iOS (no context required)")
                     BasicAds.initialize(null)
                 }
+
                 PlatformType.DESKTOP -> {
                     println("🎯 Basic-Ads not supported on Desktop")
                     return@LaunchedEffect

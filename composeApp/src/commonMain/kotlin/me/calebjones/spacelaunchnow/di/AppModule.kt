@@ -2,13 +2,14 @@ package me.calebjones.spacelaunchnow.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.revenuecat.purchases.kmp.Purchases
 import me.calebjones.spacelaunchnow.UserViewModel
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.UserRepository
 import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatBillingClient
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
-import me.calebjones.spacelaunchnow.data.billing.createBillingClient
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
@@ -142,9 +143,12 @@ val appModule = module {
     singleOf(::RevenueCatManager)
 
     // BillingClient now uses RevenueCat instead of platform-specific implementations
-    // Note: Keeping as factory for now, can convert to single later
-    factory<BillingClient> {
-        createBillingClient()
+    single<BillingClient> {
+        BillingClient(
+            revenueCatClient = RevenueCatBillingClient(
+                purchases = Purchases.sharedInstance
+            )
+        )
     }
 
     single<SubscriptionRepository> {

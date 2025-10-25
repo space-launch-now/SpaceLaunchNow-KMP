@@ -50,8 +50,7 @@ class NotificationRepositoryImpl(
             val persistedState = storage.getState()
             _state.value = persistedState
 
-            println("Loaded state: notifications=${persistedState.enableNotifications}, followAll=${persistedState.followAllLaunches}")
-            println("Agencies: ${persistedState.subscribedAgencies.size}, Locations: ${persistedState.subscribedLocations.size}")
+            println("Loaded state: notifications=${persistedState.enableNotifications}")
             println("Topic settings: ${persistedState.topicSettings}")
 
             // Start background subscription processing
