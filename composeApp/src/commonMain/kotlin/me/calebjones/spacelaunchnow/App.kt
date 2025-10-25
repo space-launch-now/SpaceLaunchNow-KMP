@@ -29,10 +29,14 @@ import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
+import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import org.koin.compose.koinInject
 
@@ -118,7 +122,7 @@ fun isTabletOrDesktop(): Boolean {
 )
 @Composable
 fun SpaceLaunchNowApp(
-    contextFactory: me.calebjones.spacelaunchnow.platform.ContextFactory,
+    contextFactory: ContextFactory,
     notificationLaunchId: String? = null,
     onNotificationLaunchIdConsumed: () -> Unit = {},
     navigationDestination: String? = null,
@@ -205,7 +209,7 @@ fun SpaceLaunchNowApp(
     // This singleton creation triggers all StateFlows to start collecting immediately,
     // ensuring switches show correct state with no animation when settings screen loads
     val appSettingsViewModel =
-        koinInject<me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel>()
+        koinInject<AppSettingsViewModel>()
 
     // Trigger StateFlow collection by accessing a flow
     LaunchedEffect(Unit) {
@@ -215,7 +219,7 @@ fun SpaceLaunchNowApp(
     }
 
     // Observe the theme setting
-    val themeOption by appPreferences.themeFlow.collectAsState(initial = me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.System)
+    val themeOption by appPreferences.themeFlow.collectAsState(initial = ThemeOption.System)
 
     // Observe the useUtc setting
     val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
@@ -227,7 +231,7 @@ fun SpaceLaunchNowApp(
         if (notificationLaunchId != null) {
             println("Navigating to launch detail for ID: $notificationLaunchId")
             navController.navigate(
-                me.calebjones.spacelaunchnow.navigation.LaunchDetail(
+                LaunchDetail(
                     notificationLaunchId
                 )
             )
@@ -241,7 +245,7 @@ fun SpaceLaunchNowApp(
         when (navigationDestination) {
             "subscription" -> {
                 println("Navigating to SupportUs screen from widget")
-                navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs)
+                navController.navigate(SupportUs)
                 onNavigationDestinationConsumed()
             }
 
@@ -353,11 +357,10 @@ fun SpaceLaunchNowApp(
         println("=== END APP START DEBUG INFO ===")
     }
 
-    // Determine initial layout type and keep it stable - don't switch between layouts on rotation
-    // This preserves navigation state across configuration changes
-    val isTabletOrDesktopValue = isTabletOrDesktop()
-    println("Device layout type: ${if (isTabletOrDesktopValue) "Tablet/Desktop" else "Phone"}")
-    val useTabletLayout = remember(navController) { isTabletOrDesktopValue }
+    // Determine layout type and update on window size changes (rotation, window resize)
+    // Don't cache this - let it recalculate on every recomposition when screen rotates
+    val useTabletLayout = isTabletOrDesktop()
+    println("Device layout type: ${if (useTabletLayout) "Tablet/Desktop" else "Phone"}")
 
     // Try to show a consent popup
     ConsentPopup(
