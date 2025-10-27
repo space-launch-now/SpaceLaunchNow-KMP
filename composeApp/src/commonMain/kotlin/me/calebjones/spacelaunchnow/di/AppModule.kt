@@ -143,10 +143,12 @@ val appModule = module {
     singleOf(::RevenueCatManager)
 
     // BillingClient now uses RevenueCat instead of platform-specific implementations
+    // Use lazy factory to avoid accessing Purchases.sharedInstance during Koin initialization
     single<BillingClient> {
+        val revenueCatManager = get<RevenueCatManager>()
         BillingClient(
             revenueCatClient = RevenueCatBillingClient(
-                purchases = Purchases.sharedInstance
+                revenueCatManager = revenueCatManager
             )
         )
     }
