@@ -190,20 +190,19 @@ fun ThemeCustomizationScreen(
 
             // Color Customization (PREMIUM - Disabled for free users)
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Column {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         SectionHeaderText("Primary Color")
-                        SectionSubHeaderText(
-                            "Choose the primary color for your theme."
-                        )
+                        Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.width(4.dp))
+                        if (!hasCustomTheme) {
+                            PremiumBadge()
+                        }
                     }
-                    if (!hasCustomTheme) {
-                        PremiumBadge()
-                    }
+                    SectionSubHeaderText("Choose the primary color for your theme.")
                 }
                 SettingsCardRow {
                     ColorPalette(
@@ -260,18 +259,19 @@ fun ThemeCustomizationScreen(
 
             // Widget Appearance Customization (Show all controls, disable for non-premium)
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         SectionHeaderText("Widget Appearance")
-                        SectionSubHeaderText("Customize the look of your home screen widgets")
+                        Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.width(4.dp))
+                        if (!hasWidgetCustomization) {
+                            PremiumBadge()
+                        }
                     }
-                    if (!hasWidgetCustomization) {
-                        PremiumBadge()
-                    }
+                    SectionSubHeaderText("Customize the look of your home screen widgets")
                 }
             }
 

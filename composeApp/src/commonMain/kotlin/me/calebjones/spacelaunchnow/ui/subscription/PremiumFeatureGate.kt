@@ -28,9 +28,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -331,12 +331,12 @@ fun PremiumBadge(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = Modifier.padding(16.dp).then(modifier),
+        modifier = modifier,
         color = MaterialTheme.colorScheme.primaryContainer,
         shape = MaterialTheme.shapes.small
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 0.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -350,7 +350,8 @@ fun PremiumBadge(
                 text = "Premium",
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                maxLines = 1
             )
         }
     }
@@ -378,25 +379,27 @@ fun rememberIsPremium(): State<Boolean> {
 fun rememberHasFeature(feature: PremiumFeature): State<Boolean> {
     val subscriptionRepo = koinInject<SubscriptionRepository>()
     val subscriptionState by subscriptionRepo.state.collectAsState()
-    val temporaryAccess = koinInject<me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess>()
-    
+    val temporaryAccess =
+        koinInject<me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess>()
+
     // Observe the access change trigger to recompose when temporary access changes
     val accessChangeTrigger by temporaryAccess.accessChangeTrigger.collectAsState()
-    
+
     // Create a state that combines both subscription and temporary access
     // Include accessChangeTrigger in the key to trigger recomposition when it changes
-    val hasAccess = produceState(initialValue = false, subscriptionState, feature, accessChangeTrigger) {
-        // Check subscription state
-        val hasSubscription = subscriptionState.hasFeature(feature)
-        
-        // Check temporary access
-        val hasTemporary = temporaryAccess.hasTemporaryAccess(feature)
-        
-        value = hasSubscription || hasTemporary
-        
-        println("🔍 rememberHasFeature(${feature.name}): subscription=$hasSubscription, temporary=$hasTemporary, result=${value}")
-    }
-    
+    val hasAccess =
+        produceState(initialValue = false, subscriptionState, feature, accessChangeTrigger) {
+            // Check subscription state
+            val hasSubscription = subscriptionState.hasFeature(feature)
+
+            // Check temporary access
+            val hasTemporary = temporaryAccess.hasTemporaryAccess(feature)
+
+            value = hasSubscription || hasTemporary
+
+            println("🔍 rememberHasFeature(${feature.name}): subscription=$hasSubscription, temporary=$hasTemporary, result=${value}")
+        }
+
     return hasAccess
 }
 
