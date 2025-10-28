@@ -99,11 +99,23 @@ jobs:
           echo "✅ Using Xcode version:"
           xcodebuild -version
 
+      # ==================== CODE SIGNING ====================
+      - name: Clean up existing keychains
+        run: |
+          # Remove any existing temporary keychains from previous runs
+          security list-keychains | grep -o 'signing_temp.*\.keychain' | while read keychain; do
+            echo "🧹 Removing existing keychain: $keychain"
+            security delete-keychain "$keychain" || true
+          done
+          echo "✅ Keychain cleanup complete"
+
       - name: Import Apple certificates
         uses: apple-actions/import-codesign-certs@v2
         with:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          keychain: signing_temp_${{ github.run_id }}
+          create-keychain: true
 
       - name: Setup App Store Connect API Key
         env:
@@ -281,3 +293,17 @@ jobs:
           
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Cost Estimate:** ~\$6.00 (30 min macOS build time)" >> $GITHUB_STEP_SUMMARY
+
+      # ==================== CLEANUP ====================
+      - name: Clean up keychains
+        if: always()
+        run: |
+          echo "🧹 Cleaning up temporary keychains..."
+          # Remove the specific keychain created for this run
+          security delete-keychain "signing_temp_${{ github.run_id }}.keychain" || true
+          # Clean up any other temporary keychains that might be left over
+          security list-keychains | grep -o 'signing_temp.*\.keychain' | while read keychain; do
+            echo "Removing leftover keychain: $keychain"
+            security delete-keychain "$keychain" || true
+          done
+          echo "✅ Keychain cleanup complete"
