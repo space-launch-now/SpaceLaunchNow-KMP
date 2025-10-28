@@ -1,4 +1,22 @@
-# 0.1.0 (2025-10-24)
+# [4.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v4.0.0-b27...v4.0.0) (2025-10-28)
+
+
+### Bug Fixes
+
+* error with test and deprecated things ([fe6e081](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/fe6e0818760939f59f39bdfe996b8918c24b2150))
+* fix layout for medium size screen ([fd792d8](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/fd792d85eb22f1c56e2b5dd7c8ea60b385644833))
+* premium badge layout and improve UI responsiveness ([682ef0a](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/682ef0ab8b1c66845b3b8a1ab2f577ad853c93c1))
+
+
+### Features
+
+* Add ad unit IDs to env example and update release version ([2ecb78d](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/2ecb78d8c6872d7c7374f5bbd2d0d8668c8436de))
+* Add FCMBridge and NotificationTestHelper for Firebase Cloud Messaging integration ([e967612](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/e967612d25f061070a845b99d05012abdbe4d4e7))
+* Update app name for debug mode and enhance ad handling ([5322df8](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/5322df8653343d37a00f512fbc450d3beccd603c))
+
+
+
+# [4.0.0-b27](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/504006e2e33c1667c6e60f84f920d76ed77d02c9...v4.0.0-b27) (2025-10-24)
 
 
 ### Bug Fixes
