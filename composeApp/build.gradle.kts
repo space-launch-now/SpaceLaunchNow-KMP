@@ -268,6 +268,7 @@ android {
 
         versionCode = computeVersionCode()
         versionName = computeVersionName()
+        manifestPlaceholders["appName"] = "Space Launch Now"
     }
     
     // Bundle configuration for 16KB optimization
