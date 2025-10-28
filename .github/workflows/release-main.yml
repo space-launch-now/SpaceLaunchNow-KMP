@@ -52,7 +52,7 @@ jobs:
           # Set FORCE_VERSION to override automatic versioning (e.g., "4.0.0")
           # Leave empty to use automatic semantic versioning
           # During pre-release, lock at 4.0.0 to only increment build number
-          FORCE_VERSION: "4.0.0"
+          FORCE_VERSION: "5.0.0"
         run: |
           if [ -n "$FORCE_VERSION" ]; then
             NEW_VERSION="$FORCE_VERSION"
@@ -123,7 +123,7 @@ jobs:
   # Job 2: Run tests with calculated version
   test:
     name: Run Tests
-    needs: [version]
+    needs: [ version ]
     runs-on: ubuntu-latest
     
     steps:
@@ -187,7 +187,7 @@ jobs:
   # Job 3: Commit version ONLY after tests pass
   commit:
     name: Commit Version & Tag
-    needs: [version, test]
+    needs: [ version, test ]
     runs-on: ubuntu-latest
     
     steps:
@@ -215,7 +215,7 @@ jobs:
   # Job 4: Build AAB (after commit)
   build-aab:
     name: Build Release AAB
-    needs: [version, commit]
+    needs: [ version, commit ]
     runs-on: ubuntu-latest
     
     steps:
@@ -296,7 +296,7 @@ jobs:
   # Job 5: Deploy to Google Play Store and Firebase (after AAB build completes)
   deploy:
     name: Deploy to Play Store & Firebase
-    needs: [version, build-aab]
+    needs: [ version, build-aab ]
     runs-on: ubuntu-latest
     
     steps:
