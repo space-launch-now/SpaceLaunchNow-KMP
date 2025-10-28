@@ -3,6 +3,9 @@ import ComposeApp
 
 @main
 struct iOSApp: App {
+    // Register AppDelegate for Firebase initialization
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

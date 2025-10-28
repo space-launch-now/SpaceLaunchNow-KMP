@@ -25,8 +25,14 @@ import kotlin.time.ExperimentalTime
  *
  */
 class RevenueCatBillingClient(
-    private val purchases: Purchases
+    private val revenueCatManager: RevenueCatManager
 ) {
+
+    /**
+     * Lazy access to Purchases instance to avoid accessing before initialization
+     */
+    private val purchases: Purchases
+        get() = Purchases.sharedInstance
 
     private val _purchaseUpdates = MutableSharedFlow<PlatformPurchase>(replay = 0)
     val purchaseUpdates: Flow<PlatformPurchase> = _purchaseUpdates.asSharedFlow()

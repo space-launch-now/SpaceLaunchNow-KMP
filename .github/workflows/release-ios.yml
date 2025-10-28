@@ -18,7 +18,7 @@ env:
 jobs:
   build-ios:
     name: Build & Deploy iOS
-    runs-on: macos-14
+    runs-on: self-hosted
     
     steps:
       - name: Checkout code
@@ -89,10 +89,15 @@ jobs:
           echo "Building iOS version: $FULL_VERSION"
 
       # ==================== XCODE SETUP ====================
-      - name: Set Xcode version
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.2'
+      # For self-hosted runners, Xcode must be pre-installed
+      # This step just verifies and selects the version
+      - name: Select Xcode version
+        run: |
+          # Use latest installed Xcode on self-hosted runner
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+          echo "✅ Using Xcode version:"
+          xcodebuild -version
 
       - name: Import Apple certificates
         uses: apple-actions/import-codesign-certs@v2

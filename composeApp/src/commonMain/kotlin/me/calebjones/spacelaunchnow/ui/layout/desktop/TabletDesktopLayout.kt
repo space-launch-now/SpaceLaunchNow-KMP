@@ -27,6 +27,7 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -89,6 +90,9 @@ fun TabletDesktopLayout(
                 val selectedIcons =
                     listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Settings)
 
+                val windowSizeInfo = currentWindowAdaptiveInfo()
+                val windowSize = windowSizeInfo.windowSizeClass
+
                 // Use Column to stack main content and banner ad
                 Column(modifier = Modifier.fillMaxSize()) {
                     // Main content area
@@ -102,6 +106,7 @@ fun TabletDesktopLayout(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 NavigationRail(
+
                                     header = {
                                         Image(
                                             painter = painterResource(Res.drawable.launcher),

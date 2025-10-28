@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DashboardCustomize
@@ -45,6 +46,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -58,6 +60,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
@@ -123,6 +126,14 @@ fun SupportUsScreen(
 //                        fontSize = 36.sp,
 //                        color = MaterialTheme.colorScheme.onPrimaryContainer,
 //                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -509,19 +520,52 @@ private fun HeroSection(
 
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(125.dp)
                     .offset(y = offsetY.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
+                    .shadow(elevation = 8.dp, shape = CircleShape, clip = false),
                 contentAlignment = Alignment.Center
             ) {
-                androidx.compose.foundation.Image(
-                    painter = painterResource(Res.drawable.launcher),
-                    contentDescription = "Space Launch Now",
+                // Outer colorful sweep gradient border effect
+                Box(
                     modifier = Modifier
-                        .size(64.dp)
+                        .size(125.dp)
                         .clip(CircleShape)
-                )
+                        .background(
+                            Brush.sweepGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.colorScheme.secondary,
+                                    MaterialTheme.colorScheme.tertiary,
+                                    MaterialTheme.colorScheme.primary,
+                                )
+                            )
+                        )
+                        .then(Modifier)
+                ) {}
+                // Middle thin border
+                Box(
+                    modifier = Modifier
+                        .size(121.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                ) {}
+                // Inner circle with shadow (for rocket image background)
+                Box(
+                    modifier = Modifier
+                        .size(112.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .then(Modifier),
+                    contentAlignment = Alignment.Center
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = painterResource(Res.drawable.launcher),
+                        contentDescription = "Space Launch Now",
+                        modifier = Modifier
+                            .size(90.dp)
+                            .align(Alignment.Center)
+                    )
+                }
             }
 
             if (isSubscribed) {

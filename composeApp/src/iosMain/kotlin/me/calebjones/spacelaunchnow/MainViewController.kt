@@ -1,17 +1,16 @@
 package me.calebjones.spacelaunchnow
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.window.ComposeUIViewController
-import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.di.koinConfig
-import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.koin.core.context.startKoin
+import org.koin.mp.KoinPlatform.getKoin
 
 private var koinInitialized = false
 
@@ -29,6 +28,18 @@ fun MainViewController() = ComposeUIViewController {
         initializeBuildConfig()
         startKoin(koinConfig)
         koinInitialized = true
+        
+        // Initialize RevenueCat immediately after Koin is ready (similar to Android)
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val revenueCatManager = getKoin().get<RevenueCatManager>()
+                revenueCatManager.initialize(appUserId = null)
+                println("iOS: RevenueCat initialized successfully")
+            } catch (e: Exception) {
+                println("iOS: Failed to initialize RevenueCat - ${e.message}")
+                e.printStackTrace()
+            }
+        }
     }
     
     val navigationDestination by navigationDestinationState

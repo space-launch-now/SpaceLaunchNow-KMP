@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -40,9 +41,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -68,9 +69,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.Rocket
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -477,7 +475,7 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
 
             // Tabs
             val selectedTabIndex = if (selectedTab == ScheduleTab.Upcoming) 0 else 1
-            TabRow(
+            PrimaryTabRow(
                 selectedTabIndex = selectedTabIndex,
 //                divider = { HorizontalDivider() }
             ) {
@@ -622,9 +620,9 @@ private fun ScheduleLaunchCard(
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = null,
-                    placeholder = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
-                    error = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
-                    fallback = rememberVectorPainter(FontAwesomeIcons.Solid.Rocket),
+                    placeholder = rememberVectorPainter(Icons.Filled.RocketLaunch),
+                    error = rememberVectorPainter(Icons.Filled.RocketLaunch),
+                    fallback = rememberVectorPainter(Icons.Filled.RocketLaunch),
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
@@ -640,7 +638,7 @@ private fun ScheduleLaunchCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = FontAwesomeIcons.Solid.Rocket,
+                        imageVector = Icons.Filled.RocketLaunch,
                         contentDescription = "placeholder",
                         modifier = Modifier.size(48.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),

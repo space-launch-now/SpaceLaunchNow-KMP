@@ -98,8 +98,6 @@ fun SharedDetailScaffold(
 
     Box(
         Modifier
-            .clip(RoundedCornerShape(20.dp))
-
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.surfaceContainer),
     ) {

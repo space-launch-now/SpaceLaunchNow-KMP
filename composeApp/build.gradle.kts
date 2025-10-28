@@ -135,7 +135,7 @@ kotlin {
 
                 // JDK cryptography provider for Android
                 implementation(libs.cryptography.provider.jdk)
-                
+
                 // ShadowGlow library for advanced drop shadows
                 implementation(libs.shadowglow)
             }
@@ -168,7 +168,7 @@ kotlin {
 
                 implementation(compose.material3)
                 implementation(compose.materialIconsExtended)
-                
+
                 // Adaptive layouts for responsive UI
                 implementation(libs.compose.material3.adaptive)
 
@@ -268,6 +268,20 @@ android {
 
         versionCode = computeVersionCode()
         versionName = computeVersionName()
+        manifestPlaceholders["appName"] = "Space Launch Now"
+    }
+    
+    // Bundle configuration for 16KB optimization
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
     }
     packaging {
         resources {
@@ -276,13 +290,19 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             buildConfigField("boolean", "IS_DEBUG", "false")
         }
         getByName("debug") {
-            // applicationIdSuffix = ".kmpdebug"
+            applicationIdSuffix = ".kmpdebug"
             versionNameSuffix = "-DEBUG"
             buildConfigField("boolean", "IS_DEBUG", "true")
+            manifestPlaceholders["appName"] = "@string/app_name_debug"
         }
     }
     compileOptions {
