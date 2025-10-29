@@ -26,6 +26,49 @@ actual object AppSecrets {
             println("🔑 AppSecrets.revenueCatIosKey result: ${if (key.isNotEmpty()) "✅ loaded (${key.take(15)}...)" else "❌ EMPTY"}")
             return key
         }
+
+    // AdMob ad unit IDs
+    actual val androidBannerAdUnitId: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "androidBannerAdUnitId") ?: ""
+            println("🔑 AppSecrets.androidBannerAdUnitId: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
+
+    actual val iosBannerAdUnitId: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "iosBannerAdUnitId") ?: ""
+            println("🔑 AppSecrets.iosBannerAdUnitId: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
+
+    actual val androidInterstitialAdUnitId: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "androidInterstitialAdUnitId") ?: ""
+            println("🔑 AppSecrets.androidInterstitialAdUnitId: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
+
+    actual val iosInterstitialAdUnitId: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "iosInterstitialAdUnitId") ?: ""
+            println("🔑 AppSecrets.iosInterstitialAdUnitId: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
+
+    actual val androidRewardedAdUnitId: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "androidRewardedAdUnitId") ?: ""
+            println("🔑 AppSecrets.androidRewardedAdUnitId: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
+
+    actual val iosRewardedAdUnitId: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "iosRewardedAdUnitId") ?: ""
+            println("🔑 AppSecrets.iosRewardedAdUnitId: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
 }
 
 internal fun getStringResource(filename: String, fileType: String, valueKey: String): String? {

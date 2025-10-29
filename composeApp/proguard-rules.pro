@@ -18,6 +18,9 @@
 -keep class kotlinx.serialization.** { *; }
 -keep @kotlinx.serialization.Serializable class * { *; }
 
+# Keep BuildConfig for version information
+-keep class me.calebjones.spacelaunchnow.BuildConfig { *; }
+
 # Keep API models (generated from OpenAPI)
 -keep class me.calebjones.spacelaunchnow.api.** { *; }
 

@@ -16,7 +16,7 @@ import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.util.BuildConfig
-import me.calebjones.spacelaunchnow.util.EnvironmentManager
+import me.calebjones.spacelaunchnow.data.config.AdMobConfig
 
 /**
  * Global ad manager that provides optimized ad configuration and preloading strategies.
@@ -315,7 +315,7 @@ class GlobalAdManager(
 
         /**
          * Get the correct Ad Unit ID for the current platform and ad type
-         * Uses test Ad Unit IDs in debug builds, production IDs from .env in release builds
+         * Uses test Ad Unit IDs in debug builds, production IDs from AdMobConfig in release builds
          */
         fun getPlatformAdUnitId(adType: AdType = AdType.BANNER): String {
             // Use test Ad Unit IDs in debug builds
@@ -327,21 +327,11 @@ class GlobalAdManager(
                 }
             }
 
-            // Use production Ad Unit IDs from .env in release builds
-            return when (getPlatform().type) {
-                PlatformType.ANDROID -> when (adType) {
-                    AdType.BANNER -> EnvironmentManager.getEnv("ANDROID_BANNER_AD_UNIT_ID", AdUnitId.BANNER_DEFAULT)
-                    AdType.INTERSTITIAL -> EnvironmentManager.getEnv("ANDROID_INTERSTITIAL_AD_UNIT_ID", AdUnitId.INTERSTITIAL_DEFAULT)
-                    AdType.REWARDED -> EnvironmentManager.getEnv("ANDROID_REWARDED_AD_UNIT_ID", AdUnitId.REWARDED_DEFAULT)
-                }
-
-                PlatformType.IOS -> when (adType) {
-                    AdType.BANNER -> EnvironmentManager.getEnv("IOS_BANNER_AD_UNIT_ID", AdUnitId.BANNER_DEFAULT)
-                    AdType.INTERSTITIAL -> EnvironmentManager.getEnv("IOS_INTERSTITIAL_AD_UNIT_ID", AdUnitId.INTERSTITIAL_DEFAULT)
-                    AdType.REWARDED -> EnvironmentManager.getEnv("IOS_REWARDED_AD_UNIT_ID", AdUnitId.REWARDED_DEFAULT)
-                }
-
-                else -> AdUnitId.BANNER_DEFAULT // Fallback for Desktop/other platforms (uses test ID)
+            // Use production Ad Unit IDs from AdMobConfig in release builds
+            return when (adType) {
+                AdType.BANNER -> AdMobConfig.bannerAdUnitId
+                AdType.INTERSTITIAL -> AdMobConfig.interstitialAdUnitId
+                AdType.REWARDED -> AdMobConfig.rewardedAdUnitId
             }
         }
     }

@@ -21,6 +21,6 @@ actual fun initializeBuildConfig() {
         // Fallback values if we can't access the generated BuildConfig
         BuildConfig.VERSION_NAME = "unknown"
         BuildConfig.VERSION_CODE = 0
-        BuildConfig.IS_DEBUG = true
+        BuildConfig.IS_DEBUG = false
     }
 }

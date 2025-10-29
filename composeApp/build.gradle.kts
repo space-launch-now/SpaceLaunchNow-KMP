@@ -138,6 +138,12 @@ kotlin {
 
                 // ShadowGlow library for advanced drop shadows
                 implementation(libs.shadowglow)
+                // Purchases-KMP (RevenueCat): ANDROID ONLY
+                implementation(libs.purchases.core)
+                implementation(libs.purchases.ui)
+                implementation(libs.purchases.either)
+                implementation(libs.purchases.result)
+                implementation(libs.basicAds)
             }
         }
 
@@ -151,6 +157,11 @@ kotlin {
 
                 // Apple cryptography provider for iOS
                 implementation(libs.cryptography.provider.apple)
+                // Purchases-KMP (RevenueCat): IOS ONLY
+                implementation(libs.purchases.core)
+                implementation(libs.purchases.ui)
+                implementation(libs.purchases.either)
+                implementation(libs.purchases.result)
             }
         }
 
@@ -211,17 +222,8 @@ kotlin {
                 implementation(libs.aboutlibraries.compose.m2)
                 implementation(libs.aboutlibraries.compose.m3)
 
-                // Add the purchases-kmp dependencies.
-                implementation(libs.purchases.core)
-                implementation(libs.purchases.ui)   // Optional
-                implementation(libs.purchases.either)     // Optional
-                implementation(libs.purchases.result)     // Optional
-
                 // Cryptography library for secure hashing
                 implementation(libs.cryptography.core)
-
-                // Basic Ads (Google AdMob for KMP)
-                implementation(libs.basicAds)
             }
         }
 
@@ -257,10 +259,26 @@ android {
         val apiKey = envProps.getProperty("API_KEY") ?: ""
         val revenueCatAndroidKey = envProps.getProperty("REVENUECAT_ANDROID_KEY") ?: ""
         val revenueCatIosKey = envProps.getProperty("REVENUECAT_IOS_KEY") ?: ""
+        
+        // AdMob ad unit IDs
+        val androidBannerAdUnitId = envProps.getProperty("ANDROID_BANNER_AD_UNIT_ID") ?: ""
+        val iosBannerAdUnitId = envProps.getProperty("IOS_BANNER_AD_UNIT_ID") ?: ""
+        val androidInterstitialAdUnitId = envProps.getProperty("ANDROID_INTERSTITIAL_AD_UNIT_ID") ?: ""
+        val iosInterstitialAdUnitId = envProps.getProperty("IOS_INTERSTITIAL_AD_UNIT_ID") ?: ""
+        val androidRewardedAdUnitId = envProps.getProperty("ANDROID_REWARDED_AD_UNIT_ID") ?: ""
+        val iosRewardedAdUnitId = envProps.getProperty("IOS_REWARDED_AD_UNIT_ID") ?: ""
 
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         buildConfigField("String", "REVENUECAT_ANDROID_KEY", "\"$revenueCatAndroidKey\"")
         buildConfigField("String", "REVENUECAT_IOS_KEY", "\"$revenueCatIosKey\"")
+        
+        // AdMob ad unit IDs
+        buildConfigField("String", "ANDROID_BANNER_AD_UNIT_ID", "\"$androidBannerAdUnitId\"")
+        buildConfigField("String", "IOS_BANNER_AD_UNIT_ID", "\"$iosBannerAdUnitId\"")
+        buildConfigField("String", "ANDROID_INTERSTITIAL_AD_UNIT_ID", "\"$androidInterstitialAdUnitId\"")
+        buildConfigField("String", "IOS_INTERSTITIAL_AD_UNIT_ID", "\"$iosInterstitialAdUnitId\"")
+        buildConfigField("String", "ANDROID_REWARDED_AD_UNIT_ID", "\"$androidRewardedAdUnitId\"")
+        buildConfigField("String", "IOS_REWARDED_AD_UNIT_ID", "\"$iosRewardedAdUnitId\"")
 
         // Add version information to BuildConfig
         buildConfigField("String", "VERSION_NAME", "\"${computeVersionName()}\"")
