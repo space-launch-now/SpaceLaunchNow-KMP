@@ -301,21 +301,12 @@ actual class GlobalAdManager actual constructor(
         }
     }
 
-    companion object {
-        /**
-         * Ad types supported by the app
-         */
-        enum class AdType {
-            BANNER,
-            INTERSTITIAL,
-            REWARDED
-        }
-
+    actual companion object {
         /**
          * Get the correct Ad Unit ID for the current platform and ad type
          * Uses test Ad Unit IDs in debug builds, production IDs from AdMobConfig in release builds
          */
-        fun getPlatformAdUnitId(adType: AdType = AdType.BANNER): String {
+        actual fun getPlatformAdUnitId(adType: AdType): String {
             // Use test Ad Unit IDs in debug builds
             if (BuildConfig.IS_DEBUG) {
                 return when (adType) {

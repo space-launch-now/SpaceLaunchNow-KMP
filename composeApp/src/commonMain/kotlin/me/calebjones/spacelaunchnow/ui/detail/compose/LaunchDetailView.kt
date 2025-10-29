@@ -522,7 +522,7 @@ private fun LaunchDetailContentInBody(
 
                     SmartBannerAd(
                         modifier = Modifier.fillMaxWidth(),
-                        adSize = AdSize.MEDIUM_RECTANGLE,
+                        placementType = AdPlacementType.CONTENT,
                         showRemoveAdsButton = true,
                         onRemoveAdsClick = onNavigateToSettings
                     )
@@ -645,7 +645,7 @@ private fun LaunchDetailContentInBody(
 
                 SmartBannerAd(
                     modifier = Modifier.fillMaxWidth(),
-                    adSize = AdSize.MEDIUM_RECTANGLE,
+                    placementType = AdPlacementType.CONTENT,
                     showRemoveAdsButton = true,
                     onRemoveAdsClick = onNavigateToSettings
                 )

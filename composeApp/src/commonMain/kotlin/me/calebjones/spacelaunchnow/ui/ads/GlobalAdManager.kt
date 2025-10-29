@@ -3,6 +3,15 @@ package me.calebjones.spacelaunchnow.ui.ads
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 
 /**
+ * Ad types supported by the app
+ */
+enum class AdType {
+    BANNER,
+    INTERSTITIAL,
+    REWARDED
+}
+
+/**
  * Global ad manager that provides optimized ad configuration and preloading strategies.
  * 
  * Platform-specific implementations:
@@ -37,15 +46,6 @@ expect class GlobalAdManager(contextFactory: ContextFactory?) {
     fun getMinutesSinceLastInterstitial(): Long
     
     companion object {
-        /**
-         * Ad types supported by the app
-         */
-        enum class AdType {
-            BANNER,
-            INTERSTITIAL,
-            REWARDED
-        }
-        
         /**
          * Get the correct Ad Unit ID for the current platform and ad type
          */
