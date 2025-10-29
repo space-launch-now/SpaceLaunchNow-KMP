@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b3...v5.0.0) (2025-10-29)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b4...v5.0.0) (2025-10-29)
+
+
+### Bug Fixes
+
+* enable AD_FREE feature in PremiumFeature ([7769960](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/77699602dc9be097c3fa47d670995dfaa9b51292))
+
+
+
+# [5.0.0-b4](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b3...v5.0.0-b4) (2025-10-29)
 
 
 ### Features
