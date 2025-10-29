@@ -48,9 +48,9 @@ data class DockingEventEndpointNormal (
 
     @SerialName(value = "url") @Required val url: kotlin.String,
 
-    @SerialName(value = "docking") @Required val docking: kotlinx.datetime.Instant,
+    @SerialName(value = "docking") @Required val docking: kotlin.time.Instant,
 
-    @SerialName(value = "departure") @Required val departure: kotlinx.datetime.Instant?,
+    @SerialName(value = "departure") @Required val departure: kotlin.time.Instant?,
 
     @SerialName(value = "docking_location") @Required val dockingLocation: DockingLocation,
 

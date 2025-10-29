@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.data.model
 
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock.System
 
 /**
  * Subscription state model
@@ -36,7 +37,7 @@ data class SubscriptionState(
      * Check if subscription is expired based on expiresAt timestamp
      */
     fun isExpired(
-        currentTimeMillis: Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+        currentTimeMillis: Long = System.now().toEpochMilliseconds()
     ): Boolean {
         val expires = expiresAt ?: return false
         return currentTimeMillis > expires
@@ -46,7 +47,7 @@ data class SubscriptionState(
      * Check if verification is recent (within last hour)
      */
     fun isRecentlyVerified(
-        currentTimeMillis: Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+        currentTimeMillis: Long = System.now().toEpochMilliseconds()
     ): Boolean {
         val oneHourMillis = 60 * 60 * 1000L
         return (currentTimeMillis - lastVerified) < oneHourMillis

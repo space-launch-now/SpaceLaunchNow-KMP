@@ -12,7 +12,7 @@
 | **launch** | [**LaunchBasic**](LaunchBasic.md) |  |  |
 | **event** | [**EventMini**](EventMini.md) |  |  |
 | **program** | [**ProgramMini**](ProgramMini.md) |  |  |
-| **createdOn** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **createdOn** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 
 
 

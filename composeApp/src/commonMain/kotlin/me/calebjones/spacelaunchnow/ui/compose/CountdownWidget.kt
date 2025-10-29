@@ -20,8 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock.System
+import kotlin.time.Instant
 import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
@@ -37,7 +37,7 @@ fun BuildLaunchCountdown() {
     SpaceLaunchNowTheme {
         Card {
             LaunchCountdown(
-                launchTime = Clock.System.now().plus(6.hours),
+                launchTime = System.now().plus(6.hours),
                 status = LaunchStatus(1, "Go for Launch", "The launch is a go!")
             )
         }
@@ -167,11 +167,11 @@ fun LaunchStatusDialog(
 
 @Composable
 private fun CountdownDisplay(launchTime: Instant) {
-    val remainingTime = remember { mutableStateOf(launchTime - Clock.System.now()) }
+    val remainingTime = remember { mutableStateOf(launchTime - System.now()) }
 
     LaunchedEffect(launchTime) {
         while (true) {
-            remainingTime.value = launchTime - Clock.System.now()
+            remainingTime.value = launchTime - System.now()
             delay(1.seconds)
         }
     }

@@ -21,8 +21,8 @@
 | **dateOfBirth** | [**kotlinx.datetime.LocalDate**](kotlinx.datetime.LocalDate.md) |  |  |
 | **dateOfDeath** | [**kotlinx.datetime.LocalDate**](kotlinx.datetime.LocalDate.md) |  |  |
 | **wiki** | **kotlin.String** |  |  |
-| **lastFlight** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
-| **firstFlight** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
+| **lastFlight** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
+| **firstFlight** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
 | **socialMediaLinks** | [**kotlin.collections.List&lt;SocialMediaLink&gt;**](SocialMediaLink.md) |  |  |
 | **flightsCount** | **kotlin.Int** |  |  |
 | **landingsCount** | **kotlin.Int** |  |  |

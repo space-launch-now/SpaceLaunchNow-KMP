@@ -1,7 +1,8 @@
 package me.calebjones.spacelaunchnow.api.extensions
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
+import kotlin.time.ExperimentalTime
 
 /**
  * Extension functions for EventsApi to provide clean, named-parameter interfaces
@@ -11,6 +12,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 /**
  * Get a list of events with clean parameter interface
  */
+@OptIn(ExperimentalTime::class)
 suspend fun EventsApi.getEventList(
     limit: Int? = null,
     upcoming: Boolean? = null,

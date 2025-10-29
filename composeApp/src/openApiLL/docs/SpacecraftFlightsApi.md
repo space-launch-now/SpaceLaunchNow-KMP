@@ -26,12 +26,12 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 
 val apiInstance = SpacecraftFlightsApi()
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
-val missionEnd : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val missionEnd : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val missionEndDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val missionEndGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val missionEndGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val missionEndMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val missionEndYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -52,12 +52,12 @@ try {
 
 ### Parameters
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
-| **missionEnd** | **kotlinx.datetime.Instant**|  | [optional] |
+| **missionEnd** | **kotlin.time.Instant**|  | [optional] |
 | **missionEndDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **missionEndGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **missionEndGt** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndGte** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndLt** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndLte** | **kotlin.time.Instant**|  | [optional] |
 | **missionEndMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **missionEndYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -105,12 +105,12 @@ Configure cookieAuth:
 
 val apiInstance = SpacecraftFlightsApi()
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
-val missionEnd : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val missionEnd : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val missionEndDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val missionEndGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val missionEndGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val missionEndMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val missionEndYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -131,12 +131,12 @@ try {
 
 ### Parameters
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
-| **missionEnd** | **kotlinx.datetime.Instant**|  | [optional] |
+| **missionEnd** | **kotlin.time.Instant**|  | [optional] |
 | **missionEndDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **missionEndGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **missionEndGt** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndGte** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndLt** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndLte** | **kotlin.time.Instant**|  | [optional] |
 | **missionEndMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **missionEndYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -184,12 +184,12 @@ Configure cookieAuth:
 
 val apiInstance = SpacecraftFlightsApi()
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
-val missionEnd : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val missionEnd : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val missionEndDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val missionEndGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val missionEndLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val missionEndGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val missionEndLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val missionEndMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val missionEndYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -210,12 +210,12 @@ try {
 
 ### Parameters
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
-| **missionEnd** | **kotlinx.datetime.Instant**|  | [optional] |
+| **missionEnd** | **kotlin.time.Instant**|  | [optional] |
 | **missionEndDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **missionEndGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **missionEndLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **missionEndGt** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndGte** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndLt** | **kotlin.time.Instant**|  | [optional] |
+| **missionEndLte** | **kotlin.time.Instant**|  | [optional] |
 | **missionEndMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **missionEndYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |

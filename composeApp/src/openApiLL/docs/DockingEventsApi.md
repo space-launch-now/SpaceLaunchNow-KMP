@@ -24,10 +24,10 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 
 val apiInstance = DockingEventsApi()
 val dockingDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val dockingGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Docking is greater than
-val dockingGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Docking is greater than or equal to
-val dockingLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Docking is less than
-val dockingLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Docking is less than or equal to
+val dockingGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Docking is greater than
+val dockingGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Docking is greater than or equal to
+val dockingLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Docking is less than
+val dockingLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Docking is less than or equal to
 val dockingMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val dockingYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val dockingLocationId : kotlin.Int = 56 // kotlin.Int | 
@@ -51,10 +51,10 @@ try {
 
 ### Parameters
 | **dockingDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **dockingGt** | **kotlinx.datetime.Instant**| Docking is greater than | [optional] |
-| **dockingGte** | **kotlinx.datetime.Instant**| Docking is greater than or equal to | [optional] |
-| **dockingLt** | **kotlinx.datetime.Instant**| Docking is less than | [optional] |
-| **dockingLte** | **kotlinx.datetime.Instant**| Docking is less than or equal to | [optional] |
+| **dockingGt** | **kotlin.time.Instant**| Docking is greater than | [optional] |
+| **dockingGte** | **kotlin.time.Instant**| Docking is greater than or equal to | [optional] |
+| **dockingLt** | **kotlin.time.Instant**| Docking is less than | [optional] |
+| **dockingLte** | **kotlin.time.Instant**| Docking is less than or equal to | [optional] |
 | **dockingMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **dockingYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **dockingLocationId** | **kotlin.Int**|  | [optional] |

@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.api.extensions
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList

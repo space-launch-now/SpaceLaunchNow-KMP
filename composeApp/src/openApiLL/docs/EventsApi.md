@@ -26,14 +26,14 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 
 val apiInstance = EventsApi()
 val agencyIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated agency IDs.
-val dateGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is greater than
-val dateGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is greater than or equal to
-val dateLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is less than
-val dateLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is less than or equal to
+val dateGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is greater than
+val dateGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is greater than or equal to
+val dateLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than
+val dateLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than or equal to
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val id : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val lastUpdatedGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is greater than or equal to
-val lastUpdatedLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is less than or equal to
+val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
+val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val month : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -62,14 +62,14 @@ try {
 
 ### Parameters
 | **agencyIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated agency IDs. | [optional] |
-| **dateGt** | **kotlinx.datetime.Instant**| Date is greater than | [optional] |
-| **dateGte** | **kotlinx.datetime.Instant**| Date is greater than or equal to | [optional] |
-| **dateLt** | **kotlinx.datetime.Instant**| Date is less than | [optional] |
-| **dateLte** | **kotlinx.datetime.Instant**| Date is less than or equal to | [optional] |
+| **dateGt** | **kotlin.time.Instant**| Date is greater than | [optional] |
+| **dateGte** | **kotlin.time.Instant**| Date is greater than or equal to | [optional] |
+| **dateLt** | **kotlin.time.Instant**| Date is less than | [optional] |
+| **dateLte** | **kotlin.time.Instant**| Date is less than or equal to | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **id** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **lastUpdatedGte** | **kotlinx.datetime.Instant**| Last Update is greater than or equal to | [optional] |
-| **lastUpdatedLte** | **kotlinx.datetime.Instant**| Last Update is less than or equal to | [optional] |
+| **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
+| **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **month** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -125,14 +125,14 @@ Configure cookieAuth:
 
 val apiInstance = EventsApi()
 val agencyIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated agency IDs.
-val dateGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is greater than
-val dateGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is greater than or equal to
-val dateLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is less than
-val dateLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is less than or equal to
+val dateGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is greater than
+val dateGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is greater than or equal to
+val dateLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than
+val dateLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than or equal to
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val id : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val lastUpdatedGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is greater than or equal to
-val lastUpdatedLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is less than or equal to
+val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
+val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val month : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -161,14 +161,14 @@ try {
 
 ### Parameters
 | **agencyIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated agency IDs. | [optional] |
-| **dateGt** | **kotlinx.datetime.Instant**| Date is greater than | [optional] |
-| **dateGte** | **kotlinx.datetime.Instant**| Date is greater than or equal to | [optional] |
-| **dateLt** | **kotlinx.datetime.Instant**| Date is less than | [optional] |
-| **dateLte** | **kotlinx.datetime.Instant**| Date is less than or equal to | [optional] |
+| **dateGt** | **kotlin.time.Instant**| Date is greater than | [optional] |
+| **dateGte** | **kotlin.time.Instant**| Date is greater than or equal to | [optional] |
+| **dateLt** | **kotlin.time.Instant**| Date is less than | [optional] |
+| **dateLte** | **kotlin.time.Instant**| Date is less than or equal to | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **id** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **lastUpdatedGte** | **kotlinx.datetime.Instant**| Last Update is greater than or equal to | [optional] |
-| **lastUpdatedLte** | **kotlinx.datetime.Instant**| Last Update is less than or equal to | [optional] |
+| **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
+| **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **month** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -224,14 +224,14 @@ Configure cookieAuth:
 
 val apiInstance = EventsApi()
 val agencyIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated agency IDs.
-val dateGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is greater than
-val dateGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is greater than or equal to
-val dateLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is less than
-val dateLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Date is less than or equal to
+val dateGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is greater than
+val dateGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is greater than or equal to
+val dateLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than
+val dateLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than or equal to
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val id : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val lastUpdatedGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is greater than or equal to
-val lastUpdatedLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is less than or equal to
+val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
+val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val month : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -260,14 +260,14 @@ try {
 
 ### Parameters
 | **agencyIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated agency IDs. | [optional] |
-| **dateGt** | **kotlinx.datetime.Instant**| Date is greater than | [optional] |
-| **dateGte** | **kotlinx.datetime.Instant**| Date is greater than or equal to | [optional] |
-| **dateLt** | **kotlinx.datetime.Instant**| Date is less than | [optional] |
-| **dateLte** | **kotlinx.datetime.Instant**| Date is less than or equal to | [optional] |
+| **dateGt** | **kotlin.time.Instant**| Date is greater than | [optional] |
+| **dateGte** | **kotlin.time.Instant**| Date is greater than or equal to | [optional] |
+| **dateLt** | **kotlin.time.Instant**| Date is less than | [optional] |
+| **dateLte** | **kotlin.time.Instant**| Date is less than or equal to | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **id** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **lastUpdatedGte** | **kotlinx.datetime.Instant**| Last Update is greater than or equal to | [optional] |
-| **lastUpdatedLte** | **kotlinx.datetime.Instant**| Last Update is less than or equal to | [optional] |
+| **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
+| **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **month** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |

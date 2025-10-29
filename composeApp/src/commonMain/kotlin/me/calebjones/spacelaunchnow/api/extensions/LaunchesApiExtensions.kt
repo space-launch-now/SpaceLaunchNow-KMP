@@ -1,10 +1,11 @@
 package me.calebjones.spacelaunchnow.api.extensions
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
+import kotlin.time.ExperimentalTime
 
 
 /**
@@ -15,6 +16,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNorm
 /**
  * Get launch mini list with commonly used parameters
  */
+@OptIn(ExperimentalTime::class)
 suspend fun LaunchesApi.getLaunchMiniList(
     limit: Int? = null,
     upcoming: Boolean? = null,
@@ -136,6 +138,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
 /**
  * Get launch normal list with commonly used parameters
  */
+@OptIn(ExperimentalTime::class)
 suspend fun LaunchesApi.getLaunchList(
     limit: Int? = null,
     upcoming: Boolean? = null,

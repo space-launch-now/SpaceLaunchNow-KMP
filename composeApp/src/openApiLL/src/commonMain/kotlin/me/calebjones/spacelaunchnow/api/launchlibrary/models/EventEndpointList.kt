@@ -70,7 +70,7 @@ data class EventEndpointList (
 
     @SerialName(value = "duration") @Required val duration: kotlin.String?,
 
-    @SerialName(value = "date") val date: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "date") val date: kotlin.time.Instant? = null,
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 

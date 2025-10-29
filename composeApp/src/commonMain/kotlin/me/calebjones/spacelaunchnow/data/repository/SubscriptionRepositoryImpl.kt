@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
@@ -333,7 +333,7 @@ class SubscriptionRepositoryImpl(
         if (purchases.isEmpty()) {
             println("SubscriptionRepository: No active purchases found")
             return SubscriptionState.free().copy(
-                lastVerified = Clock.System.now().toEpochMilliseconds(),
+                lastVerified = System.now().toEpochMilliseconds(),
                 needsVerification = false,
                 isLoading = false
             )
@@ -347,7 +347,7 @@ class SubscriptionRepositoryImpl(
         if (activePurchase == null) {
             println("SubscriptionRepository: All purchases are expired")
             return SubscriptionState.free().copy(
-                lastVerified = Clock.System.now().toEpochMilliseconds(),
+                lastVerified = System.now().toEpochMilliseconds(),
                 needsVerification = false,
                 isLoading = false
             )
@@ -365,7 +365,7 @@ class SubscriptionRepositoryImpl(
             productId = activePurchase.productId,
             expiresAt = activePurchase.expiryTime,
             purchasedAt = activePurchase.purchaseTime,
-            lastVerified = Clock.System.now().toEpochMilliseconds(),
+            lastVerified = System.now().toEpochMilliseconds(),
             needsVerification = false,
             verificationError = null,
             features = features,
@@ -406,11 +406,11 @@ class SubscriptionRepositoryImpl(
                 SubscriptionState(
                     isSubscribed = true,
                     subscriptionType = subscriptionType,
-                    subscriptionId = "debug_order_${Clock.System.now().toEpochMilliseconds()}",
+                    subscriptionId = "debug_order_${System.now().toEpochMilliseconds()}",
                     productId = productId ?: "debug_product",
-                    expiresAt = Clock.System.now().plus(30.days).toEpochMilliseconds(),
-                    purchasedAt = Clock.System.now().minus(7.days).toEpochMilliseconds(),
-                    lastVerified = Clock.System.now().toEpochMilliseconds(),
+                    expiresAt = System.now().plus(30.days).toEpochMilliseconds(),
+                    purchasedAt = System.now().minus(7.days).toEpochMilliseconds(),
+                    lastVerified = System.now().toEpochMilliseconds(),
                     needsVerification = false,
                     verificationError = null,
                     features = if (productId != null) {
@@ -467,12 +467,12 @@ class SubscriptionRepositoryImpl(
             debugSimulationState = SubscriptionState(
                 isSubscribed = false,
                 subscriptionType = SubscriptionType.FREE,
-                subscriptionId = "debug_expired_${Clock.System.now().toEpochMilliseconds()}",
+                subscriptionId = "debug_expired_${System.now().toEpochMilliseconds()}",
                 productId = "expired_premium",
-                expiresAt = Clock.System.now().minus(7.days)
+                expiresAt = System.now().minus(7.days)
                     .toEpochMilliseconds(), // Expired 7 days ago
-                purchasedAt = Clock.System.now().minus(365.days).toEpochMilliseconds(),
-                lastVerified = Clock.System.now().toEpochMilliseconds(),
+                purchasedAt = System.now().minus(365.days).toEpochMilliseconds(),
+                lastVerified = System.now().toEpochMilliseconds(),
                 needsVerification = false,
                 verificationError = "Subscription expired",
                 features = emptySet(),
@@ -579,7 +579,7 @@ class SubscriptionRepositoryImpl(
  */
 private fun PlatformPurchase.isExpired(): Boolean {
     val expiryTime = this.expiryTime ?: return false
-    return Clock.System.now().toEpochMilliseconds() > expiryTime
+    return System.now().toEpochMilliseconds() > expiryTime
 }
 
 /**

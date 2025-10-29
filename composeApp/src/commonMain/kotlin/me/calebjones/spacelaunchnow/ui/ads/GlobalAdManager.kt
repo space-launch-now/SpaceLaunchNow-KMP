@@ -9,9 +9,8 @@ import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.platform.ContextFactory
@@ -69,7 +68,7 @@ class GlobalAdManager(
         val adSize: AdSize,
         val loadTimeMs: Long,
         val success: Boolean,
-        val timestamp: Long = Clock.System.now().toEpochMilliseconds()
+        val timestamp: Long = System.now().toEpochMilliseconds()
     )
 
     /**
@@ -155,8 +154,8 @@ class GlobalAdManager(
      * Start tracking ad load performance
      */
     fun trackAdLoadStart(adSize: AdSize): String {
-        val trackingId = "${adSize}_${Clock.System.now().toEpochMilliseconds()}"
-        adLoadStartTimes[trackingId] = Clock.System.now().toEpochMilliseconds()
+        val trackingId = "${adSize}_${System.now().toEpochMilliseconds()}"
+        adLoadStartTimes[trackingId] = System.now().toEpochMilliseconds()
         println("🏁 GlobalAdManager: Started tracking ad load for $adSize (ID: $trackingId)")
         return trackingId
     }
@@ -167,7 +166,7 @@ class GlobalAdManager(
     fun completeAdLoadTracking(trackingId: String, adSize: AdSize, success: Boolean) {
         val startTime = adLoadStartTimes.remove(trackingId)
         if (startTime != null) {
-            val loadTime = Clock.System.now().toEpochMilliseconds() - startTime
+            val loadTime = System.now().toEpochMilliseconds() - startTime
             val metric = AdLoadMetric(adSize, loadTime, success)
             adLoadMetrics.add(metric)
 
@@ -262,7 +261,7 @@ class GlobalAdManager(
         detailViewVisitCount++
 
         val shouldShowByCount = detailViewVisitCount % 4 == 0
-        val currentTime = Clock.System.now().toEpochMilliseconds()
+        val currentTime = System.now().toEpochMilliseconds()
         val enoughTimeElapsed = (currentTime - lastInterstitialShownAt) >= minInterstitialInterval
 
         val shouldShow = shouldShowByCount && enoughTimeElapsed
@@ -295,7 +294,7 @@ class GlobalAdManager(
      * Get minutes since last interstitial ad was shown (for debugging)
      */
     fun getMinutesSinceLastInterstitial(): Long {
-        val currentTime = Clock.System.now().toEpochMilliseconds()
+        val currentTime = System.now().toEpochMilliseconds()
         return if (lastInterstitialShownAt > 0) {
             (currentTime - lastInterstitialShownAt) / 60_000L
         } else {

@@ -38,8 +38,8 @@ val agencyLaunchAttemptCountYearLte : kotlin.Int = 56 // kotlin.Int |
 val id : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Multiple values may be separated by commas.
 val includeSuborbital : kotlin.Boolean = true // kotlin.Boolean | 
 val isCrewed : kotlin.Boolean = true // kotlin.Boolean | 
-val lastUpdatedGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is greater than or equal to
-val lastUpdatedLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is less than or equal to
+val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
+val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val launchDesignator : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated (COSPAR) international launch designators.
 val launcherConfigId : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
@@ -61,10 +61,10 @@ val missionOrbitName : kotlin.String = missionOrbitName_example // kotlin.String
 val missionOrbitNameIcontains : kotlin.String = missionOrbitNameIcontains_example // kotlin.String | 
 val name : kotlin.String = name_example // kotlin.String | 
 val netDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val netGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is greater than
-val netGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is greater than or equal to
-val netLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is less than
-val netLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is less than or equal to
+val netGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is greater than
+val netGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is greater than or equal to
+val netLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is less than
+val netLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is less than or equal to
 val netMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val netYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -114,14 +114,14 @@ val statusIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.Lis
 val upcoming : kotlin.Boolean = true // kotlin.Boolean | Filter for launches upcoming within the next period (up to current time).
 val upcomingWithRecent : kotlin.Boolean = true // kotlin.Boolean | Filter for launches upcoming within the next period (from 1 day ago onwards).
 val videoUrl : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated video URLs.
-val windowEndGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is greater than
-val windowEndGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is greater than or equal to
-val windowEndLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is less than
-val windowEndLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is less than or equal to
-val windowStartGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is greater than
-val windowStartGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is greater than or equal to
-val windowStartLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is less than
-val windowStartLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is less than or equal to
+val windowEndGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is greater than
+val windowEndGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is greater than or equal to
+val windowEndLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is less than
+val windowEndLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is less than or equal to
+val windowStartGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is greater than
+val windowStartGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is greater than or equal to
+val windowStartLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is less than
+val windowStartLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is less than or equal to
 try {
     val result : PaginatedLaunchDetailedList = apiInstance.launchesDetailedList(agencyLaunchAttemptCount, agencyLaunchAttemptCountGt, agencyLaunchAttemptCountGte, agencyLaunchAttemptCountLt, agencyLaunchAttemptCountLte, agencyLaunchAttemptCountYear, agencyLaunchAttemptCountYearGt, agencyLaunchAttemptCountYearGte, agencyLaunchAttemptCountYearLt, agencyLaunchAttemptCountYearLte, id, includeSuborbital, isCrewed, lastUpdatedGte, lastUpdatedLte, launchDesignator, launcherConfigId, limit, locationIds, locationLaunchAttemptCount, locationLaunchAttemptCountGt, locationLaunchAttemptCountGte, locationLaunchAttemptCountLt, locationLaunchAttemptCountLte, locationLaunchAttemptCountYear, locationLaunchAttemptCountYearGt, locationLaunchAttemptCountYearGte, locationLaunchAttemptCountYearLt, locationLaunchAttemptCountYearLte, lspId, lspName, missionOrbitCelestialBodyId, missionOrbitName, missionOrbitNameIcontains, name, netDay, netGt, netGte, netLt, netLte, netMonth, netYear, offset, orbitalLaunchAttemptCount, orbitalLaunchAttemptCountGt, orbitalLaunchAttemptCountGte, orbitalLaunchAttemptCountLt, orbitalLaunchAttemptCountLte, orbitalLaunchAttemptCountYear, orbitalLaunchAttemptCountYearGt, orbitalLaunchAttemptCountYearGte, orbitalLaunchAttemptCountYearLt, orbitalLaunchAttemptCountYearLte, ordering, pad, padLocation, padLocationCelestialBodyId, padLaunchAttemptCount, padLaunchAttemptCountGt, padLaunchAttemptCountGte, padLaunchAttemptCountLt, padLaunchAttemptCountLte, padLaunchAttemptCountYear, padLaunchAttemptCountYearGt, padLaunchAttemptCountYearGte, padLaunchAttemptCountYearLt, padLaunchAttemptCountYearLte, previous, program, relatedLspId, relatedLspName, rocketConfigurationFullName, rocketConfigurationFullNameIcontains, rocketConfigurationId, rocketConfigurationManufacturerName, rocketConfigurationManufacturerNameIcontains, rocketConfigurationName, rocketSpacecraftflightSpacecraftId, rocketSpacecraftflightSpacecraftName, rocketSpacecraftflightSpacecraftNameIcontains, search, serialNumber, slug, spacecraftConfigIds, status, statusIds, upcoming, upcomingWithRecent, videoUrl, windowEndGt, windowEndGte, windowEndLt, windowEndLte, windowStartGt, windowStartGte, windowStartLt, windowStartLte)
     println(result)
@@ -148,8 +148,8 @@ try {
 | **id** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Multiple values may be separated by commas. | [optional] |
 | **includeSuborbital** | **kotlin.Boolean**|  | [optional] |
 | **isCrewed** | **kotlin.Boolean**|  | [optional] |
-| **lastUpdatedGte** | **kotlinx.datetime.Instant**| Last Update is greater than or equal to | [optional] |
-| **lastUpdatedLte** | **kotlinx.datetime.Instant**| Last Update is less than or equal to | [optional] |
+| **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
+| **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **launchDesignator** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated (COSPAR) international launch designators. | [optional] |
 | **launcherConfigId** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
@@ -171,10 +171,10 @@ try {
 | **missionOrbitNameIcontains** | **kotlin.String**|  | [optional] |
 | **name** | **kotlin.String**|  | [optional] |
 | **netDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **netGt** | **kotlinx.datetime.Instant**| NET is greater than | [optional] |
-| **netGte** | **kotlinx.datetime.Instant**| NET is greater than or equal to | [optional] |
-| **netLt** | **kotlinx.datetime.Instant**| NET is less than | [optional] |
-| **netLte** | **kotlinx.datetime.Instant**| NET is less than or equal to | [optional] |
+| **netGt** | **kotlin.time.Instant**| NET is greater than | [optional] |
+| **netGte** | **kotlin.time.Instant**| NET is greater than or equal to | [optional] |
+| **netLt** | **kotlin.time.Instant**| NET is less than | [optional] |
+| **netLte** | **kotlin.time.Instant**| NET is less than or equal to | [optional] |
 | **netMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **netYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -224,16 +224,16 @@ try {
 | **upcoming** | **kotlin.Boolean**| Filter for launches upcoming within the next period (up to current time). | [optional] |
 | **upcomingWithRecent** | **kotlin.Boolean**| Filter for launches upcoming within the next period (from 1 day ago onwards). | [optional] |
 | **videoUrl** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated video URLs. | [optional] |
-| **windowEndGt** | **kotlinx.datetime.Instant**| Window End is greater than | [optional] |
-| **windowEndGte** | **kotlinx.datetime.Instant**| Window End is greater than or equal to | [optional] |
-| **windowEndLt** | **kotlinx.datetime.Instant**| Window End is less than | [optional] |
-| **windowEndLte** | **kotlinx.datetime.Instant**| Window End is less than or equal to | [optional] |
-| **windowStartGt** | **kotlinx.datetime.Instant**| Window Start is greater than | [optional] |
-| **windowStartGte** | **kotlinx.datetime.Instant**| Window Start is greater than or equal to | [optional] |
-| **windowStartLt** | **kotlinx.datetime.Instant**| Window Start is less than | [optional] |
+| **windowEndGt** | **kotlin.time.Instant**| Window End is greater than | [optional] |
+| **windowEndGte** | **kotlin.time.Instant**| Window End is greater than or equal to | [optional] |
+| **windowEndLt** | **kotlin.time.Instant**| Window End is less than | [optional] |
+| **windowEndLte** | **kotlin.time.Instant**| Window End is less than or equal to | [optional] |
+| **windowStartGt** | **kotlin.time.Instant**| Window Start is greater than | [optional] |
+| **windowStartGte** | **kotlin.time.Instant**| Window Start is greater than or equal to | [optional] |
+| **windowStartLt** | **kotlin.time.Instant**| Window Start is less than | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **windowStartLte** | **kotlinx.datetime.Instant**| Window Start is less than or equal to | [optional] |
+| **windowStartLte** | **kotlin.time.Instant**| Window Start is less than or equal to | [optional] |
 
 ### Return type
 
@@ -285,8 +285,8 @@ val agencyLaunchAttemptCountYearLte : kotlin.Int = 56 // kotlin.Int |
 val id : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Multiple values may be separated by commas.
 val includeSuborbital : kotlin.Boolean = true // kotlin.Boolean | 
 val isCrewed : kotlin.Boolean = true // kotlin.Boolean | 
-val lastUpdatedGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is greater than or equal to
-val lastUpdatedLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is less than or equal to
+val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
+val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val launchDesignator : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated (COSPAR) international launch designators.
 val launcherConfigId : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
@@ -308,10 +308,10 @@ val missionOrbitName : kotlin.String = missionOrbitName_example // kotlin.String
 val missionOrbitNameIcontains : kotlin.String = missionOrbitNameIcontains_example // kotlin.String | 
 val name : kotlin.String = name_example // kotlin.String | 
 val netDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val netGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is greater than
-val netGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is greater than or equal to
-val netLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is less than
-val netLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is less than or equal to
+val netGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is greater than
+val netGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is greater than or equal to
+val netLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is less than
+val netLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is less than or equal to
 val netMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val netYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -361,14 +361,14 @@ val statusIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.Lis
 val upcoming : kotlin.Boolean = true // kotlin.Boolean | Filter for launches upcoming within the next period (up to current time).
 val upcomingWithRecent : kotlin.Boolean = true // kotlin.Boolean | Filter for launches upcoming within the next period (from 1 day ago onwards).
 val videoUrl : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated video URLs.
-val windowEndGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is greater than
-val windowEndGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is greater than or equal to
-val windowEndLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is less than
-val windowEndLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is less than or equal to
-val windowStartGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is greater than
-val windowStartGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is greater than or equal to
-val windowStartLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is less than
-val windowStartLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is less than or equal to
+val windowEndGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is greater than
+val windowEndGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is greater than or equal to
+val windowEndLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is less than
+val windowEndLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is less than or equal to
+val windowStartGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is greater than
+val windowStartGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is greater than or equal to
+val windowStartLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is less than
+val windowStartLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is less than or equal to
 try {
     val result : PaginatedLaunchNormalList = apiInstance.launchesList(agencyLaunchAttemptCount, agencyLaunchAttemptCountGt, agencyLaunchAttemptCountGte, agencyLaunchAttemptCountLt, agencyLaunchAttemptCountLte, agencyLaunchAttemptCountYear, agencyLaunchAttemptCountYearGt, agencyLaunchAttemptCountYearGte, agencyLaunchAttemptCountYearLt, agencyLaunchAttemptCountYearLte, id, includeSuborbital, isCrewed, lastUpdatedGte, lastUpdatedLte, launchDesignator, launcherConfigId, limit, locationIds, locationLaunchAttemptCount, locationLaunchAttemptCountGt, locationLaunchAttemptCountGte, locationLaunchAttemptCountLt, locationLaunchAttemptCountLte, locationLaunchAttemptCountYear, locationLaunchAttemptCountYearGt, locationLaunchAttemptCountYearGte, locationLaunchAttemptCountYearLt, locationLaunchAttemptCountYearLte, lspId, lspName, missionOrbitCelestialBodyId, missionOrbitName, missionOrbitNameIcontains, name, netDay, netGt, netGte, netLt, netLte, netMonth, netYear, offset, orbitalLaunchAttemptCount, orbitalLaunchAttemptCountGt, orbitalLaunchAttemptCountGte, orbitalLaunchAttemptCountLt, orbitalLaunchAttemptCountLte, orbitalLaunchAttemptCountYear, orbitalLaunchAttemptCountYearGt, orbitalLaunchAttemptCountYearGte, orbitalLaunchAttemptCountYearLt, orbitalLaunchAttemptCountYearLte, ordering, pad, padLocation, padLocationCelestialBodyId, padLaunchAttemptCount, padLaunchAttemptCountGt, padLaunchAttemptCountGte, padLaunchAttemptCountLt, padLaunchAttemptCountLte, padLaunchAttemptCountYear, padLaunchAttemptCountYearGt, padLaunchAttemptCountYearGte, padLaunchAttemptCountYearLt, padLaunchAttemptCountYearLte, previous, program, relatedLspId, relatedLspName, rocketConfigurationFullName, rocketConfigurationFullNameIcontains, rocketConfigurationId, rocketConfigurationManufacturerName, rocketConfigurationManufacturerNameIcontains, rocketConfigurationName, rocketSpacecraftflightSpacecraftId, rocketSpacecraftflightSpacecraftName, rocketSpacecraftflightSpacecraftNameIcontains, search, serialNumber, slug, spacecraftConfigIds, status, statusIds, upcoming, upcomingWithRecent, videoUrl, windowEndGt, windowEndGte, windowEndLt, windowEndLte, windowStartGt, windowStartGte, windowStartLt, windowStartLte)
     println(result)
@@ -395,8 +395,8 @@ try {
 | **id** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Multiple values may be separated by commas. | [optional] |
 | **includeSuborbital** | **kotlin.Boolean**|  | [optional] |
 | **isCrewed** | **kotlin.Boolean**|  | [optional] |
-| **lastUpdatedGte** | **kotlinx.datetime.Instant**| Last Update is greater than or equal to | [optional] |
-| **lastUpdatedLte** | **kotlinx.datetime.Instant**| Last Update is less than or equal to | [optional] |
+| **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
+| **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **launchDesignator** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated (COSPAR) international launch designators. | [optional] |
 | **launcherConfigId** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
@@ -418,10 +418,10 @@ try {
 | **missionOrbitNameIcontains** | **kotlin.String**|  | [optional] |
 | **name** | **kotlin.String**|  | [optional] |
 | **netDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **netGt** | **kotlinx.datetime.Instant**| NET is greater than | [optional] |
-| **netGte** | **kotlinx.datetime.Instant**| NET is greater than or equal to | [optional] |
-| **netLt** | **kotlinx.datetime.Instant**| NET is less than | [optional] |
-| **netLte** | **kotlinx.datetime.Instant**| NET is less than or equal to | [optional] |
+| **netGt** | **kotlin.time.Instant**| NET is greater than | [optional] |
+| **netGte** | **kotlin.time.Instant**| NET is greater than or equal to | [optional] |
+| **netLt** | **kotlin.time.Instant**| NET is less than | [optional] |
+| **netLte** | **kotlin.time.Instant**| NET is less than or equal to | [optional] |
 | **netMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **netYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -471,16 +471,16 @@ try {
 | **upcoming** | **kotlin.Boolean**| Filter for launches upcoming within the next period (up to current time). | [optional] |
 | **upcomingWithRecent** | **kotlin.Boolean**| Filter for launches upcoming within the next period (from 1 day ago onwards). | [optional] |
 | **videoUrl** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated video URLs. | [optional] |
-| **windowEndGt** | **kotlinx.datetime.Instant**| Window End is greater than | [optional] |
-| **windowEndGte** | **kotlinx.datetime.Instant**| Window End is greater than or equal to | [optional] |
-| **windowEndLt** | **kotlinx.datetime.Instant**| Window End is less than | [optional] |
-| **windowEndLte** | **kotlinx.datetime.Instant**| Window End is less than or equal to | [optional] |
-| **windowStartGt** | **kotlinx.datetime.Instant**| Window Start is greater than | [optional] |
-| **windowStartGte** | **kotlinx.datetime.Instant**| Window Start is greater than or equal to | [optional] |
-| **windowStartLt** | **kotlinx.datetime.Instant**| Window Start is less than | [optional] |
+| **windowEndGt** | **kotlin.time.Instant**| Window End is greater than | [optional] |
+| **windowEndGte** | **kotlin.time.Instant**| Window End is greater than or equal to | [optional] |
+| **windowEndLt** | **kotlin.time.Instant**| Window End is less than | [optional] |
+| **windowEndLte** | **kotlin.time.Instant**| Window End is less than or equal to | [optional] |
+| **windowStartGt** | **kotlin.time.Instant**| Window Start is greater than | [optional] |
+| **windowStartGte** | **kotlin.time.Instant**| Window Start is greater than or equal to | [optional] |
+| **windowStartLt** | **kotlin.time.Instant**| Window Start is less than | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **windowStartLte** | **kotlinx.datetime.Instant**| Window Start is less than or equal to | [optional] |
+| **windowStartLte** | **kotlin.time.Instant**| Window Start is less than or equal to | [optional] |
 
 ### Return type
 
@@ -532,8 +532,8 @@ val agencyLaunchAttemptCountYearLte : kotlin.Int = 56 // kotlin.Int |
 val id : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Multiple values may be separated by commas.
 val includeSuborbital : kotlin.Boolean = true // kotlin.Boolean | 
 val isCrewed : kotlin.Boolean = true // kotlin.Boolean | 
-val lastUpdatedGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is greater than or equal to
-val lastUpdatedLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Last Update is less than or equal to
+val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
+val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val launchDesignator : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated (COSPAR) international launch designators.
 val launcherConfigId : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
@@ -555,10 +555,10 @@ val missionOrbitName : kotlin.String = missionOrbitName_example // kotlin.String
 val missionOrbitNameIcontains : kotlin.String = missionOrbitNameIcontains_example // kotlin.String | 
 val name : kotlin.String = name_example // kotlin.String | 
 val netDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val netGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is greater than
-val netGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is greater than or equal to
-val netLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is less than
-val netLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | NET is less than or equal to
+val netGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is greater than
+val netGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is greater than or equal to
+val netLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is less than
+val netLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | NET is less than or equal to
 val netMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val netYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -608,14 +608,14 @@ val statusIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.Lis
 val upcoming : kotlin.Boolean = true // kotlin.Boolean | Filter for launches upcoming within the next period (up to current time).
 val upcomingWithRecent : kotlin.Boolean = true // kotlin.Boolean | Filter for launches upcoming within the next period (from 1 day ago onwards).
 val videoUrl : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated video URLs.
-val windowEndGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is greater than
-val windowEndGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is greater than or equal to
-val windowEndLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is less than
-val windowEndLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window End is less than or equal to
-val windowStartGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is greater than
-val windowStartGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is greater than or equal to
-val windowStartLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is less than
-val windowStartLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Window Start is less than or equal to
+val windowEndGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is greater than
+val windowEndGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is greater than or equal to
+val windowEndLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is less than
+val windowEndLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window End is less than or equal to
+val windowStartGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is greater than
+val windowStartGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is greater than or equal to
+val windowStartLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is less than
+val windowStartLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Window Start is less than or equal to
 try {
     val result : PaginatedLaunchBasicList = apiInstance.launchesMiniList(agencyLaunchAttemptCount, agencyLaunchAttemptCountGt, agencyLaunchAttemptCountGte, agencyLaunchAttemptCountLt, agencyLaunchAttemptCountLte, agencyLaunchAttemptCountYear, agencyLaunchAttemptCountYearGt, agencyLaunchAttemptCountYearGte, agencyLaunchAttemptCountYearLt, agencyLaunchAttemptCountYearLte, id, includeSuborbital, isCrewed, lastUpdatedGte, lastUpdatedLte, launchDesignator, launcherConfigId, limit, locationIds, locationLaunchAttemptCount, locationLaunchAttemptCountGt, locationLaunchAttemptCountGte, locationLaunchAttemptCountLt, locationLaunchAttemptCountLte, locationLaunchAttemptCountYear, locationLaunchAttemptCountYearGt, locationLaunchAttemptCountYearGte, locationLaunchAttemptCountYearLt, locationLaunchAttemptCountYearLte, lspId, lspName, missionOrbitCelestialBodyId, missionOrbitName, missionOrbitNameIcontains, name, netDay, netGt, netGte, netLt, netLte, netMonth, netYear, offset, orbitalLaunchAttemptCount, orbitalLaunchAttemptCountGt, orbitalLaunchAttemptCountGte, orbitalLaunchAttemptCountLt, orbitalLaunchAttemptCountLte, orbitalLaunchAttemptCountYear, orbitalLaunchAttemptCountYearGt, orbitalLaunchAttemptCountYearGte, orbitalLaunchAttemptCountYearLt, orbitalLaunchAttemptCountYearLte, ordering, pad, padLocation, padLocationCelestialBodyId, padLaunchAttemptCount, padLaunchAttemptCountGt, padLaunchAttemptCountGte, padLaunchAttemptCountLt, padLaunchAttemptCountLte, padLaunchAttemptCountYear, padLaunchAttemptCountYearGt, padLaunchAttemptCountYearGte, padLaunchAttemptCountYearLt, padLaunchAttemptCountYearLte, previous, program, relatedLspId, relatedLspName, rocketConfigurationFullName, rocketConfigurationFullNameIcontains, rocketConfigurationId, rocketConfigurationManufacturerName, rocketConfigurationManufacturerNameIcontains, rocketConfigurationName, rocketSpacecraftflightSpacecraftId, rocketSpacecraftflightSpacecraftName, rocketSpacecraftflightSpacecraftNameIcontains, search, serialNumber, slug, spacecraftConfigIds, status, statusIds, upcoming, upcomingWithRecent, videoUrl, windowEndGt, windowEndGte, windowEndLt, windowEndLte, windowStartGt, windowStartGte, windowStartLt, windowStartLte)
     println(result)
@@ -642,8 +642,8 @@ try {
 | **id** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Multiple values may be separated by commas. | [optional] |
 | **includeSuborbital** | **kotlin.Boolean**|  | [optional] |
 | **isCrewed** | **kotlin.Boolean**|  | [optional] |
-| **lastUpdatedGte** | **kotlinx.datetime.Instant**| Last Update is greater than or equal to | [optional] |
-| **lastUpdatedLte** | **kotlinx.datetime.Instant**| Last Update is less than or equal to | [optional] |
+| **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
+| **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **launchDesignator** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated (COSPAR) international launch designators. | [optional] |
 | **launcherConfigId** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
@@ -665,10 +665,10 @@ try {
 | **missionOrbitNameIcontains** | **kotlin.String**|  | [optional] |
 | **name** | **kotlin.String**|  | [optional] |
 | **netDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **netGt** | **kotlinx.datetime.Instant**| NET is greater than | [optional] |
-| **netGte** | **kotlinx.datetime.Instant**| NET is greater than or equal to | [optional] |
-| **netLt** | **kotlinx.datetime.Instant**| NET is less than | [optional] |
-| **netLte** | **kotlinx.datetime.Instant**| NET is less than or equal to | [optional] |
+| **netGt** | **kotlin.time.Instant**| NET is greater than | [optional] |
+| **netGte** | **kotlin.time.Instant**| NET is greater than or equal to | [optional] |
+| **netLt** | **kotlin.time.Instant**| NET is less than | [optional] |
+| **netLte** | **kotlin.time.Instant**| NET is less than or equal to | [optional] |
 | **netMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **netYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -718,16 +718,16 @@ try {
 | **upcoming** | **kotlin.Boolean**| Filter for launches upcoming within the next period (up to current time). | [optional] |
 | **upcomingWithRecent** | **kotlin.Boolean**| Filter for launches upcoming within the next period (from 1 day ago onwards). | [optional] |
 | **videoUrl** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated video URLs. | [optional] |
-| **windowEndGt** | **kotlinx.datetime.Instant**| Window End is greater than | [optional] |
-| **windowEndGte** | **kotlinx.datetime.Instant**| Window End is greater than or equal to | [optional] |
-| **windowEndLt** | **kotlinx.datetime.Instant**| Window End is less than | [optional] |
-| **windowEndLte** | **kotlinx.datetime.Instant**| Window End is less than or equal to | [optional] |
-| **windowStartGt** | **kotlinx.datetime.Instant**| Window Start is greater than | [optional] |
-| **windowStartGte** | **kotlinx.datetime.Instant**| Window Start is greater than or equal to | [optional] |
-| **windowStartLt** | **kotlinx.datetime.Instant**| Window Start is less than | [optional] |
+| **windowEndGt** | **kotlin.time.Instant**| Window End is greater than | [optional] |
+| **windowEndGte** | **kotlin.time.Instant**| Window End is greater than or equal to | [optional] |
+| **windowEndLt** | **kotlin.time.Instant**| Window End is less than | [optional] |
+| **windowEndLte** | **kotlin.time.Instant**| Window End is less than or equal to | [optional] |
+| **windowStartGt** | **kotlin.time.Instant**| Window Start is greater than | [optional] |
+| **windowStartGte** | **kotlin.time.Instant**| Window Start is greater than or equal to | [optional] |
+| **windowStartLt** | **kotlin.time.Instant**| Window Start is less than | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **windowStartLte** | **kotlinx.datetime.Instant**| Window Start is less than or equal to | [optional] |
+| **windowStartLte** | **kotlin.time.Instant**| Window Start is less than or equal to | [optional] |
 
 ### Return type
 

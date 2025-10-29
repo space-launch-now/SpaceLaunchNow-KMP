@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.util
 
-import kotlinx.datetime.Instant
+import kotlin.time.Clock.System
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -72,14 +73,14 @@ object DateTimeUtil {
         return try {
             val timeZone = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
             val localDateTime = instant.toLocalDateTime(timeZone)
-            val now = kotlinx.datetime.Clock.System.now().toLocalDateTime(timeZone)
+            val now = System.now().toLocalDateTime(timeZone)
             
             val daysDiff = localDateTime.date.toEpochDays() - now.date.toEpochDays()
             
             when (daysDiff) {
-                0 -> "Today at ${formatLaunchTime(instant, useUtc)}"
-                1 -> "Tomorrow at ${formatLaunchTime(instant, useUtc)}"
-                -1 -> "Yesterday at ${formatLaunchTime(instant, useUtc)}"
+                0L -> "Today at ${formatLaunchTime(instant, useUtc)}"
+                1L -> "Tomorrow at ${formatLaunchTime(instant, useUtc)}"
+                (-1L) -> "Yesterday at ${formatLaunchTime(instant, useUtc)}"
                 in 2..6 -> {
                     val dayName = localDateTime.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
                     "$dayName at ${formatLaunchTime(instant, useUtc)}"

@@ -67,7 +67,7 @@ open class ExpeditionsApi : ApiClient {
      * @return PaginatedExpeditionDetailedList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun expeditionsDetailedList(crewAstronaut: kotlin.Int? = null, crewAstronautAgency: kotlin.Int? = null, endGt: kotlinx.datetime.Instant? = null, endGte: kotlinx.datetime.Instant? = null, endLt: kotlinx.datetime.Instant? = null, endLte: kotlinx.datetime.Instant? = null, isActive: kotlin.Boolean? = null, limit: kotlin.Int? = null, name: kotlin.String? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStation: kotlin.Int? = null, startGt: kotlinx.datetime.Instant? = null, startGte: kotlinx.datetime.Instant? = null, startLt: kotlinx.datetime.Instant? = null, startLte: kotlinx.datetime.Instant? = null): HttpResponse<PaginatedExpeditionDetailedList> {
+    open suspend fun expeditionsDetailedList(crewAstronaut: kotlin.Int? = null, crewAstronautAgency: kotlin.Int? = null, endGt: kotlin.time.Instant? = null, endGte: kotlin.time.Instant? = null, endLt: kotlin.time.Instant? = null, endLte: kotlin.time.Instant? = null, isActive: kotlin.Boolean? = null, limit: kotlin.Int? = null, name: kotlin.String? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStation: kotlin.Int? = null, startGt: kotlin.time.Instant? = null, startGte: kotlin.time.Instant? = null, startLt: kotlin.time.Instant? = null, startLte: kotlin.time.Instant? = null): HttpResponse<PaginatedExpeditionDetailedList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 
@@ -133,7 +133,7 @@ open class ExpeditionsApi : ApiClient {
      * @return PaginatedExpeditionNormalList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun expeditionsList(crewAstronaut: kotlin.Int? = null, crewAstronautAgency: kotlin.Int? = null, endGt: kotlinx.datetime.Instant? = null, endGte: kotlinx.datetime.Instant? = null, endLt: kotlinx.datetime.Instant? = null, endLte: kotlinx.datetime.Instant? = null, isActive: kotlin.Boolean? = null, limit: kotlin.Int? = null, name: kotlin.String? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStation: kotlin.Int? = null, startGt: kotlinx.datetime.Instant? = null, startGte: kotlinx.datetime.Instant? = null, startLt: kotlinx.datetime.Instant? = null, startLte: kotlinx.datetime.Instant? = null): HttpResponse<PaginatedExpeditionNormalList> {
+    open suspend fun expeditionsList(crewAstronaut: kotlin.Int? = null, crewAstronautAgency: kotlin.Int? = null, endGt: kotlin.time.Instant? = null, endGte: kotlin.time.Instant? = null, endLt: kotlin.time.Instant? = null, endLte: kotlin.time.Instant? = null, isActive: kotlin.Boolean? = null, limit: kotlin.Int? = null, name: kotlin.String? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStation: kotlin.Int? = null, startGt: kotlin.time.Instant? = null, startGte: kotlin.time.Instant? = null, startLt: kotlin.time.Instant? = null, startLte: kotlin.time.Instant? = null): HttpResponse<PaginatedExpeditionNormalList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 

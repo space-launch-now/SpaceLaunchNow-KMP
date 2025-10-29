@@ -9,7 +9,7 @@
 | **reused** | **kotlin.Boolean** |  |  |
 | **launcherFlightNumber** | **kotlin.Int** |  |  |
 | **launcher** | [**LauncherNormal**](LauncherNormal.md) |  |  |
-| **previousFlightDate** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
+| **previousFlightDate** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
 | **turnAroundTime** | **kotlin.String** |  |  [readonly] |
 | **landing** | [**Landing**](Landing.md) |  |  |
 | **previousFlight** | [**LaunchMini**](LaunchMini.md) |  |  |

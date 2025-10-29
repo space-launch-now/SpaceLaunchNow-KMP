@@ -40,9 +40,9 @@ data class RoadClosure (
 
     @SerialName(value = "status") @Required val status: RoadClosureStatus,
 
-    @SerialName(value = "window_start") @Required val windowStart: kotlinx.datetime.Instant,
+    @SerialName(value = "window_start") @Required val windowStart: kotlin.time.Instant,
 
-    @SerialName(value = "window_end") @Required val windowEnd: kotlinx.datetime.Instant
+    @SerialName(value = "window_end") @Required val windowEnd: kotlin.time.Instant
 
 ) {
 

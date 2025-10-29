@@ -63,7 +63,7 @@ open class DockingEventsApi : ApiClient {
      * @return PaginatedDockingEventEndpointNormalList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun dockingEventsList(dockingDay: kotlin.collections.List<kotlin.Double>? = null, dockingGt: kotlinx.datetime.Instant? = null, dockingGte: kotlinx.datetime.Instant? = null, dockingLt: kotlinx.datetime.Instant? = null, dockingLte: kotlinx.datetime.Instant? = null, dockingMonth: kotlin.collections.List<kotlin.Double>? = null, dockingYear: kotlin.collections.List<kotlin.Double>? = null, dockingLocationId: kotlin.Int? = null, flightVehicleChaserId: kotlin.Int? = null, limit: kotlin.Int? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStationTargetId: kotlin.Int? = null): HttpResponse<PaginatedDockingEventEndpointNormalList> {
+    open suspend fun dockingEventsList(dockingDay: kotlin.collections.List<kotlin.Double>? = null, dockingGt: kotlin.time.Instant? = null, dockingGte: kotlin.time.Instant? = null, dockingLt: kotlin.time.Instant? = null, dockingLte: kotlin.time.Instant? = null, dockingMonth: kotlin.collections.List<kotlin.Double>? = null, dockingYear: kotlin.collections.List<kotlin.Double>? = null, dockingLocationId: kotlin.Int? = null, flightVehicleChaserId: kotlin.Int? = null, limit: kotlin.Int? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spaceStationTargetId: kotlin.Int? = null): HttpResponse<PaginatedDockingEventEndpointNormalList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 

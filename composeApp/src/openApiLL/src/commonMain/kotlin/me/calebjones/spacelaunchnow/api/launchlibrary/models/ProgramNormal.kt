@@ -63,9 +63,9 @@ data class ProgramNormal (
 
     @SerialName(value = "agencies") @Required val agencies: kotlin.collections.List<AgencyMini>,
 
-    @SerialName(value = "start_date") @Required val startDate: kotlinx.datetime.Instant?,
+    @SerialName(value = "start_date") @Required val startDate: kotlin.time.Instant?,
 
-    @SerialName(value = "end_date") @Required val endDate: kotlinx.datetime.Instant?,
+    @SerialName(value = "end_date") @Required val endDate: kotlin.time.Instant?,
 
     @SerialName(value = "mission_patches") @Required val missionPatches: kotlin.collections.List<MissionPatch>,
 

@@ -50,7 +50,7 @@ data class EventMini (
 
     @SerialName(value = "image") @Required val image: Image?,
 
-    @SerialName(value = "date") val date: kotlinx.datetime.Instant? = null
+    @SerialName(value = "date") val date: kotlin.time.Instant? = null
 
 ) {
 

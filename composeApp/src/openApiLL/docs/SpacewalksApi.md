@@ -27,11 +27,11 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 val apiInstance = SpacewalksApi()
 val astronautIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val end : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val end : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val eventIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val id : kotlin.Int = 56 // kotlin.Int | 
 val ids : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
@@ -48,10 +48,10 @@ val programName : kotlin.String = programName_example // kotlin.String |
 val programNameContains : kotlin.String = programNameContains_example // kotlin.String | 
 val search : kotlin.String = search_example // kotlin.String | A search term.
 val spacestationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val startGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val startGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val year : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 try {
     val result : PaginatedSpacewalkEndpointDetailedList = apiInstance.spacewalksDetailedList(astronautIds, day, end, endGt, endGte, endLt, endLte, eventIds, id, ids, launchIds, limit, month, name, nameContains, offset, ordering, ownerIds, programIds, programName, programNameContains, search, spacestationIds, startGt, startGte, startLt, startLte, year)
@@ -68,11 +68,11 @@ try {
 ### Parameters
 | **astronautIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **end** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **end** | **kotlin.time.Instant**|  | [optional] |
+| **endGt** | **kotlin.time.Instant**|  | [optional] |
+| **endGte** | **kotlin.time.Instant**|  | [optional] |
+| **endLt** | **kotlin.time.Instant**|  | [optional] |
+| **endLte** | **kotlin.time.Instant**|  | [optional] |
 | **eventIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **id** | **kotlin.Int**|  | [optional] |
 | **ids** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
@@ -89,10 +89,10 @@ try {
 | **programNameContains** | **kotlin.String**|  | [optional] |
 | **search** | **kotlin.String**| A search term. | [optional] |
 | **spacestationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **startGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **startGt** | **kotlin.time.Instant**|  | [optional] |
+| **startGte** | **kotlin.time.Instant**|  | [optional] |
+| **startLt** | **kotlin.time.Instant**|  | [optional] |
+| **startLte** | **kotlin.time.Instant**|  | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
 | **year** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
@@ -136,11 +136,11 @@ Configure cookieAuth:
 val apiInstance = SpacewalksApi()
 val astronautIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val end : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val end : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val eventIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val id : kotlin.Int = 56 // kotlin.Int | 
 val ids : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
@@ -157,10 +157,10 @@ val programName : kotlin.String = programName_example // kotlin.String |
 val programNameContains : kotlin.String = programNameContains_example // kotlin.String | 
 val search : kotlin.String = search_example // kotlin.String | A search term.
 val spacestationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val startGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val startGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val year : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 try {
     val result : PaginatedSpacewalkEndpointNormalList = apiInstance.spacewalksList(astronautIds, day, end, endGt, endGte, endLt, endLte, eventIds, id, ids, launchIds, limit, month, name, nameContains, offset, ordering, ownerIds, programIds, programName, programNameContains, search, spacestationIds, startGt, startGte, startLt, startLte, year)
@@ -177,11 +177,11 @@ try {
 ### Parameters
 | **astronautIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **end** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **end** | **kotlin.time.Instant**|  | [optional] |
+| **endGt** | **kotlin.time.Instant**|  | [optional] |
+| **endGte** | **kotlin.time.Instant**|  | [optional] |
+| **endLt** | **kotlin.time.Instant**|  | [optional] |
+| **endLte** | **kotlin.time.Instant**|  | [optional] |
 | **eventIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **id** | **kotlin.Int**|  | [optional] |
 | **ids** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
@@ -198,10 +198,10 @@ try {
 | **programNameContains** | **kotlin.String**|  | [optional] |
 | **search** | **kotlin.String**| A search term. | [optional] |
 | **spacestationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **startGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **startGt** | **kotlin.time.Instant**|  | [optional] |
+| **startGte** | **kotlin.time.Instant**|  | [optional] |
+| **startLt** | **kotlin.time.Instant**|  | [optional] |
+| **startLte** | **kotlin.time.Instant**|  | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
 | **year** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
@@ -245,11 +245,11 @@ Configure cookieAuth:
 val apiInstance = SpacewalksApi()
 val astronautIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val end : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val endLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val end : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val endLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val eventIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val id : kotlin.Int = 56 // kotlin.Int | 
 val ids : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
@@ -266,10 +266,10 @@ val programName : kotlin.String = programName_example // kotlin.String |
 val programNameContains : kotlin.String = programNameContains_example // kotlin.String | 
 val search : kotlin.String = search_example // kotlin.String | A search term.
 val spacestationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val startGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val startLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val startGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val startLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val year : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 try {
     val result : PaginatedSpacewalkListList = apiInstance.spacewalksMiniList(astronautIds, day, end, endGt, endGte, endLt, endLte, eventIds, id, ids, launchIds, limit, month, name, nameContains, offset, ordering, ownerIds, programIds, programName, programNameContains, search, spacestationIds, startGt, startGte, startLt, startLte, year)
@@ -286,11 +286,11 @@ try {
 ### Parameters
 | **astronautIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **end** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **endLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **end** | **kotlin.time.Instant**|  | [optional] |
+| **endGt** | **kotlin.time.Instant**|  | [optional] |
+| **endGte** | **kotlin.time.Instant**|  | [optional] |
+| **endLt** | **kotlin.time.Instant**|  | [optional] |
+| **endLte** | **kotlin.time.Instant**|  | [optional] |
 | **eventIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **id** | **kotlin.Int**|  | [optional] |
 | **ids** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
@@ -307,10 +307,10 @@ try {
 | **programNameContains** | **kotlin.String**|  | [optional] |
 | **search** | **kotlin.String**| A search term. | [optional] |
 | **spacestationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **startGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **startLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **startGt** | **kotlin.time.Instant**|  | [optional] |
+| **startGte** | **kotlin.time.Instant**|  | [optional] |
+| **startLt** | **kotlin.time.Instant**|  | [optional] |
+| **startLte** | **kotlin.time.Instant**|  | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
 | **year** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |

@@ -28,7 +28,6 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/snapi/auth/OAuth.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/snapi/infrastructure/ApiAbstractions.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/snapi/infrastructure/ApiClient.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/snapi/infrastructure/Base64ByteArray.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/snapi/infrastructure/Bytes.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/snapi/infrastructure/HttpResponse.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/snapi/infrastructure/OctetByteArray.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/snapi/infrastructure/PartConfig.kt

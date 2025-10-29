@@ -56,7 +56,7 @@ data class UpdateEndpoint (
 
     @SerialName(value = "program") @Required val program: ProgramMini?,
 
-    @SerialName(value = "created_on") val createdOn: kotlinx.datetime.Instant? = null
+    @SerialName(value = "created_on") val createdOn: kotlin.time.Instant? = null
 
 ) {
 

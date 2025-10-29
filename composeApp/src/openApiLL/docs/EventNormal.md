@@ -13,7 +13,7 @@
 | **slug** | **kotlin.String** |  |  |
 | **type** | [**EventType**](EventType.md) |  |  |
 | **datePrecision** | [**NetPrecision**](NetPrecision.md) |  |  |
-| **date** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **date** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
 | **webcastLive** | **kotlin.Boolean** |  |  [optional] |
 | **location** | **kotlin.String** |  |  [optional] |

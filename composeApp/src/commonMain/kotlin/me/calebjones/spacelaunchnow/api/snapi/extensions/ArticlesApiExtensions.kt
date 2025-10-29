@@ -4,7 +4,7 @@ import me.calebjones.spacelaunchnow.api.snapi.apis.ArticlesApi
 import me.calebjones.spacelaunchnow.api.snapi.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.api.snapi.models.PaginatedArticleList
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * Extension functions for ArticlesApi to provide clean, named-parameter interfaces

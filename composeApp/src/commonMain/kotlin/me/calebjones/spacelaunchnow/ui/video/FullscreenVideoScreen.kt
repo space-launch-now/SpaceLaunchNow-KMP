@@ -41,9 +41,9 @@ import chaintech.videoplayer.host.MediaPlayerHost
 import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.util.VideoUtil
+import kotlin.time.Clock.System
 
 @Composable
 fun FullscreenVideoScreen(
@@ -56,7 +56,7 @@ fun FullscreenVideoScreen(
     modifier: Modifier = Modifier
 ) {
     var showControls by remember { mutableStateOf(true) }
-    var lastInteractionTime by remember { mutableStateOf(Clock.System.now().toEpochMilliseconds()) }
+    var lastInteractionTime by remember { mutableStateOf(System.now().toEpochMilliseconds()) }
 
     // Auto-hide controls after 3 seconds of inactivity
     LaunchedEffect(lastInteractionTime) {
@@ -75,7 +75,7 @@ fun FullscreenVideoScreen(
             ) {
                 // Toggle controls visibility on tap
                 showControls = !showControls
-                lastInteractionTime = Clock.System.now().toEpochMilliseconds()
+                lastInteractionTime = System.now().toEpochMilliseconds()
             }
     ) {
         // Main video player - use a stable key for better retention across rotations
@@ -290,7 +290,7 @@ fun FullscreenVideoScreen(
     modifier: Modifier = Modifier
 ) {
     var showControls by remember { mutableStateOf(true) }
-    var lastInteractionTime by remember { mutableStateOf(Clock.System.now().toEpochMilliseconds()) }
+    var lastInteractionTime by remember { mutableStateOf(System.now().toEpochMilliseconds()) }
 
     // Auto-hide controls after 3 seconds of inactivity
     LaunchedEffect(lastInteractionTime) {
@@ -324,7 +324,7 @@ fun FullscreenVideoScreen(
             ) {
                 // Toggle controls visibility on tap
                 showControls = !showControls
-                lastInteractionTime = Clock.System.now().toEpochMilliseconds()
+                lastInteractionTime = System.now().toEpochMilliseconds()
             }
     ) {
         // Main video player - use a more stable approach to prevent recreation during rotation

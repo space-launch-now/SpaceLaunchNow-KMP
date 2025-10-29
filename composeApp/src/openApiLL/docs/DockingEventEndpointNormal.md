@@ -6,8 +6,8 @@
 | ------------ | ------------- | ------------- | ------------- |
 | **id** | **kotlin.Int** |  |  [readonly] |
 | **url** | **kotlin.String** |  |  [readonly] |
-| **docking** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
-| **departure** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
+| **docking** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
+| **departure** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
 | **dockingLocation** | [**DockingLocation**](DockingLocation.md) |  |  |
 | **spaceStationTarget** | [**SpaceStationMini**](SpaceStationMini.md) |  |  |
 | **flightVehicleTarget** | [**SpacecraftFlightMini**](SpacecraftFlightMini.md) |  |  |

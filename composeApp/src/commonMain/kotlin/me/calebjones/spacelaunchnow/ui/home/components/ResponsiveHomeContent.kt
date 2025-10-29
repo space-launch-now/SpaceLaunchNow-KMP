@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
-import kotlinx.datetime.Clock
+import kotlin.time.Clock.System
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.isDesktop
@@ -76,7 +76,7 @@ fun ResponsiveHomeContent(
 
     // Get current day and month for "This Day in History"
     val currentDate = remember {
-        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     }
     val currentDay = currentDate.dayOfMonth
     val currentMonth = currentDate.monthNumber

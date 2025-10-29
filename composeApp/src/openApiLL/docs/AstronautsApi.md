@@ -47,11 +47,11 @@ val dateOfDeathLt : kotlinx.datetime.LocalDate = 2013-10-20 // kotlinx.datetime.
 val dateOfDeathLte : kotlinx.datetime.LocalDate = 2013-10-20 // kotlinx.datetime.LocalDate | 
 val dateOfDeathMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val dateOfDeathYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val firstFlight : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val firstFlight : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val flightsCount : kotlin.Int = 56 // kotlin.Int | 
 val flightsCountGt : kotlin.Int = 56 // kotlin.Int | 
 val flightsCountGte : kotlin.Int = 56 // kotlin.Int | 
@@ -65,11 +65,11 @@ val landingsCountGt : kotlin.Int = 56 // kotlin.Int |
 val landingsCountGte : kotlin.Int = 56 // kotlin.Int | 
 val landingsCountLt : kotlin.Int = 56 // kotlin.Int | 
 val landingsCountLte : kotlin.Int = 56 // kotlin.Int | 
-val lastFlight : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val lastFlight : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val nationality : kotlin.String = nationality_example // kotlin.String | Nationality
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -112,11 +112,11 @@ try {
 | **dateOfDeathLte** | **kotlinx.datetime.LocalDate**|  | [optional] |
 | **dateOfDeathMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **dateOfDeathYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **firstFlight** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **firstFlight** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightGt** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightGte** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightLt** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightLte** | **kotlin.time.Instant**|  | [optional] |
 | **flightsCount** | **kotlin.Int**|  | [optional] |
 | **flightsCountGt** | **kotlin.Int**|  | [optional] |
 | **flightsCountGte** | **kotlin.Int**|  | [optional] |
@@ -130,11 +130,11 @@ try {
 | **landingsCountGte** | **kotlin.Int**|  | [optional] |
 | **landingsCountLt** | **kotlin.Int**|  | [optional] |
 | **landingsCountLte** | **kotlin.Int**|  | [optional] |
-| **lastFlight** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **lastFlight** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightGt** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightGte** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightLt** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightLte** | **kotlin.time.Instant**|  | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **nationality** | **kotlin.String**| Nationality | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -204,11 +204,11 @@ val dateOfDeathLt : kotlinx.datetime.LocalDate = 2013-10-20 // kotlinx.datetime.
 val dateOfDeathLte : kotlinx.datetime.LocalDate = 2013-10-20 // kotlinx.datetime.LocalDate | 
 val dateOfDeathMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val dateOfDeathYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val firstFlight : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val firstFlight : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val flightsCount : kotlin.Int = 56 // kotlin.Int | 
 val flightsCountGt : kotlin.Int = 56 // kotlin.Int | 
 val flightsCountGte : kotlin.Int = 56 // kotlin.Int | 
@@ -222,11 +222,11 @@ val landingsCountGt : kotlin.Int = 56 // kotlin.Int |
 val landingsCountGte : kotlin.Int = 56 // kotlin.Int | 
 val landingsCountLt : kotlin.Int = 56 // kotlin.Int | 
 val landingsCountLte : kotlin.Int = 56 // kotlin.Int | 
-val lastFlight : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val lastFlight : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val nationality : kotlin.String = nationality_example // kotlin.String | Nationality
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -269,11 +269,11 @@ try {
 | **dateOfDeathLte** | **kotlinx.datetime.LocalDate**|  | [optional] |
 | **dateOfDeathMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **dateOfDeathYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **firstFlight** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **firstFlight** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightGt** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightGte** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightLt** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightLte** | **kotlin.time.Instant**|  | [optional] |
 | **flightsCount** | **kotlin.Int**|  | [optional] |
 | **flightsCountGt** | **kotlin.Int**|  | [optional] |
 | **flightsCountGte** | **kotlin.Int**|  | [optional] |
@@ -287,11 +287,11 @@ try {
 | **landingsCountGte** | **kotlin.Int**|  | [optional] |
 | **landingsCountLt** | **kotlin.Int**|  | [optional] |
 | **landingsCountLte** | **kotlin.Int**|  | [optional] |
-| **lastFlight** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **lastFlight** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightGt** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightGte** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightLt** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightLte** | **kotlin.time.Instant**|  | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **nationality** | **kotlin.String**| Nationality | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
@@ -361,11 +361,11 @@ val dateOfDeathLt : kotlinx.datetime.LocalDate = 2013-10-20 // kotlinx.datetime.
 val dateOfDeathLte : kotlinx.datetime.LocalDate = 2013-10-20 // kotlinx.datetime.LocalDate | 
 val dateOfDeathMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val dateOfDeathYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
-val firstFlight : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val firstFlightLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val firstFlight : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val firstFlightLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val flightsCount : kotlin.Int = 56 // kotlin.Int | 
 val flightsCountGt : kotlin.Int = 56 // kotlin.Int | 
 val flightsCountGte : kotlin.Int = 56 // kotlin.Int | 
@@ -379,11 +379,11 @@ val landingsCountGt : kotlin.Int = 56 // kotlin.Int |
 val landingsCountGte : kotlin.Int = 56 // kotlin.Int | 
 val landingsCountLt : kotlin.Int = 56 // kotlin.Int | 
 val landingsCountLte : kotlin.Int = 56 // kotlin.Int | 
-val lastFlight : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
-val lastFlightLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val lastFlight : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
+val lastFlightLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val nationality : kotlin.String = nationality_example // kotlin.String | Nationality
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
@@ -426,11 +426,11 @@ try {
 | **dateOfDeathLte** | **kotlinx.datetime.LocalDate**|  | [optional] |
 | **dateOfDeathMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **dateOfDeathYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
-| **firstFlight** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **firstFlightLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **firstFlight** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightGt** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightGte** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightLt** | **kotlin.time.Instant**|  | [optional] |
+| **firstFlightLte** | **kotlin.time.Instant**|  | [optional] |
 | **flightsCount** | **kotlin.Int**|  | [optional] |
 | **flightsCountGt** | **kotlin.Int**|  | [optional] |
 | **flightsCountGte** | **kotlin.Int**|  | [optional] |
@@ -444,11 +444,11 @@ try {
 | **landingsCountGte** | **kotlin.Int**|  | [optional] |
 | **landingsCountLt** | **kotlin.Int**|  | [optional] |
 | **landingsCountLte** | **kotlin.Int**|  | [optional] |
-| **lastFlight** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightGt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightGte** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightLt** | **kotlinx.datetime.Instant**|  | [optional] |
-| **lastFlightLte** | **kotlinx.datetime.Instant**|  | [optional] |
+| **lastFlight** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightGt** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightGte** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightLt** | **kotlin.time.Instant**|  | [optional] |
+| **lastFlightLte** | **kotlin.time.Instant**|  | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **nationality** | **kotlin.String**| Nationality | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
