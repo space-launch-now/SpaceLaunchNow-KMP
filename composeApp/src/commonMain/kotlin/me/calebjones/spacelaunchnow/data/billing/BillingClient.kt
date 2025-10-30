@@ -109,7 +109,8 @@ object SubscriptionProducts {
     const val RC_PACKAGE_ANNUAL = "\$rc_annual"      // Maps to sln_production_yearly:yearly
 
     // RevenueCat entitlement identifier (configured in dashboard)
-    const val RC_ENTITLEMENT_PREMIUM = "premium"     // All features unlocked
+    const val RC_ENTITLEMENT_PREMIUM = "entl9fe2b6018c"     // All features unlocked
+    const val RC_ENTITLEMENT_LEGACY = "entl3ad15261a3"     // All features unlocked
 
     // NOTE: We don't explicitly list all legacy products here as there are hundreds of them.
     // Any product ID that doesn't match current products or debug products is treated as legacy.

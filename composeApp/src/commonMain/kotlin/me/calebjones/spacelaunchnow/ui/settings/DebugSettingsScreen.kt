@@ -23,9 +23,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -59,18 +58,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import kotlin.time.Clock.System
+import me.calebjones.spacelaunchnow.LocalContextFactory
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
-import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
+import me.calebjones.spacelaunchnow.platform.billing.createDirectBillingClient
+import me.calebjones.spacelaunchnow.platform.billing.isDirectBillingSupported
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import org.koin.compose.koinInject
+import kotlin.time.Clock.System
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +82,7 @@ fun DebugSettingsScreen(
 ) {
     val appPreferences = koinInject<me.calebjones.spacelaunchnow.data.storage.AppPreferences>()
     val debugMenuUnlocked by appPreferences.debugMenuUnlockedFlow.collectAsState(initial = false)
-    
+
     if (!BuildConfig.IS_DEBUG && !debugMenuUnlocked) {
         // Show a message that debug settings are not available
         Box(
@@ -441,7 +442,7 @@ fun DebugSettingsScreen(
                             NotificationAgency.ROSCOSMOS,
                             NotificationAgency.NORTHROP_GRUMMAN
                         )
-                        
+
                         val locations = listOf(
                             NotificationLocation.KSC,
                             NotificationLocation.TEXAS,
@@ -456,7 +457,7 @@ fun DebugSettingsScreen(
                             NotificationLocation.KODIAK,
                             NotificationLocation.OTHER
                         )
-                        
+
                         val notificationTypes = listOf(
                             "netstampChanged" to "Launch Time Changed",
                             "twentyFourHour" to "24 Hours Before",
@@ -494,7 +495,7 @@ fun DebugSettingsScreen(
                                 enabled = !isLoading,
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-                            
+
                             ExposedDropdownMenu(
                                 expanded = agencyExpanded,
                                 onDismissRequest = { agencyExpanded = false }
@@ -526,7 +527,7 @@ fun DebugSettingsScreen(
                                 enabled = !isLoading,
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-                            
+
                             ExposedDropdownMenu(
                                 expanded = locationExpanded,
                                 onDismissRequest = { locationExpanded = false }
@@ -560,10 +561,13 @@ fun DebugSettingsScreen(
                         // Notification Type Picker
                         ExposedDropdownMenuBox(
                             expanded = notificationTypeExpanded,
-                            onExpandedChange = { notificationTypeExpanded = !notificationTypeExpanded }
+                            onExpandedChange = {
+                                notificationTypeExpanded = !notificationTypeExpanded
+                            }
                         ) {
                             OutlinedTextField(
-                                value = notificationTypes.find { it.first == selectedNotificationType }?.second ?: selectedNotificationType,
+                                value = notificationTypes.find { it.first == selectedNotificationType }?.second
+                                    ?: selectedNotificationType,
                                 onValueChange = {},
                                 readOnly = true,
                                 label = { Text("Notification Type") },
@@ -572,7 +576,7 @@ fun DebugSettingsScreen(
                                 enabled = !isLoading,
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-                            
+
                             ExposedDropdownMenu(
                                 expanded = notificationTypeExpanded,
                                 onDismissRequest = { notificationTypeExpanded = false }
@@ -688,9 +692,10 @@ fun DebugSettingsScreen(
                         )
 
                         // Get billing client and coroutine scope
-                        val billingClient = koinInject<me.calebjones.spacelaunchnow.data.billing.BillingClient>()
+                        val billingClient =
+                            koinInject<me.calebjones.spacelaunchnow.data.billing.BillingClient>()
                         val coroutineScope = rememberCoroutineScope()
-                        
+
                         // Current simulated state display
                         Surface(
                             color = if (subscriptionState.isSubscribed) {
@@ -719,9 +724,13 @@ fun DebugSettingsScreen(
 
                         // Actual owned products from billing client
                         var isQuerying by remember { mutableStateOf(false) }
-                        var ownedProducts by remember { mutableStateOf<List<me.calebjones.spacelaunchnow.data.model.PlatformPurchase>?>(null) }
+                        var ownedProducts by remember {
+                            mutableStateOf<List<me.calebjones.spacelaunchnow.data.model.PlatformPurchase>?>(
+                                null
+                            )
+                        }
                         var queryError by remember { mutableStateOf<String?>(null) }
-                        
+
                         LaunchedEffect(Unit) {
                             // Auto-query on first load
                             isQuerying = true
@@ -757,7 +766,7 @@ fun DebugSettingsScreen(
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
-                                    
+
                                     if (!isQuerying) {
                                         IconButton(
                                             onClick = {
@@ -770,7 +779,8 @@ fun DebugSettingsScreen(
                                                             isQuerying = false
                                                         },
                                                         onFailure = { error ->
-                                                            queryError = error.message ?: "Unknown error"
+                                                            queryError =
+                                                                error.message ?: "Unknown error"
                                                             isQuerying = false
                                                         }
                                                     )
@@ -792,9 +802,12 @@ fun DebugSettingsScreen(
                                         Text(
                                             text = "⏳ Querying...",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                                alpha = 0.7f
+                                            )
                                         )
                                     }
+
                                     queryError != null -> {
                                         Text(
                                             text = "❌ Error: $queryError",
@@ -802,18 +815,25 @@ fun DebugSettingsScreen(
                                             color = MaterialTheme.colorScheme.error
                                         )
                                     }
+
                                     ownedProducts?.isEmpty() == true -> {
                                         Text(
                                             text = "No products owned",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                                alpha = 0.7f
+                                            )
                                         )
                                     }
+
                                     ownedProducts != null -> {
                                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                             ownedProducts!!.forEach { purchase ->
-                                                val subscriptionType = me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.getSubscriptionType(purchase.productId)
-                                                
+                                                val subscriptionType =
+                                                    me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.getSubscriptionType(
+                                                        purchase.productId
+                                                    )
+
                                                 Row(
                                                     modifier = Modifier.fillMaxWidth(),
                                                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -831,24 +851,31 @@ fun DebugSettingsScreen(
                                                         Text(
                                                             text = subscriptionType.name,
                                                             style = MaterialTheme.typography.labelSmall,
-                                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                                                alpha = 0.7f
+                                                            )
                                                         )
                                                     }
-                                                    
-                                                    val isExpired = purchase.expiryTime?.let { expiry ->
-                                                        System.now().toEpochMilliseconds() > expiry
-                                                    } ?: false
-                                                    
+
+                                                    val isExpired =
+                                                        purchase.expiryTime?.let { expiry ->
+                                                            System.now()
+                                                                .toEpochMilliseconds() > expiry
+                                                        } ?: false
+
                                                     Surface(
-                                                        color = if (isExpired) 
-                                                            MaterialTheme.colorScheme.error 
-                                                        else 
+                                                        color = if (isExpired)
+                                                            MaterialTheme.colorScheme.error
+                                                        else
                                                             MaterialTheme.colorScheme.tertiary,
                                                         shape = MaterialTheme.shapes.extraSmall
                                                     ) {
                                                         Text(
                                                             text = if (isExpired) "EXPIRED" else "ACTIVE",
-                                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                                            modifier = Modifier.padding(
+                                                                horizontal = 6.dp,
+                                                                vertical = 2.dp
+                                                            ),
                                                             style = MaterialTheme.typography.labelSmall,
                                                             fontSize = 10.sp,
                                                             color = if (isExpired)
@@ -984,18 +1011,19 @@ fun DebugSettingsScreen(
                         HorizontalDivider()
 
                         var customSku by remember { mutableStateOf("") }
+                        var customProductType by remember { mutableStateOf("inapp") }
                         var customBasePlan by remember { mutableStateOf("") }
                         var isPurchasing by remember { mutableStateOf(false) }
 
                         Text(
-                            text = "Custom SKU Purchase:",
+                            text = "Custom SKU Purchase (Direct Android Billing):",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         )
 
                         Text(
-                            text = "⚠️ This will initiate a REAL purchase flow using the billing library!",
+                            text = "⚠️ This uses the native Android Billing Library directly (bypasses RevenueCat)!",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                             fontWeight = FontWeight.Bold
@@ -1005,61 +1033,156 @@ fun DebugSettingsScreen(
                             value = customSku,
                             onValueChange = { customSku = it },
                             label = { Text("Product ID / SKU") },
-                            placeholder = { Text("e.g., spacelaunchnow_pro") },
+                            placeholder = { Text("e.g., spacelaunchnow_pro, 2020_super_fan") },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !isLoading && !isPurchasing,
                             singleLine = true,
                             supportingText = {
-                                Text("Required: Enter the product ID", fontSize = 11.sp)
+                                Text(
+                                    "Required: Product ID from Google Play Console",
+                                    fontSize = 11.sp
+                                )
                             }
                         )
 
-                        OutlinedTextField(
-                            value = customBasePlan,
-                            onValueChange = { customBasePlan = it },
-                            label = { Text("Base Plan ID (optional)") },
-                            placeholder = { Text("e.g., base-plan, yearly") },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading && !isPurchasing,
-                            singleLine = true,
-                            supportingText = {
-                                Text("Optional: Only needed for subscriptions with multiple plans", fontSize = 11.sp)
+                        // Product Type Selector
+                        var productTypeExpanded by remember { mutableStateOf(false) }
+                        val productTypes =
+                            listOf("inapp" to "In-App Product (one-time)", "subs" to "Subscription")
+
+                        ExposedDropdownMenuBox(
+                            expanded = productTypeExpanded,
+                            onExpandedChange = { productTypeExpanded = !productTypeExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = productTypes.find { it.first == customProductType }?.second
+                                    ?: customProductType,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Product Type") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = productTypeExpanded) },
+                                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                                enabled = !isLoading && !isPurchasing,
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = productTypeExpanded,
+                                onDismissRequest = { productTypeExpanded = false }
+                            ) {
+                                productTypes.forEach { (type, display) ->
+                                    DropdownMenuItem(
+                                        text = { Text(display) },
+                                        onClick = {
+                                            customProductType = type
+                                            productTypeExpanded = false
+                                        }
+                                    )
+                                }
                             }
-                        )
+                        }
+
+                        if (customProductType == "subs") {
+                            OutlinedTextField(
+                                value = customBasePlan,
+                                onValueChange = { customBasePlan = it },
+                                label = { Text("Base Plan ID (for subscriptions)") },
+                                placeholder = { Text("e.g., base-plan, yearly") },
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = !isLoading && !isPurchasing,
+                                singleLine = true,
+                                supportingText = {
+                                    Text(
+                                        "Optional: Leave empty to use default plan",
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            )
+                        }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            // Get context factory outside of onClick to avoid composable issues
+                            val contextFactory = LocalContextFactory.current
+                            
                             Button(
                                 onClick = {
                                     if (customSku.isNotBlank()) {
                                         coroutineScope.launch {
                                             isPurchasing = true
-                                            val basePlan = if (customBasePlan.isNotBlank()) customBasePlan else null
-                                            
-                                            billingClient.launchPurchaseFlow(
-                                                productId = customSku,
-                                                basePlanId = basePlan
-                                            ).fold(
-                                                onSuccess = { purchaseToken ->
-                                                    isPurchasing = false
+
+                                            // Check if direct billing is supported
+                                            if (!isDirectBillingSupported()) {
+                                                snackbarHostState.showSnackbar(
+                                                    "❌ Direct billing is only available on Android"
+                                                )
+                                                isPurchasing = false
+                                                return@launch
+                                            }
+
+                                            // Get activity context for Android
+                                            try {
+                                                val activity = contextFactory?.getActivity()
+
+                                                if (activity == null) {
                                                     snackbarHostState.showSnackbar(
-                                                        "✅ Purchase initiated: $customSku"
+                                                        "❌ Activity context not available"
                                                     )
-                                                },
-                                                onFailure = { error ->
                                                     isPurchasing = false
-                                                    snackbarHostState.showSnackbar(
-                                                        "❌ Purchase failed: ${error.message}"
-                                                    )
+                                                    return@launch
                                                 }
-                                            )
+
+                                                // Create direct billing client using factory function
+                                                val directBilling =
+                                                    createDirectBillingClient(activity)
+
+                                                // Initialize
+                                                directBilling.initialize().fold(
+                                                    onSuccess = {
+                                                        // Launch purchase flow
+                                                        val basePlan =
+                                                            if (customProductType == "subs" && customBasePlan.isNotBlank()) {
+                                                                customBasePlan
+                                                            } else null
+
+                                                        directBilling.launchPurchaseFlow(
+                                                            productId = customSku,
+                                                            productType = customProductType,
+                                                            basePlanId = basePlan
+                                                        ).fold(
+                                                            onSuccess = {
+                                                                snackbarHostState.showSnackbar(
+                                                                    "✅ Purchase flow launched: $customSku"
+                                                                )
+                                                            },
+                                                            onFailure = { error ->
+                                                                snackbarHostState.showSnackbar(
+                                                                    "❌ ${error.message}"
+                                                                )
+                                                            }
+                                                        )
+                                                        directBilling.disconnect()
+                                                    },
+                                                    onFailure = { error ->
+                                                        snackbarHostState.showSnackbar(
+                                                            "❌ Billing init failed: ${error.message}"
+                                                        )
+                                                    }
+                                                )
+                                            } catch (e: Exception) {
+                                                snackbarHostState.showSnackbar(
+                                                    "❌ Error: ${e.message}"
+                                                )
+                                            } finally {
+                                                isPurchasing = false
+                                            }
                                         }
                                     }
                                 },
                                 modifier = Modifier.weight(1f),
-                                enabled = customSku.isNotBlank() && !isLoading && !isPurchasing,
+                                enabled = customSku.isNotBlank() && !isLoading && !isPurchasing && isDirectBillingSupported(),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.error,
                                     contentColor = MaterialTheme.colorScheme.onError
@@ -1073,15 +1196,21 @@ fun DebugSettingsScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                 }
-                                Text(if (isPurchasing) "Purchasing..." else "💳 Buy Product")
+                                Text(if (isPurchasing) "Purchasing..." else "💳 Buy Product (Direct)")
                             }
                         }
 
                         Text(
-                            text = "💡 Examples:\n" +
-                                   "• One-time: spacelaunchnow_pro (no base plan)\n" +
-                                   "• Monthly sub: sln_production_yearly + base-plan\n" +
-                                   "• Yearly sub: sln_production_yearly + yearly",
+                            text = if (isDirectBillingSupported()) {
+                                "💡 Uses native Android Billing Library:\n" +
+                                        "• Works with ANY product in Google Play Console\n" +
+                                        "• Doesn't require RevenueCat configuration\n" +
+                                        "• Perfect for testing legacy or beta products"
+                            } else {
+                                "⚠️ Direct billing not supported on this platform\n" +
+                                        "• Available on Android only\n" +
+                                        "• iOS/Desktop: Use RevenueCat offerings instead"
+                            },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 10.sp
@@ -1155,13 +1284,13 @@ fun DebugSettingsScreen(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        
+
                         Text(
                             text = "v4 only subscribes to version topic. All filtering is client-side.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        
+
                         if (uiState.notificationSettings.subscribedTopics.isEmpty()) {
                             Text(
                                 text = "⏳ Not yet subscribed (initializing...)",

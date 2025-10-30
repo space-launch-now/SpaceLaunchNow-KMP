@@ -29,6 +29,8 @@ Grant/Deny Access
 ```kotlin
 package me.calebjones.spacelaunchnow.data.model
 
+import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
+
 enum class PremiumFeature(
     val displayName: String,
     val description: String,
@@ -37,17 +39,17 @@ enum class PremiumFeature(
     REMOVE_ADS(
         displayName = "Remove Ads",
         description = "Enjoy an ad-free experience",
-        revenueCatEntitlementId = "premium"  // All premium users get this
+        revenueCatEntitlementId = SubscriptionProducts.RC_ENTITLEMENT_PREMIUM  // All premium users get this
     ),
     PREMIUM_WIDGETS(
         displayName = "Premium Widgets",
         description = "Access advanced home screen widgets",
-        revenueCatEntitlementId = "premium"
+        revenueCatEntitlementId = SubscriptionProducts.RC_ENTITLEMENT_PREMIUM
     ),
     PREMIUM_THEMES(
         displayName = "Premium Themes",
         description = "Unlock all color themes and customization",
-        revenueCatEntitlementId = "premium"
+        revenueCatEntitlementId = SubscriptionProducts.RC_ENTITLEMENT_PREMIUM
     );
 
     companion object {
@@ -134,7 +136,7 @@ class SubscriptionRepositoryImpl(
             }.toSet()
 
             // Check if user has premium entitlement
-            val hasPremium = revenueCatManager.hasEntitlement("premium")
+            val hasPremium = revenueCatManager.hasEntitlement(SubscriptionProducts.RC_ENTITLEMENT_PREMIUM)
 
             val verifiedState = SubscriptionState(
                 isSubscribed = hasPremium,
