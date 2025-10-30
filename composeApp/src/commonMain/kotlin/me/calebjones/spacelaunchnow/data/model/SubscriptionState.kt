@@ -100,10 +100,18 @@ enum class SubscriptionType(val isLegacy: Boolean = false) {
     companion object {
         fun fromProductId(productId: String): SubscriptionType {
             val result = when {
-                productId.contains("pro", ignoreCase = true) -> PREMIUM
+                // Match current/known premium product patterns
+                productId == "spacelaunchnow_pro" -> PREMIUM
+                productId == "sln_production_yearly" -> PREMIUM
                 productId.contains("yearly", ignoreCase = true) -> PREMIUM
                 productId.contains("monthly", ignoreCase = true) -> PREMIUM
                 productId.contains("base-plan", ignoreCase = true) -> PREMIUM
+                // Match "pro" as a word (not as part of "product", "profile", etc.)
+                // Use regex to match "pro" with word boundaries or as suffix after underscore
+                productId.matches(Regex(".*[_\\s]pro$", RegexOption.IGNORE_CASE)) -> PREMIUM
+                productId.matches(Regex("^pro[_\\s].*", RegexOption.IGNORE_CASE)) -> PREMIUM
+                productId.equals("pro", ignoreCase = true) -> PREMIUM
+                // Everything else is legacy
                 else -> LEGACY
             }
             println("SubscriptionType.fromProductId: '$productId' -> $result")
