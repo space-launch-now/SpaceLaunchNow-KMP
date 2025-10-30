@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b7...v5.0.0) (2025-10-30)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b8...v5.0.0) (2025-10-30)
+
+
+### Features
+
+* Prevent infinite loops by checking subscription state before update ([d5cec27](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/d5cec2729169856c154f910dc97d4296d23786ea))
+
+
+
+# [5.0.0-b8](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b7...v5.0.0-b8) (2025-10-30)
 
 
 ### Features
@@ -43,15 +52,6 @@
 ### Bug Fixes
 
 * enable AD_FREE feature in PremiumFeature ([7769960](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/77699602dc9be097c3fa47d670995dfaa9b51292))
-
-
-
-# [5.0.0-b4](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b3...v5.0.0-b4) (2025-10-29)
-
-
-### Features
-
-* update buildconfig and packages ([4343ba3](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/4343ba3edb2200f60aa7a74ee071670dba4bb997))
 
 
 
