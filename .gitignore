@@ -25,3 +25,4 @@ iosApp/Secrets.plist
 iosApp/iosApp/GoogleService-Info.plist
 
 **google-services.json
+keystore.properties

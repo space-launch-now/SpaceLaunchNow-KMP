@@ -638,6 +638,16 @@ class SubscriptionRepositoryImpl(
         features: Set<PremiumFeature>
     ) {
         val subscriptionType = SubscriptionProducts.getSubscriptionType(productId)
+        
+        // Only update if the current state is different to avoid infinite loops
+        val currentState = _state.value
+        if (currentState.productId == productId && 
+            currentState.subscriptionType == subscriptionType &&
+            currentState.isSubscribed) {
+            // State already matches, no update needed
+            return
+        }
+        
         val newState = SubscriptionState(
             isSubscribed = true,
             subscriptionType = subscriptionType,
