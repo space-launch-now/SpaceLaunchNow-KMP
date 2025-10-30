@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -34,7 +35,15 @@ actual fun AdConsentPopup(
     onFailure: ((Throwable) -> Unit)?
 ) {
     val contextFactory = LocalContextFactory.current
-    val consent by rememberConsent(activity = contextFactory?.getActivity())
+    val activity = contextFactory?.getActivity() as? Activity
+    
+    // Only show consent popup if we have a valid Activity
+    if (activity == null) {
+        println("⚠️ AdConsentPopup: Activity context is null, consent popup will not be shown")
+        return
+    }
+    
+    val consent by rememberConsent(activity = activity)
     
     // Show consent popup
     ConsentPopup(
@@ -56,65 +65,75 @@ actual fun WithPreloadedAds(
     context: Any?,
     content: @Composable () -> Unit
 ) {
+    // Cast context to Activity - it should be an Activity on Android
+    val activity = context as? Activity
+    
+    if (activity == null) {
+        println("⚠️ WithPreloadedAds: Activity context is null, ads will not be loaded")
+        // Still provide the content but without ads
+        content()
+        return
+    }
+    
     // Preload banner ads
     val preloadedBannerAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER
     )
     val preloadedLargeBannerAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.LARGE_BANNER
     )
     val preloadedMediumRectangleAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.MEDIUM_RECTANGLE
     )
     
     // Preload dedicated navigation ads
     val preloadedNavigationBannerAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER
     )
     val preloadedNavigationLargeBannerAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.LARGE_BANNER
     )
     val preloadedNavigationLeaderboardAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.LEADERBOARD
     )
     
     // Preload tablet-specific ads
     val preloadedLeaderboardAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.LEADERBOARD
     )
     val preloadedFullBannerAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.FULL_BANNER
     )
     val preloadedFluidAd by rememberBannerAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.BANNER),
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.FLUID
     )
     
     // Preload interstitial and rewarded ads
     val preloadedInterstitialAd by rememberInterstitialAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.INTERSTITIAL)
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.INTERSTITIAL)
     )
     val preloadedRewardedAd by rememberRewardedAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(GlobalAdManager.Companion.AdType.REWARDED)
+        activity = activity,
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.REWARDED)
     )
     
     // Provide all preloaded ads via CompositionLocal

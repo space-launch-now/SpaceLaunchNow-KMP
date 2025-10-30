@@ -187,17 +187,18 @@ fun SpaceLaunchNowApp(
     val useTabletLayout = isTabletOrDesktop()
     println("Device layout type: ${if (useTabletLayout) "Tablet/Desktop" else "Phone"}")
 
-    // Show consent popup (platform-specific implementation)
-    AdConsentPopup(
-        onFailure = { println("Consent popup failure: ${it.message}") }
-    )
-
     // Provide the useUtc setting and contextFactory throughout the app
     // Ad-related CompositionLocals are provided by WithPreloadedAds wrapper
     CompositionLocalProvider(
         LocalUseUtc provides useUtc,
         LocalContextFactory provides contextFactory
     ) {
+        // Show consent popup (platform-specific implementation)
+        // Must be inside CompositionLocalProvider to access LocalContextFactory
+        AdConsentPopup(
+            onFailure = { println("Consent popup failure: ${it.message}") }
+        )
+        
         // Wrap content with preloaded ads (platform-specific: Android/iOS preloads, Desktop no-op)
         WithPreloadedAds(
             context = contextFactory.getActivity()
