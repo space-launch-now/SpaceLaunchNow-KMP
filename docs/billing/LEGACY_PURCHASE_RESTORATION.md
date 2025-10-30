@@ -280,5 +280,5 @@ override suspend fun initialize() {
 ## See Also
 
 - [REVENUECAT_COMPLETE_PROGRESS_SUMMARY.md](../docs/billing/REVENUECAT_COMPLETE_PROGRESS_SUMMARY.md) - RevenueCat integration details
-- [SubscriptionProducts.kt](../composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/data/billing/BillingClient.kt) - Product ID mappings
+- [BillingClient.kt](../composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/data/billing/BillingClient.kt) - Product ID mappings (SubscriptionProducts object)
 - [LegacyPurchaseRestorationTest.kt](../composeApp/src/commonTest/kotlin/me/calebjones/spacelaunchnow/data/billing/LegacyPurchaseRestorationTest.kt) - Test suite

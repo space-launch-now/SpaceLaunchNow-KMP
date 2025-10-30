@@ -259,7 +259,7 @@ object SubscriptionProducts {
      * Check if product should be treated as premium (including legacy)
      * Only debug products are considered non-premium
      */
-    fun grantsPremiuAccess(productId: String): Boolean {
+    fun grantsPremiumAccess(productId: String): Boolean {
         return getSubscriptionType(productId) != SubscriptionType.FREE
     }
 }

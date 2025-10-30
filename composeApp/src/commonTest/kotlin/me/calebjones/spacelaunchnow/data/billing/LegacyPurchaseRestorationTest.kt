@@ -108,7 +108,7 @@ class LegacyPurchaseRestorationTest {
             "Legacy product should grant ad-free access"
         )
         assertTrue(
-            SubscriptionProducts.grantsPremiuAccess(legacyProductId),
+            SubscriptionProducts.grantsPremiumAccess(legacyProductId),
             "Legacy product should be considered premium access"
         )
     }
