@@ -7,8 +7,8 @@
 | **id** | **kotlin.Int** |  |  [readonly] |
 | **title** | **kotlin.String** |  |  |
 | **status** | [**RoadClosureStatus**](RoadClosureStatus.md) |  |  |
-| **windowStart** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
-| **windowEnd** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
+| **windowStart** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
+| **windowEnd** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
 
 
 

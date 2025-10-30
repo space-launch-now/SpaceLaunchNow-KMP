@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList

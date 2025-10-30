@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
@@ -564,7 +564,7 @@ class HomeViewModel(
     fun loadNext24Hours(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val now = Clock.System.now()
+                val now = System.now()
                 val tomorrow = now.plus(24.hours)
 
                 val result = launchRepository.getUpcomingLaunchesList(
@@ -593,7 +593,7 @@ class HomeViewModel(
     fun loadNextWeek(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val now = Clock.System.now()
+                val now = System.now()
                 val nextWeek = now.plus(7.days)
 
                 val result = launchRepository.getUpcomingLaunchesList(
@@ -622,7 +622,7 @@ class HomeViewModel(
     fun loadNextMonth(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val now = Clock.System.now()
+                val now = System.now()
                 val nextMonth = now.plus(30.days)
 
                 val result = launchRepository.getUpcomingLaunchesList(

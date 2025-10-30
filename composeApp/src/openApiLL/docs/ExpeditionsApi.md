@@ -26,10 +26,10 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 val apiInstance = ExpeditionsApi()
 val crewAstronaut : kotlin.Int = 56 // kotlin.Int | 
 val crewAstronautAgency : kotlin.Int = 56 // kotlin.Int | 
-val endGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | End is greater than
-val endGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | End is greater than or equal to
-val endLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | End is less than
-val endLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | End is greater than or equal to
+val endGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | End is greater than
+val endGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | End is greater than or equal to
+val endLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | End is less than
+val endLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | End is greater than or equal to
 val isActive : kotlin.Boolean = true // kotlin.Boolean | 
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val name : kotlin.String = name_example // kotlin.String | 
@@ -37,10 +37,10 @@ val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to ret
 val ordering : kotlin.String = ordering_example // kotlin.String | Which field to use when ordering the results.
 val search : kotlin.String = search_example // kotlin.String | A search term.
 val spaceStation : kotlin.Int = 56 // kotlin.Int | 
-val startGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Start is greater than
-val startGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Start is greater than or equal to
-val startLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Start is less than
-val startLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Start is greater than or equal to
+val startGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Start is greater than
+val startGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Start is greater than or equal to
+val startLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Start is less than
+val startLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Start is greater than or equal to
 try {
     val result : PaginatedExpeditionDetailedList = apiInstance.expeditionsDetailedList(crewAstronaut, crewAstronautAgency, endGt, endGte, endLt, endLte, isActive, limit, name, offset, ordering, search, spaceStation, startGt, startGte, startLt, startLte)
     println(result)
@@ -56,10 +56,10 @@ try {
 ### Parameters
 | **crewAstronaut** | **kotlin.Int**|  | [optional] |
 | **crewAstronautAgency** | **kotlin.Int**|  | [optional] |
-| **endGt** | **kotlinx.datetime.Instant**| End is greater than | [optional] |
-| **endGte** | **kotlinx.datetime.Instant**| End is greater than or equal to | [optional] |
-| **endLt** | **kotlinx.datetime.Instant**| End is less than | [optional] |
-| **endLte** | **kotlinx.datetime.Instant**| End is greater than or equal to | [optional] |
+| **endGt** | **kotlin.time.Instant**| End is greater than | [optional] |
+| **endGte** | **kotlin.time.Instant**| End is greater than or equal to | [optional] |
+| **endLt** | **kotlin.time.Instant**| End is less than | [optional] |
+| **endLte** | **kotlin.time.Instant**| End is greater than or equal to | [optional] |
 | **isActive** | **kotlin.Boolean**|  | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **name** | **kotlin.String**|  | [optional] |
@@ -67,12 +67,12 @@ try {
 | **ordering** | **kotlin.String**| Which field to use when ordering the results. | [optional] |
 | **search** | **kotlin.String**| A search term. | [optional] |
 | **spaceStation** | **kotlin.Int**|  | [optional] |
-| **startGt** | **kotlinx.datetime.Instant**| Start is greater than | [optional] |
-| **startGte** | **kotlinx.datetime.Instant**| Start is greater than or equal to | [optional] |
-| **startLt** | **kotlinx.datetime.Instant**| Start is less than | [optional] |
+| **startGt** | **kotlin.time.Instant**| Start is greater than | [optional] |
+| **startGte** | **kotlin.time.Instant**| Start is greater than or equal to | [optional] |
+| **startLt** | **kotlin.time.Instant**| Start is less than | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **startLte** | **kotlinx.datetime.Instant**| Start is greater than or equal to | [optional] |
+| **startLte** | **kotlin.time.Instant**| Start is greater than or equal to | [optional] |
 
 ### Return type
 
@@ -113,10 +113,10 @@ Configure cookieAuth:
 val apiInstance = ExpeditionsApi()
 val crewAstronaut : kotlin.Int = 56 // kotlin.Int | 
 val crewAstronautAgency : kotlin.Int = 56 // kotlin.Int | 
-val endGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | End is greater than
-val endGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | End is greater than or equal to
-val endLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | End is less than
-val endLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | End is greater than or equal to
+val endGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | End is greater than
+val endGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | End is greater than or equal to
+val endLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | End is less than
+val endLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | End is greater than or equal to
 val isActive : kotlin.Boolean = true // kotlin.Boolean | 
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val name : kotlin.String = name_example // kotlin.String | 
@@ -124,10 +124,10 @@ val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to ret
 val ordering : kotlin.String = ordering_example // kotlin.String | Which field to use when ordering the results.
 val search : kotlin.String = search_example // kotlin.String | A search term.
 val spaceStation : kotlin.Int = 56 // kotlin.Int | 
-val startGt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Start is greater than
-val startGte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Start is greater than or equal to
-val startLt : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Start is less than
-val startLte : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | Start is greater than or equal to
+val startGt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Start is greater than
+val startGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Start is greater than or equal to
+val startLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Start is less than
+val startLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Start is greater than or equal to
 try {
     val result : PaginatedExpeditionNormalList = apiInstance.expeditionsList(crewAstronaut, crewAstronautAgency, endGt, endGte, endLt, endLte, isActive, limit, name, offset, ordering, search, spaceStation, startGt, startGte, startLt, startLte)
     println(result)
@@ -143,10 +143,10 @@ try {
 ### Parameters
 | **crewAstronaut** | **kotlin.Int**|  | [optional] |
 | **crewAstronautAgency** | **kotlin.Int**|  | [optional] |
-| **endGt** | **kotlinx.datetime.Instant**| End is greater than | [optional] |
-| **endGte** | **kotlinx.datetime.Instant**| End is greater than or equal to | [optional] |
-| **endLt** | **kotlinx.datetime.Instant**| End is less than | [optional] |
-| **endLte** | **kotlinx.datetime.Instant**| End is greater than or equal to | [optional] |
+| **endGt** | **kotlin.time.Instant**| End is greater than | [optional] |
+| **endGte** | **kotlin.time.Instant**| End is greater than or equal to | [optional] |
+| **endLt** | **kotlin.time.Instant**| End is less than | [optional] |
+| **endLte** | **kotlin.time.Instant**| End is greater than or equal to | [optional] |
 | **isActive** | **kotlin.Boolean**|  | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **name** | **kotlin.String**|  | [optional] |
@@ -154,12 +154,12 @@ try {
 | **ordering** | **kotlin.String**| Which field to use when ordering the results. | [optional] |
 | **search** | **kotlin.String**| A search term. | [optional] |
 | **spaceStation** | **kotlin.Int**|  | [optional] |
-| **startGt** | **kotlinx.datetime.Instant**| Start is greater than | [optional] |
-| **startGte** | **kotlinx.datetime.Instant**| Start is greater than or equal to | [optional] |
-| **startLt** | **kotlinx.datetime.Instant**| Start is less than | [optional] |
+| **startGt** | **kotlin.time.Instant**| Start is greater than | [optional] |
+| **startGte** | **kotlin.time.Instant**| Start is greater than or equal to | [optional] |
+| **startLt** | **kotlin.time.Instant**| Start is less than | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **startLte** | **kotlinx.datetime.Instant**| Start is greater than or equal to | [optional] |
+| **startLte** | **kotlin.time.Instant**| Start is greater than or equal to | [optional] |
 
 ### Return type
 

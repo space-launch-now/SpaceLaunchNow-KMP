@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
 /**
  * Manages temporary premium access granted through rewarded ads
@@ -39,7 +39,7 @@ class TemporaryPremiumAccess(
     val accessChangeTrigger: StateFlow<Long> = _accessChangeTrigger.asStateFlow()
 
     private fun notifyAccessChanged() {
-        val newValue = Clock.System.now().toEpochMilliseconds()
+        val newValue = System.now().toEpochMilliseconds()
         _accessChangeTrigger.value = newValue
         println("🔔 TemporaryPremiumAccess: notifyAccessChanged() -> trigger = $newValue")
     }
@@ -48,7 +48,7 @@ class TemporaryPremiumAccess(
      * Check if user has temporary access to a specific premium feature
      */
     suspend fun hasTemporaryAccess(feature: PremiumFeature): Boolean {
-        val now = Clock.System.now()
+        val now = System.now()
         val expiresAt = getExpirationTime(feature)
         val hasAccess = expiresAt?.let { now < it } ?: false
         println("🔍 TemporaryPremiumAccess.hasTemporaryAccess($feature): now=$now, expiresAt=$expiresAt, hasAccess=$hasAccess")
@@ -59,7 +59,7 @@ class TemporaryPremiumAccess(
      * Grant temporary access to a premium feature for 24 hours
      */
     suspend fun grantTemporaryAccess(feature: PremiumFeature) {
-        val expiresAt = Clock.System.now().plus(ACCESS_DURATION)
+        val expiresAt = System.now().plus(ACCESS_DURATION)
         
         println("🎁 TemporaryPremiumAccess.grantTemporaryAccess($feature): granting until $expiresAt")
         
@@ -114,7 +114,7 @@ class TemporaryPremiumAccess(
      */
     suspend fun getTimeRemaining(feature: PremiumFeature): kotlinx.datetime.DateTimePeriod? {
         val expiresAt = getExpirationTime(feature) ?: return null
-        val now = Clock.System.now()
+        val now = System.now()
         
         return if (now < expiresAt) {
             // Calculate remaining time (simplified to just show hours)
@@ -132,7 +132,7 @@ class TemporaryPremiumAccess(
     val hasTemporaryCustomThemes: Flow<Boolean> = dataStore.data.map { preferences ->
         val expiresAtMs = preferences[TEMP_CUSTOM_THEMES_EXPIRES_AT] ?: return@map false
         val expiresAt = Instant.fromEpochMilliseconds(expiresAtMs)
-        Clock.System.now() < expiresAt
+        System.now() < expiresAt
     }
 
     /**
@@ -141,7 +141,7 @@ class TemporaryPremiumAccess(
     val hasTemporaryAdvancedWidgets: Flow<Boolean> = dataStore.data.map { preferences ->
         val expiresAtMs = preferences[TEMP_ADVANCED_WIDGETS_EXPIRES_AT] ?: return@map false
         val expiresAt = Instant.fromEpochMilliseconds(expiresAtMs)
-        Clock.System.now() < expiresAt
+        System.now() < expiresAt
     }
 
     /**
@@ -150,7 +150,7 @@ class TemporaryPremiumAccess(
     val hasTemporaryWidgetsCustomization: Flow<Boolean> = dataStore.data.map { preferences ->
         val expiresAtMs = preferences[TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT] ?: return@map false
         val expiresAt = Instant.fromEpochMilliseconds(expiresAtMs)
-        Clock.System.now() < expiresAt
+        System.now() < expiresAt
     }
 
     /**
@@ -193,7 +193,7 @@ class TemporaryPremiumAccess(
      * Should be called periodically to cleanup old entries
      */
     suspend fun cleanupExpiredAccess() {
-        val now = Clock.System.now()
+        val now = System.now()
         val expiredFeatures = mutableListOf<PremiumFeature>()
         
         dataStore.edit { preferences ->

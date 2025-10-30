@@ -16,11 +16,11 @@
 | **responseMode** | **kotlin.String** |  |  [readonly] |
 | **duration** | **kotlin.String** |  |  [readonly] |
 | **updates** | [**kotlin.collections.List&lt;Update&gt;**](Update.md) |  |  |
-| **date** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **date** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
 | **webcastLive** | **kotlin.Boolean** |  |  [optional] |
 | **location** | **kotlin.String** |  |  [optional] |
-| **lastUpdated** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **lastUpdated** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 
 
 

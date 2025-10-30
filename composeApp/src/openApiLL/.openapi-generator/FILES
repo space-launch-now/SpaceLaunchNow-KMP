@@ -292,7 +292,6 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/auth/OAuth.
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/infrastructure/ApiAbstractions.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/infrastructure/ApiClient.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/infrastructure/Base64ByteArray.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/infrastructure/Bytes.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/infrastructure/HttpResponse.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/infrastructure/OctetByteArray.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/infrastructure/PartConfig.kt

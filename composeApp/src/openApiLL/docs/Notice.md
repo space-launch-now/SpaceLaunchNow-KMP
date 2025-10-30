@@ -6,7 +6,7 @@
 | ------------ | ------------- | ------------- | ------------- |
 | **id** | **kotlin.Int** |  |  [readonly] |
 | **type** | [**NoticeType**](NoticeType.md) |  |  |
-| **date** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
+| **date** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
 | **url** | **kotlin.String** |  |  |
 
 

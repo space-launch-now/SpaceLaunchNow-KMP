@@ -48,7 +48,7 @@ data class FirstStageDetailedSerializerNoLanding (
 
     @SerialName(value = "launcher") @Required val launcher: LauncherNormal,
 
-    @SerialName(value = "previous_flight_date") @Required val previousFlightDate: kotlinx.datetime.Instant?,
+    @SerialName(value = "previous_flight_date") @Required val previousFlightDate: kotlin.time.Instant?,
 
     @SerialName(value = "turn_around_time") @Required val turnAroundTime: kotlin.String?,
 

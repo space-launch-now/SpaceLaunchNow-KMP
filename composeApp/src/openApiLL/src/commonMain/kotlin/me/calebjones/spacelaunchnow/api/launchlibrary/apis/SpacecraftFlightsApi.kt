@@ -64,7 +64,7 @@ open class SpacecraftFlightsApi : ApiClient {
      * @return PaginatedSpacecraftFlightDetailedList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun spacecraftFlightsDetailedList(limit: kotlin.Int? = null, missionEnd: kotlinx.datetime.Instant? = null, missionEndDay: kotlin.collections.List<kotlin.Double>? = null, missionEndGt: kotlinx.datetime.Instant? = null, missionEndGte: kotlinx.datetime.Instant? = null, missionEndLt: kotlinx.datetime.Instant? = null, missionEndLte: kotlinx.datetime.Instant? = null, missionEndMonth: kotlin.collections.List<kotlin.Double>? = null, missionEndYear: kotlin.collections.List<kotlin.Double>? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spacecraft: kotlin.Int? = null): HttpResponse<PaginatedSpacecraftFlightDetailedList> {
+    open suspend fun spacecraftFlightsDetailedList(limit: kotlin.Int? = null, missionEnd: kotlin.time.Instant? = null, missionEndDay: kotlin.collections.List<kotlin.Double>? = null, missionEndGt: kotlin.time.Instant? = null, missionEndGte: kotlin.time.Instant? = null, missionEndLt: kotlin.time.Instant? = null, missionEndLte: kotlin.time.Instant? = null, missionEndMonth: kotlin.collections.List<kotlin.Double>? = null, missionEndYear: kotlin.collections.List<kotlin.Double>? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spacecraft: kotlin.Int? = null): HttpResponse<PaginatedSpacecraftFlightDetailedList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 
@@ -122,7 +122,7 @@ open class SpacecraftFlightsApi : ApiClient {
      * @return PaginatedSpacecraftFlightNormalList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun spacecraftFlightsList(limit: kotlin.Int? = null, missionEnd: kotlinx.datetime.Instant? = null, missionEndDay: kotlin.collections.List<kotlin.Double>? = null, missionEndGt: kotlinx.datetime.Instant? = null, missionEndGte: kotlinx.datetime.Instant? = null, missionEndLt: kotlinx.datetime.Instant? = null, missionEndLte: kotlinx.datetime.Instant? = null, missionEndMonth: kotlin.collections.List<kotlin.Double>? = null, missionEndYear: kotlin.collections.List<kotlin.Double>? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spacecraft: kotlin.Int? = null): HttpResponse<PaginatedSpacecraftFlightNormalList> {
+    open suspend fun spacecraftFlightsList(limit: kotlin.Int? = null, missionEnd: kotlin.time.Instant? = null, missionEndDay: kotlin.collections.List<kotlin.Double>? = null, missionEndGt: kotlin.time.Instant? = null, missionEndGte: kotlin.time.Instant? = null, missionEndLt: kotlin.time.Instant? = null, missionEndLte: kotlin.time.Instant? = null, missionEndMonth: kotlin.collections.List<kotlin.Double>? = null, missionEndYear: kotlin.collections.List<kotlin.Double>? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spacecraft: kotlin.Int? = null): HttpResponse<PaginatedSpacecraftFlightNormalList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 
@@ -180,7 +180,7 @@ open class SpacecraftFlightsApi : ApiClient {
      * @return PaginatedSpacecraftFlightMiniList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun spacecraftFlightsMiniList(limit: kotlin.Int? = null, missionEnd: kotlinx.datetime.Instant? = null, missionEndDay: kotlin.collections.List<kotlin.Double>? = null, missionEndGt: kotlinx.datetime.Instant? = null, missionEndGte: kotlinx.datetime.Instant? = null, missionEndLt: kotlinx.datetime.Instant? = null, missionEndLte: kotlinx.datetime.Instant? = null, missionEndMonth: kotlin.collections.List<kotlin.Double>? = null, missionEndYear: kotlin.collections.List<kotlin.Double>? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spacecraft: kotlin.Int? = null): HttpResponse<PaginatedSpacecraftFlightMiniList> {
+    open suspend fun spacecraftFlightsMiniList(limit: kotlin.Int? = null, missionEnd: kotlin.time.Instant? = null, missionEndDay: kotlin.collections.List<kotlin.Double>? = null, missionEndGt: kotlin.time.Instant? = null, missionEndGte: kotlin.time.Instant? = null, missionEndLt: kotlin.time.Instant? = null, missionEndLte: kotlin.time.Instant? = null, missionEndMonth: kotlin.collections.List<kotlin.Double>? = null, missionEndYear: kotlin.collections.List<kotlin.Double>? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null, spacecraft: kotlin.Int? = null): HttpResponse<PaginatedSpacecraftFlightMiniList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 

@@ -64,7 +64,7 @@ data class EventNormal (
 
     @SerialName(value = "date_precision") @Required val datePrecision: NetPrecision?,
 
-    @SerialName(value = "date") val date: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "date") val date: kotlin.time.Instant? = null,
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 

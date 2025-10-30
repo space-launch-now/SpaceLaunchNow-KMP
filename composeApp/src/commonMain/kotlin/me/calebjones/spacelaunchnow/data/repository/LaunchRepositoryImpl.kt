@@ -5,7 +5,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchList

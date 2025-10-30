@@ -44,7 +44,7 @@ data class SpacecraftFlightMiniSerializerNoLanding (
 
     @SerialName(value = "destination") @Required val destination: kotlin.String?,
 
-    @SerialName(value = "mission_end") @Required val missionEnd: kotlinx.datetime.Instant?,
+    @SerialName(value = "mission_end") @Required val missionEnd: kotlin.time.Instant?,
 
     @SerialName(value = "spacecraft") @Required val spacecraft: SpacecraftNormal,
 

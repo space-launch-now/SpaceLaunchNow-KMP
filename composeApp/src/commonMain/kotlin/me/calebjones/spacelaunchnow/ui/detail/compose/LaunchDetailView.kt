@@ -120,8 +120,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.lexilabs.basic.ads.AdSize
-import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
@@ -129,7 +127,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.brands.WikipediaW
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlin.time.Clock.System
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.LocalUseUtc
@@ -143,6 +141,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
 import me.calebjones.spacelaunchnow.isLargeScreen
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
@@ -153,7 +152,6 @@ import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import org.koin.compose.koinInject
-
 // Keep only TitleHeight which is used for spacing
 private val TitleHeight = 120.dp
 private val CompactHeight = 40.dp
@@ -480,7 +478,6 @@ fun LaunchDetailView(
 
 
 // This composable contains all the detailed launch information
-@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 private fun LaunchDetailContentInBody(
     launch: LaunchDetailed,
@@ -523,7 +520,7 @@ private fun LaunchDetailContentInBody(
 
                     SmartBannerAd(
                         modifier = Modifier.fillMaxWidth(),
-                        adSize = AdSize.MEDIUM_RECTANGLE,
+                        placementType = AdPlacementType.CONTENT,
                         showRemoveAdsButton = true,
                         onRemoveAdsClick = onNavigateToSettings
                     )
@@ -580,7 +577,7 @@ private fun LaunchDetailContentInBody(
                     // Video Player Card
                     if (videoPlayerState.availableVideos.isNotEmpty()) {
                         val videoTitle = launch.net?.let { net ->
-                            val now = kotlinx.datetime.Clock.System.now()
+                            val now = System.now()
                             if (net > now) "Watch Live" else "Watch Replay"
                         } ?: "Watch Launch"
 
@@ -646,7 +643,7 @@ private fun LaunchDetailContentInBody(
 
                 SmartBannerAd(
                     modifier = Modifier.fillMaxWidth(),
-                    adSize = AdSize.MEDIUM_RECTANGLE,
+                    placementType = AdPlacementType.CONTENT,
                     showRemoveAdsButton = true,
                     onRemoveAdsClick = onNavigateToSettings
                 )
@@ -655,7 +652,7 @@ private fun LaunchDetailContentInBody(
                 // 3. Video Player Card - positioned above timeline
                 if (videoPlayerState.availableVideos.isNotEmpty()) {
                     val videoTitle = launch.net?.let { net ->
-                        val now = kotlinx.datetime.Clock.System.now()
+                        val now = System.now()
                         if (net > now) "Watch Live" else "Watch Replay"
                     } ?: "Watch Launch"
 
@@ -844,7 +841,7 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
     // Build a dynamic list of facts that are available
     data class Fact(val icon: ImageVector, val value: String, val label: String)
 
-    val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
+    val currentYear = System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
 
     val facts = buildList {
         launch.orbitalLaunchAttemptCount?.let { count ->

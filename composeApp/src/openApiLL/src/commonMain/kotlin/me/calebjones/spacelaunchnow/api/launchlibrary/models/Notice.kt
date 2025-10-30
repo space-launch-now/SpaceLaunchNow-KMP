@@ -37,7 +37,7 @@ data class Notice (
 
     @SerialName(value = "type") @Required val type: NoticeType,
 
-    @SerialName(value = "date") @Required val date: kotlinx.datetime.Instant,
+    @SerialName(value = "date") @Required val date: kotlin.time.Instant,
 
     @SerialName(value = "url") @Required val url: kotlin.String
 

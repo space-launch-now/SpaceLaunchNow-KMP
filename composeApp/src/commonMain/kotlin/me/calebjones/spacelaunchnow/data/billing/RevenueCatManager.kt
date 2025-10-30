@@ -150,24 +150,82 @@ class RevenueCatManager {
     }
 
     /**
+     * Get all active product identifiers (including non-subscription purchases)
+     * This includes legacy purchases that may not have entitlements configured
+     */
+    fun getActiveProductIdentifiers(): Set<String> {
+        val customerInfo = _customerInfo.value ?: return emptySet()
+        val productIds = mutableSetOf<String>()
+        
+        // Add all products from active entitlements
+        customerInfo.entitlements.active.values.forEach { entitlementInfo ->
+            entitlementInfo.productIdentifier?.let { productIds.add(it) }
+        }
+        
+        // Add all non-subscription purchases (lifetime purchases)
+        customerInfo.nonSubscriptionTransactions.forEach { transaction ->
+            productIds.add(transaction.productIdentifier)
+        }
+        
+        // Add all active subscription product identifiers
+        customerInfo.activeSubscriptions.forEach { productId ->
+            productIds.add(productId)
+        }
+        
+        println("RevenueCat: Active product identifiers: $productIds")
+        return productIds
+    }
+
+    /**
+     * Check if user has any active purchase (including legacy products)
+     * This is useful for detecting legacy purchases that may not have entitlements configured
+     */
+    fun hasAnyActivePurchase(): Boolean {
+        return getActiveProductIdentifiers().isNotEmpty()
+    }
+
+    /**
      * Restore purchases (useful for users who reinstalled the app)
      */
     suspend fun restorePurchases() {
         try {
-            if (!_isInitialized.value) return
+            if (!_isInitialized.value) {
+                println("RevenueCat: Cannot restore - not initialized")
+                return
+            }
 
+            println("RevenueCat: Starting restore purchases...")
             Purchases.sharedInstance.restorePurchases(
                 onError = { error ->
-                    println("RevenueCat: Restore purchases failed - ${error.message}")
+                    println("RevenueCat: ❌ Restore purchases failed - ${error.message}")
+                    println("  Error code: ${error.code}")
+                    println("  Underlying error: ${error.underlyingErrorMessage}")
                 },
                 onSuccess = { customerInfo ->
                     _customerInfo.value = customerInfo
-                    println("RevenueCat: Purchases restored successfully")
+                    println("RevenueCat: ✅ Purchases restored successfully")
+                    println("  Active entitlements: ${customerInfo.entitlements.active.keys}")
+                    println("  Active subscriptions: ${customerInfo.activeSubscriptions}")
+                    println("  Non-subscription transactions: ${customerInfo.nonSubscriptionTransactions.map { it.productIdentifier }}")
+                    
+                    // Log all product identifiers found
+                    val allProducts = mutableSetOf<String>()
+                    customerInfo.entitlements.active.values.forEach { entitlementInfo ->
+                        entitlementInfo.productIdentifier?.let { allProducts.add(it) }
+                    }
+                    customerInfo.nonSubscriptionTransactions.forEach { transaction ->
+                        allProducts.add(transaction.productIdentifier)
+                    }
+                    customerInfo.activeSubscriptions.forEach { productId ->
+                        allProducts.add(productId)
+                    }
+                    println("  Total active products found: ${allProducts.size} - $allProducts")
                 }
             )
 
         } catch (e: Exception) {
-            println("RevenueCat: Failed to restore purchases - ${e.message}")
+            println("RevenueCat: ❌ Failed to restore purchases - ${e.message}")
+            e.printStackTrace()
         }
     }
 

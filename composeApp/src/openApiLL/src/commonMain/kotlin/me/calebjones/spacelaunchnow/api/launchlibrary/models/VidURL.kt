@@ -60,9 +60,9 @@ data class VidURL (
 
     @SerialName(value = "feature_image") val featureImage: kotlin.String? = null,
 
-    @SerialName(value = "start_time") val startTime: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "start_time") val startTime: kotlin.time.Instant? = null,
 
-    @SerialName(value = "end_time") val endTime: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "end_time") val endTime: kotlin.time.Instant? = null,
 
     @SerialName(value = "live") val live: kotlin.Boolean? = null
 

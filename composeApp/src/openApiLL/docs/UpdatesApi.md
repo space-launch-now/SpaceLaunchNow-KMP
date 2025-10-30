@@ -23,7 +23,7 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 //import me.calebjones.spacelaunchnow.api.launchlibrary.models.*
 
 val apiInstance = UpdatesApi()
-val createdOn : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val createdOn : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val launch : kotlin.String = 38400000-8cf0-11bd-b23e-10b96e4ef00d // kotlin.String | 
 val launchLaunchServiceProvider : kotlin.Int = 56 // kotlin.Int | 
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
@@ -44,7 +44,7 @@ try {
 ```
 
 ### Parameters
-| **createdOn** | **kotlinx.datetime.Instant**|  | [optional] |
+| **createdOn** | **kotlin.time.Instant**|  | [optional] |
 | **launch** | **kotlin.String**|  | [optional] |
 | **launchLaunchServiceProvider** | **kotlin.Int**|  | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |

@@ -97,9 +97,9 @@ data class AstronautEndpointDetailed (
 
     @SerialName(value = "wiki") @Required val wiki: kotlin.String?,
 
-    @SerialName(value = "last_flight") @Required val lastFlight: kotlinx.datetime.Instant?,
+    @SerialName(value = "last_flight") @Required val lastFlight: kotlin.time.Instant?,
 
-    @SerialName(value = "first_flight") @Required val firstFlight: kotlinx.datetime.Instant?,
+    @SerialName(value = "first_flight") @Required val firstFlight: kotlin.time.Instant?,
 
     @SerialName(value = "social_media_links") @Required val socialMediaLinks: kotlin.collections.List<SocialMediaLink>?,
 

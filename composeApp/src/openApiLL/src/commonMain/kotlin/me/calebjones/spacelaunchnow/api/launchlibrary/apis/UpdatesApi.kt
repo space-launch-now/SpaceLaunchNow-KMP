@@ -57,7 +57,7 @@ open class UpdatesApi : ApiClient {
      * @return PaginatedUpdateEndpointList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun updatesList(createdOn: kotlinx.datetime.Instant? = null, launch: kotlin.String? = null, launchLaunchServiceProvider: kotlin.Int? = null, limit: kotlin.Int? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, program: kotlin.Int? = null, search: kotlin.String? = null): HttpResponse<PaginatedUpdateEndpointList> {
+    open suspend fun updatesList(createdOn: kotlin.time.Instant? = null, launch: kotlin.String? = null, launchLaunchServiceProvider: kotlin.Int? = null, limit: kotlin.Int? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, program: kotlin.Int? = null, search: kotlin.String? = null): HttpResponse<PaginatedUpdateEndpointList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 

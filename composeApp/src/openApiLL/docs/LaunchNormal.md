@@ -31,10 +31,10 @@
 | **padLaunchAttemptCountYear** | **kotlin.Int** |  |  |
 | **agencyLaunchAttemptCountYear** | **kotlin.Int** |  |  |
 | **name** | **kotlin.String** |  |  [optional] |
-| **lastUpdated** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
-| **net** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
-| **windowEnd** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
-| **windowStart** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **lastUpdated** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
+| **net** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
+| **windowEnd** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
+| **windowStart** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **webcastLive** | **kotlin.Boolean** |  |  [optional] |
 
 

@@ -13,8 +13,8 @@
 | **title** | **kotlin.String** |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
 | **featureImage** | **kotlin.String** |  |  [optional] |
-| **startTime** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
-| **endTime** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **startTime** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
+| **endTime** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **live** | **kotlin.Boolean** |  |  [optional] |
 
 

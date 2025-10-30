@@ -11,8 +11,8 @@
 | **imageUrl** | **kotlin.String** |  |  |
 | **newsSite** | **kotlin.String** |  |  [readonly] |
 | **summary** | **kotlin.String** |  |  |
-| **publishedAt** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
-| **updatedAt** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [readonly] |
+| **publishedAt** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
+| **updatedAt** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [readonly] |
 | **launches** | [**kotlin.collections.List&lt;Launch&gt;**](Launch.md) |  |  |
 | **events** | [**kotlin.collections.List&lt;Event&gt;**](Event.md) |  |  |
 | **featured** | **kotlin.Boolean** |  |  [optional] |

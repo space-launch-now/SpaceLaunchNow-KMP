@@ -9,7 +9,7 @@
 | **comment** | **kotlin.String** |  |  |
 | **infoUrl** | **kotlin.String** |  |  |
 | **createdBy** | **kotlin.String** |  |  [readonly] |
-| **createdOn** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **createdOn** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 
 
 

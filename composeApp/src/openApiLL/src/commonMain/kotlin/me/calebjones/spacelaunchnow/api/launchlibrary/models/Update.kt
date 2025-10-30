@@ -44,7 +44,7 @@ data class Update (
 
     @SerialName(value = "created_by") @Required val createdBy: kotlin.String?,
 
-    @SerialName(value = "created_on") val createdOn: kotlinx.datetime.Instant? = null
+    @SerialName(value = "created_on") val createdOn: kotlin.time.Instant? = null
 
 ) {
 

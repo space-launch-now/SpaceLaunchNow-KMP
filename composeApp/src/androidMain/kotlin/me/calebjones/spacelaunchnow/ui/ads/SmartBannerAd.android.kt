@@ -45,52 +45,27 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
 /**
- * Ad placement types for context-aware ad sizing
- */
-enum class AdPlacementType {
-    NAVIGATION,     // Bottom nav, navigation rail - compact ads
-    CONTENT,        // Article content, detail pages - larger content ads
-    FEED,           // Home page, lists - medium visibility ads
-    INTERSTITIAL    // Between content sections - attention-grabbing ads
-}
-
-/**
+ * Android implementation of SmartBannerAd using BasicAds library.
+ * 
  * Smart banner ad component that automatically handles:
  * - Premium subscription checking (no ads if user has AD_FREE)
- * - Platform detection (shows on Android/iOS, hidden on Desktop)
- * - Context factory validation
  * - Material 3 styling
- * - Proper sizing for different ad formats
+ * - Proper sizing for different ad formats based on placement type
  * - Optional "Remove Ads" button for premium conversion
  * - Performance tracking and optimization via GlobalAdManager
- *
- * This component uses GlobalAdManager for performance tracking and optimization
- * to provide the fastest possible ad loading experience.
- *
- * Supported ad sizes:
- * - BANNER (320x50) - Standard banner for phones & tablets
- * - LARGE_BANNER (320x100) - Large banner for phones & tablets
- * - MEDIUM_RECTANGLE (300x250) - IAB medium rectangle for phones & tablets
- * - FULL_BANNER (468x60) - IAB full-size banner for tablets
- * - LEADERBOARD (728x90) - IAB leaderboard for tablets
- * - WIDE_SKYSCRAPER (160x600) - IAB wide skyscraper
- * - FLUID - Dynamic size that adapts to content
- *
- * Usage patterns:
- * - Navigation/Bottom areas: SmartBannerAd(showCard = false) (no card wrapper)
- * - Content areas: SmartBannerAd(showRemoveAdsButton = true, onRemoveAdsClick = {...}) (with card)
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
-fun SmartBannerAd(
-    modifier: Modifier = Modifier,
-    adSize: AdSize = AdSize.BANNER,
-    placementType: AdPlacementType? = null, // If provided, overrides adSize
-    showRemoveAdsButton: Boolean = false, // Default: no button (e.g., BottomNavigationBar)
-    showCard: Boolean = true, // Default: show card wrapper (disable for navigation areas)
-    onRemoveAdsClick: (() -> Unit)? = null,
-    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)? = null
+actual fun SmartBannerAd(
+    modifier: Modifier,
+    placementType: AdPlacementType,
+    showRemoveAdsButton: Boolean,
+    showCard: Boolean,
+    onRemoveAdsClick: (() -> Unit)?,
+    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?
 ) {
+    // Convert placement type to AdSize for Android implementation
+    val adSize = getAdSizeForPlacement(placementType)
     val contextFactory = LocalContextFactory.current
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
 
@@ -105,10 +80,10 @@ fun SmartBannerAd(
     val preloadedFullBannerAd = LocalPreloadedFullBannerAd.current
     val preloadedFluidAd = LocalPreloadedFluidAd.current
 
-    // Determine the actual ad size to use - placementType overrides adSize
-    val actualAdSize = placementType?.let { getAdSizeForPlacement(it) } ?: adSize
+    // Get the actual ad size based on placement type
+    val actualAdSize = getAdSizeForPlacement(placementType)
     
-    println("🎯 SmartBannerAd: Using AdSize ${actualAdSize.width}x${actualAdSize.height} for placement $placementType")
+    println("🎯 SmartBannerAd (Android): Using AdSize ${actualAdSize.width}x${actualAdSize.height} for placement $placementType")
 
     // Don't show ads if:
     // 1. User has ad-free premium feature

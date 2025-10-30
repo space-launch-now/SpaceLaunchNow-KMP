@@ -57,9 +57,9 @@ data class Blog (
 
     @SerialName(value = "summary") @Required val summary: kotlin.String,
 
-    @SerialName(value = "published_at") @Required val publishedAt: kotlinx.datetime.Instant,
+    @SerialName(value = "published_at") @Required val publishedAt: kotlin.time.Instant,
 
-    @SerialName(value = "updated_at") @Required val updatedAt: kotlinx.datetime.Instant,
+    @SerialName(value = "updated_at") @Required val updatedAt: kotlin.time.Instant,
 
     @SerialName(value = "launches") @Required val launches: kotlin.collections.List<Launch>,
 

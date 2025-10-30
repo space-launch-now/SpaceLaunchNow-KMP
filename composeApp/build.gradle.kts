@@ -72,6 +72,11 @@ kotlin {
         }
     }
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlin.time.ExperimentalTime")
+            }
+        }
         named { it.lowercase().startsWith("ios") }.configureEach {
             languageSettings {
                 optIn("kotlinx.cinterop.ExperimentalForeignApi")
@@ -162,6 +167,8 @@ kotlin {
                 implementation(libs.purchases.ui)
                 implementation(libs.purchases.either)
                 implementation(libs.purchases.result)
+
+                implementation(libs.basicAds)
             }
         }
 

@@ -99,7 +99,7 @@ data class EventEndpointDetailed (
 
     @SerialName(value = "astronauts") @Required val astronauts: kotlin.collections.List<AstronautNormal>?,
 
-    @SerialName(value = "date") val date: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "date") val date: kotlin.time.Instant? = null,
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 
@@ -107,7 +107,7 @@ data class EventEndpointDetailed (
 
     @SerialName(value = "location") val location: kotlin.String? = null,
 
-    @SerialName(value = "last_updated") val lastUpdated: kotlinx.datetime.Instant? = null
+    @SerialName(value = "last_updated") val lastUpdated: kotlin.time.Instant? = null
 
 ) {
 

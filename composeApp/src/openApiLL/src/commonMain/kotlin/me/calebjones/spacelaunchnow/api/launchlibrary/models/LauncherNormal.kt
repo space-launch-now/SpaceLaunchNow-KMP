@@ -65,9 +65,9 @@ data class LauncherNormal (
 
     @SerialName(value = "flights") @Required val flights: kotlin.Int?,
 
-    @SerialName(value = "last_launch_date") @Required val lastLaunchDate: kotlinx.datetime.Instant?,
+    @SerialName(value = "last_launch_date") @Required val lastLaunchDate: kotlin.time.Instant?,
 
-    @SerialName(value = "first_launch_date") @Required val firstLaunchDate: kotlinx.datetime.Instant?,
+    @SerialName(value = "first_launch_date") @Required val firstLaunchDate: kotlin.time.Instant?,
 
     @SerialName(value = "fastest_turnaround") @Required val fastestTurnaround: kotlin.String?,
 

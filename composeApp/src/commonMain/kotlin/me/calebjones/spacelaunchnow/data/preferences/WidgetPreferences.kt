@@ -7,10 +7,9 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.compose.ui.graphics.Color
-import kotlinx.datetime.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock.System
 
 /**
  * Widget theme source options.
@@ -111,7 +110,7 @@ class WidgetPreferences(private val dataStore: DataStore<Preferences>) {
     suspend fun updateWidgetAccessGranted(hasAccess: Boolean) {
         dataStore.edit { preferences ->
             if (hasAccess) {
-                preferences[WIDGET_ACCESS_GRANTED] = Clock.System.now().toEpochMilliseconds()
+                preferences[WIDGET_ACCESS_GRANTED] = System.now().toEpochMilliseconds()
             } else {
                 preferences.remove(WIDGET_ACCESS_GRANTED)
             }

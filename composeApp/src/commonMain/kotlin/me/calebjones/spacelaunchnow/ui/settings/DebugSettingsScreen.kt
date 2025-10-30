@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
@@ -835,7 +836,7 @@ fun DebugSettingsScreen(
                                                     }
                                                     
                                                     val isExpired = purchase.expiryTime?.let { expiry ->
-                                                        kotlinx.datetime.Clock.System.now().toEpochMilliseconds() > expiry
+                                                        System.now().toEpochMilliseconds() > expiry
                                                     } ?: false
                                                     
                                                     Surface(

@@ -22,11 +22,11 @@
 | **spacestations** | [**kotlin.collections.List&lt;SpaceStationNormal&gt;**](SpaceStationNormal.md) |  |  |
 | **program** | [**kotlin.collections.List&lt;ProgramNormal&gt;**](ProgramNormal.md) |  |  |
 | **astronauts** | [**kotlin.collections.List&lt;AstronautNormal&gt;**](AstronautNormal.md) |  |  |
-| **date** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **date** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
 | **webcastLive** | **kotlin.Boolean** |  |  [optional] |
 | **location** | **kotlin.String** |  |  [optional] |
-| **lastUpdated** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **lastUpdated** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 
 
 

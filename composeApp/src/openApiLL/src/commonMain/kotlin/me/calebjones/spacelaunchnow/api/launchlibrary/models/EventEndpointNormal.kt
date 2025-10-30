@@ -75,7 +75,7 @@ data class EventEndpointNormal (
 
     @SerialName(value = "updates") @Required val updates: kotlin.collections.List<Update>,
 
-    @SerialName(value = "date") val date: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "date") val date: kotlin.time.Instant? = null,
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 
@@ -83,7 +83,7 @@ data class EventEndpointNormal (
 
     @SerialName(value = "location") val location: kotlin.String? = null,
 
-    @SerialName(value = "last_updated") val lastUpdated: kotlinx.datetime.Instant? = null
+    @SerialName(value = "last_updated") val lastUpdated: kotlin.time.Instant? = null
 
 ) {
 

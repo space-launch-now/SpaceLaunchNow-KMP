@@ -10,8 +10,8 @@
 | **url** | **kotlin.String** |  |  |
 | **imageUrl** | **kotlin.String** |  |  |
 | **newsSite** | **kotlin.String** |  |  [readonly] |
-| **publishedAt** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
-| **updatedAt** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [readonly] |
+| **publishedAt** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
+| **updatedAt** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [readonly] |
 | **summary** | **kotlin.String** |  |  [optional] |
 
 

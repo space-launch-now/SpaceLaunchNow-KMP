@@ -14,8 +14,8 @@
 | **successfulLandings** | **kotlin.Int** |  |  |
 | **attemptedLandings** | **kotlin.Int** |  |  |
 | **flights** | **kotlin.Int** |  |  |
-| **lastLaunchDate** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
-| **firstLaunchDate** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
+| **lastLaunchDate** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
+| **firstLaunchDate** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
 | **fastestTurnaround** | **kotlin.String** |  |  [readonly] |
 | **launcherConfig** | [**LauncherConfigList**](LauncherConfigList.md) |  |  |
 | **flightProven** | **kotlin.Boolean** |  |  [optional] |

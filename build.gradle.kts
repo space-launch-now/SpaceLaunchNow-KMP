@@ -10,6 +10,6 @@ plugins {
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.composeHotReload) apply false
     alias(libs.plugins.aboutLibraries) apply false
-    id("com.google.gms.google-services") version "4.4.2" apply false
+    id("com.google.gms.google-services") version "4.4.4" apply false
 
 }

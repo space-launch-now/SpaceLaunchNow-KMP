@@ -56,9 +56,9 @@ data class SpacewalkEndpointNormal (
 
     @SerialName(value = "name") @Required val name: kotlin.String?,
 
-    @SerialName(value = "start") @Required val start: kotlinx.datetime.Instant?,
+    @SerialName(value = "start") @Required val start: kotlin.time.Instant?,
 
-    @SerialName(value = "end") @Required val end: kotlinx.datetime.Instant?,
+    @SerialName(value = "end") @Required val end: kotlin.time.Instant?,
 
     @SerialName(value = "duration") @Required val duration: kotlin.String?,
 

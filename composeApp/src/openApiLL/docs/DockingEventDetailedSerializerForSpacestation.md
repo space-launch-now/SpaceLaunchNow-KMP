@@ -6,11 +6,11 @@
 | ------------ | ------------- | ------------- | ------------- |
 | **id** | **kotlin.Int** |  |  [readonly] |
 | **url** | **kotlin.String** |  |  [readonly] |
-| **docking** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  |
+| **docking** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
 | **flightVehicleChaser** | [**SpacecraftFlightForDockingEvent**](SpacecraftFlightForDockingEvent.md) |  |  |
 | **spaceStationChaser** | [**SpaceStationNormal**](SpaceStationNormal.md) |  |  |
 | **payloadFlightChaser** | [**PayloadFlightNormal**](PayloadFlightNormal.md) |  |  |
-| **departure** | [**kotlinx.datetime.Instant**](kotlinx.datetime.Instant.md) |  |  [optional] |
+| **departure** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 
 
 

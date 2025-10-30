@@ -41,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
@@ -78,7 +77,6 @@ fun EventDetailView(
     }
 }
 
-@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 private fun EventDetailContentInBody(event: EventEndpointDetailed) {
     Column(

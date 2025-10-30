@@ -148,13 +148,13 @@ data class LaunchDetailed (
 
     @SerialName(value = "name") val name: kotlin.String? = null,
 
-    @SerialName(value = "last_updated") val lastUpdated: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "last_updated") val lastUpdated: kotlin.time.Instant? = null,
 
-    @SerialName(value = "net") val net: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "net") val net: kotlin.time.Instant? = null,
 
-    @SerialName(value = "window_end") val windowEnd: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "window_end") val windowEnd: kotlin.time.Instant? = null,
 
-    @SerialName(value = "window_start") val windowStart: kotlinx.datetime.Instant? = null,
+    @SerialName(value = "window_start") val windowStart: kotlin.time.Instant? = null,
 
     @SerialName(value = "webcast_live") val webcastLive: kotlin.Boolean? = null
 

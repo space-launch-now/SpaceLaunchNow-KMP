@@ -30,7 +30,7 @@ val attemptedLandingsGt : kotlin.Int = 56 // kotlin.Int |
 val attemptedLandingsGte : kotlin.Int = 56 // kotlin.Int | 
 val attemptedLandingsLt : kotlin.Int = 56 // kotlin.Int | 
 val attemptedLandingsLte : kotlin.Int = 56 // kotlin.Int | 
-val firstLaunchDate : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val firstLaunchDate : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val firstLaunchDateDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date days.
 val firstLaunchDateMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date months.
 val firstLaunchDateYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date years.
@@ -43,7 +43,7 @@ val flightsLte : kotlin.Int = 56 // kotlin.Int |
 val id : kotlin.Int = 56 // kotlin.Int | 
 val idContains : kotlin.Int = 56 // kotlin.Int | 
 val isPlaceholder : kotlin.Boolean = true // kotlin.Boolean | 
-val lastLaunchDate : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val lastLaunchDate : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val launcherConfigIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated launcher config IDs.
 val launcherConfigManufacturerName : kotlin.String = launcherConfigManufacturerName_example // kotlin.String | 
 val launcherConfigManufacturerNameContains : kotlin.String = launcherConfigManufacturerNameContains_example // kotlin.String | 
@@ -77,7 +77,7 @@ try {
 | **attemptedLandingsGte** | **kotlin.Int**|  | [optional] |
 | **attemptedLandingsLt** | **kotlin.Int**|  | [optional] |
 | **attemptedLandingsLte** | **kotlin.Int**|  | [optional] |
-| **firstLaunchDate** | **kotlinx.datetime.Instant**|  | [optional] |
+| **firstLaunchDate** | **kotlin.time.Instant**|  | [optional] |
 | **firstLaunchDateDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date days. | [optional] |
 | **firstLaunchDateMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date months. | [optional] |
 | **firstLaunchDateYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date years. | [optional] |
@@ -90,7 +90,7 @@ try {
 | **id** | **kotlin.Int**|  | [optional] |
 | **idContains** | **kotlin.Int**|  | [optional] |
 | **isPlaceholder** | **kotlin.Boolean**|  | [optional] |
-| **lastLaunchDate** | **kotlinx.datetime.Instant**|  | [optional] |
+| **lastLaunchDate** | **kotlin.time.Instant**|  | [optional] |
 | **launcherConfigIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated launcher config IDs. | [optional] |
 | **launcherConfigManufacturerName** | **kotlin.String**|  | [optional] |
 | **launcherConfigManufacturerNameContains** | **kotlin.String**|  | [optional] |
@@ -151,7 +151,7 @@ val attemptedLandingsGt : kotlin.Int = 56 // kotlin.Int |
 val attemptedLandingsGte : kotlin.Int = 56 // kotlin.Int | 
 val attemptedLandingsLt : kotlin.Int = 56 // kotlin.Int | 
 val attemptedLandingsLte : kotlin.Int = 56 // kotlin.Int | 
-val firstLaunchDate : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val firstLaunchDate : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val firstLaunchDateDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date days.
 val firstLaunchDateMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date months.
 val firstLaunchDateYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date years.
@@ -164,7 +164,7 @@ val flightsLte : kotlin.Int = 56 // kotlin.Int |
 val id : kotlin.Int = 56 // kotlin.Int | 
 val idContains : kotlin.Int = 56 // kotlin.Int | 
 val isPlaceholder : kotlin.Boolean = true // kotlin.Boolean | 
-val lastLaunchDate : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val lastLaunchDate : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val launcherConfigIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated launcher config IDs.
 val launcherConfigManufacturerName : kotlin.String = launcherConfigManufacturerName_example // kotlin.String | 
 val launcherConfigManufacturerNameContains : kotlin.String = launcherConfigManufacturerNameContains_example // kotlin.String | 
@@ -198,7 +198,7 @@ try {
 | **attemptedLandingsGte** | **kotlin.Int**|  | [optional] |
 | **attemptedLandingsLt** | **kotlin.Int**|  | [optional] |
 | **attemptedLandingsLte** | **kotlin.Int**|  | [optional] |
-| **firstLaunchDate** | **kotlinx.datetime.Instant**|  | [optional] |
+| **firstLaunchDate** | **kotlin.time.Instant**|  | [optional] |
 | **firstLaunchDateDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date days. | [optional] |
 | **firstLaunchDateMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date months. | [optional] |
 | **firstLaunchDateYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date years. | [optional] |
@@ -211,7 +211,7 @@ try {
 | **id** | **kotlin.Int**|  | [optional] |
 | **idContains** | **kotlin.Int**|  | [optional] |
 | **isPlaceholder** | **kotlin.Boolean**|  | [optional] |
-| **lastLaunchDate** | **kotlinx.datetime.Instant**|  | [optional] |
+| **lastLaunchDate** | **kotlin.time.Instant**|  | [optional] |
 | **launcherConfigIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated launcher config IDs. | [optional] |
 | **launcherConfigManufacturerName** | **kotlin.String**|  | [optional] |
 | **launcherConfigManufacturerNameContains** | **kotlin.String**|  | [optional] |
@@ -272,7 +272,7 @@ val attemptedLandingsGt : kotlin.Int = 56 // kotlin.Int |
 val attemptedLandingsGte : kotlin.Int = 56 // kotlin.Int | 
 val attemptedLandingsLt : kotlin.Int = 56 // kotlin.Int | 
 val attemptedLandingsLte : kotlin.Int = 56 // kotlin.Int | 
-val firstLaunchDate : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val firstLaunchDate : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val firstLaunchDateDay : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date days.
 val firstLaunchDateMonth : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date months.
 val firstLaunchDateYear : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated first launch date years.
@@ -285,7 +285,7 @@ val flightsLte : kotlin.Int = 56 // kotlin.Int |
 val id : kotlin.Int = 56 // kotlin.Int | 
 val idContains : kotlin.Int = 56 // kotlin.Int | 
 val isPlaceholder : kotlin.Boolean = true // kotlin.Boolean | 
-val lastLaunchDate : kotlinx.datetime.Instant = 2013-10-20T19:20:30+01:00 // kotlinx.datetime.Instant | 
+val lastLaunchDate : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | 
 val launcherConfigIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated launcher config IDs.
 val launcherConfigManufacturerName : kotlin.String = launcherConfigManufacturerName_example // kotlin.String | 
 val launcherConfigManufacturerNameContains : kotlin.String = launcherConfigManufacturerNameContains_example // kotlin.String | 
@@ -319,7 +319,7 @@ try {
 | **attemptedLandingsGte** | **kotlin.Int**|  | [optional] |
 | **attemptedLandingsLt** | **kotlin.Int**|  | [optional] |
 | **attemptedLandingsLte** | **kotlin.Int**|  | [optional] |
-| **firstLaunchDate** | **kotlinx.datetime.Instant**|  | [optional] |
+| **firstLaunchDate** | **kotlin.time.Instant**|  | [optional] |
 | **firstLaunchDateDay** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date days. | [optional] |
 | **firstLaunchDateMonth** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date months. | [optional] |
 | **firstLaunchDateYear** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated first launch date years. | [optional] |
@@ -332,7 +332,7 @@ try {
 | **id** | **kotlin.Int**|  | [optional] |
 | **idContains** | **kotlin.Int**|  | [optional] |
 | **isPlaceholder** | **kotlin.Boolean**|  | [optional] |
-| **lastLaunchDate** | **kotlinx.datetime.Instant**|  | [optional] |
+| **lastLaunchDate** | **kotlin.time.Instant**|  | [optional] |
 | **launcherConfigIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated launcher config IDs. | [optional] |
 | **launcherConfigManufacturerName** | **kotlin.String**|  | [optional] |
 | **launcherConfigManufacturerNameContains** | **kotlin.String**|  | [optional] |

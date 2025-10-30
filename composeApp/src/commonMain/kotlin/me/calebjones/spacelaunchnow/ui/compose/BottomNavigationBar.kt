@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Screen
@@ -22,7 +21,6 @@ import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 
-@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(

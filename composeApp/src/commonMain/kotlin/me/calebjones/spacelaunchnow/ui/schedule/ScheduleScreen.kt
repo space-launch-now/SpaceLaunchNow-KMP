@@ -75,7 +75,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
@@ -165,7 +165,7 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
     var upcomingCache by remember { mutableStateOf<TabCache?>(null) }
     var previousCache by remember { mutableStateOf<TabCache?>(null) }
 
-    fun now() = Clock.System.now().toEpochMilliseconds()
+    fun now() = System.now().toEpochMilliseconds()
 
     fun cacheFor(tab: ScheduleTab) = when (tab) {
         ScheduleTab.Upcoming -> upcomingCache

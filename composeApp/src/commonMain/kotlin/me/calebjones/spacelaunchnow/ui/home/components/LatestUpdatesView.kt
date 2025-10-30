@@ -23,8 +23,8 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.rememberAsyncImagePainter
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock.System
+import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
@@ -341,7 +341,7 @@ fun EmptyUpdatesCard(
 private fun formatUpdateDate(createdOn: Instant): String {
     // Simple date formatting - you might want to use a more sophisticated formatter
     return try {
-        val now = Clock.System.now()
+        val now = System.now()
         val duration = now - createdOn
         when {
             duration.inWholeDays > 0 -> "${duration.inWholeDays}d ago"
