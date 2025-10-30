@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import kotlin.time.Clock.System
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -55,7 +54,6 @@ import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 fun ResponsiveHomeContent(
     navController: NavController,

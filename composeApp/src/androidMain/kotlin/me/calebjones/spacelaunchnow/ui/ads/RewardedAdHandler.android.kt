@@ -16,26 +16,19 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
 /**
+ * Android implementation of RewardedAdHandler using BasicAds library.
+ * 
  * Rewarded ad handler that shows preloaded rewarded ads.
- *
- * Usage: Call this composable when you want to show a rewarded ad
- * It will automatically:
- * - Check if the user has ad-free premium
- * - Use the preloaded rewarded ad for instant showing
- * - Only show on mobile platforms (Android/iOS)
- *
- * @param shouldShow Whether to trigger showing the rewarded ad
- * @param onRewardEarned Called when the user earns a reward (with reward amount and type)
- * @param onAdShown Called when a rewarded ad is successfully shown
- * @param onAdFailed Called when a rewarded ad fails to load or show
+ * - Checks if the user has ad-free premium
+ * - Uses the preloaded rewarded ad for instant showing
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
-fun RewardedAdHandler(
-    shouldShow: Boolean = false,
-    onRewardEarned: ((rewardAmount: Int, rewardType: String) -> Unit)? = null,
-    onAdShown: (() -> Unit)? = null,
-    onAdFailed: ((String) -> Unit)? = null
+actual fun RewardedAdHandler(
+    shouldShow: Boolean,
+    onRewardEarned: ((rewardAmount: Int, rewardType: String) -> Unit)?,
+    onAdShown: (() -> Unit)?,
+    onAdFailed: ((String) -> Unit)?
 ) {
     val contextFactory = LocalContextFactory.current
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)

@@ -18,23 +18,18 @@ import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import org.koin.compose.koinInject
 
 /**
+ * iOS implementation of InterstitialAdHandler using BasicAds library.
+ * 
  * Interstitial ad handler that shows ads every 4th detail view visit.
- *
- * Usage: Call this composable when entering a detail view (launch detail, event detail, etc.)
- * It will automatically:
- * - Check if the user has ad-free premium
- * - Track visit count and show ads every 4th visit
- * - Respect minimum time intervals between ads (5 minutes)
- * - Only show on mobile platforms (Android/iOS)
- *
- * @param onAdShown Called when an interstitial ad is successfully shown
- * @param onAdFailed Called when an interstitial ad fails to load or show
+ * - Checks if the user has ad-free premium
+ * - Tracks visit count and shows ads every 4th visit
+ * - Respects minimum time intervals between ads (5 minutes)
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
-fun InterstitialAdHandler(
-    onAdShown: (() -> Unit)? = null,
-    onAdFailed: ((String) -> Unit)? = null
+actual fun InterstitialAdHandler(
+    onAdShown: (() -> Unit)?,
+    onAdFailed: ((String) -> Unit)?
 ) {
     val contextFactory = LocalContextFactory.current
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)

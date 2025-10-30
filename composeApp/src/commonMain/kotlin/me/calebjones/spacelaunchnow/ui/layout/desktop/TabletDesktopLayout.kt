@@ -40,7 +40,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
-import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.launcher
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
@@ -73,7 +72,7 @@ import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalSharedTransitionApi::class, DependsOnGoogleMobileAds::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun TabletDesktopLayout(
     navController: NavHostController,

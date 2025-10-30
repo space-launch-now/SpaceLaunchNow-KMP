@@ -120,8 +120,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.lexilabs.basic.ads.AdSize
-import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
@@ -143,6 +141,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
 import me.calebjones.spacelaunchnow.isLargeScreen
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
@@ -479,7 +478,6 @@ fun LaunchDetailView(
 
 
 // This composable contains all the detailed launch information
-@OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 private fun LaunchDetailContentInBody(
     launch: LaunchDetailed,
@@ -522,7 +520,7 @@ private fun LaunchDetailContentInBody(
 
                     SmartBannerAd(
                         modifier = Modifier.fillMaxWidth(),
-                        adSize = AdSize.MEDIUM_RECTANGLE,
+                        placementType = AdPlacementType.CONTENT,
                         showRemoveAdsButton = true,
                         onRemoveAdsClick = onNavigateToSettings
                     )
@@ -645,7 +643,7 @@ private fun LaunchDetailContentInBody(
 
                 SmartBannerAd(
                     modifier = Modifier.fillMaxWidth(),
-                    adSize = AdSize.MEDIUM_RECTANGLE,
+                    placementType = AdPlacementType.CONTENT,
                     showRemoveAdsButton = true,
                     onRemoveAdsClick = onNavigateToSettings
                 )
