@@ -166,7 +166,17 @@ class SubscriptionRepositoryImpl(
 
             purchasesResult.fold(
                 onSuccess = { purchases ->
-                    val newState = processVerifiedPurchases(purchases)
+                    var newState = processVerifiedPurchases(purchases)
+
+                    // If no purchases found via billing client, check RevenueCat for legacy purchases
+                    if (!newState.isSubscribed) {
+                        println("SubscriptionRepository: No purchases from billing client, checking RevenueCat for legacy purchases...")
+                        val legacyState = checkForLegacyPurchasesInRevenueCat()
+                        if (legacyState != null) {
+                            println("SubscriptionRepository: Found legacy purchase in RevenueCat")
+                            newState = legacyState
+                        }
+                    }
 
                     // Update state and cache
                     _state.value = newState
@@ -177,6 +187,15 @@ class SubscriptionRepositoryImpl(
                 },
                 onFailure = { error ->
                     println("SubscriptionRepository: Verification failed - ${error.message}")
+
+                    // Check RevenueCat for legacy purchases as fallback
+                    val legacyState = checkForLegacyPurchasesInRevenueCat()
+                    if (legacyState != null) {
+                        println("SubscriptionRepository: Found legacy purchase in RevenueCat despite billing error")
+                        _state.value = legacyState
+                        storage.saveState(legacyState)
+                        return Result.success(legacyState)
+                    }
 
                     // Use cached state but mark as needing verification
                     val errorState = currentState.copy(
@@ -235,6 +254,15 @@ class SubscriptionRepositoryImpl(
 
     override suspend fun restorePurchases(): Result<SubscriptionState> {
         println("SubscriptionRepository: Restoring purchases...")
+        
+        // First, call RevenueCat's restore which syncs all platform purchases to RevenueCat
+        println("SubscriptionRepository: Calling RevenueCat.restorePurchases() to sync platform purchases...")
+        revenueCatManager.restorePurchases()
+        
+        // Wait a moment for RevenueCat to sync
+        delay(1000)
+        
+        // Then verify to get the updated state
         return verifySubscription(forceRefresh = true)
     }
 
@@ -295,7 +323,34 @@ class SubscriptionRepositoryImpl(
             return true
         }
 
-        // No entitlement - revoke widget access
+        // Priority 3.5: Check for legacy purchases without entitlements
+        // This handles purchases made before RevenueCat or not configured in dashboard
+        val activeProductIds = revenueCatManager.getActiveProductIdentifiers()
+        println("  RevenueCat active products: $activeProductIds")
+        
+        if (activeProductIds.isNotEmpty()) {
+            // Check if any of the active products grant the requested feature
+            for (productId in activeProductIds) {
+                val productFeatures = SubscriptionProducts.getFeaturesForProduct(productId)
+                if (productFeatures.contains(feature)) {
+                    println("  ✅ Legacy/active purchase '$productId' grants ${feature.name}")
+                    
+                    // Cache widget access for widgets
+                    if (feature == PremiumFeature.ADVANCED_WIDGETS) {
+                        widgetPreferences.updateWidgetAccessGranted(true)
+                        updateWidgetsAfterAccessChange("legacy access granted")
+                    }
+                    
+                    // Update cached state with legacy purchase
+                    updateCachedStateFromLegacyPurchase(productId, productFeatures)
+                    
+                    return true
+                }
+            }
+            println("  ⚠️ Active products found but none grant ${feature.name}")
+        }
+
+        // No entitlement or legacy purchase - revoke widget access
         if (feature == PremiumFeature.ADVANCED_WIDGETS) {
             widgetPreferences.updateWidgetAccessGranted(false)
             // Trigger widget update after revoking access
@@ -570,6 +625,89 @@ class SubscriptionRepositoryImpl(
             hasAccess = hasAccess,
             expiresAt = null, // Could be added if needed
             timeRemaining = timeRemaining
+        )
+    }
+
+    /**
+     * Update cached subscription state from a legacy purchase
+     * This is called when we detect an active purchase in RevenueCat that doesn't have
+     * an entitlement configured, but we still want to grant access based on product ID
+     */
+    private suspend fun updateCachedStateFromLegacyPurchase(
+        productId: String,
+        features: Set<PremiumFeature>
+    ) {
+        val subscriptionType = SubscriptionProducts.getSubscriptionType(productId)
+        val newState = SubscriptionState(
+            isSubscribed = true,
+            subscriptionType = subscriptionType,
+            subscriptionId = null, // RevenueCat handles subscription IDs
+            productId = productId,
+            expiresAt = null, // Legacy purchases are typically lifetime
+            purchasedAt = null, // Don't have this info from RevenueCat
+            lastVerified = System.now().toEpochMilliseconds(),
+            needsVerification = false,
+            verificationError = null,
+            features = features,
+            isLoading = false,
+            isCached = false
+        )
+        
+        println("SubscriptionRepository: Updating cached state from legacy purchase: $productId -> $subscriptionType")
+        _state.value = newState
+        storage.saveState(newState)
+    }
+
+    /**
+     * Check RevenueCat for any active purchases (including legacy products without entitlements)
+     * Returns a SubscriptionState if any active purchase is found, null otherwise
+     */
+    private fun checkForLegacyPurchasesInRevenueCat(): SubscriptionState? {
+        val activeProductIds = revenueCatManager.getActiveProductIdentifiers()
+        if (activeProductIds.isEmpty()) {
+            println("SubscriptionRepository: No active products in RevenueCat")
+            return null
+        }
+
+        println("SubscriptionRepository: Found ${activeProductIds.size} active products in RevenueCat: $activeProductIds")
+
+        // Find the most premium product
+        var bestProductId: String? = null
+        var bestSubscriptionType = SubscriptionType.FREE
+        var bestFeatures: Set<PremiumFeature> = emptySet()
+
+        for (productId in activeProductIds) {
+            val subscriptionType = SubscriptionProducts.getSubscriptionType(productId)
+            val features = SubscriptionProducts.getFeaturesForProduct(productId)
+
+            // Prefer PREMIUM over LEGACY over FREE
+            if (subscriptionType.ordinal > bestSubscriptionType.ordinal) {
+                bestProductId = productId
+                bestSubscriptionType = subscriptionType
+                bestFeatures = features
+            }
+        }
+
+        if (bestProductId == null || bestSubscriptionType == SubscriptionType.FREE) {
+            println("SubscriptionRepository: No premium/legacy products found")
+            return null
+        }
+
+        println("SubscriptionRepository: Best product: $bestProductId with type $bestSubscriptionType")
+
+        return SubscriptionState(
+            isSubscribed = true,
+            subscriptionType = bestSubscriptionType,
+            subscriptionId = null,
+            productId = bestProductId,
+            expiresAt = null, // Legacy purchases are typically lifetime
+            purchasedAt = null,
+            lastVerified = System.now().toEpochMilliseconds(),
+            needsVerification = false,
+            verificationError = null,
+            features = bestFeatures,
+            isLoading = false,
+            isCached = false
         )
     }
 }
