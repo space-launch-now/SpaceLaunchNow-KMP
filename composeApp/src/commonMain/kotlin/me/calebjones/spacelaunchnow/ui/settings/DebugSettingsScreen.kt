@@ -980,6 +980,113 @@ fun DebugSettingsScreen(
                             Text("❓ Unknown SKU")
                         }
 
+                        // Custom SKU Input Section
+                        HorizontalDivider()
+
+                        var customSku by remember { mutableStateOf("") }
+                        var customBasePlan by remember { mutableStateOf("") }
+                        var isPurchasing by remember { mutableStateOf(false) }
+
+                        Text(
+                            text = "Custom SKU Purchase:",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+
+                        Text(
+                            text = "⚠️ This will initiate a REAL purchase flow using the billing library!",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        OutlinedTextField(
+                            value = customSku,
+                            onValueChange = { customSku = it },
+                            label = { Text("Product ID / SKU") },
+                            placeholder = { Text("e.g., spacelaunchnow_pro") },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading && !isPurchasing,
+                            singleLine = true,
+                            supportingText = {
+                                Text("Required: Enter the product ID", fontSize = 11.sp)
+                            }
+                        )
+
+                        OutlinedTextField(
+                            value = customBasePlan,
+                            onValueChange = { customBasePlan = it },
+                            label = { Text("Base Plan ID (optional)") },
+                            placeholder = { Text("e.g., base-plan, yearly") },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading && !isPurchasing,
+                            singleLine = true,
+                            supportingText = {
+                                Text("Optional: Only needed for subscriptions with multiple plans", fontSize = 11.sp)
+                            }
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    if (customSku.isNotBlank()) {
+                                        coroutineScope.launch {
+                                            isPurchasing = true
+                                            val basePlan = if (customBasePlan.isNotBlank()) customBasePlan else null
+                                            
+                                            billingClient.launchPurchaseFlow(
+                                                productId = customSku,
+                                                basePlanId = basePlan
+                                            ).fold(
+                                                onSuccess = { purchaseToken ->
+                                                    isPurchasing = false
+                                                    snackbarHostState.showSnackbar(
+                                                        "✅ Purchase initiated: $customSku"
+                                                    )
+                                                },
+                                                onFailure = { error ->
+                                                    isPurchasing = false
+                                                    snackbarHostState.showSnackbar(
+                                                        "❌ Purchase failed: ${error.message}"
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                enabled = customSku.isNotBlank() && !isLoading && !isPurchasing,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.error,
+                                    contentColor = MaterialTheme.colorScheme.onError
+                                )
+                            ) {
+                                if (isPurchasing) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.onError
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text(if (isPurchasing) "Purchasing..." else "💳 Buy Product")
+                            }
+                        }
+
+                        Text(
+                            text = "💡 Examples:\n" +
+                                   "• One-time: spacelaunchnow_pro (no base plan)\n" +
+                                   "• Monthly sub: sln_production_yearly + base-plan\n" +
+                                   "• Yearly sub: sln_production_yearly + yearly",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 10.sp
+                        )
+
                         // Advanced options
                         HorizontalDivider()
 
