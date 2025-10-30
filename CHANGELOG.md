@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b6...v5.0.0) (2025-10-30)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b7...v5.0.0) (2025-10-30)
+
+
+### Features
+
+* Implement Direct Android Billing Client for testing custom SKU purchases ([941b177](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/941b177c692dc72eee2b5e3f58607c365571a6e7))
+
+
+
+# [5.0.0-b7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b6...v5.0.0-b7) (2025-10-30)
 
 
 ### Features
@@ -43,10 +52,6 @@
 ### Features
 
 * update buildconfig and packages ([4343ba3](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/4343ba3edb2200f60aa7a74ee071670dba4bb997))
-
-
-
-# [5.0.0-b3](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b2...v5.0.0-b3) (2025-10-28)
 
 
 
