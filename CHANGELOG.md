@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b8...v5.0.0) (2025-10-30)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b9...v5.0.0) (2025-10-31)
+
+
+### Features
+
+* Add subscription state checks to InterstitialAdHandler and update project name in settings ([85abf10](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/85abf10c07987e11991dbfab8c8cb1842579e6c5))
+
+
+
+# [5.0.0-b9](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b8...v5.0.0-b9) (2025-10-30)
 
 
 ### Features
@@ -43,15 +52,6 @@
 * enhance ad initialization and consent handling across platforms ([abdfe79](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/abdfe7907316c614d55262f5b8ef666ef78ab038))
 * enhance subscription type detection for premium products ([c4318ad](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/c4318adb10a8e7157c356b9fbd36f08bc4dcccd5))
 * move ad UI composables to platform-specific source sets ([cec7f0e](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/cec7f0e5ead0602878f765bdf378afad3ef598bb))
-
-
-
-# [5.0.0-b5](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b4...v5.0.0-b5) (2025-10-29)
-
-
-### Bug Fixes
-
-* enable AD_FREE feature in PremiumFeature ([7769960](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/77699602dc9be097c3fa47d670995dfaa9b51292))
 
 
 
