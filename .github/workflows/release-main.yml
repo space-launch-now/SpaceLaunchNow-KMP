@@ -347,7 +347,7 @@ jobs:
           serviceAccountJson: service-account.json
           packageName: me.calebjones.spacelaunchnow
           releaseFiles: ${{ steps.artifacts.outputs.aab }}
-          track: qa
+          track: internal
           status: completed
           mappingFile: ${{ steps.artifacts.outputs.mapping }}
           whatsNewDirectory: docs/release-notes/whatsnew/
