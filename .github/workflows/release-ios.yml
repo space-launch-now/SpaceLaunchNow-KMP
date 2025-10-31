@@ -152,6 +152,7 @@ jobs:
           echo "Bundle ID: $BUNDLE_ID"
           
           # Build archive - xcodebuild will automatically download provisioning profiles
+          set -o pipefail
           xcrun xcodebuild \
             -project iosApp.xcodeproj \
             -scheme iosApp \
@@ -165,9 +166,14 @@ jobs:
             -authenticationKeyIssuerID ${{ secrets.APPLE_API_ISSUER_ID }} \
             DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_STYLE=Automatic \
-            archive | xcpretty || true
+            archive | xcpretty
           
-          echo "✅ Archive created successfully"
+          if [ -d "$RUNNER_TEMP/SpaceLaunchNow.xcarchive" ]; then
+            echo "✅ Archive created successfully"
+          else
+            echo "❌ Archive creation failed"
+            exit 1
+          fi
 
       - name: Export IPA for App Store
         env:
