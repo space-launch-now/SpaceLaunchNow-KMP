@@ -104,7 +104,7 @@ jobs:
           promoteTrack: beta
           status: completed
           userFraction: 1.0
-          whatsNewDirectory: docs/release-notes/
+          whatsNewDirectory: docs/release-notes/whatsnew/
 
       - name: Promote to Production (Staged)
         if: github.event.inputs.promote_to == 'production'
@@ -116,7 +116,7 @@ jobs:
           promoteTrack: production
           status: inProgress
           userFraction: ${{ steps.rollout.outputs.fraction }}
-          whatsNewDirectory: docs/release-notes/
+          whatsNewDirectory: docs/release-notes/whatsnew/
 
       - name: Create Production Release Tag
         if: github.event.inputs.promote_to == 'production'

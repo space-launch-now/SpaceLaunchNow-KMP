@@ -244,7 +244,26 @@ kotlin {
     }
 }
 
+// Load keystore properties (optional for local development)
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+val hasKeystoreProperties = keystorePropertiesFile.canRead()
+
+if (hasKeystoreProperties) {
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
+}
+
 android {
+    signingConfigs {
+        if (hasKeystoreProperties) {
+            create("releaseConfig") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
+        }
+    }
     namespace = "me.calebjones.spacelaunchnow"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -320,6 +339,9 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("boolean", "IS_DEBUG", "false")
+            if (hasKeystoreProperties) {
+                signingConfig = signingConfigs.getByName("releaseConfig")
+            }
         }
         getByName("debug") {
             applicationIdSuffix = ".kmpdebug"

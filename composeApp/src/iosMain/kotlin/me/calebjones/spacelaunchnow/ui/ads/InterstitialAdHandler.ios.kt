@@ -33,16 +33,24 @@ actual fun InterstitialAdHandler(
 ) {
     val contextFactory = LocalContextFactory.current
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
+    
+    // Get subscription state to check if it's still loading
+    val subscriptionRepo = koinInject<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
+    val subscriptionState by subscriptionRepo.state.collectAsState()
 
     // 🚀 USE PRELOADED AD: Get preloaded interstitial ad from CompositionLocal
     val preloadedInterstitialAd = LocalPreloadedInterstitialAd.current
 
+    println("🎯 InterstitialAdHandler: hasAdFree=$hasAdFree, isLoading=${subscriptionState.isLoading}, isMobile=${getPlatform().type.isMobile}, hasContext=${contextFactory != null}, hasPreloadedAd=${preloadedInterstitialAd != null}")
+
     // Don't show ads if:
-    // 1. User has ad-free premium feature
-    // 2. Not on a mobile platform (Android/iOS)
-    // 3. No context factory available
-    // 4. No preloaded interstitial ad available
-    if (hasAdFree ||
+    // 1. Subscription state is still loading (prevents race condition)
+    // 2. User has ad-free premium feature
+    // 3. Not on a mobile platform (Android/iOS)
+    // 4. No context factory available
+    // 5. No preloaded interstitial ad available
+    if (subscriptionState.isLoading ||
+        hasAdFree ||
         !getPlatform().type.isMobile ||
         contextFactory == null ||
         preloadedInterstitialAd == null
@@ -147,7 +155,8 @@ actual fun InterstitialAdHandler(
 
     // Show the interstitial ad using the Composable pattern (required by basic-ads)
     // Only show if ad hasn't been shown yet in this session
-    if (!adShownThisSession && interstitialAd.state == AdState.READY) {
+    // Double-check hasAdFree in case subscription state changed during composition
+    if (!adShownThisSession && interstitialAd.state == AdState.READY && !hasAdFree && !subscriptionState.isLoading) {
         InterstitialAd(loadedAd = interstitialAd)
     }
 }

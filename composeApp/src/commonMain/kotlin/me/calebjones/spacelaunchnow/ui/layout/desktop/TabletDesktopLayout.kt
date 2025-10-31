@@ -40,8 +40,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
-import kotlinproject.composeapp.generated.resources.Res
-import kotlinproject.composeapp.generated.resources.launcher
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
@@ -71,6 +69,8 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.jetbrains.compose.resources.painterResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

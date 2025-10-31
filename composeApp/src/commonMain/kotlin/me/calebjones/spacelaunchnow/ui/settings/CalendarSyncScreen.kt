@@ -48,8 +48,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinproject.composeapp.generated.resources.Res
-import kotlinproject.composeapp.generated.resources.launcher_monochrome
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
@@ -57,6 +55,8 @@ import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launcher_monochrome
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

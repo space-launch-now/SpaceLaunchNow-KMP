@@ -90,6 +90,9 @@ jobs:
       - name: Create release notes
         run: |
           mkdir -p docs/release-notes
+          mkdir -p docs/release-notes/whatsnew
+          
+          # Create full release notes markdown
           cat > docs/release-notes/v${{ env.VERSION_NAME }}.md << 'EOF'
           ## 🚀 Space Launch Now ${{ env.VERSION_NAME }}
           
@@ -102,6 +105,12 @@ jobs:
           *This release was automatically created by GitHub Actions*
           EOF
           
+          # Create Play Store "What's New" file (English US locale)
+          cat > docs/release-notes/whatsnew/whatsnew-en-US << 'EOF'
+          ${{ steps.changelog.outputs.clean_changelog }}
+          EOF
+          
+          # Create GitHub release notes
           echo "## 🚀 Space Launch Now ${{ env.VERSION_NAME }}" > release-notes.txt
           echo "" >> release-notes.txt
           echo "**Release Date:** $(date +%Y-%m-%d)" >> release-notes.txt
@@ -338,10 +347,10 @@ jobs:
           serviceAccountJson: service-account.json
           packageName: me.calebjones.spacelaunchnow
           releaseFiles: ${{ steps.artifacts.outputs.aab }}
-          track: alpha
+          track: qa
           status: completed
           mappingFile: ${{ steps.artifacts.outputs.mapping }}
-          whatsNewDirectory: docs/release-notes/
+          whatsNewDirectory: docs/release-notes/whatsnew/
 
       - name: Deploy AAB to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1

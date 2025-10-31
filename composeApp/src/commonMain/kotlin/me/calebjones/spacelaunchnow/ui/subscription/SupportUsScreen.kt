@@ -70,8 +70,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinproject.composeapp.generated.resources.Res
-import kotlinproject.composeapp.generated.resources.launcher
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
@@ -80,6 +78,8 @@ import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 
 /**
  * "Support Us" screen - Encouraging membership with focused perks

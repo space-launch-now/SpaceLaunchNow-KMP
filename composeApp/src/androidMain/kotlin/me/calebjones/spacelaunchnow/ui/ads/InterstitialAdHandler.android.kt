@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -9,17 +10,17 @@ import androidx.compose.runtime.setValue
 import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.composable.InterstitialAd
-import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.LocalContextFactory
 import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
+import me.calebjones.spacelaunchnow.util.BuildConfig
 import org.koin.compose.koinInject
 
 /**
  * Android implementation of InterstitialAdHandler using BasicAds library.
- * 
+ *
  * Interstitial ad handler that shows ads every 4th detail view visit.
  * - Checks if the user has ad-free premium
  * - Tracks visit count and shows ads every 4th visit
@@ -34,15 +35,24 @@ actual fun InterstitialAdHandler(
     val contextFactory = LocalContextFactory.current
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
 
+    // Get subscription state to check if it's still loading
+    val subscriptionRepo =
+        koinInject<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
+    val subscriptionState by subscriptionRepo.state.collectAsState()
+
     // 🚀 USE PRELOADED AD: Get preloaded interstitial ad from CompositionLocal
     val preloadedInterstitialAd = LocalPreloadedInterstitialAd.current
 
+    println("🎯 InterstitialAdHandler: hasAdFree=$hasAdFree, isLoading=${subscriptionState.isLoading}, isMobile=${getPlatform().type.isMobile}, hasContext=${contextFactory != null}, hasPreloadedAd=${preloadedInterstitialAd != null}")
+
     // Don't show ads if:
-    // 1. User has ad-free premium feature
-    // 2. Not on a mobile platform (Android/iOS)
-    // 3. No context factory available
-    // 4. No preloaded interstitial ad available
-    if (hasAdFree ||
+    // 1. Subscription state is still loading (prevents race condition)
+    // 2. User has ad-free premium feature
+    // 3. Not on a mobile platform (Android/iOS)
+    // 4. No context factory available
+    // 5. No preloaded interstitial ad available
+    if (subscriptionState.isLoading ||
+        hasAdFree ||
         !getPlatform().type.isMobile ||
         contextFactory == null ||
         preloadedInterstitialAd == null
@@ -58,7 +68,7 @@ actual fun InterstitialAdHandler(
     val shouldShowAd = remember {
         globalAdManager.shouldShowInterstitialOnDetailView()
     }
-    
+
     // Track if ad has already been shown in this composition to prevent repeats
     var adShownThisSession by remember { mutableStateOf(false) }
 
@@ -94,7 +104,7 @@ actual fun InterstitialAdHandler(
         println("⏭️ InterstitialAdHandler: Not time to show ad yet.")
         return
     }
-    
+
     if (adShownThisSession) {
         println("⏭️ InterstitialAdHandler: Ad already shown in this session.")
         return
@@ -147,7 +157,8 @@ actual fun InterstitialAdHandler(
 
     // Show the interstitial ad using the Composable pattern (required by basic-ads)
     // Only show if ad hasn't been shown yet in this session
-    if (!adShownThisSession && interstitialAd.state == AdState.READY) {
+    // Double-check hasAdFree in case subscription state changed during composition
+    if (!adShownThisSession && interstitialAd.state == AdState.READY && !hasAdFree && !subscriptionState.isLoading) {
         InterstitialAd(loadedAd = interstitialAd)
     }
 }

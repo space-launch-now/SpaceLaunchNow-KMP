@@ -36,8 +36,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.AltRoute
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.AltRoute
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Badge
@@ -47,6 +48,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.ChangeCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -88,6 +90,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenu
@@ -107,7 +110,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -115,6 +117,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -125,9 +128,10 @@ import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
+import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.brands.WikipediaW
-import kotlinx.coroutines.launch
-import kotlin.time.Clock.System
+import compose.icons.fontawesomeicons.solid.InfoCircle
+import compose.icons.fontawesomeicons.solid.Map
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.LocalUseUtc
@@ -136,6 +140,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LocationList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
@@ -146,12 +151,14 @@ import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
+import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
-import me.calebjones.spacelaunchnow.util.LaunchSharingService
+import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import me.calebjones.spacelaunchnow.util.VideoUtil
-import org.koin.compose.koinInject
+import kotlin.time.Clock.System
+
 // Keep only TitleHeight which is used for spacing
 private val TitleHeight = 120.dp
 private val CompactHeight = 40.dp
@@ -463,21 +470,49 @@ fun LaunchDetailView(
             MaterialTheme.colorScheme.surfaceVariant
         ),
     ) {
-        // Render existing launch detail content inside the shared scaffold body
-        LaunchDetailContentInBody(
+        // Use LaunchDetailOpenUrlProvider to provide a working openUrl to the body content
+        LaunchDetailOpenUrlProvider(
             launch = launch,
             videoPlayerState = videoPlayerState,
             onSelectVideo = onSelectVideo,
             onSetPlayerVisible = onSetPlayerVisible,
+            onNavigateBack = onNavigateBack,
             onNavigateToFullscreen = onNavigateToFullscreen,
-            onVideoSelected = onVideoSelected,
-            onNavigateToSettings = null // TODO: Pass from parent screen
+            onVideoSelected = onVideoSelected
         )
     }
 }
 
 
 // This composable contains all the detailed launch information
+@Composable
+fun LaunchDetailOpenUrlProvider(
+    launch: LaunchDetailed,
+    videoPlayerState: me.calebjones.spacelaunchnow.ui.viewmodel.VideoPlayerState,
+    onSelectVideo: (Int) -> Unit,
+    onSetPlayerVisible: (Boolean) -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateToFullscreen: (String, String) -> Unit,
+    onVideoSelected: (Int) -> Unit
+) {
+    val uriHandler = LocalUriHandler.current
+    val openUrl: (String) -> Unit = { url ->
+        try {
+            uriHandler.openUri(url)
+        } catch (_: Throwable) {
+        }
+    }
+    LaunchDetailContentInBody(
+        launch = launch,
+        videoPlayerState = videoPlayerState,
+        onSelectVideo = onSelectVideo,
+        onSetPlayerVisible = onSetPlayerVisible,
+        onNavigateToFullscreen = onNavigateToFullscreen,
+        onVideoSelected = onVideoSelected,
+        openUrl = openUrl
+    )
+}
+
 @Composable
 private fun LaunchDetailContentInBody(
     launch: LaunchDetailed,
@@ -486,7 +521,8 @@ private fun LaunchDetailContentInBody(
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
-    onNavigateToSettings: (() -> Unit)? = null
+    onNavigateToSettings: (() -> Unit)? = null,
+    openUrl: (String) -> Unit
 ) {
     val isLargeScreen = isLargeScreen()
     Column(
@@ -546,6 +582,22 @@ private fun LaunchDetailContentInBody(
                         MissionDetailsCard(mission = mission, launch = launch)
                     }
 
+                    launch.pad?.let { pad ->
+                        Text(
+                            text = "Launch Location",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        LaunchLocationCard(
+                            location = pad.location,
+                            pad = pad,
+                            openUrl = openUrl
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        PadQuickStatsRow(pad)
+                        Spacer(Modifier.height(16.dp))
+                    }
+
                     // Spacecraft Details Card
                     if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
                         Text(
@@ -565,7 +617,7 @@ private fun LaunchDetailContentInBody(
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
-                        AgencyDetailsCard(agency = agency)
+                        AgencyDetailsCard(agency = agency, openUrl = openUrl)
                     }
                 }
 
@@ -602,7 +654,7 @@ private fun LaunchDetailContentInBody(
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
-                        LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
+                        LaunchVehicleDetailsCard(rocketConfig = rocketConfig, openUrl = openUrl)
                         LaunchVehicleDetailedStatistics(rocketConfig = rocketConfig)
                     }
 
@@ -696,6 +748,23 @@ private fun LaunchDetailContentInBody(
                     Spacer(Modifier.height(16.dp))
                 }
 
+                launch.pad?.let { pad ->
+                    Text(
+                        text = "Launch Location",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    LaunchLocationCard(
+                        location = pad.location,
+                        pad = pad,
+                        openUrl = openUrl
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    PadQuickStatsRow(pad)
+                    Spacer(Modifier.height(16.dp))
+                }
+
                 // 6. Launch Vehicle Details Card
                 launch.rocket?.configuration?.let { rocketConfig ->
                     Text(
@@ -704,7 +773,7 @@ private fun LaunchDetailContentInBody(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(16.dp))
-                    LaunchVehicleDetailsCard(rocketConfig = rocketConfig)
+                    LaunchVehicleDetailsCard(rocketConfig = rocketConfig, openUrl = openUrl)
                     Spacer(Modifier.height(16.dp))
                     LaunchVehicleDetailedStatistics(rocketConfig = rocketConfig)
                     Spacer(Modifier.height(16.dp))
@@ -747,7 +816,7 @@ private fun LaunchDetailContentInBody(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(16.dp))
-                    AgencyDetailsCard(agency = agency)
+                    AgencyDetailsCard(agency = agency, openUrl = openUrl)
                     Spacer(Modifier.height(16.dp))
                     Text(
                         text = "Launch Service Provider Statistics",
@@ -769,8 +838,9 @@ private fun LaunchDetailContentInBody(
 private fun InfoTile(
     icon: ImageVector,
     label: String,
-    value: String,
-    modifier: Modifier = Modifier
+    value: String? = null,
+    modifier: Modifier = Modifier,
+    customComposable: (@Composable () -> Unit)? = null
 ) {
     Surface(
         modifier = modifier,
@@ -797,12 +867,297 @@ private fun InfoTile(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            if (customComposable != null) {
+                customComposable()
+            } else if (value != null) {
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoTileHorizontal(
+    icon: ImageVector,
+    label: String,
+    value: String? = null,
+    customComposable: (@Composable () -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp)
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        if (customComposable != null) {
+            customComposable()
+        } else if (value != null) {
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.End
+            )
+        }
+    }
+}
+
+@Composable
+private fun LaunchLocationCard(
+    location: LocationList?,
+    pad: me.calebjones.spacelaunchnow.api.launchlibrary.models.PadDetailed?,
+    openUrl: (String) -> Unit = { /* TODO: Implement for platform */ }
+) {
+    if (location == null) return
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Map image centered at the top (if exists)
+            location.mapImage?.let { mapUrl ->
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = mapUrl,
+                        contentDescription = "Location Map",
+                        modifier = Modifier
+                            .height(140.dp)
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+            // Name
+            location.name?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            // Country and Timezone combined row
+            if (location.country != null || location.timezoneName != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    location.country?.let { country ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            country.alpha2Code?.let { code ->
+                                AsyncImage(
+                                    model = "https://flagcdn.com/w40/${code.lowercase()}.png",
+                                    contentDescription = "Flag",
+                                    modifier = Modifier.width(24.dp).height(16.dp)
+                                        .clip(RoundedCornerShape(2.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                            Text(
+                                text = country.name ?: country.alpha2Code ?: "Unknown",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+                    location.timezoneName?.let { tz ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Filled.Public,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(text = tz, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
+            }
+            // Description
+            location.description?.takeIf { it.isNotBlank() }?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            HorizontalDivider()
+            // Pad info (if available)
+            pad?.let { it ->
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Map image centered at the top (if exists)
+                    it.mapImage?.let { mapUrl ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            AsyncImage(
+                                model = mapUrl,
+                                contentDescription = "Pad Map",
+                                modifier = Modifier
+                                    .height(140.dp)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                    it.name?.let { padName ->
+                        Text(
+                            text = padName,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    it.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                        Text(
+                            text = desc,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    // Other details (coords, turnaround)
+                    val otherStats = listOfNotNull(
+                        it.latitude?.let { lat ->
+                            it.longitude?.let { lon ->
+                                val latStr = ((lat * 100).toInt() / 100.0).toString()
+                                val lonStr = ((lon * 100).toInt() / 100.0).toString()
+                                "Coordinates: $latStr, $lonStr"
+                            }
+                        },
+                        it.fastestTurnaround?.takeIf { f -> f.isNotBlank() }
+                            ?.let { f -> "Fastest Turnaround: ${parseIsoDurationToHumanReadable(f)}" }
+                    )
+
+                    if (otherStats.isNotEmpty()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            otherStats.forEach { stat ->
+                                Text(
+                                    text = stat,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
+                    // Optional: Pad map url (if exists)
+                    it.mapUrl?.let { mapUrl ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Button(
+                                onClick = { openUrl(mapUrl) },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
+                            ) {
+                                Icon(
+                                    imageVector = FontAwesomeIcons.Solid.Map,
+                                    contentDescription = "Map",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Open Map", color = MaterialTheme.colorScheme.onTertiary)
+                            }
+                        }
+                    }
+                    // Info & Wiki links
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        it.infoUrl?.let { url ->
+                            Button(
+                                onClick = { openUrl(url) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = FontAwesomeIcons.Solid.InfoCircle,
+                                    contentDescription = "Information",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Website")
+                            }
+                        }
+                        it.wikiUrl?.let { url ->
+                            Button(
+                                onClick = { openUrl(url) },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                            ) {
+                                Icon(
+                                    imageVector = FontAwesomeIcons.Brands.WikipediaW,
+                                    contentDescription = "Wikipedia",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Wikipedia", color = MaterialTheme.colorScheme.onSecondary)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Internal data class for InfoTileData to support composable tiles
+private data class InfoTileData(
+    val icon: ImageVector,
+    val label: String,
+    val value: String? = null,
+    val customComposable: (@Composable () -> Unit)? = null,
+)
+
+// PadQuickStatsRow composable extracted for reuse
+@Composable
+private fun PadQuickStatsRow(pad: me.calebjones.spacelaunchnow.api.launchlibrary.models.PadDetailed?) {
+    if (pad == null) return
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (pad.totalLaunchCount != null) {
+            StatCard(
+                modifier = Modifier.weight(1f),
+                icon = Icons.Filled.Public,
+                value = pad.totalLaunchCount.toString(),
+                label = "Launches"
+            )
+        }
+        if (pad.orbitalLaunchAttemptCount != null) {
+            StatCard(
+                modifier = Modifier.weight(1f),
+                icon = Icons.Filled.TrendingUp,
+                value = pad.orbitalLaunchAttemptCount.toString(),
+                label = "Orbital Attempts"
             )
         }
     }
@@ -908,13 +1263,60 @@ private fun MissionDetailsCard(mission: Mission, launch: LaunchDetailed) {
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.Start
         ) {
+            // Centered agency logo
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                launch.missionPatches.firstOrNull()?.imageUrl?.let { imageUrl ->
+                    SubcomposeAsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Mission Patch",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Fit,
+                        loading = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        },
+                        error = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceVariant,
+                                        RoundedCornerShape(8.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Error,
+                                    contentDescription = "Mission",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        }
+                    )
+                }
+            }
             Text(
                 text = mission.name,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             // Locked to Chips layout
@@ -965,10 +1367,11 @@ private fun MissionDetailsChipsContent(launch: LaunchDetailed) {
         }
 
         // Agencies chips (if present)
-        if (!mission.agencies.isNullOrEmpty()) {
+        if (mission.agencies.isNotEmpty()) {
             Text(
                 text = "Agencies",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -989,7 +1392,7 @@ private fun MissionDetailsGridContent(mission: Mission) {
         mission.orbit?.name?.takeIf { it.isNotBlank() }?.let {
             add(Triple(Icons.Filled.Public, "Target Orbit", it))
         }
-        if (!mission.agencies.isNullOrEmpty()) {
+        if (mission.agencies.isNotEmpty()) {
             val count = mission.agencies.size
             add(Triple(Icons.Filled.Business, if (count == 1) "Agency" else "Agencies", "$count"))
         }
@@ -1389,10 +1792,10 @@ private fun LiveBadge() {
 
 
 @Composable
-private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
-    val sharingService = koinInject<LaunchSharingService>()
-    val coroutineScope = rememberCoroutineScope()
-
+private fun LaunchVehicleDetailsCard(
+    rocketConfig: LauncherConfigDetailed,
+    openUrl: (String) -> Unit = { /* TODO: Implement for platform */ }
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -1407,6 +1810,46 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
+            // Status indicators
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                if (rocketConfig.active == true) {
+                    StatusChip(text = "Active", color = Color(0xFF4CAF50))
+                } else {
+                    StatusChip(text = "Inactive", color = MaterialTheme.colorScheme.error)
+                }
+
+                if (rocketConfig.reusable == true) {
+                    StatusChip(text = "Reusable", color = Color(0xFF2196F3))
+                } else {
+                    StatusChip(text = "Expendable", color = MaterialTheme.colorScheme.secondary)
+                }
+            }
+
+            // Description (overflow-aware)
+            rocketConfig.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                var expanded by remember { mutableStateOf(false) }
+                var hasOverflow by remember { mutableStateOf(false) }
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = desc,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = if (expanded) Int.MAX_VALUE else 5,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 20.sp,
+                        onTextLayout = { result ->
+                            if (!expanded) hasOverflow = result.hasVisualOverflow
+                        }
+                    )
+                    if (hasOverflow || expanded) {
+                        TextButton(onClick = { expanded = !expanded }) {
+                            Text(if (expanded) "Show less" else "Show more")
+                        }
+                    }
+                }
+            }
 
             // Build info tiles and render as two-column grid
             val infoTiles = buildList {
@@ -1489,113 +1932,159 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                 }
             }
 
-            // Description (overflow-aware)
-            rocketConfig.description?.takeIf { it.isNotBlank() }?.let { desc ->
-                var expanded by remember { mutableStateOf(false) }
-                var hasOverflow by remember { mutableStateOf(false) }
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        text = desc,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = if (expanded) Int.MAX_VALUE else 5,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = 20.sp,
-                        onTextLayout = { result ->
-                            if (!expanded) hasOverflow = result.hasVisualOverflow
-                        }
-                    )
-                    if (hasOverflow || expanded) {
-                        TextButton(onClick = { expanded = !expanded }) {
-                            Text(if (expanded) "Show less" else "Show more")
-                        }
-                    }
-                }
-            }
-
-            // Status indicators
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                if (rocketConfig.active == true) {
-                    StatusChip(text = "Active", color = Color(0xFF4CAF50))
-                }
-                if (rocketConfig.reusable == true) {
-                    StatusChip(text = "Reusable", color = Color(0xFF2196F3))
-                }
-                if (rocketConfig.isPlaceholder == true) {
-                    StatusChip(text = "Placeholder", color = MaterialTheme.colorScheme.outline)
-                }
-            }
 
-            // Specifications section
-            Text(
-                text = "Specifications",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 4.dp)
-            )
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                ) {
+                    Box {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            var specificationsExpanded by remember { mutableStateOf(false) }
 
-            // Build all specification items in a single list
-            val allSpecs = buildList {
-                rocketConfig.length?.let { length ->
-                    add(Triple("Length", "${length}m", Icons.Filled.Height))
-                }
-                rocketConfig.diameter?.let { diameter ->
-                    add(Triple("Diameter", "${diameter}m", Icons.Filled.ViewColumn))
-                }
-                rocketConfig.launchMass?.let { mass ->
-                    add(Triple("Launch Mass", "${mass.toInt()}kg", Icons.Filled.Scale))
-                }
-                rocketConfig.launchCost?.let { cost ->
-                    add(Triple("Launch Cost", "${cost}", Icons.Filled.AttachMoney))
-                }
-                rocketConfig.leoCapacity?.let { leo ->
-                    add(Triple("LEO", "${leo.toInt()}kg", Icons.Filled.Public))
-                }
-                rocketConfig.gtoCapacity?.let { gto ->
-                    add(Triple("GTO", "${gto.toInt()}kg", Icons.Filled.Satellite))
-                }
-                rocketConfig.geoCapacity?.let { geo ->
-                    add(Triple("GEO", "${geo.toInt()}kg", Icons.Filled.SatelliteAlt))
-                }
-                rocketConfig.ssoCapacity?.let { sso ->
-                    add(Triple("SSO", "${sso.toInt()}kg", Icons.Filled.AltRoute))
-                }
-                rocketConfig.toThrust?.let { thrust ->
-                    add(Triple("Thrust", "${thrust}", Icons.Filled.Speed))
-                }
-                rocketConfig.apogee?.let { apogee ->
-                    add(Triple("Apogee", "$apogee", Icons.Filled.TrendingUp))
-                }
-            }
+                            // Specifications section header with expand/collapse
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { specificationsExpanded = !specificationsExpanded }
+                                    .padding(top = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Specifications",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Icon(
+                                    imageVector = if (specificationsExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = if (specificationsExpanded) "Collapse" else "Expand",
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
 
-            // Display specifications in a 3-column grid
-            if (allSpecs.isNotEmpty()) {
-                allSpecs.chunked(3).forEach { rowSpecs ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        rowSpecs.forEach { (label, value, icon) ->
-                            SpecCard(
-                                label = label,
-                                value = value,
-                                icon = icon,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                        // Fill remaining slots with spacers if needed
-                        repeat(3 - rowSpecs.size) {
-                            Spacer(modifier = Modifier.weight(1f))
+                            // Build all specification items in a single list
+                            val allSpecs = buildList {
+                                rocketConfig.length?.let { length ->
+                                    add(Triple("Length", "${length}m", Icons.Filled.Height))
+                                }
+                                rocketConfig.diameter?.let { diameter ->
+                                    add(Triple("Diameter", "${diameter}m", Icons.Filled.ViewColumn))
+                                }
+                                rocketConfig.launchMass?.let { mass ->
+                                    add(
+                                        Triple(
+                                            "Launch Mass",
+                                            NumberFormatUtil.formatNumberWithUnit(mass, "kg"),
+                                            Icons.Filled.Scale
+                                        )
+                                    )
+                                }
+                                rocketConfig.launchCost?.let { cost ->
+                                    // Dollar on the front for USD
+                                    add(
+                                        Triple(
+                                            "Launch Cost",
+                                            "$" + NumberFormatUtil.formatNumberWithUnit(cost, ""),
+                                            Icons.Filled.AttachMoney
+                                        )
+                                    )
+                                }
+                                rocketConfig.leoCapacity?.let { leo ->
+                                    add(
+                                        Triple(
+                                            "LEO",
+                                            NumberFormatUtil.formatNumberWithUnit(leo, "kg"),
+                                            Icons.Filled.Public
+                                        )
+                                    )
+                                }
+                                rocketConfig.gtoCapacity?.let { gto ->
+                                    add(
+                                        Triple(
+                                            "GTO",
+                                            NumberFormatUtil.formatNumberWithUnit(gto, "kg"),
+                                            Icons.Filled.Satellite
+                                        )
+                                    )
+                                }
+                                rocketConfig.geoCapacity?.let { geo ->
+                                    add(
+                                        Triple(
+                                            "GEO",
+                                            NumberFormatUtil.formatNumberWithUnit(geo, "kg"),
+                                            Icons.Filled.SatelliteAlt
+                                        )
+                                    )
+                                }
+                                rocketConfig.ssoCapacity?.let { sso ->
+                                    add(
+                                        Triple(
+                                            "SSO",
+                                            NumberFormatUtil.formatNumberWithUnit(sso, "kg"),
+                                            Icons.AutoMirrored.Filled.AltRoute
+                                        )
+                                    )
+                                }
+                                rocketConfig.toThrust?.let { thrust ->
+                                    add(Triple("Thrust", "$thrust to", Icons.Filled.Speed))
+                                }
+                                rocketConfig.apogee?.let { apogee ->
+                                    add(
+                                        Triple(
+                                            "Apogee",
+                                            NumberFormatUtil.formatNumberWithUnit(apogee, "km"),
+                                            Icons.AutoMirrored.Filled.TrendingUp
+                                        )
+                                    )
+                                }
+                            }
+
+                            // Display specifications in a 3-column grid with animation
+                            AnimatedVisibility(
+                                visible = specificationsExpanded,
+                                enter = fadeIn() + slideInVertically(initialOffsetY = { -it / 4 }),
+                                exit = fadeOut() + slideOutVertically(targetOffsetY = { -it / 4 })
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    if (allSpecs.isNotEmpty()) {
+                                        allSpecs.chunked(3).forEach { rowSpecs ->
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                rowSpecs.forEach { (label, value, icon) ->
+                                                    SpecCard(
+                                                        label = label,
+                                                        value = value,
+                                                        icon = icon,
+                                                        modifier = Modifier.weight(1f)
+                                                    )
+                                                }
+                                                // Fill remaining slots with spacers if needed
+                                                repeat(3 - rowSpecs.size) {
+                                                    Spacer(modifier = Modifier.weight(1f))
+                                                }
+                                            }
+                                            if (rowSpecs != allSpecs.chunked(3).last()) {
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                    if (rowSpecs != allSpecs.chunked(3).last()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
                 }
             }
-
             // Links (Info / Wiki)
             if (!rocketConfig.infoUrl.isNullOrBlank() || !rocketConfig.wikiUrl.isNullOrBlank()) {
                 Row(
@@ -1606,11 +2095,7 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                 ) {
                     rocketConfig.infoUrl?.let { url ->
                         Button(
-                            onClick = {
-                                coroutineScope.launch {
-                                    sharingService.shareUrl(url)
-                                }
-                            },
+                            onClick = { openUrl(url) },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                         ) {
@@ -1620,16 +2105,12 @@ private fun LaunchVehicleDetailsCard(rocketConfig: LauncherConfigDetailed) {
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Additional Information")
+                            Text("Website")
                         }
                     }
                     rocketConfig.wikiUrl?.let { url ->
                         Button(
-                            onClick = {
-                                coroutineScope.launch {
-                                    sharingService.shareUrl(url)
-                                }
-                            },
+                            onClick = { openUrl(url) },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                         ) {
@@ -1882,7 +2363,7 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
                 val stage = stagesWithLanding.first()
                 Column(
                     Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     // Header with stage index and serial if available
                     val header = buildString {
@@ -1917,6 +2398,26 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
                             }) { Text(if (expanded) "Read less" else "Read more") }
                         }
                     }
+
+                    val useUtc = LocalUseUtc.current
+                    stage.previousFlightDate?.let {
+                        InfoTileHorizontal(
+                            icon = Icons.Filled.Schedule,
+                            label = "Previous Flight",
+                            value = DateTimeUtil.formatLaunchDateTime(
+                                it,
+                                useUtc
+                            )
+                        )
+                    }
+                    stage.turnAroundTime?.takeIf { it.isNotBlank() }
+                        ?.let {
+                            InfoTileHorizontal(
+                                icon = Icons.Filled.Timelapse,
+                                label = "Turnaround",
+                                value = parseIsoDurationToHumanReadable(it)
+                            )
+                        }
                     HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
                     LandingStageGridContent(stage)
 
@@ -1963,7 +2464,7 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                LandingStageGridContent(stage)
+
                                 stage.landing?.description?.takeIf { it.isNotBlank() }
                                     ?.let { desc ->
                                         var expanded by remember { mutableStateOf(false) }
@@ -1985,6 +2486,27 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
                                             }
                                         }
                                     }
+
+                                val useUtc = LocalUseUtc.current
+                                stage.previousFlightDate?.let {
+                                    InfoTileHorizontal(
+                                        icon = Icons.Filled.Schedule,
+                                        label = "Previous Flight",
+                                        value = DateTimeUtil.formatLaunchDateTime(
+                                            it,
+                                            useUtc
+                                        )
+                                    )
+                                }
+                                stage.turnAroundTime?.takeIf { it.isNotBlank() }
+                                    ?.let {
+                                        InfoTileHorizontal(
+                                            icon = Icons.Filled.Timelapse,
+                                            label = "Turnaround",
+                                            value = parseIsoDurationToHumanReadable(it)
+                                        )
+                                    }
+                                LandingStageGridContent(stage)
                             }
                         }
                     }
@@ -2070,6 +2592,14 @@ private fun LandingStageChipsContent(stage: FirstStageNormal) {
                     )
                 }
             }
+            if (landing?.success == null) {
+                item {
+                    InfoChip(
+                        icon = Icons.Filled.CheckCircle,
+                        text = "TBD"
+                    )
+                }
+            }
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             landing?.landingLocation?.name?.let { name ->
@@ -2092,7 +2622,7 @@ private fun LandingStageChipsContent(stage: FirstStageNormal) {
                 item {
                     InfoChip(
                         icon = Icons.Filled.Schedule,
-                        text = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(
+                        text = DateTimeUtil.formatLaunchDateTime(
                             prev,
                             useUtc
                         )
@@ -2136,41 +2666,22 @@ private fun LandingStageChipsContent(stage: FirstStageNormal) {
 @Composable
 private fun LandingStageGridContent(stage: FirstStageNormal) {
     val landing = stage.landing
-    val useUtc = LocalUseUtc.current
+
     val tiles = buildList {
         add(Triple(Icons.Filled.Category, "Stage Type", stage.type))
         stage.reused?.let { add(Triple(Icons.Filled.Repeat, "Reused", if (it) "Yes" else "No")) }
         stage.launcherFlightNumber?.let { add(Triple(Icons.Filled.Label, "Flight #", "$it")) }
-        stage.previousFlightDate?.let {
-            add(
-                Triple(
-                    Icons.Filled.Schedule,
-                    "Prev. Flight",
-                    me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(it, useUtc)
-                )
-            )
-        }
-        stage.turnAroundTime?.takeIf { it.isNotBlank() }
-            ?.let {
-                add(
-                    Triple(
-                        Icons.Filled.Timelapse,
-                        "Turnaround",
-                        parseIsoDurationToHumanReadable(it)
-                    )
-                )
-            }
-        landing?.landingLocation?.name?.let { add(Triple(Icons.Filled.LocationOn, "Location", it)) }
-        landing?.type?.name?.let { add(Triple(Icons.Filled.FlightLand, "Landing Type", it)) }
         landing?.downrangeDistance?.let {
             add(
                 Triple(
                     Icons.Filled.TrendingUp,
                     "Downrange",
-                    "${it} km"
+                    "$it km"
                 )
             )
         }
+        landing?.landingLocation?.name?.let { add(Triple(Icons.Filled.LocationOn, "Location", it)) }
+        landing?.type?.name?.let { add(Triple(Icons.Filled.FlightLand, "Landing Type", it)) }
         landing?.attempt?.let {
             add(
                 Triple(
@@ -2186,6 +2697,15 @@ private fun LandingStageGridContent(stage: FirstStageNormal) {
                     if (it) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
                     "Result",
                     if (it) "Success" else "Failure"
+                )
+            )
+        }
+        if (landing?.success == null) {
+            add(
+                Triple(
+                    Icons.Filled.ChangeCircle,
+                    "Result",
+                    "TBD"
                 )
             )
         }
@@ -2321,6 +2841,13 @@ private fun LandingStageLinearContent(stage: FirstStageNormal) {
                     value = parseIsoDurationToHumanReadable(it)
                 )
             }
+        landing?.downrangeDistance?.let {
+            InfoRow(
+                icon = Icons.Filled.TrendingUp,
+                label = "Downrange",
+                value = "${it} km"
+            )
+        }
         landing?.landingLocation?.name?.let {
             InfoRow(
                 icon = Icons.Filled.LocationOn,
@@ -2333,13 +2860,6 @@ private fun LandingStageLinearContent(stage: FirstStageNormal) {
                 icon = Icons.Filled.FlightLand,
                 label = "Landing Type",
                 value = it
-            )
-        }
-        landing?.downrangeDistance?.let {
-            InfoRow(
-                icon = Icons.Filled.TrendingUp,
-                label = "Downrange",
-                value = "${it} km"
             )
         }
         landing?.attempt?.let {
@@ -2356,6 +2876,13 @@ private fun LandingStageLinearContent(stage: FirstStageNormal) {
                 value = if (it) "Success" else "Failure"
             )
         }
+        if (landing?.success == null) {
+            InfoRow(
+                icon = Icons.Filled.CheckCircle,
+                label = "Result",
+                value = "TBD"
+            )
+        }
         landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
             Text(text = desc, style = MaterialTheme.typography.bodyMedium, lineHeight = 20.sp)
         }
@@ -2364,10 +2891,10 @@ private fun LandingStageLinearContent(stage: FirstStageNormal) {
 
 
 @Composable
-private fun AgencyDetailsCard(agency: AgencyDetailed) {
-    val sharingService = koinInject<LaunchSharingService>()
-    val coroutineScope = rememberCoroutineScope()
-
+private fun AgencyDetailsCard(
+    agency: AgencyDetailed,
+    openUrl: (String) -> Unit = { /* TODO: Implement for platform */ }
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -2375,49 +2902,53 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.Start
         ) {
             // Agency header (logo larger and centered)
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Agency logo
-                SubcomposeAsyncImage(
-                    model = agency.logo?.imageUrl ?: "",
-                    contentDescription = "Agency logo",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentScale = ContentScale.Fit,
-                    loading = {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Business,
-                                contentDescription = "Agency",
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
+                // Centered agency logo
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    SubcomposeAsyncImage(
+                        model = agency.logo?.imageUrl ?: "",
+                        contentDescription = "Agency logo",
+                        modifier = Modifier
+                            .height(200.dp),
+                        contentScale = ContentScale.Fit,
+                        loading = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Business,
+                                    contentDescription = "Agency",
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                )
+                            }
+                        },
+                        error = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Business,
+                                    contentDescription = "Agency",
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                )
+                            }
                         }
-                    },
-                    error = {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Business,
-                                contentDescription = "Agency",
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
-                        }
-                    }
-                )
+                    )
+                }
 
                 Text(
                     text = agency.name,
@@ -2429,24 +2960,34 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
             // Grid of key details (above countries)
             val infoTiles = buildList {
                 agency.type?.name?.takeIf { it.isNotBlank() }?.let {
-                    add(Triple(Icons.Filled.Business, "Type", it))
+                    add(InfoTileData(Icons.Filled.Business, "Type", it))
                 }
                 agency.foundingYear?.let { year ->
-                    add(Triple(Icons.Filled.CalendarToday, "Founded", year.toString()))
+                    add(InfoTileData(Icons.Filled.CalendarToday, "Founded", year.toString()))
                 }
                 agency.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
-                    add(Triple(Icons.Filled.Person, "Administrator", admin))
+                    add(InfoTileData(Icons.Filled.Person, "Administrator", admin))
+                }
+                if (agency.country.isNotEmpty() && agency.country.size == 1) {
+                    add(
+                        InfoTileData(
+                            icon = Icons.Filled.Flag,
+                            label = "Country",
+                            value = null,
+                            customComposable = { CountryChip(agency.country.first()) }
+                        ))
                 }
             }
             if (infoTiles.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    infoTiles.chunked(3).forEach { row ->
+                    infoTiles.chunked(2).forEach { row ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            row.forEach { (icon, label, value) ->
+                            row.forEach { tile ->
                                 InfoTile(
-                                    icon = icon,
-                                    label = label,
-                                    value = value,
+                                    icon = tile.icon,
+                                    label = tile.label,
+                                    value = tile.value,
+                                    customComposable = tile.customComposable,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
@@ -2457,50 +2998,9 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
             }
 
             // Countries as chips (moved below grid)
-            if (agency.country.isNotEmpty()) {
+            if (agency.country.isNotEmpty() && agency.country.size > 1) {
                 CountryInfoRow(countries = agency.country)
             }
-
-            // Action buttons
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                agency.infoUrl?.let { infoUrl ->
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                sharingService.shareUrl(infoUrl)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary
-                        )
-                    ) {
-                        Text("INFO")
-                    }
-                }
-
-                agency.wikiUrl?.let { wikiUrl ->
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                sharingService.shareUrl(wikiUrl)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary
-                        )
-                    ) {
-                        Text("WIKI")
-                    }
-                }
-            }
-
             // Agency description
             agency.description?.let { description ->
                 Text(
@@ -2514,6 +3014,40 @@ private fun AgencyDetailsCard(agency: AgencyDetailed) {
                     style = MaterialTheme.typography.bodyMedium,
                     lineHeight = 20.sp
                 )
+            }
+
+
+            // Info & Wiki links
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                agency.infoUrl?.let { url ->
+                    Button(
+                        onClick = { openUrl(url) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = FontAwesomeIcons.Solid.InfoCircle,
+                            contentDescription = "Information",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Website")
+                    }
+                }
+                agency.wikiUrl?.let { url ->
+                    Button(
+                        onClick = { openUrl(url) },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Icon(
+                            imageVector = FontAwesomeIcons.Brands.WikipediaW,
+                            contentDescription = "Wikipedia",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Wikipedia")
+                    }
+                }
             }
         }
     }

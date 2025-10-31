@@ -45,10 +45,10 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.brands.Discord
 import compose.icons.fontawesomeicons.brands.Github
-import kotlinproject.composeapp.generated.resources.Res
-import kotlinproject.composeapp.generated.resources.launcher
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import org.jetbrains.compose.resources.painterResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
