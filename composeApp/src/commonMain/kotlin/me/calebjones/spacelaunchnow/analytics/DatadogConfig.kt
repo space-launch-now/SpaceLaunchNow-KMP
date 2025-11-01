@@ -19,9 +19,9 @@ import me.calebjones.spacelaunchnow.util.EnvironmentManager
  */
 fun initializeDatadog(context: Any? = null) {
     // context should be application context on Android and can be null on iOS
-    val datadogEnabled = EnvironmentManager.getEnv("DATADOG_ENABLED", "false")
+    val datadogEnabled = EnvironmentManager.getEnvBoolean("DATADOG_ENABLED", false)
     print("Datadog Enabled: $datadogEnabled")
-    if (!datadogEnabled.toBoolean()) {
+    if (!datadogEnabled) {
         println("Datadog is disabled")
         return
     }
@@ -52,22 +52,13 @@ fun initializeDatadog(context: Any? = null) {
     val logsConfig = LogsConfiguration.Builder().build()
     Logs.enable(logsConfig)
 
-    val logger = Logger.Builder()
-        .setNetworkInfoEnabled(true)
-        .setPrintLogsToConsole(true)
-        .setRemoteSampleRate(100f)
-        .setBundleWithRumEnabled(true)
-        .setName("SLN")
-        .build()
+    // Initialize global logger
+    DatadogLogger.initialize()
 
-    logger.debug("A debug message.")
-    logger.info("Some relevant information?")
-    logger.warn("An important warning...")
-    logger.error("An error was met!")
-    logger.critical("What a Terrible Failure!")
-    println("YTESSSSSS QUEEEEEN MainApplication?")
-
-
+    DatadogLogger.info("Datadog initialized successfully", mapOf(
+        "environment" to appEnvironment,
+        "rum_enabled" to applicationId.isNotEmpty()
+    ))
 }
 
 fun initializeRum(applicationId: String) {
@@ -146,5 +137,50 @@ object DatadogRUM {
     fun clearUser() {
         Datadog.clearAllData()
         println("Datadog User Cleared")
+    }
+}
+
+/**
+ * Global Datadog Logger
+ * Use this for logging throughout the application
+ */
+object DatadogLogger {
+    private var logger: Logger? = null
+
+    fun initialize() {
+        logger = Logger.Builder()
+            .setNetworkInfoEnabled(true)
+            .setPrintLogsToConsole(true)
+            .setRemoteSampleRate(100f)
+            .setBundleWithRumEnabled(true)
+            .setName("SLN")
+            .build()
+    }
+
+    fun debug(message: String, attributes: Map<String, Any?> = emptyMap()) {
+        logger?.debug(message, null, attributes)
+        println("DEBUG: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
+    }
+
+    fun info(message: String, attributes: Map<String, Any?> = emptyMap()) {
+        logger?.info(message, null, attributes)
+        println("INFO: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
+    }
+
+    fun warn(message: String, attributes: Map<String, Any?> = emptyMap()) {
+        logger?.warn(message, null, attributes)
+        println("WARN: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
+    }
+
+    fun error(message: String, throwable: Throwable? = null, attributes: Map<String, Any?> = emptyMap()) {
+        logger?.error(message, throwable, attributes)
+        println("ERROR: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
+        throwable?.printStackTrace()
+    }
+
+    fun critical(message: String, throwable: Throwable? = null, attributes: Map<String, Any?> = emptyMap()) {
+        logger?.critical(message, throwable, attributes)
+        println("CRITICAL: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
+        throwable?.printStackTrace()
     }
 }

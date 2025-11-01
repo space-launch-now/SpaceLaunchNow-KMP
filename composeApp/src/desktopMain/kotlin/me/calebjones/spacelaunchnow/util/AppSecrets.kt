@@ -12,4 +12,10 @@ actual object AppSecrets {
     actual val iosInterstitialAdUnitId: String = ""
     actual val androidRewardedAdUnitId: String = ""
     actual val iosRewardedAdUnitId: String = ""
+
+    // Datadog configuration (Desktop doesn't use Datadog, so empty/default values)
+    actual val datadogEnabled: Boolean = false
+    actual val dataDogClientToken: String = ""
+    actual val dataDogApplicationId: String = ""
+    actual val dataDogEnv: String = "development"
 }

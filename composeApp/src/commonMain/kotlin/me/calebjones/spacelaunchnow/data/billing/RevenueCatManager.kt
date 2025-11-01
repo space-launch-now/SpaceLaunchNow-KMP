@@ -8,6 +8,8 @@ import com.revenuecat.purchases.kmp.models.Offering
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import me.calebjones.spacelaunchnow.analytics.DatadogLogger
+import me.calebjones.spacelaunchnow.analytics.DatadogRUM
 import me.calebjones.spacelaunchnow.data.config.RevenueCatConfig
 
 /**
@@ -73,16 +75,45 @@ class RevenueCatManager {
             if (!_isInitialized.value) return
 
             Purchases.sharedInstance.getCustomerInfo(
-                onError = { error -> println("RevenueCat: Failed to get customer info - ${error.message}") },
+                onError = { error -> 
+                    println("RevenueCat: Failed to get customer info - ${error.message}")
+                    DatadogLogger.error("Failed to get RevenueCat customer info", null, mapOf(
+                        "error_message" to (error.message ?: "unknown"),
+                        "error_code" to error.code.name
+                    ))
+                },
                 onSuccess = { customerInfo ->
                     _customerInfo.value = customerInfo
                     println("RevenueCat: Customer info refreshed")
                     println("  - Active entitlements: ${customerInfo.entitlements.active.keys}")
+                    
+                    // Set user info in Datadog for tracking
+                    val userId = customerInfo.originalAppUserId
+                    val activeEntitlements = customerInfo.entitlements.active.keys.joinToString(",")
+                    val activeSubscriptions = customerInfo.activeSubscriptions.joinToString(",")
+                    
+                    DatadogRUM.setUser(
+                        id = userId,
+                        extraInfo = mapOf(
+                            "platform" to RevenueCatConfig.platform,
+                            "active_entitlements" to activeEntitlements,
+                            "active_subscriptions" to activeSubscriptions,
+                            "has_premium" to customerInfo.entitlements.active.containsKey("premium"),
+                            "first_seen" to customerInfo.firstSeen.toString()
+                        )
+                    )
+                    
+                    DatadogLogger.info("Customer info refreshed", mapOf(
+                        "user_id" to userId,
+                        "active_entitlements" to activeEntitlements,
+                        "active_subscriptions" to activeSubscriptions
+                    ))
                 }
             )
 
         } catch (e: Exception) {
             println("RevenueCat: Failed to refresh customer info - ${e.message}")
+            DatadogLogger.error("Exception refreshing customer info", e)
         }
     }
 
@@ -191,15 +222,27 @@ class RevenueCatManager {
         try {
             if (!_isInitialized.value) {
                 println("RevenueCat: Cannot restore - not initialized")
+                DatadogLogger.warn("Restore purchases called but SDK not initialized")
                 return
             }
 
             println("RevenueCat: Starting restore purchases...")
+            DatadogLogger.info("Restore purchases started", mapOf(
+                "user_id" to (_customerInfo.value?.originalAppUserId ?: "unknown")
+            ))
+            
             Purchases.sharedInstance.restorePurchases(
                 onError = { error ->
                     println("RevenueCat: ❌ Restore purchases failed - ${error.message}")
                     println("  Error code: ${error.code}")
                     println("  Underlying error: ${error.underlyingErrorMessage}")
+                    
+                    DatadogLogger.error("Restore purchases failed", null, mapOf(
+                        "error_message" to (error.message ?: "unknown"),
+                        "error_code" to error.code.name,
+                        "underlying_error" to (error.underlyingErrorMessage ?: "none"),
+                        "user_id" to (_customerInfo.value?.originalAppUserId ?: "unknown")
+                    ))
                 },
                 onSuccess = { customerInfo ->
                     _customerInfo.value = customerInfo
@@ -220,12 +263,62 @@ class RevenueCatManager {
                         allProducts.add(productId)
                     }
                     println("  Total active products found: ${allProducts.size} - $allProducts")
+                    
+                    // Detailed Datadog logging for debugging user issues
+                    val entitlementDetails = customerInfo.entitlements.active.entries.associate { (key, value) ->
+                        key to mapOf(
+                            "product_id" to (value.productIdentifier ?: "unknown"),
+                            "is_active" to value.isActive,
+                            "will_renew" to value.willRenew,
+                            "period_type" to value.periodType.name,
+                            "expires_date" to (value.expirationDate?.toString() ?: "never")
+                        )
+                    }
+                    
+                    val nonSubTransactions = customerInfo.nonSubscriptionTransactions.map { transaction ->
+                        mapOf(
+                            "product_id" to transaction.productIdentifier,
+                            "purchase_date" to transaction.purchaseDate.toString(),
+                            "store_transaction_id" to transaction.transactionIdentifier
+                        )
+                    }
+                    
+                    DatadogLogger.info("Restore purchases successful", mapOf(
+                        "user_id" to customerInfo.originalAppUserId,
+                        "total_products_found" to allProducts.size,
+                        "all_products" to allProducts.joinToString(","),
+                        "active_entitlements" to customerInfo.entitlements.active.keys.joinToString(","),
+                        "active_subscriptions" to customerInfo.activeSubscriptions.joinToString(","),
+                        "non_subscription_count" to customerInfo.nonSubscriptionTransactions.size,
+                        "entitlement_details" to entitlementDetails.toString(),
+                        "non_subscription_details" to nonSubTransactions.toString(),
+                        "management_url" to (customerInfo.managementUrlString),
+                        "original_purchase_date" to (customerInfo.originalPurchaseDate?.toString() ?: "unknown"),
+                        "first_seen" to customerInfo.firstSeen.toString()
+                    ))
+                    
+                    // Update Datadog user info with restored purchase data
+                    DatadogRUM.setUser(
+                        id = customerInfo.originalAppUserId,
+                        extraInfo = mapOf(
+                            "platform" to RevenueCatConfig.platform,
+                            "active_entitlements" to customerInfo.entitlements.active.keys.joinToString(","),
+                            "active_subscriptions" to customerInfo.activeSubscriptions.joinToString(","),
+                            "total_products" to allProducts.size,
+                            "has_premium" to customerInfo.entitlements.active.containsKey("premium"),
+                            "has_legacy_purchase" to (customerInfo.nonSubscriptionTransactions.isNotEmpty())
+                        )
+                    )
                 }
             )
 
         } catch (e: Exception) {
             println("RevenueCat: ❌ Failed to restore purchases - ${e.message}")
             e.printStackTrace()
+            
+            DatadogLogger.error("Exception during restore purchases", e, mapOf(
+                "user_id" to (_customerInfo.value?.originalAppUserId ?: "unknown")
+            ))
         }
     }
 

@@ -104,6 +104,8 @@ kotlin {
 
                 // JDK cryptography provider for Desktop
                 implementation(libs.cryptography.provider.jdk)
+
+
             }
         }
 
@@ -234,6 +236,12 @@ kotlin {
 
                 implementation(libs.dd.sdk.kotlin.multiplatform.rum)
                 implementation(libs.dd.sdk.kotlin.multiplatform.logs)
+
+                // TODO remove
+                implementation(libs.purchases.core)
+                implementation(libs.purchases.ui)
+                implementation(libs.purchases.either)
+                implementation(libs.purchases.result)
 
             }
         }

@@ -467,6 +467,11 @@ fun SupportUsScreen(
                 }
             }
 
+            // RevenueCat User ID for Support
+            item {
+                RevenueCatUserIdCard(viewModel = viewModel)
+            }
+
             // Fine Print
             item {
                 Spacer(Modifier.height(24.dp))
@@ -988,6 +993,24 @@ private fun SuccessCard(message: String) {
             )
         }
     }
+}
+
+@Composable
+private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
+    val revenueCatManager = koinInject<me.calebjones.spacelaunchnow.data.billing.RevenueCatManager>()
+    val customerInfo by revenueCatManager.customerInfo.collectAsState()
+    
+    val userId = customerInfo?.originalAppUserId ?: "Not available"
+    
+    Text(
+        text = "User ID: $userId",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+    )
 }
 
 @Composable

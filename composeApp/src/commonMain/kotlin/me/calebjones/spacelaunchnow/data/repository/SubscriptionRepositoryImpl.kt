@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.time.Clock.System
+import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
@@ -154,10 +155,20 @@ class SubscriptionRepositoryImpl(
         // Skip if recently verified and not forcing refresh
         if (!forceRefresh && currentState.isRecentlyVerified() && !currentState.needsVerification) {
             println("SubscriptionRepository: Using recently verified state")
+            DatadogLogger.debug("Using cached subscription state", mapOf(
+                "subscription_type" to currentState.subscriptionType.name,
+                "is_subscribed" to currentState.isSubscribed
+            ))
             return Result.success(currentState)
         }
 
         println("SubscriptionRepository: Verifying subscription with platform...")
+        DatadogLogger.info("Starting subscription verification", mapOf(
+            "force_refresh" to forceRefresh,
+            "current_subscription_type" to currentState.subscriptionType.name,
+            "needs_verification" to currentState.needsVerification
+        ))
+        
         _state.value = currentState.copy(isLoading = true)
 
         return try {
@@ -166,15 +177,28 @@ class SubscriptionRepositoryImpl(
 
             purchasesResult.fold(
                 onSuccess = { purchases ->
+                    DatadogLogger.info("Platform billing query successful", mapOf(
+                        "purchases_count" to purchases.size,
+                        "purchase_tokens" to purchases.map { it.purchaseToken }.joinToString(",")
+                    ))
+                    
                     var newState = processVerifiedPurchases(purchases)
 
                     // If no purchases found via billing client, check RevenueCat for legacy purchases
                     if (!newState.isSubscribed) {
                         println("SubscriptionRepository: No purchases from billing client, checking RevenueCat for legacy purchases...")
+                        DatadogLogger.info("No active purchases from billing client, checking RevenueCat for legacy purchases")
+                        
                         val legacyState = checkForLegacyPurchasesInRevenueCat()
                         if (legacyState != null) {
                             println("SubscriptionRepository: Found legacy purchase in RevenueCat")
+                            DatadogLogger.info("Legacy purchase found in RevenueCat", mapOf(
+                                "subscription_type" to legacyState.subscriptionType.name,
+                                "features" to legacyState.features.joinToString(",") { it.name }
+                            ))
                             newState = legacyState
+                        } else {
+                            DatadogLogger.info("No legacy purchases found in RevenueCat")
                         }
                     }
 
@@ -183,20 +207,36 @@ class SubscriptionRepositoryImpl(
                     storage.saveState(newState)
 
                     println("SubscriptionRepository: Verification complete - isSubscribed: ${newState.isSubscribed}")
+                    DatadogLogger.info("Subscription verification complete", mapOf(
+                        "is_subscribed" to newState.isSubscribed,
+                        "subscription_type" to newState.subscriptionType.name,
+                        "features" to newState.features.joinToString(",") { it.name },
+                        "has_premium" to newState.hasFeature(PremiumFeature.AD_FREE)
+                    ))
+                    
                     Result.success(newState)
                 },
                 onFailure = { error ->
                     println("SubscriptionRepository: Verification failed - ${error.message}")
+                    DatadogLogger.error("Platform billing query failed", error, mapOf(
+                        "error_message" to (error.message ?: "unknown")
+                    ))
 
                     // Check RevenueCat for legacy purchases as fallback
+                    DatadogLogger.info("Attempting RevenueCat fallback after billing error")
                     val legacyState = checkForLegacyPurchasesInRevenueCat()
                     if (legacyState != null) {
                         println("SubscriptionRepository: Found legacy purchase in RevenueCat despite billing error")
+                        DatadogLogger.info("Legacy purchase found despite billing error", mapOf(
+                            "subscription_type" to legacyState.subscriptionType.name
+                        ))
                         _state.value = legacyState
                         storage.saveState(legacyState)
                         return Result.success(legacyState)
                     }
 
+                    DatadogLogger.warn("No fallback purchases found, using cached state with error")
+                    
                     // Use cached state but mark as needing verification
                     val errorState = currentState.copy(
                         isLoading = false,
@@ -254,16 +294,58 @@ class SubscriptionRepositoryImpl(
 
     override suspend fun restorePurchases(): Result<SubscriptionState> {
         println("SubscriptionRepository: Restoring purchases...")
+        DatadogLogger.info("Restore purchases flow started in SubscriptionRepository", mapOf(
+            "current_state" to _state.value.subscriptionType.name,
+            "is_subscribed" to _state.value.isSubscribed
+        ))
         
-        // First, call RevenueCat's restore which syncs all platform purchases to RevenueCat
-        println("SubscriptionRepository: Calling RevenueCat.restorePurchases() to sync platform purchases...")
-        revenueCatManager.restorePurchases()
-        
-        // Wait a moment for RevenueCat to sync
-        delay(1000)
-        
-        // Then verify to get the updated state
-        return verifySubscription(forceRefresh = true)
+        try {
+            // First, call RevenueCat's restore which syncs all platform purchases to RevenueCat
+            println("SubscriptionRepository: Calling RevenueCat.restorePurchases() to sync platform purchases...")
+            DatadogLogger.info("Calling RevenueCat.restorePurchases() to sync with platform store")
+            
+            revenueCatManager.restorePurchases()
+            
+            // Wait a moment for RevenueCat to sync
+            println("SubscriptionRepository: Waiting for RevenueCat sync to complete...")
+            delay(1000)
+            
+            // Then verify to get the updated state
+            println("SubscriptionRepository: Verifying subscription after restore...")
+            DatadogLogger.info("Verifying subscription after restore")
+            
+            val result = verifySubscription(forceRefresh = true)
+            
+            result.fold(
+                onSuccess = { state ->
+                    DatadogLogger.info("Restore purchases completed successfully", mapOf(
+                        "new_state" to state.subscriptionType.name,
+                        "is_subscribed" to state.isSubscribed,
+                        "has_features" to state.features.isNotEmpty(),
+                        "features" to state.features.joinToString(",") { it.name },
+                        "verification_source" to (state.verificationError ?: "none")
+                    ))
+                },
+                onFailure = { error ->
+                    DatadogLogger.error("Restore purchases failed during verification", error, mapOf(
+                        "error_message" to (error.message ?: "unknown")
+                    ))
+                }
+            )
+            
+            return result
+            
+        } catch (e: Exception) {
+            println("SubscriptionRepository: Exception during restore - ${e.message}")
+            e.printStackTrace()
+            
+            DatadogLogger.error("Exception during restore purchases flow", e, mapOf(
+                "error_message" to (e.message ?: "unknown"),
+                "error_type" to e::class.simpleName
+            ))
+            
+            return Result.failure(e)
+        }
     }
 
     override suspend fun getProductPricing(productId: String): Result<List<me.calebjones.spacelaunchnow.data.model.ProductPricing>> {

@@ -15,7 +15,7 @@ actual object AppSecrets {
     actual val androidRewardedAdUnitId: String = BuildConfig.ANDROID_REWARDED_AD_UNIT_ID
     actual val iosRewardedAdUnitId: String = BuildConfig.IOS_REWARDED_AD_UNIT_ID
 
-    actual val datadogEnabled: String = BuildConfig.DATADOG_ENABLED
+    actual val datadogEnabled: Boolean = BuildConfig.DATADOG_ENABLED
     actual val dataDogClientToken: String = BuildConfig.DATADOG_CLIENT_TOKEN
     actual val dataDogApplicationId: String = BuildConfig.DATADOG_APPLICATION_ID
     actual val dataDogEnv: String = BuildConfig.DATADOG_ENVIRONMENT

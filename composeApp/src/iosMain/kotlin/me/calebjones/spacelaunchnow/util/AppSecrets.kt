@@ -69,6 +69,34 @@ actual object AppSecrets {
             println("🔑 AppSecrets.iosRewardedAdUnitId: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
             return key
         }
+
+    actual val datadogEnabled: Boolean
+        get() {
+            val key = getStringResource("Secrets", "plist", "datadogEnabled") ?: "false"
+            println("🔑 AppSecrets.datadogEnabled: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key.lowercase() == "true"
+        }
+
+    actual val dataDogClientToken: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "dataDogClientToken") ?: ""
+            println("🔑 AppSecrets.dataDogClientToken: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
+
+    actual val dataDogApplicationId: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "dataDogApplicationId") ?: ""
+            println("🔑 AppSecrets.dataDogApplicationId: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
+
+    actual val dataDogEnv: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "dataDogEnv") ?: "production"
+            println("🔑 AppSecrets.dataDogEnv: ${if (key.isNotEmpty()) "✅ loaded" else "❌ EMPTY"}")
+            return key
+        }
 }
 
 internal fun getStringResource(filename: String, fileType: String, valueKey: String): String? {

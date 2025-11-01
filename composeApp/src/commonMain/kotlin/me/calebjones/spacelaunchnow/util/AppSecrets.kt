@@ -13,7 +13,7 @@ expect object AppSecrets {
     val androidRewardedAdUnitId: String
     val iosRewardedAdUnitId: String
 
-    val datadogEnabled: String
+    val datadogEnabled: Boolean
     val dataDogClientToken: String
     val dataDogApplicationId: String
     val dataDogEnv: String
