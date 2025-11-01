@@ -1,11 +1,13 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
 import app.lexilabs.basic.ads.BasicAds
+import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.RequestConfiguration
 
 /**
  * iOS implementation of AdInitializer using BasicAds library
  */
+@OptIn(DependsOnGoogleMobileAds::class)
 actual object AdInitializer {
     actual val isSupported: Boolean = true
     
@@ -33,10 +35,10 @@ actual object AdInitializer {
     actual fun configure(isDebug: Boolean, testDeviceIds: List<String>) {
         try {
             BasicAds.configuration = RequestConfiguration(
-                maxAdContentRating = null,
-                publisherPrivacyPersonalizationState = RequestConfiguration.PublisherPrivacyPersonalizationState.DEFAULT,
-                tagForChildDirectedTreatment = 0,
-                tagForUnderAgeOfConsent = 0,
+                maxAdContentRating = RequestConfiguration.MAX_AD_CONTENT_RATING_T,
+                publisherPrivacyPersonalizationState = RequestConfiguration.PublisherPrivacyPersonalizationState.ENABLED,
+                tagForChildDirectedTreatment = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE,
+                tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE,
                 testDeviceIds = testDeviceIds
             )
             println("✅ AdInitializer (iOS): Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})")

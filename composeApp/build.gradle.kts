@@ -104,6 +104,8 @@ kotlin {
 
                 // JDK cryptography provider for Desktop
                 implementation(libs.cryptography.provider.jdk)
+
+
             }
         }
 
@@ -231,6 +233,16 @@ kotlin {
 
                 // Cryptography library for secure hashing
                 implementation(libs.cryptography.core)
+
+                implementation(libs.dd.sdk.kotlin.multiplatform.rum)
+                implementation(libs.dd.sdk.kotlin.multiplatform.logs)
+
+                // TODO remove
+                implementation(libs.purchases.core)
+                implementation(libs.purchases.ui)
+                implementation(libs.purchases.either)
+                implementation(libs.purchases.result)
+
             }
         }
 
@@ -283,26 +295,43 @@ android {
         val apiKey = envProps.getProperty("API_KEY") ?: ""
         val revenueCatAndroidKey = envProps.getProperty("REVENUECAT_ANDROID_KEY") ?: ""
         val revenueCatIosKey = envProps.getProperty("REVENUECAT_IOS_KEY") ?: ""
-        
+
         // AdMob ad unit IDs
         val androidBannerAdUnitId = envProps.getProperty("ANDROID_BANNER_AD_UNIT_ID") ?: ""
         val iosBannerAdUnitId = envProps.getProperty("IOS_BANNER_AD_UNIT_ID") ?: ""
-        val androidInterstitialAdUnitId = envProps.getProperty("ANDROID_INTERSTITIAL_AD_UNIT_ID") ?: ""
+        val androidInterstitialAdUnitId =
+            envProps.getProperty("ANDROID_INTERSTITIAL_AD_UNIT_ID") ?: ""
         val iosInterstitialAdUnitId = envProps.getProperty("IOS_INTERSTITIAL_AD_UNIT_ID") ?: ""
         val androidRewardedAdUnitId = envProps.getProperty("ANDROID_REWARDED_AD_UNIT_ID") ?: ""
         val iosRewardedAdUnitId = envProps.getProperty("IOS_REWARDED_AD_UNIT_ID") ?: ""
 
+        // Datadog configuration
+        val datadogClientToken = envProps.getProperty("DATADOG_CLIENT_TOKEN") ?: ""
+        val datadogApplicationId = envProps.getProperty("DATADOG_APPLICATION_ID") ?: ""
+        val datadogEnabled = envProps.getProperty("DATADOG_ENABLED") ?: "false"
+        val datadogEnvironment = envProps.getProperty("DATADOG_ENVIRONMENT") ?: "production"
+
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         buildConfigField("String", "REVENUECAT_ANDROID_KEY", "\"$revenueCatAndroidKey\"")
         buildConfigField("String", "REVENUECAT_IOS_KEY", "\"$revenueCatIosKey\"")
-        
+
         // AdMob ad unit IDs
         buildConfigField("String", "ANDROID_BANNER_AD_UNIT_ID", "\"$androidBannerAdUnitId\"")
         buildConfigField("String", "IOS_BANNER_AD_UNIT_ID", "\"$iosBannerAdUnitId\"")
-        buildConfigField("String", "ANDROID_INTERSTITIAL_AD_UNIT_ID", "\"$androidInterstitialAdUnitId\"")
+        buildConfigField(
+            "String",
+            "ANDROID_INTERSTITIAL_AD_UNIT_ID",
+            "\"$androidInterstitialAdUnitId\""
+        )
         buildConfigField("String", "IOS_INTERSTITIAL_AD_UNIT_ID", "\"$iosInterstitialAdUnitId\"")
         buildConfigField("String", "ANDROID_REWARDED_AD_UNIT_ID", "\"$androidRewardedAdUnitId\"")
         buildConfigField("String", "IOS_REWARDED_AD_UNIT_ID", "\"$iosRewardedAdUnitId\"")
+
+        // Datadog configuration
+        buildConfigField("String", "DATADOG_CLIENT_TOKEN", "\"$datadogClientToken\"")
+        buildConfigField("String", "DATADOG_APPLICATION_ID", "\"$datadogApplicationId\"")
+        buildConfigField("boolean", "DATADOG_ENABLED", "$datadogEnabled")
+        buildConfigField("String", "DATADOG_ENVIRONMENT", "\"$datadogEnvironment\"")
 
         // Add version information to BuildConfig
         buildConfigField("String", "VERSION_NAME", "\"${computeVersionName()}\"")
@@ -312,7 +341,7 @@ android {
         versionName = computeVersionName()
         manifestPlaceholders["appName"] = "Space Launch Now"
     }
-    
+
     // Bundle configuration for 16KB optimization
     bundle {
         language {

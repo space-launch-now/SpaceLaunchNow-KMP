@@ -2,11 +2,11 @@ package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.composable.InterstitialAd
@@ -38,7 +38,7 @@ actual fun InterstitialAdHandler(
     // Get subscription state to check if it's still loading
     val subscriptionRepo =
         koinInject<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
-    val subscriptionState by subscriptionRepo.state.collectAsState()
+    val subscriptionState by subscriptionRepo.state.collectAsStateWithLifecycle()
 
     // 🚀 USE PRELOADED AD: Get preloaded interstitial ad from CompositionLocal
     val preloadedInterstitialAd = LocalPreloadedInterstitialAd.current

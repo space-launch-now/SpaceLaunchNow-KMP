@@ -10,6 +10,7 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
+		3C2B8C842EB3C13800CB87C4 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 3C2B8C832EB3C13800CB87C4 /* GoogleMobileAds */; };
 		3C2F71422E936FBD0026D5CD /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2F711B2E936F980026D5CD /* WidgetKit.framework */; };
 		3C2F71432E936FBD0026D5CD /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2F711D2E936F980026D5CD /* SwiftUI.framework */; };
 		3C2F71672E9379750026D5CD /* ComposeApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2F71662E9379750026D5CD /* ComposeApp.framework */; };
@@ -104,6 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C2B8C842EB3C13800CB87C4 /* GoogleMobileAds in Frameworks */,
 				3C2F71672E9379750026D5CD /* ComposeApp.framework in Frameworks */,
 				3C2F71432E936FBD0026D5CD /* SwiftUI.framework in Frameworks */,
 				3C35B9622EA9816900E28A01 /* PurchasesHybridCommonUI in Frameworks */,
@@ -219,6 +221,7 @@
 			packageProductDependencies = (
 				3C35B95F2EA9816900E28A01 /* PurchasesHybridCommon */,
 				3C35B9612EA9816900E28A01 /* PurchasesHybridCommonUI */,
+				3C2B8C832EB3C13800CB87C4 /* GoogleMobileAds */,
 			);
 			productName = LaunchWidgetExtension;
 			productReference = 3C2F71412E936FBD0026D5CD /* LaunchWidgetExtension.appex */;
@@ -727,6 +730,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3C2B8C832EB3C13800CB87C4 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3C35B9592EA97E1B00E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
 		3C35B95A2EA97E1B00E28A01 /* GoogleMobileAds */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3C35B9592EA97E1B00E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;

@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.initializeDatadog
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
@@ -63,9 +64,21 @@ class MainApplication : Application() {
             Log.e("MainApplication", "Failed to start Koin", e)
             throw e
         }
+        
+        // Initialize Datadog analytics using KMP SDK
+        Log.d("MainApplication", "Initializing Datadog...")
+        try {
+            // initializeDatadog reads from .env file via EnvironmentManager
+            initializeDatadog(context = this)
+            Log.d("MainApplication", "✅ Datadog initialized successfully")
+        } catch (e: Exception) {
+            Log.e("MainApplication", "❌ Failed to initialize Datadog", e)
+            // Don't crash the app if Datadog fails
+        }
 
         // Initialize RevenueCat after Koin is ready
         Log.d("MainApplication", "Initializing RevenueCat...")
+        
         @Suppress("OPT_IN_USAGE")
         kotlinx.coroutines.GlobalScope.launch {
             try {
@@ -79,10 +92,12 @@ class MainApplication : Application() {
         }
 
         Log.d("MainApplication", "Creating notification channels...")
+        
         // Create notification channels for Android O+
         NotificationDisplayHelper.createNotificationChannels(this)
 
         Log.d("MainApplication", "Scheduling widget updates...")
+        
         // Schedule widget updates
         scheduleWidgetUpdates()
 

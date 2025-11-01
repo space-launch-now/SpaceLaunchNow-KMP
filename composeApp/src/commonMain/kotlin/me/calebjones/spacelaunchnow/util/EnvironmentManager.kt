@@ -15,6 +15,19 @@ object EnvironmentManager {
             "API_KEY" -> AppSecrets.apiKey
             "REVENUECAT_ANDROID_KEY" -> AppSecrets.revenueCatAndroidKey
             "REVENUECAT_IOS_KEY" -> AppSecrets.revenueCatIosKey
+            "DATADOG_CLIENT_TOKEN" -> AppSecrets.dataDogClientToken
+            "DATADOG_APPLICATION_ID" -> AppSecrets.dataDogApplicationId
+            "DATADOG_ENVIRONMENT" -> AppSecrets.dataDogEnv
+            else -> defaultValue
+        }
+    }
+
+    /**
+     * Gets a boolean environment variable
+     */
+    fun getEnvBoolean(key: String, defaultValue: Boolean = false): Boolean {
+        return when (key) {
+            "DATADOG_ENABLED" -> AppSecrets.datadogEnabled
             else -> defaultValue
         }
     }
