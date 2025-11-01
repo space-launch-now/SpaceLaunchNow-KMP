@@ -15,6 +15,10 @@ object EnvironmentManager {
             "API_KEY" -> AppSecrets.apiKey
             "REVENUECAT_ANDROID_KEY" -> AppSecrets.revenueCatAndroidKey
             "REVENUECAT_IOS_KEY" -> AppSecrets.revenueCatIosKey
+            "DATADOG_ENABLED" -> AppSecrets.datadogEnabled
+            "DATADOG_CLIENT_TOKEN" -> AppSecrets.dataDogClientToken
+            "DATADOG_APPLICATION_ID" -> AppSecrets.dataDogApplicationId
+            "DATADOG_ENVIRONMENT" -> AppSecrets.dataDogEnv
             else -> defaultValue
         }
     }

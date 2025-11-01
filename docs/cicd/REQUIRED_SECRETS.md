@@ -73,7 +73,39 @@ Configure these secrets in GitHub repository **Settings → Secrets and variable
 
 ---
 
-## 📱 Android Secrets
+## � Datadog Analytics (⚠️ NEW - Optional but Recommended)
+
+| Secret Name | Type | Description |
+|------------|------|-------------|
+| `DATADOG_CLIENT_TOKEN` | string | Datadog client token for RUM & Logs |
+| `DATADOG_APPLICATION_ID` | string | Datadog RUM application ID |
+| `DATADOG_ENABLED` | boolean | Enable/disable Datadog tracking (default: true) |
+| `DATADOG_ENVIRONMENT` | string | Environment name (production/staging/dev) |
+
+**Where to get:**
+1. Go to https://app.datadoghq.com/organization-settings/client-tokens
+2. Create a new **Client Token** (or use existing)
+3. Go to https://app.datadoghq.com/rum/application/create
+4. Create a new RUM Application
+5. Copy the **Application ID**
+
+**Important Notes:**
+- ✅ Client Token is safe to embed in apps (public token)
+- ✅ Application ID identifies your app in Datadog
+- ✅ Set `DATADOG_ENABLED=false` to disable tracking
+- ✅ Use different Application IDs for production/staging
+- 📊 Free tier: 10,000 sessions/month
+- 📊 See [DATADOG_INTEGRATION.md](../DATADOG_INTEGRATION.md) for full setup
+
+**Optional Settings:**
+```bash
+DATADOG_ENABLED=true                    # Enable/disable tracking
+DATADOG_ENVIRONMENT=production          # Environment tag
+```
+
+---
+
+## �📱 Android Secrets
 
 ### Firebase
 

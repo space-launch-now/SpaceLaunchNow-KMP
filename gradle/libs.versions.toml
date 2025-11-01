@@ -24,6 +24,8 @@ compose-material3 = "1.4.0"
 compose-material3-adaptive = "1.1.2"
 compose-hot-reload = "1.0.0-beta08"
 coreSplashscreen = "1.0.1"
+ddSdkKotlinMultiplatformLogs = "1.4.0"
+ddSdkKotlinMultiplatformRum = "1.4.0"
 insetsx = "0.1.0-alpha10"
 junit = "4.13.2"
 kotlin = "2.2.20"
@@ -74,11 +76,17 @@ basic-ads = "0.2.7"
 google-play-services-ads = "23.6.0"
 android-ump = "3.1.0"
 
+# Datadog RUM & Logs for KMP
+datadog-sdk-android = "2.20.0"
+datadog-sdk-ios = "2.26.0"
+
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billingKtx" }
+dd-sdk-kotlin-multiplatform-logs = { module = "com.datadoghq:dd-sdk-kotlin-multiplatform-logs", version.ref = "ddSdkKotlinMultiplatformLogs" }
+dd-sdk-kotlin-multiplatform-rum = { module = "com.datadoghq:dd-sdk-kotlin-multiplatform-rum", version.ref = "ddSdkKotlinMultiplatformRum" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktorClientMock" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
@@ -192,6 +200,12 @@ shadowglow = { module = "me.trishiraj:shadowglow", version.ref = "shadowglow" }
 basicAds = { module = "app.lexilabs.basic:basic-ads", version.ref = "basic-ads" }
 googleAds = { module = "com.google.android.gms:play-services-ads", version.ref = "google-play-services-ads" }
 androidUmp = { module = "com.google.android.ump:user-messaging-platform", version.ref = "android-ump" }
+
+# Datadog RUM & Logs
+datadog-sdk-android-core = { module = "com.datadoghq:dd-sdk-android-core", version.ref = "datadog-sdk-android" }
+datadog-sdk-android-logs = { module = "com.datadoghq:dd-sdk-android-logs", version.ref = "datadog-sdk-android" }
+datadog-sdk-android-rum = { module = "com.datadoghq:dd-sdk-android-rum", version.ref = "datadog-sdk-android" }
+datadog-sdk-android-trace = { module = "com.datadoghq:dd-sdk-android-trace", version.ref = "datadog-sdk-android" }
 
 
 [bundles]
