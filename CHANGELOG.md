@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b11...v5.0.0) (2025-11-01)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b12...v5.0.0) (2025-11-02)
+
+
+### Features
+
+* add Datadog configuration to CI/CD workflows and document required secrets ([fd7afeb](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/fd7afebb6047de168f214366b77d064c63ef3c7a))
+
+
+
+# [5.0.0-b12](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b11...v5.0.0-b12) (2025-11-01)
 
 
 ### Features
@@ -26,15 +35,6 @@
 ### Features
 
 * Prevent infinite loops by checking subscription state before update ([d5cec27](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/d5cec2729169856c154f910dc97d4296d23786ea))
-
-
-
-# [5.0.0-b8](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b7...v5.0.0-b8) (2025-10-30)
-
-
-### Features
-
-* Implement Direct Android Billing Client for testing custom SKU purchases ([941b177](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/941b177c692dc72eee2b5e3f58607c365571a6e7))
 
 
 
