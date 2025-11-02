@@ -45,6 +45,10 @@ jobs:
           IOS_INTERSTITIAL_AD_UNIT_ID=${{ secrets.IOS_INTERSTITIAL_AD_UNIT_ID }}
           ANDROID_REWARDED_AD_UNIT_ID=${{ secrets.ANDROID_REWARDED_AD_UNIT_ID }}
           IOS_REWARDED_AD_UNIT_ID=${{ secrets.IOS_REWARDED_AD_UNIT_ID }}
+          DATADOG_ENABLED=${{ secrets.DATADOG_ENABLED }}
+          DATADOG_CLIENT_TOKEN=${{ secrets.DATADOG_CLIENT_TOKEN }}
+          DATADOG_APPLICATION_ID=${{ secrets.DATADOG_APPLICATION_ID }}
+          DATADOG_ENVIRONMENT=${{ secrets.DATADOG_ENVIRONMENT }}
           EOF
 
       - name: Decode Google Services JSON
