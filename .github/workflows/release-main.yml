@@ -310,9 +310,9 @@ jobs:
             composeApp/build/outputs/mapping/release/mapping.txt
           retention-days: 90
 
-  # Job 5: Deploy to Google Play Store and Firebase (after AAB build completes)
-  deploy:
-    name: Deploy to Play Store & Firebase
+  # Job 5: Deploy to Google Play Store (after AAB build completes)
+  deploy-play-store:
+    name: Deploy to Play Store
     needs: [ version, build-aab ]
     runs-on: ubuntu-latest
     
@@ -360,6 +360,47 @@ jobs:
           mappingFile: ${{ steps.artifacts.outputs.mapping }}
           whatsNewDirectory: docs/release-notes/whatsnew/
 
+      - name: Play Store Deployment Summary
+        run: |
+          echo "## 🎯 Google Play Store Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version Code:** ${{ needs.version.outputs.version_code }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Track:** Internal (Alpha)" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
+
+  # Job 6: Deploy to Firebase Distribution (parallel with Play Store)
+  deploy-firebase:
+    name: Deploy to Firebase
+    needs: [ version, build-aab ]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download version files
+        uses: actions/download-artifact@v4
+        with:
+          name: version-files
+
+      - name: Download AAB
+        uses: actions/download-artifact@v4
+        with:
+          name: release-aab
+          path: aab/
+
+      - name: Resolve artifact paths
+        id: artifacts
+        run: |
+          AAB_PATH=$(find aab -name "*.aab" -type f | head -n 1)
+          echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
+
+      - name: Decode Service Account
+        env:
+          PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+        run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
+
       - name: Deploy AAB to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
@@ -373,6 +414,44 @@ jobs:
             ${{ needs.version.outputs.changelog }}
             
             See full details at: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.version.outputs.version_name }}
+
+      - name: Firebase Deployment Summary
+        run: |
+          echo "## 🔥 Firebase Distribution Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version Code:** ${{ needs.version.outputs.version_code }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Groups:** vip_testers" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
+
+  # Job 7: Create GitHub Release (after both deployments complete)
+  create-release:
+    name: Create GitHub Release
+    needs: [ version, build-aab, deploy-play-store, deploy-firebase ]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download version files
+        uses: actions/download-artifact@v4
+        with:
+          name: version-files
+
+      - name: Download AAB
+        uses: actions/download-artifact@v4
+        with:
+          name: release-aab
+          path: aab/
+
+      - name: Resolve artifact paths
+        id: artifacts
+        run: |
+          AAB_PATH=$(find aab -name "*.aab" -type f | head -n 1)
+          MAPPING_PATH=$(find aab -name "mapping.txt" -type f | head -n 1)
+          echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
+          echo "mapping=$MAPPING_PATH" >> $GITHUB_OUTPUT
 
       # Temporarily disabled during testing
       - name: Create GitHub Release
