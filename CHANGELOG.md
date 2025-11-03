@@ -1,4 +1,17 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b14...v5.0.0) (2025-11-03)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b16...v5.0.0) (2025-11-03)
+
+
+### Bug Fixes
+
+* split deployment jobs for Play Store and Firebase ([87c61cf](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/87c61cf80e6a9c8a5148605f2089b6f76c0de6b4))
+
+
+
+# [5.0.0-b16](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b15...v5.0.0-b16) (2025-11-03)
+
+
+
+# [5.0.0-b15](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b14...v5.0.0-b15) (2025-11-03)
 
 
 ### Features
@@ -22,19 +35,6 @@
 ### Features
 
 * add Datadog configuration to CI/CD workflows and document required secrets ([fd7afeb](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/fd7afebb6047de168f214366b77d064c63ef3c7a))
-
-
-
-# [5.0.0-b12](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b11...v5.0.0-b12) (2025-11-01)
-
-
-### Features
-
-* implement datadog for loggin ([f121703](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/f121703f3e60dcdf67b1b07ea653e6079fef1a23))
-
-
-
-# [5.0.0-b11](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b10...v5.0.0-b11) (2025-10-31)
 
 
 
