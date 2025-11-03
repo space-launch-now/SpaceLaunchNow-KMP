@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b13...v5.0.0) (2025-11-03)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b14...v5.0.0) (2025-11-03)
+
+
+### Features
+
+* Add TOTP authentication for debug menu access and add syncPurchases option ([7eb41a7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/7eb41a793a7ad7b2ad5ce17ce9f66742591379fc))
+
+
+
+# [5.0.0-b14](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b13...v5.0.0-b14) (2025-11-03)
 
 
 ### Features
@@ -26,15 +35,6 @@
 
 
 # [5.0.0-b11](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b10...v5.0.0-b11) (2025-10-31)
-
-
-
-# [5.0.0-b10](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b9...v5.0.0-b10) (2025-10-31)
-
-
-### Features
-
-* Add subscription state checks to InterstitialAdHandler and update project name in settings ([85abf10](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/85abf10c07987e11991dbfab8c8cb1842579e6c5))
 
 
 
