@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b12...v5.0.0) (2025-11-02)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b13...v5.0.0) (2025-11-03)
+
+
+### Features
+
+* add debug button for querying old purchase history directly ([a6fe999](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/a6fe9996759dce2e8853e5fa1f430f611916a782))
+
+
+
+# [5.0.0-b13](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b12...v5.0.0-b13) (2025-11-02)
 
 
 ### Features
@@ -26,15 +35,6 @@
 ### Features
 
 * Add subscription state checks to InterstitialAdHandler and update project name in settings ([85abf10](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/85abf10c07987e11991dbfab8c8cb1842579e6c5))
-
-
-
-# [5.0.0-b9](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b8...v5.0.0-b9) (2025-10-30)
-
-
-### Features
-
-* Prevent infinite loops by checking subscription state before update ([d5cec27](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/d5cec2729169856c154f910dc97d4296d23786ea))
 
 
 
