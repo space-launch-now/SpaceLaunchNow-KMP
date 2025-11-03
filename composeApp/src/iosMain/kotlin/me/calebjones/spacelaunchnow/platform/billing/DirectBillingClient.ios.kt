@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.platform.billing
 
+import me.calebjones.spacelaunchnow.data.billing.OldPurchaseRecord
+
 /**
  * iOS implementation of DirectBillingClient (not supported).
  * iOS uses RevenueCat exclusively.
@@ -14,6 +16,12 @@ actual class DirectBillingClient {
         productType: String,
         basePlanId: String?
     ): Result<String> {
+        return Result.failure(UnsupportedOperationException("Direct billing is not supported on iOS. Please use RevenueCat."))
+    }
+    
+    actual suspend fun queryPurchaseHistory(
+        productType: String
+    ): Result<List<OldPurchaseRecord>> {
         return Result.failure(UnsupportedOperationException("Direct billing is not supported on iOS. Please use RevenueCat."))
     }
     

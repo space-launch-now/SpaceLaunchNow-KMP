@@ -1106,7 +1106,7 @@ fun DebugSettingsScreen(
                         ) {
                             // Get context factory outside of onClick to avoid composable issues
                             val contextFactory = LocalContextFactory.current
-                            
+
                             Button(
                                 onClick = {
                                     if (customSku.isNotBlank()) {
@@ -1211,6 +1211,165 @@ fun DebugSettingsScreen(
                                         "• Available on Android only\n" +
                                         "• iOS/Desktop: Use RevenueCat offerings instead"
                             },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 10.sp
+                        )
+
+                        // Purchase History Query Section
+                        HorizontalDivider()
+                        HorizontalDivider()
+
+                        var isQueryingHistory by remember { mutableStateOf(false) }
+                        var purchaseHistoryResult by remember { mutableStateOf<String?>(null) }
+
+                        Text(
+                            text = "Query Purchase History (Direct Billing Library):",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            val contextFactory = LocalContextFactory.current
+
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        isQueryingHistory = true
+                                        purchaseHistoryResult = null
+
+                                        if (!isDirectBillingSupported()) {
+                                            purchaseHistoryResult =
+                                                "❌ Direct billing only available on Android"
+                                            snackbarHostState.showSnackbar(purchaseHistoryResult!!)
+                                            isQueryingHistory = false
+                                            return@launch
+                                        }
+
+                                        try {
+                                            val activity = contextFactory?.getActivity()
+                                            if (activity == null) {
+                                                purchaseHistoryResult =
+                                                    "❌ Activity context not available"
+                                                snackbarHostState.showSnackbar(purchaseHistoryResult!!)
+                                                isQueryingHistory = false
+                                                return@launch
+                                            }
+
+                                            val directBilling = createDirectBillingClient(activity)
+
+                                            directBilling.initialize().fold(
+                                                onSuccess = {
+                                                    // Query IN-APP purchase history (one-time purchases)
+                                                    directBilling.queryPurchaseHistory("inapp")
+                                                        .fold(
+                                                            onSuccess = { oldPurchases ->
+                                                                if (oldPurchases.isEmpty()) {
+                                                                    purchaseHistoryResult =
+                                                                        "ℹ️ No purchase history found"
+                                                                    snackbarHostState.showSnackbar("No purchases found")
+                                                                } else {
+                                                                    val resultText = buildString {
+                                                                        appendLine("✅ Found ${oldPurchases.size} historical purchases!")
+                                                                        appendLine()
+                                                                        oldPurchases.forEachIndexed { index, purchase ->
+                                                                            appendLine("Purchase #${index + 1}:")
+                                                                            appendLine("  Product: ${purchase.productId}")
+                                                                            appendLine("  Date: ${purchase.purchaseInstant}")
+                                                                            appendLine("  Legacy? ${if (purchase.isLegacyPurchase) "YES ⚠️" else "NO"}")
+                                                                            appendLine(
+                                                                                "  Token: ${
+                                                                                    purchase.purchaseToken.take(
+                                                                                        40
+                                                                                    )
+                                                                                }..."
+                                                                            )
+                                                                            appendLine()
+                                                                        }
+
+                                                                        val legacyCount =
+                                                                            oldPurchases.count { it.isLegacyPurchase }
+                                                                        if (legacyCount > 0) {
+                                                                            appendLine("🏛️ Found $legacyCount LEGACY purchases (pre-2024)!")
+                                                                            appendLine("These are likely invisible to RevenueCat BC8!")
+                                                                        }
+                                                                    }
+                                                                    purchaseHistoryResult =
+                                                                        resultText
+                                                                    snackbarHostState.showSnackbar("Found ${oldPurchases.size} purchases!")
+                                                                }
+                                                            },
+                                                            onFailure = { error ->
+                                                                purchaseHistoryResult =
+                                                                    "❌ Query failed: ${error.message}"
+                                                                snackbarHostState.showSnackbar(
+                                                                    purchaseHistoryResult!!
+                                                                )
+                                                            }
+                                                        )
+                                                    directBilling.disconnect()
+                                                },
+                                                onFailure = { error ->
+                                                    purchaseHistoryResult =
+                                                        "❌ Billing init failed: ${error.message}"
+                                                    snackbarHostState.showSnackbar(
+                                                        purchaseHistoryResult!!
+                                                    )
+                                                }
+                                            )
+                                        } catch (e: Exception) {
+                                            purchaseHistoryResult =
+                                                "❌ Error: ${e.message}\n\n${e.stackTraceToString()}"
+                                            snackbarHostState.showSnackbar("Error: ${e.message}")
+                                        } finally {
+                                            isQueryingHistory = false
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                enabled = !isLoading && !isQueryingHistory && isDirectBillingSupported(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiary,
+                                    contentColor = MaterialTheme.colorScheme.onTertiary
+                                )
+                            ) {
+                                if (isQueryingHistory) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.onTertiary
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text(if (isQueryingHistory) "Querying..." else "🔍 Query Old Purchases")
+                            }
+                        }
+
+                        // Display purchase history results
+                        purchaseHistoryResult?.let { result ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                        alpha = 0.5f
+                                    )
+                                )
+                            ) {
+                                Text(
+                                    text = result,
+                                    modifier = Modifier.padding(12.dp),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+
+                        Text(
+                            text = "💡 This queries Google Play Billing Library directly.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 10.sp

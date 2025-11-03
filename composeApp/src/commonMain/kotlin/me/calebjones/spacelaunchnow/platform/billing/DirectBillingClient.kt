@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.platform.billing
 
+import me.calebjones.spacelaunchnow.data.billing.OldPurchaseRecord
+
 /**
  * Direct billing client for testing custom SKU purchases.
  * This bypasses RevenueCat and uses the platform's native billing library.
@@ -28,6 +30,16 @@ expect class DirectBillingClient() {
         productType: String = "inapp",
         basePlanId: String? = null
     ): Result<String>
+    
+    /**
+     * Query purchase history from the platform's billing service.
+     * 
+     * @param productType Type of product: "inapp" for one-time purchases, "subs" for subscriptions
+     * @return Result with list of old purchase records, or error on failure
+     */
+    suspend fun queryPurchaseHistory(
+        productType: String = "inapp"
+    ): Result<List<OldPurchaseRecord>>
     
     /**
      * Disconnect from the billing service.

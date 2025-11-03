@@ -300,19 +300,59 @@ class SubscriptionRepositoryImpl(
         ))
         
         try {
-            // First, call RevenueCat's restore which syncs all platform purchases to RevenueCat
+            // Call RevenueCat's restore which syncs all platform purchases to RevenueCat
+            // and returns the updated CustomerInfo
             println("SubscriptionRepository: Calling RevenueCat.restorePurchases() to sync platform purchases...")
             DatadogLogger.info("Calling RevenueCat.restorePurchases() to sync with platform store")
             
-            revenueCatManager.restorePurchases()
+            val customerInfo = revenueCatManager.restorePurchases()
             
-            // Wait a moment for RevenueCat to sync
-            println("SubscriptionRepository: Waiting for RevenueCat sync to complete...")
-            delay(1000)
+            if (customerInfo == null) {
+                println("SubscriptionRepository: ❌ Restore failed - null CustomerInfo returned")
+                DatadogLogger.error("Restore purchases failed - null CustomerInfo", null, mapOf(
+                    "reason" to "RevenueCat restorePurchases returned null"
+                ))
+                return Result.failure(Exception("Failed to restore purchases"))
+            }
             
-            // Then verify to get the updated state
-            println("SubscriptionRepository: Verifying subscription after restore...")
-            DatadogLogger.info("Verifying subscription after restore")
+            // Inspect the returned CustomerInfo
+            println("SubscriptionRepository: ✅ CustomerInfo received from restore")
+            println("  Active entitlements: ${customerInfo.entitlements.active.keys.joinToString(", ")}")
+            println("  Non-sub transactions: ${customerInfo.nonSubscriptionTransactions.size}")
+            println("  All purchases: ${customerInfo.allPurchaseDates.size}")
+            
+            DatadogLogger.info("CustomerInfo inspection after restore", mapOf(
+                "user_id" to customerInfo.originalAppUserId,
+                "active_entitlements" to customerInfo.entitlements.active.keys.joinToString(","),
+                "active_entitlements_count" to customerInfo.entitlements.active.size,
+                "non_sub_count" to customerInfo.nonSubscriptionTransactions.size,
+                "all_purchases_count" to customerInfo.allPurchaseDates.size,
+                "has_any_active_entitlements" to customerInfo.entitlements.active.isNotEmpty()
+            ))
+            
+            // Check expiration dates for all active entitlements
+            customerInfo.entitlements.active.forEach { (key, entitlement) ->
+                val expirationInfo = if (entitlement.expirationDate != null) {
+                    "expires ${entitlement.expirationDate}"
+                } else {
+                    "lifetime (no expiration)"
+                }
+                println("  Entitlement '$key': $expirationInfo")
+                
+                DatadogLogger.info("Active entitlement details", mapOf(
+                    "entitlement_id" to key,
+                    "product_id" to (entitlement.productIdentifier ?: "unknown"),
+                    "expires_date" to (entitlement.expirationDate?.toString() ?: "never"),
+                    "is_lifetime" to (entitlement.expirationDate == null),
+                    "will_renew" to entitlement.willRenew,
+                    "period_type" to entitlement.periodType.name,
+                    "original_purchase_date" to (entitlement.originalPurchaseDate?.toString() ?: "unknown")
+                ))
+            }
+            
+            // Then verify to get the updated subscription state
+            println("SubscriptionRepository: Verifying subscription state after restore...")
+            DatadogLogger.info("Verifying subscription state after restore")
             
             val result = verifySubscription(forceRefresh = true)
             
@@ -755,13 +795,32 @@ class SubscriptionRepositoryImpl(
      * Returns a SubscriptionState if any active purchase is found, null otherwise
      */
     private fun checkForLegacyPurchasesInRevenueCat(): SubscriptionState? {
+        println("SubscriptionRepository: === Checking for legacy purchases in RevenueCat ===")
+        DatadogLogger.info("Checking for legacy purchases without entitlements")
+        
         val activeProductIds = revenueCatManager.getActiveProductIdentifiers()
         if (activeProductIds.isEmpty()) {
-            println("SubscriptionRepository: No active products in RevenueCat")
+            println("SubscriptionRepository: ❌ No active products in RevenueCat")
+            println("  This means RevenueCat returned NO products at all")
+            println("  Possible causes:")
+            println("    1. User has no purchases on this store account")
+            println("    2. User is signed into a different store account than the one used to purchase")
+            println("    3. Purchases haven't synced to RevenueCat yet")
+            DatadogLogger.warn("No active products found in RevenueCat", mapOf(
+                "user_id" to (revenueCatManager.customerInfo.value?.originalAppUserId ?: "unknown"),
+                "has_entitlements" to (revenueCatManager.customerInfo.value?.entitlements?.active?.isNotEmpty() == true),
+                "entitlements" to (revenueCatManager.customerInfo.value?.entitlements?.active?.keys?.joinToString(",") ?: "none")
+            ))
             return null
         }
 
-        println("SubscriptionRepository: Found ${activeProductIds.size} active products in RevenueCat: $activeProductIds")
+        println("SubscriptionRepository: ✅ Found ${activeProductIds.size} active products in RevenueCat")
+        println("  Products: ${activeProductIds.joinToString(", ")}")
+        DatadogLogger.info("Active products found in RevenueCat", mapOf(
+            "product_count" to activeProductIds.size,
+            "products" to activeProductIds.joinToString(","),
+            "user_id" to (revenueCatManager.customerInfo.value?.originalAppUserId ?: "unknown")
+        ))
 
         // Find the most premium product
         var bestProductId: String? = null
@@ -771,21 +830,47 @@ class SubscriptionRepositoryImpl(
         for (productId in activeProductIds) {
             val subscriptionType = SubscriptionProducts.getSubscriptionType(productId)
             val features = SubscriptionProducts.getFeaturesForProduct(productId)
+            val isLegacy = SubscriptionProducts.isLegacyProduct(productId)
+
+            println("  Analyzing product: $productId")
+            println("    Subscription Type: $subscriptionType")
+            println("    Features: ${features.joinToString(", ") { it.name }}")
+            println("    Is Legacy: $isLegacy")
 
             // Prefer PREMIUM over LEGACY over FREE
             if (subscriptionType.ordinal > bestSubscriptionType.ordinal) {
                 bestProductId = productId
                 bestSubscriptionType = subscriptionType
                 bestFeatures = features
+                println("    ✅ New best product (higher tier)")
             }
         }
 
         if (bestProductId == null || bestSubscriptionType == SubscriptionType.FREE) {
-            println("SubscriptionRepository: No premium/legacy products found")
+            println("SubscriptionRepository: ❌ No premium/legacy products found")
+            println("  All ${activeProductIds.size} products were either debug products or mapped to FREE tier")
+            DatadogLogger.warn("Active products found but none grant premium access", mapOf(
+                "product_count" to activeProductIds.size,
+                "products" to activeProductIds.joinToString(","),
+                "user_id" to (revenueCatManager.customerInfo.value?.originalAppUserId ?: "unknown")
+            ))
             return null
         }
 
-        println("SubscriptionRepository: Best product: $bestProductId with type $bestSubscriptionType")
+        println("SubscriptionRepository: ✅ Best product selected: $bestProductId")
+        println("  Subscription Type: $bestSubscriptionType")
+        println("  Features: ${bestFeatures.joinToString(", ") { it.name }}")
+        println("  Is Legacy: ${SubscriptionProducts.isLegacyProduct(bestProductId)}")
+        
+        DatadogLogger.info("Legacy purchase detected and granted", mapOf(
+            "product_id" to bestProductId,
+            "subscription_type" to bestSubscriptionType.name,
+            "features" to bestFeatures.joinToString(",") { it.name },
+            "feature_count" to bestFeatures.size,
+            "is_legacy_sku" to SubscriptionProducts.isLegacyProduct(bestProductId),
+            "user_id" to (revenueCatManager.customerInfo.value?.originalAppUserId ?: "unknown"),
+            "all_products_checked" to activeProductIds.joinToString(",")
+        ))
 
         return SubscriptionState(
             isSubscribed = true,

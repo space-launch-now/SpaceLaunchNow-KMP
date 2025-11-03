@@ -308,7 +308,7 @@ android {
         // Datadog configuration
         val datadogClientToken = envProps.getProperty("DATADOG_CLIENT_TOKEN") ?: ""
         val datadogApplicationId = envProps.getProperty("DATADOG_APPLICATION_ID") ?: ""
-        val datadogEnabled = envProps.getProperty("DATADOG_ENABLED") ?: "false"
+        val datadogEnabled = envProps.getProperty("DATADOG_ENABLED")?.lowercase() ?: "false"
         val datadogEnvironment = envProps.getProperty("DATADOG_ENVIRONMENT") ?: "production"
 
         buildConfigField("String", "API_KEY", "\"$apiKey\"")

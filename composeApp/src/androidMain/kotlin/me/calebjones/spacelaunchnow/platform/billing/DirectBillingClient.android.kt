@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.platform.billing
 
 import android.app.Activity
 import me.calebjones.spacelaunchnow.data.billing.DirectAndroidBillingClient
+import me.calebjones.spacelaunchnow.data.billing.OldPurchaseRecord
 
 /**
  * Android implementation of DirectBillingClient using Google Play Billing Library.
@@ -23,6 +24,12 @@ actual class DirectBillingClient {
         basePlanId: String?
     ): Result<String> {
         return client.launchPurchaseFlow(productId, productType, basePlanId)
+    }
+    
+    actual suspend fun queryPurchaseHistory(
+        productType: String
+    ): Result<List<OldPurchaseRecord>> {
+        return client.queryPurchaseHistory(productType)
     }
     
     actual fun disconnect() {
