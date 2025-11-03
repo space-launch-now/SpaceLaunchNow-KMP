@@ -27,6 +27,14 @@ actual object AppSecrets {
             return key
         }
 
+    // Debug Menu TOTP Secret
+    actual val totpSecret: String
+        get() {
+            val key = getStringResource("Secrets", "plist", "totpSecret") ?: "JBSWY3DPEHPK3PXP"
+            println("🔑 AppSecrets.totpSecret: ${if (key.isNotEmpty()) "✅ loaded" else "❌ using default"}")
+            return key
+        }
+
     // AdMob ad unit IDs
     actual val androidBannerAdUnitId: String
         get() {

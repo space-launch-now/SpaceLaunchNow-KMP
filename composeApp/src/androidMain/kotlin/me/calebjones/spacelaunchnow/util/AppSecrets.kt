@@ -7,6 +7,9 @@ actual object AppSecrets {
     actual val revenueCatAndroidKey: String = BuildConfig.REVENUECAT_ANDROID_KEY
     actual val revenueCatIosKey: String = BuildConfig.REVENUECAT_IOS_KEY
 
+    // Debug Menu TOTP Secret
+    actual val totpSecret: String = BuildConfig.TOTP_SECRET
+
     // AdMob ad unit IDs
     actual val androidBannerAdUnitId: String = BuildConfig.ANDROID_BANNER_AD_UNIT_ID
     actual val iosBannerAdUnitId: String = BuildConfig.IOS_BANNER_AD_UNIT_ID

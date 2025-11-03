@@ -5,6 +5,9 @@ expect object AppSecrets {
     val revenueCatAndroidKey: String
     val revenueCatIosKey: String
 
+    // Debug Menu TOTP Secret
+    val totpSecret: String
+
     // AdMob ad unit IDs
     val androidBannerAdUnitId: String
     val iosBannerAdUnitId: String

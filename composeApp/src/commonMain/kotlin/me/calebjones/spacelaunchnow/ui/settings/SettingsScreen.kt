@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Star
@@ -47,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -88,6 +90,7 @@ fun SettingsScreen(
     var passwordInput by remember { mutableStateOf("") }
     var showPasswordError by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
+    var useTotp by remember { mutableStateOf(false) } // Toggle between password and TOTP
 
     val uriHandler = LocalUriHandler.current
     val onPrivacyPolicy = {
@@ -289,34 +292,80 @@ fun SettingsScreen(
                 passwordInput = ""
                 showPasswordError = false
                 showPassword = false
+                useTotp = false
             },
-            title = { Text("Enter Debug Password") },
+            title = { Text(if (useTotp) "Enter TOTP Code" else "Enter Debug Password") },
             text = {
                 Column {
-                    Text("Enter the password to unlock developer settings:")
+                    Text(
+                        if (useTotp) 
+                            "Enter the 6-digit code from your authenticator app:" 
+                        else 
+                            "Enter the password to unlock developer settings:"
+                    )
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = passwordInput,
                         onValueChange = {
-                            passwordInput = it
+                            // For TOTP, limit to 6 digits
+                            passwordInput = if (useTotp) {
+                                it.filter { char -> char.isDigit() }.take(6)
+                            } else {
+                                it
+                            }
                             showPasswordError = false
                         },
-                        label = { Text("Password") },
-                        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { showPassword = !showPassword }) {
-                                Icon(
-                                    imageVector = if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                    contentDescription = if (showPassword) "Hide password" else "Show password"
-                                )
+                        label = { Text(if (useTotp) "TOTP Code" else "Password") },
+                        visualTransformation = if (useTotp || showPassword) 
+                            VisualTransformation.None 
+                        else 
+                            PasswordVisualTransformation(),
+                        trailingIcon = if (!useTotp) {
+                            {
+                                IconButton(onClick = { showPassword = !showPassword }) {
+                                    Icon(
+                                        imageVector = if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                        contentDescription = if (showPassword) "Hide password" else "Show password"
+                                    )
+                                }
                             }
-                        },
+                        } else null,
                         isError = showPasswordError,
                         supportingText = if (showPasswordError) {
-                            { Text("Incorrect password", color = MaterialTheme.colorScheme.error) }
+                            { 
+                                Text(
+                                    if (useTotp) "Invalid TOTP code" else "Incorrect password", 
+                                    color = MaterialTheme.colorScheme.error
+                                ) 
+                            }
                         } else null,
-                        singleLine = true
+                        singleLine = true,
+                        keyboardOptions = if (useTotp) {
+                            KeyboardOptions(keyboardType = KeyboardType.Number)
+                        } else {
+                            KeyboardOptions.Default
+                        }
                     )
+                    
+                    // Toggle between password and TOTP
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        TextButton(
+                            onClick = {
+                                useTotp = !useTotp
+                                passwordInput = ""
+                                showPasswordError = false
+                            }
+                        ) {
+                            Text(
+                                if (useTotp) "Use Password Instead" else "Use TOTP Instead",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
                 }
             },
             confirmButton = {
@@ -328,6 +377,7 @@ fun SettingsScreen(
                                 showPasswordDialog = false
                                 passwordInput = ""
                                 showPasswordError = false
+                                useTotp = false
                             } else {
                                 showPasswordError = true
                             }
@@ -343,6 +393,7 @@ fun SettingsScreen(
                         showPasswordDialog = false
                         passwordInput = ""
                         showPasswordError = false
+                        useTotp = false
                     }
                 ) {
                     Text("Cancel")

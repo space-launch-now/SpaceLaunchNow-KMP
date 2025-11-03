@@ -231,7 +231,7 @@ kotlin {
                 implementation(libs.aboutlibraries.compose.m2)
                 implementation(libs.aboutlibraries.compose.m3)
 
-                // Cryptography library for secure hashing
+                // Cryptography library for secure hashing (also used for TOTP HMAC-SHA1)
                 implementation(libs.cryptography.core)
 
                 implementation(libs.dd.sdk.kotlin.multiplatform.rum)
@@ -296,6 +296,9 @@ android {
         val revenueCatAndroidKey = envProps.getProperty("REVENUECAT_ANDROID_KEY") ?: ""
         val revenueCatIosKey = envProps.getProperty("REVENUECAT_IOS_KEY") ?: ""
 
+        // Debug Menu TOTP Secret
+        val totpSecret = envProps.getProperty("TOTP_SECRET") ?: "JBSWY3DPEHPK3PXP"
+
         // AdMob ad unit IDs
         val androidBannerAdUnitId = envProps.getProperty("ANDROID_BANNER_AD_UNIT_ID") ?: ""
         val iosBannerAdUnitId = envProps.getProperty("IOS_BANNER_AD_UNIT_ID") ?: ""
@@ -314,6 +317,9 @@ android {
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         buildConfigField("String", "REVENUECAT_ANDROID_KEY", "\"$revenueCatAndroidKey\"")
         buildConfigField("String", "REVENUECAT_IOS_KEY", "\"$revenueCatIosKey\"")
+
+        // Debug Menu TOTP Secret
+        buildConfigField("String", "TOTP_SECRET", "\"$totpSecret\"")
 
         // AdMob ad unit IDs
         buildConfigField("String", "ANDROID_BANNER_AD_UNIT_ID", "\"$androidBannerAdUnitId\"")

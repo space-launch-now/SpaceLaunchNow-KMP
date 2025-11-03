@@ -5,6 +5,9 @@ actual object AppSecrets {
     actual val revenueCatAndroidKey: String = DesktopSecret.REVENUECAT_ANDROID_KEY
     actual val revenueCatIosKey: String = DesktopSecret.REVENUECAT_IOS_KEY
     
+    // Debug Menu TOTP Secret
+    actual val totpSecret: String = DesktopSecret.TOTP_SECRET
+    
     // AdMob ad unit IDs (Desktop doesn't use ads, so empty strings)
     actual val androidBannerAdUnitId: String = ""
     actual val iosBannerAdUnitId: String = ""

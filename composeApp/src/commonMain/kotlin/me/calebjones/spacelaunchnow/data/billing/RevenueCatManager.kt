@@ -53,9 +53,13 @@ class RevenueCatManager {
 
             // Mark as initialized BEFORE making API calls
             _isInitialized.value = true
-            println("RevenueCat: SDK initialized, fetching data...")
+            println("RevenueCat: SDK initialized, syncing purchases with store...")
 
-            // Load initial customer info
+            // Sync purchases from the store at app start
+            // This ensures we have the latest purchase state without showing restore UI
+            syncPurchases()
+
+            // Load initial customer info (which will include synced purchases)
             refreshCustomerInfo()
 
             // Load offerings
@@ -258,6 +262,62 @@ class RevenueCatManager {
      */
     fun hasAnyActivePurchase(): Boolean {
         return getActiveProductIdentifiers().isNotEmpty()
+    }
+
+    /**
+     * Sync purchases from the store without triggering restore UI
+     * This should be called at app start to ensure latest purchase state
+     * 
+     * Unlike restorePurchases(), this doesn't trigger any user-facing restore flow
+     * and silently syncs purchases in the background.
+     */
+    suspend fun syncPurchases() = suspendCancellableCoroutine { continuation ->
+        try {
+            if (!_isInitialized.value) {
+                println("RevenueCat: Cannot sync - not initialized")
+                continuation.resume(Unit)
+                return@suspendCancellableCoroutine
+            }
+
+            println("RevenueCat: Syncing purchases from store...")
+            DatadogLogger.info("Syncing purchases at app start")
+
+            Purchases.sharedInstance.syncPurchases(
+                onError = { error ->
+                    println("RevenueCat: ⚠️ Sync purchases failed - ${error.message}")
+                    DatadogLogger.warn(
+                        "Sync purchases failed", mapOf(
+                            "error_message" to error.message,
+                            "error_code" to error.code.name
+                        )
+                    )
+                    // Don't fail initialization if sync fails - continue anyway
+                    continuation.resume(Unit)
+                },
+                onSuccess = { customerInfo ->
+                    println("RevenueCat: ✅ Purchases synced successfully")
+                    println("  Active entitlements: ${customerInfo.entitlements.active.keys.joinToString(", ")}")
+                    
+                    // Update cached customer info
+                    _customerInfo.value = customerInfo
+                    
+                    DatadogLogger.info(
+                        "Purchases synced successfully", mapOf(
+                            "user_id" to customerInfo.originalAppUserId,
+                            "active_entitlements" to customerInfo.entitlements.active.keys.joinToString(","),
+                            "all_purchases_count" to customerInfo.allPurchaseDates.size
+                        )
+                    )
+                    
+                    continuation.resume(Unit)
+                }
+            )
+        } catch (e: Exception) {
+            println("RevenueCat: Exception during sync - ${e.message}")
+            DatadogLogger.error("Exception during syncPurchases", e)
+            // Don't fail - continue initialization
+            continuation.resume(Unit)
+        }
     }
 
     /**
