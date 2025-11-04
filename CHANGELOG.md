@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b16...v5.0.0) (2025-11-03)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b17...v5.0.0) (2025-11-04)
+
+
+### Features
+
+* add beta warning dialog and purchase restore ([91ab207](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/91ab2077ff9c25f0f9c82618648b3ab27d51e7c2))
+
+
+
+# [5.0.0-b17](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b16...v5.0.0-b17) (2025-11-03)
 
 
 ### Bug Fixes
@@ -26,15 +35,6 @@
 ### Features
 
 * add debug button for querying old purchase history directly ([a6fe999](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/a6fe9996759dce2e8853e5fa1f430f611916a782))
-
-
-
-# [5.0.0-b13](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b12...v5.0.0-b13) (2025-11-02)
-
-
-### Features
-
-* add Datadog configuration to CI/CD workflows and document required secrets ([fd7afeb](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/fd7afebb6047de168f214366b77d064c63ef3c7a))
 
 
 
