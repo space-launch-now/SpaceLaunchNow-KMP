@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b17...v5.0.0) (2025-11-04)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b18...v5.0.0) (2025-11-04)
+
+
+### Bug Fixes
+
+* remove DirectBillingClient implementation and related code roll back to older Android billing library ([71019d7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/71019d7a268bd2a9dce3f091fb7b851cd64d8604))
+
+
+
+# [5.0.0-b18](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b17...v5.0.0-b18) (2025-11-04)
 
 
 ### Features
@@ -26,15 +35,6 @@
 ### Features
 
 * Add TOTP authentication for debug menu access and add syncPurchases option ([7eb41a7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/7eb41a793a7ad7b2ad5ce17ce9f66742591379fc))
-
-
-
-# [5.0.0-b14](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b13...v5.0.0-b14) (2025-11-03)
-
-
-### Features
-
-* add debug button for querying old purchase history directly ([a6fe999](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/a6fe9996759dce2e8853e5fa1f430f611916a782))
 
 
 
