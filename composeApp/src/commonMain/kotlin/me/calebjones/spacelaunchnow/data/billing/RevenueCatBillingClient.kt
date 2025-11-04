@@ -183,8 +183,8 @@ class RevenueCatBillingClient(
         return PlatformPurchase(
             purchaseToken = entitlementId,
             productId = entitlement?.productIdentifier ?: entitlementId,
-            purchaseTime = entitlement?.originalPurchaseDate?.toEpochMilliseconds() ?: 0L,
-            expiryTime = entitlement?.expirationDate?.toEpochMilliseconds(),
+            purchaseTime = entitlement?.originalPurchaseDateMillis ?: 0L,
+            expiryTime = entitlement?.expirationDateMillis,
             isAcknowledged = true,
             orderId = null,
             platform = Platform.UNKNOWN // RevenueCat abstracts, can't know the real platform here

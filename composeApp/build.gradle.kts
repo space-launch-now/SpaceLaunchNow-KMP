@@ -134,8 +134,6 @@ kotlin {
                 // Android-specific HTTP client engine
                 implementation(libs.ktor.client.android)
 
-                implementation(libs.billing.ktx)
-
                 // Google AdMob and UMP for Android
                 implementation(libs.googleAds)
                 implementation(libs.androidUmp)

@@ -107,7 +107,7 @@ class RevenueCatManager {
                             "active_entitlements" to activeEntitlements,
                             "active_subscriptions" to activeSubscriptions,
                             "has_premium" to customerInfo.entitlements.active.containsKey("premium"),
-                            "first_seen" to customerInfo.firstSeen.toString()
+                            "first_seen" to customerInfo.firstSeenMillis
                         )
                     )
 
@@ -198,6 +198,7 @@ class RevenueCatManager {
         val customerInfo = _customerInfo.value
 
         if (customerInfo == null) {
+            // Only log warning on null customer info - this is important
             println("RevenueCat: ⚠️ Cannot get active products - no customer info available")
             DatadogLogger.warn("getActiveProductIdentifiers called with null customer info")
             return emptySet()
@@ -205,43 +206,22 @@ class RevenueCatManager {
 
         val productIds = mutableSetOf<String>()
 
-        println("RevenueCat: === Getting All Active Product Identifiers ===")
-
-        // Add all products from active entitlements
-        println("  Checking active entitlements (${customerInfo.entitlements.active.size})...")
+        // Collect products without verbose logging (this is called frequently from UI)
         customerInfo.entitlements.active.values.forEach { entitlementInfo ->
             entitlementInfo.productIdentifier?.let {
                 productIds.add(it)
-                println("    ✅ From entitlement '${entitlementInfo.identifier}': $it")
             }
         }
 
-        // Add all non-subscription purchases (lifetime purchases)
-        println("  Checking non-subscription transactions (${customerInfo.nonSubscriptionTransactions.size})...")
         customerInfo.nonSubscriptionTransactions.forEach { transaction ->
             productIds.add(transaction.productIdentifier)
-            println("    ✅ From transaction: ${transaction.productIdentifier}")
         }
 
-        // Add all active subscription product identifiers
-        println("  Checking active subscriptions (${customerInfo.activeSubscriptions.size})...")
         customerInfo.activeSubscriptions.forEach { productId ->
             productIds.add(productId)
-            println("    ✅ From subscription: $productId")
         }
 
-        println("  === TOTAL: ${productIds.size} unique active products ===")
-        if (productIds.isNotEmpty()) {
-            println("  Products: ${productIds.joinToString(", ")}")
-        } else {
-            println("  ⚠️ WARNING: No active products found!")
-            println("  This means:")
-            println("    - No active entitlements")
-            println("    - No non-subscription transactions (lifetime purchases)")
-            println("    - No active subscriptions")
-            println("  User may be on wrong store account or purchases not imported")
-        }
-
+        // Only log to Datadog (lightweight) - removed verbose console logging
         DatadogLogger.info(
             "Active product identifiers retrieved", mapOf(
                 "product_count" to productIds.size,
@@ -267,7 +247,7 @@ class RevenueCatManager {
     /**
      * Sync purchases from the store without triggering restore UI
      * This should be called at app start to ensure latest purchase state
-     * 
+     *
      * Unlike restorePurchases(), this doesn't trigger any user-facing restore flow
      * and silently syncs purchases in the background.
      */
@@ -296,19 +276,27 @@ class RevenueCatManager {
                 },
                 onSuccess = { customerInfo ->
                     println("RevenueCat: ✅ Purchases synced successfully")
-                    println("  Active entitlements: ${customerInfo.entitlements.active.keys.joinToString(", ")}")
-                    
+                    println(
+                        "  Active entitlements: ${
+                            customerInfo.entitlements.active.keys.joinToString(
+                                ", "
+                            )
+                        }"
+                    )
+
                     // Update cached customer info
                     _customerInfo.value = customerInfo
-                    
+
                     DatadogLogger.info(
                         "Purchases synced successfully", mapOf(
                             "user_id" to customerInfo.originalAppUserId,
-                            "active_entitlements" to customerInfo.entitlements.active.keys.joinToString(","),
-                            "all_purchases_count" to customerInfo.allPurchaseDates.size
+                            "active_entitlements" to customerInfo.entitlements.active.keys.joinToString(
+                                ","
+                            ),
+                            "all_purchases_count" to customerInfo.allPurchaseDateMillis.size
                         )
                     )
-                    
+
                     continuation.resume(Unit)
                 }
             )
@@ -368,9 +356,9 @@ class RevenueCatManager {
                     // === CRITICAL LOGGING FOR LEGACY SKU DEBUGGING ===
                     println("RevenueCat: ✅ Purchases restored successfully")
                     println("  App User ID: ${customerInfo.originalAppUserId}")
-                    println("  Request Date: ${customerInfo.requestDate}")
-                    println("  Original Purchase Date: ${customerInfo.originalPurchaseDate?.toString() ?: "none"}")
-                    println("  First Seen: ${customerInfo.firstSeen}")
+                    println("  Request Date: ${customerInfo.requestDateMillis}")
+                    println("  Original Purchase Date: ${customerInfo.originalPurchaseDateMillis?.toString() ?: "none"}")
+                    println("  First Seen: ${customerInfo.firstSeenMillis}")
                     println("")
                     println("  === ENTITLEMENTS (${customerInfo.entitlements.all.size} total, ${customerInfo.entitlements.active.size} active) ===")
                     if (customerInfo.entitlements.active.isEmpty()) {
@@ -387,8 +375,8 @@ class RevenueCatManager {
                             println("       Is Active: ${value.isActive}")
                             println("       Will Renew: ${value.willRenew}")
                             println("       Period Type: ${value.periodType.name}")
-                            println("       Expires: ${value.expirationDate?.toString() ?: "never"}")
-                            println("       Purchase Date: ${value.originalPurchaseDate?.toString() ?: "unknown"}")
+                            println("       Expires: ${value.expirationDateMillis?.toString() ?: "never"}")
+                            println("       Purchase Date: ${value.originalPurchaseDateMillis?.toString() ?: "unknown"}")
                             println("       Store: ${value.store.name}")
                         }
                     }
@@ -396,7 +384,7 @@ class RevenueCatManager {
                     println("  === ALL ENTITLEMENTS (including inactive) ===")
                     customerInfo.entitlements.all.forEach { (key, value) ->
                         println("    ${if (value.isActive) "✅" else "❌"} $key:")
-                        println("       Product ID: ${value.productIdentifier ?: "unknown"}")
+                        println("       Product ID: ${value.productIdentifier}")
                         println("       Is Active: ${value.isActive}")
                     }
                     println("")
@@ -417,13 +405,13 @@ class RevenueCatManager {
                     } else {
                         customerInfo.nonSubscriptionTransactions.forEach { transaction ->
                             println("    • Product: ${transaction.productIdentifier}")
-                            println("      Purchase Date: ${transaction.purchaseDate}")
+                            println("      Purchase Date: ${transaction.purchaseDateMillis}")
                             println("      Transaction ID: ${transaction.transactionIdentifier}")
                         }
                     }
                     println("")
                     println("  === ALL PURCHASES (including inactive) ===")
-                    val allPurchases = customerInfo.allPurchaseDates
+                    val allPurchases = customerInfo.allPurchaseDateMillis
                     if (allPurchases.isEmpty()) {
                         println("  ⚠️ CRITICAL: NO PURCHASES FOUND AT ALL!")
                         println("  This indicates:")
@@ -467,8 +455,9 @@ class RevenueCatManager {
                                 "is_active" to value.isActive,
                                 "will_renew" to value.willRenew,
                                 "period_type" to value.periodType.name,
-                                "expires_date" to (value.expirationDate?.toString() ?: "never"),
-                                "original_purchase_date" to (value.originalPurchaseDate?.toString()
+                                "expires_date" to (value.expirationDateMillis?.toString()
+                                    ?: "never"),
+                                "original_purchase_date" to (value.originalPurchaseDateMillis?.toString()
                                     ?: "unknown"),
                                 "store" to value.store.name
                             )
@@ -486,26 +475,27 @@ class RevenueCatManager {
                         customerInfo.nonSubscriptionTransactions.map { transaction ->
                             mapOf(
                                 "product_id" to transaction.productIdentifier,
-                                "purchase_date" to transaction.purchaseDate.toString(),
+                                "purchase_date" to transaction.purchaseDateMillis.toString(),
                                 "store_transaction_id" to transaction.transactionIdentifier
                             )
                         }
 
-                    val allPurchasesMap = customerInfo.allPurchaseDates.map { (productId, date) ->
-                        mapOf(
-                            "product_id" to productId,
-                            "purchase_date" to date.toString()
-                        )
-                    }
+                    val allPurchasesMap =
+                        customerInfo.allPurchaseDateMillis.map { (productId, date) ->
+                            mapOf(
+                                "product_id" to productId,
+                                "purchase_date" to date.toString()
+                            )
+                        }
 
                     DatadogLogger.info(
                         "Restore purchases successful - DETAILED", mapOf(
                             "user_id" to customerInfo.originalAppUserId,
                             "is_anonymous" to customerInfo.originalAppUserId.startsWith("\$RCAnonymousID:"),
-                            "request_date" to customerInfo.requestDate.toString(),
-                            "original_purchase_date" to (customerInfo.originalPurchaseDate?.toString()
+                            "request_date" to customerInfo.requestDateMillis.toString(),
+                            "original_purchase_date" to (customerInfo.originalPurchaseDateMillis?.toString()
                                 ?: "none"),
-                            "first_seen" to customerInfo.firstSeen.toString(),
+                            "first_seen" to customerInfo.firstSeenMillis.toString(),
                             "total_products_found" to allProducts.size,
                             "all_products" to allProducts.joinToString(","),
                             "active_entitlements_count" to customerInfo.entitlements.active.size,
@@ -518,10 +508,10 @@ class RevenueCatManager {
                                 ","
                             ),
                             "non_subscription_count" to customerInfo.nonSubscriptionTransactions.size,
-                            "all_purchases_count" to customerInfo.allPurchaseDates.size,
+                            "all_purchases_count" to customerInfo.allPurchaseDateMillis.size,
                             "has_any_entitlements" to customerInfo.entitlements.active.isNotEmpty(),
                             "has_non_sub_transactions" to customerInfo.nonSubscriptionTransactions.isNotEmpty(),
-                            "has_any_purchases" to customerInfo.allPurchaseDates.isNotEmpty(),
+                            "has_any_purchases" to customerInfo.allPurchaseDateMillis.isNotEmpty(),
                             "entitlement_details" to entitlementDetails.toString(),
                             "all_entitlement_details" to allEntitlementDetails.toString(),
                             "non_subscription_details" to nonSubTransactions.toString(),

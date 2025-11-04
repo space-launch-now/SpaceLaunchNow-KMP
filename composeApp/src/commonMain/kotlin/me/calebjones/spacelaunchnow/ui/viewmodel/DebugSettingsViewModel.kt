@@ -268,7 +268,7 @@ class DebugSettingsViewModel(
                             activeEntitlements.forEach { (id, info) ->
                                 appendLine("  • $id")
                                 appendLine("    Product: ${info.productIdentifier}")
-                                appendLine("    Expires: ${info.expirationDate?.toString() ?: "Never"}")
+                                appendLine("    Expires: ${info.expirationDateMillis?.toString() ?: "Never"}")
                             }
                         }
 
@@ -280,7 +280,7 @@ class DebugSettingsViewModel(
 
                         appendLine("\n💳 Original Purchase Info:")
                         appendLine("  • Original App User ID: ${customerInfo.originalAppUserId}")
-                        appendLine("  • First Seen: ${customerInfo.firstSeen.toString()}")
+                        appendLine("  • First Seen: ${customerInfo.firstSeenMillis.toString()}")
                     }
                 }
                 _detailedMessage.value = message
