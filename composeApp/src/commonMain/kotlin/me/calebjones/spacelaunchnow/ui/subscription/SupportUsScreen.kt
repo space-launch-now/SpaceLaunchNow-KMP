@@ -11,6 +11,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,12 +30,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DashboardCustomize
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material.icons.filled.Widgets
@@ -74,6 +78,7 @@ import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import org.jetbrains.compose.resources.painterResource
@@ -470,6 +475,14 @@ fun SupportUsScreen(
             // RevenueCat User ID for Support
             item {
                 RevenueCatUserIdCard(viewModel = viewModel)
+            }
+
+            // Google Form Link (Android only)
+            if (getPlatform().type.isAndroid) {
+                item {
+                    Spacer(Modifier.height(16.dp))
+                    GoogleFormLinkCard()
+                }
             }
 
             // Fine Print
@@ -999,18 +1012,52 @@ private fun SuccessCard(message: String) {
 private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
     val revenueCatManager = koinInject<me.calebjones.spacelaunchnow.data.billing.RevenueCatManager>()
     val customerInfo by revenueCatManager.customerInfo.collectAsState()
+    val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
     
     val userId = customerInfo?.originalAppUserId ?: "Not available"
     
-    Text(
-        text = "User ID: $userId",
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        textAlign = TextAlign.Center,
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-    )
+            .clickable(enabled = userId != "Not available") {
+                clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(userId))
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "User ID",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = userId,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                )
+            }
+            
+            if (userId != "Not available") {
+                Icon(
+                    imageVector = Icons.Default.ContentCopy,
+                    contentDescription = "Copy User ID",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -1044,6 +1091,59 @@ private fun FinePrint() {
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         )
+    }
+}
+
+@Composable
+private fun GoogleFormLinkCard() {
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .clickable {
+                uriHandler.openUri("https://docs.google.com/forms/d/e/1FAIpQLSehYiA23d3YYVZOCTDe7XCNGvydK1kgrXhzIOg3-D-inmLBUg/viewform?usp=dialog")
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Feedback,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Unable to Restore Purchase?",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Let me know and I'll help you out",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            Icon(
+                imageVector = Icons.Default.OpenInNew,
+                contentDescription = "Open form",
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 

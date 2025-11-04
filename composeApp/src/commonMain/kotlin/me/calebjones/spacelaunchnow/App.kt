@@ -20,6 +20,7 @@ import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.AdConsentPopup
 import me.calebjones.spacelaunchnow.ui.ads.AdInitializer
 import me.calebjones.spacelaunchnow.ui.ads.WithPreloadedAds
+import me.calebjones.spacelaunchnow.ui.compose.BetaWarningDialog
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
@@ -193,6 +194,9 @@ fun SpaceLaunchNowApp(
         LocalUseUtc provides useUtc,
         LocalContextFactory provides contextFactory
     ) {
+        // Show beta warning dialog on first launch
+        BetaWarningDialog()
+        
         // Show consent popup (platform-specific implementation)
         // Must be inside CompositionLocalProvider to access LocalContextFactory
         AdConsentPopup(

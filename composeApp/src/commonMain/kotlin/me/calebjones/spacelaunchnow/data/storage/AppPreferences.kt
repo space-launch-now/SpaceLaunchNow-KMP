@@ -21,6 +21,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         
         // Debug menu unlock (for release builds)
         private val DEBUG_MENU_UNLOCKED = booleanPreferencesKey("debug_menu_unlocked")
+        
+        // Beta warning dialog shown flag
+        private val BETA_WARNING_SHOWN = booleanPreferencesKey("beta_warning_shown")
     }
 
     val themeFlow: Flow<ThemeOption> = dataStore.data.map { preferences ->
@@ -92,5 +95,20 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     
     suspend fun isDebugMenuUnlocked(): Boolean {
         return dataStore.data.map { it[DEBUG_MENU_UNLOCKED] }.first() ?: false
+    }
+    
+    // Beta warning dialog methods
+    val betaWarningShownFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[BETA_WARNING_SHOWN] ?: false
+    }
+    
+    suspend fun setBetaWarningShown(shown: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[BETA_WARNING_SHOWN] = shown
+        }
+    }
+    
+    suspend fun isBetaWarningShown(): Boolean {
+        return dataStore.data.map { it[BETA_WARNING_SHOWN] }.first() ?: false
     }
 }
