@@ -1,20 +1,26 @@
 package me.calebjones.spacelaunchnow.services
 
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.runBlocking
-import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
+import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.ui.viewmodel.NotificationDisplayHelper
-import org.koin.android.ext.android.inject
+import me.calebjones.spacelaunchnow.workers.NotificationWorker
 
+/**
+ * Firebase Cloud Messaging service for handling push notifications
+ * 
+ * IMPORTANT: This service delegates to WorkManager for actual notification processing
+ * because FCM's onMessageReceived has a very short execution window (~10 seconds).
+ * Image loading can take longer, so we use WorkManager to guarantee delivery.
+ */
 class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
-
-    // Use Koin to inject the singleton NotificationPreferences
-    private val notificationPreferences: NotificationPreferences by inject()
 
     override fun onCreate() {
         super.onCreate()
-        // Create notification channel
+        // Create notification channels
         NotificationDisplayHelper.createNotificationChannel(this)
     }
 
@@ -26,70 +32,53 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         println("MessageId: ${remoteMessage.messageId}")
         println("Data: ${remoteMessage.data}")
 
-        // Get user notification settings
-        val notificationSettings = runBlocking {
-            notificationPreferences.getNotificationSettings()
-        }
+        DatadogLogger.info("FCM notification received - delegating to WorkManager", mapOf(
+            "messageId" to remoteMessage.messageId,
+            "from" to remoteMessage.from,
+            "dataSize" to remoteMessage.data.size,
+            "hasNotificationPayload" to (remoteMessage.notification != null),
+            "data" to remoteMessage.data.toString()
+        ))
 
-        // Parse notification data (v4 format)
-        val notificationData = me.calebjones.spacelaunchnow.data.model.NotificationData.fromMap(remoteMessage.data)
+        // CRITICAL: Delegate to WorkManager immediately to avoid execution timeout
+        // FCM onMessageReceived has ~10 second window, but image loading can take longer
+        // WorkManager guarantees execution even if app is killed
         
-        if (notificationData == null) {
-            println("⚠️ Failed to parse notification data, showing notification anyway")
-            // Fallback to showing notification with FCM notification payload
-            remoteMessage.notification?.let { notification ->
-                NotificationDisplayHelper.showNotificationFromMap(
-                    context = this,
-                    data = remoteMessage.data,
-                    title = notification.title ?: "Space Launch Now",
-                    body = notification.body ?: ""
-                )
-            }
-            return
-        }
-
-        println("Parsed notification data: type=${notificationData.notificationType}, launch=${notificationData.launchName}, agency=${notificationData.agencyId}, location=${notificationData.locationId}")
-
-        // Apply client-side filtering
-        val shouldShow = me.calebjones.spacelaunchnow.data.model.NotificationFilter.shouldShowNotification(
-            data = notificationData,
-            state = notificationSettings
-        )
-
-        if (!shouldShow) {
-            println("🔇 Notification filtered out by user preferences")
-            return
-        }
-
-        println("✅ Notification passed filters, showing to user")
-
-        // Show notification using the unified helper
-        val title = remoteMessage.notification?.title ?: notificationData.launchName
-        val body = remoteMessage.notification?.body ?: "Launch from ${notificationData.launchLocation}"
+        val workData = Data.Builder()
         
-        NotificationDisplayHelper.showNotification(
-            context = this,
-            notificationData = notificationData,
-            title = title,
-            body = body
-        )
+        // Add all FCM data payload
+        remoteMessage.data.forEach { (key, value) ->
+            workData.putString(key, value)
+        }
+        
+        // Add FCM notification payload if present (for title/body)
+        remoteMessage.notification?.let { notification ->
+            workData.putString("fcm_title", notification.title)
+            workData.putString("fcm_body", notification.body)
+        }
+        
+        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+            .setInputData(workData.build())
+            .build()
+        
+        WorkManager.getInstance(this).enqueue(workRequest)
+        
+        println("✅ Notification processing delegated to WorkManager: ${workRequest.id}")
+        DatadogLogger.info("Notification processing delegated to WorkManager", mapOf(
+            "workRequestId" to workRequest.id.toString(),
+            "messageId" to remoteMessage.messageId
+        ))
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // TODO: Send token to backend if needed
         println("New FCM token: $token")
-    }
-
-    private fun handleDataMessage(data: Map<String, String>) {
-        // Handle data-only messages for in-app updates
-        when (data["type"]) {
-            "launch" -> {
-                // Handle launch-specific data
-                println("Received data-only launch message for launch_id: ${data["launch_id"]}")
-                // Data-only messages are typically used for in-app updates rather than notifications
-                // The main notification logic is handled in onMessageReceived
-            }
-        }
+        
+        DatadogLogger.info("New FCM token generated", mapOf(
+            "tokenLength" to token.length,
+            "tokenPrefix" to token.take(10)
+        ))
+        
+        // TODO: Send token to backend if needed
     }
 }
