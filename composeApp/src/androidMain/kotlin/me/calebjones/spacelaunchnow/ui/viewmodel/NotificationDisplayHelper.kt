@@ -140,22 +140,28 @@ object NotificationDisplayHelper {
                         enableLights(true)
                         lightColor = Color.RED
                         enableVibration(true)
-                        vibrationPattern = longArrayOf(0, 200, 100, 200, 100, 200, 100, 400) // Urgent triple-buzz
+                        vibrationPattern =
+                            longArrayOf(0, 200, 100, 200, 100, 200, 100, 400) // Urgent triple-buzz
                     }
+
                     SpaceLaunchNotificationChannel.LAUNCH_STATUS_UPDATES -> {
                         // High priority: Strong pattern for launch status (success/failure/in-flight)  
                         enableLights(true)
                         lightColor = Color.BLUE
                         enableVibration(true)
-                        vibrationPattern = longArrayOf(0, 300, 200, 300, 200, 500) // Strong double-buzz
+                        vibrationPattern =
+                            longArrayOf(0, 300, 200, 300, 200, 500) // Strong double-buzz
                     }
+
                     SpaceLaunchNotificationChannel.SCHEDULE_CHANGES -> {
                         // High priority: Distinctive pattern for schedule changes
                         enableLights(true)
                         lightColor = Color.YELLOW
                         enableVibration(true)
-                        vibrationPattern = longArrayOf(0, 100, 100, 100, 100, 100, 200, 400) // Triple tap + hold
+                        vibrationPattern =
+                            longArrayOf(0, 100, 100, 100, 100, 100, 200, 400) // Triple tap + hold
                     }
+
                     SpaceLaunchNotificationChannel.LAUNCH_REMINDERS -> {
                         // Default: Standard notification pattern (1-24 hours)
                         enableLights(true)
@@ -163,6 +169,7 @@ object NotificationDisplayHelper {
                         enableVibration(true)
                         vibrationPattern = longArrayOf(0, 250, 250, 250) // Standard double-buzz
                     }
+
                     SpaceLaunchNotificationChannel.WEBCAST_NOTIFICATIONS -> {
                         // Default: Gentle pattern for webcast notifications
                         enableLights(true)
@@ -170,6 +177,7 @@ object NotificationDisplayHelper {
                         enableVibration(true)
                         vibrationPattern = longArrayOf(0, 200, 100, 200) // Gentle double-tap
                     }
+
                     else -> {
                         // Low priority: Simple single vibration for events/news
                         if (channelConfig.importance >= NotificationManager.IMPORTANCE_DEFAULT) {
@@ -507,7 +515,7 @@ object NotificationDisplayHelper {
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
             .setContentTitle(displayTitle)
             .setContentText(displayBody)
-            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
+            .setSmallIcon(R.drawable.ic_rocket_notification)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
