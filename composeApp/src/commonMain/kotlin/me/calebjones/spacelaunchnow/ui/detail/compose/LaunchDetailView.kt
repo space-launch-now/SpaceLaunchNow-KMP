@@ -2771,7 +2771,7 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val header = buildString {
-                        append("Stage ${index + 1}")
+                        append("Stage #${index + 1}")
                         stage.launcher.serialNumber?.takeIf { it.isNotBlank() }?.let {
                             append(" • ")
                             append(it)
