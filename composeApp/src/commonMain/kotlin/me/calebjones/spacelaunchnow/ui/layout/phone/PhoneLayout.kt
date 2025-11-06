@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
+import me.calebjones.spacelaunchnow.navigation.AgencyDetail
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
@@ -36,6 +37,7 @@ import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.ui.about.AboutLibrariesScreen
 import me.calebjones.spacelaunchnow.ui.compose.BottomNavigationBar
+import me.calebjones.spacelaunchnow.ui.detail.AgencyDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
@@ -63,6 +65,7 @@ fun PhoneLayout(
     val showBottomBar = when (navBackStackEntry?.destination?.route) {
         LaunchDetail::class.qualifiedName -> false // Hide for LaunchDetail
         EventDetail::class.qualifiedName -> false // Hide for EventDetail
+        AgencyDetail::class.qualifiedName -> false // Hide for AgencyDetail
         FullscreenVideo::class.qualifiedName -> false // Hide for FullscreenVideo
         NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
         DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
@@ -74,12 +77,13 @@ fun PhoneLayout(
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern
             val currentRoute = navBackStackEntry?.destination?.route
-            // If the route contains LaunchDetail, EventDetail, or FullscreenVideo, hide bottom bar
-            currentRoute?.contains("LaunchDetail") != true && currentRoute?.contains("EventDetail") != true && currentRoute?.contains(
-                "FullscreenVideo"
-            ) != true && currentRoute?.contains("NotificationSettings") != true && currentRoute?.contains(
-                "DebugSettings"
-            ) != true
+            // If the route contains LaunchDetail, EventDetail, AgencyDetail, or FullscreenVideo, hide bottom bar
+            currentRoute?.contains("LaunchDetail") != true && 
+            currentRoute?.contains("EventDetail") != true && 
+            currentRoute?.contains("AgencyDetail") != true &&
+            currentRoute?.contains("FullscreenVideo") != true && 
+            currentRoute?.contains("NotificationSettings") != true && 
+            currentRoute?.contains("DebugSettings") != true
         }
     }
 
@@ -143,6 +147,13 @@ fun PhoneLayout(
                             val eventDetail = backStackEntry.toRoute<EventDetail>()
                             EventDetailScreen(
                                 eventId = eventDetail.eventId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
+                            val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                            AgencyDetailScreen(
+                                agencyId = agencyDetail.agencyId,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
