@@ -73,9 +73,8 @@ class NotificationWorker(
             }
 
             // Show notification (image loading happens here, but we have time)
+            // Use fcm_title if provided, otherwise fall back to launch name
             val title = inputData.getString("fcm_title") ?: notificationData.launchName
-            val body =
-                inputData.getString("fcm_body") ?: "Launch from ${notificationData.launchLocation}"
 
             println("[NotificationWorker] Showing notification")
             DatadogLogger.info(
@@ -85,11 +84,11 @@ class NotificationWorker(
                 )
             )
 
+            // NotificationDisplayHelper.showNotification always generates formatted body from NotificationData
             NotificationDisplayHelper.showNotification(
                 context = applicationContext,
                 notificationData = notificationData,
-                title = title,
-                body = body
+                title = title
             )
 
             Result.success()

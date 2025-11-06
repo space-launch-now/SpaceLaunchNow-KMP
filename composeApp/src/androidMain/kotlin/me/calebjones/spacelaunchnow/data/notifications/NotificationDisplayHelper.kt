@@ -465,8 +465,7 @@ object NotificationDisplayHelper {
     fun showNotification(
         context: Context,
         notificationData: NotificationData,
-        title: String? = null,
-        body: String? = null
+        title: String? = null
     ) {
         // Ensure channels exist
         createNotificationChannels(context)
@@ -474,7 +473,7 @@ object NotificationDisplayHelper {
         // Determine which channel to use
         val channelId = getChannelId(notificationData.notificationType)
 
-        // Use provided title/body or generate from notification data and strings
+        // Use provided title or generate from notification data
         // Add 🔴 emoji to title if webcast is available (like old app)
         val baseTitle = title ?: notificationData.launchName
         val displayTitle = if (notificationData.isWebcastLive()) {
@@ -483,6 +482,7 @@ object NotificationDisplayHelper {
             baseTitle
         }
 
+        // Always generate body with proper date formatting from NotificationData
         val displayBody = getNotificationBody(
             context,
             notificationData.notificationType,
@@ -586,6 +586,7 @@ object NotificationDisplayHelper {
     /**
      * Display a notification from raw data map (used by Firebase)
      * This converts the map to NotificationData and calls showNotification
+     * Note: body parameter is only used for fallback when parsing fails
      */
     fun showNotificationFromMap(
         context: Context,
@@ -595,7 +596,8 @@ object NotificationDisplayHelper {
     ) {
         val notificationData = NotificationData.Companion.fromMap(data)
         if (notificationData != null) {
-            showNotification(context, notificationData, title, body)
+            // Don't pass body - always use formatted body from NotificationData
+            showNotification(context, notificationData, title)
         } else {
             // Fallback: show basic notification if parsing fails
             showBasicNotification(

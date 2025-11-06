@@ -17,10 +17,10 @@ actual fun showTestNotification(notificationData: NotificationData) {
 
     // Use the unified notification display helper
     // This ensures test notifications look and behave exactly like real FCM notifications
+    // Body is always generated from NotificationData with proper date formatting
     NotificationDisplayHelper.showNotification(
         context = context,
         notificationData = notificationData,
-        title = "Test: ${notificationData.launchName}",
-        body = "Test launch ${notificationData.launchLocation} • ${notificationData.notificationType}"
+        title = "Test: ${notificationData.launchName}"
     )
 }
