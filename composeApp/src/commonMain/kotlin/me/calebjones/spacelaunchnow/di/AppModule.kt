@@ -20,6 +20,8 @@ import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.RocketRepository
+import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
@@ -40,6 +42,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
@@ -77,6 +80,8 @@ val appModule = module {
     viewModelOf(::EventViewModel)
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
+    singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
+    viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
 
     // Global Ad Manager - Singleton managed by Koin

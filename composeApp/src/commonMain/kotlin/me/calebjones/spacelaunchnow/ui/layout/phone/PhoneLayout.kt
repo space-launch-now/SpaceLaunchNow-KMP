@@ -30,6 +30,8 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.RocketDetail
+import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
@@ -39,6 +41,8 @@ import me.calebjones.spacelaunchnow.ui.compose.BottomNavigationBar
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
+import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
+import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
@@ -63,6 +67,8 @@ fun PhoneLayout(
     val showBottomBar = when (navBackStackEntry?.destination?.route) {
         LaunchDetail::class.qualifiedName -> false // Hide for LaunchDetail
         EventDetail::class.qualifiedName -> false // Hide for EventDetail
+        RocketDetail::class.qualifiedName -> false // Hide for RocketDetail
+        Rockets::class.qualifiedName -> false // Hide for Rockets list
         FullscreenVideo::class.qualifiedName -> false // Hide for FullscreenVideo
         NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
         DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
@@ -79,7 +85,7 @@ fun PhoneLayout(
                 "FullscreenVideo"
             ) != true && currentRoute?.contains("NotificationSettings") != true && currentRoute?.contains(
                 "DebugSettings"
-            ) != true
+            ) != true && currentRoute?.contains("RocketDetail") != true && currentRoute?.contains("Rockets") != true
         }
     }
 
@@ -183,6 +189,19 @@ fun PhoneLayout(
                         composableWithCompositionLocal<CalendarSync> {
                             CalendarSyncScreen(
                                 navController = navController
+                            )
+                        }
+                        composableWithCompositionLocal<Rockets> {
+                            RocketListScreen(
+                                onNavigateToRocketDetail = { id -> navController.navigate(RocketDetail(id)) },
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<RocketDetail> { backStackEntry ->
+                            val rocketDetail = backStackEntry.toRoute<RocketDetail>()
+                            RocketDetailScreen(
+                                rocketId = rocketDetail.rocketId,
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
                     }
