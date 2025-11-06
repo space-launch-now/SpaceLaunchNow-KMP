@@ -192,14 +192,6 @@ private fun RocketListItem(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    rocket.totalLaunchCount?.let { count ->
-                        Text(
-                            text = "$count launches",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
                     if (rocket.active == true) {
                         Text(
                             text = "Active",
