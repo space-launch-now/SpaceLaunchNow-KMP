@@ -12,13 +12,10 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -29,11 +26,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -56,7 +50,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Factory
-import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.FlightLand
 import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.Height
@@ -70,7 +63,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material.icons.filled.Satellite
 import androidx.compose.material.icons.filled.SatelliteAlt
@@ -91,16 +83,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -135,7 +124,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
@@ -151,8 +139,6 @@ import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyDetailsCard
-import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryChip
-import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryInfoRow
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.InfoTileData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
@@ -947,7 +933,7 @@ private fun LaunchLocationCard(
 ) {
     if (location == null) return
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -1053,7 +1039,6 @@ private fun LaunchLocationCard(
                 }
             }
         }
-        Spacer(modifier = Modifier.width(16.dp))
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -2763,30 +2748,30 @@ private fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSeria
 
 @Composable
 private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+    val stagesWithLanding = launcherStages.filter { it.landing != null }
+
+    // Guard: if nothing to show, return early
+    if (stagesWithLanding.isEmpty()) return
+
+    // Each stage gets its own card
+    stagesWithLanding.forEachIndexed { index, stage ->
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            val stagesWithLanding = launcherStages.filter { it.landing != null }
-
-            // Guard: if nothing to show, skip rendering content
-            if (stagesWithLanding.isEmpty()) return@Column
-
-            if (stagesWithLanding.size == 1) {
-                // Single landing: show a grid in a single inner card with description
-                val stage = stagesWithLanding.first()
-                Column(
-                    Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Header with stage index, serial, and flight number
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Header with stage index and serial if available
                     val header = buildString {
-                        append("Stage 1")
+                        append("Stage ${index + 1}")
                         stage.launcher.serialNumber?.takeIf { it.isNotBlank() }?.let {
                             append(" • ")
                             append(it)
@@ -2796,288 +2781,69 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
                         text = header,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
-                    stage.landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
-                        var expanded by remember { mutableStateOf(false) }
-                        var hasOverflow by remember { mutableStateOf(false) }
-                        Text(
-                            text = desc,
-                            style = MaterialTheme.typography.bodyMedium,
-                            maxLines = if (expanded) Int.MAX_VALUE else 4,
-                            overflow = TextOverflow.Ellipsis,
-                            lineHeight = 20.sp,
-                            onTextLayout = { result ->
-                                if (!expanded) hasOverflow = result.hasVisualOverflow
-                            }
-                        )
-                        if (hasOverflow || expanded) {
-                            TextButton(onClick = {
-                                expanded = !expanded
-                            }) { Text(if (expanded) "Read less" else "Read more") }
-                        }
-                    }
 
-                    val useUtc = LocalUseUtc.current
-                    stage.previousFlightDate?.let {
-                        InfoTileHorizontal(
-                            icon = Icons.Filled.Schedule,
-                            label = "Previous Flight",
-                            value = DateTimeUtil.formatLaunchDateTime(
-                                it,
-                                useUtc
-                            )
-                        )
-                    }
-                    stage.turnAroundTime?.takeIf { it.isNotBlank() }
-                        ?.let {
-                            InfoTileHorizontal(
-                                icon = Icons.Filled.Timelapse,
-                                label = "Turnaround",
-                                value = parseIsoDurationToHumanReadable(it)
-                            )
-                        }
-                    HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
-                    LandingStageGridContent(stage)
-
-                }
-            } else {
-                // Multiple landings: show a horizontal scroller of cards
-                val listState = rememberLazyListState()
-                val flingBehavior = rememberSnapFlingBehavior(
-                    lazyListState = listState,
-                    snapPosition = SnapPosition.Start
-                )
-                LazyRow(
-                    state = listState,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
-                    flingBehavior = flingBehavior
-                ) {
-                    itemsIndexed(
-                        items = stagesWithLanding,
-                        key = { _, stage -> stage.id }
-                    ) { index, stage ->
-                        Card(
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-                            modifier = Modifier
-                                .widthIn(min = 260.dp)
+                    // Flight number tag
+                    stage.launcherFlightNumber?.let { flightNum ->
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer
                         ) {
-                            Column(
-                                Modifier.padding(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                // Header with stage index and serial if available
-                                val header = buildString {
-                                    append("Stage ${index + 1}")
-                                    stage.launcher.serialNumber?.takeIf { it.isNotBlank() }?.let {
-                                        append(" • ")
-                                        append(it)
-                                    }
-                                }
-                                Text(
-                                    text = header,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-
-                                stage.landing?.description?.takeIf { it.isNotBlank() }
-                                    ?.let { desc ->
-                                        var expanded by remember { mutableStateOf(false) }
-                                        var hasOverflow by remember { mutableStateOf(false) }
-                                        Text(
-                                            text = desc,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            maxLines = if (expanded) 6 else 3,
-                                            overflow = TextOverflow.Ellipsis,
-                                            lineHeight = 18.sp,
-                                            onTextLayout = { result ->
-                                                if (!expanded) hasOverflow =
-                                                    result.hasVisualOverflow
-                                            }
-                                        )
-                                        if (hasOverflow || expanded) {
-                                            TextButton(onClick = { expanded = !expanded }) {
-                                                Text(if (expanded) "Read less" else "Read more")
-                                            }
-                                        }
-                                    }
-
-                                val useUtc = LocalUseUtc.current
-                                stage.previousFlightDate?.let {
-                                    InfoTileHorizontal(
-                                        icon = Icons.Filled.Schedule,
-                                        label = "Previous Flight",
-                                        value = DateTimeUtil.formatLaunchDateTime(
-                                            it,
-                                            useUtc
-                                        )
-                                    )
-                                }
-                                stage.turnAroundTime?.takeIf { it.isNotBlank() }
-                                    ?.let {
-                                        InfoTileHorizontal(
-                                            icon = Icons.Filled.Timelapse,
-                                            label = "Turnaround",
-                                            value = parseIsoDurationToHumanReadable(it)
-                                        )
-                                    }
-                                LandingStageGridContent(stage)
-                            }
+                            Text(
+                                text = "Flight #$flightNum",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
                         }
                     }
                 }
-            }
-        }
-    }
-}
 
-// Landing Details Style enum and implementations
+                stage.landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                    var expanded by remember { mutableStateOf(false) }
+                    var hasOverflow by remember { mutableStateOf(false) }
+                    Text(
+                        text = desc,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = if (expanded) Int.MAX_VALUE else 4,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 20.sp,
+                        onTextLayout = { result ->
+                            if (!expanded) hasOverflow = result.hasVisualOverflow
+                        }
+                    )
+                    if (hasOverflow || expanded) {
+                        TextButton(onClick = {
+                            expanded = !expanded
+                        }) { Text(if (expanded) "Read less" else "Read more") }
+                    }
+                }
 
-private enum class LandingDetailsStyle { Chips, Grid, Sections, Linear }
-
-@Composable
-private fun LandingStylePicker(
-    selected: LandingDetailsStyle,
-    onSelected: (LandingDetailsStyle) -> Unit
-) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        val options = listOf(
-            LandingDetailsStyle.Chips to "Chips",
-            LandingDetailsStyle.Grid to "Grid",
-            LandingDetailsStyle.Sections to "Sections",
-            LandingDetailsStyle.Linear to "Linear",
-        )
-        options.forEach { (style, label) ->
-            val isSelected = style == selected
-            if (isSelected) {
-                FilledTonalButton(
-                    onClick = { onSelected(style) },
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(label)
-                }
-            } else {
-                OutlinedButton(
-                    onClick = { onSelected(style) },
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(label)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LandingStageChipsContent(stage: FirstStageNormal) {
-    val landing = stage.landing
-    val useUtc = LocalUseUtc.current
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            item { InfoChip(icon = Icons.Filled.Category, text = stage.type) }
-            stage.reused?.let { reused ->
-                item {
-                    InfoChip(
-                        icon = Icons.Filled.Repeat,
-                        text = if (reused) "Reused" else "New"
-                    )
-                }
-            }
-            stage.launcherFlightNumber?.let { num ->
-                item {
-                    InfoChip(
-                        icon = Icons.Filled.Label,
-                        text = "Flight #$num"
-                    )
-                }
-            }
-            landing?.type?.name?.let { typeName ->
-                item {
-                    InfoChip(
-                        icon = Icons.Filled.FlightLand,
-                        text = typeName
-                    )
-                }
-            }
-            landing?.success?.let { success ->
-                item {
-                    InfoChip(
-                        icon = if (success) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
-                        text = if (success) "Success" else "Failure"
-                    )
-                }
-            }
-            if (landing?.success == null) {
-                item {
-                    InfoChip(
-                        icon = Icons.Filled.CheckCircle,
-                        text = "TBD"
-                    )
-                }
-            }
-        }
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            landing?.landingLocation?.name?.let { name ->
-                item {
-                    InfoChip(
-                        icon = Icons.Filled.LocationOn,
-                        text = name
-                    )
-                }
-            }
-            landing?.downrangeDistance?.let { dr ->
-                item {
-                    InfoChip(
-                        icon = Icons.Filled.TrendingUp,
-                        text = "${dr} km"
-                    )
-                }
-            }
-            stage.previousFlightDate?.let { prev ->
-                item {
-                    InfoChip(
+                val useUtc = LocalUseUtc.current
+                stage.previousFlightDate?.let {
+                    InfoTileHorizontal(
                         icon = Icons.Filled.Schedule,
-                        text = DateTimeUtil.formatLaunchDateTime(
-                            prev,
-                            useUtc
-                        )
+                        label = "Previous Flight",
+                        value = DateTimeUtil.formatLaunchDateTime(it, useUtc)
                     )
                 }
-            }
-            stage.turnAroundTime?.takeIf { it.isNotBlank() }
-                ?.let { tat ->
-                    item {
-                        InfoChip(
-                            icon = Icons.Filled.Timelapse,
-                            text = parseIsoDurationToHumanReadable(tat)
-                        )
-                    }
+                stage.turnAroundTime?.takeIf { it.isNotBlank() }?.let {
+                    InfoTileHorizontal(
+                        icon = Icons.Filled.Timelapse,
+                        label = "Turnaround",
+                        value = parseIsoDurationToHumanReadable(it)
+                    )
                 }
+                if (stage.landing != null) {
+                    LandingStageGridContent(stage)
+                }
+            }
         }
-        landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
-            var expanded by remember { mutableStateOf(false) }
-            var hasOverflow by remember { mutableStateOf(false) }
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = desc,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = if (expanded) Int.MAX_VALUE else 4,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 20.sp,
-                    onTextLayout = { result ->
-                        if (!expanded) hasOverflow = result.hasVisualOverflow
-                    }
-                )
-                if (hasOverflow || expanded) {
-                    TextButton(onClick = {
-                        expanded = !expanded
-                    }) { Text(if (expanded) "Read less" else "Read more") }
-                }
-            }
+        if (stage != stagesWithLanding.last()) {
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -3088,403 +2854,80 @@ private fun LandingStageGridContent(stage: FirstStageNormal) {
 
     val tiles = buildList {
         add(Triple(Icons.Filled.Category, "Stage Type", stage.type))
-        stage.reused?.let { add(Triple(Icons.Filled.Repeat, "Reused", if (it) "Yes" else "No")) }
-        stage.launcherFlightNumber?.let { add(Triple(Icons.Filled.Label, "Flight #", "$it")) }
-        landing?.downrangeDistance?.let {
-            add(
-                Triple(
-                    Icons.Filled.TrendingUp,
-                    "Downrange",
-                    "$it km"
-                )
-            )
-        }
-        landing?.landingLocation?.name?.let { add(Triple(Icons.Filled.LocationOn, "Location", it)) }
         landing?.type?.name?.let { add(Triple(Icons.Filled.FlightLand, "Landing Type", it)) }
         landing?.attempt?.let {
-            add(
-                Triple(
-                    Icons.Filled.FlightTakeoff,
-                    "Attempt",
-                    if (it) "Yes" else "No"
+            if (it) {
+                add(
+                    Triple(
+                        Icons.Filled.FlightTakeoff,
+                        "Attempt",
+                        if (it) "Yes" else "No"
+                    )
                 )
-            )
-        }
-        landing?.success?.let {
-            add(
-                Triple(
-                    if (it) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
-                    "Result",
-                    if (it) "Success" else "Failure"
-                )
-            )
-        }
-        if (landing?.success == null) {
-            add(
-                Triple(
-                    Icons.Filled.ChangeCircle,
-                    "Result",
-                    "TBD"
-                )
-            )
-        }
-    }
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        tiles.chunked(2).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                row.forEach { (icon, label, value) ->
-                    InfoTile(
-                        icon = icon,
-                        label = label,
-                        value = value,
-                        modifier = Modifier.weight(1f)
+
+                landing.success?.let { success ->
+                    add(
+                        Triple(
+                            if (success) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
+                            "Result",
+                            if (success) "Success" else "Failure"
+                        )
                     )
                 }
-                if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+                if (landing.success == null) {
+                    add(
+                        Triple(
+                            Icons.Filled.ChangeCircle,
+                            "Result",
+                            "TBD"
+                        )
+                    )
+                }
             }
         }
     }
-}
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+    ) {
 
-@Composable
-private fun LandingStageSectionedContent(stage: FirstStageNormal) {
-    val landing = stage.landing
-    val useUtc = LocalUseUtc.current
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(8.dp)
+        ) {
             Text(
-                text = "Summary",
-                style = MaterialTheme.typography.titleSmall,
+                text = "Landing Details",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            var expanded by remember { mutableStateOf(false) }
-            var hasOverflow by remember { mutableStateOf(false) }
-            Text(
-                text = desc,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = if (expanded) Int.MAX_VALUE else 5,
-                overflow = TextOverflow.Ellipsis,
-                lineHeight = 20.sp,
-                onTextLayout = { result -> if (!expanded) hasOverflow = result.hasVisualOverflow }
+            InfoTileHorizontal(
+                icon = Icons.Filled.LocationOn,
+                label = "Location",
+                value = landing?.landingLocation?.name
             )
-            if (hasOverflow || expanded) {
-                TextButton(onClick = {
-                    expanded = !expanded
-                }) { Text(if (expanded) "Show less" else "Show more") }
-            }
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        }
-
-        Text(
-            text = "Stage",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold
-        )
-        val stageDetails = listOfNotNull(
-            "Stage Type" to stage.type,
-            stage.reused?.let { "Reused" to if (it) "Yes" else "No" },
-            stage.launcherFlightNumber?.let { "Flight #" to "$it" },
-            stage.previousFlightDate?.let {
-                "Prev. Flight" to me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(
-                    it,
-                    useUtc
-                )
-            },
-            stage.turnAroundTime?.takeIf { it.isNotBlank() }
-                ?.let { "Turnaround" to parseIsoDurationToHumanReadable(it) },
-        )
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            stageDetails.forEach { (label, value) ->
-                InfoRow(icon = Icons.Filled.Label, label = label, value = value)
-            }
-        }
-
-        landing?.let { l ->
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Text(
-                text = "Landing",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
-            )
-            val landingDetails = listOfNotNull(
-                l.landingLocation?.name?.let { "Location" to it },
-                l.type?.name?.let { "Type" to it },
-                l.downrangeDistance?.let { "Downrange" to "${it} km" },
-                l.attempt?.let { "Attempt" to if (it) "Yes" else "No" },
-                l.success?.let { "Result" to if (it) "Success" else "Failure" },
+            InfoTileHorizontal(
+                icon = Icons.AutoMirrored.Filled.TrendingUp,
+                label = "Downrange",
+                value = "${landing?.downrangeDistance ?: "N/A"} km"
             )
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                landingDetails.forEach { (label, value) ->
-                    InfoRow(icon = Icons.Filled.Label, label = label, value = value)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LandingStageLinearContent(stage: FirstStageNormal) {
-    val landing = stage.landing
-    val useUtc = LocalUseUtc.current
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        InfoRow(icon = Icons.Filled.Category, label = "Stage Type", value = stage.type)
-        stage.reused?.let {
-            InfoRow(
-                icon = Icons.Filled.Repeat,
-                label = "Reused",
-                value = if (it) "Yes" else "No"
-            )
-        }
-        stage.launcherFlightNumber?.let {
-            InfoRow(
-                icon = Icons.Filled.Label,
-                label = "Flight #",
-                value = "$it"
-            )
-        }
-        stage.previousFlightDate?.let {
-            InfoRow(
-                icon = Icons.Filled.Schedule,
-                label = "Prev. Flight",
-                value = me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime(
-                    it,
-                    useUtc
-                )
-            )
-        }
-        stage.turnAroundTime?.takeIf { it.isNotBlank() }
-            ?.let {
-                InfoRow(
-                    icon = Icons.Filled.Timelapse,
-                    label = "Turnaround",
-                    value = parseIsoDurationToHumanReadable(it)
-                )
-            }
-        landing?.downrangeDistance?.let {
-            InfoRow(
-                icon = Icons.Filled.TrendingUp,
-                label = "Downrange",
-                value = "${it} km"
-            )
-        }
-        landing?.landingLocation?.name?.let {
-            InfoRow(
-                icon = Icons.Filled.LocationOn,
-                label = "Landing Location",
-                value = it
-            )
-        }
-        landing?.type?.name?.let {
-            InfoRow(
-                icon = Icons.Filled.FlightLand,
-                label = "Landing Type",
-                value = it
-            )
-        }
-        landing?.attempt?.let {
-            InfoRow(
-                icon = Icons.Filled.FlightTakeoff,
-                label = "Attempt",
-                value = if (it) "Yes" else "No"
-            )
-        }
-        landing?.success?.let {
-            InfoRow(
-                icon = if (it) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
-                label = "Result",
-                value = if (it) "Success" else "Failure"
-            )
-        }
-        if (landing?.success == null) {
-            InfoRow(
-                icon = Icons.Filled.CheckCircle,
-                label = "Result",
-                value = "TBD"
-            )
-        }
-        landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
-            Text(text = desc, style = MaterialTheme.typography.bodyMedium, lineHeight = 20.sp)
-        }
-    }
-}
-
-
-// Moved to SharedDetailComponents.kt - use shared version instead
-/*
-@Composable
-private fun AgencyDetailsCard(
-    agency: AgencyDetailed,
-    openUrl: (String) -> Unit = { /* TODO: Implement for platform */ }
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            // Agency header (logo larger and centered)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                // Centered agency logo
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
-                    ) {
-                        SubcomposeAsyncImage(
-                            model = agency.logo?.imageUrl ?: "",
-                            contentDescription = "Agency logo",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .defaultMinSize(minWidth = 200.dp, minHeight = 200.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .padding(16.dp),
-                            contentScale = ContentScale.Fit,
-                            loading = {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(48.dp),
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            },
-                            error = {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Business,
-                                        contentDescription = "Agency",
-                                        modifier = Modifier.size(64.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                                    )
-                                }
-                            }
-                        )
-                    }
-                }
-
-                Text(
-                    text = agency.name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Grid of key details (above countries)
-            val infoTiles = buildList {
-                agency.type?.name?.takeIf { it.isNotBlank() }?.let {
-                    add(InfoTileData(Icons.Filled.Business, "Type", it))
-                }
-                agency.foundingYear?.let { year ->
-                    add(InfoTileData(Icons.Filled.CalendarToday, "Founded", year.toString()))
-                }
-                agency.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
-                    add(InfoTileData(Icons.Filled.Person, "Administrator", admin))
-                }
-                if (agency.country.isNotEmpty() && agency.country.size == 1) {
-                    add(
-                        InfoTileData(
-                            icon = Icons.Filled.Flag,
-                            label = "Country",
-                            value = null,
-                            customComposable = { CountryChip(agency.country.first()) }
-                        ))
-                }
-            }
-            if (infoTiles.isNotEmpty()) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    infoTiles.chunked(2).forEach { row ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            row.forEach { tile ->
-                                InfoTile(
-                                    icon = tile.icon,
-                                    label = tile.label,
-                                    value = tile.value,
-                                    customComposable = tile.customComposable,
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                            if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+                tiles.chunked(2).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        row.forEach { (icon, label, value) ->
+                            InfoTile(
+                                icon = icon,
+                                label = label,
+                                value = value,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
-                    }
-                }
-            }
-
-            // Countries as chips (moved below grid)
-            if (agency.country.isNotEmpty() && agency.country.size > 1) {
-                CountryInfoRow(countries = agency.country)
-            }
-            // Agency description
-            agency.description?.let { description ->
-                Text(
-                    text = "About",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    lineHeight = 20.sp
-                )
-            }
-
-
-            // Info & Wiki links
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                agency.infoUrl?.let { url ->
-                    Button(
-                        onClick = { openUrl(url) },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(
-                            imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                            contentDescription = "Information",
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Website")
-                    }
-                }
-                agency.wikiUrl?.let { url ->
-                    Button(
-                        onClick = { openUrl(url) },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-                    ) {
-                        Icon(
-                            imageVector = FontAwesomeIcons.Brands.WikipediaW,
-                            contentDescription = "Wikipedia",
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Wikipedia")
+                        if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
         }
     }
 }
-*/
 
 @Composable
 private fun AgencyLaunchStatistics(agency: AgencyDetailed) {
@@ -3593,83 +3036,6 @@ private fun StatusChip(text: String, color: Color) {
         )
     }
 }
-
-// Moved to SharedDetailComponents.kt - use shared version instead
-/*
-@Composable
-private fun CountryInfoRow(countries: List<Country>) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Header row with icon and label
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Flag,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
-            Text(
-                text = if (countries.size == 1) "Country" else "Countries",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        // List of countries below the header
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(countries) { country ->
-                CountryChip(country = country)
-            }
-        }
-    }
-}
-*/
-
-// Moved to SharedDetailComponents.kt - use shared version instead
-/*
-@Composable
-private fun CountryChip(country: Country) {
-    val label = country.name ?: country.alpha2Code ?: "Unknown"
-    val flagUrl = country.alpha2Code?.let { code ->
-        "https://flagcdn.com/w40/${code.lowercase()}.png"
-    }
-
-    AssistChip(
-        onClick = {},
-        label = {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Medium
-            )
-        },
-        leadingIcon = flagUrl?.let { url ->
-            {
-                AsyncImage(
-                    model = url,
-                    contentDescription = "Flag of ${country.name}",
-                    modifier = Modifier
-                        .width(18.dp)
-                        .height(12.dp)
-                        .clip(RoundedCornerShape(2.dp)),
-                    contentScale = ContentScale.Crop
-                )
-            }
-        },
-        shape = RoundedCornerShape(16.dp),
-        colors = AssistChipDefaults.assistChipColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    )
-}
-*/
 
 @Composable
 private fun AgencyChip(agencyName: String) {
@@ -4143,7 +3509,7 @@ fun LaunchDetailErrorView(
 fun LaunchDetailLoadingView(onNavigateBack: () -> Unit) {
     // Use SharedDetailScaffold to match the responsive behavior of the actual detail view
     SharedDetailScaffold(
-        titleText = "Loading...",
+        titleText = "",
         taglineText = null,
         imageUrl = null, // No image for loading state
         onNavigateBack = onNavigateBack,
