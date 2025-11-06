@@ -49,6 +49,8 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.RocketDetail
+import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
@@ -60,6 +62,8 @@ import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
+import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
+import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
@@ -246,6 +250,19 @@ fun TabletDesktopLayout(
                                     composableWithCompositionLocal<CalendarSync> {
                                         CalendarSyncScreen(
                                             navController = navController
+                                        )
+                                    }
+                                    composableWithCompositionLocal<Rockets> {
+                                        RocketListScreen(
+                                            onNavigateToRocketDetail = { id -> navController.navigate(RocketDetail(id)) },
+                                            onNavigateBack = { navController.popBackStack() }
+                                        )
+                                    }
+                                    composableWithCompositionLocal<RocketDetail> { backStackEntry ->
+                                        val rocketDetail = backStackEntry.toRoute<RocketDetail>()
+                                        RocketDetailScreen(
+                                            rocketId = rocketDetail.rocketId,
+                                            onNavigateBack = { navController.popBackStack() }
                                         )
                                     }
                                 }
