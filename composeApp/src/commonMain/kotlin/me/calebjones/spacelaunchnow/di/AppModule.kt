@@ -36,6 +36,7 @@ import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
@@ -43,6 +44,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
@@ -75,9 +77,11 @@ val appModule = module {
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
     viewModelOf(::HomeViewModel)
+    viewModelOf(::ScheduleViewModel)
     singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
+    viewModelOf(::AgencyViewModel)
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }

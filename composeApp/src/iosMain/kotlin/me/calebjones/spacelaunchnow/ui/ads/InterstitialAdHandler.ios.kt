@@ -156,9 +156,25 @@ actual fun InterstitialAdHandler(
 
     // Show the interstitial ad using the Composable pattern (required by basic-ads)
     // Only show if ad hasn't been shown yet in this session
-    // Double-check hasAdFree in case subscription state changed during composition
-    if (!adShownThisSession && interstitialAd.state == AdState.READY && !hasAdFree && !subscriptionState.isLoading) {
+    // CRITICAL: Triple-check all conditions to prevent showing ads to premium users
+    // This is the FINAL gate before the ad is displayed
+    if (!adShownThisSession && 
+        interstitialAd.state == AdState.READY && 
+        !hasAdFree && 
+        !subscriptionState.isLoading &&
+        !subscriptionState.isSubscribed // ADDITIONAL CHECK: Verify subscription state directly
+    ) {
+        println("🎯 InterstitialAd: FINAL GATE - Showing ad to free user")
         InterstitialAd(loadedAd = interstitialAd)
+    } else if (!adShownThisSession && interstitialAd.state == AdState.READY) {
+        // Ad is ready but we're NOT showing it - log why
+        val reason = when {
+            hasAdFree -> "hasAdFree=true"
+            subscriptionState.isLoading -> "isLoading=true"
+            subscriptionState.isSubscribed -> "isSubscribed=true"
+            else -> "unknown"
+        }
+        println("⛔ InterstitialAd: BLOCKED - Not showing ad because: $reason")
     }
 }
 

@@ -41,6 +41,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
+import me.calebjones.spacelaunchnow.navigation.AgencyDetail
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
@@ -55,6 +56,7 @@ import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.detail.AgencyDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
@@ -216,6 +218,13 @@ fun TabletDesktopLayout(
                                         val eventDetail = backStackEntry.toRoute<EventDetail>()
                                         EventDetailScreen(
                                             eventId = eventDetail.eventId,
+                                            onNavigateBack = { navController.popBackStack() }
+                                        )
+                                    }
+                                    composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
+                                        val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                                        AgencyDetailScreen(
+                                            agencyId = agencyDetail.agencyId,
                                             onNavigateBack = { navController.popBackStack() }
                                         )
                                     }

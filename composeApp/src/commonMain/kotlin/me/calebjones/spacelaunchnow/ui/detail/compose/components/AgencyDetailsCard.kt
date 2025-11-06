@@ -169,7 +169,7 @@ fun AgencyDetailsCard(
             agency.description?.let { description ->
                 Text(
                     text = "About",
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )

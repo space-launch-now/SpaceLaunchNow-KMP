@@ -48,6 +48,9 @@ data object Rockets
 data class RocketDetail(val rocketId: Int)
 
 @Serializable
+data class AgencyDetail(val agencyId: Int)
+
+@Serializable
 data class FullscreenVideo(
     val launchId: String,
     val videoUrl: String,

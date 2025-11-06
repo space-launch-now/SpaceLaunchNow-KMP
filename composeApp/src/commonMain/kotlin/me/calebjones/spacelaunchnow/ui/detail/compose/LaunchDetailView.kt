@@ -1476,156 +1476,6 @@ private fun MissionDetailsGridContent(mission: Mission) {
     }
 }
 
-@Composable
-private fun MissionDetailsSectionedContent(mission: Mission) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // About
-        mission.description?.takeIf { it.isNotBlank() }?.let { desc ->
-            Text(
-                text = "About",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
-            )
-            var expanded by remember { mutableStateOf(false) }
-            var hasOverflow by remember { mutableStateOf(false) }
-            Text(
-                text = desc,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = if (expanded) Int.MAX_VALUE else 5,
-                overflow = TextOverflow.Ellipsis,
-                lineHeight = 20.sp,
-                onTextLayout = { result ->
-                    if (!expanded) hasOverflow = result.hasVisualOverflow
-                }
-            )
-            if (hasOverflow || expanded) {
-                TextButton(onClick = { expanded = !expanded }) {
-                    Text(if (expanded) "Show less" else "Show more")
-                }
-            }
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        }
-
-        // Details
-        val details = buildList {
-            mission.type?.takeIf { it.isNotBlank() }?.let { add("Mission Type" to it) }
-            mission.orbit?.name?.takeIf { it.isNotBlank() }?.let { add("Target Orbit" to it) }
-        }
-        if (details.isNotEmpty()) {
-            Text(
-                text = "Details",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                details.forEach { (label, value) ->
-                    InfoRow(
-                        icon = if (label.contains("Orbit")) Icons.Filled.Public else Icons.Filled.Category,
-                        label = label,
-                        value = value
-                    )
-                }
-            }
-        }
-
-        // Agencies
-        if (!mission.agencies.isNullOrEmpty()) {
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Text(
-                text = if (mission.agencies.size == 1) "Agency" else "Agencies",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
-            )
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(mission.agencies) { agency ->
-                    AgencyChip(agencyName = agency.name)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MissionDetailsLinearContent(mission: Mission) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // Mission description
-        mission.description?.let { description ->
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                lineHeight = 20.sp
-            )
-        }
-
-        // Mission type and orbit
-        mission.type?.let { type ->
-            InfoRow(
-                icon = Icons.Filled.Category,
-                label = "Mission Type",
-                value = type,
-            )
-        }
-
-        mission.orbit?.name?.let { orbitName ->
-            InfoRow(
-                icon = Icons.Filled.Public,
-                label = "Target Orbit",
-                value = orbitName
-            )
-        }
-
-        // Agencies involved
-        if (!mission.agencies.isNullOrEmpty()) {
-            Text(
-                text = "Agencies",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(mission.agencies) { agency ->
-                    AgencyChip(agencyName = agency.name)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun InfoRow(
-    icon: ImageVector,
-    label: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(32.dp)
-        )
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
-}
 
 @Composable
 private fun StatCard(
@@ -1684,65 +1534,6 @@ private fun StatCard(
                     maxLines = 2,
                     textAlign = TextAlign.Center
                 )
-            }
-        }
-    }
-}
-
-
-@Composable
-private fun PrecisionBadge(
-    netPrecision: NetPrecision?,
-) {
-    val ui = remember(netPrecision) { mapNetPrecisionUi(netPrecision) }
-    var expanded by remember { mutableStateOf(false) }
-
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.tertiaryContainer,
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable {
-                if (ui.secondary != null) {
-                    expanded = !expanded
-                }
-            }
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                imageVector = ui.icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.9f),
-                modifier = Modifier.size(16.dp)
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(
-                    text = ui.primary,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                AnimatedVisibility(
-                    visible = expanded && ui.secondary != null,
-                    enter = fadeIn() + slideInVertically(initialOffsetY = { -it / 2 }),
-                    exit = fadeOut() + slideOutVertically(targetOffsetY = { -it / 2 })
-                ) {
-                    ui.secondary?.let { secondary ->
-                        Text(
-                            text = secondary,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.85f),
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
             }
         }
     }
@@ -1819,26 +1610,6 @@ private fun mapNetPrecisionUi(netPrecision: NetPrecision?): PrecisionUi {
     }
 }
 
-@Composable
-private fun LiveBadge() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Surface(
-            shape = CircleShape,
-            color = Color.Red,
-            modifier = Modifier.size(8.dp)
-        ) {}
-        Text(
-            text = "LIVE",
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
 
 @Composable
 private fun LaunchVehicleDetailsCard(
@@ -1850,32 +1621,94 @@ private fun LaunchVehicleDetailsCard(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            // Rocket thumbnail image on the left
+            rocketConfig.image?.let { imageUrl ->
+                Surface(
+                    modifier = Modifier.size(80.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surface,
+                    border = androidx.compose.foundation.BorderStroke(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                    )
+                ) {
+                    SubcomposeAsyncImage(
+                        model = imageUrl.thumbnailUrl,
+                        contentDescription = "Rocket image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        loading = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .shimmer(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            }
+                        },
+                        error = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Rocket,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                    modifier = Modifier.size(40.dp)
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+
+            // Rocket details on the right
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = rocketConfig.fullName ?: "Unknown Rocket",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                // Status indicators
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    if (rocketConfig.active == true) {
+                        StatusChip(text = "Active", color = Color(0xFF4CAF50))
+                    } else {
+                        StatusChip(text = "Inactive", color = MaterialTheme.colorScheme.error)
+                    }
+
+                    if (rocketConfig.reusable == true) {
+                        StatusChip(text = "Reusable", color = Color(0xFF2196F3))
+                    } else {
+                        StatusChip(text = "Expendable", color = MaterialTheme.colorScheme.secondary)
+                    }
+                }
+            }
+        }
+
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = rocketConfig.fullName ?: "Unknown Rocket",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-            // Status indicators
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                if (rocketConfig.active == true) {
-                    StatusChip(text = "Active", color = Color(0xFF4CAF50))
-                } else {
-                    StatusChip(text = "Inactive", color = MaterialTheme.colorScheme.error)
-                }
-
-                if (rocketConfig.reusable == true) {
-                    StatusChip(text = "Reusable", color = Color(0xFF2196F3))
-                } else {
-                    StatusChip(text = "Expendable", color = MaterialTheme.colorScheme.secondary)
-                }
-            }
 
             // Description (overflow-aware)
             rocketConfig.description?.takeIf { it.isNotBlank() }?.let { desc ->
@@ -2771,7 +2604,7 @@ private fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val header = buildString {
-                        append("Stage ${index + 1}")
+                        append("Stage #${index + 1}")
                         stage.launcher.serialNumber?.takeIf { it.isNotBlank() }?.let {
                             append(" • ")
                             append(it)
