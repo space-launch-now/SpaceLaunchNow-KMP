@@ -17,6 +17,7 @@ import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -71,7 +72,6 @@ import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Rocket
-import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Satellite
 import androidx.compose.material.icons.filled.SatelliteAlt
 import androidx.compose.material.icons.filled.Scale
@@ -91,7 +91,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -151,6 +150,13 @@ import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyDetailsCard
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryChip
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryInfoRow
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.InfoTile
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.InfoTileData
+import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
+import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
@@ -272,7 +278,8 @@ private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                     ) {
                         LaunchCountdown(
                             launchTime = launchTime,
-                            status = launch.status
+                            status = launch.status,
+                            precision = launch.netPrecision
                         )
                     }
                 }
@@ -320,7 +327,7 @@ private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                                                 }
                                             Text(
                                                 text = dateOnlyText,
-                                                style = MaterialTheme.typography.labelLarge,
+                                                style = MaterialTheme.typography.headlineMedium,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 maxLines = 2,
                                                 overflow = TextOverflow.Ellipsis,
@@ -349,9 +356,10 @@ private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                                     }
 
                                 }
+                                val windowAllowed = launch.netPrecision?.id in 0..4
 
                                 // Window indicator (if window exists) - now inside the same surface
-                                if (launch.windowStart != null && launch.windowEnd != null) {
+                                if (launch.windowStart != null && launch.windowEnd != null && windowAllowed) {
                                     LaunchWindowIndicator(
                                         launchTime = launch.net ?: launch.windowStart,
                                         windowStart = launch.windowStart,
@@ -608,7 +616,7 @@ private fun LaunchDetailContentInBody(
                             fontWeight = FontWeight.Bold
                         )
                         SpacecraftDetailsCard(
-                            spacecraftStages = launch.rocket?.spacecraftStage ?: emptyList()
+                            spacecraftStages = launch.rocket.spacecraftStage
                         )
                     }
 
@@ -836,6 +844,8 @@ private fun LaunchDetailContentInBody(
     }
 }
 
+// Moved to SharedDetailComponents.kt - use shared version instead
+/*
 @Composable
 private fun InfoTile(
     icon: ImageVector,
@@ -883,6 +893,7 @@ private fun InfoTile(
         }
     }
 }
+*/
 
 @Composable
 private fun InfoTileHorizontal(
@@ -986,42 +997,49 @@ private fun LaunchLocationCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                // Country and Timezone combined row
-                if (location.country != null || location.timezoneName != null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        location.country?.let { country ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                country.alpha2Code?.let { code ->
-                                    AsyncImage(
-                                        model = "https://flagcdn.com/w40/${code.lowercase()}.png",
-                                        contentDescription = "Flag",
-                                        modifier = Modifier.width(24.dp).height(16.dp)
-                                            .clip(RoundedCornerShape(2.dp)),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-                                Text(
-                                    text = country.name ?: country.alpha2Code ?: "Unknown",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            }
+                location.country?.let { country ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        country.alpha2Code?.let { code ->
+                            AsyncImage(
+                                model = "https://flagcdn.com/w40/${code.lowercase()}.png",
+                                contentDescription = "Flag",
+                                modifier = Modifier.width(24.dp).height(16.dp)
+                                    .clip(RoundedCornerShape(2.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
                         }
-                        location.timezoneName?.let { tz ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.Public,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Text(text = tz, style = MaterialTheme.typography.bodyMedium)
-                            }
+                        Text(
+                            text = country.name ?: country.alpha2Code ?: "Unknown",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+
+                location.celestialBody.let { celestialBody ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Public,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(text = celestialBody.name, style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+                location.timezoneName?.let { tz ->
+                    if (tz.isNotBlank()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Filled.Schedule,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(text = tz, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
@@ -1180,12 +1198,7 @@ private fun LaunchLocationCard(
 }
 
 // Internal data class for InfoTileData to support composable tiles
-private data class InfoTileData(
-    val icon: ImageVector,
-    val label: String,
-    val value: String? = null,
-    val customComposable: (@Composable () -> Unit)? = null,
-)
+// Note: InfoTileData, InfoTile, CountryChip, CountryInfoRow, and AgencyDetailsCard have been moved to components/ folder
 
 // PadQuickStatsRow composable extracted for reuse
 @Composable
@@ -1247,7 +1260,7 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
     // Build a dynamic list of facts that are available
     data class Fact(val icon: ImageVector, val value: String, val label: String)
 
-    val currentYear = System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
+    val currentYear = launch.net?.toLocalDateTime(TimeZone.currentSystemDefault())?.year
 
     val facts = buildList {
         launch.orbitalLaunchAttemptCount?.let { count ->
@@ -1264,7 +1277,7 @@ private fun QuickStatsGrid(launch: LaunchDetailed) {
                 Fact(
                     Icons.Filled.Business,
                     "#${count}",
-                    "${launch.launchServiceProvider.name}\n$currentYear"
+                    "${launch.launchServiceProvider.abbrev}\n$currentYear"
                 )
             )
         }
@@ -2329,6 +2342,19 @@ private fun LaunchVehicleDetailedStatistics(rocketConfig: LauncherConfigDetailed
 private fun SpacecraftDetailsCard(spacecraftStages: List<SpacecraftFlightDetailedSerializerNoLaunch>) {
     if (spacecraftStages.isEmpty()) return
 
+    spacecraftStages.forEach { spacecraftFlight ->
+        SpacecraftDetailCard(spacecraftFlight = spacecraftFlight)
+        if (spacecraftFlight != spacecraftStages.last()) {
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+private fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoLaunch) {
+    val spacecraft = spacecraftFlight.spacecraft
+    val useUtc = LocalUseUtc.current
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -2338,57 +2364,399 @@ private fun SpacecraftDetailsCard(spacecraftStages: List<SpacecraftFlightDetaile
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            spacecraftStages.forEach { spacecraft ->
-                SpacecraftItem(spacecraft = spacecraft)
-                if (spacecraft != spacecraftStages.last()) {
-                    Divider(
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                        modifier = Modifier.padding(vertical = 8.dp)
+            // Spacecraft image
+            spacecraft.image?.imageUrl?.let { imageUrl ->
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                    ) {
+                        SubcomposeAsyncImage(
+                            model = imageUrl,
+                            contentDescription = spacecraft.name,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Fit,
+                            loading = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(48.dp),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            },
+                            error = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp)
+                                        .shimmer(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Rocket,
+                                        contentDescription = "Spacecraft image failed to load",
+                                        modifier = Modifier.size(64.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+            // Header with spacecraft name
+            Text(
+                text = spacecraft.name,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Status indicators
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                spacecraft.status.name.let { status ->
+                    StatusChip(
+                        text = status,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                spacecraft.serialNumber?.let { serial ->
+                    StatusChip(
+                        text = "S/N: $serial",
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                if (spacecraft.inSpace == true) {
+                    StatusChip(
+                        text = "In Space",
+                        color = MaterialTheme.colorScheme.tertiary
                     )
                 }
             }
-        }
-    }
-}
 
-@Composable
-private fun SpacecraftItem(spacecraft: SpacecraftFlightDetailedSerializerNoLaunch) {
-    val useUtc = LocalUseUtc.current
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Spacecraft name and destination
-        spacecraft.spacecraft?.name?.let { name ->
-            InfoRow(
-                icon = Icons.Filled.Rocket,
-                label = "Spacecraft",
-                value = name
-            )
-        }
+            // Description (overflow-aware)
+            spacecraft.description.takeIf { it.isNotBlank() }?.let { desc ->
+                var expanded by remember { mutableStateOf(false) }
+                var hasOverflow by remember { mutableStateOf(false) }
+                Text(
+                    text = desc,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = if (expanded) Int.MAX_VALUE else 3,
+                    overflow = TextOverflow.Ellipsis,
+                    onTextLayout = { textLayoutResult ->
+                        hasOverflow = textLayoutResult.hasVisualOverflow
+                    }
+                )
+                if (hasOverflow || expanded) {
+                    TextButton(onClick = { expanded = !expanded }) {
+                        Text(if (expanded) "Show less" else "Read more")
+                    }
+                }
+            }
 
-        spacecraft.destination?.let { destination ->
-            InfoRow(
-                icon = Icons.Filled.LocationOn,
-                label = "Destination",
-                value = destination
-            )
-        }
+            // Flight information tiles
+            val infoTiles = buildList {
+                spacecraftFlight.destination?.let {
+                    add(InfoTileData(Icons.Filled.LocationOn, "Destination", it))
+                }
 
-        // Mission duration and landing info
-        spacecraft.missionEnd?.let { endDate ->
-            InfoRow(
-                icon = Icons.Filled.Schedule,
-                label = "Mission End",
-                value = formatLaunchTime(endDate, useUtc)
-            )
-        }
+                spacecraft.flightsCount?.let {
+                    add(InfoTileData(CustomIcons.RocketLaunch, "Total Flights", "$it"))
+                }
 
-        spacecraft.landing?.type?.name?.let { landingType ->
-            InfoRow(
-                icon = Icons.Filled.FlightLand,
-                label = "Landing Type",
-                value = landingType
-            )
+                spacecraft.missionEndsCount?.let {
+                    add(InfoTileData(Icons.Filled.CheckCircle, "Completed Missions", "$it"))
+                }
+
+                spacecraftFlight.missionEnd?.let {
+                    add(
+                        InfoTileData(
+                            Icons.Filled.Schedule,
+                            "Mission End",
+                            formatLaunchTime(it, useUtc)
+                        )
+                    )
+                }
+
+                spacecraftFlight.duration?.let {
+                    add(
+                        InfoTileData(
+                            Icons.Filled.Timelapse,
+                            "Mission Duration",
+                            parseIsoDurationToHumanReadable(it)
+                        )
+                    )
+                }
+
+                spacecraft.timeInSpace?.let {
+                    add(
+                        InfoTileData(
+                            Icons.Filled.Satellite,
+                            "Time in Space",
+                            parseIsoDurationToHumanReadable(it)
+                        )
+                    )
+                }
+
+                spacecraft.timeDocked?.let {
+                    add(
+                        InfoTileData(
+                            Icons.Filled.SatelliteAlt,
+                            "Time Docked",
+                            parseIsoDurationToHumanReadable(it)
+                        )
+                    )
+                }
+
+                spacecraftFlight.turnAroundTime?.let {
+                    add(
+                        InfoTileData(
+                            Icons.Filled.Refresh,
+                            "Turnaround Time",
+                            parseIsoDurationToHumanReadable(it)
+                        )
+                    )
+                }
+
+                spacecraft.fastestTurnaround?.let {
+                    add(
+                        InfoTileData(
+                            Icons.Filled.Speed,
+                            "Fastest Turnaround",
+                            parseIsoDurationToHumanReadable(it)
+                        )
+                    )
+                }
+
+                spacecraftFlight.landing?.type?.name?.let {
+                    add(InfoTileData(Icons.Filled.FlightLand, "Landing Type", it))
+                }
+
+                spacecraftFlight.landing?.landingLocation?.name?.let {
+                    add(InfoTileData(Icons.Filled.Place, "Landing Location", it))
+                }
+            }
+
+            if (infoTiles.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    infoTiles.chunked(2).forEach { rowTiles ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            rowTiles.forEach { tile ->
+                                InfoTile(
+                                    icon = tile.icon,
+                                    label = tile.label,
+                                    value = tile.value,
+                                    modifier = Modifier.weight(1f),
+                                    customComposable = tile.customComposable
+                                )
+                            }
+                            // Fill remaining space if odd number
+                            if (rowTiles.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Crew information
+            if (spacecraftFlight.launchCrew.isNotEmpty() ||
+                spacecraftFlight.onboardCrew.isNotEmpty() ||
+                spacecraftFlight.landingCrew.isNotEmpty()
+            ) {
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                Text(
+                    text = "Crew Information",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                if (spacecraftFlight.launchCrew.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Launch Crew (${spacecraftFlight.launchCrew.size})",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            spacecraftFlight.launchCrew.forEach { crewMember ->
+                                AssistChip(
+                                    onClick = { },
+                                    label = { crewMember.astronaut.name?.let { Text(it) } },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Filled.Person,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(AssistChipDefaults.IconSize)
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (spacecraftFlight.onboardCrew.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Onboard Crew (${spacecraftFlight.onboardCrew.size})",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            spacecraftFlight.onboardCrew.forEach { crewMember ->
+                                AssistChip(
+                                    onClick = { },
+                                    label = { crewMember.astronaut.name?.let { Text(it) } },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Filled.Person,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(AssistChipDefaults.IconSize)
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (spacecraftFlight.landingCrew.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Landing Crew (${spacecraftFlight.landingCrew.size})",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            spacecraftFlight.landingCrew.forEach { crewMember ->
+                                AssistChip(
+                                    onClick = { },
+                                    label = { crewMember.astronaut.name?.let { Text(it) } },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Filled.Person,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(AssistChipDefaults.IconSize)
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Docking events
+            if (spacecraftFlight.dockingEvents.isNotEmpty()) {
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                Text(
+                    text = "Docking Events (${spacecraftFlight.dockingEvents.size})",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                spacecraftFlight.dockingEvents.forEach { dockingEvent ->
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            dockingEvent.spaceStationTarget?.name?.let { stationName ->
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Filled.SatelliteAlt,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Text(
+                                        text = stationName,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+
+                            Text(
+                                text = dockingEvent.dockingLocation.name,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                dockingEvent.docking.let { dockingTime ->
+                                    Column {
+                                        Text(
+                                            text = "Docked",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = formatLaunchTime(dockingTime, useUtc),
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
+                                }
+
+                                dockingEvent.departure?.let { departureTime ->
+                                    Column {
+                                        Text(
+                                            text = "Departed",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = formatLaunchTime(departureTime, useUtc),
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -2941,6 +3309,8 @@ private fun LandingStageLinearContent(stage: FirstStageNormal) {
 }
 
 
+// Moved to SharedDetailComponents.kt - use shared version instead
+/*
 @Composable
 private fun AgencyDetailsCard(
     agency: AgencyDetailed,
@@ -2959,46 +3329,57 @@ private fun AgencyDetailsCard(
             // Agency header (logo larger and centered)
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 // Centered agency logo
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    SubcomposeAsyncImage(
-                        model = agency.logo?.imageUrl ?: "",
-                        contentDescription = "Agency logo",
-                        modifier = Modifier
-                            .height(200.dp),
-                        contentScale = ContentScale.Fit,
-                        loading = {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Business,
-                                    contentDescription = "Agency",
-                                    modifier = Modifier.size(64.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                )
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                    ) {
+                        SubcomposeAsyncImage(
+                            model = agency.logo?.imageUrl ?: "",
+                            contentDescription = "Agency logo",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .defaultMinSize(minWidth = 200.dp, minHeight = 200.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .padding(16.dp),
+                            contentScale = ContentScale.Fit,
+                            loading = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(48.dp),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            },
+                            error = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Business,
+                                        contentDescription = "Agency",
+                                        modifier = Modifier.size(64.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                    )
+                                }
                             }
-                        },
-                        error = {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Business,
-                                    contentDescription = "Agency",
-                                    modifier = Modifier.size(64.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                )
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
 
                 Text(
@@ -3103,6 +3484,7 @@ private fun AgencyDetailsCard(
         }
     }
 }
+*/
 
 @Composable
 private fun AgencyLaunchStatistics(agency: AgencyDetailed) {
@@ -3132,7 +3514,7 @@ private fun AgencyLaunchStatistics(agency: AgencyDetailed) {
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Filled.RocketLaunch,
+                    icon = CustomIcons.RocketLaunch,
                     value = "$totalLaunches",
                     label = "Total\nLaunches",
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -3212,6 +3594,8 @@ private fun StatusChip(text: String, color: Color) {
     }
 }
 
+// Moved to SharedDetailComponents.kt - use shared version instead
+/*
 @Composable
 private fun CountryInfoRow(countries: List<Country>) {
     Column(
@@ -3246,7 +3630,10 @@ private fun CountryInfoRow(countries: List<Country>) {
         }
     }
 }
+*/
 
+// Moved to SharedDetailComponents.kt - use shared version instead
+/*
 @Composable
 private fun CountryChip(country: Country) {
     val label = country.name ?: country.alpha2Code ?: "Unknown"
@@ -3282,6 +3669,7 @@ private fun CountryChip(country: Country) {
         )
     )
 }
+*/
 
 @Composable
 private fun AgencyChip(agencyName: String) {

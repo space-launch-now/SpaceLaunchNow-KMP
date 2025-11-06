@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -48,12 +47,12 @@ import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
+import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
+import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 @Composable
 fun NextLaunchView(navController: NavController) {
@@ -143,7 +142,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Filled.RocketLaunch,
+                                        imageVector = CustomIcons.RocketLaunch,
                                         contentDescription = "Launch placeholder",
                                         modifier = Modifier.size(96.dp),
                                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
@@ -160,7 +159,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.RocketLaunch,
+                                imageVector = CustomIcons.RocketLaunch,
                                 contentDescription = "Launch placeholder",
                                 modifier = Modifier.size(96.dp),
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
@@ -186,7 +185,8 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                 // Comprehensive countdown section with status, timer, and launch window
                 LaunchCountdown(
                     launchTime = launch.net!!,
-                    status = launch.status
+                    status = launch.status,
+                    precision = launch.netPrecision
                 )
 
                 // Mission information section

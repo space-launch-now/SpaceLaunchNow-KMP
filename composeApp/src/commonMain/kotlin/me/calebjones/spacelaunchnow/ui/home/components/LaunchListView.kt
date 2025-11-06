@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -58,6 +57,8 @@ import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.LaunchListShimmer
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
+import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
+import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 
@@ -205,7 +206,7 @@ fun LaunchItemView(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.RocketLaunch,
+                                imageVector = CustomIcons.RocketLaunch,
                                 contentDescription = "Launch placeholder",
                                 modifier = Modifier.size(72.dp),
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
@@ -222,7 +223,7 @@ fun LaunchItemView(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.RocketLaunch,
+                        imageVector = CustomIcons.RocketLaunch,
                         contentDescription = "Launch placeholder",
                         modifier = Modifier.size(72.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)

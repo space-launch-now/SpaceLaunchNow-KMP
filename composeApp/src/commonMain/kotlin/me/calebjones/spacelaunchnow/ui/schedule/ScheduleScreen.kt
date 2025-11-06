@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -61,26 +60,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
+import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
+import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.koinInject
+import kotlin.time.Clock.System
 
 @Composable
 fun ScheduleScreen(
@@ -585,6 +585,21 @@ private fun ScheduleContent(onLaunchClick: (String) -> Unit) {
 }
 
 @Composable
+private fun RocketIconPlaceholder() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = CustomIcons.RocketLaunch,
+            contentDescription = "placeholder",
+            modifier = Modifier.size(48.dp).padding(4.dp),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+        )
+    }
+}
+
+@Composable
 private fun ScheduleLaunchCard(
     launch: LaunchBasic,
     onClick: () -> Unit
@@ -617,12 +632,11 @@ private fun ScheduleLaunchCard(
             val mission = launch.launchServiceProvider.name
 
             if (imageUrl != null) {
-                AsyncImage(
+                SubcomposeAsyncImage(
                     model = imageUrl,
                     contentDescription = null,
-                    placeholder = rememberVectorPainter(Icons.Filled.RocketLaunch),
-                    error = rememberVectorPainter(Icons.Filled.RocketLaunch),
-                    fallback = rememberVectorPainter(Icons.Filled.RocketLaunch),
+                    loading = { RocketIconPlaceholder() },
+                    error = { RocketIconPlaceholder() },
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
@@ -638,9 +652,9 @@ private fun ScheduleLaunchCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.RocketLaunch,
+                        imageVector = CustomIcons.RocketLaunch,
                         contentDescription = "placeholder",
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(48.dp).padding(4.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
                     )
                 }
