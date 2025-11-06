@@ -60,17 +60,19 @@ class LaunchViewModel(
         }
     }
 
-    fun fetchLaunchDetails(id: String) {
+    fun fetchLaunchDetails(id: String, forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _error.value = null
             
-            // Check if we have detailed data in cache first
-            val cachedDetailed = launchCache.getCachedLaunchDetailed(id)
-            if (cachedDetailed != null) {
-                _launchDetails.value = cachedDetailed
-                updateVideoPlayerState(cachedDetailed)
-                _isLoading.value = false
-                return@launch
+            // Check if we have detailed data in cache first (unless forcing refresh)
+            if (!forceRefresh) {
+                val cachedDetailed = launchCache.getCachedLaunchDetailed(id)
+                if (cachedDetailed != null) {
+                    _launchDetails.value = cachedDetailed
+                    updateVideoPlayerState(cachedDetailed)
+                    _isLoading.value = false
+                    return@launch
+                }
             }
             
             _isLoading.value = true
@@ -86,6 +88,14 @@ class LaunchViewModel(
             }
             _isLoading.value = false
         }
+    }
+    
+    /**
+     * Force refresh launch details (bypasses cache)
+     * Useful for pull-to-refresh functionality
+     */
+    fun refreshLaunchDetails(id: String) {
+        fetchLaunchDetails(id, forceRefresh = true)
     }
     
     /**
