@@ -41,6 +41,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
@@ -73,6 +74,7 @@ val appModule = module {
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
     viewModelOf(::HomeViewModel)
+    viewModelOf(::ScheduleViewModel)
     singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
