@@ -42,6 +42,9 @@ data class LaunchDetail(val launchId: String)
 data class EventDetail(val eventId: Int)
 
 @Serializable
+data class AgencyDetail(val agencyId: Int)
+
+@Serializable
 data class FullscreenVideo(
     val launchId: String,
     val videoUrl: String,

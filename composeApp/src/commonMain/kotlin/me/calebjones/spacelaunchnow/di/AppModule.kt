@@ -34,6 +34,7 @@ import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
@@ -75,6 +76,7 @@ val appModule = module {
     singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
+    viewModelOf(::AgencyViewModel)
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::LaunchCache)
