@@ -232,6 +232,19 @@ fun SettingsScreen(
                     }
                 }
                 // ABOUT
+                // EXPLORE
+                item {
+                    SectionHeaderText("Explore")
+                    Spacer(Modifier.height(2.dp))
+                    SettingsCardRow {
+                        SettingsNavigationRow(
+                            title = "Rockets",
+                            subtitle = "Browse launcher configurations and details",
+                            onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Rockets) }
+                        )
+                    }
+                }
+                // ABOUT
                 item {
                     SectionHeaderText("About")
                     Spacer(Modifier.height(2.dp))
