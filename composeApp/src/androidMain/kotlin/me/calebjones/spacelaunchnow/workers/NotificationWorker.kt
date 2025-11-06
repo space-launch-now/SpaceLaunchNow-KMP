@@ -8,8 +8,8 @@ import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
+import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
-import me.calebjones.spacelaunchnow.ui.viewmodel.NotificationDisplayHelper
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

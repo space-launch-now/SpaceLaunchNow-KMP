@@ -19,9 +19,10 @@ actual fun formatLocalDateTime(localDateTime: LocalDateTime, useUtc: Boolean): S
             localDateTime.second
         )
         
-        // Use JVM's locale-aware formatting
+        // Use user's locale from LocaleUtil for consistent locale handling
+        val userLocale = Locale.forLanguageTag(LocaleUtil.getLocaleTag())
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-            .withLocale(Locale.getDefault())
+            .withLocale(userLocale)
 
         val formatted = javaDateTime.format(formatter)
         if (useUtc) "$formatted UTC" else formatted
@@ -43,9 +44,10 @@ actual fun formatLocalDate(localDateTime: LocalDateTime, useUtc: Boolean): Strin
             localDateTime.dayOfMonth
         )
         
-        // Use JVM's locale-aware date formatting
+        // Use user's locale from LocaleUtil for consistent locale handling
+        val userLocale = Locale.forLanguageTag(LocaleUtil.getLocaleTag())
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-            .withLocale(Locale.getDefault())
+            .withLocale(userLocale)
 
         val formatted = javaDate.format(formatter)
         if (useUtc) "$formatted UTC" else formatted
@@ -64,9 +66,10 @@ actual fun formatLocalTime(localDateTime: LocalDateTime, useUtc: Boolean): Strin
             localDateTime.minute
         )
         
-        // Use JVM's locale-aware time formatting
+        // Use user's locale from LocaleUtil for consistent locale handling
+        val userLocale = Locale.forLanguageTag(LocaleUtil.getLocaleTag())
         val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
-            .withLocale(Locale.getDefault())
+            .withLocale(userLocale)
 
         val formatted = javaTime.format(formatter)
         if (useUtc) "$formatted UTC" else formatted

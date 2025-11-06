@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.viewmodel
+package me.calebjones.spacelaunchnow.data.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -27,6 +27,8 @@ import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.SpaceLaunchNotificationChannel
+import me.calebjones.spacelaunchnow.util.LocaleUtil
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -63,7 +65,7 @@ object NotificationDisplayHelper {
      * This provides the mapping between topics and channels
      */
     fun getChannelForTopic(topic: NotificationTopic): String {
-        return SpaceLaunchNotificationChannel.getChannelForTopic(topic).id
+        return SpaceLaunchNotificationChannel.Companion.getChannelForTopic(topic).id
     }
 
     /**
@@ -145,7 +147,7 @@ object NotificationDisplayHelper {
                     }
 
                     SpaceLaunchNotificationChannel.LAUNCH_STATUS_UPDATES -> {
-                        // High priority: Strong pattern for launch status (success/failure/in-flight)  
+                        // High priority: Strong pattern for launch status (success/failure/in-flight)
                         enableLights(true)
                         lightColor = Color.BLUE
                         enableVibration(true)
@@ -395,9 +397,9 @@ object NotificationDisplayHelper {
     }
 
     /**
-     * Convert ISO 8601 timestamp to pretty date format
+     * Convert ISO 8601 timestamp to pretty time format
      * Input: "2025-10-15T12:00:00Z"
-     * Output: "Oct 15, 2025 at 12:00 PM" (localized)
+     * Output: "12:00 PM" (en-US) or "12:00" (most other locales with 24-hour format)
      */
     private fun formatLaunchDate(launchNet: String): String {
         return try {
@@ -407,8 +409,12 @@ object NotificationDisplayHelper {
             }
             val date = inputFormat.parse(launchNet)
 
-            // Format to pretty date (user's local timezone)
-            val outputFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+            // Use locale-aware time formatting (automatically handles 12-hour vs 24-hour)
+            val userLocale = Locale.forLanguageTag(LocaleUtil.getLocaleTag())
+            val outputFormat = DateFormat.getTimeInstance(
+                DateFormat.SHORT,
+                userLocale
+            )
             date?.let { outputFormat.format(it) } ?: launchNet
         } catch (e: Exception) {
             println("⚠️ Failed to parse launch date: $launchNet - ${e.message}")
@@ -587,7 +593,7 @@ object NotificationDisplayHelper {
         title: String? = null,
         body: String? = null
     ) {
-        val notificationData = NotificationData.fromMap(data)
+        val notificationData = NotificationData.Companion.fromMap(data)
         if (notificationData != null) {
             showNotification(context, notificationData, title, body)
         } else {

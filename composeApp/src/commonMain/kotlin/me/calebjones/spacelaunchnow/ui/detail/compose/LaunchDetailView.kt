@@ -337,12 +337,14 @@ private fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                                             textAlign = TextAlign.Center
                                         )
                                         launch.probability?.let { prob ->
-                                            InfoTile(
-                                                icon = Icons.Filled.WbCloudy,
-                                                label = "Weather",
-                                                value = "$prob%",
-                                                modifier = Modifier.weight(1f)
-                                            )
+                                            if (prob > 0) {
+                                                InfoTile(
+                                                    icon = Icons.Filled.WbCloudy,
+                                                    label = "Weather",
+                                                    value = "$prob%",
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                            }
                                         }
                                     }
 
@@ -933,192 +935,241 @@ private fun LaunchLocationCard(
     openUrl: (String) -> Unit = { /* TODO: Implement for platform */ }
 ) {
     if (location == null) return
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            // Map image centered at the top (if exists)
-            location.mapImage?.let { mapUrl ->
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    AsyncImage(
-                        model = mapUrl,
-                        contentDescription = "Location Map",
-                        modifier = Modifier
-                            .height(140.dp)
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Map image centered at the top (if exists)
+                // Prefer location.image, fallback to mapImage if image is null
+                location.image?.imageUrl?.let { mapUrl ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            model = mapUrl,
+                            contentDescription = "Location Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                } ?: location.mapImage?.let { mapUrl ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            model = mapUrl,
+                            contentDescription = "Location Map",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+                // Name
+                location.name?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                // Country and Timezone combined row
+                if (location.country != null || location.timezoneName != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        location.country?.let { country ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                country.alpha2Code?.let { code ->
+                                    AsyncImage(
+                                        model = "https://flagcdn.com/w40/${code.lowercase()}.png",
+                                        contentDescription = "Flag",
+                                        modifier = Modifier.width(24.dp).height(16.dp)
+                                            .clip(RoundedCornerShape(2.dp)),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text(
+                                    text = country.name ?: country.alpha2Code ?: "Unknown",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                        }
+                        location.timezoneName?.let { tz ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Filled.Public,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(text = tz, style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+                }
+                // Description
+                location.description?.takeIf { it.isNotBlank() }?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
-            // Name
-            location.name?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            // Country and Timezone combined row
-            if (location.country != null || location.timezoneName != null) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    location.country?.let { country ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            country.alpha2Code?.let { code ->
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Pad info (if available)
+                pad?.let { it ->
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        // Map image centered at the top (if exists)
+                        // Prefer pad.image, fallback to mapImage if image is null
+                        it.image?.imageUrl?.let { mapUrl ->
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 AsyncImage(
-                                    model = "https://flagcdn.com/w40/${code.lowercase()}.png",
-                                    contentDescription = "Flag",
-                                    modifier = Modifier.width(24.dp).height(16.dp)
-                                        .clip(RoundedCornerShape(2.dp)),
+                                    model = mapUrl,
+                                    contentDescription = "Pad Image",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp)),
                                     contentScale = ContentScale.Crop
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
                             }
+                        } ?: it.mapImage?.let { mapUrl ->
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                AsyncImage(
+                                    model = mapUrl,
+                                    contentDescription = "Pad Map",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+                        it.name?.let { padName ->
                             Text(
-                                text = country.name ?: country.alpha2Code ?: "Unknown",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.secondary
+                                text = padName,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
                             )
                         }
-                    }
-                    location.timezoneName?.let { tz ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Filled.Public,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Text(text = tz, style = MaterialTheme.typography.bodyMedium)
-                        }
-                    }
-                }
-            }
-            // Description
-            location.description?.takeIf { it.isNotBlank() }?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            HorizontalDivider()
-            // Pad info (if available)
-            pad?.let { it ->
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // Map image centered at the top (if exists)
-                    it.mapImage?.let { mapUrl ->
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            AsyncImage(
-                                model = mapUrl,
-                                contentDescription = "Pad Map",
-                                modifier = Modifier
-                                    .height(140.dp)
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp)),
-                                contentScale = ContentScale.Crop
+                        it.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                            Text(
+                                text = desc,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                    }
-                    it.name?.let { padName ->
-                        Text(
-                            text = padName,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                        // Other details (coords, turnaround)
+                        val otherStats = listOfNotNull(
+                            it.latitude?.let { lat ->
+                                it.longitude?.let { lon ->
+                                    val latStr = ((lat * 100).toInt() / 100.0).toString()
+                                    val lonStr = ((lon * 100).toInt() / 100.0).toString()
+                                    "Coordinates: $latStr, $lonStr"
+                                }
+                            },
+                            it.fastestTurnaround?.takeIf { f -> f.isNotBlank() }
+                                ?.let { f ->
+                                    "Fastest Turnaround: ${
+                                        parseIsoDurationToHumanReadable(
+                                            f
+                                        )
+                                    }"
+                                }
                         )
-                    }
-                    it.description?.takeIf { it.isNotBlank() }?.let { desc ->
-                        Text(
-                            text = desc,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    // Other details (coords, turnaround)
-                    val otherStats = listOfNotNull(
-                        it.latitude?.let { lat ->
-                            it.longitude?.let { lon ->
-                                val latStr = ((lat * 100).toInt() / 100.0).toString()
-                                val lonStr = ((lon * 100).toInt() / 100.0).toString()
-                                "Coordinates: $latStr, $lonStr"
-                            }
-                        },
-                        it.fastestTurnaround?.takeIf { f -> f.isNotBlank() }
-                            ?.let { f -> "Fastest Turnaround: ${parseIsoDurationToHumanReadable(f)}" }
-                    )
 
-                    if (otherStats.isNotEmpty()) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            otherStats.forEach { stat ->
-                                Text(
-                                    text = stat,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+                        if (otherStats.isNotEmpty()) {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                otherStats.forEach { stat ->
+                                    Text(
+                                        text = stat,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
                             }
                         }
-                    }
-                    // Optional: Pad map url (if exists)
-                    it.mapUrl?.let { mapUrl ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Button(
-                                onClick = { openUrl(mapUrl) },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
-                            ) {
-                                Icon(
-                                    imageVector = FontAwesomeIcons.Solid.Map,
-                                    contentDescription = "Map",
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Open Map", color = MaterialTheme.colorScheme.onTertiary)
+                        // Optional: Pad map url (if exists)
+                        it.mapUrl?.let { mapUrl ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Button(
+                                    onClick = { openUrl(mapUrl) },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
+                                ) {
+                                    Icon(
+                                        imageVector = FontAwesomeIcons.Solid.Map,
+                                        contentDescription = "Map",
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Open Map", color = MaterialTheme.colorScheme.onTertiary)
+                                }
                             }
                         }
-                    }
-                    // Info & Wiki links
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        it.infoUrl?.let { url ->
-                            Button(
-                                onClick = { openUrl(url) },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(
-                                    imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                                    contentDescription = "Information",
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Website")
+                        // Info & Wiki links
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            it.infoUrl?.let { url ->
+                                Button(
+                                    onClick = { openUrl(url) },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(
+                                        imageVector = FontAwesomeIcons.Solid.InfoCircle,
+                                        contentDescription = "Information",
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Website")
+                                }
                             }
-                        }
-                        it.wikiUrl?.let { url ->
-                            Button(
-                                onClick = { openUrl(url) },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-                            ) {
-                                Icon(
-                                    imageVector = FontAwesomeIcons.Brands.WikipediaW,
-                                    contentDescription = "Wikipedia",
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Wikipedia", color = MaterialTheme.colorScheme.onSecondary)
+                            it.wikiUrl?.let { url ->
+                                Button(
+                                    onClick = { openUrl(url) },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                                ) {
+                                    Icon(
+                                        imageVector = FontAwesomeIcons.Brands.WikipediaW,
+                                        contentDescription = "Wikipedia",
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Wikipedia", color = MaterialTheme.colorScheme.onSecondary)
+                                }
                             }
                         }
                     }
