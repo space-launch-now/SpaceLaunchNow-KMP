@@ -84,7 +84,8 @@ import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 @Composable
 fun TabletDesktopLayout(
     navController: NavHostController,
-    themeOption: ThemeOption = ThemeOption.System
+    themeOption: ThemeOption = ThemeOption.System,
+    content: @Composable () -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -160,135 +161,12 @@ fun TabletDesktopLayout(
                                 }
                             }
                             HorizontalDivider(modifier = Modifier.fillMaxHeight().width(1.dp))
-                            // Main Content
+                            // Main Content - Accept hoisted NavHost content
                             Surface(
-                                color = MaterialTheme.colorScheme.background
+                                color = MaterialTheme.colorScheme.background,
+                                modifier = Modifier.fillMaxSize()
                             ) {
-                                NavHost(
-                                    navController = navController,
-                                    startDestination = Home,
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    composableWithCompositionLocal<Home> {
-                                        HomeScreen(navController = navController)
-                                    }
-                                    composable<Schedule> {
-                                        ScheduleScreen(
-                                            onLaunchClick = { id ->
-                                                navController.navigate(
-                                                    LaunchDetail(
-                                                        id
-                                                    )
-                                                )
-                                            }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<Settings> {
-                                        SettingsScreen(
-                                            navController = navController,
-                                            onOpenNotificationSettings = {
-                                                navController.navigate(NotificationSettings)
-                                            },
-                                            onOpenDebugSettings = {
-                                                navController.navigate(DebugSettings)
-                                            },
-                                            onOpenAboutLibraries = {
-                                                navController.navigate(AboutLibraries)
-                                            }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<NotificationSettings> {
-                                        NotificationSettingsScreen(
-                                            navController = navController,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<DebugSettings> {
-                                        DebugSettingsScreen(
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
-                                        val launchDetail = backStackEntry.toRoute<LaunchDetail>()
-                                        LaunchDetailScreen(
-                                            launchId = launchDetail.launchId,
-                                            onNavigateBack = { navController.popBackStack() },
-                                            navController = navController
-                                        )
-                                    }
-                                    composableWithCompositionLocal<EventDetail> { backStackEntry ->
-                                        val eventDetail = backStackEntry.toRoute<EventDetail>()
-                                        EventDetailScreen(
-                                            eventId = eventDetail.eventId,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
-                                        val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
-                                        AgencyDetailScreen(
-                                            agencyId = agencyDetail.agencyId,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
-                                        val fullscreenVideo =
-                                            backStackEntry.toRoute<FullscreenVideo>()
-                                        FullscreenVideoScreen(
-                                            videoUrl = fullscreenVideo.videoUrl,
-                                            launchName = fullscreenVideo.launchName,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<SupportUs> {
-                                        SupportUsScreen(
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<me.calebjones.spacelaunchnow.navigation.ThemeCustomization> {
-                                        ThemeCustomizationScreen(
-                                            navController = navController
-                                        )
-                                    }
-                                    composableWithCompositionLocal<CalendarSync> {
-                                        CalendarSyncScreen(
-                                            navController = navController
-                                        )
-                                    }
-                                    composableWithCompositionLocal<Rockets> {
-                                        RocketListScreen(
-                                            onNavigateToRocketDetail = { id ->
-                                                navController.navigate(
-                                                    RocketDetail(id)
-                                                )
-                                            },
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<RocketDetail> { backStackEntry ->
-                                        val rocketDetail = backStackEntry.toRoute<RocketDetail>()
-                                        RocketDetailScreen(
-                                            rocketId = rocketDetail.rocketId,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<Agencies> {
-                                        AgencyListScreen(
-                                            onNavigateToAgencyDetail = { id ->
-                                                navController.navigate(
-                                                    AgencyDetail(id)
-                                                )
-                                            },
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
-                                        val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
-                                        AgencyDetailScreen(
-                                            agencyId = agencyDetail.agencyId,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                }
+                                content()
                             }
                         }
                     }

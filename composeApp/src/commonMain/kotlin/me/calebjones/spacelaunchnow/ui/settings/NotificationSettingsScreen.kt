@@ -156,111 +156,7 @@ fun NotificationSettingsScreen(
                 }
             }
 
-            // Launch Service Providers Card
-            item {
-                Column {
-                    Text(
-                        text = "Launch Service Providers",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Select which launch providers to follow",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        uiState.availableAgencies.chunked(2).forEach { agencyPair ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                agencyPair.forEach { agency ->
-                                    AgencyCheckboxItem(
-                                        agency = agency,
-                                        isChecked = uiState.notificationSettings.subscribedAgencies.contains(
-                                            agency.id.toString()
-                                        ),
-                                        onCheckedChange = {
-                                            viewModel.toggleAgencySubscription(agency)
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                                if (agencyPair.size == 1) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Launch Locations Card
-            item {
-                Column {
-                    Text(
-                        text = "Launch Locations",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Select which locations to follow",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        uiState.availableLocations.chunked(2).forEach { locationPair ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                locationPair.forEach { location ->
-                                    LocationCheckboxItem(
-                                        location = location,
-                                        isChecked = uiState.notificationSettings.subscribedLocations.contains(
-                                            location.id.toString()
-                                        ),
-                                        onCheckedChange = {
-                                            viewModel.toggleLocationSubscription(location)
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                                if (locationPair.size == 1) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Strict Matching Card
+                        // Strict Matching Card
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -389,6 +285,110 @@ fun NotificationSettingsScreen(
                                 },
                                 enabled = !uiState.notificationSettings.followAllLaunches
                             )
+                        }
+                    }
+                }
+            }
+
+            // Launch Service Providers Card
+            item {
+                Column {
+                    Text(
+                        text = "Launch Service Providers",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Select which launch providers to follow",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        uiState.availableAgencies.chunked(2).forEach { agencyPair ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                agencyPair.forEach { agency ->
+                                    AgencyCheckboxItem(
+                                        agency = agency,
+                                        isChecked = uiState.notificationSettings.subscribedAgencies.contains(
+                                            agency.id.toString()
+                                        ),
+                                        onCheckedChange = {
+                                            viewModel.toggleAgencySubscription(agency)
+                                        },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                if (agencyPair.size == 1) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Launch Locations Card
+            item {
+                Column {
+                    Text(
+                        text = "Launch Locations",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Select which locations to follow",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        uiState.availableLocations.chunked(2).forEach { locationPair ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                locationPair.forEach { location ->
+                                    LocationCheckboxItem(
+                                        location = location,
+                                        isChecked = uiState.notificationSettings.subscribedLocations.contains(
+                                            location.id.toString()
+                                        ),
+                                        onCheckedChange = {
+                                            viewModel.toggleLocationSubscription(location)
+                                        },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                if (locationPair.size == 1) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
                         }
                     }
                 }

@@ -62,7 +62,8 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 @Composable
 fun PhoneLayout(
     navController: NavHostController,
-    themeOption: ThemeOption = ThemeOption.System
+    themeOption: ThemeOption = ThemeOption.System,
+    content: @Composable () -> Unit
 ) {
     // Observe the current back stack entry
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -113,139 +114,71 @@ fun PhoneLayout(
                         }
                     }
                 ) { innerPadding ->
-                    NavHost(
+                    // Accept hoisted NavHost content and apply phone-specific padding
+                    PhoneContentWrapper(
                         navController = navController,
-                        startDestination = Home,
-                        modifier = Modifier
-                    ) {
-                        composableWithCompositionLocal<Home> {
-                            Box(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
-                                HomeScreen(navController = navController)
-                            }
-                        }
-                        composableWithCompositionLocal<Schedule> {
-                            Box(modifier = Modifier.padding(innerPadding)) {
-                                ScheduleScreen(
-                                    onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
-                                )
-                            }
-                        }
-                        composableWithCompositionLocal<Settings> {
-                            Box(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
-                                SettingsScreen(
-                                    navController = navController,
-                                    onOpenNotificationSettings = {
-                                        navController.navigate(NotificationSettings)
-                                    },
-                                    onOpenDebugSettings = {
-                                        navController.navigate(DebugSettings)
-                                    },
-                                    onOpenAboutLibraries = {
-                                        navController.navigate(AboutLibraries)
-                                    }
-                                )
-                            }
-                        }
-                        composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
-                            val launchDetail = backStackEntry.toRoute<LaunchDetail>()
-                            // LaunchDetailScreen gets full screen access (no padding)
-                            LaunchDetailScreen(
-                                launchId = launchDetail.launchId,
-                                onNavigateBack = { navController.popBackStack() },
-                                navController = navController
-                            )
-                        }
-                        composableWithCompositionLocal<EventDetail> { backStackEntry ->
-                            val eventDetail = backStackEntry.toRoute<EventDetail>()
-                            EventDetailScreen(
-                                eventId = eventDetail.eventId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
-                            val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
-                            AgencyDetailScreen(
-                                agencyId = agencyDetail.agencyId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
-                            val fullscreenVideo = backStackEntry.toRoute<FullscreenVideo>()
-                            FullscreenVideoScreen(
-                                videoUrl = fullscreenVideo.videoUrl,
-                                launchName = fullscreenVideo.launchName,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<NotificationSettings> {
-                            // NotificationSettingsScreen gets full screen access (no padding)
-                            NotificationSettingsScreen(
-                                navController = navController,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<DebugSettings> {
-                            // DebugSettingsScreen gets full screen access (no padding)
-                            DebugSettingsScreen(
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<AboutLibraries> {
-                            AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
-                        }
-                        composableWithCompositionLocal<SupportUs> {
-                            SupportUsScreen(
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<ThemeCustomization> {
-                            ThemeCustomizationScreen(
-                                navController = navController
-                            )
-                        }
-                        composableWithCompositionLocal<CalendarSync> {
-                            CalendarSyncScreen(
-                                navController = navController
-                            )
-                        }
-                        composableWithCompositionLocal<Rockets> {
-                            RocketListScreen(
-                                onNavigateToRocketDetail = { id ->
-                                    navController.navigate(
-                                        RocketDetail(id)
-                                    )
-                                },
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<RocketDetail> { backStackEntry ->
-                            val rocketDetail = backStackEntry.toRoute<RocketDetail>()
-                            RocketDetailScreen(
-                                rocketId = rocketDetail.rocketId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<Agencies> {
-                            AgencyListScreen(
-                                onNavigateToAgencyDetail = { id ->
-                                    navController.navigate(
-                                        AgencyDetail(id)
-                                    )
-                                },
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
-                            val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
-                            AgencyDetailScreen(
-                                agencyId = agencyDetail.agencyId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                    }
+                        innerPadding = innerPadding,
+                        content = content
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PhoneContentWrapper(
+    navController: NavHostController,
+    innerPadding: androidx.compose.foundation.layout.PaddingValues,
+    content: @Composable () -> Unit
+) {
+    // Observe the current back stack entry to determine padding needs
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    
+    // Determine which screens need special padding
+    val needsBottomPadding = when (navBackStackEntry?.destination?.route) {
+        // Full screen routes (no padding)
+        LaunchDetail::class.qualifiedName,
+        EventDetail::class.qualifiedName,
+        RocketDetail::class.qualifiedName,
+        AgencyDetail::class.qualifiedName,
+        FullscreenVideo::class.qualifiedName,
+        NotificationSettings::class.qualifiedName,
+        DebugSettings::class.qualifiedName -> false
+        
+        // Default padding for main routes  
+        Home::class.qualifiedName,
+        Settings::class.qualifiedName -> true
+        
+        // Full padding for list routes
+        Schedule::class.qualifiedName -> true
+        
+        else -> {
+            // For routes with arguments, check if it starts with certain patterns
+            val currentRoute = navBackStackEntry?.destination?.route
+            currentRoute?.contains("LaunchDetail") != true &&
+                    currentRoute?.contains("EventDetail") != true &&
+                    currentRoute?.contains("AgencyDetail") != true &&
+                    currentRoute?.contains("FullscreenVideo") != true &&
+                    currentRoute?.contains("NotificationSettings") != true &&
+                    currentRoute?.contains("DebugSettings") != true
+        }
+    }
+    
+    val needsAllPadding = when (navBackStackEntry?.destination?.route) {
+        Schedule::class.qualifiedName -> true
+        else -> false
+    }
+    
+    // Apply appropriate padding based on route
+    Box(
+        modifier = when {
+            needsAllPadding -> Modifier.padding(innerPadding)
+            needsBottomPadding -> Modifier.padding(bottom = innerPadding.calculateBottomPadding())
+            else -> Modifier // No padding for full screen routes
+        }
+    ) {
+        content()
     }
 }
 

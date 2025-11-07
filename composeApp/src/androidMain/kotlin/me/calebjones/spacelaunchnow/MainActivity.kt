@@ -41,6 +41,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         setTheme(android.R.style.Theme_Material_NoActionBar)
         super.onCreate(savedInstanceState)
+        
+        println("🔄 ROTATION_DEBUG: onCreate called - savedInstanceState: ${if (savedInstanceState == null) "null (fresh start)" else "not null (restoring)"}")
 
         // Initialize notification settings helper for Android
         NotificationSettingsHelper.initialize(this)
