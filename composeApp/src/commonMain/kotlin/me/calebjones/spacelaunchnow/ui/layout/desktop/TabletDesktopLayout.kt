@@ -90,6 +90,29 @@ fun TabletDesktopLayout(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    // Determine if the side navigation rail should be shown
+    val showSideNavigation = when (navBackStackEntry?.destination?.route) {
+        LaunchDetail::class.qualifiedName -> false // Hide for LaunchDetail
+        EventDetail::class.qualifiedName -> false // Hide for EventDetail
+        RocketDetail::class.qualifiedName -> false // Hide for RocketDetail
+        AgencyDetail::class.qualifiedName -> false // Hide for AgencyDetail
+        FullscreenVideo::class.qualifiedName -> false // Hide for FullscreenVideo
+        NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
+        DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
+        
+        else -> {
+            // For routes with arguments, check if it contains certain patterns
+            val currentRoute = navBackStackEntry?.destination?.route
+            currentRoute?.contains("LaunchDetail") != true &&
+                    currentRoute?.contains("EventDetail") != true &&
+                    currentRoute?.contains("AgencyDetail") != true &&
+                    currentRoute?.contains("RocketDetail") != true &&
+                    currentRoute?.contains("FullscreenVideo") != true &&
+                    currentRoute?.contains("NotificationSettings") != true &&
+                    currentRoute?.contains("DebugSettings") != true
+        }
+    }
+
     SpaceLaunchNowTheme(themeOption = themeOption) {
         SharedTransitionLayout {
             CompositionLocalProvider(LocalSharedTransitionScope provides this) {
@@ -108,59 +131,61 @@ fun TabletDesktopLayout(
                         modifier = Modifier.weight(1f)
                     ) {
                         Row(Modifier.fillMaxSize()) {
-                            // Sidebar Navigation using NavigationRail
-                            Column(
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) {
-                                NavigationRail(
-
-                                    header = {
-                                        Image(
-                                            painter = painterResource(Res.drawable.launcher),
-                                            contentDescription = "App Icon",
-                                            contentScale = ContentScale.Fit,
-                                            modifier = Modifier
-                                                .size(96.dp)
-                                                .absolutePadding(
-                                                    left = 8.dp,
-                                                    right = 8.dp,
-                                                    bottom = 32.dp,
-                                                    top = 16.dp
-                                                )
-                                        )
-                                    },
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            // Sidebar Navigation using NavigationRail - conditionally shown
+                            if (showSideNavigation) {
+                                Column(
+                                    verticalArrangement = Arrangement.Bottom,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {
-                                    screens.forEachIndexed { index, screen ->
-                                        NavigationRailItem(
-                                            modifier = Modifier.padding(8.dp),
-                                            icon = {
-                                                Icon(
-                                                    selectedIcons[index], // Always use same icon for simplicity
-                                                    contentDescription = items[index]
-                                                )
-                                            },
-                                            label = {
-                                                Text(
-                                                    items[index],
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            },
-                                            selected = currentDestination?.route == screen::class.qualifiedName,
-                                            onClick = {
-                                                navController.navigate(screen) {
-                                                    // Avoid multiple copies of the same destination
-                                                    launchSingleTop = true
-                                                    // Restore state when returning to a previously selected screen
-                                                    restoreState = true
+                                    NavigationRail(
+
+                                        header = {
+                                            Image(
+                                                painter = painterResource(Res.drawable.launcher),
+                                                contentDescription = "App Icon",
+                                                contentScale = ContentScale.Fit,
+                                                modifier = Modifier
+                                                    .size(96.dp)
+                                                    .absolutePadding(
+                                                        left = 8.dp,
+                                                        right = 8.dp,
+                                                        bottom = 32.dp,
+                                                        top = 16.dp
+                                                    )
+                                            )
+                                        },
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ) {
+                                        screens.forEachIndexed { index, screen ->
+                                            NavigationRailItem(
+                                                modifier = Modifier.padding(8.dp),
+                                                icon = {
+                                                    Icon(
+                                                        selectedIcons[index], // Always use same icon for simplicity
+                                                        contentDescription = items[index]
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(
+                                                        items[index],
+                                                        color = MaterialTheme.colorScheme.onSurface
+                                                    )
+                                                },
+                                                selected = currentDestination?.route == screen::class.qualifiedName,
+                                                onClick = {
+                                                    navController.navigate(screen) {
+                                                        // Avoid multiple copies of the same destination
+                                                        launchSingleTop = true
+                                                        // Restore state when returning to a previously selected screen
+                                                        restoreState = true
+                                                    }
                                                 }
-                                            }
-                                        )
+                                            )
+                                        }
                                     }
                                 }
+                                HorizontalDivider(modifier = Modifier.fillMaxHeight().width(1.dp))
                             }
-                            HorizontalDivider(modifier = Modifier.fillMaxHeight().width(1.dp))
                             // Main Content - Accept hoisted NavHost content
                             Surface(
                                 color = MaterialTheme.colorScheme.background,

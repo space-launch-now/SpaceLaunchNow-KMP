@@ -55,7 +55,8 @@ fun VideoPlayerCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Common video player
-            val selectedVideo = videoPlayerState.availableVideos[videoPlayerState.selectedVideoIndex]
+            val selectedVideo =
+                videoPlayerState.availableVideos[videoPlayerState.selectedVideoIndex]
             LaunchVideoPlayer(
                 vidUrl = selectedVideo,
                 launchName = launchName,
@@ -67,6 +68,10 @@ fun VideoPlayerCard(
 
             // Video picker (only show if there are multiple videos)
             if (videoPlayerState.availableVideos.size > 1) {
+                Text(
+                    text = "Select Video",
+                    style = MaterialTheme.typography.titleMedium
+                )
                 VideoPickerDropdown(
                     videos = videoPlayerState.availableVideos,
                     selectedIndex = videoPlayerState.selectedVideoIndex,
