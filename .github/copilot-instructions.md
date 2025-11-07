@@ -332,6 +332,8 @@ launchesApi.getLaunchMiniList(limit = 10, upcoming = true)
 2. Create ViewModel extending `ViewModel` with StateFlow properties
 3. Register ViewModel in `AppModule.kt` using `viewModelOf(::YourViewModel)`
 4. Add repository if external data needed, register with `bind<Interface>()`
+5. Implement Composables in separate files as often as possible, keep files as short as possible
+6. Attempt to use components from `ui/components/` to match styles
 
 ### Platform-Specific Code
 

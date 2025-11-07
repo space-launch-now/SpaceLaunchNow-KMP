@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.detail.compose.components
+package me.calebjones.spacelaunchnow.ui.components
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width

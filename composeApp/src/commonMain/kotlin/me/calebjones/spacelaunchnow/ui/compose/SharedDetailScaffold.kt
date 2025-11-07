@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.detail.compose
+package me.calebjones.spacelaunchnow.ui.compose
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.LinearEasing
@@ -24,11 +24,11 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -319,7 +319,7 @@ private fun SharedDetailImage(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    androidx.compose.material3.CircularProgressIndicator(
+                    CircularProgressIndicator(
                         modifier = Modifier.size(48.dp),
                         strokeWidth = 4.dp,
                         color = MaterialTheme.colorScheme.primary

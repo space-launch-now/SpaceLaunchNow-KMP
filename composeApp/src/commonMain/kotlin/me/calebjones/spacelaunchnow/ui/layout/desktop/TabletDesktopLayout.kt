@@ -41,6 +41,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
+import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
@@ -56,9 +57,10 @@ import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
-import me.calebjones.spacelaunchnow.ui.detail.AgencyDetailScreen
-import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
+import me.calebjones.spacelaunchnow.ui.agencies.AgencyDetailScreen
+import me.calebjones.spacelaunchnow.ui.agencies.AgencyListScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
+import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
@@ -254,7 +256,11 @@ fun TabletDesktopLayout(
                                     }
                                     composableWithCompositionLocal<Rockets> {
                                         RocketListScreen(
-                                            onNavigateToRocketDetail = { id -> navController.navigate(RocketDetail(id)) },
+                                            onNavigateToRocketDetail = { id ->
+                                                navController.navigate(
+                                                    RocketDetail(id)
+                                                )
+                                            },
                                             onNavigateBack = { navController.popBackStack() }
                                         )
                                     }
@@ -262,6 +268,23 @@ fun TabletDesktopLayout(
                                         val rocketDetail = backStackEntry.toRoute<RocketDetail>()
                                         RocketDetailScreen(
                                             rocketId = rocketDetail.rocketId,
+                                            onNavigateBack = { navController.popBackStack() }
+                                        )
+                                    }
+                                    composableWithCompositionLocal<Agencies> {
+                                        AgencyListScreen(
+                                            onNavigateToAgencyDetail = { id ->
+                                                navController.navigate(
+                                                    AgencyDetail(id)
+                                                )
+                                            },
+                                            onNavigateBack = { navController.popBackStack() }
+                                        )
+                                    }
+                                    composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
+                                        val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                                        AgencyDetailScreen(
+                                            agencyId = agencyDetail.agencyId,
                                             onNavigateBack = { navController.popBackStack() }
                                         )
                                     }

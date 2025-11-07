@@ -234,14 +234,22 @@ fun SettingsScreen(
                 // ABOUT
                 // EXPLORE
                 item {
-                    SectionHeaderText("Explore")
+                    SectionHeaderText("Explore (WORK IN PROGRESS VIEWS)")
                     Spacer(Modifier.height(2.dp))
                     SettingsCardRow {
-                        SettingsNavigationRow(
-                            title = "Rockets",
-                            subtitle = "Browse launcher configurations and details",
-                            onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Rockets) }
-                        )
+                        Column(Modifier.fillMaxWidth()) {
+                            SettingsNavigationRow(
+                                title = "Rockets",
+                                subtitle = "Browse launcher configurations and details",
+                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Rockets) }
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
+                                title = "Agencies",
+                                subtitle = "Explore space agencies and their missions",
+                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Agencies) }
+                            )
+                        }
                     }
                 }
                 // ABOUT
@@ -311,9 +319,9 @@ fun SettingsScreen(
             text = {
                 Column {
                     Text(
-                        if (useTotp) 
-                            "Enter the 6-digit code from your authenticator app:" 
-                        else 
+                        if (useTotp)
+                            "Enter the 6-digit code from your authenticator app:"
+                        else
                             "Enter the password to unlock developer settings:"
                     )
                     Spacer(Modifier.height(8.dp))
@@ -329,9 +337,9 @@ fun SettingsScreen(
                             showPasswordError = false
                         },
                         label = { Text(if (useTotp) "TOTP Code" else "Password") },
-                        visualTransformation = if (useTotp || showPassword) 
-                            VisualTransformation.None 
-                        else 
+                        visualTransformation = if (useTotp || showPassword)
+                            VisualTransformation.None
+                        else
                             PasswordVisualTransformation(),
                         trailingIcon = if (!useTotp) {
                             {
@@ -345,11 +353,11 @@ fun SettingsScreen(
                         } else null,
                         isError = showPasswordError,
                         supportingText = if (showPasswordError) {
-                            { 
+                            {
                                 Text(
-                                    if (useTotp) "Invalid TOTP code" else "Incorrect password", 
+                                    if (useTotp) "Invalid TOTP code" else "Incorrect password",
                                     color = MaterialTheme.colorScheme.error
-                                ) 
+                                )
                             }
                         } else null,
                         singleLine = true,
@@ -359,7 +367,7 @@ fun SettingsScreen(
                             KeyboardOptions.Default
                         }
                     )
-                    
+
                     // Toggle between password and TOTP
                     Spacer(Modifier.height(8.dp))
                     Row(

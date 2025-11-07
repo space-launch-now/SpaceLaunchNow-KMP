@@ -48,6 +48,9 @@ data object Rockets
 data class RocketDetail(val rocketId: Int)
 
 @Serializable
+data object Agencies
+
+@Serializable
 data class AgencyDetail(val agencyId: Int)
 
 @Serializable

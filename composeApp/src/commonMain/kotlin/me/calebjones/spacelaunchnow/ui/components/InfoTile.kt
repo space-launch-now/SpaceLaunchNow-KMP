@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.detail.compose.components
+package me.calebjones.spacelaunchnow.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +33,7 @@ data class InfoTileData(
 
 /**
  * Reusable Info Tile component for displaying labeled data with an icon
- * 
+ *
  * @param icon The icon to display at the top of the tile
  * @param label The label text describing the data
  * @param value The value text to display (optional if customComposable is provided)

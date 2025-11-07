@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
-import me.calebjones.spacelaunchnow.ui.detail.compose.SharedDetailScaffold
+import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 
 private val TitleHeight = 128.dp
 
@@ -121,7 +121,7 @@ private fun RocketInfoCard(rocket: LauncherConfigDetailed) {
             rocket.maidenFlight?.let { InfoRow(label = "Maiden Flight", value = it.toString()) }
             InfoRow(label = "Status", value = if (rocket.active == true) "Active" else "Inactive")
             InfoRow(label = "Reusable", value = if (rocket.reusable == true) "Yes" else "No")
-            
+
             rocket.minStage?.let { min ->
                 rocket.maxStage?.let { max ->
                     InfoRow(label = "Stages", value = if (min == max) "$min" else "$min-$max")
@@ -178,9 +178,24 @@ private fun PerformanceCard(rocket: LauncherConfigDetailed) {
 
             rocket.length?.let { InfoRow(label = "Length", value = "${"%.1f".format(it)} m") }
             rocket.diameter?.let { InfoRow(label = "Diameter", value = "${"%.1f".format(it)} m") }
-            rocket.launchMass?.let { InfoRow(label = "Launch Mass", value = "${"%.0f".format(it)} kg") }
-            rocket.toThrust?.let { InfoRow(label = "Liftoff Thrust", value = "${"%.0f".format(it)} kN") }
-            rocket.launchCost?.let { InfoRow(label = "Launch Cost", value = "$${"%.0f".format(it.toDouble())}M") }
+            rocket.launchMass?.let {
+                InfoRow(
+                    label = "Launch Mass",
+                    value = "${"%.0f".format(it)} kg"
+                )
+            }
+            rocket.toThrust?.let {
+                InfoRow(
+                    label = "Liftoff Thrust",
+                    value = "${"%.0f".format(it)} kN"
+                )
+            }
+            rocket.launchCost?.let {
+                InfoRow(
+                    label = "Launch Cost",
+                    value = "$${"%.0f".format(it.toDouble())}M"
+                )
+            }
         }
     }
 }
@@ -231,11 +246,21 @@ private fun LaunchStatsCard(rocket: LauncherConfigDetailed) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            rocket.totalLaunchCount?.let { InfoRow(label = "Total Launches", value = it.toString()) }
+            rocket.totalLaunchCount?.let {
+                InfoRow(
+                    label = "Total Launches",
+                    value = it.toString()
+                )
+            }
             rocket.successfulLaunches?.let { InfoRow(label = "Successful", value = it.toString()) }
             rocket.failedLaunches?.let { InfoRow(label = "Failed", value = it.toString()) }
             rocket.pendingLaunches?.let { InfoRow(label = "Pending", value = it.toString()) }
-            rocket.consecutiveSuccessfulLaunches?.let { InfoRow(label = "Consecutive Successes", value = it.toString()) }
+            rocket.consecutiveSuccessfulLaunches?.let {
+                InfoRow(
+                    label = "Consecutive Successes",
+                    value = it.toString()
+                )
+            }
         }
     }
 }
@@ -262,7 +287,12 @@ private fun LandingStatsCard(rocket: LauncherConfigDetailed) {
             rocket.attemptedLandings?.let { InfoRow(label = "Attempted", value = it.toString()) }
             rocket.successfulLandings?.let { InfoRow(label = "Successful", value = it.toString()) }
             rocket.failedLandings?.let { InfoRow(label = "Failed", value = it.toString()) }
-            rocket.consecutiveSuccessfulLandings?.let { InfoRow(label = "Consecutive Successes", value = it.toString()) }
+            rocket.consecutiveSuccessfulLandings?.let {
+                InfoRow(
+                    label = "Consecutive Successes",
+                    value = it.toString()
+                )
+            }
         }
     }
 }

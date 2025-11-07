@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.detail.compose
+package me.calebjones.spacelaunchnow.ui.agencies.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material.icons.filled.Satellite
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Button
@@ -59,10 +58,11 @@ import compose.icons.fontawesomeicons.solid.InfoCircle
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.components.CountryChip
+import me.calebjones.spacelaunchnow.ui.components.InfoTile
+import me.calebjones.spacelaunchnow.ui.components.InfoTileData
+import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryInfoRow
-import me.calebjones.spacelaunchnow.ui.detail.compose.components.InfoTile
-import me.calebjones.spacelaunchnow.ui.detail.compose.components.InfoTileData
-import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryChip
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 
@@ -433,7 +433,7 @@ private fun AgencyLandingStatistics(agency: AgencyEndpointDetailed) {
             if (attemptedLandings > 0) {
                 StatCard(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Filled.Rocket,
+                    icon = CustomIcons.RocketLaunch,
                     value = "$attemptedLandings",
                     label = "Attempted\nLandings",
                     containerColor = MaterialTheme.colorScheme.surfaceVariant

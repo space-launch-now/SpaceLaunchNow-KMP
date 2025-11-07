@@ -12,6 +12,8 @@ import me.calebjones.spacelaunchnow.data.billing.RevenueCatBillingClient
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
+import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
+import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
@@ -82,6 +84,7 @@ val appModule = module {
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
+    singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }

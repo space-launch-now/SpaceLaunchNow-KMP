@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
+import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
@@ -38,10 +39,11 @@ import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.ui.about.AboutLibrariesScreen
+import me.calebjones.spacelaunchnow.ui.agencies.AgencyDetailScreen
+import me.calebjones.spacelaunchnow.ui.agencies.AgencyListScreen
 import me.calebjones.spacelaunchnow.ui.compose.BottomNavigationBar
-import me.calebjones.spacelaunchnow.ui.detail.AgencyDetailScreen
-import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
+import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
@@ -71,6 +73,7 @@ fun PhoneLayout(
         EventDetail::class.qualifiedName -> false // Hide for EventDetail
         RocketDetail::class.qualifiedName -> false // Hide for RocketDetail
         Rockets::class.qualifiedName -> false // Hide for Rockets list
+        Agencies::class.qualifiedName -> false // Hide for Agencies list
         AgencyDetail::class.qualifiedName -> false // Hide for AgencyDetail
         FullscreenVideo::class.qualifiedName -> false // Hide for FullscreenVideo
         NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
@@ -85,13 +88,14 @@ fun PhoneLayout(
             val currentRoute = navBackStackEntry?.destination?.route
 
             // If the route contains LaunchDetail, EventDetail, AgencyDetail, or FullscreenVideo, hide bottom bar
-            currentRoute?.contains("LaunchDetail") != true && 
-            currentRoute?.contains("EventDetail") != true && 
-            currentRoute?.contains("AgencyDetail") != true &&
-            currentRoute?.contains("Rockets") != true &&
-            currentRoute?.contains("FullscreenVideo") != true && 
-            currentRoute?.contains("NotificationSettings") != true && 
-            currentRoute?.contains("DebugSettings") != true
+            currentRoute?.contains("LaunchDetail") != true &&
+                    currentRoute?.contains("EventDetail") != true &&
+                    currentRoute?.contains("AgencyDetail") != true &&
+                    currentRoute?.contains("Rockets") != true &&
+                    currentRoute?.contains("Agencies") != true &&
+                    currentRoute?.contains("FullscreenVideo") != true &&
+                    currentRoute?.contains("NotificationSettings") != true &&
+                    currentRoute?.contains("DebugSettings") != true
         }
     }
 
@@ -206,7 +210,11 @@ fun PhoneLayout(
                         }
                         composableWithCompositionLocal<Rockets> {
                             RocketListScreen(
-                                onNavigateToRocketDetail = { id -> navController.navigate(RocketDetail(id)) },
+                                onNavigateToRocketDetail = { id ->
+                                    navController.navigate(
+                                        RocketDetail(id)
+                                    )
+                                },
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
@@ -214,6 +222,23 @@ fun PhoneLayout(
                             val rocketDetail = backStackEntry.toRoute<RocketDetail>()
                             RocketDetailScreen(
                                 rocketId = rocketDetail.rocketId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<Agencies> {
+                            AgencyListScreen(
+                                onNavigateToAgencyDetail = { id ->
+                                    navController.navigate(
+                                        AgencyDetail(id)
+                                    )
+                                },
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
+                            val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                            AgencyDetailScreen(
+                                agencyId = agencyDetail.agencyId,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

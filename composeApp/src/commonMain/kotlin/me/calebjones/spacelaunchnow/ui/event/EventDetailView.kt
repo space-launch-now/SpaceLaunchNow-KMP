@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.detail.compose
+package me.calebjones.spacelaunchnow.ui.event
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,6 +54,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Update
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
