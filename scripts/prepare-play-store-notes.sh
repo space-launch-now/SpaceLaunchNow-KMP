@@ -21,7 +21,8 @@ fi
 
 # Remove markdown URLs with commit hashes
 # Pattern: "text ([hash](url))" becomes "text"
-CLEANED=$(echo "$CHANGELOG" | sed -E 's/\s*\(\[?[a-f0-9]+\]?\([^)]+\)\)//g')
+# Match any characters in brackets followed by URL
+CLEANED=$(echo "$CHANGELOG" | sed -E 's/\s*\(\[[^]]+\]\([^)]+\)\)//g')
 
 # Remove any remaining markdown links [text](url) -> text
 CLEANED=$(echo "$CLEANED" | sed -E 's/\[([^]]+)\]\([^)]+\)/\1/g')
