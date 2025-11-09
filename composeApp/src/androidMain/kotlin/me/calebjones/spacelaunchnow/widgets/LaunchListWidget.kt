@@ -3,13 +3,12 @@ package me.calebjones.spacelaunchnow.widgets
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -26,10 +25,8 @@ import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.color.ColorProvider
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
-import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -49,12 +46,13 @@ import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import kotlin.time.Clock
-import kotlin.time.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class LaunchListWidget : GlanceAppWidget() {
@@ -73,16 +71,20 @@ class LaunchListWidget : GlanceAppWidget() {
             // Read appearance from Glance state (written by WidgetUpdater)
             val prefs = currentState<Preferences>()
             val forceUpdateTimestamp = prefs[longPreferencesKey("force_update_timestamp")]
-            val themeSourceName = prefs[stringPreferencesKey("widget_theme_source")] ?: "FOLLOW_APP_THEME"
+            val themeSourceName =
+                prefs[stringPreferencesKey("widget_theme_source")] ?: "FOLLOW_APP_THEME"
             val appThemeMode = prefs[stringPreferencesKey("app_theme_mode")] ?: "System"
             val backgroundAlpha = prefs[floatPreferencesKey("widget_background_alpha")] ?: 1.0f
             val cornerRadius = prefs[intPreferencesKey("widget_corner_radius")] ?: 16
             val hasAccessStr = prefs[stringPreferencesKey("widget_has_access")] ?: "false"
             val hasWidgetAccess = hasAccessStr.toBoolean()
-            
+
             val themeSource = WidgetThemeSource.fromString(themeSourceName)
             println("LaunchListWidget: Glance state - timestamp=$forceUpdateTimestamp, source=$themeSource, appTheme=$appThemeMode, alpha=$backgroundAlpha, radius=$cornerRadius, access=$hasWidgetAccess")
-            
+            println("LaunchListWidget: RAW hasAccessStr from state: '$hasAccessStr'")
+            println("LaunchListWidget: Parsed hasWidgetAccess boolean: $hasWidgetAccess")
+            println("LaunchListWidget: Will show ${if (hasWidgetAccess) "UNLOCKED" else "LOCKED"} content")
+
             // Get appropriate color providers based on theme source with alpha applied
             val useDynamicColors = themeSource == WidgetThemeSource.DYNAMIC_COLORS
             val colorProviders = WidgetGlanceColorScheme.getColorProvidersWithAlpha(
@@ -91,7 +93,7 @@ class LaunchListWidget : GlanceAppWidget() {
                 alpha = backgroundAlpha,
                 appThemeMode = if (themeSource == WidgetThemeSource.FOLLOW_APP_THEME) appThemeMode else "System"
             )
-            
+
             GlanceTheme(colors = colorProviders) {
                 if (hasWidgetAccess) {
                     LaunchListWidgetContent(
@@ -113,7 +115,7 @@ class LaunchListWidget : GlanceAppWidget() {
         return withContext(Dispatchers.IO) {
             try {
                 val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
-                val result = launchRepository.getUpcomingLaunchesNormal(limit = 5)
+                val result = launchRepository.getUpcomingLaunchesNormal(limit = 10)
                 result.getOrNull()?.results ?: emptyList()
             } catch (e: Exception) {
                 println("Widget: Failed to fetch launches: ${e.message}")
@@ -277,7 +279,6 @@ fun LaunchListItem(launch: LaunchNormal) {
         modifier = GlanceModifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 6.dp)
-            .background(GlanceTheme.colors.surface)
             .padding(8.dp)
             .clickable(
                 actionStartActivity(

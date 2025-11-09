@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +15,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,12 +32,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -45,6 +53,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import kotlin.time.Clock.System
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullscreenVideoScreen(
     vidUrl: VidURL,
@@ -55,13 +64,22 @@ fun FullscreenVideoScreen(
     onVideoSelected: ((Int) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    var showControls by remember { mutableStateOf(true) }
-    var lastInteractionTime by remember { mutableStateOf(System.now().toEpochMilliseconds()) }
+    val uriHandler = LocalUriHandler.current
 
-    // Auto-hide controls after 3 seconds of inactivity
-    LaunchedEffect(lastInteractionTime) {
-        delay(3000)
-        showControls = false
+    // Auto-hiding controls state
+    var showControls by rememberSaveable { mutableStateOf(true) }
+    var lastTapTime by remember { mutableLongStateOf(System.now().toEpochMilliseconds()) }
+
+    // Auto-hide controls after 3 seconds
+    LaunchedEffect(showControls, lastTapTime) {
+        println("LaunchedEffect triggered - showControls: $showControls, lastTapTime: $lastTapTime")
+        if (showControls) {
+            delay(3000)
+            if (showControls) { // Check again in case user interacted during delay
+                println("Auto-hiding controls after 3 seconds")
+                showControls = false
+            }
+        }
     }
 
     Box(
@@ -69,16 +87,8 @@ fun FullscreenVideoScreen(
             .fillMaxSize()
             .background(Color.Black)
             .systemBarsPadding()
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) {
-                // Toggle controls visibility on tap
-                showControls = !showControls
-                lastInteractionTime = System.now().toEpochMilliseconds()
-            }
     ) {
-        // Main video player - use a stable key for better retention across rotations
+        // Video content (always visible)
         val playerHost = remember("fullscreen_${vidUrl.url}") {
             MediaPlayerHost(mediaUrl = vidUrl.url)
         }
@@ -91,86 +101,139 @@ fun FullscreenVideoScreen(
             )
         )
 
-        // Top bar with back button and video info - animated visibility
+        // Touch overlay - only active when controls are hidden
+        if (!showControls) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                println("Touch overlay tapped - showing controls")
+                                showControls = true
+                                lastTapTime = System.now().toEpochMilliseconds()
+                            }
+                        )
+                    }
+            )
+        }
+
+        // Animated header bar
+        println("Rendering header bar (detailed) - showControls: $showControls")
         AnimatedVisibility(
             visible = showControls,
             enter = fadeIn(),
             exit = fadeOut(),
-            modifier = Modifier.align(Alignment.TopStart)
+            modifier = Modifier.align(Alignment.TopCenter)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Color.Black.copy(alpha = 0.7f)
-                    )
-                    .padding(
-                        horizontal = 16.dp,
-                        vertical = 16.dp
-                    ),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Back button
-                IconButton(
-                    onClick = onNavigateBack,
+            println("AnimatedVisibility content block executing (detailed) - showControls: $showControls")
+            Column {
+                Row(
                     modifier = Modifier
-                        .background(
-                            Color.Black.copy(alpha = 0.5f),
-                            RoundedCornerShape(4.dp)
-                        )
-                        .padding(4.dp)
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(alpha = 0.9f))
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Exit fullscreen",
-                        tint = Color.White
-                    )
-                }
-
-                // Video title
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Text(
-                        text = VideoUtil.getVideoTitle(vidUrl, launchName),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Text(
-                        text = VideoUtil.getVideoSourceName(vidUrl),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.7f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                // Live indicator
-                if (vidUrl.live == true) {
-                    Surface(
-                        color = Color.Red,
-                        shape = RoundedCornerShape(4.dp)
+                    // Back button
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.size(40.dp)
                     ) {
-                        Text(
-                            text = "LIVE",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
+
+                    // Title section - takes available space
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = VideoUtil.getVideoTitle(vidUrl, launchName),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = Color.White,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        Text(
+                            text = VideoUtil.getVideoSourceName(vidUrl),
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = Color.White.copy(alpha = 0.7f),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+
+                    // Actions row
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        // Live indicator
+                        if (vidUrl.live == true) {
+                            Surface(
+                                color = Color.Red,
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    text = "LIVE",
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        // Open external icon
+                        IconButton(
+                            onClick = {
+                                try {
+                                    uriHandler.openUri(vidUrl.url)
+                                } catch (e: Exception) {
+                                    println("Failed to open external URL: ${e.message}")
+                                }
+                            },
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.OpenInNew,
+                                contentDescription = "Open in external app",
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                 }
+
+                // Invisible clickable area below the header to hide controls
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp) // Give some space for easy tapping
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            println("Control area tapped - hiding controls")
+                            showControls = false
+                        }
+                )
             }
         }
 
-        // Bottom controls for multiple videos - animated visibility
+        // Animated bottom controls for multiple videos
         if (availableVideos.size > 1 && onVideoSelected != null) {
             AnimatedVisibility(
                 visible = showControls,
@@ -282,6 +345,7 @@ private fun VideoSelectionButton(
 }
 
 // Simplified version for single video with URL and launch name
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullscreenVideoScreen(
     videoUrl: String,
@@ -289,13 +353,22 @@ fun FullscreenVideoScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showControls by remember { mutableStateOf(true) }
-    var lastInteractionTime by remember { mutableStateOf(System.now().toEpochMilliseconds()) }
+    val uriHandler = LocalUriHandler.current
 
-    // Auto-hide controls after 3 seconds of inactivity
-    LaunchedEffect(lastInteractionTime) {
-        delay(3000)
-        showControls = false
+    // Auto-hiding controls state
+    var showControls by rememberSaveable { mutableStateOf(true) }
+    var lastTapTime by remember { mutableLongStateOf(System.now().toEpochMilliseconds()) }
+
+    // Auto-hide controls after 3 seconds
+    LaunchedEffect(showControls, lastTapTime) {
+        println("LaunchedEffect (simplified) triggered - showControls: $showControls, lastTapTime: $lastTapTime")
+        if (showControls) {
+            delay(3000)
+            if (showControls) { // Check again in case user interacted during delay
+                println("Auto-hiding controls after 3 seconds (simplified)")
+                showControls = false
+            }
+        }
     }
 
     // Create a simple VidURL object for the single video
@@ -318,20 +391,10 @@ fun FullscreenVideoScreen(
             .fillMaxSize()
             .background(Color.Black)
             .systemBarsPadding()
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) {
-                // Toggle controls visibility on tap
-                showControls = !showControls
-                lastInteractionTime = System.now().toEpochMilliseconds()
-            }
     ) {
-        // Main video player - use a more stable approach to prevent recreation during rotation
+        // Video content (always visible)
         val playerHost = remember(videoUrl) {
-            MediaPlayerHost(mediaUrl = videoUrl).apply {
-                // Initialize any needed configuration here
-            }
+            MediaPlayerHost(mediaUrl = videoUrl)
         }
 
         VideoPlayerComposable(
@@ -342,48 +405,100 @@ fun FullscreenVideoScreen(
             )
         )
 
-        // Top bar with back button and video info - animated visibility
+        // Touch overlay - only active when controls are hidden
+        if (!showControls) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                println("Touch overlay tapped - showing controls")
+                                showControls = true
+                                lastTapTime = System.now().toEpochMilliseconds()
+                            }
+                        )
+                    }
+            )
+        }
+
+        // Animated header bar
+        println("Rendering header bar (simplified) - showControls: $showControls")
         AnimatedVisibility(
             visible = showControls,
             enter = fadeIn(),
             exit = fadeOut(),
-            modifier = Modifier.align(Alignment.TopStart)
+            modifier = Modifier.align(Alignment.TopCenter)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Color.Black.copy(alpha = 0.7f)
-                    )
-                    .padding(
-                        horizontal = 16.dp,
-                        vertical = 8.dp
-                    ),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Back button
-                IconButton(
-                    onClick = onNavigateBack,
+            println("AnimatedVisibility content block executing (simplified) - showControls: $showControls")
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(alpha = 0.9f))
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Exit fullscreen",
-                        tint = Color.White
+                    // Back button
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    // Title section - takes available space
+                    Text(
+                        text = launchName,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.White,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
                     )
+
+                    // Open external icon
+                    IconButton(
+                        onClick = {
+                            try {
+                                uriHandler.openUri(videoUrl)
+                            } catch (e: Exception) {
+                                println("Failed to open external URL: ${e.message}")
+                            }
+                        },
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.OpenInNew,
+                            contentDescription = "Open in external app",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
 
-                // Video title
-                Text(
-                    text = launchName,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                // Invisible clickable area below the header to hide controls
+                Box(
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                        .height(200.dp) // Give some space for easy tapping
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            println("Control area tapped - hiding controls")
+                            showControls = false
+                        }
                 )
             }
         }

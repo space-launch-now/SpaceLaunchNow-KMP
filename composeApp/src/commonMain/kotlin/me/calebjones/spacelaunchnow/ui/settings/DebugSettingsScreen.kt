@@ -51,19 +51,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.LocalContextFactory
-import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
@@ -684,15 +683,298 @@ fun DebugSettingsScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "🎭 Simulate Subscription States",
+                            text = "🎭 Subscription Simulation",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold
                         )
 
-                        // Get billing client and coroutine scope
+                        val coroutineScope = rememberCoroutineScope()
+                        
+                        // Cast to SimpleSubscriptionRepository to access debug methods
+                        val simpleRepo = subscriptionRepo as? SimpleSubscriptionRepository
+                        var isSimulationActive by remember { mutableStateOf(false) }
+                        
+                        // Check if we're in debug mode
+                        LaunchedEffect(Unit) {
+                            simpleRepo?.let {
+                                isSimulationActive = it.isInDebugMode()
+                            }
+                        }
+
+                        // Current state display
+                        Surface(
+                            color = if (subscriptionState.isSubscribed) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant
+                            },
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = "📊 Current State:",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = if (subscriptionState.isSubscribed) {
+                                        "${subscriptionState.subscriptionType.name} (${subscriptionState.productId ?: "Unknown"})"
+                                    } else {
+                                        "FREE"
+                                    },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                
+                                // Show features
+                                if (subscriptionState.features.isNotEmpty()) {
+                                    Text(
+                                        text = "Features: ${subscriptionState.features.joinToString { it.name }}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                
+                                // Show simulation status
+                                Text(
+                                    text = if (isSimulationActive) "⚠️ SIMULATION ACTIVE" else "✅ Real Billing Data",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (isSimulationActive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        HorizontalDivider()
+
+                        // Simulation Toggle
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Simulation Mode:",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.weight(1f)
+                            )
+                            
+                            if (isSimulationActive) {
+                                OutlinedButton(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            simpleRepo?.clearDebugState()
+                                            isSimulationActive = false
+                                        }
+                                    }
+                                ) {
+                                    Text("🔄 Use Real Data")
+                                }
+                            } else {
+                                Button(
+                                    onClick = {
+                                        // Enable simulation with free state
+                                        coroutineScope.launch {
+                                            simpleRepo?.setDebugSubscription(SubscriptionType.FREE)
+                                            isSimulationActive = true
+                                        }
+                                    }
+                                ) {
+                                    Text("🎭 Enable Simulation")
+                                }
+                            }
+                        }
+
+                        // Simulation Controls (only show when simulation is active)
+                        if (isSimulationActive && simpleRepo != null) {
+                            HorizontalDivider()
+                            
+                            Text(
+                                text = "Subscription Types:",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            // Free State
+                            OutlinedButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        simpleRepo.setDebugSubscription(SubscriptionType.FREE)
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("🆓 FREE")
+                            }
+
+                            // Premium State
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        simpleRepo.setDebugSubscription(
+                                            subscriptionType = SubscriptionType.PREMIUM,
+                                            productId = "debug_premium",
+                                            entitlements = setOf("premium")
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text("⭐ PREMIUM")
+                            }
+
+                            // Lifetime State
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        simpleRepo.setDebugSubscription(
+                                            subscriptionType = SubscriptionType.LIFETIME,
+                                            productId = "debug_lifetime",
+                                            entitlements = setOf("premium")
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiary,
+                                    contentColor = MaterialTheme.colorScheme.onTertiary
+                                )
+                            ) {
+                                Text("✨ LIFETIME")
+                            }
+
+                            // Legacy State
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        simpleRepo.setDebugSubscription(
+                                            subscriptionType = SubscriptionType.LEGACY,
+                                            productId = "debug_legacy",
+                                            entitlements = setOf("legacy")
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiary
+                                )
+                            ) {
+                                Text("🏛️ LEGACY")
+                            }
+
+                            HorizontalDivider()
+
+                            // Force refresh widget access
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        val hasAccess = subscriptionRepo.forceRefreshWidgetAccess()
+                                        println("Widget access refreshed: $hasAccess")
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            ) {
+                                Text("🔧 Refresh Widget Access")
+                            }
+                        }
+
+                        // Restore Purchases Button (always available)
+                        HorizontalDivider()
+                        
+                        var isRestoring by remember { mutableStateOf(false) }
+                        
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    isRestoring = true
+                                    try {
+                                        val result = subscriptionRepo.restorePurchases()
+                                        if (result.isSuccess) {
+                                            println("✅ Restore successful: ${result.getOrNull()}")
+                                        } else {
+                                            println("❌ Restore failed: ${result.exceptionOrNull()?.message}")
+                                        }
+                                    } catch (e: Exception) {
+                                        println("❌ Restore error: ${e.message}")
+                                    } finally {
+                                        isRestoring = false
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isRestoring,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
+                        ) {
+                            if (isRestoring) {
+                                Text("🔄 Restoring...")
+                            } else {
+                                Text("🔄 Restore Purchases (Real)")
+                            }
+                        }
+
+                        // Info text
+                        Text(
+                            text = if (isSimulationActive) {
+                                "💡 Simulation mode overrides real billing data. Widget access will update automatically when you change subscription states. Use 'Use Real Data' to return to actual billing status."
+                            } else {
+                                "💡 Use 'Restore Purchases' to sync with your actual subscription status. Enable simulation to test different subscription states."
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        // Restore Purchases Button
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    isRestoring = true
+                                    try {
+                                        val result = subscriptionRepo.restorePurchases()
+                                        if (result.isSuccess) {
+                                            println("✅ Restore successful: ${result.getOrNull()}")
+                                        } else {
+                                            println("❌ Restore failed: ${result.exceptionOrNull()?.message}")
+                                        }
+                                    } catch (e: Exception) {
+                                        println("❌ Restore error: ${e.message}")
+                                    } finally {
+                                        isRestoring = false
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isRestoring,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
+                        ) {
+                            if (isRestoring) {
+                                Text("🔄 Restoring...")
+                            } else {
+                                Text("🔄 Restore Purchases")
+                            }
+                        }
+
+                        Text(
+                            text = "💡 Use 'Restore Purchases' to sync with RevenueCat and get your real subscription status.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        // Get billing client
                         val billingClient =
                             koinInject<me.calebjones.spacelaunchnow.data.billing.BillingClient>()
-                        val coroutineScope = rememberCoroutineScope()
 
                         // Current simulated state display
                         Surface(
@@ -889,122 +1171,6 @@ fun DebugSettingsScreen(
                                 }
                             }
                         }
-
-                        // Free state
-                        OutlinedButton(
-                            onClick = {
-                                if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                    subscriptionRepo.simulateSubscriptionState(
-                                        isSubscribed = false,
-                                        subscriptionType = SubscriptionType.FREE,
-                                        productId = null
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("🆓 Set FREE")
-                        }
-
-                        // Current subscription products
-                        Button(
-                            onClick = {
-                                if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                    subscriptionRepo.simulateSubscriptionState(
-                                        isSubscribed = true,
-                                        subscriptionType = SubscriptionType.PREMIUM,
-                                        productId = SubscriptionProducts.PRODUCT_ID
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("⭐ Set PREMIUM (Current Product)")
-                        }
-
-                        Button(
-                            onClick = {
-                                if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                    subscriptionRepo.simulateSubscriptionState(
-                                        isSubscribed = true,
-                                        subscriptionType = SubscriptionType.PREMIUM,
-                                        productId = SubscriptionProducts.PRO_LIFETIME
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFFFD700),
-                                contentColor = Color(0xFF1C1C1C)
-                            )
-                        ) {
-                            Text("✨ Set PRO LIFETIME")
-                        }
-
-                        // Legacy SKUs section
-                        HorizontalDivider()
-
-                        Text(
-                            text = "Legacy/Unknown SKUs:",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-
-                        Button(
-                            onClick = {
-                                if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                    subscriptionRepo.simulateSubscriptionState(
-                                        isSubscribed = true,
-                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
-                                        productId = "spacelaunchnow_premium_legacy"
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.tertiary
-                            )
-                        ) {
-                            Text("🏛️ Legacy Premium SKU")
-                        }
-
-                        Button(
-                            onClick = {
-                                if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                    subscriptionRepo.simulateSubscriptionState(
-                                        isSubscribed = true,
-                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
-                                        productId = "space_launch_now_pro_v1"
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.tertiary
-                            )
-                        ) {
-                            Text("🗂️ Old Pro V1 SKU")
-                        }
-
-                        Button(
-                            onClick = {
-                                if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                    subscriptionRepo.simulateSubscriptionState(
-                                        isSubscribed = true,
-                                        subscriptionType = SubscriptionType.LEGACY,  // LEGACY = isLegacy: true
-                                        productId = "unknown_premium_sku_12345"
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text("❓ Unknown SKU")
-                        }
-
                         // Custom SKU Input Section
                         HorizontalDivider()
 
@@ -1107,52 +1273,6 @@ fun DebugSettingsScreen(
                             fontSize = 10.sp
                         )
 
-                        // Advanced options
-                        HorizontalDivider()
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OutlinedButton(
-                                onClick = {
-                                    if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                        subscriptionRepo.simulateNeedsVerification(true)
-                                    }
-                                },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("⚠️ Needs Verification", fontSize = 12.sp)
-                            }
-
-                            OutlinedButton(
-                                onClick = {
-                                    if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                        subscriptionRepo.simulateExpiredSubscription()
-                                    }
-                                },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("⏰ Expired", fontSize = 12.sp)
-                            }
-                        }
-
-                        OutlinedButton(
-                            onClick = {
-                                if (subscriptionRepo is me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl) {
-                                    subscriptionRepo.clearDebugSimulation()
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("🔄 Clear Simulation (Use Real State)")
-                        }
-
-                        Text(
-                            text = "💡 These states persist until you change them or restart the app. They override real billing client data. Use 'Clear Simulation' to return to real billing state.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                     }
                 }
             }

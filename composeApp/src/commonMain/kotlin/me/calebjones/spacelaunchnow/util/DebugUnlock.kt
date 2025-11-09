@@ -26,7 +26,7 @@ object DebugUnlock {
     // Generate a new secret: https://stefansundin.github.io/2fa-qr/
     // Fallback for development/testing only
     private val TOTP_SECRET_BASE32 = EnvironmentManager.getEnv(
-        "TOTP_SECRET",
+        "TOTP_SECRET_BASE32",
         "JBSWY3DPEHPK3PXP" // Default for development only - CHANGE THIS!
     )
 

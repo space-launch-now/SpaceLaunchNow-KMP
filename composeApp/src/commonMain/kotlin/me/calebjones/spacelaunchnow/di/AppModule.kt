@@ -12,6 +12,8 @@ import me.calebjones.spacelaunchnow.data.billing.RevenueCatBillingClient
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
+import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
+import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
@@ -20,8 +22,12 @@ import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.RocketRepository
+import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
+import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
+import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -34,12 +40,15 @@ import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
@@ -72,11 +81,16 @@ val appModule = module {
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
     viewModelOf(::HomeViewModel)
+    viewModelOf(::ScheduleViewModel)
     singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
+    viewModelOf(::AgencyViewModel)
+    singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
     singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
+    singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
+    viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
 
     // Global Ad Manager - Singleton managed by Koin
@@ -153,16 +167,26 @@ val appModule = module {
         )
     }
 
+    // Local subscription storage (KStore)
+    single { LocalSubscriptionStorage() }
+    
+    // Subscription syncer (handles RevenueCat sync)
+    single {
+        SubscriptionSyncer(
+            localStorage = get(),
+            revenueCatManager = get()
+        )
+    }
+
+    // Simple subscription repository
     single<SubscriptionRepository> {
-        SubscriptionRepositoryImpl(
+        SimpleSubscriptionRepository(
+            localStorage = get(),
+            syncer = get(),
             billingClient = get(),
-            storage = get<SubscriptionStorage>(),
-            debugPreferences = get<DebugPreferences>(),
-            appPreferences = get<AppPreferences>(),      // Add AppPreferences injection
-            temporaryPremiumAccess = get<TemporaryPremiumAccess>(),  // Add temporary premium access
-            revenueCatManager = get<RevenueCatManager>(),  // RevenueCat dependency
-            widgetPreferences = get<WidgetPreferences>(),   // Cache widget access
-            platformWidgetUpdater = getOrNull()             // Android-only: trigger widget updates
+            widgetPreferences = get(),
+            platformWidgetUpdater = getOrNull(),
+            temporaryPremiumAccess = get()
         )
     }
 

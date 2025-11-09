@@ -41,6 +41,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
+import me.calebjones.spacelaunchnow.navigation.Agencies
+import me.calebjones.spacelaunchnow.navigation.AgencyDetail
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
@@ -48,16 +50,22 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.RocketDetail
+import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
-import me.calebjones.spacelaunchnow.ui.detail.EventDetailScreen
+import me.calebjones.spacelaunchnow.ui.agencies.AgencyDetailScreen
+import me.calebjones.spacelaunchnow.ui.agencies.AgencyListScreen
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
+import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
+import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
+import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
@@ -76,10 +84,34 @@ import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 @Composable
 fun TabletDesktopLayout(
     navController: NavHostController,
-    themeOption: ThemeOption = ThemeOption.System
+    themeOption: ThemeOption = ThemeOption.System,
+    content: @Composable () -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    // Determine if the side navigation rail should be shown
+    val showSideNavigation = when (navBackStackEntry?.destination?.route) {
+        LaunchDetail::class.qualifiedName -> false // Hide for LaunchDetail
+        EventDetail::class.qualifiedName -> false // Hide for EventDetail
+        RocketDetail::class.qualifiedName -> false // Hide for RocketDetail
+        AgencyDetail::class.qualifiedName -> false // Hide for AgencyDetail
+        FullscreenVideo::class.qualifiedName -> false // Hide for FullscreenVideo
+        NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
+        DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
+        
+        else -> {
+            // For routes with arguments, check if it contains certain patterns
+            val currentRoute = navBackStackEntry?.destination?.route
+            currentRoute?.contains("LaunchDetail") != true &&
+                    currentRoute?.contains("EventDetail") != true &&
+                    currentRoute?.contains("AgencyDetail") != true &&
+                    currentRoute?.contains("RocketDetail") != true &&
+                    currentRoute?.contains("FullscreenVideo") != true &&
+                    currentRoute?.contains("NotificationSettings") != true &&
+                    currentRoute?.contains("DebugSettings") != true
+        }
+    }
 
     SpaceLaunchNowTheme(themeOption = themeOption) {
         SharedTransitionLayout {
@@ -99,147 +131,67 @@ fun TabletDesktopLayout(
                         modifier = Modifier.weight(1f)
                     ) {
                         Row(Modifier.fillMaxSize()) {
-                            // Sidebar Navigation using NavigationRail
-                            Column(
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) {
-                                NavigationRail(
+                            // Sidebar Navigation using NavigationRail - conditionally shown
+                            if (showSideNavigation) {
+                                Column(
+                                    verticalArrangement = Arrangement.Bottom,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    NavigationRail(
 
-                                    header = {
-                                        Image(
-                                            painter = painterResource(Res.drawable.launcher),
-                                            contentDescription = "App Icon",
-                                            contentScale = ContentScale.Fit,
-                                            modifier = Modifier
-                                                .size(96.dp)
-                                                .absolutePadding(
-                                                    left = 8.dp,
-                                                    right = 8.dp,
-                                                    bottom = 32.dp,
-                                                    top = 16.dp
-                                                )
-                                        )
-                                    },
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                ) {
-                                    screens.forEachIndexed { index, screen ->
-                                        NavigationRailItem(
-                                            modifier = Modifier.padding(8.dp),
-                                            icon = {
-                                                Icon(
-                                                    selectedIcons[index], // Always use same icon for simplicity
-                                                    contentDescription = items[index]
-                                                )
-                                            },
-                                            label = {
-                                                Text(
-                                                    items[index],
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            },
-                                            selected = currentDestination?.route == screen::class.qualifiedName,
-                                            onClick = {
-                                                navController.navigate(screen) {
-                                                    // Avoid multiple copies of the same destination
-                                                    launchSingleTop = true
-                                                    // Restore state when returning to a previously selected screen
-                                                    restoreState = true
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                            HorizontalDivider(modifier = Modifier.fillMaxHeight().width(1.dp))
-                            // Main Content
-                            Surface(
-                                color = MaterialTheme.colorScheme.background
-                            ) {
-                                NavHost(
-                                    navController = navController,
-                                    startDestination = Home,
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    composableWithCompositionLocal<Home> {
-                                        HomeScreen(navController = navController)
-                                    }
-                                    composable<Schedule> {
-                                        ScheduleScreen(
-                                            onLaunchClick = { id ->
-                                                navController.navigate(
-                                                    LaunchDetail(
-                                                        id
+                                        header = {
+                                            Image(
+                                                painter = painterResource(Res.drawable.launcher),
+                                                contentDescription = "App Icon",
+                                                contentScale = ContentScale.Fit,
+                                                modifier = Modifier
+                                                    .size(96.dp)
+                                                    .absolutePadding(
+                                                        left = 8.dp,
+                                                        right = 8.dp,
+                                                        bottom = 32.dp,
+                                                        top = 16.dp
                                                     )
-                                                )
-                                            }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<Settings> {
-                                        SettingsScreen(
-                                            navController = navController,
-                                            onOpenNotificationSettings = {
-                                                navController.navigate(NotificationSettings)
-                                            },
-                                            onOpenDebugSettings = {
-                                                navController.navigate(DebugSettings)
-                                            },
-                                            onOpenAboutLibraries = {
-                                                navController.navigate(AboutLibraries)
-                                            }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<NotificationSettings> {
-                                        NotificationSettingsScreen(
-                                            navController = navController,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<DebugSettings> {
-                                        DebugSettingsScreen(
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
-                                        val launchDetail = backStackEntry.toRoute<LaunchDetail>()
-                                        LaunchDetailScreen(
-                                            launchId = launchDetail.launchId,
-                                            onNavigateBack = { navController.popBackStack() },
-                                            navController = navController
-                                        )
-                                    }
-                                    composableWithCompositionLocal<EventDetail> { backStackEntry ->
-                                        val eventDetail = backStackEntry.toRoute<EventDetail>()
-                                        EventDetailScreen(
-                                            eventId = eventDetail.eventId,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
-                                        val fullscreenVideo =
-                                            backStackEntry.toRoute<FullscreenVideo>()
-                                        FullscreenVideoScreen(
-                                            videoUrl = fullscreenVideo.videoUrl,
-                                            launchName = fullscreenVideo.launchName,
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<SupportUs> {
-                                        SupportUsScreen(
-                                            onNavigateBack = { navController.popBackStack() }
-                                        )
-                                    }
-                                    composableWithCompositionLocal<me.calebjones.spacelaunchnow.navigation.ThemeCustomization> {
-                                        ThemeCustomizationScreen(
-                                            navController = navController
-                                        )
-                                    }
-                                    composableWithCompositionLocal<CalendarSync> {
-                                        CalendarSyncScreen(
-                                            navController = navController
-                                        )
+                                            )
+                                        },
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ) {
+                                        screens.forEachIndexed { index, screen ->
+                                            NavigationRailItem(
+                                                modifier = Modifier.padding(8.dp),
+                                                icon = {
+                                                    Icon(
+                                                        selectedIcons[index], // Always use same icon for simplicity
+                                                        contentDescription = items[index]
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(
+                                                        items[index],
+                                                        color = MaterialTheme.colorScheme.onSurface
+                                                    )
+                                                },
+                                                selected = currentDestination?.route == screen::class.qualifiedName,
+                                                onClick = {
+                                                    navController.navigate(screen) {
+                                                        // Avoid multiple copies of the same destination
+                                                        launchSingleTop = true
+                                                        // Restore state when returning to a previously selected screen
+                                                        restoreState = true
+                                                    }
+                                                }
+                                            )
+                                        }
                                     }
                                 }
+                                HorizontalDivider(modifier = Modifier.fillMaxHeight().width(1.dp))
+                            }
+                            // Main Content - Accept hoisted NavHost content
+                            Surface(
+                                color = MaterialTheme.colorScheme.background,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                content()
                             }
                         }
                     }

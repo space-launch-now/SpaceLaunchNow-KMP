@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.analytics.DatadogLogger
+import me.calebjones.spacelaunchnow.data.model.NotificationAgency
+import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 
 class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
@@ -47,13 +50,91 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
             default.topicSettings
         }
 
+        // Use stored preferences if available, otherwise use defaults
+        val storedAgencies = preferences[SUBSCRIBED_AGENCIES]
+        val subscribedAgencies = if (storedAgencies != null && storedAgencies.isNotEmpty()) {
+            storedAgencies.map { it }.toSet()
+        } else {
+            default.subscribedAgencies
+        }
+
+        val storedLocations = preferences[SUBSCRIBED_LOCATIONS]
+        val subscribedLocations = if (storedLocations != null && storedLocations.isNotEmpty()) {
+            storedLocations.map { it }.toSet()
+        } else {
+            default.subscribedLocations
+        }
+
+        // Helper function to map IDs to names
+        fun getAgencyNames(ids: Set<String>): List<String> {
+            val allAgencies = listOf(
+                NotificationAgency.SPACEX,
+                NotificationAgency.NASA,
+                NotificationAgency.BLUE_ORIGIN,
+                NotificationAgency.ROCKET_LAB,
+                NotificationAgency.ULA,
+                NotificationAgency.ARIANESPACE,
+                NotificationAgency.ROSCOSMOS,
+                NotificationAgency.NORTHROP_GRUMMAN
+            )
+            return ids.mapNotNull { id ->
+                allAgencies.find { it.id.toString() == id }?.name
+            }
+        }
+
+        fun getLocationNames(ids: Set<String>): List<String> {
+            val allLocations = listOf(
+                NotificationLocation.VANDENBERG,
+                NotificationLocation.KSC,
+                NotificationLocation.WALLOPS,
+                NotificationLocation.TEXAS,
+                NotificationLocation.RUSSIA,
+                NotificationLocation.FRENCH_GUIANA,
+                NotificationLocation.NEW_ZEALAND,
+                NotificationLocation.JAPAN,
+                NotificationLocation.INDIA,
+                NotificationLocation.CHINA,
+                NotificationLocation.KODIAK,
+                NotificationLocation.OTHER
+            )
+            return ids.mapNotNull { id ->
+                allLocations.find { it.id.toString() == id }?.name
+            }
+        }
+
+        val agencyNames = getAgencyNames(subscribedAgencies)
+        val locationNames = getLocationNames(subscribedLocations)
+
+        println("=== NotificationPreferences: Loading Settings ===")
+        println("Subscribed Agencies (${subscribedAgencies.size}): $subscribedAgencies")
+        println("Agency Names: ${agencyNames.joinToString(", ")}")
+        println("Subscribed Locations (${subscribedLocations.size}): $subscribedLocations")
+        println("Location Names: ${locationNames.joinToString(", ")}")
+        println("Follow All Launches: ${preferences[FOLLOW_ALL_LAUNCHES] ?: default.followAllLaunches}")
+        println("Use Strict Matching: ${preferences[USE_STRICT_MATCHING] ?: default.useStrictMatching}")
+
+        DatadogLogger.debug(
+            "Notification settings loaded", mapOf(
+                "subscribedAgenciesCount" to subscribedAgencies.size,
+                "subscribedAgencies" to subscribedAgencies.joinToString(","),
+                "agencyNames" to agencyNames.joinToString(","),
+                "subscribedLocationsCount" to subscribedLocations.size,
+                "subscribedLocations" to subscribedLocations.joinToString(","),
+                "locationNames" to locationNames.joinToString(","),
+                "followAllLaunches" to (preferences[FOLLOW_ALL_LAUNCHES]
+                    ?: default.followAllLaunches),
+                "useStrictMatching" to (preferences[USE_STRICT_MATCHING]
+                    ?: default.useStrictMatching),
+                "enableNotifications" to (preferences[ENABLE_NOTIFICATIONS]
+                    ?: default.enableNotifications)
+            )
+        )
+
         NotificationState(
             enableNotifications = preferences[ENABLE_NOTIFICATIONS] ?: default.enableNotifications,
             subscribedTopics = preferences[SUBSCRIBED_TOPICS] ?: default.subscribedTopics,
-            subscribedAgencies = (preferences[SUBSCRIBED_AGENCIES] ?: emptySet())
-                .map { it }.toSet(),
-            subscribedLocations = (preferences[SUBSCRIBED_LOCATIONS] ?: emptySet())
-                .map { it }.toSet(),
+            subscribedAgencies = subscribedAgencies,
+            subscribedLocations = subscribedLocations,
             useStrictMatching = preferences[USE_STRICT_MATCHING] ?: default.useStrictMatching,
             followAllLaunches = preferences[FOLLOW_ALL_LAUNCHES] ?: default.followAllLaunches,
             hideTbdLaunches = preferences[HIDE_TBD_LAUNCHES] ?: default.hideTbdLaunches,
@@ -67,6 +148,65 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     suspend fun updateNotificationSettings(settings: NotificationState) {
+        // Get agency and location names for logging
+        val allAgencies = listOf(
+            NotificationAgency.SPACEX,
+            NotificationAgency.NASA,
+            NotificationAgency.BLUE_ORIGIN,
+            NotificationAgency.ROCKET_LAB,
+            NotificationAgency.ULA,
+            NotificationAgency.ARIANESPACE,
+            NotificationAgency.ROSCOSMOS,
+            NotificationAgency.NORTHROP_GRUMMAN
+        )
+        
+        val allLocations = listOf(
+            NotificationLocation.VANDENBERG,
+            NotificationLocation.KSC,
+            NotificationLocation.WALLOPS,
+            NotificationLocation.TEXAS,
+            NotificationLocation.RUSSIA,
+            NotificationLocation.FRENCH_GUIANA,
+            NotificationLocation.NEW_ZEALAND,
+            NotificationLocation.JAPAN,
+            NotificationLocation.INDIA,
+            NotificationLocation.CHINA,
+            NotificationLocation.KODIAK,
+            NotificationLocation.OTHER
+        )
+        
+        val agencyNames = settings.subscribedAgencies.mapNotNull { agencyId ->
+            allAgencies.find { it.id.toString() == agencyId }?.name
+        }
+        val locationNames = settings.subscribedLocations.mapNotNull { locationId ->
+            allLocations.find { it.id.toString() == locationId }?.name
+        }
+
+        // Log the settings being saved
+        println("NotificationPreferences: Saving notification settings")
+        println("  Agencies (${settings.subscribedAgencies.size}): ${settings.subscribedAgencies} -> $agencyNames")
+        println("  Locations (${settings.subscribedLocations.size}): ${settings.subscribedLocations} -> $locationNames")
+        println("  Enable Notifications: ${settings.enableNotifications}")
+        println("  Follow All Launches: ${settings.followAllLaunches}")
+        println("  Use Strict Matching: ${settings.useStrictMatching}")
+        println("  Hide TBD Launches: ${settings.hideTbdLaunches}")
+        println("  Subscribed Topics: ${settings.subscribedTopics}")
+
+        DatadogLogger.debug(
+            "Saving notification settings",
+            mapOf(
+                "subscribedAgencies" to settings.subscribedAgencies.joinToString(),
+                "agencyNames" to agencyNames.joinToString(),
+                "subscribedLocations" to settings.subscribedLocations.joinToString(),
+                "locationNames" to locationNames.joinToString(),
+                "enableNotifications" to settings.enableNotifications,
+                "followAllLaunches" to settings.followAllLaunches,
+                "useStrictMatching" to settings.useStrictMatching,
+                "hideTbdLaunches" to settings.hideTbdLaunches,
+                "subscribedTopics" to settings.subscribedTopics.joinToString()
+            )
+        )
+
         dataStore.edit { preferences ->
             preferences[ENABLE_NOTIFICATIONS] = settings.enableNotifications
             preferences[SUBSCRIBED_TOPICS] = settings.subscribedTopics
@@ -79,6 +219,9 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
             preferences[HIDE_TBD_LAUNCHES] = settings.hideTbdLaunches
             preferences[TOPIC_SETTINGS] = Json.encodeToString(settings.topicSettings)
         }
+
+        println("NotificationPreferences: Settings saved successfully")
+        DatadogLogger.info("Notification settings saved successfully")
     }
 
     suspend fun getNotificationSettings(): NotificationState {

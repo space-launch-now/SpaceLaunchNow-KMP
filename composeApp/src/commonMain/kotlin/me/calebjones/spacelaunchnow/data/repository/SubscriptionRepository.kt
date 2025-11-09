@@ -92,4 +92,10 @@ interface SubscriptionRepository {
      * Use when user logs out
      */
     suspend fun clearSubscriptionCache()
+    
+    /**
+     * Force refresh widget access for debugging
+     * Call this method to manually check and update widget access
+     */
+    suspend fun forceRefreshWidgetAccess(): Boolean
 }

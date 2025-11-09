@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DashboardCustomize
@@ -74,7 +75,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
@@ -110,12 +110,14 @@ fun SupportUsScreen(
     val subscriptionRepo = koinInject<SubscriptionRepository>()
     val fullSubscriptionState by subscriptionRepo.state.collectAsState()
     val isLegacy = subscriptionState.subscriptionType.isLegacy
-    val hasCurrentSubscription = subscriptionState.isSubscribed && !isLegacy
+    val hasCurrentSubscription = subscriptionState.isSubscribed
     val canUpgrade = !subscriptionState.isSubscribed || isLegacy
 
     // Determine which packages to show based on user's current state
     val userState = determineUserState(subscriptionState)
+    println("User State: $userState")
     val packagesToShow = getPackagesToShow(userState)
+    println("Packages to Show: $packagesToShow")
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -182,18 +184,18 @@ fun SupportUsScreen(
                 }
             }
 
-            // Current Plan Section (at the top for subscribers)
-            if (subscriptionState.isSubscribed) {
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    CurrentPlanCard(
-                        subscriptionState = subscriptionState,
-                        onVerifySubscription = { viewModel.verifySubscription(forceRefresh = true) },
-                        onRestorePurchases = { viewModel.restorePurchases() },
-                        isProcessing = uiState.isProcessing
-                    )
-                }
-            }
+//            // Current Plan Section (at the top for subscribers)
+//            if (subscriptionState.isSubscribed) {
+//                item {
+//                    Spacer(Modifier.height(24.dp))
+//                    CurrentPlanCard(
+//                        subscriptionState = subscriptionState,
+//                        onVerifySubscription = { viewModel.verifySubscription(forceRefresh = true) },
+//                        onRestorePurchases = { viewModel.restorePurchases() },
+//                        isProcessing = uiState.isProcessing
+//                    )
+//                }
+//            }
 
             // Legacy User Upgrade Encouragement Banner (special message for legacy supporters)
             if (isLegacy) {
@@ -203,212 +205,222 @@ fun SupportUsScreen(
                 }
             }
 
-            // Show full upgrade options for non-subscribers AND legacy users
-            if (canUpgrade) {
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    Text(
-                        text = if (!subscriptionState.isSubscribed) "Become a Member" else "Upgrade to Premium",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = if (!subscriptionState.isSubscribed)
-                            "Unlock premium features and support development"
-                        else
-                            "Unlock all premium features including widgets and more!",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-                }
-
-                // Premium Widget Perk
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    PremiumPerkCard(
-                        icon = Icons.Default.Widgets,
-                        title = "Premium Widget",
-                        description = "Unlock additional Launch List widget for your home screen",
-                        gradient = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.tertiary
+            if (packagesToShow.showPerks) {
+                if (canUpgrade) {
+                    item {
+                        val headerText = when (subscriptionState.subscriptionType) {
+                            SubscriptionType.LEGACY -> "Continue Your Support"
+                            SubscriptionType.PREMIUM -> "Upgrade to Lifetime"
+                            SubscriptionType.LIFETIME -> ""
+                            else -> "Become a Member"
+                        }
+                        subscriptionState.subscriptionType.isLegacy
+                        Spacer(Modifier.height(24.dp))
+                        Text(
+                            text = headerText,
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 24.dp)
                         )
-                    )
-                }
-
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    PremiumPerkCard(
-                        icon = Icons.Default.DashboardCustomize,
-                        title = "Widget Customization",
-                        description = "Customize widgets with customizable themes and layouts",
-                        gradient = listOf(
-                            MaterialTheme.colorScheme.primaryFixed,
-                            MaterialTheme.colorScheme.tertiaryFixed
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = if (!subscriptionState.isSubscribed)
+                                "Unlock premium features and support development"
+                            else
+                                "Unlock all premium features including widgets and more!",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 24.dp)
                         )
-                    )
-                }
+                    }
 
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    PremiumPerkCard(
-                        icon = Icons.Default.EditCalendar,
-                        title = "Calendar Sync",
-                        description = "Access to Calendar Sync link for Launch and Event calendar sync",
-                        gradient = listOf(
-                            MaterialTheme.colorScheme.secondary,
-                            MaterialTheme.colorScheme.inversePrimary
+                    // Premium Widget Perk
+                    item {
+                        Spacer(Modifier.height(24.dp))
+                        PremiumPerkCard(
+                            icon = Icons.Default.Widgets,
+                            title = "Premium Widget",
+                            description = "Unlock additional Launch List widget for your home screen",
+                            gradient = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.tertiary
+                            )
                         )
-                    )
-                }
+                    }
 
-                item {
-                    Spacer(Modifier.height(16.dp))
-                    PremiumPerkCard(
-                        icon = Icons.Default.FormatPaint,
-                        title = "Premium Themes",
-                        description = "Utilize premium themes to customize your app experience",
-                        gradient = listOf(
-                            MaterialTheme.colorScheme.error,
-                            MaterialTheme.colorScheme.inversePrimary
+                    item {
+                        Spacer(Modifier.height(24.dp))
+                        PremiumPerkCard(
+                            icon = Icons.Default.DashboardCustomize,
+                            title = "Widget Customization",
+                            description = "Customize widgets with customizable themes and layouts",
+                            gradient = listOf(
+                                MaterialTheme.colorScheme.primaryFixed,
+                                MaterialTheme.colorScheme.tertiaryFixed
+                            )
                         )
-                    )
-                }
+                    }
 
-                // Ad-Free Perk
-                item {
-                    Spacer(Modifier.height(16.dp))
-                    PremiumPerkCard(
-                        icon = Icons.Default.Block,
-                        title = "No Ads",
-                        description = "Enjoy an uninterrupted, ad-free experience throughout the entire app",
-                        gradient = listOf(
-                            MaterialTheme.colorScheme.secondary,
-                            MaterialTheme.colorScheme.tertiary
+                    item {
+                        Spacer(Modifier.height(24.dp))
+                        PremiumPerkCard(
+                            icon = Icons.Default.EditCalendar,
+                            title = "Calendar Sync",
+                            description = "Access to Calendar Sync link for Launch and Event calendar sync",
+                            gradient = listOf(
+                                MaterialTheme.colorScheme.secondary,
+                                MaterialTheme.colorScheme.inversePrimary
+                            )
                         )
-                    )
-                }
+                    }
 
-                // Support Development
-                item {
-                    Spacer(Modifier.height(16.dp))
-                    PremiumPerkCard(
-                        icon = Icons.Default.Favorite,
-                        title = "Support Development",
-                        description = "Help us continue improving the app and adding new features",
-                        gradient = listOf(
-                            MaterialTheme.colorScheme.error,
-                            MaterialTheme.colorScheme.primary
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                        PremiumPerkCard(
+                            icon = Icons.Default.FormatPaint,
+                            title = "Premium Themes",
+                            description = "Utilize premium themes to customize your app experience",
+                            gradient = listOf(
+                                MaterialTheme.colorScheme.error,
+                                MaterialTheme.colorScheme.inversePrimary
+                            )
                         )
-                    )
-                }
+                    }
 
-                // Pricing Cards
+                    // Ad-Free Perk
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                        PremiumPerkCard(
+                            icon = Icons.Default.Block,
+                            title = "No Ads",
+                            description = "Enjoy an uninterrupted, ad-free experience throughout the entire app",
+                            gradient = listOf(
+                                MaterialTheme.colorScheme.secondary,
+                                MaterialTheme.colorScheme.tertiary
+                            )
+                        )
+                    }
+
+                    // Support Development
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                        PremiumPerkCard(
+                            icon = Icons.Default.Favorite,
+                            title = "Support Development",
+                            description = "Help us continue improving the app and adding new features",
+                            gradient = listOf(
+                                MaterialTheme.colorScheme.error,
+                                MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+            }
+
+            if (packagesToShow.showLifetime || packagesToShow.showAnnual || packagesToShow.showMonthly) {
                 item {
                     Spacer(Modifier.height(32.dp))
                     Text(
-                        text = "Choose Your Plan",
+                        text = if (subscriptionState.isSubscribed) "Choose an upgrade!" else "Choose Your Plan",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     Spacer(Modifier.height(16.dp))
                 }
+            }
 
-                // Pro Lifetime (Golden Premium Option) - Show if available in packagesToShow
-                if (packagesToShow.showLifetime) {
-                    item {
-                        val lifetimePackage = currentOffering?.lifetime
+            // Pro Lifetime (Golden Premium Option) - Show if available in packagesToShow
+            if (packagesToShow.showLifetime) {
+                item {
+                    val lifetimePackage = currentOffering?.lifetime
 
-                        // Only show if we have the actual package from RevenueCat
+                    // Only show if we have the actual package from RevenueCat
 
-                        ProLifetimeCard(
-                            price = lifetimePackage?.storeProduct?.price?.formatted ?: "$-.--",
-                            isProcessing = uiState.isProcessing,
-                            onPurchase = {
-                                if (lifetimePackage != null) {
-                                    viewModel.purchasePackage(lifetimePackage)
-                                }
-                            },
-                            enabled = lifetimePackage != null
-                        )
-
-                        // Show divider only if lifetime was shown AND there are subscription plans to show
-                        if (packagesToShow.showAnnual || packagesToShow.showMonthly) {
-                            Spacer(Modifier.height(20.dp))
-
-                            // "Or subscribe" divider
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 24.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                HorizontalDivider(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = "  Or subscribe  ",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                HorizontalDivider(modifier = Modifier.weight(1f))
+                    ProLifetimeCard(
+                        price = lifetimePackage?.storeProduct?.price?.formatted ?: "$-.--",
+                        isProcessing = uiState.isProcessing,
+                        onPurchase = {
+                            if (lifetimePackage != null) {
+                                viewModel.purchasePackage(lifetimePackage)
                             }
-                            Spacer(Modifier.height(16.dp))
+                        },
+                        enabled = lifetimePackage != null
+                    )
+
+                    // Show divider only if lifetime was shown AND there are subscription plans to show
+                    if (packagesToShow.showAnnual && packagesToShow.showMonthly) {
+                        Spacer(Modifier.height(20.dp))
+
+                        // "Or subscribe" divider
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            HorizontalDivider(modifier = Modifier.weight(1f))
+                            Text(
+                                text = "  Or subscribe  ",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            HorizontalDivider(modifier = Modifier.weight(1f))
                         }
-                        // Don't show fallback UI or divider - just hide until loaded
+                        Spacer(Modifier.height(16.dp))
                     }
+                    // Don't show fallback UI or divider - just hide until loaded
                 }
+            }
 
-                // Yearly Plan (Recommended) - Show if available in packagesToShow
-                if (packagesToShow.showAnnual) {
-                    item {
-                        val annualPackage = currentOffering?.annual
+            // Yearly Plan (Recommended) - Show if available in packagesToShow
+            if (packagesToShow.showAnnual) {
+                item {
+                    val annualPackage = currentOffering?.annual
 
-                        PricingCard(
-                            title = "Yearly",
-                            price = annualPackage?.storeProduct?.price?.formatted ?: "$-.--",
-                            period = "/year",
-                            savings = uiState.getSavingsPercent(),
-                            isRecommended = true,
-                            isProcessing = uiState.isProcessing,
-                            onSubscribe = {
-                                if (annualPackage != null) {
-                                    viewModel.purchasePackage(annualPackage)
-                                }
-                            },
-                            enabled = annualPackage != null
-                        )
-                        // Don't show fallback UI - just hide until loaded
-                    }
+                    PricingCard(
+                        title = "Yearly",
+                        price = annualPackage?.storeProduct?.price?.formatted ?: "$-.--",
+                        period = "/year",
+                        savings = uiState.getSavingsPercent(),
+                        isRecommended = true,
+                        isProcessing = uiState.isProcessing,
+                        onSubscribe = {
+                            if (annualPackage != null) {
+                                viewModel.purchasePackage(annualPackage)
+                            }
+                        },
+                        enabled = annualPackage != null
+                    )
+                    // Don't show fallback UI - just hide until loaded
                 }
+            }
 
-                // Monthly Plan - Show if available in packagesToShow
-                if (packagesToShow.showMonthly) {
-                    item {
-                        Spacer(Modifier.height(12.dp))
+            // Monthly Plan - Show if available in packagesToShow
+            if (packagesToShow.showMonthly) {
+                item {
+                    Spacer(Modifier.height(12.dp))
 
-                        val monthlyPackage = currentOffering?.monthly
+                    val monthlyPackage = currentOffering?.monthly
 
-                        PricingCard(
-                            title = "Monthly",
-                            price = monthlyPackage?.storeProduct?.price?.formatted ?: "$-.--",
-                            period = "/month",
-                            isRecommended = false,
-                            isProcessing = uiState.isProcessing,
-                            onSubscribe = {
-                                if (monthlyPackage != null) {
-                                    viewModel.purchasePackage(monthlyPackage)
-                                }
-                            },
-                            enabled = monthlyPackage != null
-                        )
-                        // Don't show fallback UI - just hide until loaded
-                    }
+                    PricingCard(
+                        title = "Monthly",
+                        price = monthlyPackage?.storeProduct?.price?.formatted ?: "$-.--",
+                        period = "/month",
+                        isRecommended = false,
+                        isProcessing = uiState.isProcessing,
+                        onSubscribe = {
+                            if (monthlyPackage != null) {
+                                viewModel.purchasePackage(monthlyPackage)
+                            }
+                        },
+                        enabled = monthlyPackage != null
+                    )
+                    // Don't show fallback UI - just hide until loaded
                 }
-            } else {
-                // Thank You Section for existing members
+            }
+
+            if (subscriptionState.isSubscribed) {
                 item {
                     Spacer(Modifier.height(24.dp))
                     ThankYouSection(
@@ -418,6 +430,7 @@ fun SupportUsScreen(
                     )
                 }
             }
+
 
             // Current Plan Section (at bottom for non-subscribers)
             if (!subscriptionState.isSubscribed) {
@@ -432,19 +445,17 @@ fun SupportUsScreen(
                 }
             }
 
-            // Restore Purchases Button (for non-subscribers or those who need verification)
-            if (canUpgrade) {
-                item {
-                    Spacer(Modifier.height(16.dp))
+            // Restore Purchases Button (always visible for all users)
+            item {
+                Spacer(Modifier.height(16.dp))
 
-                    // Restore Purchases
-                    TextButton(
-                        onClick = { viewModel.restorePurchases() },
-                        modifier = Modifier.padding(horizontal = 24.dp),
-                        enabled = !uiState.isProcessing
-                    ) {
-                        Text(if (!subscriptionState.isSubscribed) "Already a member? Restore Purchases" else "Restore Purchases")
-                    }
+                // Restore Purchases
+                TextButton(
+                    onClick = { viewModel.restorePurchases() },
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    enabled = !uiState.isProcessing
+                ) {
+                    Text(if (!subscriptionState.isSubscribed) "Already a member? Restore Purchases" else "Restore Purchases")
                 }
             }
 
@@ -874,11 +885,20 @@ private fun ThankYouSection(
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (isLegacy) {
-                    // Legacy users only get ad-free
+                    ActivePerkItem(
+                        icon = Icons.Default.Widgets,
+                        title = "Premium Widget",
+                        description = "Additional Launch List widget"
+                    )
                     ActivePerkItem(
                         icon = Icons.Default.Block,
                         title = "No Ads",
                         description = "Ad-free experience"
+                    )
+                    ActivePerkItem(
+                        icon = Icons.Default.CalendarMonth,
+                        title = "Calendar Sync",
+                        description = "Access to ICS Sync"
                     )
                     ActivePerkItem(
                         icon = Icons.Default.Favorite,
@@ -890,17 +910,22 @@ private fun ThankYouSection(
                     ActivePerkItem(
                         icon = Icons.Default.Widgets,
                         title = "Premium Widget",
-                        description = "Unlocked"
+                        description = "Additional Launch List widget"
                     )
                     ActivePerkItem(
                         icon = Icons.Default.FormatPaint,
                         title = "Premium Themes",
-                        description = "Unlocked"
+                        description = "Customize your app"
                     )
                     ActivePerkItem(
                         icon = Icons.Default.Block,
                         title = "No Ads",
-                        description = "Active"
+                        description = "Ad-free experience"
+                    )
+                    ActivePerkItem(
+                        icon = Icons.Default.CalendarMonth,
+                        title = "Calendar Sync",
+                        description = "Access to ICS Sync"
                     )
                     ActivePerkItem(
                         icon = Icons.Default.Favorite,
@@ -1010,12 +1035,13 @@ private fun SuccessCard(message: String) {
 
 @Composable
 private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
-    val revenueCatManager = koinInject<me.calebjones.spacelaunchnow.data.billing.RevenueCatManager>()
+    val revenueCatManager =
+        koinInject<me.calebjones.spacelaunchnow.data.billing.RevenueCatManager>()
     val customerInfo by revenueCatManager.customerInfo.collectAsState()
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
-    
+
     val userId = customerInfo?.originalAppUserId ?: "Not available"
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1047,7 +1073,7 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
                     fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                 )
             }
-            
+
             if (userId != "Not available") {
                 Icon(
                     imageVector = Icons.Default.ContentCopy,
@@ -1097,7 +1123,7 @@ private fun FinePrint() {
 @Composable
 private fun GoogleFormLinkCard() {
     val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1122,7 +1148,7 @@ private fun GoogleFormLinkCard() {
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Unable to Restore Purchase?",
@@ -1136,7 +1162,7 @@ private fun GoogleFormLinkCard() {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             Icon(
                 imageVector = Icons.Default.OpenInNew,
                 contentDescription = "Open form",
@@ -1312,7 +1338,7 @@ private fun ProPerkCheckmark(text: String) {
 
 @Composable
 private fun CurrentPlanCard(
-    subscriptionState: me.calebjones.spacelaunchnow.data.model.SubscriptionState,
+    subscriptionState: SubscriptionState,
     onVerifySubscription: () -> Unit,
     onRestorePurchases: () -> Unit,
     isProcessing: Boolean
@@ -1543,7 +1569,8 @@ enum class UserState {
 data class PackagesToShow(
     val showLifetime: Boolean,
     val showAnnual: Boolean,
-    val showMonthly: Boolean
+    val showMonthly: Boolean,
+    val showPerks: Boolean
 )
 
 /**
@@ -1555,35 +1582,23 @@ data class PackagesToShow(
 private fun determineUserState(
     subscriptionState: SubscriptionState
 ): UserState {
-    // Check if user has lifetime purchase - match against actual lifetime product IDs
-    val hasLifetime = subscriptionState.productId?.let { productId ->
-        productId == SubscriptionProducts.PRO_LIFETIME ||  // Current lifetime: "spacelaunchnow_pro"
-                productId.contains("lifetime", ignoreCase = true)  // Other lifetime variants
-    } ?: false
+    println("determineUserState: $subscriptionState")
+    return when (subscriptionState.subscriptionType) {
+        SubscriptionType.LIFETIME -> UserState.LIFETIME_USER
+        SubscriptionType.PREMIUM -> {
+            // For Premium users, determine if monthly or annual based on productId
+            val isMonthly = subscriptionState.productId?.let { productId ->
+                productId.contains("monthly", ignoreCase = true) ||
+                        productId.contains("base-plan", ignoreCase = true) ||
+                        productId.contains("base_plan", ignoreCase = true)
+            } ?: false
 
-    if (hasLifetime) {
-        return UserState.LIFETIME_USER
+            if (isMonthly) UserState.MONTHLY_SUBSCRIBER else UserState.ANNUAL_SUBSCRIBER
+        }
+
+        SubscriptionType.LEGACY -> UserState.LEGACY_USER
+        SubscriptionType.FREE -> UserState.NEW_USER
     }
-
-    // Check if user is a legacy user
-    if (subscriptionState.subscriptionType.isLegacy) {
-        return UserState.LEGACY_USER
-    }
-
-    // Check if user has an active subscription
-    if (subscriptionState.isSubscribed) {
-        // Determine if monthly or annual based on productId or basePlanId
-        val isMonthly = subscriptionState.productId?.let { productId ->
-            productId.contains("monthly", ignoreCase = true) ||
-                    productId.contains("base-plan", ignoreCase = true) ||
-                    productId.contains("base_plan", ignoreCase = true)
-        } ?: false
-
-        return if (isMonthly) UserState.MONTHLY_SUBSCRIBER else UserState.ANNUAL_SUBSCRIBER
-    }
-
-    // Default: New user with no subscriptions
-    return UserState.NEW_USER
 }
 
 /**
@@ -1591,10 +1606,10 @@ private fun determineUserState(
  *
  * Rules:
  * 1) New User - Show all (lifetime, annual, monthly)
- * 2) Legacy User - Show all (lifetime, annual, monthly)
- * 3) Monthly Subscriber - Show annual and lifetime
- * 4) Annual Subscriber - Show lifetime only
- * 5) Lifetime User - Show nothing
+ * 2) Legacy User - Show lifetime and monthly (no annual - they can upgrade to Pro monthly or go straight to lifetime)
+ * 3) Monthly Subscriber (Pro) - Show lifetime only (already have Pro, can only upgrade to lifetime)
+ * 4) Annual Subscriber (Pro) - Show lifetime only (already have Pro, can only upgrade to lifetime)
+ * 5) Lifetime User - Show nothing (they have the best tier)
  *
  * @param userState The user's current state
  * @return PackagesToShow with boolean flags for each package type
@@ -1602,35 +1617,42 @@ private fun determineUserState(
 private fun getPackagesToShow(
     userState: UserState
 ): PackagesToShow {
+    println("getPackagesToShow: $userState")
     return when (userState) {
         UserState.NEW_USER -> PackagesToShow(
             showLifetime = true,
             showAnnual = true,
-            showMonthly = true
+            showMonthly = true,
+            showPerks = true
         )
 
         UserState.LEGACY_USER -> PackagesToShow(
-            showLifetime = true,
-            showAnnual = true,
-            showMonthly = true
+            showLifetime = true,   // Show lifetime upgrade option
+            showAnnual = true,    // Don't show annual (they can upgrade to lifetime)
+            showMonthly = true,     // Show monthly Pro option
+            showPerks = false
         )
 
         UserState.MONTHLY_SUBSCRIBER -> PackagesToShow(
-            showLifetime = true,
-            showAnnual = true,
-            showMonthly = false
+            showLifetime = true,   // Pro users get lifetime upgrade option only
+            showAnnual = true,    // Don't show annual (they're already Pro)
+            showMonthly = false,    // Don't show monthly (they already have it)
+            showPerks = true
+
         )
 
         UserState.ANNUAL_SUBSCRIBER -> PackagesToShow(
-            showLifetime = true,
-            showAnnual = false,
-            showMonthly = false
+            showLifetime = true,   // Pro users get lifetime upgrade option only
+            showAnnual = false,    // Don't show annual (they already have it)
+            showMonthly = false,    // Don't show monthly (they're already Pro)
+            showPerks = true
         )
 
         UserState.LIFETIME_USER -> PackagesToShow(
-            showLifetime = false,
-            showAnnual = false,
-            showMonthly = false
+            showLifetime = false,  // They already have lifetime
+            showAnnual = false,    // No downgrades
+            showMonthly = false,    // No downgrades
+            showPerks = false
         )
     }
 }

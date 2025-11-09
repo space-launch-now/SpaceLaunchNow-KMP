@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.viewmodel
+package me.calebjones.spacelaunchnow.data.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -27,6 +27,8 @@ import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.SpaceLaunchNotificationChannel
+import me.calebjones.spacelaunchnow.util.LocaleUtil
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -63,7 +65,7 @@ object NotificationDisplayHelper {
      * This provides the mapping between topics and channels
      */
     fun getChannelForTopic(topic: NotificationTopic): String {
-        return SpaceLaunchNotificationChannel.getChannelForTopic(topic).id
+        return SpaceLaunchNotificationChannel.Companion.getChannelForTopic(topic).id
     }
 
     /**
@@ -140,22 +142,28 @@ object NotificationDisplayHelper {
                         enableLights(true)
                         lightColor = Color.RED
                         enableVibration(true)
-                        vibrationPattern = longArrayOf(0, 200, 100, 200, 100, 200, 100, 400) // Urgent triple-buzz
+                        vibrationPattern =
+                            longArrayOf(0, 200, 100, 200, 100, 200, 100, 400) // Urgent triple-buzz
                     }
+
                     SpaceLaunchNotificationChannel.LAUNCH_STATUS_UPDATES -> {
-                        // High priority: Strong pattern for launch status (success/failure/in-flight)  
+                        // High priority: Strong pattern for launch status (success/failure/in-flight)
                         enableLights(true)
                         lightColor = Color.BLUE
                         enableVibration(true)
-                        vibrationPattern = longArrayOf(0, 300, 200, 300, 200, 500) // Strong double-buzz
+                        vibrationPattern =
+                            longArrayOf(0, 300, 200, 300, 200, 500) // Strong double-buzz
                     }
+
                     SpaceLaunchNotificationChannel.SCHEDULE_CHANGES -> {
                         // High priority: Distinctive pattern for schedule changes
                         enableLights(true)
                         lightColor = Color.YELLOW
                         enableVibration(true)
-                        vibrationPattern = longArrayOf(0, 100, 100, 100, 100, 100, 200, 400) // Triple tap + hold
+                        vibrationPattern =
+                            longArrayOf(0, 100, 100, 100, 100, 100, 200, 400) // Triple tap + hold
                     }
+
                     SpaceLaunchNotificationChannel.LAUNCH_REMINDERS -> {
                         // Default: Standard notification pattern (1-24 hours)
                         enableLights(true)
@@ -163,6 +171,7 @@ object NotificationDisplayHelper {
                         enableVibration(true)
                         vibrationPattern = longArrayOf(0, 250, 250, 250) // Standard double-buzz
                     }
+
                     SpaceLaunchNotificationChannel.WEBCAST_NOTIFICATIONS -> {
                         // Default: Gentle pattern for webcast notifications
                         enableLights(true)
@@ -170,6 +179,7 @@ object NotificationDisplayHelper {
                         enableVibration(true)
                         vibrationPattern = longArrayOf(0, 200, 100, 200) // Gentle double-tap
                     }
+
                     else -> {
                         // Low priority: Simple single vibration for events/news
                         if (channelConfig.importance >= NotificationManager.IMPORTANCE_DEFAULT) {
@@ -387,9 +397,9 @@ object NotificationDisplayHelper {
     }
 
     /**
-     * Convert ISO 8601 timestamp to pretty date format
+     * Convert ISO 8601 timestamp to pretty time format
      * Input: "2025-10-15T12:00:00Z"
-     * Output: "Oct 15, 2025 at 12:00 PM" (localized)
+     * Output: "12:00 PM" (en-US) or "12:00" (most other locales with 24-hour format)
      */
     private fun formatLaunchDate(launchNet: String): String {
         return try {
@@ -399,8 +409,12 @@ object NotificationDisplayHelper {
             }
             val date = inputFormat.parse(launchNet)
 
-            // Format to pretty date (user's local timezone)
-            val outputFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+            // Use locale-aware time formatting (automatically handles 12-hour vs 24-hour)
+            val userLocale = Locale.forLanguageTag(LocaleUtil.getLocaleTag())
+            val outputFormat = DateFormat.getTimeInstance(
+                DateFormat.SHORT,
+                userLocale
+            )
             date?.let { outputFormat.format(it) } ?: launchNet
         } catch (e: Exception) {
             println("⚠️ Failed to parse launch date: $launchNet - ${e.message}")
@@ -451,8 +465,7 @@ object NotificationDisplayHelper {
     fun showNotification(
         context: Context,
         notificationData: NotificationData,
-        title: String? = null,
-        body: String? = null
+        title: String? = null
     ) {
         // Ensure channels exist
         createNotificationChannels(context)
@@ -460,7 +473,7 @@ object NotificationDisplayHelper {
         // Determine which channel to use
         val channelId = getChannelId(notificationData.notificationType)
 
-        // Use provided title/body or generate from notification data and strings
+        // Use provided title or generate from notification data
         // Add 🔴 emoji to title if webcast is available (like old app)
         val baseTitle = title ?: notificationData.launchName
         val displayTitle = if (notificationData.isWebcastLive()) {
@@ -469,6 +482,7 @@ object NotificationDisplayHelper {
             baseTitle
         }
 
+        // Always generate body with proper date formatting from NotificationData
         val displayBody = getNotificationBody(
             context,
             notificationData.notificationType,
@@ -507,7 +521,7 @@ object NotificationDisplayHelper {
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
             .setContentTitle(displayTitle)
             .setContentText(displayBody)
-            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
+            .setSmallIcon(R.drawable.ic_rocket_notification)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -572,6 +586,7 @@ object NotificationDisplayHelper {
     /**
      * Display a notification from raw data map (used by Firebase)
      * This converts the map to NotificationData and calls showNotification
+     * Note: body parameter is only used for fallback when parsing fails
      */
     fun showNotificationFromMap(
         context: Context,
@@ -579,9 +594,10 @@ object NotificationDisplayHelper {
         title: String? = null,
         body: String? = null
     ) {
-        val notificationData = NotificationData.fromMap(data)
+        val notificationData = NotificationData.Companion.fromMap(data)
         if (notificationData != null) {
-            showNotification(context, notificationData, title, body)
+            // Don't pass body - always use formatted body from NotificationData
+            showNotification(context, notificationData, title)
         } else {
             // Fallback: show basic notification if parsing fails
             showBasicNotification(

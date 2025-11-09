@@ -46,6 +46,7 @@ import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -275,13 +276,11 @@ fun NewsItemShimmer() {
 }
 
 /**
- * Format published date to human readable format
+ * Format published date to human readable format using locale-aware formatting
  */
 private fun formatPublishedDate(instant: Instant): String {
     return try {
-        val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        val month = localDateTime.month.name.lowercase()
-        "${month.replaceFirstChar { it.uppercase()}} ${localDateTime.dayOfMonth}, ${localDateTime.year}"
+        DateTimeUtil.formatLaunchDate(instant)
     } catch (e: Exception) {
         "Unknown date"
     }

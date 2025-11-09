@@ -17,7 +17,7 @@ androidx-datastore = "1.1.7"
 androidx-glance = "1.1.1"
 
 
-compose-plugin = "1.9.2"
+compose-plugin = "1.9.3"
 compose = "2.2.21"
 compose-material3 = "1.4.0"
 compose-material3-adaptive = "1.1.2"
@@ -69,6 +69,7 @@ workRuntime = "2.11.0"
 
 purchases-kmp = "1.9.0+14.3.0"
 shadowglow = "1.0.0"
+kstore = "1.0.0"
 
 # Basic Ads (Google AdMob for KMP)
 basic-ads = "0.2.7"
@@ -193,6 +194,10 @@ cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-
 
 # ShadowGlow library for advanced drop shadows
 shadowglow = { module = "me.trishiraj:shadowglow", version.ref = "shadowglow" }
+
+# KStore for local data storage
+kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
+kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 
 # Basic Ads (Google AdMob for KMP)
 basicAds = { module = "app.lexilabs.basic:basic-ads", version.ref = "basic-ads" }

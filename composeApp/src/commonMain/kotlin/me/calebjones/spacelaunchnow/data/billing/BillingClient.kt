@@ -68,6 +68,20 @@ class BillingClient(
         revenueCatClient.getProductPricing(productId)
 
     /**
+     * Cancel subscription (platform-specific)
+     * This typically directs users to platform-specific subscription management
+     */
+    suspend fun cancelSubscription(): Result<Unit> {
+        return try {
+            // On most platforms, this would open subscription management
+            // For now, we'll return success indicating the action was handled
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Flow of purchase updates
      * Emits whenever a purchase is completed or updated
      */
@@ -108,9 +122,10 @@ object SubscriptionProducts {
     const val RC_PACKAGE_MONTHLY = "\$rc_monthly"    // Maps to sln_production_yearly:base-plan
     const val RC_PACKAGE_ANNUAL = "\$rc_annual"      // Maps to sln_production_yearly:yearly
 
-    // RevenueCat entitlement identifier (configured in dashboard)
-    const val RC_ENTITLEMENT_PREMIUM = "entl9fe2b6018c"     // All features unlocked
-    const val RC_ENTITLEMENT_LEGACY = "entl3ad15261a3"     // All features unlocked
+    // RevenueCat entitlement identifiers (must match dashboard exactly)
+    const val RC_ENTITLEMENT_LEGACY = "Legacy"                           // Legacy users (basic features)
+    const val RC_ENTITLEMENT_PRO = "Space Launch Now - Pro"                     // "Space Launch Now - Pro" entitlement ID
+    const val RC_ENTITLEMENT_LIFETIME = "Space Launch Now - Lifetime"                // "Space Launch Now - Lifetime" entitlement ID
 
     // NOTE: We don't explicitly list all legacy products here as there are hundreds of them.
     // Any product ID that doesn't match current products or debug products is treated as legacy.

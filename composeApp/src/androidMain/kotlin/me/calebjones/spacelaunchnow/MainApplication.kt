@@ -10,9 +10,9 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.initializeDatadog
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
-import me.calebjones.spacelaunchnow.ui.viewmodel.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import me.calebjones.spacelaunchnow.workers.WidgetUpdateWorker
 import org.koin.android.ext.android.inject
@@ -41,6 +41,11 @@ class MainApplication : Application() {
             "BuildConfig initialized, IS_DEBUG = ${me.calebjones.spacelaunchnow.util.BuildConfig.IS_DEBUG}"
         )
 
+        // Initialize AppDirectories for KStore file storage
+        Log.d("MainApplication", "Initializing AppDirectories...")
+        me.calebjones.spacelaunchnow.data.subscription.AppDirectories.initialize(this)
+        Log.d("MainApplication", "✅ AppDirectories initialized")
+
         // Now start Koin - BuildConfig.IS_DEBUG is now set
         Log.d("MainApplication", "Starting Koin...")
         try {
@@ -64,7 +69,7 @@ class MainApplication : Application() {
             Log.e("MainApplication", "Failed to start Koin", e)
             throw e
         }
-        
+
         // Initialize Datadog analytics using KMP SDK
         Log.d("MainApplication", "Initializing Datadog...")
         try {
@@ -78,7 +83,7 @@ class MainApplication : Application() {
 
         // Initialize RevenueCat after Koin is ready
         Log.d("MainApplication", "Initializing RevenueCat...")
-        
+
         @Suppress("OPT_IN_USAGE")
         kotlinx.coroutines.GlobalScope.launch {
             try {
@@ -92,12 +97,12 @@ class MainApplication : Application() {
         }
 
         Log.d("MainApplication", "Creating notification channels...")
-        
+
         // Create notification channels for Android O+
         NotificationDisplayHelper.createNotificationChannels(this)
 
         Log.d("MainApplication", "Scheduling widget updates...")
-        
+
         // Schedule widget updates
         scheduleWidgetUpdates()
 

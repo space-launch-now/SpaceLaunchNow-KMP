@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.detail.compose
+package me.calebjones.spacelaunchnow.ui.event
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,9 +49,12 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationNormal
-import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Update
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
@@ -104,12 +108,23 @@ private fun EventDetailContentInBody(event: EventEndpointDetailed) {
             Spacer(Modifier.height(16.dp))
         }
 
-        // Agencies
-        if (event.agencies.isNotEmpty()) {
-            AgenciesCard(event.agencies)
+        // Programs
+        event.program?.takeIf { it.isNotEmpty() }?.let { programs ->
+            ProgramsCard(programs)
             Spacer(Modifier.height(16.dp))
         }
 
+        // Updates
+        if (event.updates.isNotEmpty()) {
+            UpdatesCard(event.updates)
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // Agencies
+        event.agencies.takeIf { it.isNotEmpty() }?.let { list ->
+            AgenciesCard(list)
+            Spacer(Modifier.height(16.dp))
+        }
         // Astronauts
         event.astronauts?.takeIf { it.isNotEmpty() }?.let { list ->
             AstronautsCard(list)
@@ -150,30 +165,53 @@ private fun EventInfoCard(event: EventEndpointDetailed) {
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Date, location, duration
-            val meta = buildList {
-                event.date?.let { add(formatLaunchDateTime(it, useUtc)) }
-                event.location?.let { add(it) }
-                if (event.duration != null) add("Duration: ${event.duration}")
-                if (event.webcastLive == true) add("Live Now")
-            }.joinToString(" • ")
             // Description
             event.description?.let { desc ->
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Description",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(desc, style = MaterialTheme.typography.bodyMedium, lineHeight = 20.sp)
+                }
+            }
+
+            // Event Details Grid
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Description",
-                    style = MaterialTheme.typography.titleLarge,
+                    text = "Event Details",
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                Text(desc, style = MaterialTheme.typography.bodyMedium, lineHeight = 20.sp)
-            }
-            if (meta.isNotEmpty()) {
-                Text(
-                    meta,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+
+                event.date?.let { date ->
+                    InfoRow(
+                        label = "Date",
+                        value = formatLaunchDateTime(date, useUtc)
+                    )
+                }
+
+                event.location?.let { location ->
+                    InfoRow(label = "Location", value = location)
+                }
+
+                event.duration?.let { duration ->
+                    InfoRow(label = "Duration", value = duration)
+                }
+
+                if (event.webcastLive == true) {
+                    InfoRow(label = "Status", value = "Live Now 🔴")
+                }
+
+                event.lastUpdated?.let { updated ->
+                    InfoRow(
+                        label = "Last Updated",
+                        value = formatLaunchDateTime(updated, useUtc)
+                    )
+                }
             }
         }
     }
@@ -257,7 +295,7 @@ private fun AgencyRowWithLogo(agency: AgencyMini, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // Logo or fallback avatar
-        val logoUrl = detailed?.logo?.imageUrl
+        val logoUrl = detailed?.socialLogo?.imageUrl
         if (!logoUrl.isNullOrBlank()) {
             Surface(
                 shape = CircleShape,
@@ -474,6 +512,214 @@ private fun RowWithImage(
                     subtitle,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1.5f)
+        )
+    }
+}
+
+@Composable
+private fun ProgramsCard(programs: List<ProgramNormal>) {
+    val useUtc = LocalUseUtc.current
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        programs.forEach { program ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { /* TODO open program */ }
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Program image if available
+                    program.image?.imageUrl?.let { imageUrl ->
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                        ) {
+                            AsyncImage(
+                                model = imageUrl,
+                                contentDescription = program.name,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .defaultMinSize(minHeight = 150.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                            )
+                        }
+                    }
+
+                    Text(
+                        program.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    program.description?.let { desc ->
+                        Text(
+                            desc,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 20.sp
+                        )
+                    }
+
+                    // Date range if available
+                    if (program.startDate != null || program.endDate != null) {
+                        val dateRange = buildString {
+                            program.startDate?.let { append(formatLaunchDateTime(it, useUtc)) }
+                            if (program.startDate != null && program.endDate != null) {
+                                append(" → ")
+                            }
+                            program.endDate?.let { append(formatLaunchDateTime(it, useUtc)) }
+                        }
+                        Text(
+                            dateRange,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    // Agencies
+                    if (program.agencies.isNotEmpty()) {
+                        Text(
+                            "Agencies: ${program.agencies.joinToString(", ") { it.abbrev ?: it.name }}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UpdatesCard(updates: List<Update>) {
+    val useUtc = LocalUseUtc.current
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(
+                "Updates",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            updates.take(10).forEach { update ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Profile image or placeholder
+                    if (!update.profileImage.isNullOrBlank()) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                        ) {
+                            AsyncImage(
+                                model = update.profileImage,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = update.createdBy?.firstOrNull()?.uppercase() ?: "?",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        // Created by and date
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            update.createdBy?.let { author ->
+                                Text(
+                                    author,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            update.createdOn?.let { date ->
+                                Text(
+                                    formatLaunchDateTime(date, useUtc),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        // Comment
+                        update.comment?.let { comment ->
+                            Text(
+                                comment,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (updates.size > 10) {
+                Text(
+                    "+ ${updates.size - 10} more updates",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
         }

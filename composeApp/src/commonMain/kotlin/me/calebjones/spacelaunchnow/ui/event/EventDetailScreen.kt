@@ -1,12 +1,9 @@
-package me.calebjones.spacelaunchnow.ui.detail
+package me.calebjones.spacelaunchnow.ui.event
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import me.calebjones.spacelaunchnow.ui.detail.compose.EventDetailErrorView
-import me.calebjones.spacelaunchnow.ui.detail.compose.EventDetailLoadingView
-import me.calebjones.spacelaunchnow.ui.detail.compose.EventDetailView
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
 import org.koin.compose.viewmodel.koinViewModel

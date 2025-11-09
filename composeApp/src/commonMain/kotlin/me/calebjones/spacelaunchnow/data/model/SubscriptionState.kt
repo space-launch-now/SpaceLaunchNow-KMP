@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalTime::class)
+
 package me.calebjones.spacelaunchnow.data.model
 
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock.System
+import kotlin.time.ExperimentalTime
 
 /**
  * Subscription state model
@@ -95,11 +98,17 @@ data class SubscriptionState(
 enum class SubscriptionType(val isLegacy: Boolean = false) {
     FREE(isLegacy = false),
     LEGACY(isLegacy = true),  // Legacy subscriptions (ad-free + widget only)
-    PREMIUM(isLegacy = false); // Current subscriptions (all features)
+    PREMIUM(isLegacy = false), // Current subscriptions (all features)
+    LIFETIME(isLegacy = false); // Lifetime subscriptions (all features, no renewal)
 
     companion object {
         fun fromProductId(productId: String): SubscriptionType {
             val result = when {
+                // Match lifetime product patterns first
+                productId.contains("lifetime", ignoreCase = true) -> LIFETIME
+                productId.contains("permanent", ignoreCase = true) -> LIFETIME
+                productId.contains("onetime", ignoreCase = true) -> LIFETIME
+                productId.contains("one_time", ignoreCase = true) -> LIFETIME
                 // Match current/known premium product patterns
                 productId == "spacelaunchnow_pro" -> PREMIUM
                 productId == "sln_production_yearly" -> PREMIUM
@@ -168,6 +177,7 @@ enum class PremiumFeature {
                 SubscriptionType.FREE -> getFreeFeatures()
                 SubscriptionType.LEGACY -> getBasicFeatures()
                 SubscriptionType.PREMIUM -> getPremiumFeatures()
+                SubscriptionType.LIFETIME -> getPremiumFeatures() // Lifetime gets all features like Premium
             }
         }
     }
