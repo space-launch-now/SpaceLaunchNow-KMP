@@ -41,6 +41,11 @@ class MainApplication : Application() {
             "BuildConfig initialized, IS_DEBUG = ${me.calebjones.spacelaunchnow.util.BuildConfig.IS_DEBUG}"
         )
 
+        // Initialize AppDirectories for KStore file storage
+        Log.d("MainApplication", "Initializing AppDirectories...")
+        me.calebjones.spacelaunchnow.data.subscription.AppDirectories.initialize(this)
+        Log.d("MainApplication", "✅ AppDirectories initialized")
+
         // Now start Koin - BuildConfig.IS_DEBUG is now set
         Log.d("MainApplication", "Starting Koin...")
         try {

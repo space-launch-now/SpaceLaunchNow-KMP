@@ -60,9 +60,15 @@ class RevenueCatManager {
             syncPurchases()
 
             // Load initial customer info (which will include synced purchases)
-            refreshCustomerInfo()
+            // Wait for this to complete to ensure entitlements are available immediately
+            val customerInfoSuccess = refreshCustomerInfo()
+            if (customerInfoSuccess) {
+                println("RevenueCat: ✅ Customer info loaded successfully")
+            } else {
+                println("RevenueCat: ⚠️  Customer info failed to load, but continuing...")
+            }
 
-            // Load offerings
+            // Load offerings (can run in parallel, don't wait)
             refreshOfferings()
 
             println("RevenueCat: Initialization successful")
@@ -74,11 +80,18 @@ class RevenueCatManager {
     }
 
     /**
-     * Refresh customer info from RevenueCat
+     * Refresh customer info from RevenueCat (suspending)
+     * This method properly waits for the RevenueCat API call to complete
      */
-    suspend fun refreshCustomerInfo() {
+    suspend fun refreshCustomerInfo(): Boolean = suspendCancellableCoroutine { continuation ->
         try {
-            if (!_isInitialized.value) return
+            if (!_isInitialized.value) {
+                println("RevenueCat: ❌ Cannot refresh customer info - SDK not initialized")
+                continuation.resume(false)
+                return@suspendCancellableCoroutine
+            }
+
+            println("RevenueCat: 🔄 Refreshing customer info...")
 
             Purchases.sharedInstance.getCustomerInfo(
                 onError = { error ->
@@ -89,10 +102,12 @@ class RevenueCatManager {
                             "error_code" to error.code.name
                         )
                     )
+                    // Resume with false to indicate failure, but don't throw
+                    continuation.resume(false)
                 },
                 onSuccess = { customerInfo ->
                     _customerInfo.value = customerInfo
-                    println("RevenueCat: Customer info refreshed")
+                    println("RevenueCat: ✅ Customer info refreshed successfully")
                     println("  - Active entitlements: ${customerInfo.entitlements.active.keys}")
 
                     // Set user info in Datadog for tracking
@@ -118,12 +133,16 @@ class RevenueCatManager {
                             "active_subscriptions" to activeSubscriptions
                         )
                     )
+                    
+                    // Resume with true to indicate success
+                    continuation.resume(true)
                 }
             )
 
         } catch (e: Exception) {
             println("RevenueCat: Failed to refresh customer info - ${e.message}")
             DatadogLogger.error("Exception refreshing customer info", e)
+            continuation.resume(false)
         }
     }
 

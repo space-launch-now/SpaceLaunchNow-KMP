@@ -224,6 +224,10 @@ kotlin {
 
                 // DataStore for persistent storage
                 implementation(libs.androidx.datastore.preferences)
+                
+                // KStore for simple local storage
+                implementation(libs.kstore)
+                implementation(libs.kstore.file)
 
                 implementation(libs.aboutlibraries.core)
                 implementation(libs.aboutlibraries.compose.m2)

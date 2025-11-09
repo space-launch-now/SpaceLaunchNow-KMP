@@ -25,7 +25,9 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
+import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
+import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -165,16 +167,26 @@ val appModule = module {
         )
     }
 
+    // Local subscription storage (KStore)
+    single { LocalSubscriptionStorage() }
+    
+    // Subscription syncer (handles RevenueCat sync)
+    single {
+        SubscriptionSyncer(
+            localStorage = get(),
+            revenueCatManager = get()
+        )
+    }
+
+    // Simple subscription repository
     single<SubscriptionRepository> {
-        SubscriptionRepositoryImpl(
+        SimpleSubscriptionRepository(
+            localStorage = get(),
+            syncer = get(),
             billingClient = get(),
-            storage = get<SubscriptionStorage>(),
-            debugPreferences = get<DebugPreferences>(),
-            appPreferences = get<AppPreferences>(),      // Add AppPreferences injection
-            temporaryPremiumAccess = get<TemporaryPremiumAccess>(),  // Add temporary premium access
-            revenueCatManager = get<RevenueCatManager>(),  // RevenueCat dependency
-            widgetPreferences = get<WidgetPreferences>(),   // Cache widget access
-            platformWidgetUpdater = getOrNull()             // Android-only: trigger widget updates
+            widgetPreferences = get(),
+            platformWidgetUpdater = getOrNull(),
+            temporaryPremiumAccess = get()
         )
     }
 
