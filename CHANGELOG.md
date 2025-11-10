@@ -1,4 +1,18 @@
-# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b19...v5.0.0) (2025-11-09)
+# [5.0.0](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b20...v5.0.0) (2025-11-10)
+
+
+### Bug Fixes
+
+* improve URL removal regex to match all bracket contents ([5e89f77](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/5e89f7719d739e92cd9a16bea118f192254add29))
+
+
+### Features
+
+* add script to truncate Google Play release notes to 500 chars ([d101d4f](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/d101d4f90dc9ae49ef2947438205e15fa06f57f8))
+
+
+
+# [5.0.0-b20](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b19...v5.0.0-b20) (2025-11-09)
 
 
 ### Bug Fixes
@@ -52,10 +66,6 @@
 ### Bug Fixes
 
 * split deployment jobs for Play Store and Firebase ([87c61cf](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/87c61cf80e6a9c8a5148605f2089b6f76c0de6b4))
-
-
-
-# [5.0.0-b16](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/compare/v5.0.0-b15...v5.0.0-b16) (2025-11-03)
 
 
 
