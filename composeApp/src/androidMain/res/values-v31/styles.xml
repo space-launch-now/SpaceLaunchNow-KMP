@@ -7,6 +7,5 @@
         <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
         <item name="android:windowSplashScreenIconBackgroundColor">@color/splash_icon_bg
         </item>
-        <item name="android:windowSplashScreenBehavior">icon_preferred</item>
     </style>
 </resources>

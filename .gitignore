@@ -26,3 +26,4 @@ iosApp/iosApp/GoogleService-Info.plist
 
 **google-services.json
 keystore.properties
+.vscode/
