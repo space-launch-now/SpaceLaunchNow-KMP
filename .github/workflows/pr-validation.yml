@@ -88,11 +88,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Pre-compile dependencies
-        run: ./gradlew compileKotlin compileTestKotlin --parallel
-
       - name: Check code formatting
-        run: ./gradlew ktlintCheck --parallel
+        run: ./gradlew :composeApp:lint --parallel
         continue-on-error: true
 
       - name: Run unit tests
@@ -116,10 +113,6 @@ jobs:
           name: debug-apk
           path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
           retention-days: 7
-
-      - name: Build Desktop JAR
-        run: ./gradlew :composeApp:packageUberJarForCurrentOS
-        continue-on-error: true
 
       - name: Comment PR
         if: github.event_name == 'pull_request'
