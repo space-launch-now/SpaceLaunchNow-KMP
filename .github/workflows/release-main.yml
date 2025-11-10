@@ -133,7 +133,10 @@ jobs:
   test:
     name: Run Tests
     needs: [ version ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core  # Use larger runner for faster builds
+    
+    env:
+      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true -Dorg.gradle.caching=true -Dkotlin.incremental=true
     
     steps:
       - name: Checkout code
@@ -151,10 +154,34 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-version: wrapper
           cache-read-only: false
+          # Enable additional caching for release builds
+          gradle-home-cache-cleanup: true
+          cache-overwrite-existing: false
+          add-job-summary: false
+          
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.android/sdk
+            ~/.android/avd
+          key: android-sdk-${{ runner.os }}-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            android-sdk-${{ runner.os }}-
+            
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.konan
+            ~/.gradle/caches/kotlin-*
+          key: kotlin-native-${{ runner.os }}-${{ hashFiles('**/build.gradle*') }}
+          restore-keys: |
+            kotlin-native-${{ runner.os }}-
 
       - name: Create .env file
         run: |
@@ -185,8 +212,11 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
+      - name: Pre-compile dependencies for faster tests
+        run: ./gradlew compileKotlin compileTestKotlin --parallel
+
       - name: Run unit tests
-        run: ./gradlew test
+        run: ./gradlew test --parallel --continue --build-cache
 
       - name: Generate test report
         if: always()
@@ -229,7 +259,10 @@ jobs:
   build-aab:
     name: Build Release AAB
     needs: [ version, commit ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core # Use larger runner for Android builds
+    
+    env:
+      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true -Dorg.gradle.caching=true -Dkotlin.incremental=true
     
     steps:
       - name: Checkout code
@@ -247,10 +280,34 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-version: wrapper
           cache-read-only: false
+          # Enable additional caching for release builds
+          gradle-home-cache-cleanup: true
+          cache-overwrite-existing: false
+          add-job-summary: false
+          
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.android/sdk
+            ~/.android/avd
+          key: android-sdk-${{ runner.os }}-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            android-sdk-${{ runner.os }}-
+            
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.konan
+            ~/.gradle/caches/kotlin-*
+          key: kotlin-native-${{ runner.os }}-${{ hashFiles('**/build.gradle*') }}
+          restore-keys: |
+            kotlin-native-${{ runner.os }}-
 
       - name: Create .env file
         run: |
@@ -296,6 +353,9 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew :composeApp:bundleRelease \
+            --parallel \
+            --build-cache \
+            --continue \
             -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \

@@ -13,7 +13,10 @@ permissions:
 jobs:
   validate:
     name: Validate PR
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core  # Use larger runner (if available on your plan)
+    
+    env:
+      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true -Dorg.gradle.caching=true -Dkotlin.incremental=true
     
     steps:
       - name: Checkout code
@@ -28,10 +31,35 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-version: wrapper
           cache-read-only: false
+          # Enable additional caching
+          gradle-home-cache-cleanup: true
+          cache-overwrite-existing: false
+          # Cache Kotlin compilation outputs
+          add-job-summary: false
+          
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.android/sdk
+            ~/.android/avd
+          key: android-sdk-${{ runner.os }}-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            android-sdk-${{ runner.os }}-
+            
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.konan
+            ~/.gradle/caches/kotlin-*
+          key: kotlin-native-${{ runner.os }}-${{ hashFiles('**/build.gradle*') }}
+          restore-keys: |
+            kotlin-native-${{ runner.os }}-
 
       - name: Create .env file
         run: |
@@ -60,12 +88,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Pre-compile dependencies
+        run: ./gradlew compileKotlin compileTestKotlin --parallel
+
       - name: Check code formatting
-        run: ./gradlew ktlintCheck
+        run: ./gradlew ktlintCheck --parallel
         continue-on-error: true
 
       - name: Run unit tests
-        run: ./gradlew test
+        run: ./gradlew test --parallel --continue
 
       - name: Generate test report
         if: always()
@@ -76,8 +107,8 @@ jobs:
           reporter: java-junit
           fail-on-error: false
 
-      - name: Build Debug APK
-        run: ./gradlew :composeApp:assembleDebug
+      - name: Build Debug APK (parallel)
+        run: ./gradlew :composeApp:assembleDebug --parallel --build-cache
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
