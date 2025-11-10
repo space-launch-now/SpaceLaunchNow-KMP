@@ -105,10 +105,15 @@ jobs:
           *This release was automatically created by GitHub Actions*
           EOF
           
-          # Create Play Store "What's New" file (English US locale)
-          cat > docs/release-notes/whatsnew/whatsnew-en-US << 'EOF'
+          # Create temporary changelog file for processing
+          cat > /tmp/changelog-raw.txt << 'EOF'
           ${{ steps.changelog.outputs.clean_changelog }}
           EOF
+          
+          # Create Play Store "What's New" file (English US locale)
+          # Process with script to remove URLs and limit to 500 characters
+          chmod +x scripts/prepare-play-store-notes.sh
+          scripts/prepare-play-store-notes.sh /tmp/changelog-raw.txt > docs/release-notes/whatsnew/whatsnew-en-US
           
           # Create GitHub release notes
           echo "## 🚀 Space Launch Now ${{ env.VERSION_NAME }}" > release-notes.txt
