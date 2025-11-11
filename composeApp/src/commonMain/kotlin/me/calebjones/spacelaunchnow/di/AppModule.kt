@@ -43,6 +43,7 @@ import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
 import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
+import me.calebjones.spacelaunchnow.database.CacheCleanupService
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
@@ -92,7 +93,8 @@ val appModule = module {
         LaunchRepositoryImpl(
             launchesApi = get(),
             agenciesApi = get(),
-            appPreferences = get()
+            appPreferences = get(),
+            localDataSource = get()
         )
     }
     viewModelOf(::LaunchViewModel)
@@ -104,11 +106,37 @@ val appModule = module {
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
-    singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
-    singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
+    single<ArticlesRepository> {
+        ArticlesRepositoryImpl(
+            articlesApi = get(),
+            localDataSource = get()
+        )
+    }
+    single<EventsRepository> {
+        EventsRepositoryImpl(
+            eventsApi = get(),
+            localDataSource = get()
+        )
+    }
+    single<UpdatesRepository> {
+        UpdatesRepositoryImpl(
+            updatesApi = get(),
+            localDataSource = get()
+        )
+    }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
+    
+    // Background cleanup task for expired cache entries
+    single {
+        CacheCleanupService(
+            launchDataSource = get(),
+            eventDataSource = get(),
+            articleDataSource = get(),
+            updateDataSource = get()
+        )
+    }
 
     // Global Ad Manager - Singleton managed by Koin
     single {
