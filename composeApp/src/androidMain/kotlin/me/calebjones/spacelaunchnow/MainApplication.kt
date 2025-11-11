@@ -9,7 +9,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.initializeDatadog
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 class MainApplication : Application() {
 
     // Inject dependencies for initialization
-    private val revenueCatManager: RevenueCatManager by inject()
+    private val billingManager: BillingManager by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -81,18 +81,18 @@ class MainApplication : Application() {
             // Don't crash the app if Datadog fails
         }
 
-        // Initialize RevenueCat after Koin is ready
-        Log.d("MainApplication", "Initializing RevenueCat...")
+        // Initialize Billing after Koin is ready
+        Log.d("MainApplication", "Initializing Billing...")
 
         @Suppress("OPT_IN_USAGE")
         kotlinx.coroutines.GlobalScope.launch {
             try {
-                // Initialize with null appUserId to let RevenueCat create anonymous user
-                revenueCatManager.initialize(appUserId = null)
-                Log.d("MainApplication", "✅ RevenueCat initialized successfully")
+                // Initialize with null appUserId for anonymous user
+                billingManager.initialize(appUserId = null)
+                Log.d("MainApplication", "✅ Billing initialized successfully")
             } catch (e: Exception) {
-                Log.e("MainApplication", "❌ Failed to initialize RevenueCat", e)
-                // Don't crash the app if RevenueCat fails
+                Log.e("MainApplication", "❌ Failed to initialize Billing", e)
+                // Don't crash the app if billing fails
             }
         }
 
