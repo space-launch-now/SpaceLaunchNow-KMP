@@ -2,8 +2,11 @@ package me.calebjones.spacelaunchnow.data.billing
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import me.calebjones.spacelaunchnow.data.model.Platform
 import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductPricing
+import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 
 /**
  * Legacy BillingClient wrapper
@@ -41,7 +44,11 @@ class BillingClient(
                     PlatformPurchase(
                         productId = productId,
                         purchaseToken = "",
-                        isAcknowledged = true
+                        isAcknowledged = true,
+                        purchaseTime = state.lastRefreshed,
+                        expiryTime = null,
+                        orderId = null,
+                        platform = Platform.UNKNOWN
                     )
                 }
             } else {
@@ -93,10 +100,13 @@ class BillingClient(
             products.filter { it.productId == productId }.map { product ->
                 ProductPricing(
                     productId = product.productId,
-                    basePlanId = product.basePlanId,
+                    basePlanId = product.basePlanId ?: "base-plan",
                     formattedPrice = product.formattedPrice,
                     priceAmountMicros = product.priceAmountMicros,
-                    priceCurrencyCode = product.currencyCode
+                    priceCurrencyCode = product.currencyCode,
+                    billingPeriod = "P1M", // Default to monthly
+                    title = product.title,
+                    description = product.description
                 )
             }
         }
@@ -124,7 +134,11 @@ class BillingClient(
         PlatformPurchase(
             productId = state.activeProductIds.firstOrNull() ?: "",
             purchaseToken = "",
-            isAcknowledged = true
+            isAcknowledged = true,
+            purchaseTime = state.lastRefreshed,
+            expiryTime = null,
+            orderId = null,
+            platform = Platform.UNKNOWN
         )
     }
 

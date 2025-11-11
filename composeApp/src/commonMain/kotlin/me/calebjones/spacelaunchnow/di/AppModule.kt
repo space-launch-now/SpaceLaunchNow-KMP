@@ -179,14 +179,8 @@ val appModule = module {
         )
     }
 
-    // TODO: Update SubscriptionViewModel to use BillingManager instead of RevenueCatManager
-    // For now, keeping the old registration commented out
-    // single {
-    //     SubscriptionViewModel(
-    //         repository = get(),
-    //         revenueCatManager = get()
-    //     )
-    // }
+    // SubscriptionViewModel - now uses BillingManager (Phase 7 complete!)
+    viewModelOf(::SubscriptionViewModel)
 
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
@@ -201,14 +195,6 @@ val debugModule = module {
         DebugPreferences(debugDataStore)
     }
     
-    // TODO: Update DebugSettingsViewModel to use BillingManager instead of RevenueCatManager
-    // For now, keeping the old registration commented out
-    // single {
-    //     DebugSettingsViewModel(
-    //         debugPreferences = get(),
-    //         revenueCatManager = get(),
-    //         launchRepository = get(),
-    //         notificationRepository = get()
-    //     )
-    // }
+    // DebugSettingsViewModel - now uses BillingManager (Phase 7 complete!)
+    viewModelOf(::DebugSettingsViewModel)
 }

@@ -6,19 +6,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import com.revenuecat.purchases.kmp.models.Offering
-import com.revenuecat.purchases.kmp.models.Package
 
 /**
  * ViewModel for subscription management
+ * 
+ * Phase 7: Updated to use platform-agnostic BillingManager instead of RevenueCatManager
  */
 class SubscriptionViewModel(
     private val repository: SubscriptionRepository,
-    private val revenueCatManager: RevenueCatManager
+    private val billingManager: BillingManager
 ) : ViewModel() {
 
     // Subscription state from repository
@@ -28,15 +29,35 @@ class SubscriptionViewModel(
     private val _uiState = MutableStateFlow(SubscriptionUiState())
     val uiState: StateFlow<SubscriptionUiState> = _uiState.asStateFlow()
     
-    // RevenueCat offerings - expose the manager's state directly
-    val currentOffering: StateFlow<Offering?> = revenueCatManager.currentOffering
+    // Available products - platform-agnostic list
+    private val _availableProducts = MutableStateFlow<List<ProductInfo>>(emptyList())
+    val availableProducts: StateFlow<List<ProductInfo>> = _availableProducts.asStateFlow()
 
     init {
         // Initialize repository on creation
         viewModelScope.launch {
             repository.initialize()
-            // Load pricing information (legacy)
+            // Load available products from BillingManager
+            loadAvailableProducts()
+            // Load legacy pricing information (backward compatibility)
             loadPricing()
+        }
+    }
+    
+    /**
+     * Load available products from BillingManager
+     */
+    private fun loadAvailableProducts() {
+        viewModelScope.launch {
+            billingManager.getAvailableProducts().fold(
+                onSuccess = { products ->
+                    _availableProducts.value = products
+                    println("SubscriptionViewModel: Loaded ${products.size} products from BillingManager")
+                },
+                onFailure = { error ->
+                    println("SubscriptionViewModel: Failed to load products - ${error.message}")
+                }
+            )
         }
     }
 
@@ -108,54 +129,22 @@ class SubscriptionViewModel(
     }
 
     /**
-     * Purchase a subscription
+     * Purchase a product by ID
      *
      * @param productId The product ID to purchase
-     * @param basePlanId The base plan (e.g., "base-plan" for monthly, "yearly" for yearly)
+     * @param basePlanId The base plan (e.g., "monthly", "annual", "lifetime")
      */
-    fun purchaseSubscription(productId: String, basePlanId: String? = null) {
+    fun purchaseProduct(productId: String, basePlanId: String? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
 
-            repository.launchPurchaseFlow(productId, basePlanId).fold(
-                onSuccess = { _ ->
-                    _uiState.value = _uiState.value.copy(
-                        isProcessing = false,
-                        successMessage = "Purchase initiated successfully"
-                    )
-                },
-                onFailure = { error ->
-                    _uiState.value = _uiState.value.copy(
-                        isProcessing = false,
-                        errorMessage = error.message ?: "Purchase failed"
-                    )
-                }
-            )
-        }
-    }
-    
-    /**
-     * Purchase a RevenueCat package
-     *
-     * @param packageToPurchase The RevenueCat package to purchase
-     */
-    fun purchasePackage(packageToPurchase: Package) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
-            
-            println("SubscriptionViewModel: Initiating purchase for package: ${packageToPurchase.identifier}")
-            
-            // Use the package's product ID and identifier for the purchase
-            val productId = packageToPurchase.storeProduct.id
-            val basePlanId = packageToPurchase.identifier
-            
-            repository.launchPurchaseFlow(productId, basePlanId).fold(
+            billingManager.launchPurchaseFlow(productId, basePlanId).fold(
                 onSuccess = { _ ->
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
                         successMessage = "Purchase completed successfully!"
                     )
-                    println("SubscriptionViewModel: ✅ Purchase successful for ${packageToPurchase.identifier}")
+                    println("SubscriptionViewModel: ✅ Purchase successful for $productId")
                 },
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
@@ -165,6 +154,46 @@ class SubscriptionViewModel(
                     println("SubscriptionViewModel: ❌ Purchase failed: ${error.message}")
                 }
             )
+        }
+    }
+    
+    /**
+     * Purchase a product (convenience method using ProductInfo)
+     * 
+     * @param product The ProductInfo to purchase
+     */
+    fun purchaseProduct(product: ProductInfo) {
+        purchaseProduct(product.productId, product.basePlanId)
+    }
+    
+    /**
+     * Legacy method - Purchase a subscription
+     *
+     * @param productId The product ID to purchase
+     * @param basePlanId The base plan (e.g., "base-plan" for monthly, "yearly" for yearly)
+     */
+    @Deprecated("Use purchaseProduct() instead", ReplaceWith("purchaseProduct(productId, basePlanId)"))
+    fun purchaseSubscription(productId: String, basePlanId: String? = null) {
+        purchaseProduct(productId, basePlanId)
+    }
+    
+    /**
+     * Helper method to find products by type
+     */
+    fun getProductByType(type: ProductType): ProductInfo? {
+        return when (type) {
+            ProductType.MONTHLY -> _availableProducts.value.find { 
+                it.basePlanId?.contains("monthly", ignoreCase = true) == true 
+            }
+            ProductType.ANNUAL -> _availableProducts.value.find { 
+                it.basePlanId?.contains("annual", ignoreCase = true) == true ||
+                it.basePlanId?.contains("yearly", ignoreCase = true) == true
+            }
+            ProductType.LIFETIME -> _availableProducts.value.find { 
+                it.basePlanId?.contains("lifetime", ignoreCase = true) == true ||
+                it.productId.contains("lifetime", ignoreCase = true) ||
+                it.productId.contains("pro", ignoreCase = true)
+            }
         }
     }
 
@@ -216,6 +245,15 @@ class SubscriptionViewModel(
             errorMessage = null
         )
     }
+}
+
+/**
+ * Product type categories for easier lookup
+ */
+enum class ProductType {
+    MONTHLY,
+    ANNUAL,
+    LIFETIME
 }
 
 /**

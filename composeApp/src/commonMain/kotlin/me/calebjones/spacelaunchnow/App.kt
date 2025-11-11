@@ -14,7 +14,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
@@ -111,7 +110,6 @@ fun SpaceLaunchNowApp(
     // Initialize notifications and subscription on app start
     val notificationRepository = koinInject<NotificationRepository>()
     val subscriptionRepository = koinInject<SubscriptionRepository>()
-    val revenueCatManager = koinInject<RevenueCatManager>()
     val pushMessaging = koinInject<PushMessaging>()
     val appPreferences = koinInject<AppPreferences>()
 
@@ -225,15 +223,6 @@ fun SpaceLaunchNowApp(
             println("Subscription repository initialized successfully")
         } catch (e: Exception) {
             println("Failed to initialize subscription repository: ${e.message}")
-            e.printStackTrace()
-        }
-
-        try {
-            // Initialize RevenueCat
-            revenueCatManager.initialize()
-            println("RevenueCat manager initialized successfully")
-        } catch (e: Exception) {
-            println("Failed to initialize RevenueCat: ${e.message}")
             e.printStackTrace()
         }
 

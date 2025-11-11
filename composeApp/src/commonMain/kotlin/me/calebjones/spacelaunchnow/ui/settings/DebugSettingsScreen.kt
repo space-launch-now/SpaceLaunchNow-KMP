@@ -1369,7 +1369,7 @@ fun DebugSettingsScreen(
 
                         // Check Initialization
                         Button(
-                            onClick = { debugViewModel.checkRevenueCatInitialization() },
+                            onClick = { debugViewModel.checkBillingInitialization() },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !isLoading
                         ) {
@@ -1378,7 +1378,7 @@ fun DebugSettingsScreen(
 
                         // Query Products
                         Button(
-                            onClick = { debugViewModel.queryRevenueCatProducts() },
+                            onClick = { debugViewModel.queryBillingProducts() },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !isLoading
                         ) {
@@ -1387,7 +1387,7 @@ fun DebugSettingsScreen(
 
                         // Check Entitlements
                         Button(
-                            onClick = { debugViewModel.checkRevenueCatEntitlements() },
+                            onClick = { debugViewModel.checkBillingEntitlements() },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !isLoading
                         ) {
@@ -1396,7 +1396,7 @@ fun DebugSettingsScreen(
 
                         // Test Restore
                         OutlinedButton(
-                            onClick = { debugViewModel.testRevenueCatRestore() },
+                            onClick = { debugViewModel.testBillingRestore() },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !isLoading
                         ) {
@@ -1405,7 +1405,7 @@ fun DebugSettingsScreen(
 
                         // View Offering Details
                         OutlinedButton(
-                            onClick = { debugViewModel.viewRevenueCatOfferingDetails() },
+                            onClick = { debugViewModel.viewBillingProductDetails() },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !isLoading
                         ) {

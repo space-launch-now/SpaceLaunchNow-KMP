@@ -35,11 +35,14 @@ class SubscriptionSyncer(
                     
                     // Update local storage with new purchase state
                     localStorage.update(
-                        isSubscribed = purchaseState.isSubscribed,
-                        subscriptionType = purchaseState.subscriptionType,
-                        productIds = purchaseState.activeProductIds,
-                        availableFeatures = purchaseState.features,
-                        needsSync = false
+                        LocalSubscriptionData(
+                            isSubscribed = purchaseState.isSubscribed,
+                            subscriptionType = purchaseState.subscriptionType,
+                            productIds = purchaseState.activeProductIds,
+                            entitlements = purchaseState.activeEntitlements,
+                            lastSynced = currentTime,
+                            needsSync = false
+                        )
                     )
                     
                     println("SubscriptionSyncer: ✅ Sync complete")
