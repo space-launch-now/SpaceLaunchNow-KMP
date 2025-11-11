@@ -146,7 +146,7 @@ class LocalSubscriptionStorage {
                 subscriptionType = subscriptionType,
                 entitlements = entitlements,
                 productIds = productIds,
-                lastSynced = System.currentTimeMillis(),
+                lastSynced = Clock.System.now().toEpochMilliseconds(),
                 needsSync = false // Don't sync when in debug mode
             )
         )
@@ -168,7 +168,7 @@ class LocalSubscriptionStorage {
         // This is a simple heuristic - debug states typically don't need sync
         // and have been recently "synced" (set by debug methods)
         val current = runBlocking { get() }
-        val recentlySet = (System.currentTimeMillis() - current.lastSynced) < 60_000 // Within 1 minute
+        val recentlySet = (Clock.System.now().toEpochMilliseconds() - current.lastSynced) < 60_000 // Within 1 minute
         return !current.needsSync && recentlySet && current.subscriptionType != SubscriptionType.FREE
     }
 }

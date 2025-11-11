@@ -12,3 +12,14 @@ internal actual fun platformFormatNumber(value: Int): String {
     formatter.numberStyle = NSNumberFormatterDecimalStyle
     return formatter.stringFromNumber(NSNumber(value)) ?: value.toString()
 }
+
+/**
+ * iOS implementation for decimal formatting with specified decimal places.
+ */
+internal actual fun platformFormatDecimal(value: Double, decimalPlaces: Int): String {
+    val formatter = NSNumberFormatter()
+    formatter.numberStyle = NSNumberFormatterDecimalStyle
+    formatter.minimumFractionDigits = 0u
+    formatter.maximumFractionDigits = decimalPlaces.toULong()
+    return formatter.stringFromNumber(NSNumber(value)) ?: value.toString()
+}
