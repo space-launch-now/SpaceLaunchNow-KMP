@@ -1,3 +1,7 @@
 ### Bug Fixes
 
-* remove DirectBillingClient implementation and related code roll back to older Android billing library ([71019d7](https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/commit/71019d7a268bd2a9dce3f091fb7b851cd64d8604))
+* improve URL removal regex to match all bracket contents
+
+### Features
+
+* add script to truncate Google Play release notes to 500 chars

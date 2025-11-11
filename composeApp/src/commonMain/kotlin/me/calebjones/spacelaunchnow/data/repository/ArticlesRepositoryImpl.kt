@@ -12,8 +12,12 @@ import me.calebjones.spacelaunchnow.api.snapi.extensions.searchArticles
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.api.snapi.models.PaginatedArticleList
 import me.calebjones.spacelaunchnow.data.model.ApiError
+import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
 
-class ArticlesRepositoryImpl(private val articlesApi: ArticlesApi) : ArticlesRepository {
+class ArticlesRepositoryImpl(
+    private val articlesApi: ArticlesApi,
+    private val localDataSource: ArticleLocalDataSource? = null
+) : ArticlesRepository {
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -29,7 +33,19 @@ class ArticlesRepositoryImpl(private val articlesApi: ArticlesApi) : ArticlesRep
 
     override suspend fun getArticles(limit: Int): Result<PaginatedArticleList> {
         return try {
-            println("=== ArticlesRepository: Fetching articles (limit: $limit) ===")
+            // Try cache first if available
+            val cachedArticles = localDataSource?.getRecentArticles(limit)
+            if (cachedArticles != null && cachedArticles.isNotEmpty()) {
+                println("ArticlesRepository: Returning ${cachedArticles.size} cached articles")
+                return Result.success(PaginatedArticleList(
+                    count = cachedArticles.size,
+                    next = null,
+                    previous = null,
+                    results = cachedArticles
+                ))
+            }
+            
+            println("=== ArticlesRepository: Fetching articles from API (limit: $limit) ===")
             
             val response = articlesApi.getArticles(
                 limit = limit
@@ -38,12 +54,38 @@ class ArticlesRepositoryImpl(private val articlesApi: ArticlesApi) : ArticlesRep
             val body = response.body()
             println("Successfully fetched ${body.results.size} articles")
             
+            // Cache the results for future use
+            localDataSource?.cacheArticles(body.results)
+            println("ArticlesRepository: Cached ${body.results.size} articles from API")
+            
             Result.success(body)
         } catch (e: ResponseException) {
             println("ResponseException: ${e.message}")
+            // On error, try to return stale cache if available
+            val staleCached = localDataSource?.getRecentArticles(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles due to API error")
+                return Result.success(PaginatedArticleList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: IOException) {
             println("IOException: ${e.message}")
+            // On network error, try to return stale cache if available
+            val staleCached = localDataSource?.getRecentArticles(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles due to network error")
+                return Result.success(PaginatedArticleList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: Exception) {
             println("Failed to get articles: ${e.message}")

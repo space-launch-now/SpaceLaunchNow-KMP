@@ -1,0 +1,168 @@
+-- Launch table for caching launch data
+-- Stores the serialized JSON for flexibility with API changes
+
+CREATE TABLE LaunchBasicCache (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    status_id INTEGER,
+    status_name TEXT,
+    net INTEGER, -- stored as epoch milliseconds
+    window_end INTEGER, -- stored as epoch milliseconds
+    window_start INTEGER, -- stored as epoch milliseconds
+    launch_service_provider_id INTEGER,
+    launch_service_provider_name TEXT,
+    rocket_configuration_id INTEGER,
+    rocket_configuration_name TEXT,
+    pad_name TEXT,
+    location_name TEXT,
+    image_url TEXT,
+    json_data TEXT NOT NULL, -- Full serialized LaunchBasic object
+    cached_at INTEGER NOT NULL, -- Timestamp when cached
+    expires_at INTEGER NOT NULL -- Timestamp when cache expires
+);
+
+CREATE TABLE LaunchNormalCache (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    status_id INTEGER,
+    status_name TEXT,
+    net INTEGER, -- stored as epoch milliseconds
+    window_end INTEGER, -- stored as epoch milliseconds
+    window_start INTEGER, -- stored as epoch milliseconds
+    launch_service_provider_id INTEGER,
+    launch_service_provider_name TEXT,
+    rocket_configuration_id INTEGER,
+    rocket_configuration_name TEXT,
+    pad_name TEXT,
+    location_name TEXT,
+    image_url TEXT,
+    mission_name TEXT,
+    mission_description TEXT,
+    json_data TEXT NOT NULL, -- Full serialized LaunchNormal object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE TABLE LaunchDetailedCache (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    status_id INTEGER,
+    status_name TEXT,
+    net INTEGER,
+    window_end INTEGER,
+    window_start INTEGER,
+    launch_service_provider_id INTEGER,
+    launch_service_provider_name TEXT,
+    rocket_configuration_id INTEGER,
+    rocket_configuration_name TEXT,
+    pad_name TEXT,
+    location_name TEXT,
+    image_url TEXT,
+    mission_name TEXT,
+    mission_description TEXT,
+    json_data TEXT NOT NULL, -- Full serialized LaunchDetailed object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Indexes for common queries
+CREATE INDEX idx_launch_basic_net ON LaunchBasicCache(net);
+CREATE INDEX idx_launch_basic_status ON LaunchBasicCache(status_id);
+CREATE INDEX idx_launch_basic_expires ON LaunchBasicCache(expires_at);
+CREATE INDEX idx_launch_normal_net ON LaunchNormalCache(net);
+CREATE INDEX idx_launch_normal_status ON LaunchNormalCache(status_id);
+CREATE INDEX idx_launch_normal_expires ON LaunchNormalCache(expires_at);
+CREATE INDEX idx_launch_detailed_expires ON LaunchDetailedCache(expires_at);
+
+-- Queries for LaunchBasic
+insertOrReplaceBasic:
+INSERT OR REPLACE INTO LaunchBasicCache (
+    id, name, status_id, status_name, net, window_end, window_start,
+    launch_service_provider_id, launch_service_provider_name,
+    rocket_configuration_id, rocket_configuration_name,
+    pad_name, location_name, image_url,
+    json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getBasicById:
+SELECT * FROM LaunchBasicCache 
+WHERE id = ? AND expires_at > ?;
+
+getUpcomingBasic:
+SELECT * FROM LaunchBasicCache 
+WHERE net > ? AND expires_at > ?
+ORDER BY net ASC
+LIMIT ?;
+
+getPreviousBasic:
+SELECT * FROM LaunchBasicCache 
+WHERE net < ? AND expires_at > ?
+ORDER BY net DESC
+LIMIT ?;
+
+deleteExpiredBasic:
+DELETE FROM LaunchBasicCache WHERE expires_at < ?;
+
+deleteBasicById:
+DELETE FROM LaunchBasicCache WHERE id = ?;
+
+clearAllBasic:
+DELETE FROM LaunchBasicCache;
+
+-- Queries for LaunchNormal
+insertOrReplaceNormal:
+INSERT OR REPLACE INTO LaunchNormalCache (
+    id, name, status_id, status_name, net, window_end, window_start,
+    launch_service_provider_id, launch_service_provider_name,
+    rocket_configuration_id, rocket_configuration_name,
+    pad_name, location_name, image_url, mission_name, mission_description,
+    json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getNormalById:
+SELECT * FROM LaunchNormalCache 
+WHERE id = ? AND expires_at > ?;
+
+getUpcomingNormal:
+SELECT * FROM LaunchNormalCache 
+WHERE net > ? AND expires_at > ?
+ORDER BY net ASC
+LIMIT ?;
+
+getPreviousNormal:
+SELECT * FROM LaunchNormalCache 
+WHERE net < ? AND expires_at > ?
+ORDER BY net DESC
+LIMIT ?;
+
+deleteExpiredNormal:
+DELETE FROM LaunchNormalCache WHERE expires_at < ?;
+
+deleteNormalById:
+DELETE FROM LaunchNormalCache WHERE id = ?;
+
+clearAllNormal:
+DELETE FROM LaunchNormalCache;
+
+-- Queries for LaunchDetailed
+insertOrReplaceDetailed:
+INSERT OR REPLACE INTO LaunchDetailedCache (
+    id, name, status_id, status_name, net, window_end, window_start,
+    launch_service_provider_id, launch_service_provider_name,
+    rocket_configuration_id, rocket_configuration_name,
+    pad_name, location_name, image_url, mission_name, mission_description,
+    json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getDetailedById:
+SELECT * FROM LaunchDetailedCache 
+WHERE id = ? AND expires_at > ?;
+
+deleteExpiredDetailed:
+DELETE FROM LaunchDetailedCache WHERE expires_at < ?;
+
+deleteDetailedById:
+DELETE FROM LaunchDetailedCache WHERE id = ?;
+
+clearAllDetailed:
+DELETE FROM LaunchDetailedCache;

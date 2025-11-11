@@ -8,6 +8,7 @@ import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.billing.createBillingManager
 import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
+import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.createPlatformSharingService
 
@@ -19,6 +20,8 @@ val desktopModule = module {
     
     // Billing (no-op for Desktop)
     single<BillingManager> { createBillingManager() }
+    // Database driver factory
+    single { DatabaseDriverFactory() }
     
     // Desktop sharing functionality
     single<LaunchSharingService> { createPlatformSharingService() }
