@@ -6,7 +6,7 @@ import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import org.koin.core.context.startKoin
@@ -29,14 +29,14 @@ fun MainViewController() = ComposeUIViewController {
         startKoin(koinConfig)
         koinInitialized = true
         
-        // Initialize RevenueCat immediately after Koin is ready (similar to Android)
+        // Initialize Billing immediately after Koin is ready (similar to Android)
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                val revenueCatManager = getKoin().get<RevenueCatManager>()
-                revenueCatManager.initialize(appUserId = null)
-                println("iOS: RevenueCat initialized successfully")
+                val billingManager = getKoin().get<BillingManager>()
+                billingManager.initialize(appUserId = null)
+                println("iOS: Billing initialized successfully")
             } catch (e: Exception) {
-                println("iOS: Failed to initialize RevenueCat - ${e.message}")
+                println("iOS: Failed to initialize Billing - ${e.message}")
                 e.printStackTrace()
             }
         }
