@@ -1,0 +1,52 @@
+-- Event table for caching event data
+
+CREATE TABLE EventCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    type_name TEXT,
+    description TEXT,
+    location TEXT,
+    news_url TEXT,
+    video_url TEXT,
+    feature_image TEXT,
+    date INTEGER, -- stored as epoch milliseconds
+    json_data TEXT NOT NULL, -- Full serialized EventEndpointNormal object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Index for common queries
+CREATE INDEX idx_event_date ON EventCache(date);
+CREATE INDEX idx_event_expires ON EventCache(expires_at);
+
+-- Event queries
+insertOrReplaceEvent:
+INSERT OR REPLACE INTO EventCache (
+    id, name, type_name, description, location, news_url, video_url, 
+    feature_image, date, json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getEventById:
+SELECT * FROM EventCache 
+WHERE id = ? AND expires_at > ?;
+
+getUpcomingEvents:
+SELECT * FROM EventCache 
+WHERE date > ? AND expires_at > ?
+ORDER BY date ASC
+LIMIT ?;
+
+getAllEvents:
+SELECT * FROM EventCache 
+WHERE expires_at > ?
+ORDER BY date DESC
+LIMIT ?;
+
+deleteExpiredEvents:
+DELETE FROM EventCache WHERE expires_at < ?;
+
+deleteEventById:
+DELETE FROM EventCache WHERE id = ?;
+
+clearAllEvents:
+DELETE FROM EventCache;

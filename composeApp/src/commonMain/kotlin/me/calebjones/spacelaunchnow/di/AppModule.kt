@@ -37,6 +37,12 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
+import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
+import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
+import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
+import me.calebjones.spacelaunchnow.database.EventLocalDataSource
+import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
+import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
@@ -71,6 +77,17 @@ val koinConfig = koinConfiguration {
 val appModule = module {
     singleOf(::UserRepositoryImpl) { bind<UserRepository>() }
     viewModelOf(::UserViewModel)
+    
+    // Database and local data sources
+    single { 
+        val driver = get<DatabaseDriverFactory>().createDriver()
+        SpaceLaunchDatabase(driver)
+    }
+    single { LaunchLocalDataSource(get()) }
+    single { EventLocalDataSource(get()) }
+    single { ArticleLocalDataSource(get()) }
+    single { UpdateLocalDataSource(get()) }
+    
     single<LaunchRepository> {
         LaunchRepositoryImpl(
             launchesApi = get(),

@@ -42,6 +42,7 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.openApiGenerator)
     alias(libs.plugins.aboutLibraries)
+    alias(libs.plugins.sqldelight)
     id("com.google.gms.google-services")
 }
 
@@ -104,7 +105,9 @@ kotlin {
 
                 // JDK cryptography provider for Desktop
                 implementation(libs.cryptography.provider.jdk)
-
+                
+                // SQLDelight JVM driver
+                implementation(libs.sqldelight.sqlite.driver)
 
             }
         }
@@ -149,6 +152,9 @@ kotlin {
                 implementation(libs.purchases.either)
                 implementation(libs.purchases.result)
                 implementation(libs.basicAds)
+                
+                // SQLDelight Android driver
+                implementation(libs.sqldelight.android.driver)
             }
         }
 
@@ -169,6 +175,9 @@ kotlin {
                 implementation(libs.purchases.result)
 
                 implementation(libs.basicAds)
+                
+                // SQLDelight iOS driver
+                implementation(libs.sqldelight.native.driver)
             }
         }
 
@@ -238,6 +247,10 @@ kotlin {
 
                 implementation(libs.dd.sdk.kotlin.multiplatform.rum)
                 implementation(libs.dd.sdk.kotlin.multiplatform.logs)
+                
+                // SQLDelight common runtime and coroutines
+                implementation(libs.sqldelight.runtime)
+                implementation(libs.sqldelight.coroutines)
 
                 // TODO remove
                 implementation(libs.purchases.core)
@@ -491,6 +504,16 @@ tasks.whenTaskAdded {
                     bundle.renameTo(File(bundleDir, newName))
                 }
             }
+        }
+    }
+}
+
+// SQLDelight configuration
+sqldelight {
+    databases {
+        create("SpaceLaunchDatabase") {
+            packageName.set("me.calebjones.spacelaunchnow.database")
+            generateAsync.set(true)
         }
     }
 }

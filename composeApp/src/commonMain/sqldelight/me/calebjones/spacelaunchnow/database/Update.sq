@@ -1,0 +1,42 @@
+-- Update table for caching updates/news feed
+
+CREATE TABLE UpdateCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    profile_image TEXT,
+    comment TEXT NOT NULL,
+    info_url TEXT,
+    created_on INTEGER, -- stored as epoch milliseconds
+    json_data TEXT NOT NULL, -- Full serialized UpdateEndpoint object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Index for common queries
+CREATE INDEX idx_update_created ON UpdateCache(created_on);
+CREATE INDEX idx_update_expires ON UpdateCache(expires_at);
+
+-- Update queries
+insertOrReplaceUpdate:
+INSERT OR REPLACE INTO UpdateCache (
+    id, profile_image, comment, info_url, created_on,
+    json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+getUpdateById:
+SELECT * FROM UpdateCache 
+WHERE id = ? AND expires_at > ?;
+
+getRecentUpdates:
+SELECT * FROM UpdateCache 
+WHERE expires_at > ?
+ORDER BY created_on DESC
+LIMIT ?;
+
+deleteExpiredUpdates:
+DELETE FROM UpdateCache WHERE expires_at < ?;
+
+deleteUpdateById:
+DELETE FROM UpdateCache WHERE id = ?;
+
+clearAllUpdates:
+DELETE FROM UpdateCache;

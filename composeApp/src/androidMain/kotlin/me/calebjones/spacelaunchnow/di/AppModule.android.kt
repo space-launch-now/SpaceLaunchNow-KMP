@@ -9,6 +9,7 @@ import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.data.storage.createAppSettingsDataStore
 import me.calebjones.spacelaunchnow.data.storage.createSubscriptionDataStore
+import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.AndroidSharingService
@@ -18,6 +19,9 @@ val androidModule = module {
     single(named("DebugDataStore")) { createDebugDataStore(androidContext()) }
     single(named("AppSettingsDataStore")) { createAppSettingsDataStore(androidContext()) }
     single(named("SubscriptionDataStore")) { createSubscriptionDataStore(androidContext()) }
+    
+    // Database driver factory
+    single { DatabaseDriverFactory(androidContext()) }
     
     // Platform-specific widget updater (Android only)
     single { PlatformWidgetUpdater(context = androidContext()) }
