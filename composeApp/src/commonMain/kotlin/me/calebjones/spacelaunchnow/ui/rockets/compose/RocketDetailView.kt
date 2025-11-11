@@ -18,6 +18,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetai
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
+import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 
 private val TitleHeight = 128.dp
 
@@ -176,24 +177,24 @@ private fun PerformanceCard(rocket: LauncherConfigDetailed) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            rocket.length?.let { InfoRow(label = "Length", value = "${"%.1f".format(it)} m") }
-            rocket.diameter?.let { InfoRow(label = "Diameter", value = "${"%.1f".format(it)} m") }
+            rocket.length?.let { InfoRow(label = "Length", value = "${NumberFormatUtil.formatDecimal(it, 1)} m") }
+            rocket.diameter?.let { InfoRow(label = "Diameter", value = "${NumberFormatUtil.formatDecimal(it, 1)} m") }
             rocket.launchMass?.let {
                 InfoRow(
                     label = "Launch Mass",
-                    value = "${"%.0f".format(it)} kg"
+                    value = "${NumberFormatUtil.formatDecimal(it, 0)} kg"
                 )
             }
             rocket.toThrust?.let {
                 InfoRow(
                     label = "Liftoff Thrust",
-                    value = "${"%.0f".format(it)} kN"
+                    value = "${NumberFormatUtil.formatDecimal(it, 0)} kN"
                 )
             }
             rocket.launchCost?.let {
                 InfoRow(
                     label = "Launch Cost",
-                    value = "$${"%.0f".format(it.toDouble())}M"
+                    value = "$${NumberFormatUtil.formatDecimal(it.toDouble(), 0)}M"
                 )
             }
         }
@@ -219,10 +220,10 @@ private fun CapacityCard(rocket: LauncherConfigDetailed) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            rocket.leoCapacity?.let { InfoRow(label = "LEO", value = "${"%.0f".format(it)} kg") }
-            rocket.gtoCapacity?.let { InfoRow(label = "GTO", value = "${"%.0f".format(it)} kg") }
-            rocket.geoCapacity?.let { InfoRow(label = "GEO", value = "${"%.0f".format(it)} kg") }
-            rocket.ssoCapacity?.let { InfoRow(label = "SSO", value = "${"%.0f".format(it)} kg") }
+            rocket.leoCapacity?.let { InfoRow(label = "LEO", value = "${NumberFormatUtil.formatDecimal(it, 0)} kg") }
+            rocket.gtoCapacity?.let { InfoRow(label = "GTO", value = "${NumberFormatUtil.formatDecimal(it, 0)} kg") }
+            rocket.geoCapacity?.let { InfoRow(label = "GEO", value = "${NumberFormatUtil.formatDecimal(it, 0)} kg") }
+            rocket.ssoCapacity?.let { InfoRow(label = "SSO", value = "${NumberFormatUtil.formatDecimal(it, 0)} kg") }
         }
     }
 }

@@ -7,6 +7,9 @@ import platform.Foundation.NSLocale
 import platform.Foundation.NSTimeZone
 import platform.Foundation.localeWithLocaleIdentifier
 import platform.Foundation.timeIntervalSince1970
+import platform.Foundation.timeZoneWithName
+import platform.Foundation.dateWithTimeIntervalSince1970
+import platform.Foundation.localTimeZone
 
 /**
  * iOS-specific implementations using NSDateFormatter with locale support
@@ -24,7 +27,9 @@ actual fun formatLocalDateTime(localDateTime: LocalDateTime, useUtc: Boolean): S
         dateFormatter.timeStyle = platform.Foundation.NSDateFormatterShortStyle
         
         if (useUtc) {
-            dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC")
+            dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC") 
+                ?: NSTimeZone.timeZoneWithName("GMT")
+                ?: NSTimeZone.localTimeZone
         }
         
         // Convert LocalDateTime to NSDate
@@ -56,7 +61,9 @@ actual fun formatLocalDate(localDateTime: LocalDateTime, useUtc: Boolean): Strin
         dateFormatter.timeStyle = platform.Foundation.NSDateFormatterNoStyle
         
         if (useUtc) {
-            dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC")
+            dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC") 
+                ?: NSTimeZone.timeZoneWithName("GMT")
+                ?: NSTimeZone.localTimeZone
         }
         
         // Convert LocalDateTime to NSDate
@@ -85,7 +92,9 @@ actual fun formatLocalTime(localDateTime: LocalDateTime, useUtc: Boolean): Strin
         dateFormatter.timeStyle = platform.Foundation.NSDateFormatterShortStyle
         
         if (useUtc) {
-            dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC")
+            dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC") 
+                ?: NSTimeZone.timeZoneWithName("GMT")
+                ?: NSTimeZone.localTimeZone
         }
         
         // Convert LocalDateTime to NSDate
@@ -105,8 +114,8 @@ actual fun formatLocalTime(localDateTime: LocalDateTime, useUtc: Boolean): Strin
 private fun LocalDateTime.toEpochSeconds(): Long {
     // Simplified conversion - in production you might want to use kotlinx-datetime properly
     val year = this.year
-    val month = this.monthNumber
-    val day = this.dayOfMonth
+    val month = this.month.ordinal
+    val day = this.day
     val hour = this.hour
     val minute = this.minute
     val second = this.second
