@@ -2,14 +2,11 @@ package me.calebjones.spacelaunchnow.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.revenuecat.purchases.kmp.Purchases
 import me.calebjones.spacelaunchnow.UserViewModel
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.UserRepository
 import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatBillingClient
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
@@ -153,28 +150,20 @@ val appModule = module {
         )
     }
 
-    // RevenueCat dependencies - initialize first
-    singleOf(::RevenueCatManager)
-
-    // BillingClient now uses RevenueCat instead of platform-specific implementations
-    // Use lazy factory to avoid accessing Purchases.sharedInstance during Koin initialization
+    // Billing dependencies - platform-specific BillingManager is provided by platform modules
+    // BillingClient wrapper for backward compatibility
     single<BillingClient> {
-        val revenueCatManager = get<RevenueCatManager>()
-        BillingClient(
-            revenueCatClient = RevenueCatBillingClient(
-                revenueCatManager = revenueCatManager
-            )
-        )
+        BillingClient(billingManager = get())
     }
 
     // Local subscription storage (KStore)
     single { LocalSubscriptionStorage() }
     
-    // Subscription syncer (handles RevenueCat sync)
+    // Subscription syncer (uses BillingManager)
     single {
         SubscriptionSyncer(
             localStorage = get(),
-            revenueCatManager = get()
+            billingManager = get()
         )
     }
 
@@ -190,13 +179,14 @@ val appModule = module {
         )
     }
 
-    // SubscriptionViewModel with RevenueCatManager
-    single {
-        SubscriptionViewModel(
-            repository = get(),
-            revenueCatManager = get()
-        )
-    }
+    // TODO: Update SubscriptionViewModel to use BillingManager instead of RevenueCatManager
+    // For now, keeping the old registration commented out
+    // single {
+    //     SubscriptionViewModel(
+    //         repository = get(),
+    //         revenueCatManager = get()
+    //     )
+    // }
 
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
@@ -210,12 +200,15 @@ val debugModule = module {
         val debugDataStore = get<DataStore<Preferences>>(named("DebugDataStore"))
         DebugPreferences(debugDataStore)
     }
-    single {
-        DebugSettingsViewModel(
-            debugPreferences = get(),
-            revenueCatManager = get(),
-            launchRepository = get(),
-            notificationRepository = get()
-        )
-    }
+    
+    // TODO: Update DebugSettingsViewModel to use BillingManager instead of RevenueCatManager
+    // For now, keeping the old registration commented out
+    // single {
+    //     DebugSettingsViewModel(
+    //         debugPreferences = get(),
+    //         revenueCatManager = get(),
+    //         launchRepository = get(),
+    //         notificationRepository = get()
+    //     )
+    // }
 }

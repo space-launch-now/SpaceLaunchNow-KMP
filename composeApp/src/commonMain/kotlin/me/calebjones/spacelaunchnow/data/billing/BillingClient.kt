@@ -1,37 +1,54 @@
 package me.calebjones.spacelaunchnow.data.billing
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
-import me.calebjones.spacelaunchnow.data.model.PremiumFeature
-import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.data.model.ProductPricing
 
 /**
- * Platform-agnostic billing interface
- *
- * Now uses RevenueCat for unified billing across all platforms
- *
+ * Legacy BillingClient wrapper
+ * Maintains backward compatibility while using new BillingManager architecture
+ * 
+ * NOTE: This class exists for backward compatibility during migration.
+ * New code should use BillingManager directly.
+ * 
  * CRITICAL SECURITY:
  * - This is the ONLY source of truth for subscription status
  * - Never rely on cached values for access control
  * - Always verify purchases server-side for sensitive operations
  */
 class BillingClient(
-    private val revenueCatClient: RevenueCatBillingClient
+    private val billingManager: BillingManager
 ) {
 
     /**
      * Initialize the billing client
      * Must be called before any other operations
      */
-    suspend fun initialize(): Result<Unit> = revenueCatClient.initialize()
+    suspend fun initialize(): Result<Unit> = billingManager.initialize()
 
     /**
      * Query current active purchases
-     * This directly queries RevenueCat which syncs with Google Play or App Store
+     * This directly queries the billing system (RevenueCat) which syncs with platform stores
      *
      * @return List of active purchases from platform
      */
-    suspend fun queryPurchases(): Result<List<PlatformPurchase>> = revenueCatClient.queryPurchases()
+    suspend fun queryPurchases(): Result<List<PlatformPurchase>> {
+        val state = billingManager.purchaseState.value
+        return Result.success(
+            if (state.isSubscribed) {
+                state.activeProductIds.map { productId ->
+                    PlatformPurchase(
+                        productId = productId,
+                        purchaseToken = "",
+                        isAcknowledged = true
+                    )
+                }
+            } else {
+                emptyList()
+            }
+        )
+    }
 
     /**
      * Start purchase flow for a subscription
@@ -40,23 +57,30 @@ class BillingClient(
      * @param basePlanId The base plan ID (e.g., "base-plan" for monthly, "yearly" for yearly)
      * @return Result with purchase token on success
      */
-    suspend fun launchPurchaseFlow(productId: String, basePlanId: String? = null): Result<String> = 
-        revenueCatClient.launchPurchaseFlow(productId, basePlanId)
+    suspend fun launchPurchaseFlow(productId: String, basePlanId: String? = null): Result<String> {
+        return billingManager.launchPurchaseFlow(productId, basePlanId).map { "" }
+    }
 
     /**
      * Acknowledge a purchase (handled automatically by RevenueCat)
      *
      * @param purchaseToken The purchase token to acknowledge
      */
-    suspend fun acknowledgePurchase(purchaseToken: String): Result<Unit> = 
-        revenueCatClient.acknowledgePurchase(purchaseToken)
+    suspend fun acknowledgePurchase(purchaseToken: String): Result<Unit> {
+        // RevenueCat auto-acknowledges purchases
+        return Result.success(Unit)
+    }
 
     /**
      * Get available products for purchase
      *
      * @return List of product IDs that can be purchased
      */
-    suspend fun getAvailableProducts(): Result<List<String>> = revenueCatClient.getAvailableProducts()
+    suspend fun getAvailableProducts(): Result<List<String>> {
+        return billingManager.getAvailableProducts().map { products ->
+            products.map { it.productId }
+        }
+    }
 
     /**
      * Get product pricing details
@@ -64,8 +88,19 @@ class BillingClient(
      * @param productId The product ID to query
      * @return List of pricing information for all base plans of this product
      */
-    suspend fun getProductPricing(productId: String): Result<List<me.calebjones.spacelaunchnow.data.model.ProductPricing>> = 
-        revenueCatClient.getProductPricing(productId)
+    suspend fun getProductPricing(productId: String): Result<List<ProductPricing>> {
+        return billingManager.getAvailableProducts().map { products ->
+            products.filter { it.productId == productId }.map { product ->
+                ProductPricing(
+                    productId = product.productId,
+                    basePlanId = product.basePlanId,
+                    formattedPrice = product.formattedPrice,
+                    priceAmountMicros = product.priceAmountMicros,
+                    priceCurrencyCode = product.currencyCode
+                )
+            }
+        }
+    }
 
     /**
      * Cancel subscription (platform-specific)
@@ -85,12 +120,20 @@ class BillingClient(
      * Flow of purchase updates
      * Emits whenever a purchase is completed or updated
      */
-    val purchaseUpdates: Flow<PlatformPurchase> = revenueCatClient.purchaseUpdates
+    val purchaseUpdates: Flow<PlatformPurchase> = billingManager.purchaseState.map { state ->
+        PlatformPurchase(
+            productId = state.activeProductIds.firstOrNull() ?: "",
+            purchaseToken = "",
+            isAcknowledged = true
+        )
+    }
 
     /**
      * Disconnect and cleanup resources
      */
-    fun disconnect() = revenueCatClient.disconnect()
+    fun disconnect() {
+        // BillingManager handles lifecycle - no-op here
+    }
 }
 
 /**

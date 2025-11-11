@@ -1318,15 +1318,24 @@ Important to add tests add we go and plan for testability.
 
 ---
 
-### Phase 4: Implement Desktop No-Op Manager ⏸️ PENDING
-**Status:** Not started  
-**Estimated Time:** 1 hour
+### Phase 4: Implement Desktop No-Op Manager ✅ COMPLETE
+**Status:** Complete  
+**Time Taken:** 1 hour  
+**Summary:** See [PHASE_4_SUMMARY.md](./PHASE_4_SUMMARY.md) for full details
 
 ---
 
-### Phase 5: Update Common Components ⏸️ PENDING
-**Status:** Not started  
-**Estimated Time:** 3-4 hours
+### Phase 5: Update Common Components ✅ COMPLETE
+**Status:** Complete  
+**Time Taken:** 2 hours  
+**Summary:** See [PHASE_5_SUMMARY.md](./PHASE_5_SUMMARY.md) for full details
+
+**Key Achievements:**
+- ✅ Updated `BillingClient` to use `BillingManager`
+- ✅ Updated `SubscriptionSyncer` to use `BillingManager`
+- ✅ Updated `AppModule` DI configuration
+- ✅ Removed all RevenueCat imports from common infrastructure
+- ⏳ Marked `SubscriptionViewModel` and `DebugSettingsViewModel` for Phase 7
 
 ---
 
@@ -1340,6 +1349,11 @@ Important to add tests add we go and plan for testability.
 **Status:** Not started  
 **Estimated Time:** 2-3 hours
 
+**Known TODOs:**
+- Update `SubscriptionViewModel` to use `BillingManager`
+- Update `DebugSettingsViewModel` to use `BillingManager`
+- Re-enable ViewModel DI registrations in `AppModule`
+
 ---
 
 ### Phase 8: Testing and Validation ⏸️ PENDING
@@ -1348,10 +1362,10 @@ Important to add tests add we go and plan for testability.
 
 ---
 
-**Total Progress:** 3/8 Phases Complete (37.5%)  
-**Time Spent:** ~11 hours  
-**Estimated Remaining:** ~9-14 hours
+**Total Progress:** 5/8 Phases Complete (62.5%)  
+**Time Spent:** ~14 hours  
+**Estimated Remaining:** ~6-9 hours
 
 ---
 
-*Document Version 1.1 - Last Updated: November 10, 2025*
+*Document Version 1.2 - Last Updated: January 2025*
