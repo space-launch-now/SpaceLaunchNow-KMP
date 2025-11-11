@@ -1046,17 +1046,17 @@ class MockBillingManager : BillingManager {
 
 ### Pre-Migration
 
-- [ ] Review all files that reference `RevenueCatManager` or `RevenueCatBillingClient`
-- [ ] Create backup branch: `git checkout -b backup/before-revenuecat-decoupling`
-- [ ] Document current behavior with screenshots/videos
-- [ ] Create test plan for validation
+- [x] Review all files that reference `RevenueCatManager` or `RevenueCatBillingClient`
+- [x] Create backup branch: `git checkout -b backup/before-revenuecat-decoupling`
+- [x] Document current behavior with screenshots/videos
+- [x] Create test plan for validation
 
 ### Phase 1: Interfaces
 
-- [ ] Create `BillingManager` interface in commonMain
-- [ ] Create `PurchaseState` data class
-- [ ] Create `ProductInfo` data class
-- [ ] Add `expect fun createBillingManager()` declaration
+- [x] Create `BillingManager` interface in commonMain
+- [x] Create `PurchaseState` data class
+- [x] Create `ProductInfo` data class
+- [x] Add `expect fun createBillingManager()` declaration
 
 ### Phase 2: Android
 
@@ -1106,7 +1106,8 @@ class MockBillingManager : BillingManager {
 - [ ] Remove unused imports
 - [ ] Update documentation
 
-### Testing
+### Testing - Integrate at whatever phase makes sense
+Important to add tests add we go and plan for testability.
 
 - [ ] Android: Test free user flow
 - [ ] Android: Test purchase flow
