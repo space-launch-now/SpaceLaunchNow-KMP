@@ -57,6 +57,7 @@ import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
+import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.koin.compose.viewmodel.koinViewModel
 
 private val TitleHeight = 128.dp
@@ -199,7 +200,7 @@ private fun EventInfoCard(event: EventEndpointDetailed) {
                 }
 
                 event.duration?.let { duration ->
-                    InfoRow(label = "Duration", value = duration)
+                    InfoRow(label = "Duration", value = parseIsoDurationToHumanReadable(duration))
                 }
 
                 if (event.webcastLive == true) {
