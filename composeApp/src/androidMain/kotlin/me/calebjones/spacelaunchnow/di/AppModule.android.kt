@@ -12,12 +12,19 @@ import me.calebjones.spacelaunchnow.data.storage.createSubscriptionDataStore
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.AndroidSharingService
+import me.calebjones.spacelaunchnow.data.billing.BillingManager
+import me.calebjones.spacelaunchnow.data.billing.createBillingManager
 
 val androidModule = module {
     single { createDataStore(androidContext()) }
     single(named("DebugDataStore")) { createDebugDataStore(androidContext()) }
     single(named("AppSettingsDataStore")) { createAppSettingsDataStore(androidContext()) }
     single(named("SubscriptionDataStore")) { createSubscriptionDataStore(androidContext()) }
+    
+    // Platform-specific BillingManager
+    single<BillingManager> {
+        createBillingManager(androidContext())
+    }
     
     // Platform-specific widget updater (Android only)
     single { PlatformWidgetUpdater(context = androidContext()) }
