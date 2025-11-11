@@ -1,0 +1,45 @@
+-- Article table for caching news articles
+
+CREATE TABLE ArticleCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    url TEXT NOT NULL,
+    image_url TEXT,
+    news_site TEXT,
+    summary TEXT,
+    published_at INTEGER, -- stored as epoch milliseconds
+    updated_at INTEGER,
+    json_data TEXT NOT NULL, -- Full serialized Article object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Index for common queries
+CREATE INDEX idx_article_published ON ArticleCache(published_at);
+CREATE INDEX idx_article_expires ON ArticleCache(expires_at);
+
+-- Article queries
+insertOrReplaceArticle:
+INSERT OR REPLACE INTO ArticleCache (
+    id, title, url, image_url, news_site, summary,
+    published_at, updated_at, json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getArticleById:
+SELECT * FROM ArticleCache 
+WHERE id = ? AND expires_at > ?;
+
+getRecentArticles:
+SELECT * FROM ArticleCache 
+WHERE expires_at > ?
+ORDER BY published_at DESC
+LIMIT ?;
+
+deleteExpiredArticles:
+DELETE FROM ArticleCache WHERE expires_at < ?;
+
+deleteArticleById:
+DELETE FROM ArticleCache WHERE id = ?;
+
+clearAllArticles:
+DELETE FROM ArticleCache;

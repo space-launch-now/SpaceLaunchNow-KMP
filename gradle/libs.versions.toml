@@ -70,6 +70,7 @@ workRuntime = "2.11.0"
 purchases-kmp = "1.9.0+14.3.0"
 shadowglow = "1.0.0"
 kstore = "1.0.0"
+sqldelight = "2.0.2"
 
 # Basic Ads (Google AdMob for KMP)
 basic-ads = "0.2.7"
@@ -199,6 +200,13 @@ shadowglow = { module = "me.trishiraj:shadowglow", version.ref = "shadowglow" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 
+# SQLDelight for local database
+sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
+sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+
 # Basic Ads (Google AdMob for KMP)
 basicAds = { module = "app.lexilabs.basic:basic-ads", version.ref = "basic-ads" }
 googleAds = { module = "com.google.android.gms:play-services-ads", version.ref = "google-play-services-ads" }
@@ -218,10 +226,11 @@ ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "k
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 openApiGenerator = { id = "org.openapi.generator", version = "7.16.0" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "compose" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "compose" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "google-services-plugin" }
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }

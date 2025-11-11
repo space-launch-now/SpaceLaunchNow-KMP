@@ -19,11 +19,13 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDeta
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.ApiError
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 
 class LaunchRepositoryImpl(
     private val launchesApi: LaunchesApi,
     private val agenciesApi: AgenciesApi,
-    private val appPreferences: AppPreferences
+    private val appPreferences: AppPreferences,
+    private val localDataSource: LaunchLocalDataSource? = null
 ) : LaunchRepository {
 
     private val json = Json { ignoreUnknownKeys = true }
@@ -57,6 +59,19 @@ class LaunchRepositoryImpl(
 
     override suspend fun getUpcomingLaunchesNormal(limit: Int): Result<PaginatedLaunchNormalList> {
         return try {
+            // Try cache first if available
+            val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(limit)
+            if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
+                println("LaunchRepository: Returning ${cachedLaunches.size} cached upcoming launches")
+                return Result.success(PaginatedLaunchNormalList(
+                    count = cachedLaunches.size,
+                    next = null,
+                    previous = null,
+                    results = cachedLaunches
+                ))
+            }
+            
+            // If no cache, fetch from API
             val hideTbd = withContext(Dispatchers.Default) { appPreferences.getHideTbdLaunches() }
             
             // Always use upcoming only (no recent launches functionality)
@@ -74,10 +89,37 @@ class LaunchRepositoryImpl(
             } else {
                 launches
             }
+            
+            // Cache the results for future use
+            localDataSource?.cacheNormalLaunches(filtered.results)
+            println("LaunchRepository: Cached ${filtered.results.size} upcoming launches from API")
+            
             Result.success(filtered)
         } catch (e: ResponseException) {
+            // On error, try to return stale cache if available
+            val staleCached = localDataSource?.getUpcomingNormalLaunches(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("LaunchRepository: Returning ${staleCached.size} stale cached launches due to API error")
+                return Result.success(PaginatedLaunchNormalList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: IOException) {
+            // On network error, try to return stale cache if available
+            val staleCached = localDataSource?.getUpcomingNormalLaunches(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("LaunchRepository: Returning ${staleCached.size} stale cached launches due to network error")
+                return Result.success(PaginatedLaunchNormalList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: Exception) {
             Result.failure(e)
@@ -104,15 +146,56 @@ class LaunchRepositoryImpl(
 
     override suspend fun getPreviousLaunchesNormal(limit: Int): Result<PaginatedLaunchNormalList> {
         return try {
+            // Try cache first if available
+            val cachedLaunches = localDataSource?.getPreviousNormalLaunches(limit)
+            if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
+                println("LaunchRepository: Returning ${cachedLaunches.size} cached previous launches")
+                return Result.success(PaginatedLaunchNormalList(
+                    count = cachedLaunches.size,
+                    next = null,
+                    previous = null,
+                    results = cachedLaunches
+                ))
+            }
+            
+            // If no cache, fetch from API
             val response = launchesApi.getLaunchList(
                 limit = limit,
                 previous = true,
                 ordering = "-net" // Most recent first
             )
-            Result.success(response.body())
+            val launches = response.body()
+            
+            // Cache the results for future use
+            localDataSource?.cacheNormalLaunches(launches.results)
+            println("LaunchRepository: Cached ${launches.results.size} previous launches from API")
+            
+            Result.success(launches)
         } catch (e: ResponseException) {
+            // On error, try to return stale cache if available
+            val staleCached = localDataSource?.getPreviousNormalLaunches(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("LaunchRepository: Returning ${staleCached.size} stale cached previous launches due to API error")
+                return Result.success(PaginatedLaunchNormalList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: IOException) {
+            // On network error, try to return stale cache if available
+            val staleCached = localDataSource?.getPreviousNormalLaunches(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("LaunchRepository: Returning ${staleCached.size} stale cached previous launches due to network error")
+                return Result.success(PaginatedLaunchNormalList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: Exception) {
             Result.failure(e)
@@ -140,6 +223,14 @@ class LaunchRepositoryImpl(
 
     override suspend fun getLaunchDetails(id: String): Result<LaunchDetailed> {
         return try {
+            // Try cache first if available
+            val cachedLaunch = localDataSource?.getDetailedLaunch(id)
+            if (cachedLaunch != null) {
+                println("LaunchRepository: Returning cached detailed launch: ${cachedLaunch.name}")
+                return Result.success(cachedLaunch)
+            }
+            
+            // If no cache, fetch from API
             val response = launchesApi.launchesRetrieve(id)
 
             // Print raw response for debugging
@@ -165,6 +256,11 @@ class LaunchRepositoryImpl(
             }
 
             val body = response.body()
+            
+            // Cache the detailed launch for future use
+            localDataSource?.cacheDetailedLaunch(body)
+            println("LaunchRepository: Cached detailed launch: ${body.name}")
+            
             Result.success(body)
         } catch (e: ResponseException) {
             println("ResponseException in getLaunchDetails for ID $id: ${e.message}")
@@ -172,12 +268,26 @@ class LaunchRepositoryImpl(
             try {
                 val errorBody = e.response.bodyAsText()
                 println("Error response body: $errorBody")
+                
+                // On error, try to return stale cache if available
+                val staleCached = localDataSource?.getDetailedLaunch(id)
+                if (staleCached != null) {
+                    println("LaunchRepository: Returning stale cached detailed launch due to API error: ${staleCached.name}")
+                    return Result.success(staleCached)
+                }
+                
                 Result.failure(Exception("API Error: $errorBody"))
             } catch (bodyException: Exception) {
                 Result.failure(e)
             }
         } catch (e: IOException) {
             println("IOException in getLaunchDetails for ID $id: ${e.message}")
+            // On network error, try to return stale cache if available
+            val staleCached = localDataSource?.getDetailedLaunch(id)
+            if (staleCached != null) {
+                println("LaunchRepository: Returning stale cached detailed launch due to network error: ${staleCached.name}")
+                return Result.success(staleCached)
+            }
             Result.failure(e)
         } catch (e: Exception) {
             println("Exception in getLaunchDetails for ID $id: ${e::class.simpleName}: ${e.message}")
