@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
+import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -18,10 +18,15 @@ import kotlin.random.Random
 
 expect fun resetNotificationPermissionAskedFlag()
 
+/**
+ * ViewModel for debug settings
+ * 
+ * Phase 7: Updated to use platform-agnostic BillingManager instead of RevenueCatManager
+ */
 @OptIn(kotlin.time.ExperimentalTime::class)
 class DebugSettingsViewModel(
     private val debugPreferences: DebugPreferences? = null,
-    private val revenueCatManager: RevenueCatManager? = null,
+    private val billingManager: BillingManager? = null,
     private val launchRepository: LaunchRepository? = null,
     private val notificationRepository: NotificationRepository? = null
 ) : ViewModel() {
@@ -171,31 +176,29 @@ class DebugSettingsViewModel(
         }
     }
 
-    // RevenueCat Debug Functions
-    fun checkRevenueCatInitialization() {
+    // Billing Debug Functions
+    fun checkBillingInitialization() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                if (revenueCatManager == null) {
-                    _statusMessage.value = "❌ RevenueCatManager not available (not injected)"
+                if (billingManager == null) {
+                    _statusMessage.value = "❌ BillingManager not available (not injected)"
                     return@launch
                 }
 
-                val isInitialized = revenueCatManager.isInitialized.value
-                val customerInfo = revenueCatManager.customerInfo.value
-                val offering = revenueCatManager.currentOffering.value
+                val isInitialized = billingManager.isInitialized.value
+                val purchaseState = billingManager.purchaseState.value
 
                 val message = buildString {
-                    appendLine("✅ RevenueCat Status:")
+                    appendLine("✅ Billing Status:")
                     appendLine("• Initialized: $isInitialized")
-                    appendLine("• CustomerInfo: ${if (customerInfo != null) "✅ Loaded" else "❌ Not loaded"}")
-                    appendLine("• Current Offering: ${offering?.identifier ?: "❌ Not loaded"}")
-                    if (customerInfo != null) {
-                        appendLine("• Active Entitlements: ${customerInfo.entitlements.active.keys.joinToString()}")
-                    }
+                    appendLine("• Is Subscribed: ${purchaseState.isSubscribed}")
+                    appendLine("• Subscription Type: ${purchaseState.subscriptionType?.name ?: "FREE"}")
+                    appendLine("• Active Entitlements: ${billingManager.getActiveEntitlements().joinToString()}")
+                    appendLine("• User ID: ${purchaseState.userId ?: "Anonymous"}")
                 }
                 _detailedMessage.value = message
-                _statusMessage.value = "RevenueCat Status Check"
+                _statusMessage.value = "Billing Status Check"
             } catch (e: Exception) {
                 _statusMessage.value = "❌ Error checking initialization: ${e.message}"
             } finally {
@@ -204,35 +207,41 @@ class DebugSettingsViewModel(
         }
     }
 
-    fun queryRevenueCatProducts() {
+    fun queryBillingProducts() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                if (revenueCatManager == null) {
-                    _statusMessage.value = "❌ RevenueCatManager not available"
+                if (billingManager == null) {
+                    _statusMessage.value = "❌ BillingManager not available"
                     return@launch
                 }
 
-                revenueCatManager.refreshOfferings()
-                val offering = revenueCatManager.currentOffering.value
-
-                val message = buildString {
-                    appendLine("📦 Products/Offerings:")
-                    if (offering == null) {
-                        appendLine("❌ No offering available")
-                    } else {
-                        appendLine("✅ Offering: ${offering.identifier}")
-                        appendLine("\nAvailable Packages:")
-                        offering.availablePackages.forEach { pkg ->
-                            appendLine("• ${pkg.identifier}")
-                            appendLine("  Product: ${pkg.storeProduct.id}")
-                            appendLine("  Price: ${pkg.storeProduct.price.formatted}")
-                            appendLine("  Period: ${pkg.storeProduct.period?.unit?.name ?: "Lifetime"}")
+                billingManager.getAvailableProducts().fold(
+                    onSuccess = { products ->
+                        val message = buildString {
+                            appendLine("📦 Products:")
+                            if (products.isEmpty()) {
+                                appendLine("❌ No products available")
+                            } else {
+                                appendLine("✅ Available Products (${products.size}):")
+                                products.forEach { product ->
+                                    appendLine("\n━━━━━━━━━━━━━━━━━━━━")
+                                    appendLine("Product ID: ${product.productId}")
+                                    appendLine("  Base Plan: ${product.basePlanId ?: "N/A"}")
+                                    appendLine("  Title: ${product.title}")
+                                    appendLine("  Description: ${product.description}")
+                                    appendLine("  Price: ${product.formattedPrice}")
+                                    appendLine("  Currency: ${product.currencyCode}")
+                                }
+                            }
                         }
+                        _detailedMessage.value = message
+                        _statusMessage.value = "Products Query Result"
+                    },
+                    onFailure = { error ->
+                        _statusMessage.value = "❌ Error querying products: ${error.message}"
                     }
-                }
-                _detailedMessage.value = message
-                _statusMessage.value = "Products Query Result"
+                )
             } catch (e: Exception) {
                 _statusMessage.value = "❌ Error querying products: ${e.message}"
             } finally {
@@ -241,47 +250,36 @@ class DebugSettingsViewModel(
         }
     }
 
-    fun checkRevenueCatEntitlements() {
+    fun checkBillingEntitlements() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                if (revenueCatManager == null) {
-                    _statusMessage.value = "❌ RevenueCatManager not available"
+                if (billingManager == null) {
+                    _statusMessage.value = "❌ BillingManager not available"
                     return@launch
                 }
 
-                revenueCatManager.refreshCustomerInfo()
-                val customerInfo = revenueCatManager.customerInfo.value
+                // Refresh purchase state
+                billingManager.refreshPurchaseState()
+                val purchaseState = billingManager.purchaseState.value
+                val activeEntitlements = billingManager.getActiveEntitlements()
 
                 val message = buildString {
                     appendLine("🔐 Entitlements:")
-                    if (customerInfo == null) {
-                        appendLine("❌ No customer info available")
+                    appendLine("✅ Active Entitlements (${activeEntitlements.size}):")
+                    if (activeEntitlements.isEmpty()) {
+                        appendLine("  • None (Free user)")
                     } else {
-                        val activeEntitlements = customerInfo.entitlements.active
-                        val allEntitlements = customerInfo.entitlements.all
-
-                        appendLine("✅ Active Entitlements (${activeEntitlements.size}):")
-                        if (activeEntitlements.isEmpty()) {
-                            appendLine("  • None (Free user)")
-                        } else {
-                            activeEntitlements.forEach { (id, info) ->
-                                appendLine("  • $id")
-                                appendLine("    Product: ${info.productIdentifier}")
-                                appendLine("    Expires: ${info.expirationDateMillis?.toString() ?: "Never"}")
-                            }
+                        activeEntitlements.forEach { entitlement ->
+                            appendLine("  • $entitlement")
                         }
-
-                        appendLine("\n📋 All Entitlements (${allEntitlements.size}):")
-                        allEntitlements.forEach { (id, info) ->
-                            val status = if (info.isActive) "✅ Active" else "❌ Inactive"
-                            appendLine("  • $id - $status")
-                        }
-
-                        appendLine("\n💳 Original Purchase Info:")
-                        appendLine("  • Original App User ID: ${customerInfo.originalAppUserId}")
-                        appendLine("  • First Seen: ${customerInfo.firstSeenMillis.toString()}")
                     }
+
+                    appendLine("\n💳 Purchase Info:")
+                    appendLine("  • Is Subscribed: ${purchaseState.isSubscribed}")
+                    appendLine("  • Subscription Type: ${purchaseState.subscriptionType.name}")
+                    appendLine("  • User ID: ${purchaseState.userId ?: "Anonymous"}")
+                    appendLine("  • Last Refreshed: ${purchaseState.lastRefreshed}")
                 }
                 _detailedMessage.value = message
                 _statusMessage.value = "Entitlements Check Result"
@@ -293,29 +291,30 @@ class DebugSettingsViewModel(
         }
     }
 
-    fun testRevenueCatRestore() {
+    fun testBillingRestore() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                if (revenueCatManager == null) {
-                    _statusMessage.value = "❌ RevenueCatManager not available"
+                if (billingManager == null) {
+                    _statusMessage.value = "❌ BillingManager not available"
                     return@launch
                 }
 
-                revenueCatManager.restorePurchases()
-
-                val message = buildString {
-                    appendLine("🔄 Restore Purchases:")
-                    val customerInfo = revenueCatManager.customerInfo.value
-                    if (customerInfo != null) {
-                        appendLine("✅ Restore successful")
-                        appendLine("Active Entitlements: ${customerInfo.entitlements.active.keys.joinToString()}")
-                    } else {
-                        appendLine("⚠️ Restore completed but no customer info")
+                billingManager.restorePurchases().fold(
+                    onSuccess = { purchaseState ->
+                        val message = buildString {
+                            appendLine("🔄 Restore Purchases:")
+                            appendLine("✅ Restore successful")
+                            appendLine("Active Entitlements: ${billingManager.getActiveEntitlements().joinToString()}")
+                            appendLine("Is Subscribed: ${purchaseState.isSubscribed}")
+                        }
+                        _detailedMessage.value = message
+                        _statusMessage.value = "Restore Purchases Result"
+                    },
+                    onFailure = { error ->
+                        _statusMessage.value = "❌ Error restoring purchases: ${error.message}"
                     }
-                }
-                _detailedMessage.value = message
-                _statusMessage.value = "Restore Purchases Result"
+                )
             } catch (e: Exception) {
                 _statusMessage.value = "❌ Error restoring purchases: ${e.message}"
             } finally {
@@ -324,62 +323,67 @@ class DebugSettingsViewModel(
         }
     }
 
-    fun viewRevenueCatOfferingDetails() {
+    fun viewBillingProductDetails() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                if (revenueCatManager == null) {
-                    _statusMessage.value = "❌ RevenueCatManager not available"
+                if (billingManager == null) {
+                    _statusMessage.value = "❌ BillingManager not available"
                     return@launch
                 }
 
-                val offering = revenueCatManager.currentOffering.value
+                billingManager.getAvailableProducts().fold(
+                    onSuccess = { products ->
+                        val message = buildString {
+                            appendLine("🎁 Product Details:")
+                            if (products.isEmpty()) {
+                                appendLine("❌ No products loaded")
+                                appendLine("\n💡 Try refreshing products first")
+                            } else {
+                                appendLine("✅ Available Products: ${products.size}")
+                                
+                                // Group by type
+                                val lifetime = products.find { 
+                                    it.basePlanId?.contains("lifetime", ignoreCase = true) == true ||
+                                    it.productId.contains("lifetime", ignoreCase = true) ||
+                                    it.productId.contains("pro", ignoreCase = true)
+                                }
+                                val annual = products.find { 
+                                    it.basePlanId?.contains("annual", ignoreCase = true) == true ||
+                                    it.basePlanId?.contains("yearly", ignoreCase = true) == true
+                                }
+                                val monthly = products.find { 
+                                    it.basePlanId?.contains("monthly", ignoreCase = true) == true 
+                                }
 
-                val message = buildString {
-                    appendLine("🎁 Current Offering Details:")
-                    if (offering == null) {
-                        appendLine("❌ No offering loaded")
-                        appendLine("\n💡 Try refreshing offerings first")
-                    } else {
-                        appendLine("✅ Offering ID: ${offering.identifier}")
-                        appendLine("Description: ${offering.serverDescription}")
-                        appendLine("\n📦 Packages (${offering.availablePackages.size}):")
+                                lifetime?.let { product ->
+                                    appendLine("\n⭐ Lifetime Product:")
+                                    appendLine("  • ${product.productId} - ${product.formattedPrice}")
+                                    appendLine("  • ${product.title}")
+                                }
 
-                        offering.availablePackages.forEach { pkg ->
-                            appendLine("\n━━━━━━━━━━━━━━━━━━━━")
-                            appendLine("Package: ${pkg.identifier}")
-                            appendLine("  Type: ${pkg.packageType}")
-                            appendLine("\n  Product Info:")
-                            appendLine("    • ID: ${pkg.storeProduct.id}")
-                            appendLine("    • Title: ${pkg.storeProduct.title}")
-                            appendLine("    • Price: ${pkg.storeProduct.price.formatted}")
-                            appendLine("    • Period: ${pkg.storeProduct.period?.unit?.name ?: "N/A"} (${pkg.storeProduct.period?.value ?: "N/A"})")
-                            appendLine("    • Type: ${pkg.storeProduct.type}")
+                                annual?.let { product ->
+                                    appendLine("\n📅 Annual Product:")
+                                    appendLine("  • ${product.productId} - ${product.formattedPrice}")
+                                    appendLine("  • ${product.title}")
+                                }
+
+                                monthly?.let { product ->
+                                    appendLine("\n📆 Monthly Product:")
+                                    appendLine("  • ${product.productId} - ${product.formattedPrice}")
+                                    appendLine("  • ${product.title}")
+                                }
+                            }
                         }
-
-                        // Lifetime package
-                        offering.lifetime?.let { lifetime ->
-                            appendLine("\n⭐ Lifetime Package:")
-                            appendLine("  • ${lifetime.storeProduct.id} - ${lifetime.storeProduct.price.formatted}")
-                        }
-
-                        // Annual package
-                        offering.annual?.let { annual ->
-                            appendLine("\n📅 Annual Package:")
-                            appendLine("  • ${annual.storeProduct.id} - ${annual.storeProduct.price.formatted}")
-                        }
-
-                        // Monthly package
-                        offering.monthly?.let { monthly ->
-                            appendLine("\n📆 Monthly Package:")
-                            appendLine("  • ${monthly.storeProduct.id} - ${monthly.storeProduct.price.formatted}")
-                        }
+                        _detailedMessage.value = message
+                        _statusMessage.value = "Product Details"
+                    },
+                    onFailure = { error ->
+                        _statusMessage.value = "❌ Error viewing product details: ${error.message}"
                     }
-                }
-                _detailedMessage.value = message
-                _statusMessage.value = "Offering Details"
+                )
             } catch (e: Exception) {
-                _statusMessage.value = "❌ Error viewing offering details: ${e.message}"
+                _statusMessage.value = "❌ Error viewing product details: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

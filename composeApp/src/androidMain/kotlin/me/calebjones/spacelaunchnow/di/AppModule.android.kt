@@ -13,6 +13,8 @@ import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.AndroidSharingService
+import me.calebjones.spacelaunchnow.data.billing.BillingManager
+import me.calebjones.spacelaunchnow.data.billing.createBillingManager
 
 val androidModule = module {
     single { createDataStore(androidContext()) }
@@ -20,6 +22,10 @@ val androidModule = module {
     single(named("AppSettingsDataStore")) { createAppSettingsDataStore(androidContext()) }
     single(named("SubscriptionDataStore")) { createSubscriptionDataStore(androidContext()) }
     
+    // Platform-specific BillingManager
+    single<BillingManager> {
+        createBillingManager(androidContext())
+    }
     // Database driver factory
     single { DatabaseDriverFactory(androidContext()) }
     

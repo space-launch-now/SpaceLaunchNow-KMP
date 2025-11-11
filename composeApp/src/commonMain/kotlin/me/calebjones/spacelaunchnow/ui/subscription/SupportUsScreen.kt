@@ -80,6 +80,7 @@ import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.platformShadowGlow
+import me.calebjones.spacelaunchnow.ui.viewmodel.ProductType
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -103,8 +104,13 @@ fun SupportUsScreen(
     val subscriptionState by viewModel.subscriptionState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
-    // RevenueCat offerings for dynamic pricing
-    val currentOffering by viewModel.currentOffering.collectAsState()
+    // Available products from BillingManager (platform-agnostic)
+    val availableProducts by viewModel.availableProducts.collectAsState()
+    
+    // Get products by type using helper function
+    val lifetimeProduct = viewModel.getProductByType(ProductType.LIFETIME)
+    val annualProduct = viewModel.getProductByType(ProductType.ANNUAL)
+    val monthlyProduct = viewModel.getProductByType(ProductType.MONTHLY)
 
     // Determine user status for different upgrade flows
     val subscriptionRepo = koinInject<SubscriptionRepository>()
@@ -164,8 +170,8 @@ fun SupportUsScreen(
                 )
             }
 
-            // RevenueCat offerings status (subtle indicator)
-            if (currentOffering == null && canUpgrade) {
+            // Products status (subtle indicator)
+            if (availableProducts.isEmpty() && canUpgrade) {
                 item {
                     Spacer(Modifier.height(8.dp))
                     Row(
@@ -333,19 +339,15 @@ fun SupportUsScreen(
             // Pro Lifetime (Golden Premium Option) - Show if available in packagesToShow
             if (packagesToShow.showLifetime) {
                 item {
-                    val lifetimePackage = currentOffering?.lifetime
-
-                    // Only show if we have the actual package from RevenueCat
-
                     ProLifetimeCard(
-                        price = lifetimePackage?.storeProduct?.price?.formatted ?: "$-.--",
+                        price = lifetimeProduct?.formattedPrice ?: "$-.--",
                         isProcessing = uiState.isProcessing,
                         onPurchase = {
-                            if (lifetimePackage != null) {
-                                viewModel.purchasePackage(lifetimePackage)
+                            if (lifetimeProduct != null) {
+                                viewModel.purchaseProduct(lifetimeProduct)
                             }
                         },
-                        enabled = lifetimePackage != null
+                        enabled = lifetimeProduct != null
                     )
 
                     // Show divider only if lifetime was shown AND there are subscription plans to show
@@ -376,21 +378,19 @@ fun SupportUsScreen(
             // Yearly Plan (Recommended) - Show if available in packagesToShow
             if (packagesToShow.showAnnual) {
                 item {
-                    val annualPackage = currentOffering?.annual
-
                     PricingCard(
                         title = "Yearly",
-                        price = annualPackage?.storeProduct?.price?.formatted ?: "$-.--",
+                        price = annualProduct?.formattedPrice ?: "$-.--",
                         period = "/year",
                         savings = uiState.getSavingsPercent(),
                         isRecommended = true,
                         isProcessing = uiState.isProcessing,
                         onSubscribe = {
-                            if (annualPackage != null) {
-                                viewModel.purchasePackage(annualPackage)
+                            if (annualProduct != null) {
+                                viewModel.purchaseProduct(annualProduct)
                             }
                         },
-                        enabled = annualPackage != null
+                        enabled = annualProduct != null
                     )
                     // Don't show fallback UI - just hide until loaded
                 }
@@ -401,20 +401,18 @@ fun SupportUsScreen(
                 item {
                     Spacer(Modifier.height(12.dp))
 
-                    val monthlyPackage = currentOffering?.monthly
-
                     PricingCard(
                         title = "Monthly",
-                        price = monthlyPackage?.storeProduct?.price?.formatted ?: "$-.--",
+                        price = monthlyProduct?.formattedPrice ?: "$-.--",
                         period = "/month",
                         isRecommended = false,
                         isProcessing = uiState.isProcessing,
                         onSubscribe = {
-                            if (monthlyPackage != null) {
-                                viewModel.purchasePackage(monthlyPackage)
+                            if (monthlyProduct != null) {
+                                viewModel.purchaseProduct(monthlyProduct)
                             }
                         },
-                        enabled = monthlyPackage != null
+                        enabled = monthlyProduct != null
                     )
                     // Don't show fallback UI - just hide until loaded
                 }
@@ -1035,12 +1033,11 @@ private fun SuccessCard(message: String) {
 
 @Composable
 private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
-    val revenueCatManager =
-        koinInject<me.calebjones.spacelaunchnow.data.billing.RevenueCatManager>()
-    val customerInfo by revenueCatManager.customerInfo.collectAsState()
+    val billingManager = koinInject<me.calebjones.spacelaunchnow.data.billing.BillingManager>()
+    val purchaseState by billingManager.purchaseState.collectAsState()
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
 
-    val userId = customerInfo?.originalAppUserId ?: "Not available"
+    val userId = purchaseState.userId ?: "Not available"
 
     Card(
         modifier = Modifier
