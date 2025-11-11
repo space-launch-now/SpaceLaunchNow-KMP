@@ -22,7 +22,7 @@ class UpdateLocalDataSource(
         queries.insertOrReplaceUpdate(
             id = update.id.toLong(),
             profile_image = update.profileImage,
-            comment = update.comment,
+            comment = update.comment ?: "",
             info_url = update.infoUrl,
             created_on = update.createdOn?.toEpochMilliseconds(),
             json_data = json.encodeToString(update),

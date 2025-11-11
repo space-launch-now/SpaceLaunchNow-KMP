@@ -33,7 +33,7 @@ class LaunchLocalDataSource(
         
         queries.insertOrReplaceBasic(
             id = launch.id,
-            name = launch.name,
+            name = launch.name ?: "",
             status_id = launch.status?.id?.toLong(),
             status_name = launch.status?.name,
             net = launch.net?.toEpochMilliseconds(),
@@ -41,11 +41,11 @@ class LaunchLocalDataSource(
             window_start = launch.windowStart?.toEpochMilliseconds(),
             launch_service_provider_id = launch.launchServiceProvider?.id?.toLong(),
             launch_service_provider_name = launch.launchServiceProvider?.name,
-            rocket_configuration_id = launch.rocket?.configuration?.id?.toLong(),
-            rocket_configuration_name = launch.rocket?.configuration?.name,
-            pad_name = launch.pad?.name,
-            location_name = launch.pad?.location?.name,
-            image_url = launch.image,
+            rocket_configuration_id = null,
+            rocket_configuration_name = null,
+            pad_name = null,
+            location_name = launch.locationName,
+            image_url = launch.image?.imageUrl,
             json_data = json.encodeToString(launch),
             cached_at = now,
             expires_at = expiresAt
@@ -95,7 +95,7 @@ class LaunchLocalDataSource(
         
         queries.insertOrReplaceNormal(
             id = launch.id,
-            name = launch.name,
+            name = launch.name ?: "",
             status_id = launch.status?.id?.toLong(),
             status_name = launch.status?.name,
             net = launch.net?.toEpochMilliseconds(),
@@ -107,7 +107,7 @@ class LaunchLocalDataSource(
             rocket_configuration_name = launch.rocket?.configuration?.name,
             pad_name = launch.pad?.name,
             location_name = launch.pad?.location?.name,
-            image_url = launch.image,
+            image_url = launch.image?.imageUrl,
             mission_name = launch.mission?.name,
             mission_description = launch.mission?.description,
             json_data = json.encodeToString(launch),
@@ -159,7 +159,7 @@ class LaunchLocalDataSource(
         
         queries.insertOrReplaceDetailed(
             id = launch.id,
-            name = launch.name,
+            name = launch.name ?: "",
             status_id = launch.status?.id?.toLong(),
             status_name = launch.status?.name,
             net = launch.net?.toEpochMilliseconds(),
@@ -171,7 +171,7 @@ class LaunchLocalDataSource(
             rocket_configuration_name = launch.rocket?.configuration?.name,
             pad_name = launch.pad?.name,
             location_name = launch.pad?.location?.name,
-            image_url = launch.image,
+            image_url = launch.image?.imageUrl,
             mission_name = launch.mission?.name,
             mission_description = launch.mission?.description,
             json_data = json.encodeToString(launch),
