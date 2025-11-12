@@ -201,7 +201,7 @@ class IosBillingManager : BillingManager {
             activeEntitlements = activeEntitlements,
             activeProductIds = productIds,
             features = features,
-            lastRefreshed = System.currentTimeMillis(),
+            lastRefreshed = kotlin.time.Clock.System.now().toEpochMilliseconds(),
             userId = customerInfo.originalAppUserId
         )
     }

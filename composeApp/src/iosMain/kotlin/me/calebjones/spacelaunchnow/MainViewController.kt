@@ -29,8 +29,8 @@ fun MainViewController() = ComposeUIViewController {
         startKoin(koinConfig)
         koinInitialized = true
         
-        // Initialize Billing immediately after Koin is ready (similar to Android)
-        CoroutineScope(Dispatchers.Main).launch {
+        // Initialize Billing on background thread to avoid blocking UI
+        CoroutineScope(Dispatchers.Default).launch {
             try {
                 val billingManager = getKoin().get<BillingManager>()
                 billingManager.initialize(appUserId = null)

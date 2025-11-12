@@ -4,8 +4,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Clock.System
 
 class UpdateLocalDataSource(
     database: SpaceLaunchDatabase
@@ -16,7 +16,7 @@ class UpdateLocalDataSource(
     private val cacheDuration = 6.hours
     
     suspend fun cacheUpdate(update: UpdateEndpoint) {
-        val now = System.now().toEpochMilliseconds()
+        val now = Clock.System.now().toEpochMilliseconds()
         val expiresAt = now + cacheDuration.inWholeMilliseconds
         
         queries.insertOrReplaceUpdate(
@@ -36,13 +36,13 @@ class UpdateLocalDataSource(
     }
     
     suspend fun getUpdate(id: Int): UpdateEndpoint? {
-        val now = System.now().toEpochMilliseconds()
+        val now = Clock.System.now().toEpochMilliseconds()
         val cached = queries.getUpdateById(id.toLong(), now).executeAsOneOrNull()
         return cached?.let { json.decodeFromString<UpdateEndpoint>(it.json_data) }
     }
     
     suspend fun getRecentUpdates(limit: Int): List<UpdateEndpoint> {
-        val now = System.now().toEpochMilliseconds()
+        val now = Clock.System.now().toEpochMilliseconds()
         return queries.getRecentUpdates(now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
@@ -55,7 +55,7 @@ class UpdateLocalDataSource(
     }
     
     suspend fun deleteExpiredUpdates() {
-        val now = System.now().toEpochMilliseconds()
+        val now = Clock.System.now().toEpochMilliseconds()
         queries.deleteExpiredUpdates(now)
     }
     

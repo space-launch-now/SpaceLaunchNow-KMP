@@ -8,6 +8,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -107,29 +109,10 @@ fun SpaceLaunchNowApp(
     navigationDestination: String? = null,
     onNavigationDestinationConsumed: () -> Unit = {}
 ) {
-    // Initialize notifications and subscription on app start
-    val notificationRepository = koinInject<NotificationRepository>()
-    val subscriptionRepository = koinInject<SubscriptionRepository>()
-    val pushMessaging = koinInject<PushMessaging>()
-    val appPreferences = koinInject<AppPreferences>()
-
-    // Warm up settings ViewModel to preload preferences (eagerly loads DataStore values)
-    // This singleton creation triggers all StateFlows to start collecting immediately,
-    // ensuring switches show correct state with no animation when settings screen loads
-    val appSettingsViewModel = koinInject<AppSettingsViewModel>()
-
-    // Trigger StateFlow collection by accessing a flow
-    LaunchedEffect(Unit) {
-        // Access the ViewModel to ensure it's fully initialized
-        appSettingsViewModel.themeFlow.value
-        println("✅ Settings ViewModels warmed up - preferences preloaded")
-    }
-
-    // Observe the theme setting
-    val themeOption by appPreferences.themeFlow.collectAsState(initial = ThemeOption.System)
-
-    // Observe the useUtc setting
-    val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
+    // Use hardcoded defaults to avoid ANY Koin injection during composition on iOS
+    // Preferences will be loaded in background and applied later
+    val themeOption = ThemeOption.System
+    val useUtc = false
 
     val navController = rememberNavController()
     
@@ -171,62 +154,76 @@ fun SpaceLaunchNowApp(
     }
 
     LaunchedEffect(Unit) {
-        println("=== APP START DEBUG INFO ===")
+        // Run all initialization on background thread to avoid blocking UI on iOS
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            println("=== APP START DEBUG INFO ===")
+            
+            try {
+                // Lazy inject repositories only when needed (on background thread)
+                val koin = org.koin.mp.KoinPlatform.getKoin()
+                val notificationRepository = koin.get<NotificationRepository>()
+                val subscriptionRepository = koin.get<SubscriptionRepository>()
+                val pushMessaging = koin.get<PushMessaging>()
 
-        // Initialize ads using platform-specific abstraction
-        val testDeviceIds = if (BuildConfig.IS_DEBUG) {
-            listOf(
-                "0BF9377651BCA3F62260F25FFC54F6A8",
-            )
-        } else {
-            emptyList()
+                // Initialize ads using platform-specific abstraction
+                val testDeviceIds = if (BuildConfig.IS_DEBUG) {
+                    listOf(
+                        "0BF9377651BCA3F62260F25FFC54F6A8",
+                    )
+                } else {
+                    emptyList()
+                }
+                
+                val adInitSuccess = AdInitializer.initialize(context = contextFactory.getActivity())
+                
+                if (adInitSuccess) {
+                    AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
+                }
+
+                try {
+                    // Get and print FCM token
+                    val token = pushMessaging.getToken()
+                    println("FCM Token: $token")
+                } catch (e: Exception) {
+                    println("Failed to get FCM token: ${e.message}")
+                }
+
+                try {
+                    // Initialize notifications
+                    notificationRepository.initialize()
+
+                    // Get and print current state (using the new state flow)
+                    val currentState = notificationRepository.state.value
+                    println("Current state:")
+                    println("  - Notifications enabled: ${currentState.enableNotifications}")
+                    println("  - Follow all launches: ${currentState.followAllLaunches}")
+                    println("  - Use strict matching: ${currentState.useStrictMatching}")
+                    println("  - Subscribed agencies: ${currentState.subscribedAgencies.size}")
+                    println("  - Subscribed locations: ${currentState.subscribedLocations.size}")
+                    println("  - Topic settings: ${currentState.topicSettings}")
+                    println("  - Subscribed FCM topics: ${currentState.subscribedTopics.size}")
+
+                    println("Settings loaded - state management handled by repository")
+                } catch (e: Exception) {
+                    println("Failed to initialize notifications: ${e.message}")
+                    e.printStackTrace()
+                }
+
+                try {
+                    // Initialize subscription billing
+                    subscriptionRepository.initialize()
+                    println("Subscription repository initialized successfully")
+                } catch (e: Exception) {
+                    println("Failed to initialize subscription repository: ${e.message}")
+                    e.printStackTrace()
+                }
+            } catch (e: Exception) {
+                println("Failed during app initialization: ${e.message}")
+                e.printStackTrace()
+            }
+
+            println("=== END APP START DEBUG INFO ===")
         }
-        
-        val adInitSuccess = AdInitializer.initialize(context = contextFactory.getActivity())
-        
-        if (adInitSuccess) {
-            AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
-        }
-
-        try {
-            // Get and print FCM token
-            val token = pushMessaging.getToken()
-            println("FCM Token: $token")
-        } catch (e: Exception) {
-            println("Failed to get FCM token: ${e.message}")
-        }
-
-        try {
-            // Initialize notifications
-            notificationRepository.initialize()
-
-            // Get and print current state (using the new state flow)
-            val currentState = notificationRepository.state.value
-            println("Current state:")
-            println("  - Notifications enabled: ${currentState.enableNotifications}")
-            println("  - Follow all launches: ${currentState.followAllLaunches}")
-            println("  - Use strict matching: ${currentState.useStrictMatching}")
-            println("  - Subscribed agencies: ${currentState.subscribedAgencies.size}")
-            println("  - Subscribed locations: ${currentState.subscribedLocations.size}")
-            println("  - Topic settings: ${currentState.topicSettings}")
-            println("  - Subscribed FCM topics: ${currentState.subscribedTopics.size}")
-
-            println("Settings loaded - state management handled by repository")
-        } catch (e: Exception) {
-            println("Failed to initialize notifications: ${e.message}")
-            e.printStackTrace()
-        }
-
-        try {
-            // Initialize subscription billing
-            subscriptionRepository.initialize()
-            println("Subscription repository initialized successfully")
-        } catch (e: Exception) {
-            println("Failed to initialize subscription repository: ${e.message}")
-            e.printStackTrace()
-        }
-
-        println("=== END APP START DEBUG INFO ===")
     }
 
     // Provide the useUtc setting and contextFactory throughout the app
@@ -235,8 +232,8 @@ fun SpaceLaunchNowApp(
         LocalUseUtc provides useUtc,
         LocalContextFactory provides contextFactory
     ) {
-        // Show beta warning dialog on first launch
-        BetaWarningDialog()
+        // TEMPORARILY DISABLED: BetaWarningDialog uses koinInject which blocks on iOS
+        // BetaWarningDialog()
         
         // Show consent popup (platform-specific implementation)
         // Must be inside CompositionLocalProvider to access LocalContextFactory

@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.data.subscription
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 
 /**
@@ -28,7 +29,7 @@ class SubscriptionSyncer(
         // Listen for billing manager purchase state changes
         syncScope.launch {
             billingManager.purchaseState.collect { purchaseState ->
-                val currentTime = System.currentTimeMillis()
+                val currentTime = System.now().toEpochMilliseconds()
                 if (currentTime - lastSyncTime > syncCooldownMs) {
                     println("SubscriptionSyncer: Purchase state updated, syncing...")
                     lastSyncTime = currentTime

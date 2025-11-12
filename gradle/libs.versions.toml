@@ -70,7 +70,7 @@ workRuntime = "2.11.0"
 purchases-kmp = "1.9.0+14.3.0"
 shadowglow = "1.0.0"
 kstore = "1.0.0"
-sqldelight = "2.0.2"
+sqldelight = "2.1.0"
 
 # Basic Ads (Google AdMob for KMP)
 basic-ads = "0.2.7"
