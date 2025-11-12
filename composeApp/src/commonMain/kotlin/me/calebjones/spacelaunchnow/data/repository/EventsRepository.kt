@@ -9,7 +9,7 @@ interface EventsRepository {
     /**
      * Get a list of upcoming events
      */
-    suspend fun getUpcomingEvents(limit: Int = 10): Result<PaginatedEventEndpointNormalList>
+    suspend fun getUpcomingEvents(limit: Int = 10, forceRefresh: Boolean = false): Result<PaginatedEventEndpointNormalList>
     
     /**
      * Get events by type

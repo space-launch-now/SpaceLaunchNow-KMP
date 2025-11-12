@@ -186,7 +186,7 @@ class IosBillingManager : BillingManager {
             }
         }
         
-        val subscriptionType = determineSubscriptionType(activeEntitlements)
+        val subscriptionType = determineSubscriptionType(activeEntitlements, productIds)
         val features = determineFeatures(subscriptionType)
         
         println("IosBillingManager: 📊 Purchase state:")
@@ -206,23 +206,37 @@ class IosBillingManager : BillingManager {
         )
     }
     
-    private fun determineSubscriptionType(entitlements: Set<String>): SubscriptionType {
-        val type = when {
+    private fun determineSubscriptionType(entitlements: Set<String>, productIds: Set<String>): SubscriptionType {
+        // Check entitlements first (most reliable)
+        return when {
+            // Check for premium entitlement (all variations)
             entitlements.contains("premium") -> SubscriptionType.PREMIUM
+            entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_PRO) -> SubscriptionType.PREMIUM
+            
+            // Check for lifetime/founder entitlements (all variations)
             entitlements.contains("founder") -> SubscriptionType.LIFETIME
+            entitlements.contains("lifetime") -> SubscriptionType.LIFETIME
+            entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_LIFETIME) -> SubscriptionType.LIFETIME
+            
+            // Check for legacy entitlement
+            entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_LEGACY) -> SubscriptionType.LEGACY
+            
+            // Fallback to product ID matching for legacy purchases
+            productIds.any { it.contains("lifetime", ignoreCase = true) } -> SubscriptionType.LIFETIME
+            productIds.any { 
+                it == "spacelaunchnow_pro" || 
+                it.contains("yearly", ignoreCase = true) || 
+                it.contains("monthly", ignoreCase = true)
+            } -> SubscriptionType.PREMIUM
+            
+            // Check for any active subscription or purchase (legacy)
+            productIds.isNotEmpty() -> SubscriptionType.LEGACY
+            
             else -> SubscriptionType.FREE
         }
-        println("IosBillingManager: 🎯 Determined subscription type: $type from entitlements: $entitlements")
-        return type
     }
     
     private fun determineFeatures(type: SubscriptionType): Set<PremiumFeature> {
-        val features = when (type) {
-            SubscriptionType.FREE -> emptySet()
-            SubscriptionType.PREMIUM, SubscriptionType.LIFETIME -> PremiumFeature.entries.toSet()
-            SubscriptionType.LEGACY -> PremiumFeature.getBasicFeatures()
-        }
-        println("IosBillingManager: ✨ Features for $type: $features")
-        return features
+        return PremiumFeature.getFeaturesForType(type)
     }
 }

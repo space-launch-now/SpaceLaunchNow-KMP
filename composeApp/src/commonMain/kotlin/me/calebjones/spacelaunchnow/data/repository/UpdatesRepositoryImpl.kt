@@ -27,20 +27,23 @@ class UpdatesRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestUpdates(limit: Int): Result<PaginatedUpdateEndpointList> {
+    override suspend fun getLatestUpdates(limit: Int, forceRefresh: Boolean): Result<PaginatedUpdateEndpointList> {
         return try {
-            // Try cache first if available
-            val cachedUpdates = localDataSource?.getRecentUpdates(limit)
-            if (cachedUpdates != null && cachedUpdates.isNotEmpty()) {
-                println("UpdatesRepository: Returning ${cachedUpdates.size} cached updates")
-                return Result.success(PaginatedUpdateEndpointList(
-                    count = cachedUpdates.size,
-                    next = null,
-                    previous = null,
-                    results = cachedUpdates
-                ))
+            // Try cache first if available and not forcing refresh
+            if (!forceRefresh) {
+                val cachedUpdates = localDataSource?.getRecentUpdates(limit)
+                if (cachedUpdates != null && cachedUpdates.isNotEmpty()) {
+                    println("UpdatesRepository: Returning ${cachedUpdates.size} cached updates")
+                    return Result.success(PaginatedUpdateEndpointList(
+                        count = cachedUpdates.size,
+                        next = null,
+                        previous = null,
+                        results = cachedUpdates
+                    ))
+                }
             }
             
+            println("UpdatesRepository: Fetching updates from API (forceRefresh: $forceRefresh)")
             val response = updatesApi.getLatestUpdates(limit = limit)
             val updates = response.body()
             

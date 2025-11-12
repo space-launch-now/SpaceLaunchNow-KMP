@@ -31,21 +31,23 @@ class ArticlesRepositoryImpl(
         }
     }
 
-    override suspend fun getArticles(limit: Int): Result<PaginatedArticleList> {
+    override suspend fun getArticles(limit: Int, forceRefresh: Boolean): Result<PaginatedArticleList> {
         return try {
-            // Try cache first if available
-            val cachedArticles = localDataSource?.getRecentArticles(limit)
-            if (cachedArticles != null && cachedArticles.isNotEmpty()) {
-                println("ArticlesRepository: Returning ${cachedArticles.size} cached articles")
-                return Result.success(PaginatedArticleList(
-                    count = cachedArticles.size,
-                    next = null,
-                    previous = null,
-                    results = cachedArticles
-                ))
+            // Try cache first if available and not forcing refresh
+            if (!forceRefresh) {
+                val cachedArticles = localDataSource?.getRecentArticles(limit)
+                if (cachedArticles != null && cachedArticles.isNotEmpty()) {
+                    println("ArticlesRepository: Returning ${cachedArticles.size} cached articles")
+                    return Result.success(PaginatedArticleList(
+                        count = cachedArticles.size,
+                        next = null,
+                        previous = null,
+                        results = cachedArticles
+                    ))
+                }
             }
             
-            println("=== ArticlesRepository: Fetching articles from API (limit: $limit) ===")
+            println("=== ArticlesRepository: Fetching articles from API (limit: $limit, forceRefresh: $forceRefresh) ===")
             
             val response = articlesApi.getArticles(
                 limit = limit

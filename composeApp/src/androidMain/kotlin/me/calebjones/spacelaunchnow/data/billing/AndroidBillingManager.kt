@@ -253,6 +253,8 @@ class AndroidBillingManager(
      * Update purchase state from RevenueCat CustomerInfo
      */
     private fun updatePurchaseState(customerInfo: CustomerInfo) {
+        println("AndroidBillingManager: 📊 Updating purchase state...")
+        
         val activeEntitlements = customerInfo.entitlements.active.keys
         
         // Collect all product IDs from various sources
@@ -271,6 +273,12 @@ class AndroidBillingManager(
         
         val subscriptionType = determineSubscriptionType(activeEntitlements, productIds)
         val features = determineFeatures(subscriptionType)
+        
+        println("AndroidBillingManager: 📊 Purchase state:")
+        println("  • Subscription Type: $subscriptionType")
+        println("  • Active Entitlements: $activeEntitlements")
+        println("  • Product IDs: $productIds")
+        println("  • Features: ${features.size} features")
         
         _purchaseState.value = PurchaseState(
             isSubscribed = subscriptionType != SubscriptionType.FREE,
@@ -293,8 +301,6 @@ class AndroidBillingManager(
                 "has_premium" to (subscriptionType != SubscriptionType.FREE)
             )
         )
-        
-        println("AndroidBillingManager: Updated purchase state - type=$subscriptionType, entitlements=$activeEntitlements, products=$productIds")
     }
     
     /**
@@ -306,9 +312,17 @@ class AndroidBillingManager(
     ): SubscriptionType {
         // Check entitlements first (most reliable)
         return when {
+            // Check for premium entitlement (all variations)
             entitlements.contains("premium") -> SubscriptionType.PREMIUM
+            entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_PRO) -> SubscriptionType.PREMIUM
+            
+            // Check for lifetime/founder entitlements (all variations)
             entitlements.contains("founder") -> SubscriptionType.LIFETIME
             entitlements.contains("lifetime") -> SubscriptionType.LIFETIME
+            entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_LIFETIME) -> SubscriptionType.LIFETIME
+            
+            // Check for legacy entitlement
+            entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_LEGACY) -> SubscriptionType.LEGACY
             
             // Fallback to product ID matching for legacy purchases
             productIds.any { it.contains("lifetime", ignoreCase = true) } -> SubscriptionType.LIFETIME
@@ -318,7 +332,7 @@ class AndroidBillingManager(
                 it.contains("monthly", ignoreCase = true)
             } -> SubscriptionType.PREMIUM
             
-            // Check for any active subscription or purchase
+            // Check for any active subscription or purchase (legacy)
             productIds.isNotEmpty() -> SubscriptionType.LEGACY
             
             else -> SubscriptionType.FREE
