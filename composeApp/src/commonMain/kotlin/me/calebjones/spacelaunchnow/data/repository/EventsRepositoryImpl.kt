@@ -14,21 +14,23 @@ class EventsRepositoryImpl(
     private val localDataSource: EventLocalDataSource? = null
 ) : EventsRepository {
     
-    override suspend fun getUpcomingEvents(limit: Int): Result<PaginatedEventEndpointNormalList> {
+    override suspend fun getUpcomingEvents(limit: Int, forceRefresh: Boolean): Result<PaginatedEventEndpointNormalList> {
         return try {
-            // Try cache first if available
-            val cachedEvents = localDataSource?.getUpcomingEvents(limit)
-            if (cachedEvents != null && cachedEvents.isNotEmpty()) {
-                println("EventsRepository: Returning ${cachedEvents.size} cached upcoming events")
-                return Result.success(PaginatedEventEndpointNormalList(
-                    count = cachedEvents.size,
-                    next = null,
-                    previous = null,
-                    results = cachedEvents
-                ))
+            // Try cache first if available and not forcing refresh
+            if (!forceRefresh) {
+                val cachedEvents = localDataSource?.getUpcomingEvents(limit)
+                if (cachedEvents != null && cachedEvents.isNotEmpty()) {
+                    println("EventsRepository: Returning ${cachedEvents.size} cached upcoming events")
+                    return Result.success(PaginatedEventEndpointNormalList(
+                        count = cachedEvents.size,
+                        next = null,
+                        previous = null,
+                        results = cachedEvents
+                    ))
+                }
             }
             
-            println("=== EventsRepository: Getting upcoming events from API ===")
+            println("=== EventsRepository: Getting upcoming events from API (forceRefresh: $forceRefresh) ===")
             println("Limit: $limit")
             
             val response = eventsApi.getUpcomingEvents(

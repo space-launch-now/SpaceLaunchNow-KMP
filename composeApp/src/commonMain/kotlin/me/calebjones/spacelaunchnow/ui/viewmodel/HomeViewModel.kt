@@ -342,7 +342,7 @@ class HomeViewModel(
                 _isUpdatesLoading.value = true
                 _updatesError.value = null
 
-                val result = updatesRepository.getLatestUpdates(limit = limit)
+                val result = updatesRepository.getLatestUpdates(limit = limit, forceRefresh = forceRefresh)
                 
                 result.onSuccess { paginatedUpdates: PaginatedUpdateEndpointList ->
                     println("=== HomeViewModel: Received Updates ===")
@@ -379,7 +379,7 @@ class HomeViewModel(
                 _isArticlesLoading.value = true
                 _articlesError.value = null
 
-                val result = articlesRepository.getArticles(limit = limit)
+                val result = articlesRepository.getArticles(limit = limit, forceRefresh = forceRefresh)
                 
                 result.onSuccess { paginatedArticles: PaginatedArticleList ->
                     println("=== HomeViewModel: Received Articles ===")
@@ -413,7 +413,7 @@ class HomeViewModel(
                 _isEventsLoading.value = true
                 _eventsError.value = null
 
-                val result = eventsRepository.getUpcomingEvents(limit = limit)
+                val result = eventsRepository.getUpcomingEvents(limit = limit, forceRefresh = forceRefresh)
                 
                 result.onSuccess { paginatedEvents: PaginatedEventEndpointNormalList ->
                     println("=== HomeViewModel: Received Events ===")

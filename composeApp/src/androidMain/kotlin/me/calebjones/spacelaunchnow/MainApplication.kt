@@ -15,6 +15,7 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import me.calebjones.spacelaunchnow.workers.WidgetUpdateWorker
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -81,17 +82,36 @@ class MainApplication : Application() {
             // Don't crash the app if Datadog fails
         }
 
-        // Initialize Billing after Koin is ready
-        Log.d("MainApplication", "Initializing Billing...")
+        // Initialize Billing and Subscription system after Koin is ready
+        Log.d("MainApplication", "Initializing Billing and Subscription system...")
 
         @Suppress("OPT_IN_USAGE")
         kotlinx.coroutines.GlobalScope.launch {
             try {
-                // Initialize with null appUserId for anonymous user
+                Log.d("MainApplication", "🚀 Starting billing and subscription initialization...")
+                
+                // Step 1: Initialize BillingManager (RevenueCat)
                 billingManager.initialize(appUserId = null)
-                Log.d("MainApplication", "✅ Billing initialized successfully")
+                Log.d("MainApplication", "✅ BillingManager initialized successfully")
+                
+                // Step 2: Initialize and start SubscriptionSyncer
+                // This listens to billing state changes and persists to LocalSubscriptionStorage
+                val syncer = getKoin().get<me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer>()
+                syncer.startSyncing()
+                Log.d("MainApplication", "✅ SubscriptionSyncer started successfully")
+                
+                // Step 3: Initialize SubscriptionRepository (loads cached state)
+                val repository = getKoin().get<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
+                repository.initialize()
+                Log.d("MainApplication", "✅ SubscriptionRepository initialized successfully")
+                
+                // Step 4: Force initial sync to ensure purchase state is persisted
+                syncer.syncNow()
+                Log.d("MainApplication", "✅ Initial subscription sync complete")
+                
+                Log.d("MainApplication", "🎉 All billing and subscription systems initialized")
             } catch (e: Exception) {
-                Log.e("MainApplication", "❌ Failed to initialize Billing", e)
+                Log.e("MainApplication", "❌ Failed to initialize Billing/Subscription system", e)
                 // Don't crash the app if billing fails
             }
         }
