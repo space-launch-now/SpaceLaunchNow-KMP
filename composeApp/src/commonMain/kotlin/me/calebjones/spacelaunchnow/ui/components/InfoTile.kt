@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /**
@@ -88,28 +87,6 @@ fun InfoTile(
     }
 }
 
-@Preview
-@Composable
-private fun InfoTilePreview() {
-    MaterialTheme {
-        Surface {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                InfoTile(
-                    icon = Icons.Filled.CalendarToday,
-                    label = "Founded",
-                    value = "1958",
-                    modifier = Modifier.weight(1f)
-                )
-                InfoTile(
-                    icon = Icons.Filled.CalendarToday,
-                    label = "Type",
-                    value = "Government",
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-    }
-}
+// Preview removed - use platform-specific previews if needed
+// Android: Create InfoTilePreview.android.kt with @Preview annotation
+// Desktop: Use desktop preview features

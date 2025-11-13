@@ -31,9 +31,27 @@ object NumberFormatUtil {
     fun formatNumberWithUnit(value: Double, unit: String): String {
         return "${formatNumber(value)} $unit"
     }
+
+    /**
+     * Formats a decimal number with specified number of decimal places.
+     * Examples: formatDecimal(1234.5678, 1) -> "1234.6" or "1234,6" (depending on locale)
+     */
+    fun formatDecimal(value: Double, decimalPlaces: Int): String = 
+        platformFormatDecimal(value, decimalPlaces)
+
+    /**
+     * Formats a decimal number with specified number of decimal places.
+     */
+    fun formatDecimal(value: Float, decimalPlaces: Int): String = 
+        platformFormatDecimal(value.toDouble(), decimalPlaces)
 }
 
 /**
  * Platform-specific number formatting implementation.
  */
 internal expect fun platformFormatNumber(value: Int): String
+
+/**
+ * Platform-specific decimal formatting implementation.
+ */
+internal expect fun platformFormatDecimal(value: Double, decimalPlaces: Int): String

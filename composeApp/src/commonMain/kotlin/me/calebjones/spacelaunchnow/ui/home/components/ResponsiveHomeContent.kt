@@ -404,7 +404,6 @@ fun ResponsiveHomeContent(
                 SmartBannerAd(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     placementType = AdPlacementType.INTERSTITIAL, // Between content sections
                     showRemoveAdsButton = true,

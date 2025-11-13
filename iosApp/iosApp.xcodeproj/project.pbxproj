@@ -34,6 +34,22 @@
 		3CE6841E2E9D513C00AA177C /* PurchasesHybridCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 3CE6841D2E9D513C00AA177C /* PurchasesHybridCommon */; };
 		3CE684202E9D513C00AA177C /* PurchasesHybridCommonUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3CE6841F2E9D513C00AA177C /* PurchasesHybridCommonUI */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		F907BC472EC389C800C05E19 /* DatadogCore in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC462EC389C800C05E19 /* DatadogCore */; };
+		F907BC492EC389C800C05E19 /* DatadogCrashReporting in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC482EC389C800C05E19 /* DatadogCrashReporting */; };
+		F907BC4B2EC389C800C05E19 /* DatadogFlags in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC4A2EC389C800C05E19 /* DatadogFlags */; };
+		F907BC4D2EC389C800C05E19 /* DatadogLogs in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC4C2EC389C800C05E19 /* DatadogLogs */; };
+		F907BC4F2EC389C800C05E19 /* DatadogRUM in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC4E2EC389C800C05E19 /* DatadogRUM */; };
+		F907BC512EC38A3F00C05E19 /* DatadogSessionReplay in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC502EC38A3F00C05E19 /* DatadogSessionReplay */; };
+		F907BC532EC38A3F00C05E19 /* DatadogTrace in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC522EC38A3F00C05E19 /* DatadogTrace */; };
+		F907BC552EC38A3F00C05E19 /* DatadogWebViewTracking in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC542EC38A3F00C05E19 /* DatadogWebViewTracking */; };
+		F907BC572EC38A4800C05E19 /* DatadogCore in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC562EC38A4800C05E19 /* DatadogCore */; };
+		F907BC592EC38A4800C05E19 /* DatadogCrashReporting in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC582EC38A4800C05E19 /* DatadogCrashReporting */; };
+		F907BC5B2EC38A4800C05E19 /* DatadogFlags in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC5A2EC38A4800C05E19 /* DatadogFlags */; };
+		F907BC5D2EC38A4800C05E19 /* DatadogLogs in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC5C2EC38A4800C05E19 /* DatadogLogs */; };
+		F907BC5F2EC38A4800C05E19 /* DatadogRUM in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC5E2EC38A4800C05E19 /* DatadogRUM */; };
+		F907BC612EC38A4800C05E19 /* DatadogSessionReplay in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC602EC38A4800C05E19 /* DatadogSessionReplay */; };
+		F907BC632EC38A4800C05E19 /* DatadogTrace in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC622EC38A4800C05E19 /* DatadogTrace */; };
+		F907BC652EC38A4800C05E19 /* DatadogWebViewTracking in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC642EC38A4800C05E19 /* DatadogWebViewTracking */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,11 +121,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F907BC572EC38A4800C05E19 /* DatadogCore in Frameworks */,
+				F907BC612EC38A4800C05E19 /* DatadogSessionReplay in Frameworks */,
+				F907BC652EC38A4800C05E19 /* DatadogWebViewTracking in Frameworks */,
 				3C2B8C842EB3C13800CB87C4 /* GoogleMobileAds in Frameworks */,
+				F907BC5B2EC38A4800C05E19 /* DatadogFlags in Frameworks */,
 				3C2F71672E9379750026D5CD /* ComposeApp.framework in Frameworks */,
+				F907BC632EC38A4800C05E19 /* DatadogTrace in Frameworks */,
 				3C2F71432E936FBD0026D5CD /* SwiftUI.framework in Frameworks */,
+				F907BC5F2EC38A4800C05E19 /* DatadogRUM in Frameworks */,
+				F907BC592EC38A4800C05E19 /* DatadogCrashReporting in Frameworks */,
 				3C35B9622EA9816900E28A01 /* PurchasesHybridCommonUI in Frameworks */,
 				3C35B9602EA9816900E28A01 /* PurchasesHybridCommon in Frameworks */,
+				F907BC5D2EC38A4800C05E19 /* DatadogLogs in Frameworks */,
 				3C2F71422E936FBD0026D5CD /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -118,12 +142,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F907BC552EC38A3F00C05E19 /* DatadogWebViewTracking in Frameworks */,
+				F907BC492EC389C800C05E19 /* DatadogCrashReporting in Frameworks */,
+				F907BC4F2EC389C800C05E19 /* DatadogRUM in Frameworks */,
 				3CC6E4CB2EAC8A84002F6FE9 /* FirebaseAnalyticsIdentitySupport in Frameworks */,
+				F907BC532EC38A3F00C05E19 /* DatadogTrace in Frameworks */,
+				F907BC4D2EC389C800C05E19 /* DatadogLogs in Frameworks */,
 				3CC6E4C52EAC8A84002F6FE9 /* FirebaseAI in Frameworks */,
 				3C7AFD342EADADF0002FEDEE /* FirebaseMessaging in Frameworks */,
 				3C35B95B2EA97E1B00E28A01 /* GoogleMobileAds in Frameworks */,
 				3CC6E4C72EAC8A84002F6FE9 /* FirebaseAnalytics in Frameworks */,
 				3CE684202E9D513C00AA177C /* PurchasesHybridCommonUI in Frameworks */,
+				F907BC512EC38A3F00C05E19 /* DatadogSessionReplay in Frameworks */,
+				F907BC4B2EC389C800C05E19 /* DatadogFlags in Frameworks */,
+				F907BC472EC389C800C05E19 /* DatadogCore in Frameworks */,
 				3C35B95E2EA97ED900E28A01 /* GoogleUserMessagingPlatform in Frameworks */,
 				3CC6E4C92EAC8A84002F6FE9 /* FirebaseAnalyticsCore in Frameworks */,
 				3CC6E4CD2EAC8A84002F6FE9 /* FirebaseAppCheck in Frameworks */,
@@ -222,6 +254,14 @@
 				3C35B95F2EA9816900E28A01 /* PurchasesHybridCommon */,
 				3C35B9612EA9816900E28A01 /* PurchasesHybridCommonUI */,
 				3C2B8C832EB3C13800CB87C4 /* GoogleMobileAds */,
+				F907BC562EC38A4800C05E19 /* DatadogCore */,
+				F907BC582EC38A4800C05E19 /* DatadogCrashReporting */,
+				F907BC5A2EC38A4800C05E19 /* DatadogFlags */,
+				F907BC5C2EC38A4800C05E19 /* DatadogLogs */,
+				F907BC5E2EC38A4800C05E19 /* DatadogRUM */,
+				F907BC602EC38A4800C05E19 /* DatadogSessionReplay */,
+				F907BC622EC38A4800C05E19 /* DatadogTrace */,
+				F907BC642EC38A4800C05E19 /* DatadogWebViewTracking */,
 			);
 			productName = LaunchWidgetExtension;
 			productReference = 3C2F71412E936FBD0026D5CD /* LaunchWidgetExtension.appex */;
@@ -254,6 +294,14 @@
 				3CC6E4CA2EAC8A84002F6FE9 /* FirebaseAnalyticsIdentitySupport */,
 				3CC6E4CC2EAC8A84002F6FE9 /* FirebaseAppCheck */,
 				3C7AFD332EADADF0002FEDEE /* FirebaseMessaging */,
+				F907BC462EC389C800C05E19 /* DatadogCore */,
+				F907BC482EC389C800C05E19 /* DatadogCrashReporting */,
+				F907BC4A2EC389C800C05E19 /* DatadogFlags */,
+				F907BC4C2EC389C800C05E19 /* DatadogLogs */,
+				F907BC4E2EC389C800C05E19 /* DatadogRUM */,
+				F907BC502EC38A3F00C05E19 /* DatadogSessionReplay */,
+				F907BC522EC38A3F00C05E19 /* DatadogTrace */,
+				F907BC542EC38A3F00C05E19 /* DatadogWebViewTracking */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* SpaceLaunchNow.app */;
@@ -267,7 +315,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 2600;
 				ORGANIZATIONNAME = orgName;
 				TargetAttributes = {
 					3C2F71402E936FBD0026D5CD = {
@@ -292,6 +340,7 @@
 				3C35B9592EA97E1B00E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 				3C35B95C2EA97ED900E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */,
 				3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -408,7 +457,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 4T4QRN2U5X;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -450,7 +498,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4T4QRN2U5X;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -516,6 +563,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4T4QRN2U5X;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -538,6 +586,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -579,6 +628,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4T4QRN2U5X;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -594,6 +644,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
@@ -609,7 +660,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = 4T4QRN2U5X;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -622,7 +672,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lsqlite3",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = me.spacelaunchnow.spacelaunchnow;
 				PRODUCT_NAME = "${APP_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -640,7 +693,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = 4T4QRN2U5X;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -653,7 +705,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lsqlite3",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = me.spacelaunchnow.spacelaunchnow;
 				PRODUCT_NAME = "${APP_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "$(APP_PROVISIONING_PROFILE)";
@@ -724,7 +779,15 @@
 			repositoryURL = "https://github.com/RevenueCat/purchases-hybrid-common";
 			requirement = {
 				kind = exactVersion;
-				version = 17.10.0;
+				version = 14.3.0;
+			};
+		};
+		F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/DataDog/dd-sdk-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -794,6 +857,86 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3CE6841C2E9D513C00AA177C /* XCRemoteSwiftPackageReference "purchases-hybrid-common" */;
 			productName = PurchasesHybridCommonUI;
+		};
+		F907BC462EC389C800C05E19 /* DatadogCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogCore;
+		};
+		F907BC482EC389C800C05E19 /* DatadogCrashReporting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogCrashReporting;
+		};
+		F907BC4A2EC389C800C05E19 /* DatadogFlags */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogFlags;
+		};
+		F907BC4C2EC389C800C05E19 /* DatadogLogs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogLogs;
+		};
+		F907BC4E2EC389C800C05E19 /* DatadogRUM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogRUM;
+		};
+		F907BC502EC38A3F00C05E19 /* DatadogSessionReplay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogSessionReplay;
+		};
+		F907BC522EC38A3F00C05E19 /* DatadogTrace */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogTrace;
+		};
+		F907BC542EC38A3F00C05E19 /* DatadogWebViewTracking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogWebViewTracking;
+		};
+		F907BC562EC38A4800C05E19 /* DatadogCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogCore;
+		};
+		F907BC582EC38A4800C05E19 /* DatadogCrashReporting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogCrashReporting;
+		};
+		F907BC5A2EC38A4800C05E19 /* DatadogFlags */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogFlags;
+		};
+		F907BC5C2EC38A4800C05E19 /* DatadogLogs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogLogs;
+		};
+		F907BC5E2EC38A4800C05E19 /* DatadogRUM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogRUM;
+		};
+		F907BC602EC38A4800C05E19 /* DatadogSessionReplay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogSessionReplay;
+		};
+		F907BC622EC38A4800C05E19 /* DatadogTrace */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogTrace;
+		};
+		F907BC642EC38A4800C05E19 /* DatadogWebViewTracking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
+			productName = DatadogWebViewTracking;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

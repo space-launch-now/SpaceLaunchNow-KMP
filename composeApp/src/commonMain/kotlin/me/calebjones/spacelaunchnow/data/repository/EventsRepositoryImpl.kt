@@ -1,19 +1,36 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
+import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.api.extensions.getEventList
 import me.calebjones.spacelaunchnow.api.extensions.getUpcomingEvents
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
+import me.calebjones.spacelaunchnow.database.EventLocalDataSource
 
 class EventsRepositoryImpl(
-    private val eventsApi: EventsApi
+    private val eventsApi: EventsApi,
+    private val localDataSource: EventLocalDataSource? = null
 ) : EventsRepository {
     
-    override suspend fun getUpcomingEvents(limit: Int): Result<PaginatedEventEndpointNormalList> {
+    override suspend fun getUpcomingEvents(limit: Int, forceRefresh: Boolean): Result<PaginatedEventEndpointNormalList> {
         return try {
-            println("=== EventsRepository: Getting upcoming events ===")
+            // Try cache first if available and not forcing refresh
+            if (!forceRefresh) {
+                val cachedEvents = localDataSource?.getUpcomingEvents(limit)
+                if (cachedEvents != null && cachedEvents.isNotEmpty()) {
+                    println("EventsRepository: Returning ${cachedEvents.size} cached upcoming events")
+                    return Result.success(PaginatedEventEndpointNormalList(
+                        count = cachedEvents.size,
+                        next = null,
+                        previous = null,
+                        results = cachedEvents
+                    ))
+                }
+            }
+            
+            println("=== EventsRepository: Getting upcoming events from API (forceRefresh: $forceRefresh) ===")
             println("Limit: $limit")
             
             val response = eventsApi.getUpcomingEvents(
@@ -22,11 +39,40 @@ class EventsRepositoryImpl(
             )
             
             println("Response status: ${response.status}")
-            println("Events count: ${response.body().results.size}")
+            val events = response.body()
+            println("Events count: ${events.results.size}")
             
-            Result.success(response.body())
+            // Cache the results for future use
+            localDataSource?.cacheEvents(events.results)
+            println("EventsRepository: Cached ${events.results.size} upcoming events from API")
+            
+            Result.success(events)
         } catch (e: ResponseException) {
             println("API Error: Status ${e.response.status}, Message: ${e.message}")
+            // On error, try to return stale cache if available
+            val staleCached = localDataSource?.getUpcomingEvents(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("EventsRepository: Returning ${staleCached.size} stale cached events due to API error")
+                return Result.success(PaginatedEventEndpointNormalList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
+            Result.failure(e)
+        } catch (e: IOException) {
+            // On network error, try to return stale cache if available
+            val staleCached = localDataSource?.getUpcomingEvents(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("EventsRepository: Returning ${staleCached.size} stale cached events due to network error")
+                return Result.success(PaginatedEventEndpointNormalList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: Exception) {
             println("Failed to get upcoming events: ${e.message}")

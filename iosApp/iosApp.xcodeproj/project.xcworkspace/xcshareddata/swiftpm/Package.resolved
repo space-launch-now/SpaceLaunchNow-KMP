@@ -1,5 +1,5 @@
 {
-  "originHash" : "f4da47ce711cd3d663f5608b6c36a33239f11a7f8d5c93d1ce30cb167fe396e2",
+  "originHash" : "e1c3bae3c5ae00e27aa5a4c09fb816c890253477b9373a935d9a0bf580938a21",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "61b85103a1aeed8218f17c794687781505fbbef5",
         "version" : "11.2.0"
+      }
+    },
+    {
+      "identity" : "dd-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DataDog/dd-sdk-ios.git",
+      "state" : {
+        "revision" : "7936e47acebadbc8e221cade5d48a2ffc5ac8646",
+        "version" : "3.2.0"
       }
     },
     {
@@ -110,6 +119,24 @@
       }
     },
     {
+      "identity" : "opentelemetry-swift-packages",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DataDog/opentelemetry-swift-packages.git",
+      "state" : {
+        "revision" : "4a7295600d4ebb9525a23c11586c5fdb74ae8b7e",
+        "version" : "1.13.1"
+      }
+    },
+    {
+      "identity" : "plcrashreporter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/microsoft/plcrashreporter.git",
+      "state" : {
+        "revision" : "8c61e5e38e9f737dd68512ed1ea5ab081244ad65",
+        "version" : "1.12.0"
+      }
+    },
+    {
       "identity" : "promises",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/promises.git",
@@ -123,8 +150,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/RevenueCat/purchases-hybrid-common",
       "state" : {
-        "revision" : "9b51341561d5b4ac8d4455cd864525c748ea6269",
-        "version" : "17.10.0"
+        "revision" : "c0706c7ced7f5cec92fc15ad1384169f09e5fc73",
+        "version" : "14.3.0"
       }
     },
     {
@@ -132,8 +159,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/RevenueCat/purchases-ios-spm",
       "state" : {
-        "revision" : "249432af6b37a3665e26ea6f4ffc869dcd445f01",
-        "version" : "5.43.0"
+        "revision" : "9cb74af9c5e9b4e9c22a511d8df4481fa7e3de16",
+        "version" : "5.32.0"
       }
     },
     {

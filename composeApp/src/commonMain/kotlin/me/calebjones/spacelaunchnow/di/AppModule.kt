@@ -2,14 +2,11 @@ package me.calebjones.spacelaunchnow.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.revenuecat.purchases.kmp.Purchases
 import me.calebjones.spacelaunchnow.UserViewModel
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.UserRepository
 import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatBillingClient
-import me.calebjones.spacelaunchnow.data.billing.RevenueCatManager
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
@@ -37,6 +34,13 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
+import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
+import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
+import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
+import me.calebjones.spacelaunchnow.database.EventLocalDataSource
+import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
+import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
+import me.calebjones.spacelaunchnow.database.CacheCleanupService
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
@@ -71,11 +75,23 @@ val koinConfig = koinConfiguration {
 val appModule = module {
     singleOf(::UserRepositoryImpl) { bind<UserRepository>() }
     viewModelOf(::UserViewModel)
+    
+    // Database and local data sources
+    single { 
+        val driver = get<DatabaseDriverFactory>().createDriver()
+        SpaceLaunchDatabase(driver)
+    }
+    single { LaunchLocalDataSource(get()) }
+    single { EventLocalDataSource(get()) }
+    single { ArticleLocalDataSource(get()) }
+    single { UpdateLocalDataSource(get()) }
+    
     single<LaunchRepository> {
         LaunchRepositoryImpl(
             launchesApi = get(),
             agenciesApi = get(),
-            appPreferences = get()
+            appPreferences = get(),
+            localDataSource = get()
         )
     }
     viewModelOf(::LaunchViewModel)
@@ -87,11 +103,37 @@ val appModule = module {
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
-    singleOf(::ArticlesRepositoryImpl) { bind<ArticlesRepository>() }
-    singleOf(::EventsRepositoryImpl) { bind<EventsRepository>() }
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
+    single<ArticlesRepository> {
+        ArticlesRepositoryImpl(
+            articlesApi = get(),
+            localDataSource = get()
+        )
+    }
+    single<EventsRepository> {
+        EventsRepositoryImpl(
+            eventsApi = get(),
+            localDataSource = get()
+        )
+    }
+    single<UpdatesRepository> {
+        UpdatesRepositoryImpl(
+            updatesApi = get(),
+            localDataSource = get()
+        )
+    }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
+    
+    // Background cleanup task for expired cache entries
+    single {
+        CacheCleanupService(
+            launchDataSource = get(),
+            eventDataSource = get(),
+            articleDataSource = get(),
+            updateDataSource = get()
+        )
+    }
 
     // Global Ad Manager - Singleton managed by Koin
     single {
@@ -153,28 +195,20 @@ val appModule = module {
         )
     }
 
-    // RevenueCat dependencies - initialize first
-    singleOf(::RevenueCatManager)
-
-    // BillingClient now uses RevenueCat instead of platform-specific implementations
-    // Use lazy factory to avoid accessing Purchases.sharedInstance during Koin initialization
+    // Billing dependencies - platform-specific BillingManager is provided by platform modules
+    // BillingClient wrapper for backward compatibility
     single<BillingClient> {
-        val revenueCatManager = get<RevenueCatManager>()
-        BillingClient(
-            revenueCatClient = RevenueCatBillingClient(
-                revenueCatManager = revenueCatManager
-            )
-        )
+        BillingClient(billingManager = get())
     }
 
     // Local subscription storage (KStore)
     single { LocalSubscriptionStorage() }
     
-    // Subscription syncer (handles RevenueCat sync)
+    // Subscription syncer (uses BillingManager)
     single {
         SubscriptionSyncer(
             localStorage = get(),
-            revenueCatManager = get()
+            billingManager = get()
         )
     }
 
@@ -190,13 +224,8 @@ val appModule = module {
         )
     }
 
-    // SubscriptionViewModel with RevenueCatManager
-    single {
-        SubscriptionViewModel(
-            repository = get(),
-            revenueCatManager = get()
-        )
-    }
+    // SubscriptionViewModel - now uses BillingManager (Phase 7 complete!)
+    viewModelOf(::SubscriptionViewModel)
 
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
@@ -210,12 +239,7 @@ val debugModule = module {
         val debugDataStore = get<DataStore<Preferences>>(named("DebugDataStore"))
         DebugPreferences(debugDataStore)
     }
-    single {
-        DebugSettingsViewModel(
-            debugPreferences = get(),
-            revenueCatManager = get(),
-            launchRepository = get(),
-            notificationRepository = get()
-        )
-    }
+    
+    // DebugSettingsViewModel - now uses BillingManager (Phase 7 complete!)
+    viewModelOf(::DebugSettingsViewModel)
 }

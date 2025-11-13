@@ -1,6 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 
@@ -42,23 +40,18 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.openApiGenerator)
     alias(libs.plugins.aboutLibraries)
+    alias(libs.plugins.sqldelight)
     id("com.google.gms.google-services")
 }
 
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+        // JVM target configuration moved to compilations
     }
 
     jvm("desktop") {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+        // JVM target configuration moved to compilations
     }
 
     listOf(
@@ -104,7 +97,9 @@ kotlin {
 
                 // JDK cryptography provider for Desktop
                 implementation(libs.cryptography.provider.jdk)
-
+                
+                // SQLDelight JVM driver
+                implementation(libs.sqldelight.sqlite.driver)
 
             }
         }
@@ -149,6 +144,9 @@ kotlin {
                 implementation(libs.purchases.either)
                 implementation(libs.purchases.result)
                 implementation(libs.basicAds)
+                
+                // SQLDelight Android driver
+                implementation(libs.sqldelight.android.driver)
             }
         }
 
@@ -169,6 +167,9 @@ kotlin {
                 implementation(libs.purchases.result)
 
                 implementation(libs.basicAds)
+                
+                // SQLDelight iOS driver
+                implementation(libs.sqldelight.native.driver)
             }
         }
 
@@ -238,6 +239,10 @@ kotlin {
 
                 implementation(libs.dd.sdk.kotlin.multiplatform.rum)
                 implementation(libs.dd.sdk.kotlin.multiplatform.logs)
+                
+                // SQLDelight common runtime and coroutines
+                implementation(libs.sqldelight.runtime)
+                implementation(libs.sqldelight.coroutines)
 
                 // TODO remove
                 implementation(libs.purchases.core)
@@ -255,6 +260,13 @@ kotlin {
                 implementation(libs.ktor.client.mock)
             }
         }
+    }
+}
+
+// Configure JVM target for all compilations
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
 
@@ -491,6 +503,15 @@ tasks.whenTaskAdded {
                     bundle.renameTo(File(bundleDir, newName))
                 }
             }
+        }
+    }
+}
+
+// SQLDelight configuration
+sqldelight {
+    databases {
+        create("SpaceLaunchDatabase") {
+            packageName.set("me.calebjones.spacelaunchnow.database")
         }
     }
 }
