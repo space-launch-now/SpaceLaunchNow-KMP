@@ -17,7 +17,7 @@ jobs:
   # Job 1: Calculate version (no commit yet)
   version:
     name: Calculate Version & Changelog
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     outputs:
       version_name: ${{ steps.version.outputs.version_name }}
       version_code: ${{ steps.version.outputs.version_code }}
@@ -138,10 +138,7 @@ jobs:
   test:
     name: Run Tests
     needs: [ version ]
-    runs-on: ubuntu-latest-8-core  # Use larger runner for faster builds
-    
-    env:
-      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true -Dorg.gradle.caching=true -Dkotlin.incremental=true
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
@@ -227,9 +224,6 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Pre-compile dependencies for faster tests
-        run: ./gradlew compileDebugSources desktopMainClasses metadataMainClasses --parallel
-
       - name: Run unit tests
         run: ./gradlew test --parallel --continue --build-cache
 
@@ -246,7 +240,7 @@ jobs:
   commit:
     name: Commit Version & Tag
     needs: [ version, test ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
@@ -378,9 +372,6 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew :composeApp:bundleRelease \
-            --parallel \
-            --build-cache \
-            --continue \
             -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
@@ -399,7 +390,7 @@ jobs:
   deploy-play-store:
     name: Deploy to Play Store
     needs: [ version, build-aab ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
@@ -458,7 +449,7 @@ jobs:
   deploy-firebase:
     name: Deploy to Firebase
     needs: [ version, build-aab ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
@@ -513,7 +504,7 @@ jobs:
   create-release:
     name: Create GitHub Release
     needs: [ version, build-aab, deploy-play-store, deploy-firebase ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
