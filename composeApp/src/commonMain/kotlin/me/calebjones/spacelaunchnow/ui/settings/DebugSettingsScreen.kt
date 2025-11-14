@@ -694,12 +694,46 @@ fun DebugSettingsScreen(
                         val simpleRepo = subscriptionRepo as? SimpleSubscriptionRepository
                         var isSimulationActive by remember { mutableStateOf(false) }
                         
-                        // Check if we're in debug mode
+                        // Debug logging
                         LaunchedEffect(Unit) {
+                            println("🎭 SubscriptionRepository type: ${subscriptionRepo::class.simpleName}")
+                            println("🎭 SimpleSubscriptionRepository cast: ${if (simpleRepo != null) "✅ Success" else "❌ Failed"}")
+                        }
+                        
+                        // Check if we're in debug mode
+                        LaunchedEffect(subscriptionState) {
                             simpleRepo?.let {
                                 isSimulationActive = it.isInDebugMode()
+                                println("🎭 Debug Mode Check: isSimulationActive = $isSimulationActive")
                             }
                         }
+                        
+                        // Show error if repository can't be cast
+                        if (simpleRepo == null) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.errorContainer,
+                                shape = MaterialTheme.shapes.small
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text(
+                                        text = "⚠️ Subscription Simulation Not Available",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                    Text(
+                                        text = "Repository type: ${subscriptionRepo::class.simpleName}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                    Text(
+                                        text = "Expected: SimpleSubscriptionRepository",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                }
+                            }
+                        } else {
 
                         // Current state display
                         Surface(
@@ -885,6 +919,9 @@ fun DebugSettingsScreen(
                             ) {
                                 Text("🔧 Refresh Widget Access")
                             }
+                        }
+                        
+                        // Close the else block for simpleRepo != null
                         }
 
                         // Restore Purchases Button (always available)

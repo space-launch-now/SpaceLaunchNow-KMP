@@ -162,13 +162,13 @@ class LocalSubscriptionStorage {
 
     /**
      * Check if we're currently in a debug/simulated state
-     * Debug states typically have needsSync = false with recent lastSynced
+     * A debug state is indicated by needsSync = false (manually set by debug methods)
+     * This makes it easy to detect simulation mode without time-based heuristics
      */
-    fun isInDebugMode(): Boolean {
-        // This is a simple heuristic - debug states typically don't need sync
-        // and have been recently "synced" (set by debug methods)
-        val current = runBlocking { get() }
-        val recentlySet = (Clock.System.now().toEpochMilliseconds() - current.lastSynced) < 60_000 // Within 1 minute
-        return !current.needsSync && recentlySet && current.subscriptionType != SubscriptionType.FREE
+    suspend fun isInDebugMode(): Boolean {
+        val current = get()
+        // Debug mode is active when needsSync is false and we have a premium subscription
+        // Real subscriptions will have needsSync = true to trigger syncing
+        return !current.needsSync && current.subscriptionType != SubscriptionType.FREE
     }
 }
