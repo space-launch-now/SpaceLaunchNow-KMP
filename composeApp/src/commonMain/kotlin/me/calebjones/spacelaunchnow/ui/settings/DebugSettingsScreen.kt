@@ -98,6 +98,10 @@ fun DebugSettingsScreen(
     val detailedMessage by debugViewModel.detailedMessage.collectAsStateWithLifecycle()
     val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptionState by subscriptionRepo.state.collectAsState()
+    
+    // Cache settings
+    val debugShortCacheTtl by appPreferences.debugShortCacheTtlFlow.collectAsState(initial = false)
+    val scope = rememberCoroutineScope()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var showDetailedDialog by remember { mutableStateOf(false) }
@@ -292,6 +296,86 @@ fun DebugSettingsScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                }
+            }
+
+            // Cache Configuration Section
+            item {
+                Text(
+                    text = "Cache Configuration",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Short Cache TTL (2 min)",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                Text(
+                                    text = if (debugShortCacheTtl) {
+                                        "⚠️ Cache expires in 2 minutes instead of 1 hour"
+                                    } else {
+                                        "Normal cache duration: 1 hour for all data types"
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = if (debugShortCacheTtl) {
+                                        MaterialTheme.colorScheme.error
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    }
+                                )
+                            }
+                            Switch(
+                                checked = debugShortCacheTtl,
+                                onCheckedChange = { enabled ->
+                                    scope.launch {
+                                        appPreferences.setDebugShortCacheTtl(enabled)
+                                    }
+                                }
+                            )
+                        }
+                        
+                        if (debugShortCacheTtl) {
+                            HorizontalDivider()
+                            
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = "Debug Cache Durations:",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "• All data types: 2 minutes",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = "• Check logs for cache age info",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
                 }
             }
