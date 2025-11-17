@@ -4,20 +4,34 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Clock.System
 
 class EventLocalDataSource(
-    database: SpaceLaunchDatabase
+    database: SpaceLaunchDatabase,
+    private val appPreferences: AppPreferences
 ) {
     private val queries = database.eventQueries
     private val json = Json { ignoreUnknownKeys = true }
     
-    private val cacheDuration = 6.hours
+    private val cacheDuration = 1.hours
+    private val debugCacheDuration = 2.minutes
+    
+    private suspend fun getEffectiveCacheDuration(): kotlin.time.Duration {
+        return if (appPreferences.isDebugShortCacheTtlEnabled()) {
+            println("⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${cacheDuration.inWholeHours} hours")
+            debugCacheDuration
+        } else {
+            cacheDuration
+        }
+    }
     
     suspend fun cacheEvent(event: EventEndpointNormal) {
         val now = System.now().toEpochMilliseconds()
-        val expiresAt = now + cacheDuration.inWholeMilliseconds
+        val duration = getEffectiveCacheDuration()
+        val expiresAt = now + duration.inWholeMilliseconds
         
         queries.insertOrReplaceEvent(
             id = event.id.toLong(),
@@ -47,15 +61,18 @@ class EventLocalDataSource(
     
     suspend fun getUpcomingEvents(limit: Int): List<EventEndpointNormal> {
         val now = System.now().toEpochMilliseconds()
-        return queries.getUpcomingEvents(now, now, limit.toLong())
+        val results = queries.getUpcomingEvents(now, now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
                 try {
+                    val ageMinutes = (now - cached.cached_at) / 60000
+                    println("  Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
                     json.decodeFromString<EventEndpointNormal>(cached.json_data)
                 } catch (e: Exception) {
                     null
                 }
             }
+        return results
     }
     
     suspend fun getAllEvents(limit: Int): List<EventEndpointNormal> {
@@ -74,6 +91,17 @@ class EventLocalDataSource(
     suspend fun deleteExpiredEvents() {
         val now = System.now().toEpochMilliseconds()
         queries.deleteExpiredEvents(now)
+    }
+    
+    /**
+     * Gets the timestamp of when events were last cached.
+     * Returns the most recent cached_at timestamp.
+     */
+    suspend fun getCacheTimestamp(key: String): Long? {
+        return when (key) {
+            "events" -> queries.getUpcomingEvents(Long.MAX_VALUE, Long.MAX_VALUE, 1).executeAsOneOrNull()?.cached_at
+            else -> null
+        }
     }
     
     suspend fun clearAllEvents() {

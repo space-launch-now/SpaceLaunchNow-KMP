@@ -26,10 +26,12 @@ import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,31 +43,62 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlin.time.Clock.System
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import me.calebjones.spacelaunchnow.isDesktop
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.isLargeScreen
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.components.OfflineBanner
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
+import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock.System
 
 @Composable
 fun ResponsiveHomeContent(
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isOffline: Boolean = false,
+    oldestCacheTimestamp: Long? = null,
+    onRetry: () -> Unit = {}
 ) {
     val homeViewModel = koinViewModel<HomeViewModel>()
+    val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
 
     // Collect state for the new HomeQuickView
     val previousLaunches by homeViewModel.previousLaunches.collectAsStateWithLifecycle()
     val upcomingLaunches by homeViewModel.upcomingLaunches.collectAsStateWithLifecycle()
-    val historyLaunchesCount by homeViewModel.historyLaunchesCount.collectAsStateWithLifecycle()
-    val historyLaunches by homeViewModel.historyLaunches.collectAsStateWithLifecycle()
+
+    // Collect all ViewStates
+    val featuredLaunchState by homeViewModel.featuredLaunchState.collectAsStateWithLifecycle()
+    val upcomingLaunchesState by homeViewModel.upcomingLaunchesState.collectAsStateWithLifecycle()
+    val updatesState by homeViewModel.updatesState.collectAsStateWithLifecycle()
+    val articlesState by homeViewModel.articlesState.collectAsStateWithLifecycle()
+    val eventsState by homeViewModel.eventsState.collectAsStateWithLifecycle()
+    val historyState by homeViewModel.historyState.collectAsStateWithLifecycle()
+
+    // Check if ANY view is loading
+    val isAnyViewLoading = remember(
+        featuredLaunchState,
+        upcomingLaunchesState,
+        updatesState,
+        articlesState,
+        eventsState,
+        historyState
+    ) {
+        listOf(
+            featuredLaunchState,
+            upcomingLaunchesState,
+            updatesState,
+            articlesState,
+            eventsState,
+            historyState
+        ).any { it.isLoading }
+    }
 
     // Collect accurate quick stats counts
     val next24HoursCount by homeViewModel.next24HoursCount.collectAsStateWithLifecycle()
@@ -79,10 +112,11 @@ fun ResponsiveHomeContent(
     val currentDay = currentDate.dayOfMonth
     val currentMonth = currentDate.monthNumber
 
-    // Load history launches on composition
-    remember(currentDay, currentMonth) {
-        homeViewModel.loadHistoryLaunches(day = currentDay, month = currentMonth)
-        null
+    // Load history launches on composition using NEW ViewState pattern
+    LaunchedEffect(currentDay, currentMonth) {
+        if (historyState.data.count == 0 && !historyState.isLoading && historyState.error == null) {
+            homeViewModel.loadHistoryLaunchesNew(day = currentDay, month = currentMonth)
+        }
     }
 
     val isTabletOrDesktop = isLargeScreen()
@@ -93,6 +127,28 @@ fun ResponsiveHomeContent(
             modifier = modifier.fillMaxSize(),
         ) {
             item { HomeTopBar(navController = navController) }
+
+            // Single offline banner when any data is stale
+            if (isOffline) {
+                item {
+                    OfflineBanner(
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        dataSource = me.calebjones.spacelaunchnow.data.model.DataSource.STALE_CACHE,
+                        cacheTimestamp = oldestCacheTimestamp,
+                        onRetry = onRetry
+                    )
+                }
+            }
+
+            // Show loading indicator when any view is loading
+            if (isAnyViewLoading) {
+                item {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
+                }
+            }
+
             // Hero cards row: Last Launch + Stats + Next Up (countdown)
             item {
                 Row(
@@ -179,36 +235,116 @@ fun ResponsiveHomeContent(
                                     )
                                 }
 
-                                if (historyLaunches.isNotEmpty()) {
-                                    // Scrollable carousel of history launches
-                                    LazyRow(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        contentPadding = PaddingValues(horizontal = 4.dp)
-                                    ) {
-                                        items(historyLaunches) { launch ->
-                                            LaunchItemView(
-                                                launch = launch,
-                                                navController = navController,
+                                when {
+                                    // Error state - show error with retry OR data with error indicator
+                                    historyState.error != null -> {
+                                        if (historyState.data.launches.isNotEmpty()) {
+                                            // Show stale data with error indicator
+                                            Column {
+                                                // Error banner
+                                                Card(
+                                                    colors = CardDefaults.cardColors(
+                                                        containerColor = MaterialTheme.colorScheme.errorContainer
+                                                    ),
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 4.dp, vertical = 4.dp)
+                                                ) {
+                                                    Text(
+                                                        text = "Showing cached data",
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = MaterialTheme.colorScheme.onErrorContainer,
+                                                        modifier = Modifier.padding(8.dp)
+                                                    )
+                                                }
+                                                // Show stale launches
+                                                LazyRow(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                    contentPadding = PaddingValues(horizontal = 4.dp)
+                                                ) {
+                                                    items(historyState.data.launches) { launch ->
+                                                        LaunchItemView(
+                                                            launch = launch,
+                                                            navController = navController,
+                                                            modifier = Modifier
+                                                                .width(320.dp)
+                                                                .height(240.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            // No cached data, just show error
+                                            Card(
                                                 modifier = Modifier
-                                                    .width(320.dp)
-                                                    .height(240.dp)
-                                            )
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 4.dp),
+                                                colors = CardDefaults.cardColors(
+                                                    containerColor = MaterialTheme.colorScheme.errorContainer
+                                                )
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(16.dp),
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                                ) {
+                                                    Text(
+                                                        text = "Failed to load history launches",
+                                                        fontWeight = FontWeight.Medium,
+                                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                                    )
+                                                    Text(
+                                                        text = historyState.error!!,
+                                                        fontSize = 12.sp,
+                                                        color = MaterialTheme.colorScheme.onErrorContainer.copy(
+                                                            alpha = 0.8f
+                                                        ),
+                                                        textAlign = TextAlign.Center
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
-                                } else {
-                                    // Loading placeholder
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(200.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            if (historyLaunchesCount > 0) "Loading launches..." else "No launches on this day",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                        )
+                                    // Has data (no error)
+                                    historyState.data.launches.isNotEmpty() && historyState.error == null -> {
+                                        // Scrollable carousel of history launches
+                                        LazyRow(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            contentPadding = PaddingValues(horizontal = 4.dp)
+                                        ) {
+                                            items(historyState.data.launches) { launch ->
+                                                LaunchItemView(
+                                                    launch = launch,
+                                                    navController = navController,
+                                                    modifier = Modifier
+                                                        .width(320.dp)
+                                                        .height(240.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                    // Loading or empty state
+                                    else -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(200.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                if (historyState.isLoading) "Loading launches..."
+                                                else if (historyState.data.count > 0) "Loading..."
+                                                else "No launches on this day",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                                    alpha = 0.6f
+                                                )
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -256,26 +392,28 @@ fun ResponsiveHomeContent(
                         StatItem(
                             icon = Icons.Default.History,
                             label = "This Day in History",
-                            value = if (historyLaunchesCount > 0) historyLaunchesCount.toString() else "-",
+                            value = if (historyState.data.count > 0) historyState.data.count.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                     }
                 }
             }
 
-            // Large Ad between This Day in History and Launch Schedule
-            item {
-                SmartBannerAd(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    placementType = AdPlacementType.INTERSTITIAL, // Between content sections
-                    showRemoveAdsButton = true,
-                    onRemoveAdsClick = {
-                        // Navigate to settings - navController is available in this scope
-                        navController.navigate(SupportUs)
-                    }
-                )
+            // Large Ad between This Day in History and Launch Schedule (only for non-premium users)
+            if (!hasAdFree) {
+                item {
+                    SmartBannerAd(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        placementType = AdPlacementType.INTERSTITIAL, // Between content sections
+                        showRemoveAdsButton = true,
+                        onRemoveAdsClick = {
+                            // Navigate to settings - navController is available in this scope
+                            navController.navigate(SupportUs)
+                        }
+                    )
+                }
             }
 
             item {
@@ -314,6 +452,28 @@ fun ResponsiveHomeContent(
             modifier = modifier,
         ) {
             item { HomeTopBar(navController = navController) }
+
+            // Single offline banner when any data is stale
+            if (isOffline) {
+                item {
+                    OfflineBanner(
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        dataSource = me.calebjones.spacelaunchnow.data.model.DataSource.STALE_CACHE,
+                        cacheTimestamp = oldestCacheTimestamp,
+                        onRetry = onRetry
+                    )
+                }
+            }
+
+            // Show loading indicator when any view is loading
+            if (isAnyViewLoading) {
+                item {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
+                }
+            }
+
             item { NextLaunchView(navController = navController) }
 
             // Quick Stats
@@ -358,7 +518,7 @@ fun ResponsiveHomeContent(
                         StatItem(
                             icon = Icons.Default.History,
                             label = "This Day in History",
-                            value = if (historyLaunchesCount > 0) historyLaunchesCount.toString() else "-",
+                            value = if (historyState.data.count > 0) historyState.data.count.toString() else "-",
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -375,43 +535,118 @@ fun ResponsiveHomeContent(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    if (historyLaunches.isNotEmpty()) {
-                        // Scrollable carousel of history launches
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            contentPadding = PaddingValues(horizontal = 8.dp)
-                        ) {
-                            items(historyLaunches) { launch ->
-                                LaunchItemView(
-                                    launch = launch,
-                                    navController = navController,
-                                    modifier = Modifier
-                                        .width(300.dp)
-                                        .height(220.dp)
-                                )
+                    when {
+                        // Error state with or without cached data
+                        historyState.error != null -> {
+                            if (historyState.data.launches.isNotEmpty()) {
+                                // Show stale data with error indicator
+                                Column {
+                                    // Error banner
+                                    Card(
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.errorContainer
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = "Showing cached data",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onErrorContainer,
+                                            modifier = Modifier.padding(8.dp)
+                                        )
+                                    }
+                                    // Show stale launches
+                                    LazyRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        contentPadding = PaddingValues(horizontal = 8.dp)
+                                    ) {
+                                        items(historyState.data.launches) { launch ->
+                                            LaunchItemView(
+                                                launch = launch,
+                                                navController = navController,
+                                                modifier = Modifier
+                                                    .width(300.dp)
+                                                    .height(220.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                // No cached data, just show error
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.errorContainer
+                                    )
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Text(
+                                            text = "Failed to load history launches",
+                                            fontWeight = FontWeight.Medium,
+                                            color = MaterialTheme.colorScheme.onErrorContainer
+                                        )
+                                        Text(
+                                            text = historyState.error!!,
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.colorScheme.onErrorContainer.copy(
+                                                alpha = 0.8f
+                                            ),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
                             }
                         }
-                    } else {
-                        // Loading placeholder
-                        PlainShimmerCard()
+                        // Has data (no error)
+                        historyState.data.launches.isNotEmpty() && historyState.error == null -> {
+                            LazyRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                contentPadding = PaddingValues(horizontal = 8.dp)
+                            ) {
+                                items(historyState.data.launches) { launch ->
+                                    LaunchItemView(
+                                        launch = launch,
+                                        navController = navController,
+                                        modifier = Modifier
+                                            .width(300.dp)
+                                            .height(220.dp)
+                                    )
+                                }
+                            }
+                        }
+                        // Loading or empty state
+                        else -> {
+                            PlainShimmerCard()
+                        }
                     }
                 }
             }
 
-            // Large Ad between This Day in History and Launch Schedule
-            item {
-                SmartBannerAd(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    placementType = AdPlacementType.INTERSTITIAL, // Between content sections
-                    showRemoveAdsButton = true,
-                    onRemoveAdsClick = {
-                        // Navigate to settings - navController is available in this scope
-                        navController.navigate(SupportUs)
-                    }
-                )
+            // Large Ad between This Day in History and Launch Schedule (only for non-premium users)
+            if (!hasAdFree) {
+                item {
+                    SmartBannerAd(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        placementType = AdPlacementType.INTERSTITIAL, // Between content sections
+                        showRemoveAdsButton = true,
+                        onRemoveAdsClick = {
+                            // Navigate to settings - navController is available in this scope
+                            navController.navigate(SupportUs)
+                        }
+                    )
+                }
             }
 
             item {

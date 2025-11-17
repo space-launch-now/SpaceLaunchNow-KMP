@@ -99,7 +99,7 @@ class NextUpWidget : GlanceAppWidget() {
             try {
                 val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
                 val result = launchRepository.getUpcomingLaunchesNormal(limit = 1)
-                result.getOrNull()?.results?.firstOrNull()
+                result.getOrNull()?.data?.results?.firstOrNull()
             } catch (e: Exception) {
                 println("Widget: Failed to fetch next launch: ${e.message}")
                 e.printStackTrace()

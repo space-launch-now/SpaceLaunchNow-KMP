@@ -2,15 +2,35 @@ package me.calebjones.spacelaunchnow.ui.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,18 +39,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.rememberAsyncImagePainter
-import kotlin.time.Clock.System
-import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.UpdatesShimmer
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock.System
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Composable
 fun LatestUpdatesView(
@@ -38,33 +58,97 @@ fun LatestUpdatesView(
     homeViewModel: HomeViewModel = koinViewModel(),
     navController: NavController? = null
 ) {
-    val updates by homeViewModel.updates.collectAsState()
-    val isLoading by homeViewModel.isUpdatesLoading.collectAsState()
-    val error by homeViewModel.updatesError.collectAsState()
-
+    val state by homeViewModel.updatesState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        if (updates.isEmpty() && !isLoading && error == null) {
-            homeViewModel.loadUpdates(10)
+        // Only load if we don't have data and we're not currently loading
+        if (state.data.isEmpty() && !state.isLoading && state.error == null) {
+            homeViewModel.loadUpdatesNew(10)
         }
     }
 
-    Column(modifier = modifier) {
+    Column {
         when {
-            error != null -> {
-                ErrorCard(error = error!!, onRetry = { homeViewModel.loadUpdates(10) })
+            // STATE 4: Error State - show cached data with banner OR just error
+            state.error != null -> {
+                if (state.data.isNotEmpty()) {
+                    // Show stale data with error indicator
+                    Column {
+                        // Error banner
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "Showing cached data",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                        // Show stale updates
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(all = 16.dp)
+                        ) {
+                            items(state.data) { update ->
+                                UpdateCard(update = update, navController = navController)
+                            }
+                        }
+                    }
+                } else {
+                    // No cached data, just show error
+                    ErrorCard(error = state.error!!)
+                }
             }
-            updates.isNotEmpty() -> {
+
+            // STATE 2 & 3: Loading with existing data
+            state.isLoading && state.data.isNotEmpty() -> {
+                Box {
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(all = 16.dp)
+                    ) {
+                        items(state.data) { update ->
+                            UpdateCard(update = update, navController = navController)
+                        }
+                    }
+
+                    // Show loading indicator
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
+                            .size(24.dp)
+                    )
+                }
+            }
+
+            // Data available (not loading)
+            state.data.isNotEmpty() -> {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(all = 16.dp)
                 ) {
-                    items(updates) { update ->
+                    items(state.data) { update ->
                         UpdateCard(update = update, navController = navController)
                     }
                 }
             }
+
+            // STATE 1: Fresh load, no data - show shimmer
+            state.isLoading -> {
+                UpdatesShimmer()
+            }
+
+            // Fallback
             else -> {
                 UpdatesShimmer()
             }
@@ -140,7 +224,7 @@ fun UpdateCard(
                         }
                     }
                 )
-                
+
                 Column(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -157,7 +241,7 @@ fun UpdateCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    
+
                     // Update subject (what it's about)
                     val updateSubject: String? = when {
                         update.launch != null -> update.launch.name
@@ -175,7 +259,7 @@ fun UpdateCard(
                             overflow = TextOverflow.Ellipsis
                         )
                     }
-                    
+
                     // Comment
                     Text(
                         text = update.comment ?: "No comment",
@@ -188,7 +272,7 @@ fun UpdateCard(
                     )
                 }
             }
-            
+
             // Created date aligned to bottom right corner
             update.createdOn?.let { createdOn ->
                 Text(
@@ -232,7 +316,7 @@ fun UpdateLoadingCard(
                     strokeWidth = 2.dp
                 )
             }
-            
+
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -338,6 +422,7 @@ fun EmptyUpdatesCard(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 private fun formatUpdateDate(createdOn: Instant): String {
     // Simple date formatting - you might want to use a more sophisticated formatter
     return try {

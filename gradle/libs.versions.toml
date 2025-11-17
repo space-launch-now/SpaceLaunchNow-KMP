@@ -19,7 +19,7 @@ androidx-glance = "1.1.1"
 
 compose-plugin = "1.9.3"
 compose = "2.2.21"
-compose-material3 = "1.4.0"
+compose-material3 = "1.5.0-alpha08"
 compose-material3-adaptive = "1.1.2"
 compose-hot-reload = "1.0.0-beta08"
 coreSplashscreen = "1.0.1"

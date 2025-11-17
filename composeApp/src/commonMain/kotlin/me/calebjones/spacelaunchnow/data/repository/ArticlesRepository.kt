@@ -2,9 +2,10 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.api.snapi.models.PaginatedArticleList
+import me.calebjones.spacelaunchnow.data.model.DataResult
 
 interface ArticlesRepository {
-    suspend fun getArticles(limit: Int = 10, forceRefresh: Boolean = false): Result<PaginatedArticleList>
+    suspend fun getArticles(limit: Int = 10, forceRefresh: Boolean = false): Result<DataResult<PaginatedArticleList>>
     suspend fun getFeaturedArticles(limit: Int = 10): Result<PaginatedArticleList>
     suspend fun getArticlesByLaunch(launchIds: List<String>, limit: Int = 10): Result<PaginatedArticleList>
     suspend fun getArticleById(id: Int): Result<Article>

@@ -2,11 +2,14 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.api.extensions.getEventList
 import me.calebjones.spacelaunchnow.api.extensions.getUpcomingEvents
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
+import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
 
 class EventsRepositoryImpl(
@@ -14,20 +17,36 @@ class EventsRepositoryImpl(
     private val localDataSource: EventLocalDataSource? = null
 ) : EventsRepository {
     
-    override suspend fun getUpcomingEvents(limit: Int, forceRefresh: Boolean): Result<PaginatedEventEndpointNormalList> {
+    override suspend fun getUpcomingEvents(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedEventEndpointNormalList>> {
         return try {
+            println("=== EventsRepository.getUpcomingEvents ===")
+            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
+            println("Cache available: ${localDataSource != null}")
+            
+            val now = System.now().toEpochMilliseconds()
+            val staleTimestamp = localDataSource?.getCacheTimestamp("events")
+            
             // Try cache first if available and not forcing refresh
             if (!forceRefresh) {
                 val cachedEvents = localDataSource?.getUpcomingEvents(limit)
+                println("Cache query result: ${cachedEvents?.size ?: 0} events found")
                 if (cachedEvents != null && cachedEvents.isNotEmpty()) {
-                    println("EventsRepository: Returning ${cachedEvents.size} cached upcoming events")
-                    return Result.success(PaginatedEventEndpointNormalList(
-                        count = cachedEvents.size,
-                        next = null,
-                        previous = null,
-                        results = cachedEvents
+                    println("✓ CACHE HIT: Returning ${cachedEvents.size} cached upcoming events")
+                    return Result.success(DataResult(
+                        data = PaginatedEventEndpointNormalList(
+                            count = cachedEvents.size,
+                            next = null,
+                            previous = null,
+                            results = cachedEvents
+                        ),
+                        source = DataSource.CACHE,
+                        timestamp = staleTimestamp ?: now
                     ))
+                } else {
+                    println("✗ CACHE MISS: No cached data available, fetching from API")
                 }
+            } else {
+                println("⟳ FORCE REFRESH: Bypassing cache, fetching fresh data from API")
             }
             
             println("=== EventsRepository: Getting upcoming events from API (forceRefresh: $forceRefresh) ===")
@@ -44,33 +63,47 @@ class EventsRepositoryImpl(
             
             // Cache the results for future use
             localDataSource?.cacheEvents(events.results)
-            println("EventsRepository: Cached ${events.results.size} upcoming events from API")
+            println("✓ API SUCCESS: Fetched and cached ${events.results.size} upcoming events")
             
-            Result.success(events)
+            Result.success(DataResult(
+                data = events,
+                source = DataSource.NETWORK,
+                timestamp = now
+            ))
         } catch (e: ResponseException) {
             println("API Error: Status ${e.response.status}, Message: ${e.message}")
             // On error, try to return stale cache if available
             val staleCached = localDataSource?.getUpcomingEvents(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("events")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 println("EventsRepository: Returning ${staleCached.size} stale cached events due to API error")
-                return Result.success(PaginatedEventEndpointNormalList(
-                    count = staleCached.size,
-                    next = null,
-                    previous = null,
-                    results = staleCached
+                return Result.success(DataResult(
+                    data = PaginatedEventEndpointNormalList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
                 ))
             }
             Result.failure(e)
         } catch (e: IOException) {
             // On network error, try to return stale cache if available
             val staleCached = localDataSource?.getUpcomingEvents(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("events")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 println("EventsRepository: Returning ${staleCached.size} stale cached events due to network error")
-                return Result.success(PaginatedEventEndpointNormalList(
-                    count = staleCached.size,
-                    next = null,
-                    previous = null,
-                    results = staleCached
+                return Result.success(DataResult(
+                    data = PaginatedEventEndpointNormalList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
                 ))
             }
             Result.failure(e)

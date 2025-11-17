@@ -27,6 +27,8 @@ import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.SpaceLaunchNotificationChannel
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.util.LocaleUtil
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -400,22 +402,53 @@ object NotificationDisplayHelper {
      * Convert ISO 8601 timestamp to pretty time format
      * Input: "2025-10-15T12:00:00Z"
      * Output: "12:00 PM" (en-US) or "12:00" (most other locales with 24-hour format)
+     * Respects user's locale preference and UTC setting
      */
-    private fun formatLaunchDate(launchNet: String): String {
+    private fun formatLaunchDate(context: Context, launchNet: String): String {
         return try {
-            // Parse ISO 8601 format
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
+            // Parse ISO 8601 format using ROOT locale to avoid locale-specific parsing issues
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT).apply {
                 timeZone = TimeZone.getTimeZone("UTC")
             }
             val date = inputFormat.parse(launchNet)
 
-            // Use locale-aware time formatting (automatically handles 12-hour vs 24-hour)
+            if (date == null) {
+                println("⚠️ Failed to parse launch date: $launchNet")
+                return launchNet
+            }
+
+            // Get user's locale preference
             val userLocale = Locale.forLanguageTag(LocaleUtil.getLocaleTag())
-            val outputFormat = DateFormat.getTimeInstance(
-                DateFormat.SHORT,
-                userLocale
-            )
-            date?.let { outputFormat.format(it) } ?: launchNet
+
+            // Create output formatter with user's locale
+            val outputFormat = DateFormat.getTimeInstance(DateFormat.SHORT, userLocale)
+
+            // Get user's UTC preference from AppPreferences
+            // Note: This is a synchronous call in notification context, which is acceptable
+            // since notifications are already processed in background threads
+            val useUtc = try {
+                runBlocking {
+                    val dataStore = createDataStore(context)
+                    val prefs = AppPreferences(dataStore)
+                    prefs.getUseUtc()
+                }
+            } catch (e: Exception) {
+                println("⚠️ Failed to get UTC preference: ${e.message}")
+                false // Default to local time if preference can't be read
+            }
+
+            // Set timezone based on user preference
+            if (useUtc) {
+                outputFormat.timeZone = TimeZone.getTimeZone("UTC")
+            } else {
+                // Use device's local timezone
+                outputFormat.timeZone = TimeZone.getDefault()
+            }
+
+            val formattedTime = outputFormat.format(date)
+
+            // Append UTC suffix if user prefers UTC display
+            if (useUtc) "$formattedTime UTC" else formattedTime
         } catch (e: Exception) {
             println("⚠️ Failed to parse launch date: $launchNet - ${e.message}")
             launchNet // Return original if parsing fails
@@ -431,7 +464,7 @@ object NotificationDisplayHelper {
         launchNet: String,
         launchLocation: String
     ): String {
-        val formattedDate = formatLaunchDate(launchNet)
+        val formattedDate = formatLaunchDate(context, launchNet)
 
         return when (notificationType.lowercase()) {
             "netstampchanged" -> context.getString(
