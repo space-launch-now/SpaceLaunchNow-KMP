@@ -58,6 +58,7 @@ fun LaunchDetailScreen(
         onRefresh = {
             isRefreshing = true
             viewModel.refreshLaunchDetails(launchId)
+            viewModel.fetchRelatedNews(launchId)
         }
     )
     
