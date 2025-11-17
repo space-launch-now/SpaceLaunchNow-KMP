@@ -94,6 +94,12 @@ val appModule = module {
             localDataSource = get()
         )
     }
+    single<ArticlesRepository> {
+        ArticlesRepositoryImpl(
+            articlesApi = get(),
+            localDataSource = get()
+        )
+    }
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
     viewModelOf(::HomeViewModel)
@@ -104,12 +110,6 @@ val appModule = module {
     viewModelOf(::AgencyViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
-    single<ArticlesRepository> {
-        ArticlesRepositoryImpl(
-            articlesApi = get(),
-            localDataSource = get()
-        )
-    }
     single<EventsRepository> {
         EventsRepositoryImpl(
             eventsApi = get(),
