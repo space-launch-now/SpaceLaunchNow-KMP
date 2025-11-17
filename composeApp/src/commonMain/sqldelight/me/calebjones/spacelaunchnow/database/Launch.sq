@@ -129,9 +129,21 @@ WHERE net > ? AND expires_at > ?
 ORDER BY net ASC
 LIMIT ?;
 
+getUpcomingNormalStale:
+SELECT * FROM LaunchNormalCache 
+WHERE net > ?
+ORDER BY net ASC
+LIMIT ?;
+
 getPreviousNormal:
 SELECT * FROM LaunchNormalCache 
 WHERE net < ? AND expires_at > ?
+ORDER BY net DESC
+LIMIT ?;
+
+getPreviousNormalStale:
+SELECT * FROM LaunchNormalCache 
+WHERE net < ?
 ORDER BY net DESC
 LIMIT ?;
 
@@ -157,6 +169,10 @@ INSERT OR REPLACE INTO LaunchDetailedCache (
 getDetailedById:
 SELECT * FROM LaunchDetailedCache 
 WHERE id = ? AND expires_at > ?;
+
+getDetailedByIdStale:
+SELECT * FROM LaunchDetailedCache 
+WHERE id = ?;
 
 deleteExpiredDetailed:
 DELETE FROM LaunchDetailedCache WHERE expires_at < ?;

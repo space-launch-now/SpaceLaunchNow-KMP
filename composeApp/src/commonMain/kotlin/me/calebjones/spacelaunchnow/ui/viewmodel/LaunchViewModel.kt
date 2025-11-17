@@ -65,8 +65,8 @@ class LaunchViewModel(
         viewModelScope.launch {
             val result = repository.getUpcomingLaunchesNormal(limit = limit)
             
-            result.onSuccess { launches ->
-                _upcomingLaunchesNormal.value = launches
+            result.onSuccess { dataResult ->
+                _upcomingLaunchesNormal.value = dataResult.data
             }.onFailure { exception ->
                 _error.value = exception.message
             }
@@ -90,7 +90,7 @@ class LaunchViewModel(
             
             _isLoading.value = true
             
-            val result = repository.getLaunchDetails(id)
+            val result = repository.getLaunchDetails(id, forceRefresh = forceRefresh)
             result.onSuccess { launch ->
                 _launchDetails.value = launch
                 updateVideoPlayerState(launch)

@@ -3,13 +3,14 @@ package me.calebjones.spacelaunchnow.data.repository
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
+import me.calebjones.spacelaunchnow.data.model.DataResult
 
 interface EventsRepository {
     
     /**
      * Get a list of upcoming events
      */
-    suspend fun getUpcomingEvents(limit: Int = 10, forceRefresh: Boolean = false): Result<PaginatedEventEndpointNormalList>
+    suspend fun getUpcomingEvents(limit: Int = 10, forceRefresh: Boolean = false): Result<DataResult<PaginatedEventEndpointNormalList>>
     
     /**
      * Get events by type

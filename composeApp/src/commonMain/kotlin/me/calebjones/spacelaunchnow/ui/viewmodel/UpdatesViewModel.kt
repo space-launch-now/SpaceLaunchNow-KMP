@@ -26,8 +26,8 @@ class UpdatesViewModel(private val repository: UpdatesRepository) : ViewModel() 
             
             val result = repository.getLatestUpdates(limit = limit)
             
-            result.onSuccess { updates ->
-                _updates.value = updates
+            result.onSuccess { dataResult ->
+                _updates.value = dataResult.data
             }.onFailure { exception ->
                 _error.value = exception.message
             }

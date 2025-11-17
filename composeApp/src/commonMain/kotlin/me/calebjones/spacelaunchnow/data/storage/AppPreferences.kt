@@ -22,6 +22,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // Debug menu unlock (for release builds)
         private val DEBUG_MENU_UNLOCKED = booleanPreferencesKey("debug_menu_unlocked")
         
+        // Debug: Short cache TTL for testing cache expiration
+        private val DEBUG_SHORT_CACHE_TTL = booleanPreferencesKey("debug_short_cache_ttl")
+        
         // Beta warning dialog shown flag
         private val BETA_WARNING_SHOWN = booleanPreferencesKey("beta_warning_shown")
     }
@@ -95,6 +98,21 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     
     suspend fun isDebugMenuUnlocked(): Boolean {
         return dataStore.data.map { it[DEBUG_MENU_UNLOCKED] }.first() ?: false
+    }
+    
+    // Debug short cache TTL methods
+    val debugShortCacheTtlFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[DEBUG_SHORT_CACHE_TTL] ?: false
+    }
+    
+    suspend fun setDebugShortCacheTtl(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[DEBUG_SHORT_CACHE_TTL] = enabled
+        }
+    }
+    
+    suspend fun isDebugShortCacheTtlEnabled(): Boolean {
+        return dataStore.data.map { it[DEBUG_SHORT_CACHE_TTL] }.first() ?: false
     }
     
     // Beta warning dialog methods

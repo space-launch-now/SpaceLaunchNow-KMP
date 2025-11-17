@@ -6,6 +6,7 @@ import io.ktor.client.statement.request
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.time.Instant
+import kotlin.time.Clock.System
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
@@ -18,6 +19,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.ApiError
+import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 
@@ -57,25 +60,52 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getUpcomingLaunchesNormal(limit: Int): Result<PaginatedLaunchNormalList> {
+    override suspend fun getUpcomingLaunchesNormal(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedLaunchNormalList>> {
         return try {
-            // Try cache first if available
-            val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(limit)
-            if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                println("LaunchRepository: Returning ${cachedLaunches.size} cached upcoming launches")
-                return Result.success(PaginatedLaunchNormalList(
-                    count = cachedLaunches.size,
-                    next = null,
-                    previous = null,
-                    results = cachedLaunches
-                ))
+            println("=== LaunchRepository.getUpcomingLaunchesNormal ===")
+            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
+            
+            val now = System.now().toEpochMilliseconds()
+            
+            // STALE-WHILE-REVALIDATE: Always check for stale data first
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("upcoming_launches")
+            val hasStaleData = staleCached != null && staleCached.isNotEmpty()
+            
+            // Try fresh cache if available and not forcing refresh
+            if (!forceRefresh) {
+                val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(limit)
+                if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
+                    println("✓ CACHE HIT: Returning ${cachedLaunches.size} fresh cached launches")
+                    return Result.success(DataResult(
+                        data = PaginatedLaunchNormalList(
+                            count = cachedLaunches.size,
+                            next = null,
+                            previous = null,
+                            results = cachedLaunches
+                        ),
+                        source = DataSource.CACHE,
+                        timestamp = staleTimestamp ?: now
+                    ))
+                } else if (hasStaleData) {
+                    println("⏳ STALE CACHE: Returning ${staleCached!!.size} stale launches (will show while fetching fresh)")
+                    // Return stale data immediately - UI shows this while fetch happens in background
+                    return Result.success(DataResult(
+                        data = PaginatedLaunchNormalList(
+                            count = staleCached.size,
+                            next = null,
+                            previous = null,
+                            results = staleCached
+                        ),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = staleTimestamp ?: now
+                    ))
+                }
             }
             
-            // If no cache, fetch from API
+            // Fetch from API (either no cache, expired, or force refresh)
             val hideTbd = withContext(Dispatchers.Default) { appPreferences.getHideTbdLaunches() }
             
-            // Always use upcoming only (no recent launches functionality)
-            print("Only upcoming launches (no recent)")
             val response = launchesApi.launchesList(
                 limit = limit,
                 upcoming = true,
@@ -84,7 +114,6 @@ class LaunchRepositoryImpl(
             
             val launches = response.body()
             val filtered = if (hideTbd) {
-                println("HideTBD is true")
                 launches.copy(results = launches.results.filterNot { it.status?.id == 8 })
             } else {
                 launches
@@ -92,32 +121,46 @@ class LaunchRepositoryImpl(
             
             // Cache the results for future use
             localDataSource?.cacheNormalLaunches(filtered.results)
-            println("LaunchRepository: Cached ${filtered.results.size} upcoming launches from API")
+            println("✓ API SUCCESS: Fetched and cached ${filtered.results.size} upcoming launches")
             
-            Result.success(filtered)
+            Result.success(DataResult(
+                data = filtered,
+                source = DataSource.NETWORK,
+                timestamp = now
+            ))
         } catch (e: ResponseException) {
             // On error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingNormalLaunches(limit)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("upcoming_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("LaunchRepository: Returning ${staleCached.size} stale cached launches due to API error")
-                return Result.success(PaginatedLaunchNormalList(
-                    count = staleCached.size,
-                    next = null,
-                    previous = null,
-                    results = staleCached
+                println("⚠️ API ERROR: Returning ${staleCached.size} stale cached launches as fallback")
+                return Result.success(DataResult(
+                    data = PaginatedLaunchNormalList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
                 ))
             }
             Result.failure(e)
         } catch (e: IOException) {
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingNormalLaunches(limit)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("upcoming_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("LaunchRepository: Returning ${staleCached.size} stale cached launches due to network error")
-                return Result.success(PaginatedLaunchNormalList(
-                    count = staleCached.size,
-                    next = null,
-                    previous = null,
-                    results = staleCached
+                println("⚠️ NETWORK ERROR: Returning ${staleCached.size} stale cached launches as fallback")
+                return Result.success(DataResult(
+                    data = PaginatedLaunchNormalList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
                 ))
             }
             Result.failure(e)
@@ -144,56 +187,88 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getPreviousLaunchesNormal(limit: Int): Result<PaginatedLaunchNormalList> {
+    override suspend fun getPreviousLaunchesNormal(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedLaunchNormalList>> {
         return try {
-            // Try cache first if available
-            val cachedLaunches = localDataSource?.getPreviousNormalLaunches(limit)
-            if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                println("LaunchRepository: Returning ${cachedLaunches.size} cached previous launches")
-                return Result.success(PaginatedLaunchNormalList(
-                    count = cachedLaunches.size,
-                    next = null,
-                    previous = null,
-                    results = cachedLaunches
-                ))
+            println("=== LaunchRepository.getPreviousLaunchesNormal ===")
+            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
+            
+            val now = System.now().toEpochMilliseconds()
+            
+            // STALE-WHILE-REVALIDATE: Check for stale data
+            val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("previous_launches")
+            val hasStaleData = staleCached != null && staleCached.isNotEmpty()
+            
+            // Try fresh cache if available and not forcing refresh
+            if (!forceRefresh) {
+                val cachedLaunches = localDataSource?.getPreviousNormalLaunches(limit)
+                if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
+                    println("✓ CACHE HIT: Returning ${cachedLaunches.size} fresh cached previous launches")
+                    return Result.success(DataResult(
+                        data = PaginatedLaunchNormalList(
+                            count = cachedLaunches.size,
+                            next = null,
+                            previous = null,
+                            results = cachedLaunches
+                        ),
+                        source = DataSource.CACHE,
+                        timestamp = staleTimestamp ?: now
+                    ))
+                } else if (hasStaleData) {
+                    println("⏳ STALE CACHE: Returning ${staleCached!!.size} stale previous launches")
+                }
             }
             
-            // If no cache, fetch from API
+            // Fetch from API
             val response = launchesApi.getLaunchList(
                 limit = limit,
                 previous = true,
-                ordering = "-net" // Most recent first
+                ordering = "-net"
             )
             val launches = response.body()
             
             // Cache the results for future use
             localDataSource?.cacheNormalLaunches(launches.results)
-            println("LaunchRepository: Cached ${launches.results.size} previous launches from API")
+            println("✓ API SUCCESS: Fetched and cached ${launches.results.size} previous launches")
             
-            Result.success(launches)
+            Result.success(DataResult(
+                data = launches,
+                source = DataSource.NETWORK,
+                timestamp = now
+            ))
         } catch (e: ResponseException) {
             // On error, try to return stale cache if available
-            val staleCached = localDataSource?.getPreviousNormalLaunches(limit)
+            val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("previous_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("LaunchRepository: Returning ${staleCached.size} stale cached previous launches due to API error")
-                return Result.success(PaginatedLaunchNormalList(
-                    count = staleCached.size,
-                    next = null,
-                    previous = null,
-                    results = staleCached
+                println("⚠️ API ERROR: Returning ${staleCached.size} stale cached previous launches as fallback")
+                return Result.success(DataResult(
+                    data = PaginatedLaunchNormalList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
                 ))
             }
             Result.failure(e)
         } catch (e: IOException) {
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getPreviousNormalLaunches(limit)
+            val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("previous_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("LaunchRepository: Returning ${staleCached.size} stale cached previous launches due to network error")
-                return Result.success(PaginatedLaunchNormalList(
-                    count = staleCached.size,
-                    next = null,
-                    previous = null,
-                    results = staleCached
+                println("⚠️ NETWORK ERROR: Returning ${staleCached.size} stale cached previous launches as fallback")
+                return Result.success(DataResult(
+                    data = PaginatedLaunchNormalList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
                 ))
             }
             Result.failure(e)
@@ -221,45 +296,40 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getLaunchDetails(id: String): Result<LaunchDetailed> {
+    override suspend fun getLaunchDetails(id: String, forceRefresh: Boolean): Result<LaunchDetailed> {
         return try {
-            // Try cache first if available
-            val cachedLaunch = localDataSource?.getDetailedLaunch(id)
-            if (cachedLaunch != null) {
-                println("LaunchRepository: Returning cached detailed launch: ${cachedLaunch.name}")
-                return Result.success(cachedLaunch)
+            println("=== LaunchRepository.getLaunchDetails ===")
+            println("Parameters: id=$id, forceRefresh=$forceRefresh")
+            
+            // STALE-WHILE-REVALIDATE: Check for stale data
+            val staleCached = localDataSource?.getDetailedLaunchStale(id)
+            
+            // Try fresh cache if available and not forcing refresh
+            if (!forceRefresh) {
+                val cachedLaunch = localDataSource?.getDetailedLaunch(id)
+                if (cachedLaunch != null) {
+                    println("✓ CACHE HIT: Returning fresh cached detailed launch: ${cachedLaunch.name}")
+                    return Result.success(cachedLaunch)
+                } else if (staleCached != null) {
+                    println("⏳ STALE CACHE: Returning stale detailed launch: ${staleCached.name}")
+                }
             }
             
-            // If no cache, fetch from API
+            // Fetch from API
             val response = launchesApi.launchesRetrieve(id)
-
-            // Print raw response for debugging
-            val rawResponse = response.response.bodyAsText()
-            println("=== LAUNCH DETAILS RAW RESPONSE ===")
-            println("Response status: ${response.status}")
-            println("Launch ID: $id")
-            println("Response length: ${rawResponse.length} characters")
-            println("Response:")
-            println(rawResponse)
-            println("=== END LAUNCH DETAILS RESPONSE ===")
-
+            
             // Check if it's an error response
             if (response.status >= 400) {
+                val rawResponse = response.response.bodyAsText()
                 println("HTTP Error ${response.status}: $rawResponse")
                 return Result.failure(Exception("API Error ${response.status}: $rawResponse"))
-            }
-
-            // Check if response looks like an error (contains "detail" field)
-            if (rawResponse.contains("\"detail\"")) {
-                println("API returned error response: $rawResponse")
-                return Result.failure(Exception("API Error: $rawResponse"))
             }
 
             val body = response.body()
             
             // Cache the detailed launch for future use
             localDataSource?.cacheDetailedLaunch(body)
-            println("LaunchRepository: Cached detailed launch: ${body.name}")
+            println("✓ API SUCCESS: Fetched and cached detailed launch: ${body.name}")
             
             Result.success(body)
         } catch (e: ResponseException) {
@@ -270,9 +340,9 @@ class LaunchRepositoryImpl(
                 println("Error response body: $errorBody")
                 
                 // On error, try to return stale cache if available
-                val staleCached = localDataSource?.getDetailedLaunch(id)
+                val staleCached = localDataSource?.getDetailedLaunchStale(id)
                 if (staleCached != null) {
-                    println("LaunchRepository: Returning stale cached detailed launch due to API error: ${staleCached.name}")
+                    println("⚠️ API ERROR: Returning stale cached detailed launch as fallback: ${staleCached.name}")
                     return Result.success(staleCached)
                 }
                 
@@ -283,9 +353,9 @@ class LaunchRepositoryImpl(
         } catch (e: IOException) {
             println("IOException in getLaunchDetails for ID $id: ${e.message}")
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getDetailedLaunch(id)
+            val staleCached = localDataSource?.getDetailedLaunchStale(id)
             if (staleCached != null) {
-                println("LaunchRepository: Returning stale cached detailed launch due to network error: ${staleCached.name}")
+                println("⚠️ NETWORK ERROR: Returning stale cached detailed launch as fallback: ${staleCached.name}")
                 return Result.success(staleCached)
             }
             Result.failure(e)
@@ -310,7 +380,8 @@ class LaunchRepositoryImpl(
     }
 
     override suspend fun getNextLaunch(
-        limit: Int
+        limit: Int,
+        forceRefresh: Boolean
     ): Result<PaginatedLaunchNormalList> {
         return try {
             val response = launchesApi.getLaunchList(

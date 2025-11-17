@@ -81,10 +81,10 @@ val appModule = module {
         val driver = get<DatabaseDriverFactory>().createDriver()
         SpaceLaunchDatabase(driver)
     }
-    single { LaunchLocalDataSource(get()) }
-    single { EventLocalDataSource(get()) }
-    single { ArticleLocalDataSource(get()) }
-    single { UpdateLocalDataSource(get()) }
+    single { LaunchLocalDataSource(get(), get()) }
+    single { EventLocalDataSource(get(), get()) }
+    single { ArticleLocalDataSource(get(), get()) }
+    single { UpdateLocalDataSource(get(), get()) }
     
     single<LaunchRepository> {
         LaunchRepositoryImpl(
