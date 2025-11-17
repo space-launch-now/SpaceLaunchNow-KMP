@@ -1,7 +1,12 @@
 ### Bug Fixes
 
-* improve URL removal regex to match all bracket contents
+* datadog integration and iOS build
+* implement fixes for merge conflict
+* resolve Kotlin build configuration issues
 
 ### Features
 
-* add script to truncate Google Play release notes to 500 chars
+* add SQLDelight database for persistent caching
+* Enhance billing and subscription initialization for iOS and Android
+* implement cache-first repository pattern with SQLDelight
+* parse event duration field using common utility function
