@@ -58,6 +58,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.MissionDetailsC
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.PadQuickStatsRow
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.PrecisionInfoDialog
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.QuickStatsGrid
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.SpacecraftDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.TimelineCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
@@ -279,6 +280,9 @@ val snackDetailBoundsTransform = BoundsTransform { _, _ ->
 fun LaunchDetailView(
     launch: LaunchDetailed,
     videoPlayerState: VideoPlayerState,
+    relatedNews: List<me.calebjones.spacelaunchnow.api.snapi.models.Article>,
+    isNewsLoading: Boolean,
+    newsError: String?,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateBack: () -> Unit,
@@ -301,6 +305,9 @@ fun LaunchDetailView(
         LaunchDetailOpenUrlProvider(
             launch = launch,
             videoPlayerState = videoPlayerState,
+            relatedNews = relatedNews,
+            isNewsLoading = isNewsLoading,
+            newsError = newsError,
             onSelectVideo = onSelectVideo,
             onSetPlayerVisible = onSetPlayerVisible,
             onNavigateBack = onNavigateBack,
@@ -316,6 +323,9 @@ fun LaunchDetailView(
 fun LaunchDetailOpenUrlProvider(
     launch: LaunchDetailed,
     videoPlayerState: VideoPlayerState,
+    relatedNews: List<me.calebjones.spacelaunchnow.api.snapi.models.Article>,
+    isNewsLoading: Boolean,
+    newsError: String?,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateBack: () -> Unit,
@@ -332,6 +342,9 @@ fun LaunchDetailOpenUrlProvider(
     LaunchDetailContentInBody(
         launch = launch,
         videoPlayerState = videoPlayerState,
+        relatedNews = relatedNews,
+        isNewsLoading = isNewsLoading,
+        newsError = newsError,
         onSelectVideo = onSelectVideo,
         onSetPlayerVisible = onSetPlayerVisible,
         onNavigateToFullscreen = onNavigateToFullscreen,
@@ -344,6 +357,9 @@ fun LaunchDetailOpenUrlProvider(
 private fun LaunchDetailContentInBody(
     launch: LaunchDetailed,
     videoPlayerState: VideoPlayerState,
+    relatedNews: List<me.calebjones.spacelaunchnow.api.snapi.models.Article>,
+    isNewsLoading: Boolean,
+    newsError: String?,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
@@ -397,6 +413,21 @@ private fun LaunchDetailContentInBody(
                             fontWeight = FontWeight.Bold
                         )
                         TimelineCard(timeline = launch.timeline)
+                    }
+
+                    // Related News Section
+                    if (relatedNews.isNotEmpty() || isNewsLoading || newsError != null) {
+                        Text(
+                            text = "Related News",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                        RelatedNewsCard(
+                            articles = relatedNews,
+                            isLoading = isNewsLoading,
+                            error = newsError
+                        )
                     }
 
                     // Mission Details Card
@@ -563,6 +594,22 @@ private fun LaunchDetailContentInBody(
                     )
                     Spacer(Modifier.height(16.dp))
                     TimelineCard(timeline = launch.timeline)
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                // Related News Section
+                if (relatedNews.isNotEmpty() || isNewsLoading || newsError != null) {
+                    Text(
+                        text = "Related News",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    RelatedNewsCard(
+                        articles = relatedNews,
+                        isLoading = isNewsLoading,
+                        error = newsError
+                    )
                     Spacer(Modifier.height(16.dp))
                 }
 

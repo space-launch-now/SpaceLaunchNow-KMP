@@ -11,6 +11,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetai
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
+import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 
@@ -23,7 +25,8 @@ data class VideoPlayerState(
 
 class LaunchViewModel(
     private val repository: LaunchRepository,
-    private val launchCache: LaunchCache
+    private val launchCache: LaunchCache,
+    private val articlesRepository: ArticlesRepository
 ) : ViewModel() {
 
     private val _upcomingLaunches = MutableStateFlow<PaginatedLaunchBasicList?>(null)
@@ -47,6 +50,16 @@ class LaunchViewModel(
     // Video Player State
     private val _videoPlayerState = MutableStateFlow(VideoPlayerState())
     val videoPlayerState: StateFlow<VideoPlayerState> = _videoPlayerState
+
+    // Related News State
+    private val _relatedNews = MutableStateFlow<List<Article>>(emptyList())
+    val relatedNews: StateFlow<List<Article>> = _relatedNews
+
+    private val _isNewsLoading = MutableStateFlow(false)
+    val isNewsLoading: StateFlow<Boolean> = _isNewsLoading
+
+    private val _newsError = MutableStateFlow<String?>(null)
+    val newsError: StateFlow<String?> = _newsError
 
     fun fetchUpcomingLaunchesNormal(limit: Int) {
         viewModelScope.launch {
@@ -190,5 +203,39 @@ class LaunchViewModel(
      */
     fun hasMultipleVideos(): Boolean {
         return _videoPlayerState.value.availableVideos.size > 1
+    }
+
+    // Related News Methods
+
+    /**
+     * Fetch related news articles for a launch
+     */
+    fun fetchRelatedNews(launchId: String, limit: Int = 20) {
+        viewModelScope.launch {
+            _isNewsLoading.value = true
+            _newsError.value = null
+
+            val result = articlesRepository.getArticlesByLaunch(
+                launchIds = listOf(launchId),
+                limit = limit
+            )
+            
+            result.onSuccess { paginatedList ->
+                _relatedNews.value = paginatedList.results
+            }.onFailure { exception ->
+                _newsError.value = exception.message
+            }
+            
+            _isNewsLoading.value = false
+        }
+    }
+
+    /**
+     * Clear related news state
+     */
+    fun clearRelatedNews() {
+        _relatedNews.value = emptyList()
+        _newsError.value = null
+        _isNewsLoading.value = false
     }
 }
