@@ -127,7 +127,7 @@ private fun LocalDateTime.toEpochSeconds(): Long {
     val yearsSince1970 = year - 1970L
     val daysSince1970 = yearsSince1970 * daysInYear + 
                         (yearsSince1970 / 4) + // Leap years approximation
-                        daysInMonth[month - 1] + 
+                        daysInMonth[month] + 
                         day - 1
     
     return daysSince1970 * 86400 + hour * 3600 + minute * 60 + second
