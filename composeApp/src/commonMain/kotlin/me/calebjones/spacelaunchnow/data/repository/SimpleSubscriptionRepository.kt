@@ -281,6 +281,11 @@ class SimpleSubscriptionRepository(
      * Debug: Get current local data
      */
     suspend fun getLocalData() = localStorage.get()
+    
+    /**
+     * Debug: Check if currently in debug/simulation mode
+     */
+    suspend fun isInDebugMode() = localStorage.isInDebugMode()
 
     // Debug methods for testing subscription states
 
@@ -348,9 +353,4 @@ class SimpleSubscriptionRepository(
     suspend fun hasTemporaryAccess(feature: PremiumFeature): Boolean {
         return temporaryPremiumAccess.hasTemporaryAccess(feature)
     }
-
-    /**
-     * Debug: Check if currently in debug mode
-     */
-    fun isInDebugMode(): Boolean = localStorage.isInDebugMode()
 }

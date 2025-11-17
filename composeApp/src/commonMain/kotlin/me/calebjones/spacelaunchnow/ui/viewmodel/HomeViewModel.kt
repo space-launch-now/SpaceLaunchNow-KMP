@@ -6,33 +6,58 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.toLocalDateTime
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
+import me.calebjones.spacelaunchnow.data.repository.EventsRepository
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import kotlin.time.Clock
 import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
-import me.calebjones.spacelaunchnow.api.snapi.models.Article
-import me.calebjones.spacelaunchnow.api.snapi.models.PaginatedArticleList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
-import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
-import me.calebjones.spacelaunchnow.data.repository.EventsRepository
-import me.calebjones.spacelaunchnow.cache.LaunchCache
+import kotlin.time.ExperimentalTime
+
+/**
+ * Represents the state of a view section on the Home Screen
+ *
+ * @param data The actual data (can be a single object or list)
+ * @param isLoading True if currently loading data
+ * @param isUserInitiated True if the load was triggered by user action (pull-to-refresh/retry)
+ * @param error Error message if the load failed, null otherwise
+ * @param dataSource Where the data originated from (network, cache, or stale cache)
+ * @param cacheTimestamp When the data was originally cached (epoch milliseconds)
+ */
+data class ViewState<T>(
+    val data: T,
+    val isLoading: Boolean = false,
+    val isUserInitiated: Boolean = false,
+    val error: String? = null,
+    val dataSource: me.calebjones.spacelaunchnow.data.model.DataSource = me.calebjones.spacelaunchnow.data.model.DataSource.NETWORK,
+    val cacheTimestamp: Long? = null
+)
 
 /**
  * Consolidated ViewModel for the Home Screen that manages:
  * - Featured launch (NextUp)
  * - Upcoming launches list
- * - Updates/News feed (replaces UpdatesViewModel)
+ * - Updates/News feed
  * - News articles from SNAPI
- * - Overall loading and error states
+ * - Events from Launch Library
+ *
+ * Each section uses ViewState<T> for simplified state management with 4 states:
+ * 1. Fresh load (no data) - isLoading=true, data=empty
+ * 2. Loading with stale data - isLoading=true, data=present, isUserInitiated=false
+ * 3. User-initiated refresh - isLoading=true, data=present, isUserInitiated=true
+ * 4. Error - error!=null
  */
+@OptIn(ExperimentalTime::class)
 class HomeViewModel(
     private val launchRepository: LaunchRepository,
     private val updatesRepository: UpdatesRepository,
@@ -41,35 +66,38 @@ class HomeViewModel(
     private val launchCache: LaunchCache
 ) : ViewModel() {
 
-    // Featured Launch (replaces NextUpViewModel functionality)
-    private val _featuredLaunch = MutableStateFlow<LaunchNormal?>(null)
-    val featuredLaunch: StateFlow<LaunchNormal?> = _featuredLaunch.asStateFlow()
+    // ========== NEW ViewState-based State Management ==========
 
-    // Upcoming Launches List (incorporates LaunchViewModel functionality)
-    private val _upcomingLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
-    val upcomingLaunches: StateFlow<List<LaunchNormal>> = _upcomingLaunches.asStateFlow()
+    // Featured Launch State
+    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
+    val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> =
+        _featuredLaunchState.asStateFlow()
 
-    // Previous Launches List (for bidirectional carousel)
-    private val _previousLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
-    val previousLaunches: StateFlow<List<LaunchNormal>> = _previousLaunches.asStateFlow()
+    // Upcoming Launches State
+    private val _upcomingLaunchesState =
+        MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
+    val upcomingLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> =
+        _upcomingLaunchesState.asStateFlow()
 
-    // This Day in History Launches (launches that happened on this day in previous years)
-    private val _historyLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
-    val historyLaunches: StateFlow<List<LaunchNormal>> = _historyLaunches.asStateFlow()
-    
-    // Count of history launches (computed from API)
-    private val _historyLaunchesCount = MutableStateFlow<Int>(0)
-    val historyLaunchesCount: StateFlow<Int> = _historyLaunchesCount.asStateFlow()
+    // Updates State
+    private val _updatesState = MutableStateFlow(ViewState(data = emptyList<UpdateEndpoint>()))
+    val updatesState: StateFlow<ViewState<List<UpdateEndpoint>>> = _updatesState.asStateFlow()
 
-    // Quick Stats - accurate counts from API
-    private val _next24HoursCount = MutableStateFlow<Int>(0)
-    val next24HoursCount: StateFlow<Int> = _next24HoursCount.asStateFlow()
+    // Articles State
+    private val _articlesState = MutableStateFlow(ViewState(data = emptyList<Article>()))
+    val articlesState: StateFlow<ViewState<List<Article>>> = _articlesState.asStateFlow()
 
-    private val _nextWeekCount = MutableStateFlow<Int>(0)
-    val nextWeekCount: StateFlow<Int> = _nextWeekCount.asStateFlow()
+    // Events State
+    private val _eventsState = MutableStateFlow(ViewState(data = emptyList<EventEndpointNormal>()))
+    val eventsState: StateFlow<ViewState<List<EventEndpointNormal>>> = _eventsState.asStateFlow()
 
-    private val _nextMonthCount = MutableStateFlow<Int>(0)
-    val nextMonthCount: StateFlow<Int> = _nextMonthCount.asStateFlow()
+    // History Launches State (This Day in History)
+    data class HistoryData(val count: Int, val launches: List<LaunchNormal>)
+
+    private val _historyState = MutableStateFlow(ViewState(data = HistoryData(0, emptyList())))
+    val historyState: StateFlow<ViewState<HistoryData>> = _historyState.asStateFlow()
+
+    // ========== Legacy State (for backward compatibility during migration) ==========
 
     // Combined Launches (previous + upcoming for carousel)
     private val _combinedLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
@@ -79,61 +107,90 @@ class HomeViewModel(
     private val _upcomingStartIndex = MutableStateFlow<Int>(0)
     val upcomingStartIndex: StateFlow<Int> = _upcomingStartIndex.asStateFlow()
 
-    // Updates/News Feed (replaces UpdatesViewModel functionality)
-    private val _updates = MutableStateFlow<List<UpdateEndpoint>>(emptyList())
-    val updates: StateFlow<List<UpdateEndpoint>> = _updates.asStateFlow()
+    // Previous Launches List (for bidirectional carousel)
+    private val _previousLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
+    val previousLaunches: StateFlow<List<LaunchNormal>> = _previousLaunches.asStateFlow()
 
-    // News Articles from SNAPI
-    private val _articles = MutableStateFlow<List<Article>>(emptyList())
-    val articles: StateFlow<List<Article>> = _articles.asStateFlow()
+    // ========== Legacy State Properties (still used by old functions) ==========
+    // These will be removed once all views are migrated to ViewState pattern
 
-    // Events from Launch Library
-    private val _events = MutableStateFlow<List<EventEndpointNormal>>(emptyList())
-    val events: StateFlow<List<EventEndpointNormal>> = _events.asStateFlow()
-
-    // Loading States
-    private val _isFeaturedLaunchLoading = MutableStateFlow(false)
-    val isFeaturedLaunchLoading: StateFlow<Boolean> = _isFeaturedLaunchLoading.asStateFlow()
-
-    private val _isUpcomingLaunchesLoading = MutableStateFlow(false)
-    val isUpcomingLaunchesLoading: StateFlow<Boolean> = _isUpcomingLaunchesLoading.asStateFlow()
+    // Additional legacy states for previous launches
+    private val _previousLaunchesError = MutableStateFlow<String?>(null)
+    val previousLaunchesError: StateFlow<String?> = _previousLaunchesError.asStateFlow()
 
     private val _isPreviousLaunchesLoading = MutableStateFlow(false)
     val isPreviousLaunchesLoading: StateFlow<Boolean> = _isPreviousLaunchesLoading.asStateFlow()
 
-    private val _isHistoryLaunchesLoading = MutableStateFlow(false)
-    val isHistoryLaunchesLoading: StateFlow<Boolean> = _isHistoryLaunchesLoading.asStateFlow()
+    private val _isPreviousLaunchesRefreshing = MutableStateFlow(false)
+    val isPreviousLaunchesRefreshing: StateFlow<Boolean> =
+        _isPreviousLaunchesRefreshing.asStateFlow()
 
-    private val _isUpdatesLoading = MutableStateFlow(false)
-    val isUpdatesLoading: StateFlow<Boolean> = _isUpdatesLoading.asStateFlow()
+    private val _isUpcomingLaunchesRefreshing = MutableStateFlow(false)
+    val isUpcomingLaunchesRefreshing: StateFlow<Boolean> =
+        _isUpcomingLaunchesRefreshing.asStateFlow()
 
-    private val _isArticlesLoading = MutableStateFlow(false)
-    val isArticlesLoading: StateFlow<Boolean> = _isArticlesLoading.asStateFlow()
-
-    private val _isEventsLoading = MutableStateFlow(false)
-    val isEventsLoading: StateFlow<Boolean> = _isEventsLoading.asStateFlow()
-
+    // Global app loading state (deprecated - will be removed)
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // Error States
-    private val _featuredLaunchError = MutableStateFlow<String?>(null)
-    val featuredLaunchError: StateFlow<String?> = _featuredLaunchError.asStateFlow()
+    // Pull-to-refresh global state
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
+    // Legacy individual property states - used by old functions until migration complete
+    private val _upcomingLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
+    val upcomingLaunches: StateFlow<List<LaunchNormal>> = _upcomingLaunches.asStateFlow()
+
+    private val _isUpcomingLaunchesLoading = MutableStateFlow(false)
+    val isUpcomingLaunchesLoading: StateFlow<Boolean> = _isUpcomingLaunchesLoading.asStateFlow()
+
+    private val _isFeaturedLaunchLoading = MutableStateFlow(false)
+    val isFeaturedLaunchLoading: StateFlow<Boolean> = _isFeaturedLaunchLoading.asStateFlow()
 
     private val _upcomingLaunchesError = MutableStateFlow<String?>(null)
     val upcomingLaunchesError: StateFlow<String?> = _upcomingLaunchesError.asStateFlow()
 
-    private val _previousLaunchesError = MutableStateFlow<String?>(null)
-    val previousLaunchesError: StateFlow<String?> = _previousLaunchesError.asStateFlow()
+    private val _featuredLaunch = MutableStateFlow<LaunchNormal?>(null)
+    val featuredLaunch: StateFlow<LaunchNormal?> = _featuredLaunch.asStateFlow()
 
-    private val _historyLaunchesError = MutableStateFlow<String?>(null)
-    val historyLaunchesError: StateFlow<String?> = _historyLaunchesError.asStateFlow()
+    private val _featuredLaunchError = MutableStateFlow<String?>(null)
+    val featuredLaunchError: StateFlow<String?> = _featuredLaunchError.asStateFlow()
+
+    private val _lastDataUpdate = MutableStateFlow<Long>(0)
+    val lastDataUpdate: StateFlow<Long> = _lastDataUpdate.asStateFlow()
+
+    private val _updates = MutableStateFlow<List<UpdateEndpoint>>(emptyList())
+    val updates: StateFlow<List<UpdateEndpoint>> = _updates.asStateFlow()
+
+    private val _isUpdatesLoading = MutableStateFlow(false)
+    val isUpdatesLoading: StateFlow<Boolean> = _isUpdatesLoading.asStateFlow()
+
+    private val _isUpdatesRefreshing = MutableStateFlow(false)
+    val isUpdatesRefreshing: StateFlow<Boolean> = _isUpdatesRefreshing.asStateFlow()
 
     private val _updatesError = MutableStateFlow<String?>(null)
     val updatesError: StateFlow<String?> = _updatesError.asStateFlow()
 
+    private val _articles = MutableStateFlow<List<Article>>(emptyList())
+    val articles: StateFlow<List<Article>> = _articles.asStateFlow()
+
+    private val _isArticlesLoading = MutableStateFlow(false)
+    val isArticlesLoading: StateFlow<Boolean> = _isArticlesLoading.asStateFlow()
+
+    private val _isArticlesRefreshing = MutableStateFlow(false)
+    val isArticlesRefreshing: StateFlow<Boolean> = _isArticlesRefreshing.asStateFlow()
+
     private val _articlesError = MutableStateFlow<String?>(null)
     val articlesError: StateFlow<String?> = _articlesError.asStateFlow()
+
+    private val _events = MutableStateFlow<List<EventEndpointNormal>>(emptyList())
+    val events: StateFlow<List<EventEndpointNormal>> = _events.asStateFlow()
+
+    private val _isEventsLoading = MutableStateFlow(false)
+    val isEventsLoading: StateFlow<Boolean> = _isEventsLoading.asStateFlow()
+
+    private val _isEventsRefreshing = MutableStateFlow(false)
+    val isEventsRefreshing: StateFlow<Boolean> = _isEventsRefreshing.asStateFlow()
 
     private val _eventsError = MutableStateFlow<String?>(null)
     val eventsError: StateFlow<String?> = _eventsError.asStateFlow()
@@ -141,42 +198,346 @@ class HomeViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    // History launches for "This Day in History"
+    private val _historyLaunchesCount = MutableStateFlow(0)
+    val historyLaunchesCount: StateFlow<Int> = _historyLaunchesCount.asStateFlow()
+
+    private val _historyLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
+    val historyLaunches: StateFlow<List<LaunchNormal>> = _historyLaunches.asStateFlow()
+
+    private val _isHistoryLaunchesLoading = MutableStateFlow(false)
+    val isHistoryLaunchesLoading: StateFlow<Boolean> = _isHistoryLaunchesLoading.asStateFlow()
+
+    private val _historyLaunchesError = MutableStateFlow<String?>(null)
+    val historyLaunchesError: StateFlow<String?> = _historyLaunchesError.asStateFlow()
+
+    // Quick stats counts
+    private val _next24HoursCount = MutableStateFlow(0)
+    val next24HoursCount: StateFlow<Int> = _next24HoursCount.asStateFlow()
+
+    private val _nextWeekCount = MutableStateFlow(0)
+    val nextWeekCount: StateFlow<Int> = _nextWeekCount.asStateFlow()
+
+    private val _nextMonthCount = MutableStateFlow(0)
+    val nextMonthCount: StateFlow<Int> = _nextMonthCount.asStateFlow()
+
     /**
      * Loads all home screen data in parallel for better performance
      * This is the main entry point for the home screen
+     *
+     * The main loading indicator (_isLoading) only tracks the featured launch load.
+     * Other sections (updates, articles, events, stats) load independently in the background.
      */
     fun loadHomeScreenData() {
         viewModelScope.launch {
             try {
-                _isLoading.value = true
                 clearErrors()
 
-                // Load upcoming launches, updates, articles, events, and quick stats in parallel
-                // Featured launch will be derived from the first upcoming launch
-                val upcomingLaunchesDeferred = async { loadUpcomingLaunches() }
-                val updatesDeferred = async { loadUpdates() }
-                val articlesDeferred = async { loadArticles() }
-                val eventsDeferred = async { loadEvents() }
-                val next24HoursDeferred = async { loadNext24Hours() }
-                val nextWeekDeferred = async { loadNextWeek() }
-                val nextMonthDeferred = async { loadNextMonth() }
+                // Load featured launch (upcoming launches) - this drives the main loading indicator
+                loadUpcomingLaunches()
 
-                // Wait for all to complete
-                upcomingLaunchesDeferred.await()
-                updatesDeferred.await()
-                articlesDeferred.await()
-                eventsDeferred.await()
-                next24HoursDeferred.await()
-                nextWeekDeferred.await()
-                nextMonthDeferred.await()
+                // Load everything else in parallel in the background
+                // These don't affect the main _isLoading state
+                launch { loadUpdates() }
+                launch { loadArticles() }
+                launch { loadEvents() }
+                launch { loadNext24Hours() }
+                launch { loadNextWeek() }
+                launch { loadNextMonth() }
 
-                _isLoading.value = false
             } catch (exception: Exception) {
-                _error.value = exception.message ?: "Unknown error occurred"
-                _isLoading.value = false
+                println("HomeViewModel: Error loading home screen data: ${exception.message}")
             }
         }
     }
+
+    // ========== NEW Simplified Loading Functions Using ViewState ==========
+
+    /**
+     * Loads featured launch with simplified state management
+     * @param forceRefresh If true, bypass cache (user-initiated refresh)
+     */
+    fun loadFeaturedLaunchNew(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                _featuredLaunchState.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+
+                val result = launchRepository.getUpcomingLaunchesNormal(
+                    limit = 1,
+                    forceRefresh = forceRefresh
+                )
+
+                result.onSuccess { dataResult ->
+                    val paginatedLaunches = dataResult.data
+                    _featuredLaunchState.update {
+                        it.copy(
+                            data = paginatedLaunches.results.firstOrNull(),
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+
+                    // Pre-fetch detailed data if we have a launch
+                    paginatedLaunches.results.firstOrNull()?.let { launch ->
+                        preFetchLaunchDetails(launch.id)
+                    }
+                }.onFailure { exception ->
+                    _featuredLaunchState.update {
+                        it.copy(
+                            error = formatErrorMessage(exception),
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                _featuredLaunchState.update {
+                    it.copy(
+                        error = exception.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads upcoming launches with simplified state management
+     * @param limit Number of launches to load
+     * @param forceRefresh If true, bypass cache (user-initiated refresh)
+     */
+    fun loadUpcomingLaunchesNew(limit: Int = 10, forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                // Update state: loading started
+                _upcomingLaunchesState.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+
+                val result = launchRepository.getUpcomingLaunchesNormal(
+                    limit = limit,
+                    forceRefresh = forceRefresh
+                )
+
+                result.onSuccess { dataResult ->
+                    _upcomingLaunchesState.update {
+                        it.copy(
+                            data = dataResult.data.results,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+
+                    // Update combined launches for carousel
+                    updateCombinedLaunches()
+                }.onFailure { exception ->
+                    _upcomingLaunchesState.update {
+                        it.copy(
+                            error = formatErrorMessage(exception),
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                _upcomingLaunchesState.update {
+                    it.copy(
+                        error = exception.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads updates/news feed with simplified state management
+     * @param limit Number of updates to load
+     * @param forceRefresh If true, bypass cache (user-initiated refresh)
+     */
+    fun loadUpdatesNew(limit: Int = 10, forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                _updatesState.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+
+                val result = updatesRepository.getLatestUpdates(
+                    limit = limit,
+                    forceRefresh = forceRefresh
+                )
+
+                result.onSuccess { dataResult ->
+                    _updatesState.update {
+                        it.copy(
+                            data = dataResult.data.results,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+                }.onFailure { exception ->
+                    _updatesState.update {
+                        it.copy(
+                            error = formatErrorMessage(exception),
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                _updatesState.update {
+                    it.copy(
+                        error = exception.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads news articles with simplified state management
+     * @param limit Number of articles to load
+     * @param forceRefresh If true, bypass cache (user-initiated refresh)
+     */
+    fun loadArticlesNew(limit: Int = 5, forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                _articlesState.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+
+                val result = articlesRepository.getArticles(
+                    limit = limit,
+                    forceRefresh = forceRefresh
+                )
+
+                result.onSuccess { dataResult ->
+                    _articlesState.update {
+                        it.copy(
+                            data = dataResult.data.results,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+                }.onFailure { exception ->
+                    _articlesState.update {
+                        it.copy(
+                            error = formatErrorMessage(exception),
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                _articlesState.update {
+                    it.copy(
+                        error = exception.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads events with simplified state management
+     * @param limit Number of events to load
+     * @param forceRefresh If true, bypass cache (user-initiated refresh)
+     */
+    fun loadEventsNew(limit: Int = 10, forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                _eventsState.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+
+                val result = eventsRepository.getUpcomingEvents(
+                    limit = limit,
+                    forceRefresh = forceRefresh
+                )
+
+                result.onSuccess { dataResult ->
+                    _eventsState.update {
+                        it.copy(
+                            data = dataResult.data.results,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+                }.onFailure { exception ->
+                    _eventsState.update {
+                        it.copy(
+                            error = formatErrorMessage(exception),
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                _eventsState.update {
+                    it.copy(
+                        error = exception.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Refreshes all home screen sections (for pull-to-refresh)
+     * @param onComplete Callback invoked when all refreshes complete
+     */
+    fun refreshAll(onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            try {
+                // Get current day and month for history refresh
+                val currentDate = Clock.System.now()
+                    .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+                val currentDay = currentDate.day
+                val currentMonth = currentDate.month.ordinal
+
+                // Launch all refreshes in parallel
+                val jobs = listOf(
+                    async { loadFeaturedLaunchNew(forceRefresh = true) },
+                    async { loadUpcomingLaunchesNew(forceRefresh = true) },
+                    async { loadUpdatesNew(forceRefresh = true) },
+                    async { loadArticlesNew(forceRefresh = true) },
+                    async { loadEventsNew(forceRefresh = true) },
+                    async {
+                        loadHistoryLaunchesNew(
+                            day = currentDay,
+                            month = currentMonth,
+                            forceRefresh = true
+                        )
+                    }
+                )
+
+                // Wait for all to complete
+                jobs.forEach { it.await() }
+
+                onComplete()
+            } catch (exception: Exception) {
+                println("HomeViewModel: Error during refreshAll: ${exception.message}")
+                onComplete()
+            }
+        }
+    }
+
+    /**
+     * Updates combined launches list from previous and upcoming launches
+     */
+    private fun updateCombinedLaunches() {
+        val previousReversed = _previousLaunches.value.reversed()
+        val newCombined = previousReversed + _upcomingLaunchesState.value.data
+        _combinedLaunches.value = newCombined
+        _upcomingStartIndex.value = previousReversed.size
+    }
+
+    // ========== Legacy Loading Functions (will be removed after migration) ==========
 
     /**
      * Loads the featured launch (first item from upcoming launches)
@@ -193,40 +554,69 @@ class HomeViewModel(
      * Incorporates LaunchViewModel.fetchUpcomingLaunchesNormal()
      */
     fun loadUpcomingLaunches(limit: Int = 10, forceRefresh: Boolean = false) {
-        // Skip loading if we already have data and not forcing refresh
-        if (!forceRefresh && _upcomingLaunches.value.isNotEmpty() && !_isUpcomingLaunchesLoading.value && _upcomingLaunchesError.value == null) {
-            return
-        }
-        
+        println("=== HomeViewModel.loadUpcomingLaunches ===")
+        println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
+
         viewModelScope.launch {
             try {
-                _isUpcomingLaunchesLoading.value = true
-                _isPreviousLaunchesLoading.value = true
+                val hasExistingData = _upcomingLaunches.value.isNotEmpty()
+
+                // STATE 1: Fresh load, no data - show shimmer
+                if (!hasExistingData) {
+                    _isLoading.value = true  // Main app loading indicator
+                    _isUpcomingLaunchesLoading.value = true
+                    _isPreviousLaunchesLoading.value = true
+                    _isFeaturedLaunchLoading.value = true
+                }
+                // STATE 2: Stale data (automatic) - show data + pull-to-refresh indicator
+                // STATE 3: Fresh data - do nothing, skip the call
+                // STATE 4: User refresh - show data + pull-to-refresh indicator
+                else if (forceRefresh) {
+                    _isUpcomingLaunchesRefreshing.value = true
+                    _isPreviousLaunchesRefreshing.value = true
+                } else {
+                    // STATE 3: Have fresh data, not forcing refresh - skip
+                    println("Skipping load: data exists and not forcing refresh")
+                    return@launch
+                }
+
                 _upcomingLaunchesError.value = null
                 _previousLaunchesError.value = null
 
+                println("Calling repository methods with forceRefresh=$forceRefresh")
                 // Load both upcoming and previous launches in parallel
-                val upcomingDeferred = async { launchRepository.getUpcomingLaunchesNormal(limit = limit) }
-                val previousDeferred = async { launchRepository.getPreviousLaunchesNormal(limit = 5) }
+                val upcomingDeferred = async {
+                    launchRepository.getUpcomingLaunchesNormal(
+                        limit = limit,
+                        forceRefresh = forceRefresh
+                    )
+                }
+                val previousDeferred = async {
+                    launchRepository.getPreviousLaunchesNormal(
+                        limit = 5,
+                        forceRefresh = forceRefresh
+                    )
+                }
 
                 val upcomingResult = upcomingDeferred.await()
                 val previousResult = previousDeferred.await()
-                
-                upcomingResult.onSuccess { paginatedLaunches: PaginatedLaunchNormalList ->
+
+                upcomingResult.onSuccess { dataResult ->
+                    val paginatedLaunches = dataResult.data
                     println("=== HomeViewModel: Received Upcoming Launches ===")
                     println("Total launches: ${paginatedLaunches.results.size}")
-                    
+
                     // Set the first launch as the featured launch and remove it from upcoming list
                     if (paginatedLaunches.results.isNotEmpty()) {
                         val featuredLaunch = paginatedLaunches.results.first()
                         _featuredLaunch.value = featuredLaunch
-                        
+
                         // Store the LaunchNormal in cache for quick access
                         launchCache.cacheLaunchNormal(featuredLaunch)
-                        
+
                         // Pre-fetch detailed data in the background for instant loading if user clicks "Explore"
                         preFetchLaunchDetails(featuredLaunch.id)
-                        
+
                         // Remove the first launch from upcoming list to avoid duplication
                         _upcomingLaunches.value = paginatedLaunches.results.drop(1)
                         println("Featured launch set from first upcoming: ${featuredLaunch.name}")
@@ -237,50 +627,70 @@ class HomeViewModel(
                         _upcomingLaunches.value = emptyList()
                         println("No launches available for featured launch")
                     }
-                    
+
+                    _isLoading.value = false  // Clear main app loading indicator
                     _isUpcomingLaunchesLoading.value = false
+                    _isUpcomingLaunchesRefreshing.value = false
                     _isFeaturedLaunchLoading.value = false
+
+                    // Trigger animation by updating timestamp
+                    _lastDataUpdate.value = System.now().toEpochMilliseconds()
                 }.onFailure { exception ->
                     val errorMessage = formatErrorMessage(exception)
                     println("Failed to get upcoming launches: $errorMessage")
                     _upcomingLaunchesError.value = errorMessage
                     _upcomingLaunches.value = emptyList()
-                    
+
                     // Also handle featured launch error since it depends on upcoming launches
                     _featuredLaunch.value = null
                     _featuredLaunchError.value = errorMessage
-                    
+
+                    _isLoading.value = false  // Clear main app loading indicator even on error
                     _isUpcomingLaunchesLoading.value = false
+                    _isUpcomingLaunchesRefreshing.value = false
                     _isFeaturedLaunchLoading.value = false
                 }
 
-                previousResult.onSuccess { paginatedPreviousLaunches: PaginatedLaunchNormalList ->
+                previousResult.onSuccess { dataResult ->
+                    val paginatedPreviousLaunches = dataResult.data
                     println("=== HomeViewModel: Received Previous Launches ===")
                     println("Total previous launches: ${paginatedPreviousLaunches.results.size}")
-                    
+
                     _previousLaunches.value = paginatedPreviousLaunches.results
                     _isPreviousLaunchesLoading.value = false
+                    _isPreviousLaunchesRefreshing.value = false
+
+                    // Trigger animation by updating timestamp
+                    _lastDataUpdate.value = System.now().toEpochMilliseconds()
                 }.onFailure { exception ->
                     val errorMessage = formatErrorMessage(exception)
                     println("Failed to get previous launches: $errorMessage")
                     _previousLaunchesError.value = errorMessage
                     _previousLaunches.value = emptyList()
                     _isPreviousLaunchesLoading.value = false
+                    _isPreviousLaunchesRefreshing.value = false
                 }
 
                 // Combine previous and upcoming launches for the carousel
                 // Previous launches are in reverse chronological order (most recent first)
                 // We want them in chronological order (oldest first) so they appear before upcoming
                 val previousReversed = _previousLaunches.value.reversed()
-                _combinedLaunches.value = previousReversed + _upcomingLaunches.value
+                val newCombined = previousReversed + _upcomingLaunches.value
+
+                println("=== Combined Launches Update ===")
+                println("Previous: ${previousReversed.size}, Upcoming: ${_upcomingLaunches.value.size}")
+                println("Old combined size: ${_combinedLaunches.value.size}")
+                println("New combined size: ${newCombined.size}")
+
+                _combinedLaunches.value = newCombined
                 _upcomingStartIndex.value = previousReversed.size
 
-                println("=== Combined Launches ===")
-                println("Previous: ${previousReversed.size}, Upcoming: ${_upcomingLaunches.value.size}")
+                println("Combined launches updated successfully")
                 println("Upcoming start index: ${_upcomingStartIndex.value}")
 
             } catch (exception: Exception) {
                 _upcomingLaunchesError.value = exception.message
+                _isLoading.value = false  // Clear main app loading indicator on exception
                 _isUpcomingLaunchesLoading.value = false
                 _isPreviousLaunchesLoading.value = false
             }
@@ -288,25 +698,85 @@ class HomeViewModel(
     }
 
     /**
+     * Loads history launches with simplified state management (NEW ViewState pattern)
+     * @param day Day of month to filter by
+     * @param month Month to filter by
+     * @param limit Number of launches to load
+     * @param forceRefresh If true, bypass cache (user-initiated refresh)
+     */
+    fun loadHistoryLaunchesNew(
+        day: Int,
+        month: Int,
+        limit: Int = 100,
+        forceRefresh: Boolean = false
+    ) {
+        viewModelScope.launch {
+            try {
+                _historyState.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+
+                val result = launchRepository.getLaunchesByDayAndMonth(
+                    day = day,
+                    month = month,
+                    limit = limit
+                )
+
+                result.onSuccess { paginatedLaunches ->
+                    println("=== HomeViewModel: Received History Launches ===")
+                    println("Total launches on $month/$day: ${paginatedLaunches.count}")
+
+                    _historyState.update {
+                        it.copy(
+                            data = HistoryData(
+                                count = paginatedLaunches.count,
+                                launches = paginatedLaunches.results.reversed() // Most recent first
+                            ),
+                            isLoading = false
+                        )
+                    }
+                }.onFailure { exception ->
+                    // Keep existing data, just show error
+                    _historyState.update {
+                        it.copy(
+                            error = formatErrorMessage(exception),
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                _historyState.update {
+                    it.copy(
+                        error = exception.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    /**
      * Loads launches that happened on this day in history (same day and month in previous years)
+     * LEGACY - Use loadHistoryLaunchesNew instead
      */
     fun loadHistoryLaunches(day: Int, month: Int, forceRefresh: Boolean = false) {
         // Skip loading if we already have data and not forcing refresh
         if (!forceRefresh && _historyLaunchesCount.value > 0 && !_isHistoryLaunchesLoading.value && _historyLaunchesError.value == null) {
             return
         }
-        
+
         viewModelScope.launch {
             try {
                 _isHistoryLaunchesLoading.value = true
                 _historyLaunchesError.value = null
 
-                val result = launchRepository.getLaunchesByDayAndMonth(day = day, month = month, limit = 100)
-                
+                val result =
+                    launchRepository.getLaunchesByDayAndMonth(day = day, month = month, limit = 100)
+
                 result.onSuccess { paginatedLaunches ->
                     println("=== HomeViewModel: Received History Launches ===")
                     println("Total launches on $month/$day: ${paginatedLaunches.count}")
-                    
+
                     // Store both the count and the actual launches (reversed to show most recent first)
                     _historyLaunchesCount.value = paginatedLaunches.count
                     _historyLaunches.value = paginatedLaunches.results.reversed()
@@ -329,38 +799,51 @@ class HomeViewModel(
 
     /**
      * Loads the latest updates/news feed
+     * LEGACY - Use loadUpdatesNew instead
      * Replaces UpdatesViewModel.fetchLatestUpdates()
      */
     fun loadUpdates(limit: Int = 10, forceRefresh: Boolean = false) {
-        // Skip loading if we already have data and not forcing refresh
-        if (!forceRefresh && _updates.value.isNotEmpty() && !_isUpdatesLoading.value && _updatesError.value == null) {
-            return
-        }
-        
         viewModelScope.launch {
             try {
-                _isUpdatesLoading.value = true
+                val hasExistingData = _updates.value.isNotEmpty()
+
+                if (!hasExistingData) {
+                    // STATE 1: Fresh load, no data - show shimmer
+                    _isUpdatesLoading.value = true
+                } else if (forceRefresh) {
+                    // STATE 2/4: Stale or user refresh - show pull-to-refresh
+                    _isUpdatesRefreshing.value = true
+                } else {
+                    // STATE 3: Have fresh data - skip
+                    return@launch
+                }
+
                 _updatesError.value = null
 
-                val result = updatesRepository.getLatestUpdates(limit = limit, forceRefresh = forceRefresh)
-                
-                result.onSuccess { paginatedUpdates: PaginatedUpdateEndpointList ->
+                val result =
+                    updatesRepository.getLatestUpdates(limit = limit, forceRefresh = forceRefresh)
+
+                result.onSuccess { dataResult ->
+                    val paginatedUpdates = dataResult.data
                     println("=== HomeViewModel: Received Updates ===")
                     println("Total updates: ${paginatedUpdates.results.size}")
-                    
+
                     _updates.value = paginatedUpdates.results
                     _isUpdatesLoading.value = false
+                    _isUpdatesRefreshing.value = false
                 }.onFailure { exception: Throwable ->
                     val errorMessage = formatErrorMessage(exception)
                     println("Failed to get updates: $errorMessage")
                     _updatesError.value = errorMessage
                     _updates.value = emptyList()
                     _isUpdatesLoading.value = false
+                    _isUpdatesRefreshing.value = false
                 }
 
             } catch (exception: Exception) {
                 _updatesError.value = exception.message
                 _isUpdatesLoading.value = false
+                _isUpdatesRefreshing.value = false
             }
         }
     }
@@ -369,69 +852,93 @@ class HomeViewModel(
      * Loads the latest news articles from SNAPI
      */
     fun loadArticles(limit: Int = 5, forceRefresh: Boolean = false) {
-        // Skip loading if we already have data and not forcing refresh
-        if (!forceRefresh && _articles.value.isNotEmpty() && !_isArticlesLoading.value && _articlesError.value == null) {
-            return
-        }
-        
         viewModelScope.launch {
             try {
-                _isArticlesLoading.value = true
+                val hasExistingData = _articles.value.isNotEmpty()
+
+                if (!hasExistingData) {
+                    // STATE 1: Fresh load, no data - show shimmer
+                    _isArticlesLoading.value = true
+                } else if (forceRefresh) {
+                    // STATE 2/4: Stale or user refresh - show pull-to-refresh
+                    _isArticlesRefreshing.value = true
+                } else {
+                    // STATE 3: Have fresh data - skip
+                    return@launch
+                }
+
                 _articlesError.value = null
 
-                val result = articlesRepository.getArticles(limit = limit, forceRefresh = forceRefresh)
-                
-                result.onSuccess { paginatedArticles: PaginatedArticleList ->
+                val result =
+                    articlesRepository.getArticles(limit = limit, forceRefresh = forceRefresh)
+
+                result.onSuccess { dataResult ->
+                    val paginatedArticles = dataResult.data
                     println("=== HomeViewModel: Received Articles ===")
                     println("Total articles: ${paginatedArticles.results.size}")
-                    
+
                     _articles.value = paginatedArticles.results
                     _isArticlesLoading.value = false
+                    _isArticlesRefreshing.value = false
                 }.onFailure { exception: Throwable ->
                     val errorMessage = formatErrorMessage(exception)
                     println("Failed to get articles: $errorMessage")
                     _articlesError.value = errorMessage
                     _articles.value = emptyList()
                     _isArticlesLoading.value = false
+                    _isArticlesRefreshing.value = false
                 }
 
             } catch (exception: Exception) {
                 _articlesError.value = exception.message
                 _isArticlesLoading.value = false
+                _isArticlesRefreshing.value = false
             }
         }
     }
 
     fun loadEvents(limit: Int = 10, forceRefresh: Boolean = false) {
-        // Skip loading if we already have data and not forcing refresh
-        if (!forceRefresh && _events.value.isNotEmpty() && !_isEventsLoading.value && _eventsError.value == null) {
-            return
-        }
-        
         viewModelScope.launch {
             try {
-                _isEventsLoading.value = true
+                val hasExistingData = _events.value.isNotEmpty()
+
+                if (!hasExistingData) {
+                    // STATE 1: Fresh load, no data - show shimmer
+                    _isEventsLoading.value = true
+                } else if (forceRefresh) {
+                    // STATE 2/4: Stale or user refresh - show pull-to-refresh
+                    _isEventsRefreshing.value = true
+                } else {
+                    // STATE 3: Have fresh data - skip
+                    return@launch
+                }
+
                 _eventsError.value = null
 
-                val result = eventsRepository.getUpcomingEvents(limit = limit, forceRefresh = forceRefresh)
-                
-                result.onSuccess { paginatedEvents: PaginatedEventEndpointNormalList ->
+                val result =
+                    eventsRepository.getUpcomingEvents(limit = limit, forceRefresh = forceRefresh)
+
+                result.onSuccess { dataResult ->
+                    val paginatedEvents = dataResult.data
                     println("=== HomeViewModel: Received Events ===")
                     println("Total events: ${paginatedEvents.results.size}")
-                    
+
                     _events.value = paginatedEvents.results
                     _isEventsLoading.value = false
+                    _isEventsRefreshing.value = false
                 }.onFailure { exception: Throwable ->
                     val errorMessage = formatErrorMessage(exception)
                     println("Failed to get events: $errorMessage")
                     _eventsError.value = errorMessage
                     _events.value = emptyList()
                     _isEventsLoading.value = false
+                    _isEventsRefreshing.value = false
                 }
 
             } catch (exception: Exception) {
                 _eventsError.value = exception.message
                 _isEventsLoading.value = false
+                _isEventsRefreshing.value = false
             }
         }
     }
@@ -476,9 +983,14 @@ class HomeViewModel(
      * Useful for pull-to-refresh functionality
      */
     fun refreshHomeScreenData() {
+        // Set refreshing state immediately (synchronously) before launching coroutine
+        // This ensures pull-to-refresh indicator stays visible
+        _isRefreshing.value = true
+
         viewModelScope.launch {
             try {
-                _isLoading.value = true
+                println("=== HomeViewModel.refreshHomeScreenData ===")
+                println("Force refreshing all home screen data")
                 clearErrors()
 
                 // Force refresh all home screen data in parallel
@@ -494,10 +1006,13 @@ class HomeViewModel(
                 articlesDeferred.await()
                 eventsDeferred.await()
 
-                _isLoading.value = false
+                _isRefreshing.value = false
+
+                // Trigger animation by updating timestamp
+                _lastDataUpdate.value = System.now().toEpochMilliseconds()
             } catch (exception: Exception) {
                 _error.value = exception.message ?: "Unknown error occurred"
-                _isLoading.value = false
+                _isRefreshing.value = false
             }
         }
     }
@@ -654,7 +1169,7 @@ class HomeViewModel(
             try {
                 println("Pre-fetching detailed data for launch: $launchId")
                 val result = launchRepository.getLaunchDetails(launchId)
-                
+
                 result.onSuccess { launchDetailed ->
                     // Cache the detailed launch data for instant access later
                     launchCache.cacheLaunchDetailed(launchDetailed)
@@ -676,10 +1191,12 @@ class HomeViewModel(
      */
     private fun formatErrorMessage(exception: Throwable): String {
         return when {
-            exception.message?.contains("throttled") == true -> 
+            exception.message?.contains("throttled") == true ->
                 "API rate limit exceeded. Please try again later."
-            exception.message?.contains("API Error") == true -> 
+
+            exception.message?.contains("API Error") == true ->
                 exception.message!!.substringAfter("API Error: ")
+
             else -> exception.message ?: "Unknown error occurred"
         }
     }

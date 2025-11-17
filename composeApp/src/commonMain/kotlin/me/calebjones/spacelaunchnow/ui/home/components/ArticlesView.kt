@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,56 +32,103 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.SubcomposeAsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
-import kotlin.time.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeFormat
-import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Instant
 
 
 @Composable
 fun ArticlesView() {
     val homeViewModel = koinViewModel<HomeViewModel>()
-    val articles by homeViewModel.articles.collectAsState()
-    val isLoading by homeViewModel.isArticlesLoading.collectAsState()
-    val error by homeViewModel.articlesError.collectAsState()
+    val state by homeViewModel.articlesState.collectAsStateWithLifecycle()
 
     // Load articles if not already loaded and no error
     LaunchedEffect(Unit) {
-        if (articles.isEmpty() && !isLoading && error == null) {
-            homeViewModel.loadArticles(5)
+        if (state.data.isEmpty() && !state.isLoading && state.error == null) {
+            homeViewModel.loadArticlesNew(5)
         }
     }
 
     when {
-        isLoading && articles.isEmpty() -> {
+        // STATE 4: Error State - show cached data with banner OR just error
+        state.error != null -> {
+            if (state.data.isNotEmpty()) {
+                // Show stale data with error indicator
+                Column {
+                    // Error banner
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Showing cached data",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                    // Show stale articles
+                    Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                        state.data.take(5).forEach { article ->
+                            ArticleItem(article = article)
+                        }
+                    }
+                }
+            } else {
+                // No cached data, just show error
+                ArticleErrorCard(error = state.error!!)
+            }
+        }
+
+        // STATE 2 & 3: Loading with existing data
+        state.isLoading && state.data.isNotEmpty() -> {
+            Box {
+                Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                    state.data.take(5).forEach { article ->
+                        ArticleItem(article = article)
+                    }
+                }
+
+                // Show loading indicator
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                        .size(24.dp)
+                )
+            }
+        }
+
+        // Data available (not loading, no error)
+        state.data.isNotEmpty() && state.error == null -> {
+            Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                state.data.take(5).forEach { article ->
+                    ArticleItem(article = article)
+                }
+            }
+        }
+
+        // STATE 1: Fresh load, no data - show shimmer
+        state.isLoading -> {
             Column {
                 repeat(3) {
                     NewsItemShimmer()
                 }
             }
         }
-        error != null -> {
-            ArticleErrorCard(
-                error = error!!,
-                onRetry = { homeViewModel.loadArticles(5, forceRefresh = true) }
-            )
-        }
-        articles.isNotEmpty() -> {
-            Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                articles.take(5).forEach { article ->
-                    ArticleItem(article = article)
-                }
-            }
-        }
+
+        // Fallback
         else -> {
             Column {
                 repeat(3) {
@@ -203,8 +247,7 @@ fun ArticleItem(article: Article) {
 
 @Composable
 fun ArticleErrorCard(
-    error: String,
-    onRetry: (() -> Unit)? = null
+    error: String
 ) {
     Card(
         modifier = Modifier
@@ -232,19 +275,6 @@ fun ArticleErrorCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
             )
-
-            onRetry?.let { retry ->
-                Button(
-                    onClick = retry,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError
-                    ),
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    Text("Retry")
-                }
-            }
         }
     }
 }

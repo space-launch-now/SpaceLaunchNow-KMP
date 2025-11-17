@@ -8,7 +8,9 @@ import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Clock.System
 
 /**
@@ -16,20 +18,32 @@ import kotlin.time.Clock.System
  * Provides caching with automatic expiration
  */
 class LaunchLocalDataSource(
-    database: SpaceLaunchDatabase
+    database: SpaceLaunchDatabase,
+    private val appPreferences: AppPreferences
 ) {
     private val queries = database.launchQueries
     private val json = Json { ignoreUnknownKeys = true }
     
-    // Default cache durations
-    private val basicCacheDuration = 24.hours
-    private val normalCacheDuration = 12.hours
-    private val detailedCacheDuration = 6.hours
+    // All cache durations set to 10 minutes
+    private val cacheDuration = 10.minutes
+    
+    // Debug cache duration (1 minutes for testing)
+    private val debugCacheDuration = 1.minutes
+    
+    private suspend fun getEffectiveCacheDuration(): kotlin.time.Duration {
+        return if (appPreferences.isDebugShortCacheTtlEnabled()) {
+            println("⚠️ DEBUG MODE: Using short cache TTL (1 minutes) instead of ${cacheDuration.inWholeHours} hour")
+            debugCacheDuration
+        } else {
+            cacheDuration
+        }
+    }
     
     // LaunchBasic operations
     suspend fun cacheBasicLaunch(launch: LaunchBasic) {
         val now = System.now().toEpochMilliseconds()
-        val expiresAt = now + basicCacheDuration.inWholeMilliseconds
+        val duration = getEffectiveCacheDuration()
+        val expiresAt = now + duration.inWholeMilliseconds
         
         queries.insertOrReplaceBasic(
             id = launch.id,
@@ -91,7 +105,8 @@ class LaunchLocalDataSource(
     // LaunchNormal operations
     suspend fun cacheNormalLaunch(launch: LaunchNormal) {
         val now = System.now().toEpochMilliseconds()
-        val expiresAt = now + normalCacheDuration.inWholeMilliseconds
+        val duration = getEffectiveCacheDuration()
+        val expiresAt = now + duration.inWholeMilliseconds
         
         queries.insertOrReplaceNormal(
             id = launch.id,
@@ -128,34 +143,41 @@ class LaunchLocalDataSource(
     
     suspend fun getUpcomingNormalLaunches(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
-        return queries.getUpcomingNormal(now, now, limit.toLong())
+        val results = queries.getUpcomingNormal(now, now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
                 try {
+                    val ageMinutes = (now - cached.cached_at) / 60000
+                    println("  Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
                     json.decodeFromString<LaunchNormal>(cached.json_data)
                 } catch (e: Exception) {
                     null
                 }
             }
+        return results
     }
     
     suspend fun getPreviousNormalLaunches(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
-        return queries.getPreviousNormal(now, now, limit.toLong())
+        val results = queries.getPreviousNormal(now, now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
                 try {
+                    val ageMinutes = (now - cached.cached_at) / 60000
+                    println("  Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
                     json.decodeFromString<LaunchNormal>(cached.json_data)
                 } catch (e: Exception) {
                     null
                 }
             }
+        return results
     }
     
     // LaunchDetailed operations
     suspend fun cacheDetailedLaunch(launch: LaunchDetailed) {
         val now = System.now().toEpochMilliseconds()
-        val expiresAt = now + detailedCacheDuration.inWholeMilliseconds
+        val duration = getEffectiveCacheDuration()
+        val expiresAt = now + duration.inWholeMilliseconds
         
         queries.insertOrReplaceDetailed(
             id = launch.id,
@@ -183,7 +205,73 @@ class LaunchLocalDataSource(
     suspend fun getDetailedLaunch(id: String): LaunchDetailed? {
         val now = System.now().toEpochMilliseconds()
         val cached = queries.getDetailedById(id, now).executeAsOneOrNull()
-        return cached?.let { json.decodeFromString<LaunchDetailed>(it.json_data) }
+        return cached?.let {
+            val ageMinutes = (now - it.cached_at) / 60000
+            println("  Cache entry age: ${ageMinutes} minutes (cached at ${it.cached_at}, expires at ${it.expires_at})")
+            json.decodeFromString<LaunchDetailed>(it.json_data)
+        }
+    }
+    
+    // Stale cache methods - return data regardless of expiration for stale-while-revalidate pattern
+    suspend fun getUpcomingNormalLaunchesStale(limit: Int): List<LaunchNormal> {
+        val now = System.now().toEpochMilliseconds()
+        return queries.getUpcomingNormalStale(now, limit.toLong())
+            .executeAsList()
+            .mapNotNull { cached ->
+                try {
+                    json.decodeFromString<LaunchNormal>(cached.json_data)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+    }
+    
+    suspend fun getPreviousNormalLaunchesStale(limit: Int): List<LaunchNormal> {
+        val now = System.now().toEpochMilliseconds()
+        return queries.getPreviousNormalStale(now, limit.toLong())
+            .executeAsList()
+            .mapNotNull { cached ->
+                try {
+                    json.decodeFromString<LaunchNormal>(cached.json_data)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+    }
+    
+    suspend fun getDetailedLaunchStale(id: String): LaunchDetailed? {
+        return queries.getDetailedByIdStale(id).executeAsOneOrNull()?.let {
+            try {
+                json.decodeFromString<LaunchDetailed>(it.json_data)
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+    
+    // Cache metadata operations
+    
+    /**
+     * Gets the timestamp of when data for a specific cache key was last cached.
+     * Returns the most recent cached_at timestamp for launches in the specified category.
+     * 
+     * @param key Cache category: "upcoming_launches", "previous_launches", etc.
+     * @return Timestamp in milliseconds since epoch, or null if no cached data exists
+     */
+    suspend fun getCacheTimestamp(key: String): Long? {
+        // For upcoming/previous launches, get the most recent cached_at from normal launches
+        // Since we cache all fetched launches together, they'll have the same timestamp
+        return when (key) {
+            "upcoming_launches" -> {
+                val now = System.now().toEpochMilliseconds()
+                queries.getUpcomingNormalStale(now, 1).executeAsOneOrNull()?.cached_at
+            }
+            "previous_launches" -> {
+                val now = System.now().toEpochMilliseconds()
+                queries.getPreviousNormalStale(now, 1).executeAsOneOrNull()?.cached_at
+            }
+            else -> null
+        }
     }
     
     // Cleanup operations

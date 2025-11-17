@@ -116,7 +116,7 @@ class LaunchListWidget : GlanceAppWidget() {
             try {
                 val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
                 val result = launchRepository.getUpcomingLaunchesNormal(limit = 10)
-                result.getOrNull()?.results ?: emptyList()
+                result.getOrNull()?.data?.results ?: emptyList()
             } catch (e: Exception) {
                 println("Widget: Failed to fetch launches: ${e.message}")
                 e.printStackTrace()
