@@ -43,6 +43,11 @@ fun LaunchDetailScreen(
     val error by viewModel.error.collectAsState()
     val videoPlayerState by viewModel.videoPlayerState.collectAsState()
     
+    // Related news state
+    val relatedNews by viewModel.relatedNews.collectAsState()
+    val isNewsLoading by viewModel.isNewsLoading.collectAsState()
+    val newsError by viewModel.newsError.collectAsState()
+    
     // Determine current launch data
     val currentLaunch = cachedLaunchDetailed ?: launchDetails
 
@@ -72,6 +77,9 @@ fun LaunchDetailScreen(
             // No preloaded data and not currently loading, fetch from API
             viewModel.fetchLaunchDetails(launchId)
         }
+        
+        // Fetch related news for this launch
+        viewModel.fetchRelatedNews(launchId)
     }
 
     // 🎯 INTERSTITIAL AD: Show every 4th detail view visit
@@ -106,6 +114,9 @@ fun LaunchDetailScreen(
                 LaunchDetailView(
                     launch = currentLaunch,
                     videoPlayerState = videoPlayerState,
+                    relatedNews = relatedNews,
+                    isNewsLoading = isNewsLoading,
+                    newsError = newsError,
                     onSelectVideo = viewModel::selectVideo,
                     onSetPlayerVisible = viewModel::setPlayerVisible,
                     onNavigateBack = onNavigateBack,
