@@ -893,9 +893,13 @@ fun DebugSettingsScreen(
                             } else {
                                 Button(
                                     onClick = {
-                                        // Enable simulation with free state
+                                        // Enable simulation with premium state as default
                                         coroutineScope.launch {
-                                            simpleRepo?.setDebugSubscription(SubscriptionType.FREE)
+                                            simpleRepo?.setDebugSubscription(
+                                                subscriptionType = SubscriptionType.PREMIUM,
+                                                productId = "debug_premium",
+                                                entitlements = setOf("premium")
+                                            )
                                             isSimulationActive = true
                                         }
                                     }

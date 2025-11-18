@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -50,22 +49,24 @@ fun RelatedNewsCard(
     error: String?
 ) {
     var showAll by remember { mutableStateOf(false) }
-    
+
     Column(modifier = Modifier.fillMaxWidth()) {
         when {
             isLoading && articles.isEmpty() -> {
                 RelatedNewsLoadingState()
             }
+
             error != null && articles.isEmpty() -> {
                 RelatedNewsErrorState(error = error)
             }
+
             articles.isNotEmpty() -> {
                 val displayedArticles = if (showAll) articles else articles.take(5)
-                
+
                 displayedArticles.forEach { article ->
                     RelatedNewsItem(article = article)
                 }
-                
+
                 // Show "Load More" button if there are more than 5 articles
                 if (articles.size > 5 && !showAll) {
                     TextButton(
@@ -80,7 +81,7 @@ fun RelatedNewsCard(
                         )
                     }
                 }
-                
+
                 // Show "Show Less" button if currently showing all
                 if (showAll && articles.size > 5) {
                     TextButton(
@@ -108,7 +109,7 @@ fun RelatedNewsItem(article: Article) {
         onClick = { uriHandler.openUri(article.url) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )

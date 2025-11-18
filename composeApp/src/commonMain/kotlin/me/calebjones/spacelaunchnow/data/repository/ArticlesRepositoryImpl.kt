@@ -133,10 +133,35 @@ class ArticlesRepositoryImpl(
             val response = articlesApi.getFeaturedArticles(limit = limit)
             Result.success(response.body())
         } catch (e: ResponseException) {
+            println("ResponseException in getFeaturedArticles: ${e.message}")
+            // Try to return stale cache if available
+            val staleCached = localDataSource?.getRecentArticles(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles for featured")
+                return Result.success(PaginatedArticleList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: IOException) {
+            println("IOException in getFeaturedArticles: ${e.message}")
+            // Try to return stale cache if available
+            val staleCached = localDataSource?.getRecentArticles(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles for featured (network error)")
+                return Result.success(PaginatedArticleList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: Exception) {
+            println("Exception in getFeaturedArticles: ${e.message}")
             Result.failure(e)
         }
     }
@@ -178,10 +203,35 @@ class ArticlesRepositoryImpl(
             )
             Result.success(response.body())
         } catch (e: ResponseException) {
+            println("ResponseException in searchArticles: ${e.message}")
+            // Try to return stale cache if available (less ideal for search, but better than nothing)
+            val staleCached = localDataSource?.getRecentArticles(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles for search (warning: not filtered)")
+                return Result.success(PaginatedArticleList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: IOException) {
+            println("IOException in searchArticles: ${e.message}")
+            // Try to return stale cache if available
+            val staleCached = localDataSource?.getRecentArticles(limit)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles for search (network error)")
+                return Result.success(PaginatedArticleList(
+                    count = staleCached.size,
+                    next = null,
+                    previous = null,
+                    results = staleCached
+                ))
+            }
             Result.failure(e)
         } catch (e: Exception) {
+            println("Exception in searchArticles: ${e.message}")
             Result.failure(e)
         }
     }

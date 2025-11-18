@@ -290,7 +290,7 @@ private fun ScheduleContent(
                         }
                     }
 
-                    if (tabState.items.isEmpty() && tabState.isLoading && tabState.error == null && !uiState.isRefreshing) {
+                    if (tabState.items.isEmpty() && tabState.isLoading && tabState.error == null && !tabState.isRefreshing) {
                         item {
                             Box(
                                 Modifier.fillMaxWidth().padding(24.dp),

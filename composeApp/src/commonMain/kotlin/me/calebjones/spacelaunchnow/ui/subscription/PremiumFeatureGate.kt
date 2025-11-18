@@ -385,10 +385,15 @@ fun rememberHasFeature(feature: PremiumFeature): State<Boolean> {
     // Observe the access change trigger to recompose when temporary access changes
     val accessChangeTrigger by temporaryAccess.accessChangeTrigger.collectAsState()
 
+    // Calculate initial value from current subscription state to avoid showing ads on cold start
+    val initialHasAccess = remember(subscriptionState, feature) {
+        subscriptionState.hasFeature(feature)
+    }
+
     // Create a state that combines both subscription and temporary access
     // Include accessChangeTrigger in the key to trigger recomposition when it changes
     val hasAccess =
-        produceState(initialValue = false, subscriptionState, feature, accessChangeTrigger) {
+        produceState(initialValue = initialHasAccess, subscriptionState, feature, accessChangeTrigger) {
             // Check subscription state
             val hasSubscription = subscriptionState.hasFeature(feature)
 

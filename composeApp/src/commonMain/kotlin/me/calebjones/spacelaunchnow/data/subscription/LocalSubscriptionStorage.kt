@@ -167,8 +167,9 @@ class LocalSubscriptionStorage {
      */
     suspend fun isInDebugMode(): Boolean {
         val current = get()
-        // Debug mode is active when needsSync is false and we have a premium subscription
+        // Debug mode is active when needsSync is false (manually set by setDebugSubscription)
         // Real subscriptions will have needsSync = true to trigger syncing
-        return !current.needsSync && current.subscriptionType != SubscriptionType.FREE
+        // We check needsSync = false regardless of subscription type to support simulating FREE state
+        return !current.needsSync
     }
 }
