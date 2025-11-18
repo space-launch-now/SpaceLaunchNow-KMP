@@ -4,20 +4,34 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 class UpdateLocalDataSource(
-    database: SpaceLaunchDatabase
+    database: SpaceLaunchDatabase,
+    private val appPreferences: AppPreferences
 ) {
     private val queries = database.updateQueries
     private val json = Json { ignoreUnknownKeys = true }
     
-    private val cacheDuration = 6.hours
+    private val cacheDuration = 1.hours
+    private val debugCacheDuration = 2.minutes
+    
+    private suspend fun getEffectiveCacheDuration(): kotlin.time.Duration {
+        return if (appPreferences.isDebugShortCacheTtlEnabled()) {
+            println("⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${cacheDuration.inWholeHours} hours")
+            debugCacheDuration
+        } else {
+            cacheDuration
+        }
+    }
     
     suspend fun cacheUpdate(update: UpdateEndpoint) {
         val now = Clock.System.now().toEpochMilliseconds()
-        val expiresAt = now + cacheDuration.inWholeMilliseconds
+        val duration = getEffectiveCacheDuration()
+        val expiresAt = now + duration.inWholeMilliseconds
         
         queries.insertOrReplaceUpdate(
             id = update.id.toLong(),
@@ -43,20 +57,34 @@ class UpdateLocalDataSource(
     
     suspend fun getRecentUpdates(limit: Int): List<UpdateEndpoint> {
         val now = Clock.System.now().toEpochMilliseconds()
-        return queries.getRecentUpdates(now, limit.toLong())
+        val results = queries.getRecentUpdates(now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
                 try {
+                    val ageMinutes = (now - cached.cached_at) / 60000
+                    println("  Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
                     json.decodeFromString<UpdateEndpoint>(cached.json_data)
                 } catch (e: Exception) {
                     null
                 }
             }
+        return results
     }
     
     suspend fun deleteExpiredUpdates() {
         val now = Clock.System.now().toEpochMilliseconds()
         queries.deleteExpiredUpdates(now)
+    }
+    
+    /**
+     * Gets the timestamp of when updates were last cached.
+     * Returns the most recent cached_at timestamp.
+     */
+    suspend fun getCacheTimestamp(key: String): Long? {
+        return when (key) {
+            "updates" -> queries.getRecentUpdates(Long.MAX_VALUE, 1).executeAsOneOrNull()?.cached_at
+            else -> null
+        }
     }
     
     suspend fun clearAllUpdates() {

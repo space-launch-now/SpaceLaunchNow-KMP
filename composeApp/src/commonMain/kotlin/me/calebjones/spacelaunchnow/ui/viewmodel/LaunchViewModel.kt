@@ -5,14 +5,16 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 
 data class VideoPlayerState(
     val selectedVideoIndex: Int = 0,
@@ -23,7 +25,8 @@ data class VideoPlayerState(
 
 class LaunchViewModel(
     private val repository: LaunchRepository,
-    private val launchCache: LaunchCache
+    private val launchCache: LaunchCache,
+    private val articlesRepository: ArticlesRepository
 ) : ViewModel() {
 
     private val _upcomingLaunches = MutableStateFlow<PaginatedLaunchBasicList?>(null)
@@ -48,12 +51,22 @@ class LaunchViewModel(
     private val _videoPlayerState = MutableStateFlow(VideoPlayerState())
     val videoPlayerState: StateFlow<VideoPlayerState> = _videoPlayerState
 
+    // Related News State
+    private val _relatedNews = MutableStateFlow<List<Article>>(emptyList())
+    val relatedNews: StateFlow<List<Article>> = _relatedNews
+
+    private val _isNewsLoading = MutableStateFlow(false)
+    val isNewsLoading: StateFlow<Boolean> = _isNewsLoading
+
+    private val _newsError = MutableStateFlow<String?>(null)
+    val newsError: StateFlow<String?> = _newsError
+
     fun fetchUpcomingLaunchesNormal(limit: Int) {
         viewModelScope.launch {
             val result = repository.getUpcomingLaunchesNormal(limit = limit)
-            
-            result.onSuccess { launches ->
-                _upcomingLaunchesNormal.value = launches
+
+            result.onSuccess { dataResult ->
+                _upcomingLaunchesNormal.value = dataResult.data
             }.onFailure { exception ->
                 _error.value = exception.message
             }
@@ -63,7 +76,7 @@ class LaunchViewModel(
     fun fetchLaunchDetails(id: String, forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _error.value = null
-            
+
             // Check if we have detailed data in cache first (unless forcing refresh)
             if (!forceRefresh) {
                 val cachedDetailed = launchCache.getCachedLaunchDetailed(id)
@@ -74,10 +87,10 @@ class LaunchViewModel(
                     return@launch
                 }
             }
-            
+
             _isLoading.value = true
-            
-            val result = repository.getLaunchDetails(id)
+
+            val result = repository.getLaunchDetails(id, forceRefresh = forceRefresh)
             result.onSuccess { launch ->
                 _launchDetails.value = launch
                 updateVideoPlayerState(launch)
@@ -89,7 +102,7 @@ class LaunchViewModel(
             _isLoading.value = false
         }
     }
-    
+
     /**
      * Force refresh launch details (bypasses cache)
      * Useful for pull-to-refresh functionality
@@ -97,7 +110,7 @@ class LaunchViewModel(
     fun refreshLaunchDetails(id: String) {
         fetchLaunchDetails(id, forceRefresh = true)
     }
-    
+
     /**
      * Set launch details directly (used when we have preloaded data)
      */
@@ -122,7 +135,7 @@ class LaunchViewModel(
                 // Data already fetched, no need to fetch again
                 return@launch
             }
-    
+
             val result = repository.getAgencyDetails(agencyId)
             result.onSuccess { agencyData ->
                 _agencyDataMap.value = _agencyDataMap.value.toMutableMap().apply {
@@ -190,5 +203,41 @@ class LaunchViewModel(
      */
     fun hasMultipleVideos(): Boolean {
         return _videoPlayerState.value.availableVideos.size > 1
+    }
+
+    // Related News Methods
+
+    /**
+     * Fetch related news articles for a launch
+     */
+    fun fetchRelatedNews(launchId: String, limit: Int = 20) {
+        viewModelScope.launch {
+            _isNewsLoading.value = true
+            _newsError.value = null
+
+            val result = articlesRepository.getArticlesByLaunch(
+                launchIds = listOf(launchId),
+                limit = limit
+            )
+
+            result.onSuccess { paginatedList ->
+                print("Related news size: ${paginatedList.results.size}")
+                _relatedNews.value = paginatedList.results
+            }.onFailure { exception ->
+                print("Error fetching related news: ${exception.message}")
+                _newsError.value = exception.message
+            }
+
+            _isNewsLoading.value = false
+        }
+    }
+
+    /**
+     * Clear related news state
+     */
+    fun clearRelatedNews() {
+        _relatedNews.value = emptyList()
+        _newsError.value = null
+        _isNewsLoading.value = false
     }
 }

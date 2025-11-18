@@ -2,7 +2,6 @@ package me.calebjones.spacelaunchnow.api.snapi.extensions
 
 import me.calebjones.spacelaunchnow.api.snapi.apis.ArticlesApi
 import me.calebjones.spacelaunchnow.api.snapi.infrastructure.HttpResponse
-import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.api.snapi.models.PaginatedArticleList
 import kotlin.time.Instant
 

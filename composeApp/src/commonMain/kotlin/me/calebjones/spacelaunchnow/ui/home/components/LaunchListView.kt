@@ -77,11 +77,24 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
         val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsState()
         val error by viewModel.upcomingLaunchesError.collectAsState()
         val isLoading by viewModel.isUpcomingLaunchesLoading.collectAsState()
+        val isRefreshing by viewModel.isUpcomingLaunchesRefreshing.collectAsState()
         val scrollState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
 
         // Track if we're currently dragging
         var isDragging by remember { mutableStateOf(false) }
+        
+        // Log when state changes
+        LaunchedEffect(combinedLaunches, isLoading, isRefreshing) {
+            println("=== LaunchListView: State Changed ===")
+            println("Combined launches: ${combinedLaunches.size}")
+            println("isLoading: $isLoading")
+            println("isRefreshing: $isRefreshing")
+            if (combinedLaunches.isNotEmpty()) {
+                println("First launch: ${combinedLaunches.first().name}")
+                println("Last launch: ${combinedLaunches.last().name}")
+            }
+        }
 
         LaunchedEffect(Unit) {
             if (combinedLaunches.isEmpty() && !isLoading && error == null) {
@@ -155,6 +168,7 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
                 }
             }
         } else if (isLoading) {
+            // Only show shimmer on initial load (no data)
             LaunchListShimmer()
         }
     }

@@ -4,10 +4,13 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
 import me.calebjones.spacelaunchnow.data.model.ApiError
+import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 
 class UpdatesRepositoryImpl(
@@ -27,20 +30,36 @@ class UpdatesRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestUpdates(limit: Int, forceRefresh: Boolean): Result<PaginatedUpdateEndpointList> {
+    override suspend fun getLatestUpdates(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedUpdateEndpointList>> {
         return try {
+            println("=== UpdatesRepository.getLatestUpdates ===")
+            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
+            println("Cache available: ${localDataSource != null}")
+            
+            val now = System.now().toEpochMilliseconds()
+            val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
+            
             // Try cache first if available and not forcing refresh
             if (!forceRefresh) {
                 val cachedUpdates = localDataSource?.getRecentUpdates(limit)
+                println("Cache query result: ${cachedUpdates?.size ?: 0} updates found")
                 if (cachedUpdates != null && cachedUpdates.isNotEmpty()) {
-                    println("UpdatesRepository: Returning ${cachedUpdates.size} cached updates")
-                    return Result.success(PaginatedUpdateEndpointList(
-                        count = cachedUpdates.size,
-                        next = null,
-                        previous = null,
-                        results = cachedUpdates
+                    println("✓ CACHE HIT: Returning ${cachedUpdates.size} cached updates")
+                    return Result.success(DataResult(
+                        data = PaginatedUpdateEndpointList(
+                            count = cachedUpdates.size,
+                            next = null,
+                            previous = null,
+                            results = cachedUpdates
+                        ),
+                        source = DataSource.CACHE,
+                        timestamp = staleTimestamp ?: now
                     ))
+                } else {
+                    println("✗ CACHE MISS: No cached data available, fetching from API")
                 }
+            } else {
+                println("⟳ FORCE REFRESH: Bypassing cache, fetching fresh data from API")
             }
             
             println("UpdatesRepository: Fetching updates from API (forceRefresh: $forceRefresh)")
@@ -49,32 +68,46 @@ class UpdatesRepositoryImpl(
             
             // Cache the results for future use
             localDataSource?.cacheUpdates(updates.results)
-            println("UpdatesRepository: Cached ${updates.results.size} updates from API")
+            println("✓ API SUCCESS: Fetched and cached ${updates.results.size} updates")
             
-            Result.success(updates)
+            Result.success(DataResult(
+                data = updates,
+                source = DataSource.NETWORK,
+                timestamp = now
+            ))
         } catch (e: ResponseException) {
             // On error, try to return stale cache if available
             val staleCached = localDataSource?.getRecentUpdates(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 println("UpdatesRepository: Returning ${staleCached.size} stale cached updates due to API error")
-                return Result.success(PaginatedUpdateEndpointList(
-                    count = staleCached.size,
-                    next = null,
-                    previous = null,
-                    results = staleCached
+                return Result.success(DataResult(
+                    data = PaginatedUpdateEndpointList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
                 ))
             }
             Result.failure(e)
         } catch (e: IOException) {
             // On network error, try to return stale cache if available
             val staleCached = localDataSource?.getRecentUpdates(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 println("UpdatesRepository: Returning ${staleCached.size} stale cached updates due to network error")
-                return Result.success(PaginatedUpdateEndpointList(
-                    count = staleCached.size,
-                    next = null,
-                    previous = null,
-                    results = staleCached
+                return Result.success(DataResult(
+                    data = PaginatedUpdateEndpointList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
                 ))
             }
             Result.failure(e)

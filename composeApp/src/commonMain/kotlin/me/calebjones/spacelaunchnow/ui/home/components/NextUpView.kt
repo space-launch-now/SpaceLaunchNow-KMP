@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -37,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
@@ -57,23 +57,36 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun NextLaunchView(navController: NavController) {
     val homeViewModel = koinViewModel<HomeViewModel>()
-    val nextLaunch by homeViewModel.featuredLaunch.collectAsState()
-    val error by homeViewModel.featuredLaunchError.collectAsState()
-    val isLoading by homeViewModel.isFeaturedLaunchLoading.collectAsState()
+    val state by homeViewModel.featuredLaunchState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        homeViewModel.loadFeaturedLaunch()
+        // Always load to keep data fresh (stale-while-revalidate)
+        homeViewModel.loadFeaturedLaunchNew()
     }
-    if (error != null) {
-        ErrorMessageView(
-            errorMessage = error ?: "Unknown error occurred",
-            onRetry = { homeViewModel.refreshFeaturedLaunch() }
-        )
-    } else if (nextLaunch != null) {
-        NextLaunchItemView(nextLaunch!!, navController)
-    } else if (isLoading || nextLaunch == null) {
-        // Show shimmer loading effect while loading
-        NextUpShimmerBox()
+    Column {
+
+
+        when {
+            // STATE 1: Show data if it exists (ALWAYS, even while loading or with error)
+            state.data != null -> {
+                NextLaunchItemView(state.data!!, navController)
+            }
+
+            // STATE 2: Error with no data
+            state.error != null -> {
+                ErrorMessageView(errorMessage = state.error!!)
+            }
+
+            // STATE 3: Initial loading (no data yet)
+            state.isLoading -> {
+                NextUpShimmerBox()
+            }
+
+            // Fallback: no data, not loading, no error (should not happen)
+            else -> {
+                NextUpShimmerBox()
+            }
+        }
     }
 }
 
@@ -283,13 +296,10 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
 
 
 /**
- * A component that displays error messages in a user-friendly way with a retry button
+ * A component that displays error messages in a user-friendly way
  */
 @Composable
-fun ErrorMessageView(
-    errorMessage: String,
-    onRetry: () -> Unit
-) {
+fun ErrorMessageView(errorMessage: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -327,14 +337,6 @@ fun ErrorMessageView(
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-
-                // Retry button
-                Button(
-                    onClick = onRetry,
-                    modifier = Modifier.padding(top = 16.dp)
-                ) {
-                    Text("Retry")
-                }
             }
         }
     }

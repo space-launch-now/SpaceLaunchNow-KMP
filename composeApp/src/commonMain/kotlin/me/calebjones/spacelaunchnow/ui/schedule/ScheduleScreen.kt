@@ -107,8 +107,23 @@ private fun ScheduleContent(
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = uiState.isRefreshing,
-        onRefresh = { viewModel.refresh() }
+        onRefresh = { 
+            println("=== ScheduleScreen: Pull-to-refresh triggered ===")
+            viewModel.refresh() 
+        }
     )
+    
+    // Log when refresh state changes
+    LaunchedEffect(uiState.isRefreshing) {
+        println("=== ScheduleScreen: isRefreshing = ${uiState.isRefreshing} ===")
+    }
+    
+    // Log when launch data changes
+    LaunchedEffect(uiState.upcomingTab.items.size, uiState.previousTab.items.size) {
+        println("=== ScheduleScreen: Data Updated ===")
+        println("Upcoming launches: ${uiState.upcomingTab.items.size}")
+        println("Previous launches: ${uiState.previousTab.items.size}")
+    }
 
     val pagerState = rememberPagerState(
         initialPage = if (uiState.selectedTab == ScheduleTab.Upcoming) 0 else 1,
@@ -275,7 +290,7 @@ private fun ScheduleContent(
                         }
                     }
 
-                    if (tabState.items.isEmpty() && tabState.isLoading && tabState.error == null && !uiState.isRefreshing) {
+                    if (tabState.items.isEmpty() && tabState.isLoading && tabState.error == null && !tabState.isRefreshing) {
                         item {
                             Box(
                                 Modifier.fillMaxWidth().padding(24.dp),

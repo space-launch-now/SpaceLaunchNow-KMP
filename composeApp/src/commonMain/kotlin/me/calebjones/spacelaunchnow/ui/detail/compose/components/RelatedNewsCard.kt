@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.home.components
+package me.calebjones.spacelaunchnow.ui.detail.compose.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,9 +20,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,107 +35,66 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.SubcomposeAsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
-import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Instant
-
 
 @Composable
-fun ArticlesView() {
-    val homeViewModel = koinViewModel<HomeViewModel>()
-    val state by homeViewModel.articlesState.collectAsStateWithLifecycle()
+fun RelatedNewsCard(
+    articles: List<Article>,
+    isLoading: Boolean,
+    error: String?
+) {
+    var showAll by remember { mutableStateOf(false) }
 
-    // Load articles if not already loaded and no error
-    LaunchedEffect(Unit) {
-        if (state.data.isEmpty() && !state.isLoading && state.error == null) {
-            homeViewModel.loadArticlesNew(5)
-        }
-    }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        when {
+            isLoading && articles.isEmpty() -> {
+                RelatedNewsLoadingState()
+            }
 
-    when {
-        // STATE 4: Error State - show cached data with banner OR just error
-        state.error != null -> {
-            if (state.data.isNotEmpty()) {
-                // Show stale data with error indicator
-                Column {
-                    // Error banner
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
-                        ),
+            error != null && articles.isEmpty() -> {
+                RelatedNewsErrorState(error = error)
+            }
+
+            articles.isNotEmpty() -> {
+                val displayedArticles = if (showAll) articles else articles.take(5)
+
+                displayedArticles.forEach { article ->
+                    RelatedNewsItem(article = article)
+                }
+
+                // Show "Load More" button if there are more than 5 articles
+                if (articles.size > 5 && !showAll) {
+                    TextButton(
+                        onClick = { showAll = true },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = "Showing cached data",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.padding(8.dp)
+                            text = "Load More (${articles.size - 5} more)",
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
-                    // Show stale articles
-                    Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                        state.data.take(5).forEach { article ->
-                            ArticleItem(article = article)
-                        }
+                }
+
+                // Show "Show Less" button if currently showing all
+                if (showAll && articles.size > 5) {
+                    TextButton(
+                        onClick = { showAll = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "Show Less",
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
-                }
-            } else {
-                // No cached data, just show error
-                ArticleErrorCard(error = state.error!!)
-            }
-        }
-
-        // STATE 2 & 3: Loading with existing data
-        state.isLoading && state.data.isNotEmpty() -> {
-            Box {
-                Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                    state.data.take(5).forEach { article ->
-                        ArticleItem(article = article)
-                    }
-                }
-
-                // Show loading indicator
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(16.dp)
-                        .size(24.dp)
-                )
-            }
-        }
-
-        // Data available (not loading, no error)
-        state.data.isNotEmpty() && state.error == null -> {
-            Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                state.data.take(5).forEach { article ->
-                    ArticleItem(article = article)
-                }
-            }
-        }
-
-        // STATE 1: Fresh load, no data - show shimmer
-        state.isLoading -> {
-            Column {
-                repeat(3) {
-                    NewsItemShimmer()
-                }
-            }
-        }
-
-        // Fallback
-        else -> {
-            Column {
-                repeat(3) {
-                    NewsItemShimmer()
                 }
             }
         }
@@ -141,13 +103,13 @@ fun ArticlesView() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticleItem(article: Article) {
+fun RelatedNewsItem(article: Article) {
     val uriHandler = LocalUriHandler.current
     Card(
         onClick = { uriHandler.openUri(article.url) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -234,7 +196,7 @@ fun ArticleItem(article: Article) {
                         style = MaterialTheme.typography.labelSmall
                     )
                     Text(
-                        text = formatPublishedDate(article.publishedAt),
+                        text = DateTimeUtil.formatLaunchDate(article.publishedAt),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 9.sp
@@ -246,15 +208,33 @@ fun ArticleItem(article: Article) {
 }
 
 @Composable
-fun ArticleErrorCard(
-    error: String
-) {
+fun RelatedNewsLoadingState() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(40.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Loading related news...",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+    }
+}
+
+@Composable
+fun RelatedNewsErrorState(error: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Column(
@@ -262,56 +242,13 @@ fun ArticleErrorCard(
                 .fillMaxWidth()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "Failed to load articles",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onErrorContainer
-            )
-            Text(
-                text = error,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
+                text = "No related news available",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
-    }
-}
-
-@Composable
-fun NewsItemShimmer() {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, start = 16.dp, end = 16.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Box(
-            modifier = Modifier.size(64.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .height(16.dp),
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(14.dp),
-            )
-        }
-    }
-}
-
-/**
- * Format published date to human readable format using locale-aware formatting
- */
-private fun formatPublishedDate(instant: Instant): String {
-    return try {
-        DateTimeUtil.formatLaunchDate(instant)
-    } catch (e: Exception) {
-        "Unknown date"
     }
 }

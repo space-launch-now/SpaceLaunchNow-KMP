@@ -216,19 +216,10 @@ actual fun SmartBannerAd(
         }
 
         AdState.FAILING, AdState.NONE, AdState.DISMISSED -> {
-            // Ad failed to load or was dismissed
-            println("⚠️ SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType - ad may need reloading at app level")
-            
-            // For navigation ads, don't reserve space when ads fail - prevents white gaps
-            if (!showCard && placementType != AdPlacementType.NAVIGATION) {
-                // Only show placeholder for non-navigation areas
-                Box(
-                    modifier = modifier
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .fillMaxWidth()
-                        .height(60.dp) // Standard banner height
-                )
-            }
+            // Ad failed to load or was dismissed - don't show anything (no placeholder)
+            // This prevents white gaps and invisible barriers when ads fail to load
+            println("⚠️ SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType - hiding ad space")
+            // Don't render anything - let the layout collapse
         }
 
         else -> {

@@ -1,22 +1,23 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
+import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
-import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
-import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 
 /**
  * Simple, reliable subscription repository
@@ -41,44 +42,51 @@ class SimpleSubscriptionRepository(
      * Maps local storage data to SubscriptionState for compatibility
      * Also updates widget access cache when subscription state changes
      */
-    override val state: StateFlow<SubscriptionState> = localStorage.subscriptionData.onEach { local ->
-        // Update widget access cache whenever subscription data changes
-        repositoryScope.launch {
-            try {
-                val hasWidgetAccess = local.availableFeatures.contains(PremiumFeature.ADVANCED_WIDGETS)
-                println("SimpleSubscriptionRepository: Updating widget access to: $hasWidgetAccess")
-                
-                // Wait for DataStore write to complete before triggering widget update
-                widgetPreferences.updateWidgetAccessGranted(hasWidgetAccess)
-                
-                // Trigger widget updates after DataStore write is confirmed complete
-                updateWidgetsAfterAccessChange(if (hasWidgetAccess) "access granted" else "access revoked")
-            } catch (e: Exception) {
-                println("SimpleSubscriptionRepository: ❌ Failed to update widget access: ${e.message}")
+    override val state: StateFlow<SubscriptionState> =
+        localStorage.subscriptionData.onEach { local ->
+            // Update widget access cache whenever subscription data changes
+            repositoryScope.launch {
+                try {
+                    val hasWidgetAccess =
+                        local.availableFeatures.contains(PremiumFeature.ADVANCED_WIDGETS)
+                    println("SimpleSubscriptionRepository: Updating widget access to: $hasWidgetAccess")
+
+                    // Wait for DataStore write to complete before triggering widget update
+                    widgetPreferences.updateWidgetAccessGranted(hasWidgetAccess)
+
+                    // Trigger widget updates after DataStore write is confirmed complete
+                    updateWidgetsAfterAccessChange(if (hasWidgetAccess) "access granted" else "access revoked")
+                } catch (e: Exception) {
+                    println("SimpleSubscriptionRepository: ❌ Failed to update widget access: ${e.message}")
+                }
             }
-        }
-    }.map { local ->
-        SubscriptionState(
-            isSubscribed = local.isSubscribed,
-            subscriptionType = local.subscriptionType,
-            productId = local.productIds.firstOrNull(), // Extract primary product ID
-            features = local.availableFeatures,
-            lastVerified = local.lastSynced,
-            needsVerification = local.needsSync,
-            isLoading = false
+        }.map { local ->
+            SubscriptionState(
+                isSubscribed = local.isSubscribed,
+                subscriptionType = local.subscriptionType,
+                productId = local.productIds.firstOrNull(), // Extract primary product ID
+                features = local.availableFeatures,
+                lastVerified = local.lastSynced,
+                needsVerification = local.needsSync,
+                isLoading = false
+            )
+        }.stateIn(
+            scope = repositoryScope,
+            started = kotlinx.coroutines.flow.SharingStarted.Eagerly,
+            initialValue = run {
+                // Get actual initial value from local storage to avoid flashing ads for premium users
+                val initialData = runBlocking { localStorage.get() }
+                SubscriptionState(
+                    isSubscribed = initialData.isSubscribed,
+                    subscriptionType = initialData.subscriptionType,
+                    productId = initialData.productIds.firstOrNull(),
+                    features = initialData.availableFeatures,
+                    lastVerified = initialData.lastSynced,
+                    needsVerification = initialData.needsSync,
+                    isLoading = false
+                )
+            }
         )
-    }.stateIn(
-        scope = repositoryScope,
-        started = kotlinx.coroutines.flow.SharingStarted.Eagerly,
-        initialValue = SubscriptionState(
-            isSubscribed = false,
-            subscriptionType = SubscriptionType.FREE,
-            features = emptySet(),
-            lastVerified = 0L,
-            needsVerification = true,
-            isLoading = true
-        )
-    )
 
     /**
      * Initialize the repository
@@ -87,13 +95,13 @@ class SimpleSubscriptionRepository(
      */
     override suspend fun initialize() {
         println("SimpleSubscriptionRepository: Initializing...")
-        
+
         // Initialize billing client
         billingClient.initialize()
-        
+
         // Start background syncing with RevenueCat
         syncer.startSyncing()
-        
+
         println("SimpleSubscriptionRepository: ✅ Initialized")
     }
 
@@ -105,12 +113,12 @@ class SimpleSubscriptionRepository(
     override suspend fun hasFeature(feature: PremiumFeature): Boolean {
         // First check subscription access
         val hasSubscriptionFeature = localStorage.hasFeature(feature)
-        
+
         // Then check temporary access from rewarded ads
         val hasTemporaryAccess = temporaryPremiumAccess.hasTemporaryAccess(feature)
-        
+
         val hasFeature = hasSubscriptionFeature || hasTemporaryAccess
-        
+
         println("SimpleSubscriptionRepository: hasFeature(${feature.name}) = $hasFeature (subscription: $hasSubscriptionFeature, temporary: $hasTemporaryAccess)")
         return hasFeature
     }
@@ -122,9 +130,9 @@ class SimpleSubscriptionRepository(
     override suspend fun verifySubscription(forceRefresh: Boolean): Result<SubscriptionState> {
         return try {
             println("SimpleSubscriptionRepository: Verifying subscription (forceRefresh: $forceRefresh)")
-            
+
             val syncSuccess = syncer.syncNow()
-            
+
             if (syncSuccess) {
                 val current = localStorage.get()
                 val state = SubscriptionState(
@@ -141,7 +149,7 @@ class SimpleSubscriptionRepository(
                 println("SimpleSubscriptionRepository: ❌ Verification failed")
                 Result.failure(Exception("Failed to sync with RevenueCat"))
             }
-            
+
         } catch (e: Exception) {
             println("SimpleSubscriptionRepository: ❌ Verification error: ${e.message}")
             Result.failure(e)
@@ -156,7 +164,7 @@ class SimpleSubscriptionRepository(
         basePlanId: String?
     ): Result<String> {
         println("SimpleSubscriptionRepository: Launching purchase for $productId")
-        
+
         return billingClient.launchPurchaseFlow(productId, basePlanId).also { result ->
             // If purchase was successful, trigger a sync to update local data
             if (result.isSuccess) {
@@ -172,10 +180,10 @@ class SimpleSubscriptionRepository(
     override suspend fun restorePurchases(): Result<SubscriptionState> {
         return try {
             println("SimpleSubscriptionRepository: Restoring purchases...")
-            
+
             // Trigger sync which will restore purchases from RevenueCat
             val syncSuccess = syncer.syncNow()
-            
+
             if (syncSuccess) {
                 val current = localStorage.get()
                 val state = SubscriptionState(
@@ -192,7 +200,7 @@ class SimpleSubscriptionRepository(
                 println("SimpleSubscriptionRepository: ❌ Restore failed")
                 Result.failure(Exception("Failed to restore purchases"))
             }
-            
+
         } catch (e: Exception) {
             println("SimpleSubscriptionRepository: ❌ Restore error: ${e.message}")
             Result.failure(e)
@@ -248,16 +256,17 @@ class SimpleSubscriptionRepository(
             val syncSuccess = syncer.syncNow()
             if (syncSuccess) {
                 val localData = localStorage.get()
-                val hasWidgetAccess = localData.availableFeatures.contains(PremiumFeature.ADVANCED_WIDGETS)
+                val hasWidgetAccess =
+                    localData.availableFeatures.contains(PremiumFeature.ADVANCED_WIDGETS)
                 println("SimpleSubscriptionRepository: Widget access: $hasWidgetAccess")
-                
+
                 // Wait for DataStore write to complete before triggering widget update
                 widgetPreferences.updateWidgetAccessGranted(hasWidgetAccess)
                 println("SimpleSubscriptionRepository: ✅ Updated widget preferences cache")
-                
+
                 // Trigger widget update after DataStore write is confirmed complete
                 updateWidgetsAfterAccessChange("force refresh - ${if (hasWidgetAccess) "access granted" else "access revoked"}")
-                
+
                 hasWidgetAccess
             } else {
                 println("SimpleSubscriptionRepository: ❌ Failed to refresh widget access")
@@ -276,11 +285,16 @@ class SimpleSubscriptionRepository(
         println("SimpleSubscriptionRepository: Clearing all subscription data")
         localStorage.clear()
     }
-    
+
     /**
      * Debug: Get current local data
      */
     suspend fun getLocalData() = localStorage.get()
+
+    /**
+     * Debug: Check if currently in debug/simulation mode
+     */
+    suspend fun isInDebugMode() = localStorage.isInDebugMode()
 
     // Debug methods for testing subscription states
 
@@ -335,7 +349,7 @@ class SimpleSubscriptionRepository(
     suspend fun grantTemporaryAccess(feature: PremiumFeature) {
         println("SimpleSubscriptionRepository: Granting temporary access to ${feature.name}")
         temporaryPremiumAccess.grantTemporaryAccess(feature)
-        
+
         // Update widgets if this affects widget features
         if (feature == PremiumFeature.ADVANCED_WIDGETS || feature == PremiumFeature.WIDGETS_CUSTOMIZATION) {
             updateWidgetsAfterAccessChange("temporary access granted for ${feature.name}")
@@ -348,9 +362,4 @@ class SimpleSubscriptionRepository(
     suspend fun hasTemporaryAccess(feature: PremiumFeature): Boolean {
         return temporaryPremiumAccess.hasTemporaryAccess(feature)
     }
-
-    /**
-     * Debug: Check if currently in debug mode
-     */
-    fun isInDebugMode(): Boolean = localStorage.isInDebugMode()
 }

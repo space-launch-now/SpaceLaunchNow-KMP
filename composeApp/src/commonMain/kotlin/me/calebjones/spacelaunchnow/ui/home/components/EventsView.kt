@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,79 +24,146 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.CalendarDay
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.ui.EventSharedElementKey
+import me.calebjones.spacelaunchnow.ui.SharedElementType
+import me.calebjones.spacelaunchnow.ui.detail.compose.snackDetailBoundsTransform
+import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
+import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
-import androidx.navigation.NavController
-import me.calebjones.spacelaunchnow.navigation.EventDetail
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.background
-import androidx.compose.material3.MaterialTheme as M3
-import me.calebjones.spacelaunchnow.ui.detail.compose.snackDetailBoundsTransform
-import me.calebjones.spacelaunchnow.ui.SharedElementType
-import me.calebjones.spacelaunchnow.ui.EventSharedElementKey
-import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
-import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
-import me.calebjones.spacelaunchnow.LocalUseUtc
 
 @Composable
 fun EventsView(navController: NavController) {
     val homeViewModel = koinViewModel<HomeViewModel>()
-    val events by homeViewModel.events.collectAsState()
-    val isLoading by homeViewModel.isEventsLoading.collectAsState()
-    val error by homeViewModel.eventsError.collectAsState()
+    val state by homeViewModel.eventsState.collectAsStateWithLifecycle()
 
-    when {
-        isLoading && events.isEmpty() -> {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(3) {
-                    EventItemShimmer()
+    // Load events if not already loaded and no error
+    LaunchedEffect(Unit) {
+        if (state.data.isEmpty() && !state.isLoading && state.error == null) {
+            homeViewModel.loadEventsNew(10)
+        }
+    }
+    Column {
+        when {
+            // STATE 4: Error State - show error with retry OR data with error indicator
+            state.error != null -> {
+                if (state.data.isNotEmpty()) {
+                    // Show stale data with error indicator
+                    Column {
+                        // Error banner
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "Showing cached data",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                        // Show stale events
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(state.data) { event ->
+                                EventItem(event = event, navController = navController)
+                            }
+                        }
+                    }
+                } else {
+                    // No cached data, just show error
+                    EventErrorCard(error = state.error!!)
                 }
             }
-        }
-        error != null -> {
-            EventErrorCard(error = error!!)
-        }
-        events.isNotEmpty() -> {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(events) { event ->
-                    EventItem(event = event, navController = navController)
+
+            // STATE 2 & 3: Loading with existing data
+            state.isLoading && state.data.isNotEmpty() -> {
+                Box {
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.data) { event ->
+                            EventItem(event = event, navController = navController)
+                        }
+                    }
+
+                    // Show loading indicator
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
+                            .size(24.dp)
+                    )
                 }
             }
-        }
-        else -> {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(all = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(3) {
-                    EventItemShimmer()
+
+            // Data available (not loading, no error)
+            state.data.isNotEmpty() && state.error == null -> {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(state.data) { event ->
+                        EventItem(event = event, navController = navController)
+                    }
+                }
+            }
+
+            // STATE 1: Fresh load, no data - show shimmer
+            state.isLoading -> {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(3) {
+                        EventItemShimmer()
+                    }
+                }
+            }
+
+            // Fallback
+            else -> {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(all = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(3) {
+                        EventItemShimmer()
+                    }
                 }
             }
         }
@@ -289,7 +358,7 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
                 }
             )
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // Event title
             Text(
                 text = event.name,
@@ -298,9 +367,9 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             // Event description
             event.description?.let { description ->
                 Text(
@@ -313,7 +382,7 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
             }
-            
+
             // Event type
             Text(
                 text = event.type.name ?: "Unknown Event",
@@ -322,7 +391,7 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
                 fontWeight = FontWeight.Medium,
                 style = MaterialTheme.typography.labelMedium
             )
-            
+
             // Event date (if available)
             event.date?.let { date ->
                 Text(
@@ -358,7 +427,7 @@ fun EventItemShimmer() {
                     .clip(RoundedCornerShape(8.dp))
             )
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // Shimmer title placeholder
             Box(
                 modifier = Modifier
@@ -366,7 +435,7 @@ fun EventItemShimmer() {
                     .height(16.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             // Shimmer description placeholder
             Box(
                 modifier = Modifier
@@ -380,7 +449,7 @@ fun EventItemShimmer() {
                     .height(12.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             // Shimmer type placeholder
             Box(
                 modifier = Modifier
@@ -405,7 +474,8 @@ fun EventErrorCard(error: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
                 text = "Failed to load events",
@@ -415,7 +485,8 @@ fun EventErrorCard(error: String) {
             Text(
                 text = error,
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f),
+                textAlign = TextAlign.Center
             )
         }
     }

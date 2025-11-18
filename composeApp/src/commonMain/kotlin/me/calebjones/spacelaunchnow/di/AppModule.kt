@@ -81,16 +81,22 @@ val appModule = module {
         val driver = get<DatabaseDriverFactory>().createDriver()
         SpaceLaunchDatabase(driver)
     }
-    single { LaunchLocalDataSource(get()) }
-    single { EventLocalDataSource(get()) }
-    single { ArticleLocalDataSource(get()) }
-    single { UpdateLocalDataSource(get()) }
+    single { LaunchLocalDataSource(get(), get()) }
+    single { EventLocalDataSource(get(), get()) }
+    single { ArticleLocalDataSource(get(), get()) }
+    single { UpdateLocalDataSource(get(), get()) }
     
     single<LaunchRepository> {
         LaunchRepositoryImpl(
             launchesApi = get(),
             agenciesApi = get(),
             appPreferences = get(),
+            localDataSource = get()
+        )
+    }
+    single<ArticlesRepository> {
+        ArticlesRepositoryImpl(
+            articlesApi = get(),
             localDataSource = get()
         )
     }
@@ -104,12 +110,6 @@ val appModule = module {
     viewModelOf(::AgencyViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
-    single<ArticlesRepository> {
-        ArticlesRepositoryImpl(
-            articlesApi = get(),
-            localDataSource = get()
-        )
-    }
     single<EventsRepository> {
         EventsRepositoryImpl(
             eventsApi = get(),

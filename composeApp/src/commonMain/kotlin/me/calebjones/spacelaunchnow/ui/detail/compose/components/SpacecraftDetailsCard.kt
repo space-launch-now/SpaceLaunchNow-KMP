@@ -55,6 +55,7 @@ import me.calebjones.spacelaunchnow.ui.components.InfoTileData
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
+import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 
@@ -453,7 +454,7 @@ fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoL
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         Text(
-                                            text = formatLaunchTime(dockingTime, useUtc),
+                                            text = formatLaunchDateTime(dockingTime, useUtc),
                                             style = MaterialTheme.typography.bodySmall
                                         )
                                     }
@@ -467,7 +468,7 @@ fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoL
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         Text(
-                                            text = formatLaunchTime(departureTime, useUtc),
+                                            text = formatLaunchDateTime(departureTime, useUtc),
                                             style = MaterialTheme.typography.bodySmall
                                         )
                                     }

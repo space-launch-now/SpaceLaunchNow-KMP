@@ -1,6 +1,8 @@
 package me.calebjones.spacelaunchnow.util
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSLocale
@@ -26,15 +28,20 @@ actual fun formatLocalDateTime(localDateTime: LocalDateTime, useUtc: Boolean): S
         dateFormatter.dateStyle = platform.Foundation.NSDateFormatterMediumStyle
         dateFormatter.timeStyle = platform.Foundation.NSDateFormatterShortStyle
         
+        // Set timezone for formatting output
         if (useUtc) {
             dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC") 
                 ?: NSTimeZone.timeZoneWithName("GMT")
                 ?: NSTimeZone.localTimeZone
+        } else {
+            dateFormatter.timeZone = NSTimeZone.localTimeZone
         }
         
-        // Convert LocalDateTime to NSDate
-        val timestamp = localDateTime.toEpochSeconds()
-        val nsDate = NSDate.dateWithTimeIntervalSince1970(timestamp.toDouble())
+        // Convert LocalDateTime to NSDate - LocalDateTime represents the time in the timezone used to create it
+        // We need to convert it back to an Instant using the same timezone context
+        val timeZone = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
+        val instant = localDateTime.toInstant(timeZone)
+        val nsDate = NSDate.dateWithTimeIntervalSince1970(instant.epochSeconds.toDouble())
         
         val formatted = dateFormatter.stringFromDate(nsDate)
         if (useUtc) "$formatted UTC" else formatted
@@ -60,15 +67,19 @@ actual fun formatLocalDate(localDateTime: LocalDateTime, useUtc: Boolean): Strin
         dateFormatter.dateStyle = platform.Foundation.NSDateFormatterLongStyle
         dateFormatter.timeStyle = platform.Foundation.NSDateFormatterNoStyle
         
+        // Set timezone for formatting output
         if (useUtc) {
             dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC") 
                 ?: NSTimeZone.timeZoneWithName("GMT")
                 ?: NSTimeZone.localTimeZone
+        } else {
+            dateFormatter.timeZone = NSTimeZone.localTimeZone
         }
         
-        // Convert LocalDateTime to NSDate
-        val timestamp = localDateTime.toEpochSeconds()
-        val nsDate = NSDate.dateWithTimeIntervalSince1970(timestamp.toDouble())
+        // Convert LocalDateTime to NSDate using proper timezone context
+        val timeZone = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
+        val instant = localDateTime.toInstant(timeZone)
+        val nsDate = NSDate.dateWithTimeIntervalSince1970(instant.epochSeconds.toDouble())
         
         val formatted = dateFormatter.stringFromDate(nsDate)
         if (useUtc) "$formatted UTC" else formatted
@@ -91,15 +102,19 @@ actual fun formatLocalTime(localDateTime: LocalDateTime, useUtc: Boolean): Strin
         dateFormatter.dateStyle = platform.Foundation.NSDateFormatterNoStyle
         dateFormatter.timeStyle = platform.Foundation.NSDateFormatterShortStyle
         
+        // Set timezone for formatting output
         if (useUtc) {
             dateFormatter.timeZone = NSTimeZone.timeZoneWithName("UTC") 
                 ?: NSTimeZone.timeZoneWithName("GMT")
                 ?: NSTimeZone.localTimeZone
+        } else {
+            dateFormatter.timeZone = NSTimeZone.localTimeZone
         }
         
-        // Convert LocalDateTime to NSDate
-        val timestamp = localDateTime.toEpochSeconds()
-        val nsDate = NSDate.dateWithTimeIntervalSince1970(timestamp.toDouble())
+        // Convert LocalDateTime to NSDate using proper timezone context
+        val timeZone = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
+        val instant = localDateTime.toInstant(timeZone)
+        val nsDate = NSDate.dateWithTimeIntervalSince1970(instant.epochSeconds.toDouble())
         
         val formatted = dateFormatter.stringFromDate(nsDate)
         if (useUtc) "$formatted UTC" else formatted
@@ -108,27 +123,4 @@ actual fun formatLocalTime(localDateTime: LocalDateTime, useUtc: Boolean): Strin
         val formatted = "${localDateTime.hour}:${localDateTime.minute.toString().padStart(2, '0')}"
         if (useUtc) "$formatted UTC" else formatted
     }
-}
-
-// Helper function to convert LocalDateTime to epoch seconds
-private fun LocalDateTime.toEpochSeconds(): Long {
-    // Simplified conversion - in production you might want to use kotlinx-datetime properly
-    val year = this.year
-    val month = this.month.ordinal
-    val day = this.day
-    val hour = this.hour
-    val minute = this.minute
-    val second = this.second
-    
-    // Approximate calculation (not accounting for leap years perfectly, but good enough for formatting)
-    val daysInYear = 365L
-    val daysInMonth = longArrayOf(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
-    
-    val yearsSince1970 = year - 1970L
-    val daysSince1970 = yearsSince1970 * daysInYear + 
-                        (yearsSince1970 / 4) + // Leap years approximation
-                        daysInMonth[month - 1] + 
-                        day - 1
-    
-    return daysSince1970 * 86400 + hour * 3600 + minute * 60 + second
 }

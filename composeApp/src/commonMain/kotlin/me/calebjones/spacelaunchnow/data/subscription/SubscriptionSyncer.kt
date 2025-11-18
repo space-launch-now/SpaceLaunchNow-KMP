@@ -30,6 +30,14 @@ class SubscriptionSyncer(
         syncScope.launch {
             billingManager.purchaseState.collect { purchaseState ->
                 val currentTime = System.now().toEpochMilliseconds()
+                
+                // Check if we're in debug/simulation mode
+                val currentData = localStorage.get()
+                if (!currentData.needsSync) {
+                    println("SubscriptionSyncer: 🎭 Debug mode active (needsSync=false), skipping automatic sync")
+                    return@collect
+                }
+                
                 if (currentTime - lastSyncTime > syncCooldownMs) {
                     println("SubscriptionSyncer: Purchase state updated, syncing...")
                     lastSyncTime = currentTime
