@@ -1,12 +1,14 @@
 ### Bug Fixes
 
-* datadog integration and iOS build
-* implement fixes for merge conflict
-* resolve Kotlin build configuration issues
+* correct month off-by-one error in iOS date formatting
+* Improve ad handling
+* **ios:** fix date formatting
+* refresh related news on pull-to-refresh
+* show date and time for docking/departing events instead of just time
+* update Koin module to inject ArticlesRepository into LaunchViewModel
 
 ### Features
 
-* add SQLDelight database for persistent caching
-* Enhance billing and subscription initialization for iOS and Android
-* implement cache-first repository pattern with SQLDelight
-* parse event duration field using common utility function
+* Add cache and busting
+* add related news to launch detail page - initial implementation
+* add retrieve related articles and improve ad handling
