@@ -42,7 +42,7 @@ class KoinHelper : KoinComponent {
      */
     @Throws(Exception::class)
     suspend fun fetchUpcomingLaunches(limit: Int): PaginatedLaunchNormalList {
-        return launchRepository.getUpcomingLaunchesNormal(limit).getOrThrow()
+        return launchRepository.getUpcomingLaunchesNormal(limit).getOrThrow().data
     }
 
     /**
@@ -51,7 +51,7 @@ class KoinHelper : KoinComponent {
      */
     suspend fun fetchUpcomingLaunchesOrNull(limit: Int): PaginatedLaunchNormalList? {
         val result = launchRepository.getUpcomingLaunchesNormal(limit)
-        return result.getOrNull()
+        return result.getOrNull()?.data
     }
     
     /**
