@@ -173,6 +173,7 @@ jobs:
             -authenticationKeyIssuerID ${{ secrets.APPLE_API_ISSUER_ID }} \
             DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_STYLE=Automatic \
+            -verbose \
             archive
           
           if [ -d "$RUNNER_TEMP/SpaceLaunchNow.xcarchive" ]; then
