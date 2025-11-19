@@ -1,14 +1,3 @@
 ### Bug Fixes
 
-* correct month off-by-one error in iOS date formatting
-* Improve ad handling
-* **ios:** fix date formatting
-* refresh related news on pull-to-refresh
-* show date and time for docking/departing events instead of just time
-* update Koin module to inject ArticlesRepository into LaunchViewModel
-
-### Features
-
-* Add cache and busting
-* add related news to launch detail page - initial implementation
-* add retrieve related articles and improve ad handling
+* **ios:** return data from fetchUpcomingLaunches methods in KoinHelper

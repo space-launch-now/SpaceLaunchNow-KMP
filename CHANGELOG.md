@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b22...v5.0.0) (2025-11-18)
+# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b23...v5.0.0) (2025-11-18)
+
+
+### Bug Fixes
+
+* **ios:** return data from fetchUpcomingLaunches methods in KoinHelper ([511ed89](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/511ed8918e3c1d42a483bc16c0f6c71f81244fbb))
+
+
+
+# [5.0.0-b23](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b22...v5.0.0-b23) (2025-11-18)
 
 
 ### Bug Fixes
@@ -79,15 +88,6 @@
 * improve event details and launch details ([9d6bfd0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9d6bfd0835a99ec7142c77651747dc836095afd6))
 * improve schedule view experience ([35acdf9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/35acdf9bdfbc0bfa71eae6a51c929698c5034545))
 * integrate Agency Detail Screen into navigation ([688f5ed](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/688f5ed5bfba84a65c79eda3450f346d1a39a063))
-
-
-
-# [5.0.0-b19](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b18...v5.0.0-b19) (2025-11-04)
-
-
-### Bug Fixes
-
-* remove DirectBillingClient implementation and related code roll back to older Android billing library ([71019d7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/71019d7a268bd2a9dce3f091fb7b851cd64d8604))
 
 
 
