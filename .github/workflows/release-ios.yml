@@ -155,6 +155,9 @@ jobs:
           echo "Team ID: $TEAM_ID"
           echo "Bundle ID: $BUNDLE_ID"
           
+          # Clean any existing derived data that might have conflicting certificates
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          
           # Build archive - xcodebuild will automatically download provisioning profiles
           set -o pipefail
           xcrun xcodebuild \
@@ -170,7 +173,6 @@ jobs:
             -authenticationKeyIssuerID ${{ secrets.APPLE_API_ISSUER_ID }} \
             DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_STYLE=Automatic \
-            -verbose \
             archive
           
           if [ -d "$RUNNER_TEMP/SpaceLaunchNow.xcarchive" ]; then
