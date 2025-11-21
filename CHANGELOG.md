@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b24...v5.0.0) (2025-11-19)
+# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b25...v5.0.0) (2025-11-21)
+
+
+### Bug Fixes
+
+* theme issue switching light to dark ([a2bcf2e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a2bcf2e2dbfc93b6586e31ba140184223941764d))
+
+
+
+# [5.0.0-b25](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b24...v5.0.0-b25) (2025-11-19)
 
 
 ### Bug Fixes
@@ -53,20 +62,6 @@
 * Enhance billing and subscription initialization for iOS and Android ([c6c8326](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c6c8326728d8ddbb0dfb96017126899735975e6f))
 * implement cache-first repository pattern with SQLDelight ([1ffde72](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1ffde72d232604398f99e3dccb8a00856365ceba))
 * parse event duration field using common utility function ([3fb6b43](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3fb6b43a5466666cb760f80c56338de893a607b0))
-
-
-
-# [5.0.0-b21](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b20...v5.0.0-b21) (2025-11-10)
-
-
-### Bug Fixes
-
-* improve URL removal regex to match all bracket contents ([5e89f77](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5e89f7719d739e92cd9a16bea118f192254add29))
-
-
-### Features
-
-* add script to truncate Google Play release notes to 500 chars ([d101d4f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d101d4f90dc9ae49ef2947438205e15fa06f57f8))
 
 
 
