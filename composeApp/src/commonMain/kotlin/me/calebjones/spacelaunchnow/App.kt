@@ -104,14 +104,14 @@ fun isTabletOrDesktop(): Boolean {
 @Composable
 fun SpaceLaunchNowApp(
     contextFactory: ContextFactory,
+    themeOption: ThemeOption = ThemeOption.System,
     notificationLaunchId: String? = null,
     onNotificationLaunchIdConsumed: () -> Unit = {},
     navigationDestination: String? = null,
     onNavigationDestinationConsumed: () -> Unit = {}
 ) {
-    // Use hardcoded defaults to avoid ANY Koin injection during composition on iOS
-    // Preferences will be loaded in background and applied later
-    val themeOption = ThemeOption.System
+    // Use default for useUtc to avoid Koin injection during composition on iOS
+    // Theme is now passed as parameter from platform-specific code
     val useUtc = false
 
     val navController = rememberNavController()
