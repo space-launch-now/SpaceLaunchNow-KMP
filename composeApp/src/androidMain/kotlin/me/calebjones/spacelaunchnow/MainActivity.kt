@@ -127,6 +127,7 @@ class MainActivity : ComponentActivity() {
 
             SpaceLaunchNowApp(
                 contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(this),
+                themeOption = themeOption,
                 notificationLaunchId = notificationLaunchIdState,
                 onNotificationLaunchIdConsumed = { notificationLaunchIdState = null },
                 navigationDestination = navigationDestinationState,
