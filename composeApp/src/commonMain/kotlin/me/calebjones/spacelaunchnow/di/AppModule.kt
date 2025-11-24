@@ -27,9 +27,9 @@ import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
-import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
@@ -144,9 +144,11 @@ val appModule = module {
 
     // Notification dependencies
     singleOf(::PushMessaging)
-    singleOf(::NotificationPreferences)
+    
+    // Launch filter service - converts filter settings to API parameters
+    singleOf(::LaunchFilterService)
 
-    // New notification state storage
+    // Notification state storage
     single {
         val dataStore = get<DataStore<Preferences>>()
         NotificationStateStorage(dataStore)

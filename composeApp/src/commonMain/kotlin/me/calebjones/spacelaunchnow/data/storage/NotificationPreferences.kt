@@ -51,18 +51,19 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
         }
 
         // Use stored preferences if available, otherwise use defaults
+        // Important: null means "never set" (use defaults), empty set means "explicitly deselected all"
         val storedAgencies = preferences[SUBSCRIBED_AGENCIES]
-        val subscribedAgencies = if (storedAgencies != null && storedAgencies.isNotEmpty()) {
-            storedAgencies.map { it }.toSet()
+        val subscribedAgencies = if (storedAgencies != null) {
+            storedAgencies.map { it }.toSet()  // Use stored value even if empty
         } else {
-            default.subscribedAgencies
+            default.subscribedAgencies  // Only use defaults if never set
         }
 
         val storedLocations = preferences[SUBSCRIBED_LOCATIONS]
-        val subscribedLocations = if (storedLocations != null && storedLocations.isNotEmpty()) {
-            storedLocations.map { it }.toSet()
+        val subscribedLocations = if (storedLocations != null) {
+            storedLocations.map { it }.toSet()  // Use stored value even if empty
         } else {
-            default.subscribedLocations
+            default.subscribedLocations  // Only use defaults if never set
         }
 
         // Helper function to map IDs to names

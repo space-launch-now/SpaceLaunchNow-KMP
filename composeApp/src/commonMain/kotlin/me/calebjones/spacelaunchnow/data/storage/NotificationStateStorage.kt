@@ -46,6 +46,12 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
             default.topicSettings
         }
 
+        // Important: Use stored values even if empty (user explicitly deselected all)
+        // Only fall back to defaults if never set (null)
+        // Handle sentinel value "__EMPTY__" which indicates user explicitly deselected all
+        val storedAgencies = preferences[SUBSCRIBED_AGENCIES]
+        val storedLocations = preferences[SUBSCRIBED_LOCATIONS]
+
         NotificationState(
             enableNotifications = preferences[ENABLE_NOTIFICATIONS] ?: default.enableNotifications,
             followAllLaunches = preferences[FOLLOW_ALL_LAUNCHES] ?: default.followAllLaunches,
@@ -53,10 +59,16 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
             hideTbdLaunches = preferences[HIDE_TBD_LAUNCHES] ?: default.hideTbdLaunches,
 
             topicSettings = topicSettings,
-            subscribedAgencies = (preferences[SUBSCRIBED_AGENCIES] ?: emptySet())
-                .map { it }.toSet().ifEmpty { default.subscribedAgencies },
-            subscribedLocations = (preferences[SUBSCRIBED_LOCATIONS] ?: emptySet())
-                .map { it }.toSet().ifEmpty { default.subscribedLocations },
+            subscribedAgencies = when {
+                storedAgencies == null -> default.subscribedAgencies  // Never set - use defaults
+                storedAgencies.contains("__EMPTY__") -> emptySet()    // Explicitly empty
+                else -> storedAgencies.map { it }.toSet()              // Has values
+            },
+            subscribedLocations = when {
+                storedLocations == null -> default.subscribedLocations  // Never set - use defaults
+                storedLocations.contains("__EMPTY__") -> emptySet()     // Explicitly empty
+                else -> storedLocations.map { it }.toSet()               // Has values
+            },
             subscribedTopics = preferences[SUBSCRIBED_TOPICS] ?: default.subscribedTopics
         )
     }
@@ -69,10 +81,21 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
             preferences[HIDE_TBD_LAUNCHES] = state.hideTbdLaunches
 
             preferences[TOPIC_SETTINGS] = Json.encodeToString(state.topicSettings)
-            preferences[SUBSCRIBED_AGENCIES] =
+            
+            // Important: DataStore may remove keys with empty sets, so we use a sentinel value
+            // to distinguish between "never set" (null) and "explicitly empty" (set with sentinel)
+            preferences[SUBSCRIBED_AGENCIES] = if (state.subscribedAgencies.isEmpty()) {
+                setOf("__EMPTY__")  // Sentinel value for empty selection
+            } else {
                 state.subscribedAgencies.map { it.toString() }.toSet()
-            preferences[SUBSCRIBED_LOCATIONS] =
+            }
+            
+            preferences[SUBSCRIBED_LOCATIONS] = if (state.subscribedLocations.isEmpty()) {
+                setOf("__EMPTY__")  // Sentinel value for empty selection
+            } else {
                 state.subscribedLocations.map { it.toString() }.toSet()
+            }
+            
             preferences[SUBSCRIBED_TOPICS] = state.subscribedTopics
         }
     }

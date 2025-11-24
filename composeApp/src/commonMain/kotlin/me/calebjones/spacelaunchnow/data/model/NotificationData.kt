@@ -85,7 +85,7 @@ data class NotificationData(
  * Usage on Android:
  * ```kotlin
  * val data = NotificationData.fromMap(remoteMessage.data)
- * val settings = notificationPreferences.getNotificationSettings()
+ * val settings = notificationStateStorage.getState()
  * if (NotificationFilter.shouldShowNotification(data, settings)) {
  *     showNotification(...)
  * }

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.isLargeScreen
@@ -109,8 +110,8 @@ fun ResponsiveHomeContent(
     val currentDate = remember {
         System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     }
-    val currentDay = currentDate.dayOfMonth
-    val currentMonth = currentDate.monthNumber
+    val currentDay = currentDate.day
+    val currentMonth = currentDate.month.number
 
     // Load history launches on composition using NEW ViewState pattern
     LaunchedEffect(currentDay, currentMonth) {
@@ -150,7 +151,7 @@ fun ResponsiveHomeContent(
             }
 
             // Hero cards row: Last Launch + Stats + Next Up (countdown)
-            item {
+            item(key = "hero_cards_row") {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -474,7 +475,7 @@ fun ResponsiveHomeContent(
                 }
             }
 
-            item { NextLaunchView(navController = navController) }
+            item(key = "next_launch_view") { NextLaunchView(navController = navController) }
 
             // Quick Stats
             item {

@@ -12,8 +12,18 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 interface LaunchRepository {
     suspend fun getUpcomingLaunchesList(limit: Int): Result<PaginatedLaunchBasicList>
     suspend fun getUpcomingLaunchesList(limit: Int, netGt: Instant?, netLt: Instant?): Result<PaginatedLaunchBasicList>
-    suspend fun getUpcomingLaunchesNormal(limit: Int, forceRefresh: Boolean = false): Result<DataResult<PaginatedLaunchNormalList>>
-    suspend fun getPreviousLaunchesNormal(limit: Int, forceRefresh: Boolean = false): Result<DataResult<PaginatedLaunchNormalList>>
+    suspend fun getUpcomingLaunchesNormal(
+        limit: Int,
+        forceRefresh: Boolean = false,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): Result<DataResult<PaginatedLaunchNormalList>>
+    suspend fun getPreviousLaunchesNormal(
+        limit: Int,
+        forceRefresh: Boolean = false,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): Result<DataResult<PaginatedLaunchNormalList>>
     suspend fun getLaunchesByDayAndMonth(day: Int, month: Int, limit: Int = 100): Result<PaginatedLaunchNormalList>
     suspend fun getLaunchDetails(id: String, forceRefresh: Boolean = false): Result<LaunchDetailed>
     suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed>

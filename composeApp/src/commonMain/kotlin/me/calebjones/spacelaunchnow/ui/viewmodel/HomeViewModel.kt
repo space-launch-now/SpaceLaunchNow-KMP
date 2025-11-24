@@ -4,10 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
@@ -18,6 +22,8 @@ import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import kotlin.time.Clock
 import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.days
@@ -63,7 +69,9 @@ class HomeViewModel(
     private val updatesRepository: UpdatesRepository,
     private val articlesRepository: ArticlesRepository,
     private val eventsRepository: EventsRepository,
-    private val launchCache: LaunchCache
+    private val launchCache: LaunchCache,
+    private val launchFilterService: LaunchFilterService,
+    private val notificationStateStorage: NotificationStateStorage
 ) : ViewModel() {
 
     // ========== NEW ViewState-based State Management ==========
@@ -264,9 +272,15 @@ class HomeViewModel(
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
                 }
 
+                // Wait for actual filter settings from DataStore
+                val currentFilters = notificationStateStorage.stateFlow.first()
+                val filterParams = launchFilterService.getFilterParams(currentFilters)
+
                 val result = launchRepository.getUpcomingLaunchesNormal(
                     limit = 1,
-                    forceRefresh = forceRefresh
+                    forceRefresh = forceRefresh,
+                    agencyIds = filterParams.agencyIds,
+                    locationIds = filterParams.locationIds
                 )
 
                 result.onSuccess { dataResult ->
@@ -316,9 +330,22 @@ class HomeViewModel(
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
                 }
 
+                // Wait for actual filter settings from DataStore (not the default initial value)
+                val currentFilters = notificationStateStorage.stateFlow.first()
+                println("=== HomeViewModel Filter Settings ===")
+                println("followAllLaunches: ${currentFilters.followAllLaunches}")
+                println("subscribedAgencies: ${currentFilters.subscribedAgencies}")
+                println("subscribedLocations: ${currentFilters.subscribedLocations}")
+
+                val filterParams = launchFilterService.getFilterParams(currentFilters)
+                println("filterParams.agencyIds: ${filterParams.agencyIds}")
+                println("filterParams.locationIds: ${filterParams.locationIds}")
+
                 val result = launchRepository.getUpcomingLaunchesNormal(
                     limit = limit,
-                    forceRefresh = forceRefresh
+                    forceRefresh = forceRefresh,
+                    agencyIds = filterParams.agencyIds,
+                    locationIds = filterParams.locationIds
                 )
 
                 result.onSuccess { dataResult ->
@@ -498,7 +525,7 @@ class HomeViewModel(
                 val currentDate = Clock.System.now()
                     .toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
                 val currentDay = currentDate.day
-                val currentMonth = currentDate.month.ordinal
+                val currentMonth = currentDate.month.number
 
                 // Launch all refreshes in parallel
                 val jobs = listOf(
@@ -583,18 +610,33 @@ class HomeViewModel(
                 _upcomingLaunchesError.value = null
                 _previousLaunchesError.value = null
 
-                println("Calling repository methods with forceRefresh=$forceRefresh")
+                // Wait for actual filter settings from DataStore (not the default initial value)
+                val currentFilters = notificationStateStorage.stateFlow.first()
+                println("=== HomeViewModel Filter Settings (Legacy) ===")
+                println("followAllLaunches: ${currentFilters.followAllLaunches}")
+                println("subscribedAgencies: ${currentFilters.subscribedAgencies}")
+                println("subscribedLocations: ${currentFilters.subscribedLocations}")
+
+                val filterParams = launchFilterService.getFilterParams(currentFilters)
+                println("filterParams.agencyIds: ${filterParams.agencyIds}")
+                println("filterParams.locationIds: ${filterParams.locationIds}")
+
+                println("Calling repository methods with forceRefresh=$forceRefresh, filters: agencies=${filterParams.agencyIds?.size}, locations=${filterParams.locationIds?.size}")
                 // Load both upcoming and previous launches in parallel
                 val upcomingDeferred = async {
                     launchRepository.getUpcomingLaunchesNormal(
                         limit = limit,
-                        forceRefresh = forceRefresh
+                        forceRefresh = forceRefresh,
+                        agencyIds = filterParams.agencyIds,
+                        locationIds = filterParams.locationIds
                     )
                 }
                 val previousDeferred = async {
                     launchRepository.getPreviousLaunchesNormal(
                         limit = 5,
-                        forceRefresh = forceRefresh
+                        forceRefresh = forceRefresh,
+                        agencyIds = filterParams.agencyIds,
+                        locationIds = filterParams.locationIds
                     )
                 }
 
@@ -611,6 +653,17 @@ class HomeViewModel(
                         val featuredLaunch = paginatedLaunches.results.first()
                         _featuredLaunch.value = featuredLaunch
 
+                        // ALSO update NEW ViewState for views that use it
+                        _featuredLaunchState.update {
+                            it.copy(
+                                data = featuredLaunch,
+                                isLoading = false,
+                                error = null,
+                                dataSource = dataResult.source,
+                                cacheTimestamp = dataResult.timestamp
+                            )
+                        }
+
                         // Store the LaunchNormal in cache for quick access
                         launchCache.cacheLaunchNormal(featuredLaunch)
 
@@ -619,12 +672,33 @@ class HomeViewModel(
 
                         // Remove the first launch from upcoming list to avoid duplication
                         _upcomingLaunches.value = paginatedLaunches.results.drop(1)
+                        
+                        // ALSO update NEW ViewState for upcoming launches
+                        _upcomingLaunchesState.update {
+                            it.copy(
+                                data = paginatedLaunches.results.drop(1),
+                                isLoading = false,
+                                error = null,
+                                dataSource = dataResult.source,
+                                cacheTimestamp = dataResult.timestamp
+                            )
+                        }
+                        
                         println("Featured launch set from first upcoming: ${featuredLaunch.name}")
                         println("Upcoming launches list contains ${paginatedLaunches.results.size - 1} items (excluding featured)")
                         _featuredLaunchError.value = null
                     } else {
                         _featuredLaunch.value = null
                         _upcomingLaunches.value = emptyList()
+                        
+                        // ALSO update NEW ViewStates
+                        _featuredLaunchState.update {
+                            it.copy(data = null, isLoading = false, error = null)
+                        }
+                        _upcomingLaunchesState.update {
+                            it.copy(data = emptyList(), isLoading = false, error = null)
+                        }
+                        
                         println("No launches available for featured launch")
                     }
 
@@ -644,6 +718,14 @@ class HomeViewModel(
                     // Also handle featured launch error since it depends on upcoming launches
                     _featuredLaunch.value = null
                     _featuredLaunchError.value = errorMessage
+
+                    // ALSO update NEW ViewStates
+                    _featuredLaunchState.update {
+                        it.copy(data = null, isLoading = false, error = errorMessage)
+                    }
+                    _upcomingLaunchesState.update {
+                        it.copy(data = emptyList(), isLoading = false, error = errorMessage)
+                    }
 
                     _isLoading.value = false  // Clear main app loading indicator even on error
                     _isUpcomingLaunchesLoading.value = false

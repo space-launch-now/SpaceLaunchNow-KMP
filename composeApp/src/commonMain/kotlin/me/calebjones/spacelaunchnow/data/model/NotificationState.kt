@@ -112,6 +112,12 @@ data class NotificationState(
     }
 
     fun withAgencyEnabled(agencyId: String, enabled: Boolean): NotificationState {
+        // Prevent unchecking the last agency - require at least one to be checked
+        if (!enabled && subscribedAgencies.size == 1 && subscribedAgencies.contains(agencyId)) {
+            println("⚠️ Cannot uncheck last agency - at least one must be selected")
+            return this  // Return unchanged state
+        }
+        
         val updatedAgencies = if (enabled) {
             subscribedAgencies + agencyId
         } else {
@@ -132,6 +138,12 @@ data class NotificationState(
     }
 
     fun withLocationEnabled(locationId: String, enabled: Boolean): NotificationState {
+        // Prevent unchecking the last location - require at least one to be checked
+        if (!enabled && subscribedLocations.size == 1 && subscribedLocations.contains(locationId)) {
+            println("⚠️ Cannot uncheck last location - at least one must be selected")
+            return this  // Return unchanged state
+        }
+        
         val updatedLocations = if (enabled) {
             subscribedLocations + locationId
         } else {

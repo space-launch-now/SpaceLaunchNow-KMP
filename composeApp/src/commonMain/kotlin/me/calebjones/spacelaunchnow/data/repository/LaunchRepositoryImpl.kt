@@ -15,6 +15,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
@@ -60,16 +61,24 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getUpcomingLaunchesNormal(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedLaunchNormalList>> {
+    override suspend fun getUpcomingLaunchesNormal(
+        limit: Int,
+        forceRefresh: Boolean,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): Result<DataResult<PaginatedLaunchNormalList>> {
         return try {
             println("=== LaunchRepository.getUpcomingLaunchesNormal ===")
-            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
+            println("Parameters: limit=$limit, forceRefresh=$forceRefresh, agencyIds=$agencyIds, locationIds=$locationIds")
             
             val now = System.now().toEpochMilliseconds()
             
+            // Create cache key that includes filter parameters
+            val cacheKey = buildCacheKey("upcoming_launches", agencyIds, locationIds)
+            
             // STALE-WHILE-REVALIDATE: Always check for stale data first
             val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
-            val staleTimestamp = localDataSource?.getCacheTimestamp("upcoming_launches")
+            val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
             
             // Try fresh cache if available and not forcing refresh
@@ -88,14 +97,16 @@ class LaunchRepositoryImpl(
                         timestamp = staleTimestamp ?: now
                     ))
                 } else if (hasStaleData) {
-                    println("⏳ STALE CACHE: Returning ${staleCached!!.size} stale launches (will show while fetching fresh)")
+                    // Filter stale cache by user preferences (agency and location)
+                    val filteredStale = filterLaunchesByPreferences(staleCached!!, agencyIds, locationIds)
+                    println("⏳ STALE CACHE: Returning ${filteredStale.size}/${staleCached.size} filtered stale launches (filters: agencies=$agencyIds, locations=$locationIds)")
                     // Return stale data immediately - UI shows this while fetch happens in background
                     return Result.success(DataResult(
                         data = PaginatedLaunchNormalList(
-                            count = staleCached.size,
+                            count = filteredStale.size,
                             next = null,
                             previous = null,
-                            results = staleCached
+                            results = filteredStale
                         ),
                         source = DataSource.STALE_CACHE,
                         timestamp = staleTimestamp ?: now
@@ -106,10 +117,16 @@ class LaunchRepositoryImpl(
             // Fetch from API (either no cache, expired, or force refresh)
             val hideTbd = withContext(Dispatchers.Default) { appPreferences.getHideTbdLaunches() }
             
-            val response = launchesApi.launchesList(
+            // NOTE: Current implementation uses AND logic (strict matching) when both filters are present.
+            // Flexible mode (OR logic) would require two API calls and merge, which is deferred for MVP.
+            // The API parameters use: (lsp__id IN agencies) AND (location__ids IN locations)
+            // TODO: Implement flexible mode - see LAUNCH_FILTERS_HOME_INTEGRATION.md Phase 7
+            val response = launchesApi.getLaunchList(
                 limit = limit,
                 upcoming = true,
-                ordering = "net"
+                ordering = "net",
+                lspId = agencyIds,
+                locationIds = locationIds
             )
             
             val launches = response.body()
@@ -121,7 +138,7 @@ class LaunchRepositoryImpl(
             
             // Cache the results for future use
             localDataSource?.cacheNormalLaunches(filtered.results)
-            println("✓ API SUCCESS: Fetched and cached ${filtered.results.size} upcoming launches")
+            println("✓ API SUCCESS: Fetched and cached ${filtered.results.size} upcoming launches (filters: agencies=$agencyIds, locations=$locationIds)")
             
             Result.success(DataResult(
                 data = filtered,
@@ -133,13 +150,15 @@ class LaunchRepositoryImpl(
             val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("upcoming_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("⚠️ API ERROR: Returning ${staleCached.size} stale cached launches as fallback")
+                // Filter stale cache by user preferences
+                val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
+                println("⚠️ API ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached launches as fallback")
                 return Result.success(DataResult(
                     data = PaginatedLaunchNormalList(
-                        count = staleCached.size,
+                        count = filteredStale.size,
                         next = null,
                         previous = null,
-                        results = staleCached
+                        results = filteredStale
                     ),
                     source = DataSource.STALE_CACHE,
                     timestamp = staleTimestamp
@@ -151,13 +170,15 @@ class LaunchRepositoryImpl(
             val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("upcoming_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("⚠️ NETWORK ERROR: Returning ${staleCached.size} stale cached launches as fallback")
+                // Filter stale cache by user preferences
+                val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
+                println("⚠️ NETWORK ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached launches as fallback")
                 return Result.success(DataResult(
                     data = PaginatedLaunchNormalList(
-                        count = staleCached.size,
+                        count = filteredStale.size,
                         next = null,
                         previous = null,
-                        results = staleCached
+                        results = filteredStale
                     ),
                     source = DataSource.STALE_CACHE,
                     timestamp = staleTimestamp
@@ -187,16 +208,24 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getPreviousLaunchesNormal(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedLaunchNormalList>> {
+    override suspend fun getPreviousLaunchesNormal(
+        limit: Int,
+        forceRefresh: Boolean,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): Result<DataResult<PaginatedLaunchNormalList>> {
         return try {
             println("=== LaunchRepository.getPreviousLaunchesNormal ===")
-            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
+            println("Parameters: limit=$limit, forceRefresh=$forceRefresh, agencyIds=$agencyIds, locationIds=$locationIds")
             
             val now = System.now().toEpochMilliseconds()
             
+            // Create cache key that includes filter parameters
+            val cacheKey = buildCacheKey("previous_launches", agencyIds, locationIds)
+            
             // STALE-WHILE-REVALIDATE: Check for stale data
             val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
-            val staleTimestamp = localDataSource?.getCacheTimestamp("previous_launches")
+            val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
             
             // Try fresh cache if available and not forcing refresh
@@ -215,21 +244,39 @@ class LaunchRepositoryImpl(
                         timestamp = staleTimestamp ?: now
                     ))
                 } else if (hasStaleData) {
-                    println("⏳ STALE CACHE: Returning ${staleCached!!.size} stale previous launches")
+                    // Apply user preference filters to stale cached data
+                    val filteredStale = filterLaunchesByPreferences(staleCached!!, agencyIds, locationIds)
+                    println("⏳ STALE CACHE: Returning ${filteredStale.size} filtered stale previous launches")
+                    return Result.success(DataResult(
+                        data = PaginatedLaunchNormalList(
+                            count = filteredStale.size,
+                            next = null,
+                            previous = null,
+                            results = filteredStale
+                        ),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = staleTimestamp ?: now
+                    ))
                 }
             }
             
-            // Fetch from API
+            // Fetch from API with filter parameters
+            // NOTE: Current implementation uses AND logic (strict matching) when both filters are present.
+            // Flexible mode (OR logic) would require two API calls and merge, which is deferred for MVP.
+            // The API parameters use: (lsp__id IN agencies) AND (location__ids IN locations)
+            // TODO: Implement flexible mode - see LAUNCH_FILTERS_HOME_INTEGRATION.md Phase 7
             val response = launchesApi.getLaunchList(
                 limit = limit,
                 previous = true,
-                ordering = "-net"
+                ordering = "-net",
+                lspId = agencyIds,
+                locationIds = locationIds
             )
             val launches = response.body()
             
             // Cache the results for future use
             localDataSource?.cacheNormalLaunches(launches.results)
-            println("✓ API SUCCESS: Fetched and cached ${launches.results.size} previous launches")
+            println("✓ API SUCCESS: Fetched and cached ${launches.results.size} previous launches (filters: agencies=$agencyIds, locations=$locationIds)")
             
             Result.success(DataResult(
                 data = launches,
@@ -241,13 +288,15 @@ class LaunchRepositoryImpl(
             val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("previous_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("⚠️ API ERROR: Returning ${staleCached.size} stale cached previous launches as fallback")
+                // Apply user preference filters to stale cached data
+                val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
+                println("⚠️ API ERROR: Returning ${filteredStale.size} filtered stale cached previous launches as fallback")
                 return Result.success(DataResult(
                     data = PaginatedLaunchNormalList(
-                        count = staleCached.size,
+                        count = filteredStale.size,
                         next = null,
                         previous = null,
-                        results = staleCached
+                        results = filteredStale
                     ),
                     source = DataSource.STALE_CACHE,
                     timestamp = staleTimestamp
@@ -259,13 +308,15 @@ class LaunchRepositoryImpl(
             val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("previous_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("⚠️ NETWORK ERROR: Returning ${staleCached.size} stale cached previous launches as fallback")
+                // Filter stale cache by user preferences
+                val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
+                println("⚠️ NETWORK ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached previous launches as fallback")
                 return Result.success(DataResult(
                     data = PaginatedLaunchNormalList(
-                        count = staleCached.size,
+                        count = filteredStale.size,
                         next = null,
                         previous = null,
-                        results = staleCached
+                        results = filteredStale
                     ),
                     source = DataSource.STALE_CACHE,
                     timestamp = staleTimestamp
@@ -553,5 +604,49 @@ class LaunchRepositoryImpl(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+    
+    /**
+     * Build a cache key that includes filter parameters to ensure
+     * different filter combinations don't return stale cached data
+     */
+    private fun buildCacheKey(base: String, agencyIds: List<Int>?, locationIds: List<Int>?): String {
+        return buildString {
+            append(base)
+            if (agencyIds != null && agencyIds.isNotEmpty()) {
+                append("_agencies_${agencyIds.sorted().joinToString(",")}")
+            }
+            if (locationIds != null && locationIds.isNotEmpty()) {
+                append("_locations_${locationIds.sorted().joinToString(",")}")
+            }
+        }
+    }
+
+    /**
+     * Filter launches by user's agency and location preferences.
+     * Matches the API's AND logic: (lsp__id IN agencies) AND (location__ids IN locations)
+     */
+    private fun filterLaunchesByPreferences(
+        launches: List<LaunchNormal>,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): List<LaunchNormal> {
+        var filtered = launches
+        
+        // Filter by agency (LSP) if specified
+        if (agencyIds != null && agencyIds.isNotEmpty()) {
+            filtered = filtered.filter { launch ->
+                launch.launchServiceProvider?.id?.let { it in agencyIds } ?: false
+            }
+        }
+        
+        // Filter by location if specified
+        if (locationIds != null && locationIds.isNotEmpty()) {
+            filtered = filtered.filter { launch ->
+                launch.pad?.location?.id?.let { it in locationIds } ?: false
+            }
+        }
+        
+        return filtered
     }
 }
