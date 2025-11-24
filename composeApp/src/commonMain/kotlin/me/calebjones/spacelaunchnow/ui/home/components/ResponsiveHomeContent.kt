@@ -70,13 +70,10 @@ fun ResponsiveHomeContent(
     val homeViewModel = koinViewModel<HomeViewModel>()
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
 
-    // Collect state for the new HomeQuickView
-    val previousLaunches by homeViewModel.previousLaunches.collectAsStateWithLifecycle()
-    val upcomingLaunches by homeViewModel.upcomingLaunches.collectAsStateWithLifecycle()
-
     // Collect all ViewStates
     val featuredLaunchState by homeViewModel.featuredLaunchState.collectAsStateWithLifecycle()
     val upcomingLaunchesState by homeViewModel.upcomingLaunchesState.collectAsStateWithLifecycle()
+    val previousLaunchesState by homeViewModel.previousLaunchesState.collectAsStateWithLifecycle()
     val updatesState by homeViewModel.updatesState.collectAsStateWithLifecycle()
     val articlesState by homeViewModel.articlesState.collectAsStateWithLifecycle()
     val eventsState by homeViewModel.eventsState.collectAsStateWithLifecycle()
@@ -186,8 +183,8 @@ fun ResponsiveHomeContent(
                                         fontSize = 20.sp
                                     )
                                 }
-                                if (previousLaunches.isNotEmpty()) {
-                                    val previousLaunch = previousLaunches.first()
+                                if (previousLaunchesState.data.isNotEmpty()) {
+                                    val previousLaunch = previousLaunchesState.data.first()
                                     LaunchItemView(
                                         launch = previousLaunch,
                                         navController = navController,

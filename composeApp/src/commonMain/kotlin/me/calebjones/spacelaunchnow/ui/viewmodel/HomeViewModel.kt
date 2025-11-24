@@ -105,119 +105,40 @@ class HomeViewModel(
     private val _historyState = MutableStateFlow(ViewState(data = HistoryData(0, emptyList())))
     val historyState: StateFlow<ViewState<HistoryData>> = _historyState.asStateFlow()
 
-    // ========== Legacy State (for backward compatibility during migration) ==========
+    // Previous Launches State (for bidirectional carousel)
+    private val _previousLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
+    val previousLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> = _previousLaunchesState.asStateFlow()
 
-    // Combined Launches (previous + upcoming for carousel)
-    private val _combinedLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
-    val combinedLaunches: StateFlow<List<LaunchNormal>> = _combinedLaunches.asStateFlow()
+    // ========== Derived States for Carousel ==========
 
-    // Index where upcoming launches start in combined list
-    private val _upcomingStartIndex = MutableStateFlow<Int>(0)
-    val upcomingStartIndex: StateFlow<Int> = _upcomingStartIndex.asStateFlow()
+    // Combined Launches (previous + upcoming for carousel) - derived from ViewStates
+    val combinedLaunches: StateFlow<List<LaunchNormal>> = kotlinx.coroutines.flow.combine(
+        _previousLaunchesState,
+        _upcomingLaunchesState
+    ) { previousState, upcomingState ->
+        previousState.data.reversed() + upcomingState.data
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Previous Launches List (for bidirectional carousel)
-    private val _previousLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
-    val previousLaunches: StateFlow<List<LaunchNormal>> = _previousLaunches.asStateFlow()
+    // Index where upcoming launches start in combined list - derived from previousLaunchesState
+    val upcomingStartIndex: StateFlow<Int> = _previousLaunchesState
+        .kotlinx.coroutines.flow.map { it.data.size }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    // ========== Legacy State Properties (still used by old functions) ==========
-    // These will be removed once all views are migrated to ViewState pattern
+    // Combined loading state for carousel
+    val isCarouselLoading: StateFlow<Boolean> = kotlinx.coroutines.flow.combine(
+        _previousLaunchesState,
+        _upcomingLaunchesState
+    ) { previousState, upcomingState ->
+        previousState.isLoading || upcomingState.isLoading
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    // Additional legacy states for previous launches
-    private val _previousLaunchesError = MutableStateFlow<String?>(null)
-    val previousLaunchesError: StateFlow<String?> = _previousLaunchesError.asStateFlow()
-
-    private val _isPreviousLaunchesLoading = MutableStateFlow(false)
-    val isPreviousLaunchesLoading: StateFlow<Boolean> = _isPreviousLaunchesLoading.asStateFlow()
-
-    private val _isPreviousLaunchesRefreshing = MutableStateFlow(false)
-    val isPreviousLaunchesRefreshing: StateFlow<Boolean> =
-        _isPreviousLaunchesRefreshing.asStateFlow()
-
-    private val _isUpcomingLaunchesRefreshing = MutableStateFlow(false)
-    val isUpcomingLaunchesRefreshing: StateFlow<Boolean> =
-        _isUpcomingLaunchesRefreshing.asStateFlow()
-
-    // Global app loading state (deprecated - will be removed)
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    // Pull-to-refresh global state
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
-
-    // Legacy individual property states - used by old functions until migration complete
-    private val _upcomingLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
-    val upcomingLaunches: StateFlow<List<LaunchNormal>> = _upcomingLaunches.asStateFlow()
-
-    private val _isUpcomingLaunchesLoading = MutableStateFlow(false)
-    val isUpcomingLaunchesLoading: StateFlow<Boolean> = _isUpcomingLaunchesLoading.asStateFlow()
-
-    private val _isFeaturedLaunchLoading = MutableStateFlow(false)
-    val isFeaturedLaunchLoading: StateFlow<Boolean> = _isFeaturedLaunchLoading.asStateFlow()
-
-    private val _upcomingLaunchesError = MutableStateFlow<String?>(null)
-    val upcomingLaunchesError: StateFlow<String?> = _upcomingLaunchesError.asStateFlow()
-
-    private val _featuredLaunch = MutableStateFlow<LaunchNormal?>(null)
-    val featuredLaunch: StateFlow<LaunchNormal?> = _featuredLaunch.asStateFlow()
-
-    private val _featuredLaunchError = MutableStateFlow<String?>(null)
-    val featuredLaunchError: StateFlow<String?> = _featuredLaunchError.asStateFlow()
-
-    private val _lastDataUpdate = MutableStateFlow<Long>(0)
-    val lastDataUpdate: StateFlow<Long> = _lastDataUpdate.asStateFlow()
-
-    private val _updates = MutableStateFlow<List<UpdateEndpoint>>(emptyList())
-    val updates: StateFlow<List<UpdateEndpoint>> = _updates.asStateFlow()
-
-    private val _isUpdatesLoading = MutableStateFlow(false)
-    val isUpdatesLoading: StateFlow<Boolean> = _isUpdatesLoading.asStateFlow()
-
-    private val _isUpdatesRefreshing = MutableStateFlow(false)
-    val isUpdatesRefreshing: StateFlow<Boolean> = _isUpdatesRefreshing.asStateFlow()
-
-    private val _updatesError = MutableStateFlow<String?>(null)
-    val updatesError: StateFlow<String?> = _updatesError.asStateFlow()
-
-    private val _articles = MutableStateFlow<List<Article>>(emptyList())
-    val articles: StateFlow<List<Article>> = _articles.asStateFlow()
-
-    private val _isArticlesLoading = MutableStateFlow(false)
-    val isArticlesLoading: StateFlow<Boolean> = _isArticlesLoading.asStateFlow()
-
-    private val _isArticlesRefreshing = MutableStateFlow(false)
-    val isArticlesRefreshing: StateFlow<Boolean> = _isArticlesRefreshing.asStateFlow()
-
-    private val _articlesError = MutableStateFlow<String?>(null)
-    val articlesError: StateFlow<String?> = _articlesError.asStateFlow()
-
-    private val _events = MutableStateFlow<List<EventEndpointNormal>>(emptyList())
-    val events: StateFlow<List<EventEndpointNormal>> = _events.asStateFlow()
-
-    private val _isEventsLoading = MutableStateFlow(false)
-    val isEventsLoading: StateFlow<Boolean> = _isEventsLoading.asStateFlow()
-
-    private val _isEventsRefreshing = MutableStateFlow(false)
-    val isEventsRefreshing: StateFlow<Boolean> = _isEventsRefreshing.asStateFlow()
-
-    private val _eventsError = MutableStateFlow<String?>(null)
-    val eventsError: StateFlow<String?> = _eventsError.asStateFlow()
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
-
-    // History launches for "This Day in History"
-    private val _historyLaunchesCount = MutableStateFlow(0)
-    val historyLaunchesCount: StateFlow<Int> = _historyLaunchesCount.asStateFlow()
-
-    private val _historyLaunches = MutableStateFlow<List<LaunchNormal>>(emptyList())
-    val historyLaunches: StateFlow<List<LaunchNormal>> = _historyLaunches.asStateFlow()
-
-    private val _isHistoryLaunchesLoading = MutableStateFlow(false)
-    val isHistoryLaunchesLoading: StateFlow<Boolean> = _isHistoryLaunchesLoading.asStateFlow()
-
-    private val _historyLaunchesError = MutableStateFlow<String?>(null)
-    val historyLaunchesError: StateFlow<String?> = _historyLaunchesError.asStateFlow()
+    // Combined error state for carousel (show error if either fails)
+    val carouselError: StateFlow<String?> = kotlinx.coroutines.flow.combine(
+        _previousLaunchesState,
+        _upcomingLaunchesState
+    ) { previousState, upcomingState ->
+        upcomingState.error ?: previousState.error
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     // Quick stats counts
     private val _next24HoursCount = MutableStateFlow(0)
@@ -233,22 +154,20 @@ class HomeViewModel(
      * Loads all home screen data in parallel for better performance
      * This is the main entry point for the home screen
      *
-     * The main loading indicator (_isLoading) only tracks the featured launch load.
-     * Other sections (updates, articles, events, stats) load independently in the background.
+     * Uses the NEW ViewState pattern for all data loading.
+     * All sections load independently with their own state management.
      */
     fun loadHomeScreenData() {
         viewModelScope.launch {
             try {
-                clearErrors()
-
-                // Load featured launch (upcoming launches) - this drives the main loading indicator
-                loadUpcomingLaunches()
+                // Load upcoming launches (which also loads previous for carousel) and featured launch
+                launch { loadFeaturedLaunchNew() }
+                launch { loadUpcomingLaunchesNew() }
 
                 // Load everything else in parallel in the background
-                // These don't affect the main _isLoading state
-                launch { loadUpdates() }
-                launch { loadArticles() }
-                launch { loadEvents() }
+                launch { loadUpdatesNew() }
+                launch { loadArticlesNew() }
+                launch { loadEventsNew() }
                 launch { loadNext24Hours() }
                 launch { loadNextWeek() }
                 launch { loadNextMonth() }
@@ -319,14 +238,18 @@ class HomeViewModel(
 
     /**
      * Loads upcoming launches with simplified state management
+     * Also loads previous launches in parallel for carousel
      * @param limit Number of launches to load
      * @param forceRefresh If true, bypass cache (user-initiated refresh)
      */
     fun loadUpcomingLaunchesNew(limit: Int = 10, forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                // Update state: loading started
+                // Update states: loading started
                 _upcomingLaunchesState.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+                _previousLaunchesState.update {
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
                 }
 
@@ -341,14 +264,26 @@ class HomeViewModel(
                 println("filterParams.agencyIds: ${filterParams.agencyIds}")
                 println("filterParams.locationIds: ${filterParams.locationIds}")
 
-                val result = launchRepository.getUpcomingLaunchesNormal(
-                    limit = limit,
-                    forceRefresh = forceRefresh,
-                    agencyIds = filterParams.agencyIds,
-                    locationIds = filterParams.locationIds
-                )
+                // Load both upcoming and previous in parallel
+                val upcomingDeferred = async {
+                    launchRepository.getUpcomingLaunchesNormal(
+                        limit = limit,
+                        forceRefresh = forceRefresh,
+                        agencyIds = filterParams.agencyIds,
+                        locationIds = filterParams.locationIds
+                    )
+                }
+                val previousDeferred = async {
+                    launchRepository.getPreviousLaunchesNormal(
+                        limit = 5,
+                        forceRefresh = forceRefresh,
+                        agencyIds = filterParams.agencyIds,
+                        locationIds = filterParams.locationIds
+                    )
+                }
 
-                result.onSuccess { dataResult ->
+                // Handle upcoming launches result
+                upcomingDeferred.await().onSuccess { dataResult ->
                     _upcomingLaunchesState.update {
                         it.copy(
                             data = dataResult.data.results,
@@ -357,9 +292,6 @@ class HomeViewModel(
                             cacheTimestamp = dataResult.timestamp
                         )
                     }
-
-                    // Update combined launches for carousel
-                    updateCombinedLaunches()
                 }.onFailure { exception ->
                     _upcomingLaunchesState.update {
                         it.copy(
@@ -368,8 +300,33 @@ class HomeViewModel(
                         )
                     }
                 }
+
+                // Handle previous launches result
+                previousDeferred.await().onSuccess { dataResult ->
+                    _previousLaunchesState.update {
+                        it.copy(
+                            data = dataResult.data.results,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+                }.onFailure { exception ->
+                    _previousLaunchesState.update {
+                        it.copy(
+                            error = formatErrorMessage(exception),
+                            isLoading = false
+                        )
+                    }
+                }
             } catch (exception: Exception) {
                 _upcomingLaunchesState.update {
+                    it.copy(
+                        error = exception.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
+                _previousLaunchesState.update {
                     it.copy(
                         error = exception.message ?: "Unknown error",
                         isLoading = false

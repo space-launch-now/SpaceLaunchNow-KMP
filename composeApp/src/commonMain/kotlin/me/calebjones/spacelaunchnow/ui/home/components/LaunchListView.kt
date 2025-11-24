@@ -73,11 +73,12 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
         val screenWidth = maxWidth
         val density = LocalDensity.current
 
+        // Use derived states from ViewModel (automatically computed from ViewStates)
         val combinedLaunches by viewModel.combinedLaunches.collectAsState()
         val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsState()
-        val error by viewModel.upcomingLaunchesError.collectAsState()
-        val isLoading by viewModel.isUpcomingLaunchesLoading.collectAsState()
-        val isRefreshing by viewModel.isUpcomingLaunchesRefreshing.collectAsState()
+        val error by viewModel.carouselError.collectAsState()
+        val isLoading by viewModel.isCarouselLoading.collectAsState()
+        
         val scrollState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
 
@@ -85,11 +86,10 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
         var isDragging by remember { mutableStateOf(false) }
         
         // Log when state changes
-        LaunchedEffect(combinedLaunches, isLoading, isRefreshing) {
+        LaunchedEffect(combinedLaunches, isLoading) {
             println("=== LaunchListView: State Changed ===")
             println("Combined launches: ${combinedLaunches.size}")
             println("isLoading: $isLoading")
-            println("isRefreshing: $isRefreshing")
             if (combinedLaunches.isNotEmpty()) {
                 println("First launch: ${combinedLaunches.first().name}")
                 println("Last launch: ${combinedLaunches.last().name}")
@@ -98,7 +98,7 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
 
         LaunchedEffect(Unit) {
             if (combinedLaunches.isEmpty() && !isLoading && error == null) {
-                viewModel.loadUpcomingLaunches(limit = 10)
+                viewModel.loadUpcomingLaunchesNew(limit = 10)
             }
         }
 
@@ -121,7 +121,7 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
         if (error != null) {
             LaunchListErrorCard(
                 error = error!!,
-                onRetry = { viewModel.loadUpcomingLaunches(limit = 10, forceRefresh = true) }
+                onRetry = { viewModel.loadUpcomingLaunchesNew(limit = 10, forceRefresh = true) }
             )
         } else if (combinedLaunches.isNotEmpty()) {
             LazyRow(
