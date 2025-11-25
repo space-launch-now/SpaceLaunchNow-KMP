@@ -38,7 +38,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Instant
@@ -46,13 +46,13 @@ import kotlin.time.Instant
 
 @Composable
 fun ArticlesView() {
-    val homeViewModel = koinViewModel<HomeViewModel>()
-    val state by homeViewModel.articlesState.collectAsStateWithLifecycle()
+    val feedViewModel = koinViewModel<FeedViewModel>()
+    val state by feedViewModel.articlesState.collectAsStateWithLifecycle()
 
     // Load articles if not already loaded and no error
     LaunchedEffect(Unit) {
         if (state.data.isEmpty() && !state.isLoading && state.error == null) {
-            homeViewModel.loadArticlesNew(5)
+            feedViewModel.loadArticles(5)
         }
     }
 

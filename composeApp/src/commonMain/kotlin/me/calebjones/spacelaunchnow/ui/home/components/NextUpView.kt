@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,7 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,47 +48,58 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.extensions.launchUrl
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.ui.compose.EmptyStateCard
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.FeaturedLaunchViewModel
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NextLaunchView(navController: NavController) {
-    val homeViewModel = koinViewModel<HomeViewModel>()
-    val state by homeViewModel.featuredLaunchState.collectAsStateWithLifecycle()
+    val featuredLaunchViewModel = koinViewModel<FeaturedLaunchViewModel>()
+    val state by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        // Always load to keep data fresh (stale-while-revalidate)
-        homeViewModel.loadFeaturedLaunchNew()
-    }
+    // NOTE: We don't need to call loadFeaturedLaunch here because HomeScreen already calls it
+    // in its LaunchedEffect(Unit). The ViewModel is shared, so data flows automatically.
+    
     Column {
 
 
         when {
             // STATE 1: Show data if it exists (ALWAYS, even while loading or with error)
             state.data != null -> {
+                println("[FEATURED] 🎯 DISPLAYING: Launch data (${state.data!!.name})")
                 NextLaunchItemView(state.data!!, navController)
             }
 
             // STATE 2: Error with no data
             state.error != null -> {
+                println("[FEATURED] ❌ DISPLAYING: Error message")
                 ErrorMessageView(errorMessage = state.error!!)
             }
 
             // STATE 3: Initial loading (no data yet)
             state.isLoading -> {
+                println("[FEATURED] ⏳ DISPLAYING: Shimmer (initial loading)")
                 NextUpShimmerBox()
             }
 
-            // Fallback: no data, not loading, no error (should not happen)
+            // STATE 4: No data, not loading, no error = empty results from filters
+            !state.isLoading && state.data == null && state.error == null -> {
+                println("[FEATURED] 📭 DISPLAYING: Empty filter state (no launches match filters)")
+                EmptyStateCard(navController = navController)
+            }
+
+            // Fallback: should never reach here
             else -> {
+                println("[FEATURED] ⚠️ UNEXPECTED STATE - showing shimmer as fallback")
                 NextUpShimmerBox()
             }
         }
@@ -341,3 +357,4 @@ fun ErrorMessageView(errorMessage: String) {
         }
     }
 }
+

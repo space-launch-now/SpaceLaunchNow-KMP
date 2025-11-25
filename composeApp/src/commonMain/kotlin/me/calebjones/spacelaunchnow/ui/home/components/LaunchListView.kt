@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -30,14 +32,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.CardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,12 +56,14 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.ui.compose.EmptyStateCard
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.LaunchListShimmer
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 
 // Constants for layout dimensions
@@ -68,60 +72,51 @@ private val CARD_HEIGHT = 240.dp
 private val CARD_SPACING = 16.dp
 
 @Composable
-fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
+fun LaunchListView(viewModel: LaunchCarouselViewModel, navController: NavController) {
     BoxWithConstraints {
         val screenWidth = maxWidth
         val density = LocalDensity.current
 
         // Use derived states from ViewModel (automatically computed from ViewStates)
-        val combinedLaunches by viewModel.combinedLaunches.collectAsState()
-        val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsState()
-        val error by viewModel.carouselError.collectAsState()
-        val isLoading by viewModel.isCarouselLoading.collectAsState()
-        
+        val combinedLaunches by viewModel.combinedLaunches.collectAsStateWithLifecycle()
+        val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsStateWithLifecycle()
+        val error by viewModel.carouselError.collectAsStateWithLifecycle()
+        val isLoading by viewModel.isCarouselLoading.collectAsStateWithLifecycle()
+
         val scrollState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
 
         // Track if we're currently dragging
         var isDragging by remember { mutableStateOf(false) }
-        
-        // Log when state changes
-        LaunchedEffect(combinedLaunches, isLoading) {
-            println("=== LaunchListView: State Changed ===")
-            println("Combined launches: ${combinedLaunches.size}")
-            println("isLoading: $isLoading")
-            if (combinedLaunches.isNotEmpty()) {
-                println("First launch: ${combinedLaunches.first().name}")
-                println("Last launch: ${combinedLaunches.last().name}")
-            }
-        }
 
-        LaunchedEffect(Unit) {
-            if (combinedLaunches.isEmpty() && !isLoading && error == null) {
-                viewModel.loadUpcomingLaunchesNew(limit = 10)
-            }
-        }
+        // Track if we've scrolled to position to prevent repeated scrolling
+        var hasScrolledToPosition by remember { mutableStateOf(false) }
 
-        // Scroll to center the first upcoming launch card
-        LaunchedEffect(combinedLaunches, upcomingStartIndex, screenWidth) {
-            if (combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
+        // NOTE: We don't need to call loadLaunches here because HomeScreen already calls it
+        // in its LaunchedEffect(Unit). The ViewModel is shared, so data flows automatically.
+
+        // Scroll to center the first upcoming launch card - only once after data loads
+        LaunchedEffect(combinedLaunches.isNotEmpty(), upcomingStartIndex) {
+            if (!hasScrolledToPosition && combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
                 // Calculate the offset to center the card
                 // Card width = 340dp, spacing = 16dp, contentPadding = 16dp
                 val cardWidthPx = with(density) { 340.dp.toPx() }
                 val screenWidthPx = with(density) { screenWidth.toPx() }
-                
+
                 // Center offset: (screenWidth - cardWidth) / 2 - contentPadding
                 val centerOffset = ((screenWidthPx - cardWidthPx) / 2).toInt()
-                
+
                 // Scroll to the first upcoming launch, centered
                 scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -centerOffset)
+                hasScrolledToPosition = true
+                println("=== LaunchListView: Scrolled to position $upcomingStartIndex ===")
             }
         }
 
         if (error != null) {
             LaunchListErrorCard(
                 error = error!!,
-                onRetry = { viewModel.loadUpcomingLaunchesNew(limit = 10, forceRefresh = true) }
+                onRetry = { viewModel.loadLaunches(upcomingLimit = 10, forceRefresh = true) }
             )
         } else if (combinedLaunches.isNotEmpty()) {
             LazyRow(
@@ -159,7 +154,10 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
                 state = scrollState,
 
                 ) {
-                items(combinedLaunches.size) { index ->
+                items(
+                    count = combinedLaunches.size,
+                    key = { index -> combinedLaunches[index].id }
+                ) { index ->
                     LaunchItemView(
                         launch = combinedLaunches[index],
                         navController = navController,
@@ -170,6 +168,9 @@ fun LaunchListView(viewModel: HomeViewModel, navController: NavController) {
         } else if (isLoading) {
             // Only show shimmer on initial load (no data)
             LaunchListShimmer()
+        } else if (!isLoading && combinedLaunches.isEmpty() && error == null) {
+            // Empty state - no launches match filters
+            EmptyStateCard(navController = navController)
         }
     }
 }
@@ -410,3 +411,5 @@ fun LaunchListErrorCard(
         }
     }
 }
+
+

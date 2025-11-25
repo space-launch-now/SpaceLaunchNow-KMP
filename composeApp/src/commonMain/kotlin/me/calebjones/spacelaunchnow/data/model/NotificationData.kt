@@ -179,10 +179,26 @@ object NotificationFilter {
         }
         
         // 8. Check location filter (only if filter is active)
-        // Special case: locationId="0" (Other) in subscribed list acts as a wildcard - matches ANY location
+        // Special cases:
+        // - locationId="0" (Other) in subscribed list acts as a wildcard - matches ANY location
+        // - Grouped locations (e.g., FLORIDA) may have additionalIds that should also match
         val locationMatch = if (hasLocationFilter) {
-            state.subscribedLocations.contains(data.locationId) || 
-            state.subscribedLocations.contains("0")
+            // Direct match
+            if (state.subscribedLocations.contains(data.locationId)) {
+                true
+            } 
+            // Wildcard match
+            else if (state.subscribedLocations.contains("0")) {
+                true
+            }
+            // Check if notification's location is in any subscribed location's additionalIds
+            else {
+                val allLocations = NotificationLocation.getAll()
+                state.subscribedLocations.any { subscribedLocationId ->
+                    val location = allLocations.find { it.id.toString() == subscribedLocationId }
+                    location?.getAllIds()?.any { it.toString() == data.locationId } ?: false
+                }
+            }
         } else {
             true // No location filter, so don't block based on location
         }

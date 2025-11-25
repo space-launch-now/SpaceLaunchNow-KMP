@@ -21,10 +21,8 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
-import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
-import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
+import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
@@ -34,13 +32,15 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
-import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
-import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
-import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
-import me.calebjones.spacelaunchnow.database.EventLocalDataSource
+import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
+import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
-import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.database.CacheCleanupService
+import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
+import me.calebjones.spacelaunchnow.database.EventLocalDataSource
+import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
+import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
+import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
@@ -48,12 +48,18 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.FeaturedLaunchViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
 import org.koin.core.module.dsl.bind
@@ -75,9 +81,9 @@ val koinConfig = koinConfiguration {
 val appModule = module {
     singleOf(::UserRepositoryImpl) { bind<UserRepository>() }
     viewModelOf(::UserViewModel)
-    
+
     // Database and local data sources
-    single { 
+    single {
         val driver = get<DatabaseDriverFactory>().createDriver()
         SpaceLaunchDatabase(driver)
     }
@@ -85,7 +91,7 @@ val appModule = module {
     single { EventLocalDataSource(get(), get()) }
     single { ArticleLocalDataSource(get(), get()) }
     single { UpdateLocalDataSource(get(), get()) }
-    
+
     single<LaunchRepository> {
         LaunchRepositoryImpl(
             launchesApi = get(),
@@ -102,7 +108,16 @@ val appModule = module {
     }
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
-    viewModelOf(::HomeViewModel)
+
+    // Domain-specific ViewModels
+    viewModelOf(::LaunchesViewModel)
+    viewModelOf(::FeaturedLaunchViewModel)
+    viewModelOf(::LaunchCarouselViewModel)
+    viewModelOf(::FeedViewModel)
+    viewModelOf(::EventsViewModel)
+    viewModelOf(::HistoryViewModel)
+    viewModelOf(::StatsViewModel)
+
     viewModelOf(::ScheduleViewModel)
     singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
@@ -124,7 +139,7 @@ val appModule = module {
     }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
-    
+
     // Background cleanup task for expired cache entries
     single {
         CacheCleanupService(
@@ -144,7 +159,7 @@ val appModule = module {
 
     // Notification dependencies
     singleOf(::PushMessaging)
-    
+
     // Launch filter service - converts filter settings to API parameters
     singleOf(::LaunchFilterService)
 
@@ -205,7 +220,7 @@ val appModule = module {
 
     // Local subscription storage (KStore)
     single { LocalSubscriptionStorage() }
-    
+
     // Subscription syncer (uses BillingManager)
     single {
         SubscriptionSyncer(
@@ -241,7 +256,7 @@ val debugModule = module {
         val debugDataStore = get<DataStore<Preferences>>(named("DebugDataStore"))
         DebugPreferences(debugDataStore)
     }
-    
+
     // DebugSettingsViewModel - now uses BillingManager (Phase 7 complete!)
     viewModelOf(::DebugSettingsViewModel)
 }

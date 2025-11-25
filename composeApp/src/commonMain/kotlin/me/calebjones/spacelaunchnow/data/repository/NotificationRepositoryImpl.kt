@@ -117,33 +117,11 @@ class NotificationRepositoryImpl(
     }
 
     override suspend fun getAvailableAgencies(): List<NotificationAgency> {
-        return listOf(
-            NotificationAgency.SPACEX,
-            NotificationAgency.NASA,
-            NotificationAgency.BLUE_ORIGIN,
-            NotificationAgency.ROCKET_LAB,
-            NotificationAgency.ULA,
-            NotificationAgency.ARIANESPACE,
-            NotificationAgency.ROSCOSMOS,
-            NotificationAgency.NORTHROP_GRUMMAN
-        )
+        return NotificationAgency.getAll()
     }
 
     override suspend fun getAvailableLocations(): List<NotificationLocation> {
-        return listOf(
-            NotificationLocation.VANDENBERG,
-            NotificationLocation.KSC,
-            NotificationLocation.WALLOPS,
-            NotificationLocation.TEXAS,
-            NotificationLocation.RUSSIA,
-            NotificationLocation.FRENCH_GUIANA,
-            NotificationLocation.NEW_ZEALAND,
-            NotificationLocation.JAPAN,
-            NotificationLocation.INDIA,
-            NotificationLocation.CHINA,
-            NotificationLocation.KODIAK,
-            NotificationLocation.OTHER
-        )
+        return NotificationLocation.getAll()
     }
 
     override suspend fun requestNotificationPermission(): Boolean {
