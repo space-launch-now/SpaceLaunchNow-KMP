@@ -245,7 +245,8 @@ class LaunchFilterServiceTest {
         
         val params = service.getFilterParams(state)
         assertNull(params.agencyIds)
-        assertEquals(listOf(27, 11), params.locationIds)
+        // Florida (27) expands to include Cape Canaveral (12), Vandenberg (11) has no additional IDs
+        assertEquals(listOf(27, 12, 11), params.locationIds)
         assertFalse(params.requiresFlexibleMerge)
     }
     
@@ -260,7 +261,8 @@ class LaunchFilterServiceTest {
         
         val params = service.getFilterParams(state)
         assertEquals(listOf(121), params.agencyIds)
-        assertEquals(listOf(27), params.locationIds)
+        // Florida (27) expands to include Cape Canaveral (12)
+        assertEquals(listOf(27, 12), params.locationIds)
         assertFalse(params.requiresFlexibleMerge)
     }
     
@@ -275,7 +277,8 @@ class LaunchFilterServiceTest {
         
         val params = service.getFilterParams(state)
         assertEquals(listOf(121, 44), params.agencyIds)
-        assertEquals(listOf(27, 11), params.locationIds)
+        // Florida (27) expands to include Cape Canaveral (12), Vandenberg (11) has no additional IDs
+        assertEquals(listOf(27, 12, 11), params.locationIds)
         assertTrue(params.requiresFlexibleMerge)
     }
     
