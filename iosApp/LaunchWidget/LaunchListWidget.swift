@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import UIKit
 
 // Helper extension to apply custom background with opacity (shared with NextUpWidget)
 extension View {
@@ -34,11 +35,12 @@ struct LaunchListWidget: Widget {
 struct LaunchListWidgetView: View {
     var entry: LaunchEntry
     @Environment(\.widgetFamily) var family
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack {
-            // Custom background with user-configured transparency
-            Color(white: 0.15)
+            // Custom background with user-configured transparency that respects light/dark mode
+            Color(colorScheme == .dark ? UIColor.secondarySystemBackground : UIColor.systemBackground)
                 .opacity(entry.backgroundAlpha)
             
             // Content
