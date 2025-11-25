@@ -1,4 +1,22 @@
-# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b26...v5.0.0) (2025-11-25)
+# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b27...v5.0.0) (2025-11-25)
+
+
+### Bug Fixes
+
+* implement viewstate migration ([2e90ffd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2e90ffd1114b08c6ce330d93b21e0100f8a5f712))
+* include changes ([4ac4e28](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4ac4e2882dd9dbda2e3f93972ccf225bcfd45823))
+* remove forced versioning for automatic semantic versioning ([b5d1552](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b5d15520952da8937f16d882f44070a58adca918))
+* update location IDs in LaunchFilterServiceTest to reflect correct expansions ([d03a5e8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d03a5e8412a3cef7ce928c68bc82c515809194c6))
+
+
+### Features
+
+* filter home page split viewmodels in the home screen and add additional filters ([16274be](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/16274bea4c3b3d2a961183a44f61221a4430b332))
+* Implement Launch Filters for Home Screen Integration ([42d0bf6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/42d0bf68631bb7f5acaba0b52b1cbaafd34348e3))
+
+
+
+# [5.0.0-b27](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b26...v5.0.0-b27) (2025-11-25)
 
 
 ### Bug Fixes
@@ -31,27 +49,6 @@
 ### Bug Fixes
 
 * **ios:** return data from fetchUpcomingLaunches methods in KoinHelper ([511ed89](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/511ed8918e3c1d42a483bc16c0f6c71f81244fbb))
-
-
-
-# [5.0.0-b23](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b22...v5.0.0-b23) (2025-11-18)
-
-
-### Bug Fixes
-
-* correct month off-by-one error in iOS date formatting ([810426e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/810426e79dd34a5c871e09aae5d6c1412d73559f))
-* Improve ad handling ([c7cb537](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c7cb537c1d8551ecf2e86a6c8ff3e62b3e8cf717))
-* **ios:** fix date formatting ([5dc3b3a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5dc3b3a9bd98cd7695b38ef7d1828d35bc287cfb))
-* refresh related news on pull-to-refresh ([8cc4f27](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8cc4f278f6051b7caa1ffb8de3c5247efbf59037))
-* show date and time for docking/departing events instead of just time ([ffc4c16](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ffc4c169eaa2799f103b8bd60f5d7d29726c8480))
-* update Koin module to inject ArticlesRepository into LaunchViewModel ([0fc0788](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0fc078821e7f98ffdf81ef94d616ee939af08498))
-
-
-### Features
-
-* Add cache and busting ([53387f5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/53387f5fd92de4d65d1b4b21f530b7cf3e729eba))
-* add related news to launch detail page - initial implementation ([4641987](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/464198795362f332a4d2a28e995faf7997246472))
-* add retrieve related articles and improve ad handling ([5c534a7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5c534a7421cf3878e35f7d540f287b38cb3cae7c))
 
 
 

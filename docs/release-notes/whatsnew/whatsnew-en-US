@@ -1,3 +1,11 @@
 ### Bug Fixes
 
-* iOS widget respects light mode
+* implement viewstate migration
+* include changes
+* remove forced versioning for automatic semantic versioning
+* update location IDs in LaunchFilterServiceTest to reflect correct expansions
+
+### Features
+
+* filter home page split viewmodels in the home screen and add additional filters
+* Implement Launch Filters for Home Screen Integration
