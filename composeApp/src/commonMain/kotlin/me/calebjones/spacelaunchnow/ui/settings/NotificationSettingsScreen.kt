@@ -68,13 +68,21 @@ fun NotificationSettingsScreen(
             viewModel.clearError()
         }
     }
+    
+    // Show snackbar for validation messages
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearSnackbarMessage()
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Notification Filters",
+                        text = "Launch Filters",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,

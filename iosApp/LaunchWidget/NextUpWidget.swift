@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import UIKit
 
 // MARK: - Next Up Widget
 struct NextUpWidget: Widget {
@@ -20,11 +21,12 @@ struct NextUpWidget: Widget {
 // MARK: - Next Up Widget View
 struct NextUpWidgetView: View {
     var entry: LaunchEntry
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack {
-            // Custom background with user-configured transparency
-            Color(white: 0.15)
+            // Custom background with user-configured transparency that respects light/dark mode
+            Color(colorScheme == .dark ? UIColor.secondarySystemBackground : UIColor.systemBackground)
                 .opacity(entry.backgroundAlpha)
             
             // Content

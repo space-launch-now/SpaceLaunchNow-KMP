@@ -1,11 +1,11 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
-import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Instant
 
 /**
  * Tests for UI components related to Updates

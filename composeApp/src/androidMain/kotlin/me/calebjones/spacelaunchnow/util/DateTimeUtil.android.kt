@@ -13,8 +13,8 @@ actual fun formatLocalDateTime(localDateTime: LocalDateTime, useUtc: Boolean): S
     return try {
         val javaDateTime = java.time.LocalDateTime.of(
             localDateTime.year,
-            localDateTime.monthNumber,
-            localDateTime.dayOfMonth,
+            localDateTime.month.number,
+            localDateTime.day,
             localDateTime.hour,
             localDateTime.minute,
             localDateTime.second

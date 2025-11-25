@@ -29,7 +29,8 @@ data class SettingsUiState(
     val notificationsEnabled: Boolean = true,
     val hideTbdLaunches: Boolean = false,
     val hasNotificationCustomization: Boolean = false,
-    val hasCalendarSync: Boolean = false
+    val hasCalendarSync: Boolean = false,
+    val snackbarMessage: String? = null
 )
 
 enum class ThemeOption(val label: String) {
@@ -90,6 +91,10 @@ class SettingsViewModel(
     
     private val _hasCalendarSync = MutableStateFlow(false)
     val hasCalendarSync: StateFlow<Boolean> = _hasCalendarSync.asStateFlow()
+    
+    // Snackbar message state
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
 
     // Reactive state flow that updates when agencies/locations are loaded
     val uiState: StateFlow<SettingsUiState> = combine(
@@ -100,7 +105,8 @@ class SettingsViewModel(
         appSettingsViewModel.useUtcFlow,
         appSettingsViewModel.hideTbdLaunchesFlow,
         _hasNotificationCustomization,
-        _hasCalendarSync
+        _hasCalendarSync,
+        _snackbarMessage
     ) { flows ->
         val notificationState = flows[0] as NotificationState
         val agencies = flows[1] as List<NotificationAgency>
@@ -110,6 +116,7 @@ class SettingsViewModel(
         val hideTbdLaunches = flows[5] as Boolean
         val hasNotificationCustomization = flows[6] as Boolean
         val hasCalendarSync = flows[7] as Boolean
+        val snackbarMessage = flows[8] as String?
 
         SettingsUiState(
             notificationSettings = notificationState,
@@ -122,7 +129,8 @@ class SettingsViewModel(
             useUtc = useUtc,
             hideTbdLaunches = hideTbdLaunches,
             hasNotificationCustomization = hasNotificationCustomization,
-            hasCalendarSync = hasCalendarSync
+            hasCalendarSync = hasCalendarSync,
+            snackbarMessage = snackbarMessage
         )
     }.stateIn(
         scope = viewModelScope,
@@ -194,6 +202,12 @@ class SettingsViewModel(
     fun toggleAgencySubscription(agency: NotificationAgency) {
         val currentState = uiState.value.notificationSettings
         val isCurrentlyEnabled = currentState.isAgencyEnabled(agency)
+        
+        // Check if trying to disable the last agency
+        if (isCurrentlyEnabled && currentState.subscribedAgencies.size == 1) {
+            _snackbarMessage.value = "At least one agency must be selected"
+            return
+        }
 
         viewModelScope.launch {
             notificationRepository.setAgencyEnabled(agency, !isCurrentlyEnabled)
@@ -203,6 +217,12 @@ class SettingsViewModel(
     fun toggleLocationSubscription(location: NotificationLocation) {
         val currentState = uiState.value.notificationSettings
         val isCurrentlyEnabled = currentState.isLocationEnabled(location)
+        
+        // Check if trying to disable the last location
+        if (isCurrentlyEnabled && currentState.subscribedLocations.size == 1) {
+            _snackbarMessage.value = "At least one location must be selected"
+            return
+        }
 
         viewModelScope.launch {
             notificationRepository.setLocationEnabled(location, !isCurrentlyEnabled)
@@ -214,6 +234,11 @@ class SettingsViewModel(
         viewModelScope.launch {
             notificationRepository.setTopicEnabled(topic, enabled)
         }
+    }
+    
+    // Snackbar message management
+    fun clearSnackbarMessage() {
+        _snackbarMessage.value = null
     }
 
     // Convenience methods for backward compatibility with UI

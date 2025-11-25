@@ -279,12 +279,6 @@ Result.failure(e)
 **CRITICAL**: This application requires **Java 21** to run. The Compose Hot Reload plugin
 specifically needs JetBrains JDK 21.
 
-**Windows Setup:**
-
-- Set JAVA_HOME or use Gradle property:
-  `./gradlew :composeApp:desktopRun "-Dorg.gradle.java.home=D:\tools\Android Studio Q4-2024\jbr"`
-- VS Code tasks are pre-configured with correct Java path
-
 ### API Client Updates
 
 1. **Current Status**: ✅ Successfully upgraded from Launch Library 2.3.1 to 2.4.0

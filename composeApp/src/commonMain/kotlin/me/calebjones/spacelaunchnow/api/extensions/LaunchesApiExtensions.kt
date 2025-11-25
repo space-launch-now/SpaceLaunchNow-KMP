@@ -1,11 +1,11 @@
 package me.calebjones.spacelaunchnow.api.extensions
 
-import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 
 /**
@@ -26,6 +26,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
     statusIds: List<Int>? = null,
     search: String? = null,
     lspId: List<Int>? = null,
+    relatedLspId: List<Int>? = null,
     rocketConfigurationId: Int? = null,
     isCrewed: Boolean? = null,
     includeSuborbital: Boolean? = null,
@@ -105,7 +106,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
     padLaunchAttemptCountYearLte = null,
     previous = previous,
     program = null,
-    relatedLspId = null,
+    relatedLspId = relatedLspId,
     relatedLspName = null,
     rocketConfigurationFullName = null,
     rocketConfigurationFullNameIcontains = null,
@@ -148,6 +149,7 @@ suspend fun LaunchesApi.getLaunchList(
     statusIds: List<Int>? = null,
     search: String? = null,
     lspId: List<Int>? = null,
+    relatedLspId: List<Int>? = null,
     rocketConfigurationId: Int? = null,
     isCrewed: Boolean? = null,
     includeSuborbital: Boolean? = null,
@@ -156,7 +158,8 @@ suspend fun LaunchesApi.getLaunchList(
     netDay: List<Double>? = null,
     netMonth: List<Double>? = null,
     pad: Int? = null,
-    locationIds: List<Int>? = null
+    locationIds: List<Int>? = null,
+    upcomingWithRecent: Boolean? = null
 ): HttpResponse<PaginatedLaunchNormalList> = launchesList(
     agencyLaunchAttemptCount = null,
     agencyLaunchAttemptCountGt = null,
@@ -227,7 +230,7 @@ suspend fun LaunchesApi.getLaunchList(
     padLaunchAttemptCountYearLte = null,
     previous = previous,
     program = null,
-    relatedLspId = null,
+    relatedLspId = relatedLspId,
     relatedLspName = null,
     rocketConfigurationFullName = null,
     rocketConfigurationFullNameIcontains = null,
@@ -245,7 +248,7 @@ suspend fun LaunchesApi.getLaunchList(
     status = status,
     statusIds = statusIds,
     upcoming = upcoming,
-    upcomingWithRecent = null,
+    upcomingWithRecent = upcomingWithRecent,
     videoUrl = null,
     windowEndGt = null,
     windowEndGte = null,

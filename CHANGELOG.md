@@ -1,4 +1,13 @@
-# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b25...v5.0.0) (2025-11-21)
+# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b26...v5.0.0) (2025-11-25)
+
+
+### Bug Fixes
+
+* iOS widget respects light mode ([b8c2bdb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b8c2bdb49c142d1fcc18beff281efd34c1a74833))
+
+
+
+# [5.0.0-b26](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b25...v5.0.0-b26) (2025-11-21)
 
 
 ### Bug Fixes
@@ -43,25 +52,6 @@
 * Add cache and busting ([53387f5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/53387f5fd92de4d65d1b4b21f530b7cf3e729eba))
 * add related news to launch detail page - initial implementation ([4641987](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/464198795362f332a4d2a28e995faf7997246472))
 * add retrieve related articles and improve ad handling ([5c534a7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5c534a7421cf3878e35f7d540f287b38cb3cae7c))
-
-
-
-# [5.0.0-b22](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b21...v5.0.0-b22) (2025-11-13)
-
-
-### Bug Fixes
-
-* datadog integration and iOS build ([4f43a7a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4f43a7a6c8705bcf46053d674b9f6d158af21c99))
-* implement fixes for merge conflict ([2d1c471](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2d1c471f8c75b177493b07fe2860a44239a41f66))
-* resolve Kotlin build configuration issues ([6a6ef6a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6a6ef6a0f4bd10b9bb7d4b196301c5bc77fa25f6))
-
-
-### Features
-
-* add SQLDelight database for persistent caching ([2f36576](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2f36576187c1325c2f8bc45bcf928e4fef40a954))
-* Enhance billing and subscription initialization for iOS and Android ([c6c8326](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c6c8326728d8ddbb0dfb96017126899735975e6f))
-* implement cache-first repository pattern with SQLDelight ([1ffde72](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1ffde72d232604398f99e3dccb8a00856365ceba))
-* parse event duration field using common utility function ([3fb6b43](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3fb6b43a5466666cb760f80c56338de893a607b0))
 
 
 

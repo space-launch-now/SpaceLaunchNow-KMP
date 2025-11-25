@@ -28,41 +28,17 @@ data class NotificationState(
 ) {
     companion object {
         /**
-         * Get default agency IDs for major space agencies (using numeric IDs for v4 filtering)
-         * These correspond to: SpaceX, NASA, Blue Origin, Rocket Lab, ULA, Arianespace, Roscosmos, Northrop Grumman
+         * Get default agency IDs for all available agencies (using numeric IDs for v4 filtering)
          */
         fun getDefaultAgencyIds(): Set<String> {
-            return setOf(
-                NotificationAgency.SPACEX.id.toString(),
-                NotificationAgency.NASA.id.toString(),
-                NotificationAgency.BLUE_ORIGIN.id.toString(),
-                NotificationAgency.ROCKET_LAB.id.toString(),
-                NotificationAgency.ULA.id.toString(),
-                NotificationAgency.ARIANESPACE.id.toString(),
-                NotificationAgency.ROSCOSMOS.id.toString(),
-                NotificationAgency.NORTHROP_GRUMMAN.id.toString()
-            )
+            return NotificationAgency.getAll().map { it.id.toString() }.toSet()
         }
 
         /**
-         * Get default location IDs for major launch sites (using numeric IDs for v4 filtering)
-         * These correspond to: Vandenberg, KSC, Wallops, Texas, Russia, French Guiana, New Zealand, Japan, India, China, Kodiak, Other
+         * Get default location IDs for all available launch sites (using numeric IDs for v4 filtering)
          */
         fun getDefaultLocationIds(): Set<String> {
-            return setOf(
-                NotificationLocation.VANDENBERG.id.toString(),
-                NotificationLocation.KSC.id.toString(),
-                NotificationLocation.WALLOPS.id.toString(),
-                NotificationLocation.TEXAS.id.toString(),
-                NotificationLocation.RUSSIA.id.toString(),
-                NotificationLocation.FRENCH_GUIANA.id.toString(),
-                NotificationLocation.NEW_ZEALAND.id.toString(),
-                NotificationLocation.JAPAN.id.toString(),
-                NotificationLocation.INDIA.id.toString(),
-                NotificationLocation.CHINA.id.toString(),
-                NotificationLocation.KODIAK.id.toString(),
-                NotificationLocation.OTHER.id.toString()
-            )
+            return NotificationLocation.getAll().map { it.id.toString() }.toSet()
         }
 
         val DEFAULT = NotificationState()
@@ -112,6 +88,12 @@ data class NotificationState(
     }
 
     fun withAgencyEnabled(agencyId: String, enabled: Boolean): NotificationState {
+        // Prevent unchecking the last agency - require at least one to be checked
+        if (!enabled && subscribedAgencies.size == 1 && subscribedAgencies.contains(agencyId)) {
+            println("⚠️ Cannot uncheck last agency - at least one must be selected")
+            return this  // Return unchanged state
+        }
+
         val updatedAgencies = if (enabled) {
             subscribedAgencies + agencyId
         } else {
@@ -132,6 +114,12 @@ data class NotificationState(
     }
 
     fun withLocationEnabled(locationId: String, enabled: Boolean): NotificationState {
+        // Prevent unchecking the last location - require at least one to be checked
+        if (!enabled && subscribedLocations.size == 1 && subscribedLocations.contains(locationId)) {
+            println("⚠️ Cannot uncheck last location - at least one must be selected")
+            return this  // Return unchanged state
+        }
+
         val updatedLocations = if (enabled) {
             subscribedLocations + locationId
         } else {
@@ -329,17 +317,42 @@ data class NotificationAgency(
     val id: Int,
     val topicName: String,
     val name: String,
-    val abbreviation: String? = null
+    val abbreviation: String? = null,
+
+    /**
+     * Additional IDs to include when this location is selected.
+     * Useful for grouped locations (e.g., KSC + Cape Canaveral Florida region)
+     */
+    val additionalIds: List<Int> = emptyList()
 ) {
     companion object {
         val SPACEX = NotificationAgency(121, "spacex", "SpaceX")
         val NASA = NotificationAgency(44, "nasa", "NASA")
         val BLUE_ORIGIN = NotificationAgency(141, "blueOrigin", "Blue Origin")
         val ROCKET_LAB = NotificationAgency(147, "rocketLab", "Rocket Lab")
+        val VIRGIN_GALACTIC = NotificationAgency(1024, "virginGalactic", "Virgin Galactic")
         val ULA = NotificationAgency(124, "ula", "United Launch Alliance")
         val ARIANESPACE = NotificationAgency(115, "arianespace", "Arianespace")
-        val ROSCOSMOS = NotificationAgency(111, "roscosmos", "Roscosmos")
+        val RUSSIA = NotificationAgency(
+            111,
+            "roscosmos",
+            "Russian Space Agencies",
+            additionalIds = listOf(96, 193, 63)
+        )
         val NORTHROP_GRUMMAN = NotificationAgency(257, "northrop", "Northrop Grumman")
+        val CHINA =
+            NotificationAgency(88, "casc", "Chinese Space Agencies", additionalIds = listOf(194))
+        val ISRO = NotificationAgency(31, "isro", "Indian Space Research Organisation")
+
+        /**
+         * Get all available agencies
+         */
+        fun getAll(): List<NotificationAgency> {
+            return listOf(
+                SPACEX, NASA, BLUE_ORIGIN, ROCKET_LAB, VIRGIN_GALACTIC, NORTHROP_GRUMMAN,
+                ULA, ARIANESPACE, RUSSIA, CHINA, ISRO
+            )
+        }
     }
 }
 
@@ -348,20 +361,65 @@ data class NotificationLocation(
     val id: Int,
     val topicName: String,
     val name: String,
-    val countryCode: String? = null
+    val countryCode: String? = null,
+    /**
+     * Additional IDs to include when this location is selected.
+     * Useful for grouped locations (e.g., KSC + Cape Canaveral Florida region)
+     */
+    val additionalIds: List<Int> = emptyList()
 ) {
+    /**
+     * Get all IDs associated with this location (primary + additional)
+     */
+    fun getAllIds(): List<Int> {
+        return listOf(id) + additionalIds
+    }
+
     companion object {
-        val VANDENBERG = NotificationLocation(11, "van", "Vandenberg Space Force Base", "US")
-        val KSC = NotificationLocation(27, "ksc", "Kennedy Space Center", "US")
-        val WALLOPS = NotificationLocation(21, "wallops", "Wallops Flight Facility", "US")
-        val TEXAS = NotificationLocation(143, "texas", "Starbase Texas", "US")
-        val RUSSIA = NotificationLocation(15, "russia", "Baikonur Cosmodrome", "KZ")
-        val FRENCH_GUIANA = NotificationLocation(13, "frenchGuiana", "Guiana Space Centre", "GF")
-        val NEW_ZEALAND = NotificationLocation(10, "newZealand", "Rocket Lab Launch Complex", "NZ")
-        val JAPAN = NotificationLocation(24, "japan", "Tanegashima Space Center", "JP")
-        val INDIA = NotificationLocation(14, "isro", "Satish Dhawan Space Centre", "IN")
-        val CHINA = NotificationLocation(17, "china", "Jiuquan Satellite Launch Center", "CN")
-        val KODIAK = NotificationLocation(25, "kodiak", "Pacific Spaceport Complex", "US")
-        val OTHER = NotificationLocation(20, "other", "Other Locations", null)
+        val VANDENBERG = NotificationLocation(11, "van", "California", "US")
+
+        // Example: Florida region that includes both KSC and Cape Canaveral
+        val FLORIDA =
+            NotificationLocation(27, "florida", "Florida", "US", additionalIds = listOf(12))
+        val OTHER_USA = NotificationLocation(
+            21,
+            "wallops",
+            "Misc. USA",
+            "US",
+            additionalIds = listOf(1, 25, 31, 155, 162)
+        )
+        val TEXAS =
+            NotificationLocation(143, "texas", "Texas", "US", additionalIds = listOf(29))
+        val RUSSIA = NotificationLocation(
+            15,
+            "russia",
+            "Russia & Kazakhstan",
+            "KZ",
+            additionalIds = listOf(5, 6, 18, 30, 146)
+        )
+        val FRENCH_GUIANA = NotificationLocation(13, "frenchGuiana", "French Guiana", "GF")
+        val NEW_ZEALAND = NotificationLocation(10, "newZealand", "New Zealand", "NZ")
+        val JAPAN =
+            NotificationLocation(24, "japan", "Japan", "JP", additionalIds = listOf(26, 32, 166))
+        val INDIA = NotificationLocation(14, "isro", "India", "IN")
+        val CHINA =
+            NotificationLocation(17, "china", "China", "CN", additionalIds = listOf(8, 16, 19))
+        val OTHER = NotificationLocation(
+            20,
+            "other",
+            "Misc. (Sea, Air, etc)",
+            null,
+            additionalIds = listOf(3, 20, 144)
+        )
+
+        /**
+         * Get all available locations for user selection
+         */
+        fun getAll(): List<NotificationLocation> {
+            return listOf(
+                VANDENBERG, FLORIDA, OTHER_USA, TEXAS, RUSSIA, FRENCH_GUIANA,
+                NEW_ZEALAND, JAPAN, INDIA, CHINA, OTHER
+            )
+        }
     }
 }

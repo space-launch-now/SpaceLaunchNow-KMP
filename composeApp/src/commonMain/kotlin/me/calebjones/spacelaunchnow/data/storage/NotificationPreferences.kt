@@ -51,52 +51,31 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
         }
 
         // Use stored preferences if available, otherwise use defaults
+        // Important: null means "never set" (use defaults), empty set means "explicitly deselected all"
         val storedAgencies = preferences[SUBSCRIBED_AGENCIES]
-        val subscribedAgencies = if (storedAgencies != null && storedAgencies.isNotEmpty()) {
-            storedAgencies.map { it }.toSet()
+        val subscribedAgencies = if (storedAgencies != null) {
+            storedAgencies.map { it }.toSet()  // Use stored value even if empty
         } else {
-            default.subscribedAgencies
+            default.subscribedAgencies  // Only use defaults if never set
         }
 
         val storedLocations = preferences[SUBSCRIBED_LOCATIONS]
-        val subscribedLocations = if (storedLocations != null && storedLocations.isNotEmpty()) {
-            storedLocations.map { it }.toSet()
+        val subscribedLocations = if (storedLocations != null) {
+            storedLocations.map { it }.toSet()  // Use stored value even if empty
         } else {
-            default.subscribedLocations
+            default.subscribedLocations  // Only use defaults if never set
         }
 
         // Helper function to map IDs to names
         fun getAgencyNames(ids: Set<String>): List<String> {
-            val allAgencies = listOf(
-                NotificationAgency.SPACEX,
-                NotificationAgency.NASA,
-                NotificationAgency.BLUE_ORIGIN,
-                NotificationAgency.ROCKET_LAB,
-                NotificationAgency.ULA,
-                NotificationAgency.ARIANESPACE,
-                NotificationAgency.ROSCOSMOS,
-                NotificationAgency.NORTHROP_GRUMMAN
-            )
+            val allAgencies = NotificationAgency.getAll()
             return ids.mapNotNull { id ->
                 allAgencies.find { it.id.toString() == id }?.name
             }
         }
 
         fun getLocationNames(ids: Set<String>): List<String> {
-            val allLocations = listOf(
-                NotificationLocation.VANDENBERG,
-                NotificationLocation.KSC,
-                NotificationLocation.WALLOPS,
-                NotificationLocation.TEXAS,
-                NotificationLocation.RUSSIA,
-                NotificationLocation.FRENCH_GUIANA,
-                NotificationLocation.NEW_ZEALAND,
-                NotificationLocation.JAPAN,
-                NotificationLocation.INDIA,
-                NotificationLocation.CHINA,
-                NotificationLocation.KODIAK,
-                NotificationLocation.OTHER
-            )
+            val allLocations = NotificationLocation.getAll()
             return ids.mapNotNull { id ->
                 allLocations.find { it.id.toString() == id }?.name
             }
@@ -149,31 +128,8 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
 
     suspend fun updateNotificationSettings(settings: NotificationState) {
         // Get agency and location names for logging
-        val allAgencies = listOf(
-            NotificationAgency.SPACEX,
-            NotificationAgency.NASA,
-            NotificationAgency.BLUE_ORIGIN,
-            NotificationAgency.ROCKET_LAB,
-            NotificationAgency.ULA,
-            NotificationAgency.ARIANESPACE,
-            NotificationAgency.ROSCOSMOS,
-            NotificationAgency.NORTHROP_GRUMMAN
-        )
-        
-        val allLocations = listOf(
-            NotificationLocation.VANDENBERG,
-            NotificationLocation.KSC,
-            NotificationLocation.WALLOPS,
-            NotificationLocation.TEXAS,
-            NotificationLocation.RUSSIA,
-            NotificationLocation.FRENCH_GUIANA,
-            NotificationLocation.NEW_ZEALAND,
-            NotificationLocation.JAPAN,
-            NotificationLocation.INDIA,
-            NotificationLocation.CHINA,
-            NotificationLocation.KODIAK,
-            NotificationLocation.OTHER
-        )
+        val allAgencies = NotificationAgency.getAll()
+        val allLocations = NotificationLocation.getAll()
         
         val agencyNames = settings.subscribedAgencies.mapNotNull { agencyId ->
             allAgencies.find { it.id.toString() == agencyId }?.name
