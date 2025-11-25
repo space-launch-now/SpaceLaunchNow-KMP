@@ -143,14 +143,20 @@ actual fun SmartBannerAd(
 
     // Safety check: ensure we have a banner ad to show
     if (availableAd == null) {
-        println("⚠️ SmartBannerAd: No preloaded ad available for size $actualAdSize")
+        println("⚠️ SmartBannerAd: No preloaded ad available for size $actualAdSize - skipping ad display")
+        return
+    }
+
+    // 🚀 PERFORMANCE: Fast-path return for failing ads to avoid layout delays
+    if (availableAd.state == AdState.FAILING || availableAd.state == AdState.NONE) {
+        println("⚠️ SmartBannerAd: Ad state is ${availableAd.state} - skipping to avoid layout delays")
         return
     }
 
     // Debug logging for ad state
     println("🎯 SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType")
 
-    // IMPORTANT: Always render BannerAd Composable to trigger load on iOS
+    // IMPORTANT: Always render BannerAd Composable to trigger load
     // Show layout when ad is ready, showing, or loading
     when (availableAd.state) {
         AdState.READY, AdState.SHOWING, AdState.LOADING -> {

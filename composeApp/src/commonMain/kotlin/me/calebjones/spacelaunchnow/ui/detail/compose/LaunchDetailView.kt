@@ -287,7 +287,8 @@ fun LaunchDetailView(
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
-    onVideoSelected: (Int) -> Unit
+    onVideoSelected: (Int) -> Unit,
+    onNavigateToSettings: (() -> Unit)? = null
 ) {
     // Use the shared detail scaffold to unify behavior
     SharedDetailScaffold(
@@ -312,7 +313,8 @@ fun LaunchDetailView(
             onSetPlayerVisible = onSetPlayerVisible,
             onNavigateBack = onNavigateBack,
             onNavigateToFullscreen = onNavigateToFullscreen,
-            onVideoSelected = onVideoSelected
+            onVideoSelected = onVideoSelected,
+            onNavigateToSettings = onNavigateToSettings
         )
     }
 }
@@ -330,7 +332,8 @@ fun LaunchDetailOpenUrlProvider(
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
-    onVideoSelected: (Int) -> Unit
+    onVideoSelected: (Int) -> Unit,
+    onNavigateToSettings: (() -> Unit)? = null
 ) {
     val uriHandler = LocalUriHandler.current
     val openUrl: (String) -> Unit = { url ->
@@ -349,6 +352,7 @@ fun LaunchDetailOpenUrlProvider(
         onSetPlayerVisible = onSetPlayerVisible,
         onNavigateToFullscreen = onNavigateToFullscreen,
         onVideoSelected = onVideoSelected,
+        onNavigateToSettings = onNavigateToSettings,
         openUrl = openUrl
     )
 }
@@ -399,7 +403,7 @@ private fun LaunchDetailContentInBody(
 
                     SmartBannerAd(
                         modifier = Modifier.fillMaxWidth(),
-                        placementType = AdPlacementType.CONTENT,
+                        placementType = AdPlacementType.INTERSTITIAL,
                         showRemoveAdsButton = true,
                         onRemoveAdsClick = onNavigateToSettings
                     )
@@ -556,7 +560,7 @@ private fun LaunchDetailContentInBody(
 
                 SmartBannerAd(
                     modifier = Modifier.fillMaxWidth(),
-                    placementType = AdPlacementType.CONTENT,
+                    placementType = AdPlacementType.INTERSTITIAL,
                     showRemoveAdsButton = true,
                     onRemoveAdsClick = onNavigateToSettings
                 )
@@ -645,6 +649,15 @@ private fun LaunchDetailContentInBody(
                     Spacer(Modifier.height(16.dp))
                 }
 
+                // 🚀 INLINE AD #2: After mission/location info, before vehicle details
+                SmartBannerAd(
+                    modifier = Modifier.fillMaxWidth(),
+                    placementType = AdPlacementType.FEED,
+                    showRemoveAdsButton = false,
+                    showCard = true
+                )
+                Spacer(Modifier.height(16.dp))
+
                 // 6. Launch Vehicle Details Card
                 launch.rocket?.configuration?.let { rocketConfig ->
                     Text(
@@ -687,6 +700,15 @@ private fun LaunchDetailContentInBody(
                         Spacer(Modifier.height(16.dp))
                     }
                 }
+
+                // 🚀 INLINE AD #3: After spacecraft/landing info, before agency details
+                SmartBannerAd(
+                    modifier = Modifier.fillMaxWidth(),
+                    placementType = AdPlacementType.CONTENT,
+                    showRemoveAdsButton = false,
+                    showCard = true
+                )
+                Spacer(Modifier.height(16.dp))
 
                 // 9. Agency Card
                 launch.launchServiceProvider.let { agency ->
