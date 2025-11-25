@@ -39,12 +39,15 @@ jobs:
           output-file: "CHANGELOG.md"
           version-file: "./version.properties"
           version-path: "version"
-          skip-version-file: "true"
+          skip-version-file: "false"
           skip-commit: "true"
           skip-tag: "true"
           git-push: "false"
-          # During pre-release, we manage versioning manually below
-          # This action only generates the changelog
+          tag-prefix: "v"
+          pre-release: "false"
+          pre-release-identifier: "b"
+          # This action will now automatically bump the version in version.properties
+          # and generate the changelog based on conventional commits
 
       - name: Calculate new version (no commit)
         id: version
