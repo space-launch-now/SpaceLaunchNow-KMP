@@ -87,6 +87,20 @@ class NotificationFilterTest {
         locationId = "0"   // Other (unknown location)
     )
 
+    private val spacexLaunchFromCape = NotificationData(
+        notificationType = "twentyFourHour",
+        launchId = "test-launch-cape",
+        launchUuid = "uuid-cape",
+        launchName = "Falcon 9 Block 5 | GPS III",
+        launchImage = "https://example.com/image-cape.jpg",
+        launchNet = "2025-10-18T15:00:00Z",
+        launchLocation = "Cape Canaveral SFS, FL, USA",
+        webcast = "true",
+        webcastLive = null,
+        agencyId = "121", // SpaceX
+        locationId = "12"  // Cape Canaveral Space Force Station
+    )
+
     private val rocketLabLaunchFromMahia = NotificationData(
         notificationType = "oneHour",
         launchId = "test-launch-5",
@@ -678,4 +692,39 @@ class NotificationFilterTest {
         // "Other" should match Mahia locationId="15"
         assertTrue(NotificationFilter.shouldShowNotification(rocketLabLaunchFromMahia, state))
     }
+
+    // ========== Grouped Location Tests (Multi-ID Support) ==========
+
+    @Test
+    fun testGroupedLocation_FloridaMatchesKSC() {
+        val state = NotificationState(
+            followAllLaunches = false,
+            subscribedAgencies = emptySet(),
+            subscribedLocations = setOf("27"), // Florida (primary ID, includes Cape via additionalIds)
+            useStrictMatching = false,
+            topicSettings = topicSettings("netstampChanged")
+        )
+
+        // Should show: SpaceX from KSC (direct match with Florida's primary ID)
+        assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
+    }
+
+
+    @Test
+    fun testGroupedLocation_FloridaMatchesBothKSCAndCape() {
+        val state = NotificationState(
+            followAllLaunches = false,
+            subscribedAgencies = setOf("121"), // SpaceX
+            subscribedLocations = setOf("27"), // Florida (includes both KSC=27 and Cape=12)
+            useStrictMatching = true, // Strict: need BOTH agency AND location
+            topicSettings = topicSettings("netstampChanged", "twentyFourHour")
+        )
+
+        // Should show: SpaceX from KSC (agency matches, location matches primary ID)
+        assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
+
+        // Should show: SpaceX from Cape (agency matches, location matches via additionalIds)
+        assertTrue(NotificationFilter.shouldShowNotification(spacexLaunchFromCape, state))
+    }
+
 }

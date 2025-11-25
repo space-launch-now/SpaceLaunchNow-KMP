@@ -9,7 +9,7 @@ import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
-import me.calebjones.spacelaunchnow.data.storage.NotificationPreferences
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -27,7 +27,7 @@ class NotificationWorker(
     params: WorkerParameters
 ) : CoroutineWorker(context, params), KoinComponent {
 
-    private val notificationPreferences: NotificationPreferences by inject()
+    private val notificationStateStorage: NotificationStateStorage by inject()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
@@ -51,7 +51,7 @@ class NotificationWorker(
             println("🔧 [NotificationWorker] Parsed notification: ${notificationData.launchName}")
 
             // Get user settings
-            val settings = notificationPreferences.getNotificationSettings()
+            val settings = notificationStateStorage.getState()
 
             // Apply client-side filtering
             val shouldShow = NotificationFilter.shouldShowNotification(

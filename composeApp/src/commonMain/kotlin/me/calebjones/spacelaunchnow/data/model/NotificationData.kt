@@ -78,19 +78,19 @@ data class NotificationData(
 
 /**
  * Notification filter - decides if a notification should be shown based on user preferences
- * 
+ *
  * This is a PLATFORM-AGNOSTIC filter that works on both Android and iOS.
  * Call this from any platform's notification handler before showing notifications.
- * 
+ *
  * Usage on Android:
  * ```kotlin
  * val data = NotificationData.fromMap(remoteMessage.data)
- * val settings = notificationPreferences.getNotificationSettings()
+ * val settings = notificationStateStorage.getState()
  * if (NotificationFilter.shouldShowNotification(data, settings)) {
  *     showNotification(...)
  * }
  * ```
- * 
+ *
  * Usage on iOS (Swift):
  * ```swift
  * // Get data from notification userInfo
@@ -102,7 +102,7 @@ data class NotificationData(
  * ```
  */
 object NotificationFilter {
-    
+
     /**
      * Convenience method for filtering from raw data map
      * Useful for iOS Swift interop
@@ -117,10 +117,10 @@ object NotificationFilter {
         }
         return shouldShowNotification(data, state)
     }
-    
+
     /**
      * Check if notification should be shown based on user preferences
-     * 
+     *
      * @param data Parsed notification data from server
      * @param state Current notification settings/preferences
      * @return true if notification should be shown, false if it should be suppressed
@@ -132,7 +132,7 @@ object NotificationFilter {
         println("=== NotificationFilter: Evaluating notification ===")
         println("Type: ${data.notificationType}, Agency: ${data.agencyId}, Location: ${data.locationId}")
         println("Launch: ${data.launchName}, Webcast: ${data.webcast}")
-        
+
         // 1. Check if notifications are globally enabled
         if (!state.enableNotifications) {
             println("🔇 BLOCKED: Notifications disabled globally")
@@ -171,18 +171,36 @@ object NotificationFilter {
         val hasAgencyFilter = state.subscribedAgencies.isNotEmpty()
         val hasLocationFilter = state.subscribedLocations.isNotEmpty()
 
+        println("Agency filter: $hasAgencyFilter, Location filter: $hasLocationFilter")
+
         // 7. Check agency filter (only if filter is active)
         val agencyMatch = if (hasAgencyFilter) {
             state.subscribedAgencies.contains(data.agencyId)
         } else {
             true // No agency filter, so don't block based on agency
         }
-        
+
         // 8. Check location filter (only if filter is active)
-        // Special case: locationId="0" (Other) in subscribed list acts as a wildcard - matches ANY location
+        // Special cases:
+        // - locationId="0" (Other) in subscribed list acts as a wildcard - matches ANY location
+        // - Grouped locations (e.g., FLORIDA) may have additionalIds that should also match
         val locationMatch = if (hasLocationFilter) {
-            state.subscribedLocations.contains(data.locationId) || 
-            state.subscribedLocations.contains("0")
+            // Direct match
+            if (state.subscribedLocations.contains(data.locationId)) {
+                true
+            }
+            // Wildcard match
+            else if (state.subscribedLocations.contains("0")) {
+                true
+            }
+            // Check if notification's location is in any subscribed location's additionalIds
+            else {
+                val allLocations = NotificationLocation.getAll()
+                state.subscribedLocations.any { subscribedLocationId ->
+                    val location = allLocations.find { it.id.toString() == subscribedLocationId }
+                    location?.getAllIds()?.any { it.toString() == data.locationId } ?: false
+                }
+            }
         } else {
             true // No location filter, so don't block based on location
         }
@@ -215,7 +233,7 @@ object NotificationFilter {
                 // Only location filter active: must match location
                 locationMatch
             }
-            
+
             if (!result) {
                 println("🔇 BLOCKED: Flexible matching - agency: $agencyMatch (${if (hasAgencyFilter) "filtered" else "any"}), location: $locationMatch (${if (hasLocationFilter) "filtered" else "any"})")
             } else {

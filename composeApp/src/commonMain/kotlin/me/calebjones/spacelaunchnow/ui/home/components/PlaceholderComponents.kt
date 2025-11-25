@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -31,8 +31,8 @@ fun HorizontalScrollableList() {
 
 @Composable
 fun UpcomingHorizontalScrollableList(navController: androidx.navigation.NavController) {
-    val homeViewModel = koinViewModel<HomeViewModel>()
-    LaunchListView(viewModel = homeViewModel, navController = navController)
+    val launchCarouselViewModel = koinViewModel<LaunchCarouselViewModel>()
+    LaunchListView(viewModel = launchCarouselViewModel, navController = navController)
 }
 
 @Composable

@@ -50,19 +50,19 @@ import me.calebjones.spacelaunchnow.ui.SharedElementType
 import me.calebjones.spacelaunchnow.ui.detail.compose.snackDetailBoundsTransform
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun EventsView(navController: NavController) {
-    val homeViewModel = koinViewModel<HomeViewModel>()
-    val state by homeViewModel.eventsState.collectAsStateWithLifecycle()
+    val eventsViewModel = koinViewModel<EventsViewModel>()
+    val state by eventsViewModel.eventsState.collectAsStateWithLifecycle()
 
     // Load events if not already loaded and no error
     LaunchedEffect(Unit) {
         if (state.data.isEmpty() && !state.isLoading && state.error == null) {
-            homeViewModel.loadEventsNew(10)
+            eventsViewModel.loadEvents(10)
         }
     }
     Column {

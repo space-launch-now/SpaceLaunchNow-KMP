@@ -54,32 +54,42 @@ import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.components.OfflineBanner
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
-import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Clock.System
+import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.FeaturedLaunchViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun ResponsiveHomeContent(
     navController: NavController,
+    launchesViewModel: LaunchesViewModel,
+    featuredLaunchViewModel: FeaturedLaunchViewModel,
+    launchCarouselViewModel: LaunchCarouselViewModel,
+    feedViewModel: FeedViewModel,
+    eventsViewModel: EventsViewModel,
+    historyViewModel: HistoryViewModel,
+    statsViewModel: StatsViewModel,
     modifier: Modifier = Modifier,
     isOffline: Boolean = false,
     oldestCacheTimestamp: Long? = null,
     onRetry: () -> Unit = {}
 ) {
-    val homeViewModel = koinViewModel<HomeViewModel>()
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
 
-    // Collect state for the new HomeQuickView
-    val previousLaunches by homeViewModel.previousLaunches.collectAsStateWithLifecycle()
-    val upcomingLaunches by homeViewModel.upcomingLaunches.collectAsStateWithLifecycle()
-
-    // Collect all ViewStates
-    val featuredLaunchState by homeViewModel.featuredLaunchState.collectAsStateWithLifecycle()
-    val upcomingLaunchesState by homeViewModel.upcomingLaunchesState.collectAsStateWithLifecycle()
-    val updatesState by homeViewModel.updatesState.collectAsStateWithLifecycle()
-    val articlesState by homeViewModel.articlesState.collectAsStateWithLifecycle()
-    val eventsState by homeViewModel.eventsState.collectAsStateWithLifecycle()
-    val historyState by homeViewModel.historyState.collectAsStateWithLifecycle()
+    // Collect all ViewStates from domain-specific ViewModels
+    val featuredLaunchState by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
+    val upcomingLaunchesState by launchCarouselViewModel.upcomingLaunchesState.collectAsStateWithLifecycle()
+    val previousLaunchesState by launchCarouselViewModel.previousLaunchesState.collectAsStateWithLifecycle()
+    val updatesState by feedViewModel.updatesState.collectAsStateWithLifecycle()
+    val articlesState by feedViewModel.articlesState.collectAsStateWithLifecycle()
+    val eventsState by eventsViewModel.eventsState.collectAsStateWithLifecycle()
+    val historyState by historyViewModel.historyState.collectAsStateWithLifecycle()
 
     // Check if ANY view is loading
     val isAnyViewLoading = remember(
@@ -100,14 +110,14 @@ fun ResponsiveHomeContent(
         ).any { it.isLoading }
     }
 
-    // Collect accurate quick stats counts
-    val next24HoursCount by homeViewModel.next24HoursCount.collectAsStateWithLifecycle()
-    val nextWeekCount by homeViewModel.nextWeekCount.collectAsStateWithLifecycle()
-    val nextMonthCount by homeViewModel.nextMonthCount.collectAsStateWithLifecycle()
+    // Collect accurate quick stats counts from StatsViewModel
+    val next24HoursCount by statsViewModel.next24HoursCount.collectAsStateWithLifecycle()
+    val nextWeekCount by statsViewModel.nextWeekCount.collectAsStateWithLifecycle()
+    val nextMonthCount by statsViewModel.nextMonthCount.collectAsStateWithLifecycle()
 
     // Get current day and month for "This Day in History"
     val currentDate = remember {
-        System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     }
     val currentDay = currentDate.dayOfMonth
     val currentMonth = currentDate.monthNumber
@@ -115,7 +125,7 @@ fun ResponsiveHomeContent(
     // Load history launches on composition using NEW ViewState pattern
     LaunchedEffect(currentDay, currentMonth) {
         if (historyState.data.count == 0 && !historyState.isLoading && historyState.error == null) {
-            homeViewModel.loadHistoryLaunchesNew(day = currentDay, month = currentMonth)
+            historyViewModel.loadHistoryLaunches(day = currentDay, month = currentMonth)
         }
     }
 
@@ -150,7 +160,7 @@ fun ResponsiveHomeContent(
             }
 
             // Hero cards row: Last Launch + Stats + Next Up (countdown)
-            item {
+            item(key = "hero_cards_row") {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -185,8 +195,8 @@ fun ResponsiveHomeContent(
                                         fontSize = 20.sp
                                     )
                                 }
-                                if (previousLaunches.isNotEmpty()) {
-                                    val previousLaunch = previousLaunches.first()
+                                if (previousLaunchesState.data.isNotEmpty()) {
+                                    val previousLaunch = previousLaunchesState.data.first()
                                     LaunchItemView(
                                         launch = previousLaunch,
                                         navController = navController,
@@ -433,7 +443,7 @@ fun ResponsiveHomeContent(
             // Bidirectional scrollable launch list
             item {
                 LaunchListView(
-                    viewModel = homeViewModel,
+                    viewModel = launchCarouselViewModel,
                     navController = navController
                 )
             }
@@ -474,7 +484,7 @@ fun ResponsiveHomeContent(
                 }
             }
 
-            item { NextLaunchView(navController = navController) }
+            item(key = "next_launch_view") { NextLaunchView(navController = navController) }
 
             // Quick Stats
             item {
@@ -665,7 +675,7 @@ fun ResponsiveHomeContent(
             // Use new HomeQuickView for phone (bidirectional carousel)
             item {
                 LaunchListView(
-                    viewModel = homeViewModel,
+                    viewModel = launchCarouselViewModel,
                     navController = navController
                 )
             }

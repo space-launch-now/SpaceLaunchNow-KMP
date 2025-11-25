@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.ui.home.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,13 +31,13 @@ fun HomeTopBar(navController: NavController) {
         },
         actions = {
             IconButton(
-                onClick = { 
+                onClick = {
                     navController.navigate(NotificationSettings)
                 },
             ) {
                 Icon(
-                    Icons.Default.Notifications,
-                    contentDescription = "Notifications",
+                    Icons.Default.FilterList,
+                    contentDescription = "Filters",
                     modifier = Modifier.size(24.dp)
                 )
             }

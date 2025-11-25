@@ -186,8 +186,8 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             SettingsNavigationRow(
-                                title = "Notification Filters",
-                                subtitle = "Configure launch notifications and subscriptions",
+                                title = "Launch Filters",
+                                subtitle = "Filter launches shown in app and notifications",
                                 onClick = onOpenNotificationSettings,
                                 enabled = uiState.notificationsEnabled
                             )
@@ -223,7 +223,7 @@ fun SettingsScreen(
                     SettingsCardRow {
                         Column(Modifier.fillMaxWidth()) {
                             SettingsNavigationRow(
-                                title = "Support Us ✨",
+                                title = "Support Me ✨",
                                 subtitle = "Premium features, golden card, and support development",
                                 onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs) },
                                 icon = Icons.Filled.Star

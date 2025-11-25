@@ -46,7 +46,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.UpdatesShimmer
-import me.calebjones.spacelaunchnow.ui.viewmodel.HomeViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock.System
 import kotlin.time.ExperimentalTime
@@ -55,15 +55,15 @@ import kotlin.time.Instant
 @Composable
 fun LatestUpdatesView(
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = koinViewModel(),
+    feedViewModel: FeedViewModel = koinViewModel(),
     navController: NavController? = null
 ) {
-    val state by homeViewModel.updatesState.collectAsStateWithLifecycle()
+    val state by feedViewModel.updatesState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         // Only load if we don't have data and we're not currently loading
         if (state.data.isEmpty() && !state.isLoading && state.error == null) {
-            homeViewModel.loadUpdatesNew(10)
+            feedViewModel.loadUpdates(10)
         }
     }
 
