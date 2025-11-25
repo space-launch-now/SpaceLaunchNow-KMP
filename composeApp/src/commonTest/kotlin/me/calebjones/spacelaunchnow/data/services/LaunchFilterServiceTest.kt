@@ -77,33 +77,33 @@ class LaunchFilterServiceTest {
     fun `getLocationIds converts string IDs to integers`() {
         val state = NotificationState(
             followAllLaunches = false,
-            subscribedLocations = setOf("27", "11", "5")
+            subscribedLocations = setOf("11", "5")  // Use non-grouped locations
         )
         
         val result = service.getLocationIds(state)
-        assertEquals(listOf(27, 11, 5), result)
+        assertEquals(listOf(11, 5), result)
     }
     
     @Test
     fun `getLocationIds filters out Other location (ID 0)`() {
         val state = NotificationState(
             followAllLaunches = false,
-            subscribedLocations = setOf("0", "27", "11")
+            subscribedLocations = setOf("0", "11", "5")  // Use non-grouped locations
         )
         
         val result = service.getLocationIds(state)
-        assertEquals(listOf(27, 11), result)
+        assertEquals(listOf(11, 5), result)
     }
     
     @Test
     fun `getLocationIds filters out invalid IDs`() {
         val state = NotificationState(
             followAllLaunches = false,
-            subscribedLocations = setOf("27", "bad-id", "11")
+            subscribedLocations = setOf("11", "bad-id", "5")  // Use non-grouped locations
         )
         
         val result = service.getLocationIds(state)
-        assertEquals(listOf(27, 11), result)
+        assertEquals(listOf(11, 5), result)
     }
     
     @Test
