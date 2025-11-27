@@ -22,7 +22,8 @@ data class LocalSubscriptionData(
     val entitlements: Set<String> = emptySet(), // RevenueCat entitlement IDs
     val productIds: Set<String> = emptySet(),   // Product IDs user owns
     val lastSynced: Long = 0L,                  // Last time we synced with RevenueCat
-    val needsSync: Boolean = true               // Whether we need to sync with RevenueCat
+    val needsSync: Boolean = true,              // Whether we need to sync with RevenueCat
+    val isDebugMode: Boolean = false            // Whether we're in debug/simulation mode (blocks sync)
 ) {
     /**
      * Check if user has a specific feature based on subscription type
@@ -48,7 +49,8 @@ data class LocalSubscriptionData(
         val FREE = LocalSubscriptionData(
             isSubscribed = false,
             subscriptionType = SubscriptionType.FREE,
-            needsSync = false
+            needsSync = false,
+            isDebugMode = false
         )
     }
 }
@@ -147,7 +149,8 @@ class LocalSubscriptionStorage {
                 entitlements = entitlements,
                 productIds = productIds,
                 lastSynced = Clock.System.now().toEpochMilliseconds(),
-                needsSync = false // Don't sync when in debug mode
+                needsSync = false, // Don't sync when in debug mode
+                isDebugMode = true // Mark as debug mode to prevent overwriting
             )
         )
     }
@@ -157,19 +160,17 @@ class LocalSubscriptionStorage {
      * Use this to exit debug mode and return to real state
      */
     suspend fun clearDebugState() {
-        update(LocalSubscriptionData.FREE.copy(needsSync = true)) // Force sync to get real state
+        update(LocalSubscriptionData.FREE.copy(needsSync = true, isDebugMode = false)) // Force sync to get real state
     }
 
     /**
      * Check if we're currently in a debug/simulated state
-     * A debug state is indicated by needsSync = false (manually set by debug methods)
+     * A debug state is indicated by isDebugMode = true (manually set by setDebugSubscription)
      * This makes it easy to detect simulation mode without time-based heuristics
      */
     suspend fun isInDebugMode(): Boolean {
         val current = get()
-        // Debug mode is active when needsSync is false (manually set by setDebugSubscription)
-        // Real subscriptions will have needsSync = true to trigger syncing
-        // We check needsSync = false regardless of subscription type to support simulating FREE state
-        return !current.needsSync
+        // Debug mode is active when explicitly set by setDebugSubscription
+        return current.isDebugMode
     }
 }

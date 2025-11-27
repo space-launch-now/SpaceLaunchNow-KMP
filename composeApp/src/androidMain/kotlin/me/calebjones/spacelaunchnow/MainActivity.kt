@@ -17,8 +17,11 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import chaintech.videoplayer.util.PlaybackPreference
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
+import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.notifications.AndroidNotificationPermissionHandler
 import me.calebjones.spacelaunchnow.data.notifications.NotificationPermissionManager
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -29,6 +32,7 @@ import org.koin.android.ext.android.inject
 class MainActivity : ComponentActivity() {
     private val appPreferences: AppPreferences by inject()
     private val billingClient: BillingClient by inject()
+    private val billingManager: BillingManager by inject()
     private lateinit var notificationPermissionHandler: AndroidNotificationPermissionHandler
 
     // Use mutable state for notification launch ID to trigger recomposition
@@ -147,6 +151,22 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             // Not an Android billing client or method doesn't exist - that's okay
             println("MainActivity: Billing client doesn't support setActivity - ${e.message}")
+        }
+
+        // Refresh purchase state to catch any changes made while app was in background
+        // (e.g., trial conversions, subscription renewals, or cancellations)
+        lifecycleScope.launch {
+            try {
+                println("MainActivity: Refreshing purchase state on resume...")
+                val refreshed = billingManager.refreshPurchaseState()
+                if (refreshed) {
+                    println("MainActivity: ✅ Purchase state refreshed successfully")
+                } else {
+                    println("MainActivity: ⚠️ Failed to refresh purchase state")
+                }
+            } catch (e: Exception) {
+                println("MainActivity: Error refreshing purchase state: ${e.message}")
+            }
         }
     }
 

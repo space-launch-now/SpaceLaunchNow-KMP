@@ -31,15 +31,16 @@ class SubscriptionSyncer(
             billingManager.purchaseState.collect { purchaseState ->
                 val currentTime = System.now().toEpochMilliseconds()
                 
-                // Check if we're in debug/simulation mode
+                // Check if we're in debug/simulation mode - only skip if explicitly in debug mode
                 val currentData = localStorage.get()
-                if (!currentData.needsSync) {
-                    println("SubscriptionSyncer: 🎭 Debug mode active (needsSync=false), skipping automatic sync")
+                if (currentData.isDebugMode) {
+                    println("SubscriptionSyncer: 🎭 Debug mode active (isDebugMode=true), skipping automatic sync")
                     return@collect
                 }
                 
                 if (currentTime - lastSyncTime > syncCooldownMs) {
                     println("SubscriptionSyncer: Purchase state updated, syncing...")
+                    println("SubscriptionSyncer: isSubscribed=${purchaseState.isSubscribed}, type=${purchaseState.subscriptionType}, products=${purchaseState.activeProductIds}")
                     lastSyncTime = currentTime
                     
                     // Update local storage with new purchase state
@@ -50,11 +51,12 @@ class SubscriptionSyncer(
                             productIds = purchaseState.activeProductIds,
                             entitlements = purchaseState.activeEntitlements,
                             lastSynced = currentTime,
-                            needsSync = false
+                            needsSync = false,
+                            isDebugMode = false // Real sync, not debug mode
                         )
                     )
                     
-                    println("SubscriptionSyncer: ✅ Sync complete")
+                    println("SubscriptionSyncer: ✅ Sync complete - isSubscribed=${purchaseState.isSubscribed}")
                 } else {
                     println("SubscriptionSyncer: Skipping sync (cooldown period active)")
                 }
