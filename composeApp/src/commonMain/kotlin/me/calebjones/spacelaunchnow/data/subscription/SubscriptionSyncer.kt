@@ -40,7 +40,8 @@ class SubscriptionSyncer(
                 
                 if (currentTime - lastSyncTime > syncCooldownMs) {
                     println("SubscriptionSyncer: Purchase state updated, syncing...")
-                    println("SubscriptionSyncer: isSubscribed=${purchaseState.isSubscribed}, type=${purchaseState.subscriptionType}, products=${purchaseState.activeProductIds}")
+                    println("  isSubscribed=${purchaseState.isSubscribed}, type=${purchaseState.subscriptionType}")
+                    println("  products=${purchaseState.activeProductIds}")
                     lastSyncTime = currentTime
                     
                     // Update local storage with new purchase state

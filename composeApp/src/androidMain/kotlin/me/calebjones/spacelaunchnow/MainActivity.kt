@@ -41,6 +41,10 @@ class MainActivity : ComponentActivity() {
     // Use mutable state for navigation destination (e.g., from widget)
     private var navigationDestinationState by mutableStateOf<String?>(null)
 
+    // Rate limiting for purchase state refresh on resume
+    private var lastPurchaseRefreshTime = 0L
+    private val purchaseRefreshCooldownMs = 30_000L // 30 seconds cooldown
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         setTheme(android.R.style.Theme_Material_NoActionBar)
@@ -155,18 +159,25 @@ class MainActivity : ComponentActivity() {
 
         // Refresh purchase state to catch any changes made while app was in background
         // (e.g., trial conversions, subscription renewals, or cancellations)
-        lifecycleScope.launch {
-            try {
-                println("MainActivity: Refreshing purchase state on resume...")
-                val refreshed = billingManager.refreshPurchaseState()
-                if (refreshed) {
-                    println("MainActivity: ✅ Purchase state refreshed successfully")
-                } else {
-                    println("MainActivity: ⚠️ Failed to refresh purchase state")
+        // Rate limited to avoid excessive API calls when user frequently switches apps
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastPurchaseRefreshTime > purchaseRefreshCooldownMs) {
+            lastPurchaseRefreshTime = currentTime
+            lifecycleScope.launch {
+                try {
+                    println("MainActivity: Refreshing purchase state on resume...")
+                    val refreshed = billingManager.refreshPurchaseState()
+                    if (refreshed) {
+                        println("MainActivity: ✅ Purchase state refreshed successfully")
+                    } else {
+                        println("MainActivity: ⚠️ Failed to refresh purchase state")
+                    }
+                } catch (e: Exception) {
+                    println("MainActivity: Error refreshing purchase state: ${e.message}")
                 }
-            } catch (e: Exception) {
-                println("MainActivity: Error refreshing purchase state: ${e.message}")
             }
+        } else {
+            println("MainActivity: Skipping purchase refresh (cooldown active)")
         }
     }
 
