@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.calebjones.spacelaunchnow.data.model.RoadmapItem
 import me.calebjones.spacelaunchnow.data.model.RoadmapStatus
-import me.calebjones.spacelaunchnow.ui.viewmodel.RoadmapViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -352,7 +351,7 @@ private fun getStatusColor(status: RoadmapStatus): Color {
         RoadmapStatus.COMPLETED -> Color(0xFF4CAF50) // Green
         RoadmapStatus.IN_PROGRESS -> Color(0xFF2196F3) // Blue
         RoadmapStatus.PLANNED -> Color(0xFFFFC107) // Amber
-        RoadmapStatus.CONSIDERING -> Color(0xFF9E9E9E) // Grey
+        RoadmapStatus.BACKLOG -> Color(0xFF9E9E9E) // Grey
     }
 }
 
@@ -360,5 +359,5 @@ private fun getStatusIcon(status: RoadmapStatus) = when (status) {
     RoadmapStatus.COMPLETED -> Icons.Filled.CheckCircle
     RoadmapStatus.IN_PROGRESS -> Icons.Filled.Pending
     RoadmapStatus.PLANNED -> Icons.Filled.Schedule
-    RoadmapStatus.CONSIDERING -> Icons.Filled.ThumbUp
+    RoadmapStatus.BACKLOG -> Icons.Filled.ThumbUp
 }

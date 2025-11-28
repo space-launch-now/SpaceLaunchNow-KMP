@@ -29,7 +29,6 @@ import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
-import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
@@ -43,6 +42,7 @@ import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
+import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapViewModel
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
@@ -56,7 +56,6 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
-import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
@@ -197,11 +196,6 @@ val appModule = module {
         )
     }
 
-    // Subscription dependencies
-    single {
-        val subscriptionDataStore = get<DataStore<Preferences>>(named("SubscriptionDataStore"))
-        SubscriptionStorage(subscriptionDataStore)
-    }
 
     // Temporary premium access for rewarded ads
     single {
