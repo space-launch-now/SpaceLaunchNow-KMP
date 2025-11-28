@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         setTheme(android.R.style.Theme_Material_NoActionBar)
         super.onCreate(savedInstanceState)
-        
+
         println("🔄 ROTATION_DEBUG: onCreate called - savedInstanceState: ${if (savedInstanceState == null) "null (fresh start)" else "not null (restoring)"}")
 
         // Initialize notification settings helper for Android
@@ -165,7 +165,16 @@ class MainActivity : ComponentActivity() {
             lastPurchaseRefreshTime = currentTime
             lifecycleScope.launch {
                 try {
-                    println("MainActivity: Refreshing purchase state on resume...")
+                    println("MainActivity: Syncing purchases with store on resume...")
+
+                    // CRITICAL: Sync with store FIRST to get latest subscription status from Google Play
+                    // This ensures RevenueCat has the latest data before we query customer info
+                    // Fixes issue where trial-to-paid conversions aren't reflected immediately
+                    billingManager.syncPurchases()
+                    println("MainActivity: ✅ Store sync complete")
+
+                    // THEN refresh purchase state (will now have fresh data from the sync above)
+                    println("MainActivity: Refreshing purchase state after sync...")
                     val refreshed = billingManager.refreshPurchaseState()
                     if (refreshed) {
                         println("MainActivity: ✅ Purchase state refreshed successfully")
