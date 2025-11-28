@@ -258,6 +258,14 @@ fun SettingsScreen(
                     Spacer(Modifier.height(2.dp))
                     SettingsCardRow {
                         SettingsNavigationRow(
+                            title = "Roadmap",
+                            subtitle = "View planned features and development timeline",
+                            onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Roadmap) }
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    SettingsCardRow {
+                        SettingsNavigationRow(
                             title = "About Details",
                             onClick = onAbout
                         )

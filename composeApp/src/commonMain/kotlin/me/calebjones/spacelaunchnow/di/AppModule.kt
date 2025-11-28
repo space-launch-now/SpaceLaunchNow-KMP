@@ -56,6 +56,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
+import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
@@ -247,6 +248,7 @@ val appModule = module {
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
     viewModelOf(::ThemeCustomizationViewModel)
+    viewModelOf(::RoadmapViewModel)
 }
 
 // Debug-only module - dependencies are always provided but only used when BuildConfig.isDebug is true
