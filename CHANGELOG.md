@@ -1,4 +1,24 @@
-# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b27...v5.0.0) (2025-11-25)
+# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b28...v5.0.0) (2025-11-28)
+
+
+### Bug Fixes
+
+* Address code review feedback - add rate limiting and improve logging ([2bc525a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2bc525a392a0f12e17e7c375a1669a2ef958d82e))
+* **billing:** add error handling and verification to subscription persistence ([ee04eb1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ee04eb1cf49b4090ae352808dc3597d640f81b31))
+* **billing:** add error handling and verification to subscription persistence ([372f5fa](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/372f5fa15d49a6ff6893d9f952bdc61a95d5a307))
+* improve notification handling ([2a807f1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2a807f10b962e97510e46f9ae3c435a8bee3b174))
+* Resolve billing sync issue where subscription updates were blocked ([8b802fc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8b802fcf16688154b912e67d7ce1f0c7987f7871))
+* update launch mass unit from kg to t in vehicle details ([4e8ccb9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4e8ccb923064e784a6b5427f1fb0af599aee81e6))
+
+
+### Features
+
+* add Roadmap feature with dedicated screen and ViewModel ([29f7b1e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/29f7b1ee9e336b8de10dbd00264742b178f189d2))
+* optimize ad loading and initialization for improved performance ([3882498](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/38824986b84ebb7b41ac5a4006b94dac6111319b))
+
+
+
+# [5.0.0-b28](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b27...v5.0.0-b28) (2025-11-25)
 
 
 ### Bug Fixes
@@ -40,15 +60,6 @@
 ### Bug Fixes
 
 * **ci:** add verbose flag to archive step in release workflow [skip ci] ([8d6709c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8d6709cdd9560efccd07a4c4cf13e23360c7b3f2))
-
-
-
-# [5.0.0-b24](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b23...v5.0.0-b24) (2025-11-18)
-
-
-### Bug Fixes
-
-* **ios:** return data from fetchUpcomingLaunches methods in KoinHelper ([511ed89](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/511ed8918e3c1d42a483bc16c0f6c71f81244fbb))
 
 
 

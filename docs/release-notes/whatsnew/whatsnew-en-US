@@ -1,11 +1,12 @@
 ### Bug Fixes
 
-* implement viewstate migration
-* include changes
-* remove forced versioning for automatic semantic versioning
-* update location IDs in LaunchFilterServiceTest to reflect correct expansions
+* Address code review feedback - add rate limiting and improve logging
+* **billing:** add error handling and verification to subscription persistence
+* **billing:** add error handling and verification to subscription persistence
+* improve notification handling
+* Resolve billing sync issue where subscription updates were blocked
+* update launch mass unit from kg to t in vehicle details
 
 ### Features
 
-* filter home page split viewmodels in the home screen and add additional filters
-* Implement Launch Filters for Home Screen Integration
+* add Roadmap feature with dedicated screen and ViewModel...
