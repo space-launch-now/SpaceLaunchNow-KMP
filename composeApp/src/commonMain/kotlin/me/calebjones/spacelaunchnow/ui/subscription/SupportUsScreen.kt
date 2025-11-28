@@ -1,12 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.subscription
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.EaseInOutSine
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -20,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -65,7 +58,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
@@ -79,6 +71,7 @@ import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.getPlatform
+import me.calebjones.spacelaunchnow.ui.components.AppIconBox
 import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.viewmodel.ProductType
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
@@ -106,7 +99,7 @@ fun SupportUsScreen(
 
     // Available products from BillingManager (platform-agnostic)
     val availableProducts by viewModel.availableProducts.collectAsState()
-    
+
     // Get products by type using helper function
     val lifetimeProduct = viewModel.getProductByType(ProductType.LIFETIME)
     val annualProduct = viewModel.getProductByType(ProductType.ANNUAL)
@@ -533,67 +526,7 @@ private fun HeroSection(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Animated Rocket Icon
-            val infiniteTransition = rememberInfiniteTransition(label = "rocket")
-            val offsetY by infiniteTransition.animateFloat(
-                initialValue = 0f,
-                targetValue = -10f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(2500, easing = EaseInOutSine),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "rocketFloat"
-            )
-
-            Box(
-                modifier = Modifier
-                    .size(125.dp)
-                    .offset(y = offsetY.dp)
-                    .shadow(elevation = 8.dp, shape = CircleShape, clip = false),
-                contentAlignment = Alignment.Center
-            ) {
-                // Outer colorful sweep gradient border effect
-                Box(
-                    modifier = Modifier
-                        .size(125.dp)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.sweepGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.secondary,
-                                    MaterialTheme.colorScheme.tertiary,
-                                    MaterialTheme.colorScheme.primary,
-                                )
-                            )
-                        )
-                        .then(Modifier)
-                ) {}
-                // Middle thin border
-                Box(
-                    modifier = Modifier
-                        .size(121.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                ) {}
-                // Inner circle with shadow (for rocket image background)
-                Box(
-                    modifier = Modifier
-                        .size(112.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .then(Modifier),
-                    contentAlignment = Alignment.Center
-                ) {
-                    androidx.compose.foundation.Image(
-                        painter = painterResource(Res.drawable.launcher),
-                        contentDescription = "Space Launch Now",
-                        modifier = Modifier
-                            .size(90.dp)
-                            .align(Alignment.Center)
-                    )
-                }
-            }
+            AppIconBox()
 
             if (isSubscribed) {
                 Text(

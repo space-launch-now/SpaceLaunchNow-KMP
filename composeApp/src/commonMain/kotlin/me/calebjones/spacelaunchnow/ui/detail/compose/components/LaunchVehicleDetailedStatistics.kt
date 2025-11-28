@@ -346,7 +346,7 @@ fun LaunchVehicleDetailsCard(
                                     add(
                                         Triple(
                                             "Launch Mass",
-                                            NumberFormatUtil.formatNumberWithUnit(mass, "kg"),
+                                            NumberFormatUtil.formatNumberWithUnit(mass, "t"),
                                             Icons.Filled.Scale
                                         )
                                     )

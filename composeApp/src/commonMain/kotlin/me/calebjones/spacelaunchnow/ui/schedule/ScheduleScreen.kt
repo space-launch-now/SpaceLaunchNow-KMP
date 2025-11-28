@@ -75,6 +75,8 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.viewmodel.koinViewModel
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 
 @Composable
 fun ScheduleScreen(
@@ -306,6 +308,17 @@ private fun ScheduleContent(
                             launch = launch,
                             onClick = { onLaunchClick(launch.id) }
                         )
+                        
+                        // 🚀 PERFORMANCE BOOST: Show inline banner ad every 5 items for maximum visibility
+                        // This dramatically improves show rate by embedding ads in the content feed
+                        if ((index + 1) % 25 == 0 && index < tabState.items.size - 1) {
+                            SmartBannerAd(
+                                placementType = AdPlacementType.CONTENT,
+                                showRemoveAdsButton = false,
+                                showCard = true,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
                     }
 
                     if (tabState.isLoading && tabState.items.isNotEmpty()) {

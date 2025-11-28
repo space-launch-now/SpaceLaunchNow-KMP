@@ -36,9 +36,3 @@ fun createAppSettingsDataStore(context: Context): DataStore<Preferences> {
         context.filesDir.resolve("sln_app_settings.preferences_pb").absolutePath.toPath()
     }
 }
-
-fun createSubscriptionDataStore(context: Context): DataStore<Preferences> {
-    return PreferenceDataStoreFactory.createWithPath {
-        context.filesDir.resolve("sln_subscription_settings.preferences_pb").absolutePath.toPath()
-    }
-}

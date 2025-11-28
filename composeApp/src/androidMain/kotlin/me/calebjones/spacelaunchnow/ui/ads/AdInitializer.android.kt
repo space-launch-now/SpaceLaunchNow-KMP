@@ -9,15 +9,15 @@ import app.lexilabs.basic.ads.RequestConfiguration
  */
 actual object AdInitializer {
     actual val isSupported: Boolean = true
-    
+
     private var isInitialized = false
-    
+
     actual fun initialize(context: Any?): Boolean {
         if (isInitialized) {
             println("⚠️ AdInitializer (Android): Already initialized")
             return true
         }
-        
+
         return try {
             println("🎯 AdInitializer (Android): Initializing BasicAds with context: $context")
             BasicAds.initialize(context)
@@ -30,15 +30,15 @@ actual object AdInitializer {
             false
         }
     }
-    
+
     @OptIn(DependsOnGoogleMobileAds::class)
     actual fun configure(isDebug: Boolean, testDeviceIds: List<String>) {
         try {
             BasicAds.configuration = RequestConfiguration(
-                maxAdContentRating = RequestConfiguration.MAX_AD_CONTENT_RATING_T,
+                maxAdContentRating = RequestConfiguration.MAX_AD_CONTENT_RATING_PG,
                 publisherPrivacyPersonalizationState = RequestConfiguration.PublisherPrivacyPersonalizationState.ENABLED,
-                tagForChildDirectedTreatment = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE,
-                tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE,
+                tagForChildDirectedTreatment = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED,
+                tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED,
                 testDeviceIds = testDeviceIds
             )
             println("✅ AdInitializer (Android): Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})")

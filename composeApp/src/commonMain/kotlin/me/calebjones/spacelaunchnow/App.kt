@@ -30,6 +30,7 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
@@ -52,6 +53,7 @@ import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
+import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
@@ -232,8 +234,7 @@ fun SpaceLaunchNowApp(
         LocalUseUtc provides useUtc,
         LocalContextFactory provides contextFactory
     ) {
-        // TEMPORARILY DISABLED: BetaWarningDialog uses koinInject which blocks on iOS
-        // BetaWarningDialog()
+        BetaWarningDialog()
         
         // Show consent popup (platform-specific implementation)
         // Must be inside CompositionLocalProvider to access LocalContextFactory
@@ -330,6 +331,11 @@ fun SpaceLaunchNowApp(
                     composableWithCompositionLocal<CalendarSync> {
                         CalendarSyncScreen(
                             navController = navController
+                        )
+                    }
+                    composableWithCompositionLocal<Roadmap> {
+                        RoadmapScreen(
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
                     composableWithCompositionLocal<Rockets> {

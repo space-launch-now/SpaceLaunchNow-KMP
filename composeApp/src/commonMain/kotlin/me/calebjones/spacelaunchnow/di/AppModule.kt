@@ -29,7 +29,6 @@ import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
-import me.calebjones.spacelaunchnow.data.storage.SubscriptionStorage
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
@@ -43,6 +42,7 @@ import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
+import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapViewModel
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
@@ -196,11 +196,6 @@ val appModule = module {
         )
     }
 
-    // Subscription dependencies
-    single {
-        val subscriptionDataStore = get<DataStore<Preferences>>(named("SubscriptionDataStore"))
-        SubscriptionStorage(subscriptionDataStore)
-    }
 
     // Temporary premium access for rewarded ads
     single {
@@ -247,6 +242,7 @@ val appModule = module {
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
     viewModelOf(::ThemeCustomizationViewModel)
+    viewModelOf(::RoadmapViewModel)
 }
 
 // Debug-only module - dependencies are always provided but only used when BuildConfig.isDebug is true

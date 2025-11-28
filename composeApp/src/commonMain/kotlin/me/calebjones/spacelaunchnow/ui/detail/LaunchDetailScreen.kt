@@ -130,7 +130,12 @@ fun LaunchDetailScreen(
                             )
                         )
                     },
-                    onVideoSelected = viewModel::selectVideo
+                    onVideoSelected = viewModel::selectVideo,
+                    onNavigateToSettings = {
+                        navController?.navigate(
+                            me.calebjones.spacelaunchnow.navigation.SupportUs
+                        )
+                    }
                 )
             }
 

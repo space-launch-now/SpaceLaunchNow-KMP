@@ -50,6 +50,7 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
@@ -66,6 +67,7 @@ import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
+import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
@@ -99,6 +101,7 @@ fun TabletDesktopLayout(
         FullscreenVideo::class.qualifiedName -> false // Hide for FullscreenVideo
         NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
         DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
+        Roadmap::class.qualifiedName -> false // Hide for Roadmap
         
         else -> {
             // For routes with arguments, check if it contains certain patterns
