@@ -44,17 +44,48 @@ jobs:
           skip-tag: "true"
           git-push: "false"
           tag-prefix: "v"
-          pre-release: "false"
-          pre-release-identifier: "b"
-          # This action will now automatically bump the version in version.properties
-          # and generate the changelog based on conventional commits
+          release-count: "0"
+
+      - name: Debug changelog outputs
+        run: |
+          echo "🔍 Conventional Changelog Action Outputs:"
+          echo "  version: '${{ steps.changelog.outputs.version }}'"
+          echo "  tag: '${{ steps.changelog.outputs.tag }}'"
+          echo "  skipped: '${{ steps.changelog.outputs.skipped }}'"
+          echo ""
+          echo "📄 Current version.properties:"
+          cat version.properties
+          echo ""
 
       - name: Calculate new version (no commit)
         id: version
-
         run: |
-          NEW_VERSION="${{ steps.changelog.outputs.version }}"
-          echo "📈 Using semantic version: $NEW_VERSION"
+          RAW_VERSION="${{ steps.changelog.outputs.version }}"
+          echo "📈 Raw version from action: '$RAW_VERSION'"
+          
+          # Check if action skipped (no conventional commits found)
+          if [ "${{ steps.changelog.outputs.skipped }}" == "true" ]; then
+            echo "⚠️  WARNING: Conventional changelog action skipped - no conventional commits detected"
+            echo "This means commits since last release don't follow conventional format"
+            echo "Expected format: 'feat:', 'fix:', 'chore:', etc."
+          fi
+          
+          # Check if version is empty
+          if [ -z "$RAW_VERSION" ] || [ "$RAW_VERSION" == "null" ]; then
+            echo "❌ ERROR: No version output from conventional-changelog-action"
+            echo "Falling back to current version in version.properties"
+            RAW_VERSION=$(grep "^version=" version.properties | cut -d'=' -f2)
+            echo "Using fallback version: $RAW_VERSION"
+          fi
+          
+          # Strip build number suffix if present (e.g., "5.0.0-b29" → "5.0.0")
+          # This happens when action reads from a tag like v5.0.0-b29
+          NEW_VERSION=$(echo "$RAW_VERSION" | sed 's/-b[0-9]*$//')
+          echo "📦 Clean semantic version: '$NEW_VERSION'"
+          
+          if [ "$RAW_VERSION" != "$NEW_VERSION" ]; then
+            echo "ℹ️  Stripped build suffix: $RAW_VERSION → $NEW_VERSION"
+          fi
 
           # Get previous version to check if semantic version changed
           PREV_VERSION=$(grep "^version=" version.properties | cut -d'=' -f2)
@@ -62,7 +93,7 @@ jobs:
           
           VERSION_MAJOR=$(echo $NEW_VERSION | cut -d'.' -f1)
           VERSION_MINOR=$(echo $NEW_VERSION | cut -d'.' -f2)
-          VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3)
+          VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3 | cut -d'-' -f1)  # Strip any remaining suffixes
           
           # Reset build number to 1 if semantic version changed, otherwise increment
           if [ "$NEW_VERSION" != "$PREV_VERSION" ]; then
@@ -178,7 +209,7 @@ jobs:
           
           # Dependency graph for security
           dependency-graph: generate-and-submit
-          
+
       - name: Cache Android SDK
         uses: actions/cache@v4
         with:
@@ -188,7 +219,7 @@ jobs:
           key: android-sdk-${{ runner.os }}-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             android-sdk-${{ runner.os }}-
-            
+
       - name: Cache Kotlin/Native
         uses: actions/cache@v4
         with:
@@ -311,7 +342,7 @@ jobs:
           
           # Dependency graph for security
           dependency-graph: generate-and-submit
-          
+
       - name: Cache Android SDK
         uses: actions/cache@v4
         with:
@@ -321,7 +352,7 @@ jobs:
           key: android-sdk-${{ runner.os }}-${{ hashFiles('**/build.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             android-sdk-${{ runner.os }}-
-            
+
       - name: Cache Kotlin/Native
         uses: actions/cache@v4
         with:

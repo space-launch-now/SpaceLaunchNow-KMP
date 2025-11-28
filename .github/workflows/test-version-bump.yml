@@ -72,8 +72,8 @@ jobs:
       - name: Calculate new version
         id: version
         run: |
-          NEW_VERSION="${{ steps.changelog.outputs.version }}"
-          echo "📈 Semantic version from action: '$NEW_VERSION'"
+          RAW_VERSION="${{ steps.changelog.outputs.version }}"
+          echo "📈 Raw version from action: '$RAW_VERSION'"
           
           # Check if action skipped (no conventional commits found)
           if [ "${{ steps.changelog.outputs.skipped }}" == "true" ]; then
@@ -83,11 +83,20 @@ jobs:
           fi
           
           # Check if version is empty
-          if [ -z "$NEW_VERSION" ] || [ "$NEW_VERSION" == "null" ]; then
+          if [ -z "$RAW_VERSION" ] || [ "$RAW_VERSION" == "null" ]; then
             echo "❌ ERROR: No version output from conventional-changelog-action"
             echo "Falling back to current version in version.properties"
-            NEW_VERSION=$(grep "^version=" version.properties | cut -d'=' -f2)
-            echo "Using fallback version: $NEW_VERSION"
+            RAW_VERSION=$(grep "^version=" version.properties | cut -d'=' -f2)
+            echo "Using fallback version: $RAW_VERSION"
+          fi
+          
+          # Strip build number suffix if present (e.g., "5.0.0-b29" → "5.0.0")
+          # This happens when action reads from a tag like v5.0.0-b29
+          NEW_VERSION=$(echo "$RAW_VERSION" | sed 's/-b[0-9]*$//')
+          echo "📦 Clean semantic version: '$NEW_VERSION'"
+          
+          if [ "$RAW_VERSION" != "$NEW_VERSION" ]; then
+            echo "ℹ️  Stripped build suffix: $RAW_VERSION → $NEW_VERSION"
           fi
 
           # Get previous version to check if semantic version changed
@@ -96,7 +105,7 @@ jobs:
           
           VERSION_MAJOR=$(echo $NEW_VERSION | cut -d'.' -f1)
           VERSION_MINOR=$(echo $NEW_VERSION | cut -d'.' -f2)
-          VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3)
+          VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3 | cut -d'-' -f1)  # Strip any remaining suffixes
           
           # Reset build number to 1 if semantic version changed, otherwise increment
           if [ "$NEW_VERSION" != "$PREV_VERSION" ]; then
