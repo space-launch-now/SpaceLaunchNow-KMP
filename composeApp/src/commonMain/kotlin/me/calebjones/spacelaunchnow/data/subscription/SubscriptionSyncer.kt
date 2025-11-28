@@ -33,13 +33,15 @@ class SubscriptionSyncer(
 
                 // Check if we're in debug/simulation mode
                 val currentData = localStorage.get()
-                if (!currentData.needsSync) {
-                    println("SubscriptionSyncer: 🎭 Debug mode active (needsSync=false), skipping automatic sync")
+                if (currentData.isDebugMode) {
+                    println("SubscriptionSyncer: 🎭 Debug mode active (isDebugMode=true), skipping automatic sync")
                     return@collect
                 }
 
                 if (currentTime - lastSyncTime > syncCooldownMs) {
                     println("SubscriptionSyncer: Purchase state updated, syncing...")
+                    println("  isSubscribed=${purchaseState.isSubscribed}, type=${purchaseState.subscriptionType}")
+                    println("  products=${purchaseState.activeProductIds}")
                     lastSyncTime = currentTime
 
                     // Update local storage with new purchase state
@@ -49,8 +51,11 @@ class SubscriptionSyncer(
                         productIds = purchaseState.activeProductIds,
                         entitlements = purchaseState.activeEntitlements,
                         lastSynced = currentTime,
-                        needsSync = false
+                        needsSync = false,
+                        isDebugMode = false // Real sync, not debug mode
                     )
+                    
+                    println("SubscriptionSyncer: ✅ Sync complete - isSubscribed=${purchaseState.isSubscribed}")
 
                     val success = localStorage.update(newData)
 
