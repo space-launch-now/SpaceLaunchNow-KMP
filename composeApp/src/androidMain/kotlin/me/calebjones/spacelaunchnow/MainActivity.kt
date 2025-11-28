@@ -17,8 +17,11 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import chaintech.videoplayer.util.PlaybackPreference
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
+import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.notifications.AndroidNotificationPermissionHandler
 import me.calebjones.spacelaunchnow.data.notifications.NotificationPermissionManager
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -29,6 +32,7 @@ import org.koin.android.ext.android.inject
 class MainActivity : ComponentActivity() {
     private val appPreferences: AppPreferences by inject()
     private val billingClient: BillingClient by inject()
+    private val billingManager: BillingManager by inject()
     private lateinit var notificationPermissionHandler: AndroidNotificationPermissionHandler
 
     // Use mutable state for notification launch ID to trigger recomposition
@@ -37,11 +41,15 @@ class MainActivity : ComponentActivity() {
     // Use mutable state for navigation destination (e.g., from widget)
     private var navigationDestinationState by mutableStateOf<String?>(null)
 
+    // Rate limiting for purchase state refresh on resume
+    private var lastPurchaseRefreshTime = 0L
+    private val purchaseRefreshCooldownMs = 30_000L // 30 seconds cooldown
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         setTheme(android.R.style.Theme_Material_NoActionBar)
         super.onCreate(savedInstanceState)
-        
+
         println("🔄 ROTATION_DEBUG: onCreate called - savedInstanceState: ${if (savedInstanceState == null) "null (fresh start)" else "not null (restoring)"}")
 
         // Initialize notification settings helper for Android
@@ -147,6 +155,38 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             // Not an Android billing client or method doesn't exist - that's okay
             println("MainActivity: Billing client doesn't support setActivity - ${e.message}")
+        }
+
+        // Refresh purchase state to catch any changes made while app was in background
+        // (e.g., trial conversions, subscription renewals, or cancellations)
+        // Rate limited to avoid excessive API calls when user frequently switches apps
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastPurchaseRefreshTime > purchaseRefreshCooldownMs) {
+            lastPurchaseRefreshTime = currentTime
+            lifecycleScope.launch {
+                try {
+                    println("MainActivity: Syncing purchases with store on resume...")
+
+                    // CRITICAL: Sync with store FIRST to get latest subscription status from Google Play
+                    // This ensures RevenueCat has the latest data before we query customer info
+                    // Fixes issue where trial-to-paid conversions aren't reflected immediately
+                    billingManager.syncPurchases()
+                    println("MainActivity: ✅ Store sync complete")
+
+                    // THEN refresh purchase state (will now have fresh data from the sync above)
+                    println("MainActivity: Refreshing purchase state after sync...")
+                    val refreshed = billingManager.refreshPurchaseState()
+                    if (refreshed) {
+                        println("MainActivity: ✅ Purchase state refreshed successfully")
+                    } else {
+                        println("MainActivity: ⚠️ Failed to refresh purchase state")
+                    }
+                } catch (e: Exception) {
+                    println("MainActivity: Error refreshing purchase state: ${e.message}")
+                }
+            }
+        } else {
+            println("MainActivity: Skipping purchase refresh (cooldown active)")
         }
     }
 

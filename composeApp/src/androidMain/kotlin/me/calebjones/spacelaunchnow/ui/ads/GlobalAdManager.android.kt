@@ -80,21 +80,24 @@ actual class GlobalAdManager actual constructor(
             return
         }
 
-        println("🚀 GlobalAdManager: Initializing ad optimization system on ${getPlatform().type}...")
+        println("🚀 GlobalAdManager: Fast initialization for ad optimization on ${getPlatform().type}...")
 
-        scope.launch {
-            // Initialize ad configurations for optimal performance
-            setupAdConfigurations()
+        // 🚀 PERFORMANCE: Mark as ready immediately for faster startup
+        // Configuration happens synchronously now instead of in coroutine
+        isInitialized = true
+        isOptimizationReady = true
+        
+        // Setup configurations synchronously for instant availability
+        setupAdConfigurations()
 
-            isInitialized = true
-            isOptimizationReady = true
-
-            println("✅ GlobalAdManager: Initialization complete - ads will load optimally!")
-        }
+        println("✅ GlobalAdManager: Instant initialization complete - ads ready to load!")
     }
 
-    private suspend fun setupAdConfigurations() {
-        // Configure banner ads (most common)
+    private fun setupAdConfigurations() {
+        // 🚀 PERFORMANCE: Only configure the 3 essential ad sizes we actually preload
+        // This reduces memory footprint and initialization time
+        
+        // Configure banner ads (most common - used everywhere)
         adConfigurations[AdSize.BANNER] = AdConfig(
             adUnitId = getPlatformAdUnitId(AdType.BANNER),
             adSize = AdSize.BANNER,
@@ -102,7 +105,7 @@ actual class GlobalAdManager actual constructor(
             priority = AdPriority.HIGH
         )
 
-        // Configure large banner ads (home page, detail views)
+        // Configure large banner ads (detail views, featured content)
         adConfigurations[AdSize.LARGE_BANNER] = AdConfig(
             adUnitId = getPlatformAdUnitId(AdType.BANNER),
             adSize = AdSize.LARGE_BANNER,
@@ -110,31 +113,15 @@ actual class GlobalAdManager actual constructor(
             priority = AdPriority.HIGH
         )
 
-        // Configure medium rectangle ads (content areas)
+        // Configure medium rectangle ads (inline list ads)
         adConfigurations[AdSize.MEDIUM_RECTANGLE] = AdConfig(
             adUnitId = getPlatformAdUnitId(AdType.BANNER),
             adSize = AdSize.MEDIUM_RECTANGLE,
             isOptimized = true,
-            priority = AdPriority.NORMAL
+            priority = AdPriority.HIGH  // Upgraded to HIGH for inline list ads
         )
 
-        // Configure leaderboard ads (tablets)
-        adConfigurations[AdSize.LEADERBOARD] = AdConfig(
-            adUnitId = getPlatformAdUnitId(AdType.BANNER),
-            adSize = AdSize.LEADERBOARD,
-            isOptimized = true,
-            priority = AdPriority.NORMAL
-        )
-
-        // Configure fluid ads (responsive)
-        adConfigurations[AdSize.FLUID] = AdConfig(
-            adUnitId = getPlatformAdUnitId(AdType.BANNER),
-            adSize = AdSize.FLUID,
-            isOptimized = true,
-            priority = AdPriority.LOW
-        )
-
-        println("📝 GlobalAdManager: Configured ${adConfigurations.size} ad sizes for optimization")
+        println("📝 GlobalAdManager: Configured ${adConfigurations.size} essential ad sizes (instant setup)")
     }
 
     /**

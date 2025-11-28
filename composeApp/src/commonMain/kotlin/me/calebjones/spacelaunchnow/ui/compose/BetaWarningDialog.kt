@@ -2,20 +2,11 @@ package me.calebjones.spacelaunchnow.ui.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,9 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.ui.components.AppIconBox
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 /**
@@ -41,39 +38,45 @@ import org.koin.compose.koinInject
  * about the beta status and known issues.
  */
 @Composable
-fun BetaWarningDialog() {
-    val appPreferences = koinInject<AppPreferences>()
+fun BetaWarningDialog(
+    appPreferences: AppPreferences = koinInject()
+) {
     val coroutineScope = rememberCoroutineScope()
-    
+
     val hasShownWarning by appPreferences.betaWarningShownFlow.collectAsState(initial = true)
     var showDialog by remember { mutableStateOf(false) }
-    var dontShowAgain by remember { mutableStateOf(false) }
-    
+
     // Show dialog if it hasn't been shown before
     LaunchedEffect(hasShownWarning) {
         if (!hasShownWarning) {
             showDialog = true
         }
     }
-    
+
     if (showDialog) {
+        val description = listOf(
+            "The original app's codebase is 10 years old, there were technical issues that made it impossible to support with new guidelines and restrictions from Google.",
+            "",
+            "I am actively re-implementing all features from the original app while adding new ones. Updates are released frequently as features are completed.",
+            "",
+            "Please check the Roadmap section in Settings to see planned features and progress.",
+            "",
+            "Your feedback and support is incredibly valuable to me - please let me know if there's something missing.",
+            "",
+            "Thank you to everyone who has supported this project for the last ten years!"
+        )
+
         AlertDialog(
             onDismissRequest = {
                 // Don't allow dismissing without clicking OK
             },
             containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = AlertDialogDefaults.TonalElevation,
             icon = {
-                Icon(
-                    imageVector = Icons.Filled.Warning,
-                    contentDescription = "Warning",
-                    tint = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.size(48.dp)
-                )
+                AppIconBox()
             },
             title = {
                 Text(
-                    text = "BETA Early Release",
+                    text = "Space Launch Now",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -83,97 +86,40 @@ fun BetaWarningDialog() {
             text = {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Thank you for testing the all new Space Launch Now!",
+                        text = "Thank you for using the all new Space Launch Now!",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Start
                     )
-                    
+
                     Spacer(modifier = Modifier.height(4.dp))
-                    
+
                     Text(
-                        text = "This is an early release version. You may experience some issues.",
+                        text = "This app is actively being developed with frequent updates. You may occasionally experience issues as features are added.",
                         style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Start,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // Known Issue Section
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = "⚠️ Known Issue:",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                        Text(
-                            text = "• Restoring previous purchases may not work correctly",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "• Notifications are not stacking properly",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "• Some UI elements may be misaligned on smaller screens",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    
+
                     Spacer(modifier = Modifier.height(4.dp))
-                    
+
                     Text(
-                        text = "I am working hard to fix these issues.\nThank you for your patience!",
+                        text = description.joinToString("\n"),
                         style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        textAlign = TextAlign.Start,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // Don't show again checkbox
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Checkbox(
-                            checked = dontShowAgain,
-                            onCheckedChange = { dontShowAgain = it }
-                        )
-                        Text(
-                            text = "Don't show this again",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
                 }
             },
             confirmButton = {
                 TextButton(
                     onClick = {
                         coroutineScope.launch {
-                            if (dontShowAgain) {
-                                appPreferences.setBetaWarningShown(true)
-                            }
+                            appPreferences.setBetaWarningShown(true)
                             showDialog = false
                         }
                     }
@@ -188,3 +134,22 @@ fun BetaWarningDialog() {
         )
     }
 }
+
+@Preview
+@Composable
+private fun BetaWarningDialogPreview() {
+    // Mock DataStore that returns false for beta warning shown (so dialog displays)
+    val mockDataStore = object : DataStore<Preferences> {
+        override val data: Flow<Preferences> = flowOf(emptyPreferences())
+        override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences): Preferences {
+            return emptyPreferences()
+        }
+    }
+
+    val mockPreferences = AppPreferences(mockDataStore)
+
+    MaterialTheme {
+        BetaWarningDialog(appPreferences = mockPreferences)
+    }
+}
+

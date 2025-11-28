@@ -4,12 +4,11 @@ import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.io.files.Path
 import kotlinx.serialization.Serializable
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
-import kotlin.time.Clock
+import kotlin.time.Clock.System
 
 /**
  * Local subscription data stored on device
@@ -22,7 +21,8 @@ data class LocalSubscriptionData(
     val entitlements: Set<String> = emptySet(), // RevenueCat entitlement IDs
     val productIds: Set<String> = emptySet(),   // Product IDs user owns
     val lastSynced: Long = 0L,                  // Last time we synced with RevenueCat
-    val needsSync: Boolean = true               // Whether we need to sync with RevenueCat
+    val needsSync: Boolean = true,              // Whether we need to sync with RevenueCat
+    val isDebugMode: Boolean = false            // Whether we're in debug/simulation mode (blocks sync)
 ) {
     /**
      * Check if user has a specific feature based on subscription type
@@ -48,7 +48,8 @@ data class LocalSubscriptionData(
         val FREE = LocalSubscriptionData(
             isSubscribed = false,
             subscriptionType = SubscriptionType.FREE,
-            needsSync = false
+            needsSync = false,
+            isDebugMode = false
         )
     }
 }
@@ -78,29 +79,76 @@ class LocalSubscriptionStorage {
     }
 
     /**
-     * Update subscription data
+     * Update subscription data with error handling and verification
+     * @return true if update was successful, false if it failed
      */
-    suspend fun update(data: LocalSubscriptionData) {
-        store.set(data)
+    suspend fun update(data: LocalSubscriptionData): Boolean {
+        return try {
+            println("LocalSubscriptionStorage: 💾 Saving subscription data...")
+            println("  - Subscription Type: ${data.subscriptionType}")
+            println("  - Is Subscribed: ${data.isSubscribed}")
+            println("  - Entitlements: ${data.entitlements}")
+
+            store.set(data)
+
+            // Verify write succeeded by reading back
+            val readBack = store.get()
+            val success = readBack == data
+
+            if (success) {
+                println("LocalSubscriptionStorage: ✅ Subscription data saved and verified successfully")
+            } else {
+                println("LocalSubscriptionStorage: ❌ Verification failed - read-back mismatch!")
+                println("  Expected: $data")
+                println("  Read back: $readBack")
+                me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
+                    "Subscription state verification failed - read-back mismatch",
+                    null,
+                    mapOf(
+                        "expected_type" to data.subscriptionType.name,
+                        "read_back_type" to (readBack?.subscriptionType?.name ?: "null"),
+                        "expected_subscribed" to data.isSubscribed,
+                        "read_back_subscribed" to (readBack?.isSubscribed ?: false)
+                    )
+                )
+            }
+
+            success
+        } catch (e: Exception) {
+            println("LocalSubscriptionStorage: ❌ Error saving subscription data: ${e.message}")
+            e.printStackTrace()
+            me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
+                "Failed to save subscription state to KStore",
+                e,
+                mapOf(
+                    "subscription_type" to data.subscriptionType.name,
+                    "is_subscribed" to data.isSubscribed,
+                    "error_type" to (e::class.simpleName ?: "Unknown"),
+                    "error_message" to (e.message ?: "No message")
+                )
+            )
+            false
+        }
     }
 
     /**
      * Update just the subscription type and features
+     * @return true if update was successful, false if it failed
      */
     suspend fun updateSubscription(
         isSubscribed: Boolean,
         subscriptionType: SubscriptionType,
         entitlements: Set<String> = emptySet(),
         productIds: Set<String> = emptySet()
-    ) {
+    ): Boolean {
         val current = get()
-        update(
+        return update(
             current.copy(
                 isSubscribed = isSubscribed,
                 subscriptionType = subscriptionType,
                 entitlements = entitlements,
                 productIds = productIds,
-                lastSynced = Clock.System.now().toEpochMilliseconds(),
+                lastSynced = System.now().toEpochMilliseconds(),
                 needsSync = false
             )
         )
@@ -108,17 +156,19 @@ class LocalSubscriptionStorage {
 
     /**
      * Mark that we need to sync with RevenueCat
+     * @return true if update was successful, false if it failed
      */
-    suspend fun markNeedsSync() {
+    suspend fun markNeedsSync(): Boolean {
         val current = get()
-        update(current.copy(needsSync = true))
+        return update(current.copy(needsSync = true))
     }
 
     /**
      * Clear all subscription data (reset to free)
+     * @return true if clear was successful, false if it failed
      */
-    suspend fun clear() {
-        update(LocalSubscriptionData.FREE)
+    suspend fun clear(): Boolean {
+        return update(LocalSubscriptionData.FREE)
     }
 
     /**
@@ -129,7 +179,7 @@ class LocalSubscriptionStorage {
     }
 
     // Debug methods for testing different subscription states
-    
+
     /**
      * Set debug subscription state for testing
      * This directly manipulates local storage for testing purposes
@@ -146,7 +196,7 @@ class LocalSubscriptionStorage {
                 subscriptionType = subscriptionType,
                 entitlements = entitlements,
                 productIds = productIds,
-                lastSynced = Clock.System.now().toEpochMilliseconds(),
+                lastSynced = System.now().toEpochMilliseconds(),
                 needsSync = false // Don't sync when in debug mode
             )
         )
@@ -157,19 +207,17 @@ class LocalSubscriptionStorage {
      * Use this to exit debug mode and return to real state
      */
     suspend fun clearDebugState() {
-        update(LocalSubscriptionData.FREE.copy(needsSync = true)) // Force sync to get real state
+        update(LocalSubscriptionData.FREE.copy(needsSync = true, isDebugMode = false)) // Force sync to get real state
     }
 
     /**
      * Check if we're currently in a debug/simulated state
-     * A debug state is indicated by needsSync = false (manually set by debug methods)
+     * A debug state is indicated by isDebugMode = true (manually set by setDebugSubscription)
      * This makes it easy to detect simulation mode without time-based heuristics
      */
     suspend fun isInDebugMode(): Boolean {
         val current = get()
-        // Debug mode is active when needsSync is false (manually set by setDebugSubscription)
-        // Real subscriptions will have needsSync = true to trigger syncing
-        // We check needsSync = false regardless of subscription type to support simulating FREE state
-        return !current.needsSync
+        // Debug mode is active when explicitly set by setDebugSubscription
+        return current.isDebugMode
     }
 }

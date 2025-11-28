@@ -558,6 +558,7 @@ object NotificationDisplayHelper {
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setOnlyAlertOnce(true)
 
         // Load and display image if available using Coil
         println("📱 [Notification] Image URL from notificationData: ${notificationData.launchImage}")

@@ -32,6 +32,7 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
@@ -47,6 +48,7 @@ import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
+import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
@@ -83,6 +85,7 @@ fun PhoneLayout(
         SupportUs::class.qualifiedName -> false // Hide for SupportUsScreen
         ThemeCustomization::class.qualifiedName -> false // Hide for ThemeCustomization
         CalendarSync::class.qualifiedName -> false // Hide for CalendarSync
+        Roadmap::class.qualifiedName -> false // Hide for Roadmap
 
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern

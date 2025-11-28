@@ -143,7 +143,13 @@ actual fun SmartBannerAd(
 
     // Safety check: ensure we have a banner ad to show
     if (availableAd == null) {
-        println("⚠️ SmartBannerAd: No preloaded ad available for size $actualAdSize")
+        println("⚠️ SmartBannerAd: No preloaded ad available for size $actualAdSize - skipping ad display")
+        return
+    }
+
+    // 🚀 PERFORMANCE: Fast-path return for failing ads to avoid layout delays
+    if (availableAd.state == AdState.FAILING || availableAd.state == AdState.NONE) {
+        println("⚠️ SmartBannerAd: Ad state is ${availableAd.state} - skipping to avoid layout delays")
         return
     }
 
