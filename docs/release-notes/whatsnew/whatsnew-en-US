@@ -3,10 +3,8 @@
 * Address code review feedback - add rate limiting and improve logging
 * **billing:** add error handling and verification to subscription persistence
 * **billing:** add error handling and verification to subscription persistence
+* **docs:** delete old spec files
 * improve notification handling
-* Resolve billing sync issue where subscription updates were blocked
-* update launch mass unit from kg to t in vehicle details
-
-### Features
-
-* add Roadmap feature with dedicated screen and ViewModel...
+* **release:** update version calculation
+* **release:** update version calculation
+* Resolve billing sync issue where subscription updates were blocked...
