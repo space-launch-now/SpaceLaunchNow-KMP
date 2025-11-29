@@ -39,39 +39,30 @@ jobs:
           output-file: "CHANGELOG.md"
           version-file: "./version.properties"
           version-path: "version"
-          skip-version-file: "false"
+          skip-version-file: "true"
           skip-commit: "true"
           skip-tag: "true"
           git-push: "false"
           tag-prefix: "v"
-          pre-release: "false"
-          pre-release-identifier: "b"
-          # This action will now automatically bump the version in version.properties
-          # and generate the changelog based on conventional commits
 
       - name: Calculate new version (no commit)
         id: version
 
         run: |
-          NEW_VERSION="${{ steps.changelog.outputs.version }}"
-          echo "📈 Using semantic version: $NEW_VERSION"
-
-          # Get previous version to check if semantic version changed
-          PREV_VERSION=$(grep "^version=" version.properties | cut -d'=' -f2)
-          PREV_BUILD=$(grep "versionBuildNumber=" version.properties | cut -d'=' -f2)
+          if [ -n "$FORCE_VERSION" ]; then
+            NEW_VERSION="$FORCE_VERSION"
+            echo "🔒 Using forced version: $NEW_VERSION (pre-release mode)"
+          else
+            NEW_VERSION="${{ steps.changelog.outputs.version }}"
+            echo "📈 Using semantic version: $NEW_VERSION"
+          fi
+          
+          BUILD_NUMBER=$(grep "versionBuildNumber=" version.properties | cut -d'=' -f2)
+          NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
           
           VERSION_MAJOR=$(echo $NEW_VERSION | cut -d'.' -f1)
           VERSION_MINOR=$(echo $NEW_VERSION | cut -d'.' -f2)
           VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3)
-          
-          # Reset build number to 1 if semantic version changed, otherwise increment
-          if [ "$NEW_VERSION" != "$PREV_VERSION" ]; then
-            NEW_BUILD_NUMBER=1
-            echo "🔄 Semantic version changed: $PREV_VERSION → $NEW_VERSION (resetting build to 1)"
-          else
-            NEW_BUILD_NUMBER=$((PREV_BUILD + 1))
-            echo "🔢 Same semantic version, incrementing build: b$PREV_BUILD → b$NEW_BUILD_NUMBER"
-          fi
           
           VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${NEW_BUILD_NUMBER}"
           VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + NEW_BUILD_NUMBER))
@@ -264,9 +255,14 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git add version.properties CHANGELOG.md docs/release-notes/
           git commit -m "chore(release): bump version to ${{ needs.version.outputs.version_name }} [skip ci]"
-          git tag -a "v${{ needs.version.outputs.version_name }}" -m "Release ${{ needs.version.outputs.version_name }}"
+
+          # Extract semver without build number for git tag
+          SEMVER=$(echo "${{ needs.version.outputs.version_name }}" | sed 's/-b[0-9]*$//')
+          git tag -a "v${SEMVER}" -m "Release ${{ needs.version.outputs.version_name }}"
+          
+          # Push both commit and tag
           git push origin HEAD:${{ github.ref_name }}
-          git push origin "v${{ needs.version.outputs.version_name }}"
+          git push origin "v${SEMVER}"
 
   # Job 4: Build AAB (after commit)
   build-aab:
