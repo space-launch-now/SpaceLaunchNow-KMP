@@ -401,8 +401,6 @@ fun rememberHasFeature(feature: PremiumFeature): State<Boolean> {
             val hasTemporary = temporaryAccess.hasTemporaryAccess(feature)
 
             value = hasSubscription || hasTemporary
-
-            println("🔍 rememberHasFeature(${feature.name}): subscription=$hasSubscription, temporary=$hasTemporary, result=${value}")
         }
 
     return hasAccess

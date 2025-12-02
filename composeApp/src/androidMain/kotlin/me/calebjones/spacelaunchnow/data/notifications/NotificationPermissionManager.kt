@@ -5,10 +5,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.lang.ref.WeakReference
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 object NotificationPermissionManager {
+    
     private var currentActivity: WeakReference<Activity>? = null
     private val _permissionRequestResult = MutableStateFlow<Boolean?>(null)
+
+    private val log = logger()
     val permissionRequestResult: StateFlow<Boolean?> = _permissionRequestResult.asStateFlow()
 
     fun setCurrentActivity(activity: Activity) {
@@ -30,7 +34,7 @@ object NotificationPermissionManager {
                 true // Already has permission
             }
         } else {
-            println("No activity available to request permission")
+            log.w("No activity available to request permission")
             false
         }
     }

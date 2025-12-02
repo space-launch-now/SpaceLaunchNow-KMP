@@ -73,6 +73,7 @@ import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.subscription.TemporaryPremiumCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
@@ -799,6 +800,7 @@ class ThemeCustomizationViewModel(
     private val subscriptionRepository: SubscriptionRepository,
     val temporaryPremiumAccess: TemporaryPremiumAccess  // Make it public val instead of private
 ) : ViewModel() {
+    private val log = logger()
 
     private val _hasCustomTheme = MutableStateFlow(false)
     val hasCustomTheme: StateFlow<Boolean> = _hasCustomTheme.asStateFlow()
@@ -857,8 +859,7 @@ class ThemeCustomizationViewModel(
                 val hasCustomTheme = subscriptionRepository.hasFeature(PremiumFeature.CUSTOM_THEMES)
                 val hasWidgetCustomization =
                     subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
-                println("ThemeCustomizationViewModel: State changed - isSubscribed=${subscriptionState.isSubscribed}, isExpired=${subscriptionState.isExpired()}, isPremium=$isPremium")
-                println("ThemeCustomizationViewModel: hasCustomTheme=$hasCustomTheme, hasWidgetCustomization=$hasWidgetCustomization")
+                log.d { "State changed - isSubscribed=${subscriptionState.isSubscribed}, isExpired=${subscriptionState.isExpired()}, isPremium=$isPremium, hasCustomTheme=$hasCustomTheme, hasWidgetCustomization=$hasWidgetCustomization" }
                 _hasCustomTheme.value = hasCustomTheme
                 _hasWidgetCustomization.value = hasWidgetCustomization
                 _hasPermanentPremium.value =
@@ -920,7 +921,7 @@ class ThemeCustomizationViewModel(
                     _widgetCornerRadius.value != lastAppliedRadius
 
         if (_hasUnappliedWidgetChanges.value != hasChanges) {
-            println("ThemeCustomizationViewModel: checkForUnappliedChanges() - changing from ${_hasUnappliedWidgetChanges.value} to $hasChanges")
+            log.d { "checkForUnappliedChanges() - changing from ${_hasUnappliedWidgetChanges.value} to $hasChanges" }
         }
 
         _hasUnappliedWidgetChanges.value = hasChanges
@@ -964,47 +965,44 @@ class ThemeCustomizationViewModel(
 
     fun applyWidgetChanges() {
         viewModelScope.launch {
-            println("ThemeCustomizationViewModel: applyWidgetChanges() called")
-            println("  Theme Source: ${_widgetThemeSource.value}")
-            println("  Alpha: ${_widgetBackgroundAlpha.value}")
-            println("  Radius: ${_widgetCornerRadius.value}")
+            log.d { "applyWidgetChanges() called - Theme Source: ${_widgetThemeSource.value}, Alpha: ${_widgetBackgroundAlpha.value}, Radius: ${_widgetCornerRadius.value}" }
 
             try {
                 // Save to DataStore - these are suspend functions, so they execute sequentially
                 // and this coroutine waits for each to complete before continuing
-                println("  Writing theme source to DataStore...")
+                log.v { "Writing theme source to DataStore..." }
                 widgetPreferences.updateWidgetThemeSource(_widgetThemeSource.value)
-                println("  Theme source written")
+                log.v { "Theme source written" }
 
-                println("  Writing background alpha to DataStore...")
+                log.v { "Writing background alpha to DataStore..." }
                 widgetPreferences.updateWidgetBackgroundAlpha(_widgetBackgroundAlpha.value)
-                println("  Background alpha written")
+                log.v { "Background alpha written" }
 
-                println("  Writing corner radius to DataStore...")
+                log.v { "Writing corner radius to DataStore..." }
                 widgetPreferences.updateWidgetCornerRadius(_widgetCornerRadius.value)
-                println("  Corner radius written")
+                log.v { "Corner radius written" }
 
-                println("  All DataStore writes completed successfully")
+                log.i { "All DataStore writes completed successfully" }
 
                 // Update last applied values AFTER DataStore writes complete
                 lastAppliedThemeSource = _widgetThemeSource.value
                 lastAppliedAlpha = _widgetBackgroundAlpha.value
                 lastAppliedRadius = _widgetCornerRadius.value
 
-                println("  Updated last applied values")
+                log.v { "Updated last applied values" }
 
                 // Clear unapplied changes flag
-                println("  Setting hasUnappliedWidgetChanges = false")
+                log.v { "Setting hasUnappliedWidgetChanges = false" }
                 _hasUnappliedWidgetChanges.value = false
 
                 // Trigger widget update by incrementing counter
                 // This happens AFTER all DataStore writes are confirmed complete
                 val newTriggerValue = _widgetApplyTrigger.value + 1
-                println("  Incrementing widget apply trigger: ${_widgetApplyTrigger.value} -> $newTriggerValue")
+                log.d { "Incrementing widget apply trigger: ${_widgetApplyTrigger.value} -> $newTriggerValue" }
                 _widgetApplyTrigger.value = newTriggerValue
-                println("  Widget apply trigger emitted successfully")
+                log.i { "Widget apply trigger emitted successfully" }
             } catch (e: Exception) {
-                println("ThemeCustomizationViewModel: ERROR in applyWidgetChanges(): ${e.message}")
+                log.e(e) { "ERROR in applyWidgetChanges(): ${e.message}" }
                 e.printStackTrace()
                 // Reset unapplied changes flag even on error to prevent stuck state
                 _hasUnappliedWidgetChanges.value = false

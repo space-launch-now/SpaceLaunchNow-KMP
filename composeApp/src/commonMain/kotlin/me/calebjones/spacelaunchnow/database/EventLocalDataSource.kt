@@ -5,6 +5,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Clock.System
@@ -18,10 +19,12 @@ class EventLocalDataSource(
     
     private val cacheDuration = 1.hours
     private val debugCacheDuration = 2.minutes
+
+    private val log = logger()
     
     private suspend fun getEffectiveCacheDuration(): kotlin.time.Duration {
         return if (appPreferences.isDebugShortCacheTtlEnabled()) {
-            println("⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${cacheDuration.inWholeHours} hours")
+            log.w { "⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${cacheDuration.inWholeHours} hours" }
             debugCacheDuration
         } else {
             cacheDuration
@@ -36,7 +39,7 @@ class EventLocalDataSource(
         queries.insertOrReplaceEvent(
             id = event.id.toLong(),
             name = event.name,
-            type_name = event.type?.name,
+            type_name = event.type.name,
             description = event.description,
             location = event.location,
             news_url = event.infoUrls.firstOrNull()?.url,
@@ -66,9 +69,10 @@ class EventLocalDataSource(
             .mapNotNull { cached ->
                 try {
                     val ageMinutes = (now - cached.cached_at) / 60000
-                    println("  Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
+                    log.v { "Cache entry age: $ageMinutes minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})" }
                     json.decodeFromString<EventEndpointNormal>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e { "Failed to parse cached event: ${cached.json_data}" }
                     null
                 }
             }
@@ -83,6 +87,7 @@ class EventLocalDataSource(
                 try {
                     json.decodeFromString<EventEndpointNormal>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e(e) { "Failed to parse cached event: ${cached.json_data}" }
                     null
                 }
             }

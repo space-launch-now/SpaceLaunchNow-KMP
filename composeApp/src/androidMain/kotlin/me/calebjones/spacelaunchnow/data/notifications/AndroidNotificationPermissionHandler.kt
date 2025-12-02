@@ -7,8 +7,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 class AndroidNotificationPermissionHandler(private val context: Context) {
+    private val log = logger()
 
     fun hasNotificationPermission(): Boolean {
         val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -20,15 +22,15 @@ class AndroidNotificationPermissionHandler(private val context: Context) {
             // For Android 12 and below, notification permission is granted by default
             true
         }
-        println("AndroidNotificationPermissionHandler.hasNotificationPermission() = $result")
+        log.d { "AndroidNotificationPermissionHandler.hasNotificationPermission() = $result" }
         return result
     }
 
     fun requestNotificationPermission(activity: Activity): Boolean {
-        println("AndroidNotificationPermissionHandler.requestNotificationPermission() called")
+        log.d { "AndroidNotificationPermissionHandler.requestNotificationPermission() called" }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (!hasNotificationPermission()) {
-                println("Requesting POST_NOTIFICATIONS permission via ActivityCompat.requestPermissions")
+                log.d { "Requesting POST_NOTIFICATIONS permission via ActivityCompat.requestPermissions" }
                 ActivityCompat.requestPermissions(
                     activity,
                     arrayOf(Manifest.permission.POST_NOTIFICATIONS),
@@ -36,11 +38,11 @@ class AndroidNotificationPermissionHandler(private val context: Context) {
                 )
                 false // Permission requested, result will come in onRequestPermissionsResult
             } else {
-                println("Permission already granted, returning true")
+                log.d { "Permission already granted, returning true" }
                 true // Already has permission
             }
         } else {
-            println("Android version < 13, returning true (no permission needed)")
+            log.d { "Android version < 13, returning true (no permission needed)" }
             true // No permission needed for Android 12 and below
         }
     }

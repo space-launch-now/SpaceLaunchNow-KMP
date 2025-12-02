@@ -14,6 +14,9 @@ import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+
+private val log = SpaceLogger.getLogger("RewardedAdHandler")
 
 /**
  * Android implementation of RewardedAdHandler using BasicAds library.
@@ -48,7 +51,7 @@ actual fun RewardedAdHandler(
         !shouldShow
     ) {
         if (shouldShow) {
-            println("⚠️ RewardedAdHandler: Not showing ad due to conditions.")
+            log.w { "Not showing ad due to conditions" }
         }
         return
     }
@@ -64,46 +67,46 @@ actual fun RewardedAdHandler(
         when (rewardedAd.state) {
             AdState.READY -> {
                 if (shouldShow) {
-                    println("🎯 RewardedAd: Ad loaded successfully and ready to show")
+                    log.d { "Ad loaded successfully and ready to show" }
                     // Reset reward granted flag when showing new ad
                     rewardGranted = false
                 }
             }
 
             AdState.SHOWING -> {
-                println("✅ RewardedAd: Ad is showing!")
+                log.i { "Ad is showing!" }
                 onAdShown?.invoke()
             }
 
             AdState.DISMISSED -> {
-                println("🎯 RewardedAd: Ad dismissed by user")
+                log.d { "Ad dismissed by user" }
             }
 
             AdState.FAILING -> {
-                println("❌ RewardedAd: Ad failed to load")
+                log.e { "Ad failed to load" }
                 onAdFailed?.invoke("Failed to load")
             }
 
             AdState.LOADING -> {
-                println("⏳ RewardedAd: Ad is loading...")
+                log.d { "Ad is loading..." }
             }
 
             AdState.SHOWN -> {
-                println("✅ RewardedAd: Ad has finished showing")
+                log.i { "Ad has finished showing" }
                 // Grant reward when ad completes (SHOWN state)
                 if (!rewardGranted) {
-                    println("🎉 RewardedAd: User earned reward!")
+                    log.i { "User earned reward!" }
                     onRewardEarned?.invoke(1, "reward")
                     rewardGranted = true
                 }
             }
 
             AdState.NONE -> {
-                println("⚪ RewardedAd: Initial state")
+                log.v { "Initial state" }
             }
 
             else -> {
-                println("🔄 RewardedAd: State: ${rewardedAd.state}")
+                log.d { "State: ${rewardedAd.state}" }
             }
         }
     }
@@ -113,7 +116,7 @@ actual fun RewardedAdHandler(
         RewardedAd(
             loadedAd = rewardedAd,
             onRewardEarned = {
-                println("🎉 RewardedAd: User earned reward!")
+                log.i { "User earned reward!" }
                 onRewardEarned?.invoke(1, "reward") // Default reward values
             }
         )

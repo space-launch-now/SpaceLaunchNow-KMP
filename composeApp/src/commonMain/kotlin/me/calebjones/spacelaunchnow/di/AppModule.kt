@@ -62,6 +62,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
+import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -185,6 +186,12 @@ val appModule = module {
     single {
         val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
         WidgetPreferences(appDataStore)
+    }
+
+    // Logging preferences for user-controlled diagnostic logging
+    single {
+        val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
+        LoggingPreferences(appDataStore)
     }
 
     // NotificationRepository - new clean architecture

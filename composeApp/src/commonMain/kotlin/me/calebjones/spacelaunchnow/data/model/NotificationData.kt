@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.data.model
 
 import kotlinx.serialization.Serializable
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Notification data structure for v4 notifications
@@ -21,6 +22,8 @@ data class NotificationData(
     val locationId: String                // e.g., "143" for Texas
 ) {
     companion object {
+        private val log = logger()
+        
         /**
          * Parse notification data from FCM data payload
          * Returns null if required fields are missing
@@ -41,7 +44,7 @@ data class NotificationData(
                     locationId = data["location_id"] ?: return null
                 )
             } catch (e: Exception) {
-                println("❌ Failed to parse notification data: ${e.message}")
+                log.e(e) { "❌ Failed to parse notification data: ${e.message}" }
                 null
             }
         }
@@ -102,6 +105,7 @@ data class NotificationData(
  * ```
  */
 object NotificationFilter {
+    private val log = logger()
 
     /**
      * Convenience method for filtering from raw data map
@@ -112,7 +116,7 @@ object NotificationFilter {
         state: NotificationState
     ): Boolean {
         val data = NotificationData.fromMap(dataMap) ?: run {
-            println("⚠️ Failed to parse notification data, suppressing notification")
+            log.w { "⚠️ Failed to parse notification data, suppressing notification" }
             return false
         }
         return shouldShowNotification(data, state)
@@ -129,27 +133,25 @@ object NotificationFilter {
         data: NotificationData,
         state: NotificationState
     ): Boolean {
-        println("=== NotificationFilter: Evaluating notification ===")
-        println("Type: ${data.notificationType}, Agency: ${data.agencyId}, Location: ${data.locationId}")
-        println("Launch: ${data.launchName}, Webcast: ${data.webcast}")
+        log.d { "Evaluating notification - Type: ${data.notificationType}, Agency: ${data.agencyId}, Location: ${data.locationId}, Launch: ${data.launchName}, Webcast: ${data.webcast}" }
 
         // 1. Check if notifications are globally enabled
         if (!state.enableNotifications) {
-            println("🔇 BLOCKED: Notifications disabled globally")
+            log.d { "🔇 BLOCKED: Notifications disabled globally" }
             return false
         }
 
         // 2. Check webcast-only filter
         val webcastOnly = state.isTopicEnabled(NotificationTopic.WEBCAST_ONLY)
         if (webcastOnly && !data.hasWebcast()) {
-            println("🔇 BLOCKED: Webcast-only filter enabled, launch has no webcast")
+            log.d { "🔇 BLOCKED: Webcast-only filter enabled, launch has no webcast" }
             return false
         }
 
         // 3. Check notification type (timing) settings
         val notificationTypeEnabled = isNotificationTypeEnabled(data.notificationType, state)
         if (!notificationTypeEnabled) {
-            println("🔇 BLOCKED: Notification type '${data.notificationType}' is disabled")
+            log.d { "🔇 BLOCKED: Notification type '${data.notificationType}' is disabled" }
             return false
         }
 
@@ -157,13 +159,13 @@ object NotificationFilter {
         // When followAllLaunches is enabled, show ALL notifications (skip agency/location filtering)
         // Note: useStrictMatching is ignored when followAllLaunches is enabled
         if (state.followAllLaunches) {
-            println("✅ ALLOWED: Following all launches (agency/location filtering skipped, strict matching ignored)")
+            log.d { "✅ ALLOWED: Following all launches (agency/location filtering skipped, strict matching ignored)" }
             return true
         }
 
         // 5. Check if both filters are empty (block everything)
         if (state.subscribedAgencies.isEmpty() && state.subscribedLocations.isEmpty()) {
-            println("🔇 BLOCKED: No agencies or locations subscribed (both filters empty)")
+            log.d { "🔇 BLOCKED: No agencies or locations subscribed (both filters empty)" }
             return false
         }
 
@@ -171,7 +173,7 @@ object NotificationFilter {
         val hasAgencyFilter = state.subscribedAgencies.isNotEmpty()
         val hasLocationFilter = state.subscribedLocations.isNotEmpty()
 
-        println("Agency filter: $hasAgencyFilter, Location filter: $hasLocationFilter")
+        log.v { "Agency filter: $hasAgencyFilter, Location filter: $hasLocationFilter" }
 
         // 7. Check agency filter (only if filter is active)
         val agencyMatch = if (hasAgencyFilter) {
@@ -210,14 +212,14 @@ object NotificationFilter {
             // Strict mode: BOTH agency AND location must match
             // If either filter is inactive (empty), we can't satisfy "BOTH" requirement
             if (!hasAgencyFilter || !hasLocationFilter) {
-                println("🔇 BLOCKED: Strict matching requires BOTH agency AND location filters to be active")
+                log.d { "🔇 BLOCKED: Strict matching requires BOTH agency AND location filters to be active" }
                 false
             } else {
                 val result = agencyMatch && locationMatch
                 if (!result) {
-                    println("🔇 BLOCKED: Strict matching - agency: $agencyMatch, location: $locationMatch (need BOTH)")
+                    log.d { "🔇 BLOCKED: Strict matching - agency: $agencyMatch, location: $locationMatch (need BOTH)" }
                 } else {
-                    println("✅ ALLOWED: Strict matching - agency: $agencyMatch, location: $locationMatch (both match)")
+                    log.d { "✅ ALLOWED: Strict matching - agency: $agencyMatch, location: $locationMatch (both match)" }
                 }
                 result
             }
@@ -235,14 +237,14 @@ object NotificationFilter {
             }
 
             if (!result) {
-                println("🔇 BLOCKED: Flexible matching - agency: $agencyMatch (${if (hasAgencyFilter) "filtered" else "any"}), location: $locationMatch (${if (hasLocationFilter) "filtered" else "any"})")
+                log.d { "🔇 BLOCKED: Flexible matching - agency: $agencyMatch (${if (hasAgencyFilter) "filtered" else "any"}), location: $locationMatch (${if (hasLocationFilter) "filtered" else "any"})" }
             } else {
-                println("✅ ALLOWED: Flexible matching - agency: $agencyMatch (${if (hasAgencyFilter) "filtered" else "any"}), location: $locationMatch (${if (hasLocationFilter) "filtered" else "any"})")
+                log.d { "✅ ALLOWED: Flexible matching - agency: $agencyMatch (${if (hasAgencyFilter) "filtered" else "any"}), location: $locationMatch (${if (hasLocationFilter) "filtered" else "any"})" }
             }
             result
         }
 
-        println("=== NotificationFilter: Result = $shouldShow ===")
+        log.i { "NotificationFilter result: $shouldShow" }
         return shouldShow
     }
 
@@ -260,7 +262,7 @@ object NotificationFilter {
             "success" -> state.isTopicEnabled(NotificationTopic.SUCCESS)
             "event" -> state.isTopicEnabled(NotificationTopic.EVENTS)
             else -> {
-                println("⚠️ Unknown notification type: $type, allowing by default")
+                log.w { "⚠️ Unknown notification type: $type, allowing by default" }
                 true // Unknown types are allowed by default
             }
         }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.glance.appwidget.updateAll
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.widgets.LaunchListWidget
 import me.calebjones.spacelaunchnow.widgets.NextUpWidget
 
@@ -11,6 +12,8 @@ class WidgetUpdateWorker(
     private val context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
+
+    private val log = logger()
 
     override suspend fun doWork(): Result {
         return try {
@@ -20,11 +23,10 @@ class WidgetUpdateWorker(
             // Update all instances of LaunchListWidget
             LaunchListWidget().updateAll(context)
 
-            println("Widgets updated successfully")
+            log.i { "Widgets updated successfully" }
             Result.success()
         } catch (e: Exception) {
-            println("Failed to update widgets: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "Failed to update widgets: ${e.message}" }
             Result.retry()
         }
     }

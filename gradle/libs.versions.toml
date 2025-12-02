@@ -27,6 +27,7 @@ ddSdkKotlinMultiplatformLogs = "1.4.0"
 ddSdkKotlinMultiplatformRum = "1.4.0"
 insetsx = "0.1.0-alpha10"
 junit = "4.13.2"
+kermit = "2.0.4"
 kotlin = "2.2.20"
 kotlin-test = "2.1.21"
 koin = "4.1.1"
@@ -105,6 +106,8 @@ insetsx = { module = "com.moriatsushi.insetsx:insetsx", version.ref = "insetsx" 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-test" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kermit-crashlytics = { module = "co.touchlab:kermit-crashlytics", version.ref = "kermit" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }

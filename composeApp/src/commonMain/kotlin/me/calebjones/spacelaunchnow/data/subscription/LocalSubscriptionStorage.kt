@@ -8,6 +8,7 @@ import kotlinx.io.files.Path
 import kotlinx.serialization.Serializable
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
 
 /**
@@ -59,6 +60,7 @@ data class LocalSubscriptionData(
  * This provides immediate, synchronous access to subscription status
  */
 class LocalSubscriptionStorage {
+    private val log = logger()
 
     private val store: KStore<LocalSubscriptionData> = storeOf(
         file = Path("${AppDirectories.getAppDataDir()}/subscription_data.json"),
@@ -84,10 +86,7 @@ class LocalSubscriptionStorage {
      */
     suspend fun update(data: LocalSubscriptionData): Boolean {
         return try {
-            println("LocalSubscriptionStorage: 💾 Saving subscription data...")
-            println("  - Subscription Type: ${data.subscriptionType}")
-            println("  - Is Subscribed: ${data.isSubscribed}")
-            println("  - Entitlements: ${data.entitlements}")
+            log.d { "Saving subscription data - Type: ${data.subscriptionType}, Subscribed: ${data.isSubscribed}, Entitlements: ${data.entitlements}" }
 
             store.set(data)
 
@@ -96,11 +95,9 @@ class LocalSubscriptionStorage {
             val success = readBack == data
 
             if (success) {
-                println("LocalSubscriptionStorage: ✅ Subscription data saved and verified successfully")
+                log.i { "Subscription data saved and verified successfully" }
             } else {
-                println("LocalSubscriptionStorage: ❌ Verification failed - read-back mismatch!")
-                println("  Expected: $data")
-                println("  Read back: $readBack")
+                log.e { "❌ Verification failed - read-back mismatch! Expected: $data, Read back: $readBack" }
                 me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
                     "Subscription state verification failed - read-back mismatch",
                     null,
@@ -115,8 +112,7 @@ class LocalSubscriptionStorage {
 
             success
         } catch (e: Exception) {
-            println("LocalSubscriptionStorage: ❌ Error saving subscription data: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "❌ Error saving subscription data: ${e.message}" }
             me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
                 "Failed to save subscription state to KStore",
                 e,
