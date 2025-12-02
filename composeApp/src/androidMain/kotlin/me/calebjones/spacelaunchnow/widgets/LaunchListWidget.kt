@@ -48,6 +48,7 @@ import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -57,11 +58,13 @@ import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class LaunchListWidget : GlanceAppWidget() {
 
+    private val log = logger()
+
     // CRITICAL: Must set state definition to use preferences state for force updates
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        println("=== LaunchListWidget: provideGlance START for id: $id ===")
+        log.d { "provideGlance START for id: $id" }
 
         // Pre-fetch launches outside composable (need to check access first from state)
         // We'll fetch optimistically - if no access, we just won't show them
@@ -80,10 +83,10 @@ class LaunchListWidget : GlanceAppWidget() {
             val hasWidgetAccess = hasAccessStr.toBoolean()
 
             val themeSource = WidgetThemeSource.fromString(themeSourceName)
-            println("LaunchListWidget: Glance state - timestamp=$forceUpdateTimestamp, source=$themeSource, appTheme=$appThemeMode, alpha=$backgroundAlpha, radius=$cornerRadius, access=$hasWidgetAccess")
-            println("LaunchListWidget: RAW hasAccessStr from state: '$hasAccessStr'")
-            println("LaunchListWidget: Parsed hasWidgetAccess boolean: $hasWidgetAccess")
-            println("LaunchListWidget: Will show ${if (hasWidgetAccess) "UNLOCKED" else "LOCKED"} content")
+            log.d { "Glance state - timestamp=$forceUpdateTimestamp, source=$themeSource, appTheme=$appThemeMode, alpha=$backgroundAlpha, radius=$cornerRadius, access=$hasWidgetAccess" }
+            log.v { "RAW hasAccessStr from state: '$hasAccessStr'" }
+            log.v { "Parsed hasWidgetAccess boolean: $hasWidgetAccess" }
+            log.i { "Will show ${if (hasWidgetAccess) "UNLOCKED" else "LOCKED"} content" }
 
             // Get appropriate color providers based on theme source with alpha applied
             val useDynamicColors = themeSource == WidgetThemeSource.DYNAMIC_COLORS
@@ -118,8 +121,7 @@ class LaunchListWidget : GlanceAppWidget() {
                 val result = launchRepository.getUpcomingLaunchesNormal(limit = 10)
                 result.getOrNull()?.data?.results ?: emptyList()
             } catch (e: Exception) {
-                println("Widget: Failed to fetch launches: ${e.message}")
-                e.printStackTrace()
+                log.e(e) { "Failed to fetch launches" }
                 emptyList()
             }
         }

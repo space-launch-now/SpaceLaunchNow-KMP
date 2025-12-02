@@ -26,11 +26,6 @@ fun OfflineBanner(
     modifier: Modifier = Modifier
 ) {
     if (dataSource == DataSource.STALE_CACHE) {
-        // Log cache timestamp for debugging
-        cacheTimestamp?.let {
-            println("📱 OfflineBanner: Showing stale data from ${formatTimeAgo(it)}")
-        }
-        
         Surface(
             modifier = modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.85f),
@@ -92,11 +87,6 @@ fun CacheIndicator(
     modifier: Modifier = Modifier
 ) {
     if (dataSource == DataSource.STALE_CACHE) {
-        // Log cache timestamp for debugging
-        cacheTimestamp?.let {
-            println("📦 CacheIndicator: Showing ${dataSource.name} data from ${formatTimeAgo(it)}")
-        }
-        
         Surface(
             modifier = modifier,
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),

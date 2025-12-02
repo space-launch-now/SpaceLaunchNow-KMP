@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.util
 
+import me.calebjones.spacelaunchnow.util.logging.logger
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
@@ -8,6 +9,7 @@ import platform.UIKit.UIApplicationOpenSettingsURLString
  * iOS implementation for opening system notification settings
  */
 actual object NotificationSettingsHelper {
+    private val log = logger()
     
     /**
      * Opens iOS app settings where users can manage notifications
@@ -21,11 +23,11 @@ actual object NotificationSettingsHelper {
                 if (application.canOpenURL(url)) {
                     application.openURL(url, options = emptyMap<Any?, Any>(), completionHandler = null)
                 } else {
-                    println("Cannot open iOS settings URL")
+                    log.w { "Cannot open iOS settings URL" }
                 }
             }
         } catch (e: Exception) {
-            println("Failed to open iOS notification settings: ${e.message}")
+            log.e(e) { "Failed to open iOS notification settings: ${e.message}" }
         }
     }
 }

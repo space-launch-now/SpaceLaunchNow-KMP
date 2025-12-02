@@ -1,8 +1,8 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
+import kotlin.time.Clock
 import kotlinx.io.IOException
-import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.api.extensions.getEventList
@@ -11,27 +11,28 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetail
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 class EventsRepositoryImpl(
     private val eventsApi: EventsApi,
     private val localDataSource: EventLocalDataSource? = null
 ) : EventsRepository {
     
+    private val log = logger()
+
     override suspend fun getUpcomingEvents(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedEventEndpointNormalList>> {
         return try {
-            println("=== EventsRepository.getUpcomingEvents ===")
-            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
-            println("Cache available: ${localDataSource != null}")
-            
-            val now = System.now().toEpochMilliseconds()
+            log.d { "getUpcomingEvents called - limit: $limit, forceRefresh: $forceRefresh, cacheAvailable: ${localDataSource != null}" }
+
+            val now = Clock.System.now().toEpochMilliseconds()
             val staleTimestamp = localDataSource?.getCacheTimestamp("events")
             
             // Try cache first if available and not forcing refresh
             if (!forceRefresh) {
                 val cachedEvents = localDataSource?.getUpcomingEvents(limit)
-                println("Cache query result: ${cachedEvents?.size ?: 0} events found")
+                log.v { "Cache query result: ${cachedEvents?.size ?: 0} events found" }
                 if (cachedEvents != null && cachedEvents.isNotEmpty()) {
-                    println("✓ CACHE HIT: Returning ${cachedEvents.size} cached upcoming events")
+                    log.i { "Cache hit - Returning ${cachedEvents.size} cached upcoming events" }
                     return Result.success(DataResult(
                         data = PaginatedEventEndpointNormalList(
                             count = cachedEvents.size,
@@ -43,40 +44,38 @@ class EventsRepositoryImpl(
                         timestamp = staleTimestamp ?: now
                     ))
                 } else {
-                    println("✗ CACHE MISS: No cached data available, fetching from API")
+                    log.d { "Cache miss - No cached data available, fetching from API" }
                 }
             } else {
-                println("⟳ FORCE REFRESH: Bypassing cache, fetching fresh data from API")
+                log.d { "Force refresh - Bypassing cache, fetching fresh data from API" }
             }
             
-            println("=== EventsRepository: Getting upcoming events from API (forceRefresh: $forceRefresh) ===")
-            println("Limit: $limit")
-            
+            log.d { "Fetching upcoming events from API - limit: $limit" }
+
             val response = eventsApi.getUpcomingEvents(
                 limit = limit,
                 ordering = "date"
             )
             
-            println("Response status: ${response.status}")
             val events = response.body()
-            println("Events count: ${events.results.size}")
-            
+            log.i { "Successfully fetched ${events.results.size} upcoming events from API (status: ${response.status})" }
+
             // Cache the results for future use
             localDataSource?.cacheEvents(events.results)
-            println("✓ API SUCCESS: Fetched and cached ${events.results.size} upcoming events")
-            
+            log.d { "Cached ${events.results.size} upcoming events for future use" }
+
             Result.success(DataResult(
                 data = events,
                 source = DataSource.NETWORK,
                 timestamp = now
             ))
         } catch (e: ResponseException) {
-            println("API Error: Status ${e.response.status}, Message: ${e.message}")
+            log.e(e) { "API error while fetching upcoming events (status: ${e.response.status})" }
             // On error, try to return stale cache if available
             val staleCached = localDataSource?.getUpcomingEvents(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("events")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("EventsRepository: Returning ${staleCached.size} stale cached events due to API error")
+                log.w { "Returning ${staleCached.size} stale cached events due to API error" }
                 return Result.success(DataResult(
                     data = PaginatedEventEndpointNormalList(
                         count = staleCached.size,
@@ -90,11 +89,12 @@ class EventsRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "Network error while fetching upcoming events" }
             // On network error, try to return stale cache if available
             val staleCached = localDataSource?.getUpcomingEvents(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("events")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("EventsRepository: Returning ${staleCached.size} stale cached events due to network error")
+                log.w { "Returning ${staleCached.size} stale cached events due to network error" }
                 return Result.success(DataResult(
                     data = PaginatedEventEndpointNormalList(
                         count = staleCached.size,
@@ -108,32 +108,30 @@ class EventsRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Failed to get upcoming events: ${e.message}")
+            log.e(e) { "Unexpected error while fetching upcoming events" }
             Result.failure(e)
         }
     }
     
     override suspend fun getEventsByType(typeIds: List<Int>, limit: Int): Result<PaginatedEventEndpointNormalList> {
         return try {
-            println("=== EventsRepository: Getting events by type ===")
-            println("Type IDs: $typeIds")
-            println("Limit: $limit")
-            
+            log.d { "getEventsByType called - typeIds: $typeIds, limit: $limit" }
+
             val response = eventsApi.getEventList(
                 limit = limit,
                 typeIds = typeIds,
                 ordering = "date"
             )
             
-            println("Response status: ${response.status}")
-            println("Events count: ${response.body()?.results?.size ?: 0}")
-            
-            Result.success(response.body())
+            val body = response.body()
+            log.i { "Successfully fetched ${body.results.size} events by type (status: ${response.status})" }
+
+            Result.success(body)
         } catch (e: ResponseException) {
-            println("API Error: Status ${e.response.status}, Message: ${e.message}")
+            log.e(e) { "API error while fetching events by type (status: ${e.response.status})" }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Failed to get events by type: ${e.message}")
+            log.e(e) { "Unexpected error while fetching events by type" }
             Result.failure(e)
         }
     }
@@ -144,9 +142,8 @@ class EventsRepositoryImpl(
         typeIds: List<Int>?
     ): Result<PaginatedEventEndpointNormalList> {
         return try {
-            println("=== EventsRepository: Getting events ===")
-            println("Limit: $limit, Upcoming: $upcoming, Type IDs: $typeIds")
-            
+            log.d { "getEvents called - limit: $limit, upcoming: $upcoming, typeIds: $typeIds" }
+
             val response = eventsApi.getEventList(
                 limit = limit,
                 upcoming = upcoming,
@@ -154,30 +151,30 @@ class EventsRepositoryImpl(
                 ordering = "date"
             )
             
-            println("Response status: ${response.status}")
-            println("Events count: ${response.body()?.results?.size ?: 0}")
-            
-            Result.success(response.body())
+            val body = response.body()
+            log.i { "Successfully fetched ${body.results.size} events (status: ${response.status})" }
+
+            Result.success(body)
         } catch (e: ResponseException) {
-            println("API Error: Status ${e.response.status}, Message: ${e.message}")
+            log.e(e) { "API error while fetching events (status: ${e.response.status})" }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Failed to get events: ${e.message}")
+            log.e(e) { "Unexpected error while fetching events" }
             Result.failure(e)
         }
     }
 
     override suspend fun getEventDetails(eventId: Int): Result<EventEndpointDetailed> {
         return try {
-            println("=== EventsRepository: Getting event details for $eventId ===")
+            log.d { "Getting event details for $eventId" }
             val response = eventsApi.eventsRetrieve(eventId)
-            println("Response status: ${response.status}")
+            log.i { "Successfully fetched event details (status: ${response.status})" }
             Result.success(response.body())
         } catch (e: ResponseException) {
-            println("API Error: Status ${e.response.status}, Message: ${e.message}")
+            log.e(e) { "API Error: Status ${e.response.status}" }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Failed to get event details: ${e.message}")
+            log.e(e) { "Failed to get event details" }
             Result.failure(e)
         }
     }

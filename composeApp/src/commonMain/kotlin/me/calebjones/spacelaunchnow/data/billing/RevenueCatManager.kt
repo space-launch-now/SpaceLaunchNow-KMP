@@ -12,12 +12,15 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.analytics.DatadogRUM
 import me.calebjones.spacelaunchnow.data.config.RevenueCatConfig
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.coroutines.resume
 
 /**
  * Manager class for RevenueCat operations
  */
 class RevenueCatManager {
+
+    private val log = logger()
 
     private val _isInitialized = MutableStateFlow(false)
     val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
@@ -35,11 +38,11 @@ class RevenueCatManager {
         try {
             // Skip initialization for unsupported platforms
             if (RevenueCatConfig.apiKey == "desktop_not_supported") {
-                println("RevenueCat: Skipping initialization - platform not supported (${RevenueCatConfig.platform})")
+                log.i { "Skipping initialization - platform not supported (${RevenueCatConfig.platform})" }
                 return
             }
 
-            println("RevenueCat: Initializing for ${RevenueCatConfig.platform} with debug=${RevenueCatConfig.isDebug}")
+            log.i { "Initializing for ${RevenueCatConfig.platform} with debug=${RevenueCatConfig.isDebug}" }
 
             // Set log level based on debug mode
             Purchases.logLevel = if (RevenueCatConfig.isDebug) LogLevel.DEBUG else LogLevel.WARN
@@ -49,11 +52,11 @@ class RevenueCatManager {
                 this.appUserId = appUserId
             }
 
-            println("RevenueCat: Configuration complete")
+            log.d { "Configuration complete" }
 
             // Mark as initialized BEFORE making API calls
             _isInitialized.value = true
-            println("RevenueCat: SDK initialized, syncing purchases with store...")
+            log.i { "SDK initialized, syncing purchases with store..." }
 
             // Sync purchases from the store at app start
             // This ensures we have the latest purchase state without showing restore UI
@@ -63,19 +66,18 @@ class RevenueCatManager {
             // Wait for this to complete to ensure entitlements are available immediately
             val customerInfoSuccess = refreshCustomerInfo()
             if (customerInfoSuccess) {
-                println("RevenueCat: ✅ Customer info loaded successfully")
+                log.i { "✅ Customer info loaded successfully" }
             } else {
-                println("RevenueCat: ⚠️  Customer info failed to load, but continuing...")
+                log.w { "⚠️  Customer info failed to load, but continuing..." }
             }
 
             // Load offerings (can run in parallel, don't wait)
             refreshOfferings()
 
-            println("RevenueCat: Initialization successful")
+            log.i { "Initialization successful" }
 
         } catch (e: Exception) {
-            println("RevenueCat: Failed to initialize - ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "Failed to initialize - ${e.message}" }
         }
     }
 
@@ -86,16 +88,16 @@ class RevenueCatManager {
     suspend fun refreshCustomerInfo(): Boolean = suspendCancellableCoroutine { continuation ->
         try {
             if (!_isInitialized.value) {
-                println("RevenueCat: ❌ Cannot refresh customer info - SDK not initialized")
+                log.e { "❌ Cannot refresh customer info - SDK not initialized" }
                 continuation.resume(false)
                 return@suspendCancellableCoroutine
             }
 
-            println("RevenueCat: 🔄 Refreshing customer info...")
+            log.d { "🔄 Refreshing customer info..." }
 
             Purchases.sharedInstance.getCustomerInfo(
                 onError = { error ->
-                    println("RevenueCat: Failed to get customer info - ${error.message}")
+                    log.e { "Failed to get customer info - ${error.message}" }
                     DatadogLogger.error(
                         "Failed to get RevenueCat customer info", null, mapOf(
                             "error_message" to (error.message ?: "unknown"),
@@ -107,8 +109,7 @@ class RevenueCatManager {
                 },
                 onSuccess = { customerInfo ->
                     _customerInfo.value = customerInfo
-                    println("RevenueCat: ✅ Customer info refreshed successfully")
-                    println("  - Active entitlements: ${customerInfo.entitlements.active.keys}")
+                    log.i { "✅ Customer info refreshed successfully - Active entitlements: ${customerInfo.entitlements.active.keys}" }
 
                     // Set user info in Datadog for tracking
                     val userId = customerInfo.originalAppUserId
@@ -140,7 +141,7 @@ class RevenueCatManager {
             )
 
         } catch (e: Exception) {
-            println("RevenueCat: Failed to refresh customer info - ${e.message}")
+            log.e(e) { "Failed to refresh customer info - ${e.message}" }
             DatadogLogger.error("Exception refreshing customer info", e)
             continuation.resume(false)
         }
@@ -152,35 +153,25 @@ class RevenueCatManager {
     suspend fun refreshOfferings() {
         try {
             if (!_isInitialized.value) {
-                println("RevenueCat: ❌ Cannot refresh offerings - SDK not initialized")
+                log.e { "❌ Cannot refresh offerings - SDK not initialized" }
                 return
             }
 
-            println("RevenueCat: 🔄 Requesting offerings from API...")
+            log.d { "🔄 Requesting offerings from API..." }
             Purchases.sharedInstance.getOfferings(
                 onError = { error ->
-                    println("RevenueCat: ❌ Failed to get offerings")
-                    println("  - Error code: ${error.code}")
-                    println("  - Error message: ${error.message}")
-                    println("  - Underlying error: ${error.underlyingErrorMessage}")
-                    println("  - 💡 Tip: Check RevenueCat dashboard for offering configuration")
+                    log.e { "❌ Failed to get offerings - Code: ${error.code}, Message: ${error.message}, Underlying: ${error.underlyingErrorMessage}\n  💡 Tip: Check RevenueCat dashboard for offering configuration" }
                 },
                 onSuccess = { offerings ->
-                    println("RevenueCat: ✅ Offerings API response received")
-                    println("  - Total offerings available: ${offerings.all.size}")
-                    println("  - All offering IDs: ${offerings.all.keys.joinToString()}")
-                    println("  - Current offering ID: ${offerings.current?.identifier ?: "❌ NONE"}")
+                    log.i { "✅ Offerings API response received - Total: ${offerings.all.size}, IDs: ${offerings.all.keys.joinToString()}, Current: ${offerings.current?.identifier ?: "❌ NONE"}" }
 
                     if (offerings.current == null) {
-                        println("  - ⚠️ WARNING: No 'current' offering is set!")
-                        println("  - 💡 Fix: Go to RevenueCat dashboard → Offerings → Set one as 'Current'")
+                        log.w { "⚠️ WARNING: No 'current' offering is set! Fix: Go to RevenueCat dashboard → Offerings → Set one as 'Current'" }
                     } else {
                         val pkgCount = offerings.current?.availablePackages?.size ?: 0
-                        println("  - Available packages: $pkgCount")
+                        log.d { "Available packages: $pkgCount" }
                         offerings.current?.availablePackages?.forEach { pkg ->
-                            println("    • Package: ${pkg.identifier}")
-                            println("      Product: ${pkg.storeProduct.id}")
-                            println("      Price: ${pkg.storeProduct.price.formatted}")
+                            log.d { "  • Package: ${pkg.identifier}, Product: ${pkg.storeProduct.id}, Price: ${pkg.storeProduct.price.formatted}" }
                         }
                     }
 
@@ -189,9 +180,7 @@ class RevenueCatManager {
             )
 
         } catch (e: Exception) {
-            println("RevenueCat: ❌ Exception in refreshOfferings")
-            println("  - ${e.message}")
-            println("  - ${e.stackTraceToString()}")
+            log.e(e) { "❌ Exception in refreshOfferings - ${e.message}" }
         }
     }
 
@@ -218,7 +207,7 @@ class RevenueCatManager {
 
         if (customerInfo == null) {
             // Only log warning on null customer info - this is important
-            println("RevenueCat: ⚠️ Cannot get active products - no customer info available")
+            log.w { "⚠️ Cannot get active products - no customer info available" }
             DatadogLogger.warn("getActiveProductIdentifiers called with null customer info")
             return emptySet()
         }
@@ -273,17 +262,17 @@ class RevenueCatManager {
     suspend fun syncPurchases() = suspendCancellableCoroutine { continuation ->
         try {
             if (!_isInitialized.value) {
-                println("RevenueCat: Cannot sync - not initialized")
+                log.w { "Cannot sync - not initialized" }
                 continuation.resume(Unit)
                 return@suspendCancellableCoroutine
             }
 
-            println("RevenueCat: Syncing purchases from store...")
+            log.i { "Syncing purchases from store..." }
             DatadogLogger.info("Syncing purchases at app start")
 
             Purchases.sharedInstance.syncPurchases(
                 onError = { error ->
-                    println("RevenueCat: ⚠️ Sync purchases failed - ${error.message}")
+                    log.w { "⚠️ Sync purchases failed - ${error.message}" }
                     DatadogLogger.warn(
                         "Sync purchases failed", mapOf(
                             "error_message" to error.message,
@@ -294,14 +283,7 @@ class RevenueCatManager {
                     continuation.resume(Unit)
                 },
                 onSuccess = { customerInfo ->
-                    println("RevenueCat: ✅ Purchases synced successfully")
-                    println(
-                        "  Active entitlements: ${
-                            customerInfo.entitlements.active.keys.joinToString(
-                                ", "
-                            )
-                        }"
-                    )
+                    log.i { "✅ Purchases synced successfully - Active entitlements: ${customerInfo.entitlements.active.keys.joinToString(", ")}" }
 
                     // Update cached customer info
                     _customerInfo.value = customerInfo
@@ -320,7 +302,7 @@ class RevenueCatManager {
                 }
             )
         } catch (e: Exception) {
-            println("RevenueCat: Exception during sync - ${e.message}")
+            log.e(e) { "Exception during sync - ${e.message}" }
             DatadogLogger.error("Exception during syncPurchases", e)
             // Don't fail - continue initialization
             continuation.resume(Unit)
@@ -334,13 +316,13 @@ class RevenueCatManager {
     suspend fun restorePurchases(): CustomerInfo? = suspendCancellableCoroutine { continuation ->
         try {
             if (!_isInitialized.value) {
-                println("RevenueCat: Cannot restore - not initialized")
+                log.w { "Cannot restore - not initialized" }
                 DatadogLogger.warn("Restore purchases called but SDK not initialized")
                 continuation.resume(null)
                 return@suspendCancellableCoroutine
             }
 
-            println("RevenueCat: Starting restore purchases...")
+            log.i { "Starting restore purchases..." }
             DatadogLogger.info(
                 "Restore purchases started", mapOf(
                     "user_id" to (_customerInfo.value?.originalAppUserId ?: "unknown"),
@@ -352,9 +334,7 @@ class RevenueCatManager {
 
             Purchases.sharedInstance.restorePurchases(
                 onError = { error ->
-                    println("RevenueCat: ❌ Restore purchases failed - ${error.message}")
-                    println("  Error code: ${error.code}")
-                    println("  Underlying error: ${error.underlyingErrorMessage}")
+                    log.e { "❌ Restore purchases failed - ${error.message}, Code: ${error.code}, Underlying: ${error.underlyingErrorMessage}" }
 
                     DatadogLogger.error(
                         "Restore purchases failed", null, mapOf(
@@ -373,74 +353,30 @@ class RevenueCatManager {
                     _customerInfo.value = customerInfo
 
                     // === CRITICAL LOGGING FOR LEGACY SKU DEBUGGING ===
-                    println("RevenueCat: ✅ Purchases restored successfully")
-                    println("  App User ID: ${customerInfo.originalAppUserId}")
-                    println("  Request Date: ${customerInfo.requestDateMillis}")
-                    println("  Original Purchase Date: ${customerInfo.originalPurchaseDateMillis?.toString() ?: "none"}")
-                    println("  First Seen: ${customerInfo.firstSeenMillis}")
-                    println("")
-                    println("  === ENTITLEMENTS (${customerInfo.entitlements.all.size} total, ${customerInfo.entitlements.active.size} active) ===")
+                    log.i { "✅ Purchases restored successfully - User: ${customerInfo.originalAppUserId}, Request Date: ${customerInfo.requestDateMillis}, Original Purchase: ${customerInfo.originalPurchaseDateMillis?.toString() ?: "none"}, First Seen: ${customerInfo.firstSeenMillis}" }
                     if (customerInfo.entitlements.active.isEmpty()) {
-                        println("  ⚠️ WARNING: NO ACTIVE ENTITLEMENTS FOUND!")
-                        println("  This means RevenueCat has not granted any entitlements.")
-                        println("  Possible reasons:")
-                        println("    1. Legacy product IDs not mapped to entitlements in RevenueCat dashboard")
-                        println("    2. No purchases found in store account")
-                        println("    3. Store account doesn't match the one used to purchase")
+                        log.w { "⚠️ WARNING: NO ACTIVE ENTITLEMENTS FOUND (${customerInfo.entitlements.all.size} total)! Possible reasons: 1) Legacy product IDs not mapped to entitlements in RevenueCat dashboard, 2) No purchases found in store account, 3) Store account doesn't match the one used to purchase" }
                     } else {
                         customerInfo.entitlements.active.forEach { (key, value) ->
-                            println("    ✅ $key:")
-                            println("       Product ID: ${value.productIdentifier ?: "unknown"}")
-                            println("       Is Active: ${value.isActive}")
-                            println("       Will Renew: ${value.willRenew}")
-                            println("       Period Type: ${value.periodType.name}")
-                            println("       Expires: ${value.expirationDateMillis?.toString() ?: "never"}")
-                            println("       Purchase Date: ${value.originalPurchaseDateMillis?.toString() ?: "unknown"}")
-                            println("       Store: ${value.store.name}")
+                            log.d { "  ✅ $key: Product=${value.productIdentifier ?: "unknown"}, Active=${value.isActive}, WillRenew=${value.willRenew}, Type=${value.periodType.name}, Expires=${value.expirationDateMillis?.toString() ?: "never"}, Purchased=${value.originalPurchaseDateMillis?.toString() ?: "unknown"}, Store=${value.store.name}" }
                         }
                     }
-                    println("")
-                    println("  === ALL ENTITLEMENTS (including inactive) ===")
-                    customerInfo.entitlements.all.forEach { (key, value) ->
-                        println("    ${if (value.isActive) "✅" else "❌"} $key:")
-                        println("       Product ID: ${value.productIdentifier}")
-                        println("       Is Active: ${value.isActive}")
-                    }
-                    println("")
-                    println("  === ACTIVE SUBSCRIPTIONS (${customerInfo.activeSubscriptions.size}) ===")
+                    log.d { "All entitlements (including inactive): ${customerInfo.entitlements.all.entries.joinToString { (key, value) -> "${if (value.isActive) "✅" else "❌"} $key (${value.productIdentifier}, Active=${value.isActive})" }}" }
                     if (customerInfo.activeSubscriptions.isEmpty()) {
-                        println("  ℹ️ No active subscriptions")
+                        log.d { "Active subscriptions: None" }
                     } else {
-                        customerInfo.activeSubscriptions.forEach { productId ->
-                            println("    • $productId")
-                        }
+                        log.d { "Active subscriptions (${customerInfo.activeSubscriptions.size}): ${customerInfo.activeSubscriptions.joinToString()}" }
                     }
-                    println("")
-                    println("  === NON-SUBSCRIPTION TRANSACTIONS (${customerInfo.nonSubscriptionTransactions.size}) ===")
                     if (customerInfo.nonSubscriptionTransactions.isEmpty()) {
-                        println("  ⚠️ WARNING: NO NON-SUBSCRIPTION TRANSACTIONS FOUND!")
-                        println("  This means no lifetime/one-time purchases were detected.")
-                        println("  For users with legacy lifetime purchases (2018_founder, etc.), this should NOT be empty.")
+                        log.w { "⚠️ WARNING: NO NON-SUBSCRIPTION TRANSACTIONS FOUND! No lifetime/one-time purchases detected. For users with legacy lifetime purchases (2018_founder, etc.), this should NOT be empty." }
                     } else {
-                        customerInfo.nonSubscriptionTransactions.forEach { transaction ->
-                            println("    • Product: ${transaction.productIdentifier}")
-                            println("      Purchase Date: ${transaction.purchaseDateMillis}")
-                            println("      Transaction ID: ${transaction.transactionIdentifier}")
-                        }
+                        log.d { "Non-subscription transactions (${customerInfo.nonSubscriptionTransactions.size}): ${customerInfo.nonSubscriptionTransactions.joinToString { "${it.productIdentifier} (${it.purchaseDateMillis}, ID: ${it.transactionIdentifier})" }}" }
                     }
-                    println("")
-                    println("  === ALL PURCHASES (including inactive) ===")
                     val allPurchases = customerInfo.allPurchaseDateMillis
                     if (allPurchases.isEmpty()) {
-                        println("  ⚠️ CRITICAL: NO PURCHASES FOUND AT ALL!")
-                        println("  This indicates:")
-                        println("    1. User is signed into a different store account than the one used to purchase")
-                        println("    2. Or purchases haven't been imported to RevenueCat")
-                        println("  ACTION REQUIRED: Check RevenueCat dashboard for this user's purchase history")
+                        log.e { "⚠️ CRITICAL: NO PURCHASES FOUND AT ALL! This indicates: 1) User is signed into a different store account than the one used to purchase, 2) Or purchases haven't been imported to RevenueCat. ACTION REQUIRED: Check RevenueCat dashboard for this user's purchase history" }
                     } else {
-                        allPurchases.forEach { (productId, purchaseDate) ->
-                            println("    • $productId: $purchaseDate")
-                        }
+                        log.d { "All purchases (${allPurchases.size}): ${allPurchases.entries.joinToString { "${it.key}: ${it.value}" }}" }
                     }
 
                     // Collect all unique product identifiers
@@ -455,16 +391,7 @@ class RevenueCatManager {
                         allProducts.add(productId)
                     }
 
-                    println("")
-                    println("  === SUMMARY ===")
-                    println("  Total unique products: ${allProducts.size}")
-                    if (allProducts.isNotEmpty()) {
-                        println("  Products: ${allProducts.joinToString(", ")}")
-                    }
-                    println("  Has entitlements: ${customerInfo.entitlements.active.isNotEmpty()}")
-                    println("  Has active subs: ${customerInfo.activeSubscriptions.isNotEmpty()}")
-                    println("  Has lifetime purchases: ${customerInfo.nonSubscriptionTransactions.isNotEmpty()}")
-                    println("  ==============================")
+                    log.i { "SUMMARY - Total unique products: ${allProducts.size}${if (allProducts.isNotEmpty()) ", Products: ${allProducts.joinToString(", ")}" else ""}, Has entitlements: ${customerInfo.entitlements.active.isNotEmpty()}, Has active subs: ${customerInfo.activeSubscriptions.isNotEmpty()}, Has lifetime purchases: ${customerInfo.nonSubscriptionTransactions.isNotEmpty()}" }
 
                     // Detailed Datadog logging for debugging user issues
                     val entitlementDetails =
@@ -561,8 +488,7 @@ class RevenueCatManager {
             )
 
         } catch (e: Exception) {
-            println("RevenueCat: ❌ Failed to restore purchases - ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "❌ Failed to restore purchases - ${e.message}" }
 
             DatadogLogger.error(
                 "Exception during restore purchases", e, mapOf(

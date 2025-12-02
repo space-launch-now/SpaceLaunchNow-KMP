@@ -1,11 +1,11 @@
 package me.calebjones.spacelaunchnow.ui.viewmodel
 
 import me.calebjones.spacelaunchnow.data.model.NotificationData
+import me.calebjones.spacelaunchnow.logger
+
+private val log = logger()
 
 actual fun showTestNotification(notificationData: NotificationData) {
     // Desktop implementation could use system tray notifications
-    println("🖥️ Desktop Test Notification: ${notificationData.launchName}")
-    println("   Location: ${notificationData.launchLocation}")
-    println("   Time: ${notificationData.launchNet}")
-    println("   Type: ${notificationData.notificationType}")
+    log.d { "🖥️ Desktop Test Notification - Name: ${notificationData.launchName}, Location: ${notificationData.launchLocation}, Time: ${notificationData.launchNet}, Type: ${notificationData.notificationType}" }
 }

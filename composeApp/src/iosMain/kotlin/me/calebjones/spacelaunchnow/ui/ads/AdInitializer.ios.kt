@@ -3,31 +3,32 @@ package me.calebjones.spacelaunchnow.ui.ads
 import app.lexilabs.basic.ads.BasicAds
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.RequestConfiguration
+import me.calebjones.spacelaunchnow.logger
 
 /**
  * iOS implementation of AdInitializer using BasicAds library
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 actual object AdInitializer {
+    private val log = logger()
     actual val isSupported: Boolean = true
     
     private var isInitialized = false
     
     actual fun initialize(context: Any?): Boolean {
         if (isInitialized) {
-            println("⚠️ AdInitializer (iOS): Already initialized")
+            log.w { "⚠️ AdInitializer (iOS): Already initialized" }
             return true
         }
         
         return try {
-            println("🎯 AdInitializer (iOS): Initializing BasicAds (no context required)")
+            log.d { "🎯 AdInitializer (iOS): Initializing BasicAds (no context required)" }
             BasicAds.initialize(null) // iOS doesn't require context
             isInitialized = true
-            println("✅ AdInitializer (iOS): BasicAds initialized successfully")
+            log.i { "✅ AdInitializer (iOS): BasicAds initialized successfully" }
             true
         } catch (e: Exception) {
-            println("❌ AdInitializer (iOS): Failed to initialize BasicAds: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "❌ AdInitializer (iOS): Failed to initialize BasicAds: ${e.message}" }
             false
         }
     }
@@ -41,10 +42,9 @@ actual object AdInitializer {
                 tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE,
                 testDeviceIds = testDeviceIds
             )
-            println("✅ AdInitializer (iOS): Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})")
+            log.i { "✅ AdInitializer (iOS): Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})" }
         } catch (e: Exception) {
-            println("❌ AdInitializer (iOS): Failed to configure: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "❌ AdInitializer (iOS): Failed to configure: ${e.message}" }
         }
     }
 }

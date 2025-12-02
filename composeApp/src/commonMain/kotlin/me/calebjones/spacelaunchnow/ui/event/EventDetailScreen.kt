@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -13,6 +14,7 @@ fun EventDetailScreen(
     eventId: Int,
     onNavigateBack: () -> Unit
 ) {
+    val log = SpaceLogger.getLogger("EventDetailScreen")
     val viewModel = koinViewModel<EventViewModel>()
     val eventDetails by viewModel.eventDetails.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -25,14 +27,7 @@ fun EventDetailScreen(
     }
 
     // 🎯 INTERSTITIAL AD: Show every 4th detail view visit
-    InterstitialAdHandler(
-        onAdShown = {
-            println("✅ EventDetail: Interstitial ad shown successfully")
-        },
-        onAdFailed = { error ->
-            println("❌ LaunchDetail: Interstitial ad failed: $error")
-        }
-    )
+    InterstitialAdHandler()
 
     when {
         error != null -> {

@@ -8,6 +8,7 @@ import kotlinx.io.files.Path
 import kotlinx.serialization.Serializable
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
 
 /**
@@ -59,6 +60,7 @@ data class LocalSubscriptionData(
  * This provides immediate, synchronous access to subscription status
  */
 class LocalSubscriptionStorage {
+    private val log = logger()
 
     private val store: KStore<LocalSubscriptionData> = storeOf(
         file = Path("${AppDirectories.getAppDataDir()}/subscription_data.json"),
@@ -84,10 +86,7 @@ class LocalSubscriptionStorage {
      */
     suspend fun update(data: LocalSubscriptionData): Boolean {
         return try {
-            println("LocalSubscriptionStorage: 💾 Saving subscription data...")
-            println("  - Subscription Type: ${data.subscriptionType}")
-            println("  - Is Subscribed: ${data.isSubscribed}")
-            println("  - Entitlements: ${data.entitlements}")
+            log.d { "Saving subscription data - Type: ${data.subscriptionType}, Subscribed: ${data.isSubscribed}, Entitlements: ${data.entitlements}" }
 
             store.set(data)
 
@@ -96,12 +95,9 @@ class LocalSubscriptionStorage {
             val success = readBack == data
 
             if (success) {
-                println("LocalSubscriptionStorage: ✅ Subscription data saved and verified successfully")
+                log.i { "Subscription data saved and verified successfully" }
             } else {
-                println("LocalSubscriptionStorage: ❌ Verification failed - read-back mismatch!")
-                println("  Expected: $data")
-                println("  Read back: $readBack")
-                
+  
                 // Detailed field comparison for debugging
                 val diagnostics = mutableMapOf<String, Any>(
                     "expected_type" to data.subscriptionType.name,
@@ -127,28 +123,30 @@ class LocalSubscriptionStorage {
                     diagnostics["expected_product_ids"] = data.productIds.joinToString(",")
                     diagnostics["read_back_product_ids"] = (readBack?.productIds?.joinToString(",") ?: "")
                 }
-                
-                me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
-                    "Subscription state verification failed - read-back mismatch",
-                    null,
-                    diagnostics
-                )
+
+                log.e { 
+                    buildString {
+                        appendLine("❌ Verification failed - read-back mismatch!")
+                        appendLine("Expected: $data")
+                        appendLine("Read back: $readBack")
+                        appendLine("Diagnostics:")
+                        diagnostics.forEach { (key, value) ->
+                            appendLine("  $key: $value")
+                        }
+                    }
+                }
             }
 
             success
         } catch (e: Exception) {
-            println("LocalSubscriptionStorage: ❌ Error saving subscription data: ${e.message}")
-            e.printStackTrace()
-            me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
-                "Failed to save subscription state to KStore",
-                e,
-                mapOf(
-                    "subscription_type" to data.subscriptionType.name,
-                    "is_subscribed" to data.isSubscribed,
-                    "error_type" to (e::class.simpleName ?: "Unknown"),
-                    "error_message" to (e.message ?: "No message")
-                )
-            )
+            log.e(e) { 
+                buildString {
+                    appendLine("❌ Error saving subscription data")
+                    appendLine("Subscription type: ${data.subscriptionType.name}")
+                    appendLine("Is subscribed: ${data.isSubscribed}")
+                    appendLine("Error: ${e.message}")
+                }
+            }
             false
         }
     }

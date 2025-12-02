@@ -3,29 +3,31 @@ package me.calebjones.spacelaunchnow.ui.ads
 import app.lexilabs.basic.ads.BasicAds
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.RequestConfiguration
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Android implementation of AdInitializer using BasicAds library
  */
 actual object AdInitializer {
+    private val log = logger()
     actual val isSupported: Boolean = true
 
     private var isInitialized = false
 
     actual fun initialize(context: Any?): Boolean {
         if (isInitialized) {
-            println("⚠️ AdInitializer (Android): Already initialized")
+            log.w("Already initialized")
             return true
         }
 
         return try {
-            println("🎯 AdInitializer (Android): Initializing BasicAds with context: $context")
+            log.d("Initializing BasicAds with context: $context")
             BasicAds.initialize(context)
             isInitialized = true
-            println("✅ AdInitializer (Android): BasicAds initialized successfully")
+            log.d("BasicAds initialized successfully")
             true
         } catch (e: Exception) {
-            println("❌ AdInitializer (Android): Failed to initialize BasicAds: ${e.message}")
+            log.e("Failed to initialize BasicAds: ${e.message}")
             e.printStackTrace()
             false
         }
@@ -41,9 +43,9 @@ actual object AdInitializer {
                 tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED,
                 testDeviceIds = testDeviceIds
             )
-            println("✅ AdInitializer (Android): Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})")
+            log.d("Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})")
         } catch (e: Exception) {
-            println("❌ AdInitializer (Android): Failed to configure: ${e.message}")
+            log.e("❌ Failed to configure: ${e.message}")
             e.printStackTrace()
         }
     }

@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.data.model.NotificationState
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
+    private val log = logger()
 
     companion object {
         private val ENABLE_NOTIFICATIONS = booleanPreferencesKey("enable_notifications")
@@ -39,7 +41,7 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
             try {
                 Json.decodeFromString<Map<String, Boolean>>(topicSettingsJson)
             } catch (e: Exception) {
-                println("Failed to parse topic settings, using defaults: ${e.message}")
+                log.w(e) { "Failed to parse topic settings, using defaults: ${e.message}" }
                 default.topicSettings
             }
         } else {

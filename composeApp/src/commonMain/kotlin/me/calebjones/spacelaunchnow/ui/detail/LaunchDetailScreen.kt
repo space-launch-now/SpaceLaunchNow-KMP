@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailView
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailErrorView
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailLoadingView
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
@@ -33,6 +34,7 @@ fun LaunchDetailScreen(
     onNavigateBack: () -> Unit,
     navController: NavHostController? = null
 ) {
+    val log = SpaceLogger.getLogger("LaunchDetailScreen")
     val viewModel = koinViewModel<LaunchViewModel>()
     val launchCache = koinInject<LaunchCache>()
     
@@ -84,14 +86,7 @@ fun LaunchDetailScreen(
     }
 
     // 🎯 INTERSTITIAL AD: Show every 4th detail view visit
-    InterstitialAdHandler(
-        onAdShown = {
-            println("✅ LaunchDetail: Interstitial ad shown successfully")
-        },
-        onAdFailed = { error ->
-            println("❌ LaunchDetail: Interstitial ad failed: $error")
-        }
-    )
+    InterstitialAdHandler()
 
     // Only render the view when we have launch data, show loading/error states otherwise
     val errorMessage = error

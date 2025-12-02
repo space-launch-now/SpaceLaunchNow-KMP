@@ -3,8 +3,11 @@
 package me.calebjones.spacelaunchnow.data.model
 
 import kotlinx.serialization.Serializable
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Clock.System
 import kotlin.time.ExperimentalTime
+
+private val log = SpaceLogger.getLogger("SubscriptionState")
 
 /**
  * Subscription state model
@@ -36,6 +39,7 @@ data class SubscriptionState(
     val isLoading: Boolean = false,
     val isCached: Boolean = false
 ) {
+    
     /**
      * Check if subscription is expired based on expiresAt timestamp
      */
@@ -62,7 +66,7 @@ data class SubscriptionState(
      */
     fun hasFeature(feature: PremiumFeature): Boolean {
         val hasAccess = isSubscribed && !isExpired() && features.contains(feature)
-        println("SubscriptionState.hasFeature(${feature.name}): isSubscribed=$isSubscribed, isExpired=${isExpired()}, features=$features, hasAccess=$hasAccess")
+        log.d { "hasFeature(${feature.name}): isSubscribed=$isSubscribed, isExpired=${isExpired()}, features=$features, hasAccess=$hasAccess" }
         return hasAccess
     }
 
@@ -123,7 +127,7 @@ enum class SubscriptionType(val isLegacy: Boolean = false) {
                 // Everything else is legacy
                 else -> LEGACY
             }
-            println("SubscriptionType.fromProductId: '$productId' -> $result")
+            log.d { "fromProductId: '$productId' -> $result" }
             return result
         }
     }

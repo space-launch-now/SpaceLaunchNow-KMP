@@ -13,6 +13,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 expect suspend fun requestPlatformNotificationPermission(): Boolean
 expect suspend fun hasPlatformNotificationPermission(): Boolean
@@ -22,6 +23,8 @@ class NotificationRepositoryImpl(
     private val storage: NotificationStateStorage,
     private val debugPreferences: DebugPreferences? = null
 ) : NotificationRepository {
+
+    private val log = logger()
 
     // Repository scope for background work
     private val repositoryScope = CoroutineScope(SupervisorJob())
@@ -43,23 +46,22 @@ class NotificationRepositoryImpl(
     )
 
     override suspend fun initialize() {
-        println("=== NotificationRepository: Initializing ===")
+        log.d { "NotificationRepository initializing..." }
 
         try {
             // Load persisted state
             val persistedState = storage.getState()
             _state.value = persistedState
 
-            println("Loaded state: notifications=${persistedState.enableNotifications}")
-            println("Topic settings: ${persistedState.topicSettings}")
+            log.i { "Loaded notification state - notificationsEnabled: ${persistedState.enableNotifications}" }
+            log.v { "Topic settings: ${persistedState.topicSettings}" }
 
             // Start background subscription processing
             subscriptionProcessor.requestUpdate(persistedState)
 
-            println("=== NotificationRepository: Initialized ===")
+            log.i { "NotificationRepository initialized successfully" }
         } catch (e: Exception) {
-            println("❌ Failed to initialize NotificationRepository: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "Failed to initialize NotificationRepository" }
         }
     }
 
@@ -137,33 +139,33 @@ class NotificationRepositoryImpl(
      */
     private suspend fun updateState(update: (NotificationState) -> NotificationState) {
         try {
-            println("=== NotificationRepository: updateState called ===")
+            log.d { "Notification state update requested" }
 
             // 1. Update state immediately (instant UI feedback)
             val oldState = _state.value
             val newState = update(oldState)
             _state.value = newState
 
-            println("State updated - agencies: ${newState.subscribedAgencies.size}, locations: ${newState.subscribedLocations.size}")
-            println("Agencies: ${newState.subscribedAgencies}")
-            println("Locations: ${newState.subscribedLocations}")
+            log.i { "State updated - agencies: ${newState.subscribedAgencies.size}, locations: ${newState.subscribedLocations.size}" }
+            log.v { "Subscribed agencies: ${newState.subscribedAgencies}" }
+            log.v { "Subscribed locations: ${newState.subscribedLocations}" }
 
             // 2. Persist to storage (background)
             repositoryScope.launch {
                 try {
                     storage.saveState(newState)
-                    println("✅ State persisted to storage")
+                    log.d { "Notification state persisted to storage" }
                 } catch (e: Exception) {
-                    println("❌ Failed to persist state: ${e.message}")
+                    log.e(e) { "Failed to persist notification state" }
                 }
             }
 
             // 3. Trigger background FCM subscription updates (debounced)
-            println("Triggering SubscriptionProcessor update...")
+            log.d { "Triggering SubscriptionProcessor update..." }
             subscriptionProcessor.requestUpdate(newState)
 
         } catch (e: Exception) {
-            println("❌ State update failed: ${e.message}")
+            log.e(e) { "Notification state update failed" }
             _state.value = _state.value.withError(e.message)
         }
     }

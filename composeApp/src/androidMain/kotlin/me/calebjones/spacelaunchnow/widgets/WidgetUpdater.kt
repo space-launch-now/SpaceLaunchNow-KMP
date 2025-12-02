@@ -16,6 +16,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.util.logging.logger
 import org.koin.java.KoinJavaComponent.inject
 import kotlinx.coroutines.flow.first
 
@@ -23,6 +24,8 @@ import kotlinx.coroutines.flow.first
  * Utility to trigger widget updates when appearance settings change.
  */
 object WidgetUpdater {
+    
+    private val log = logger()
     
     // Keys for widget appearance stored in Glance state
     private val FORCE_UPDATE_KEY = longPreferencesKey("force_update_timestamp")
@@ -38,31 +41,30 @@ object WidgetUpdater {
     suspend fun updateWidget(context: Context, widgetClass: Class<out androidx.glance.appwidget.GlanceAppWidget>) {
         withContext(Dispatchers.Main) {
             try {
-                println("WidgetUpdater: Updating widget: ${widgetClass.simpleName}")
+                log.d { "Updating widget: ${widgetClass.simpleName}" }
                 when (widgetClass.simpleName) {
                     "NextUpWidget" -> {
                         val manager = GlanceAppWidgetManager(context)
                         val widgetIds = manager.getGlanceIds(NextUpWidget::class.java)
-                        println("WidgetUpdater: Found ${widgetIds.size} NextUpWidget instances")
+                        log.d { "Found ${widgetIds.size} NextUpWidget instances" }
                         NextUpWidget().updateAll(context)
                     }
                     "LaunchListWidget" -> {
                         val manager = GlanceAppWidgetManager(context)
                         val widgetIds = manager.getGlanceIds(LaunchListWidget::class.java)
-                        println("WidgetUpdater: Found ${widgetIds.size} LaunchListWidget instances")
+                        log.d { "Found ${widgetIds.size} LaunchListWidget instances" }
                         LaunchListWidget().updateAll(context)
                     }
                     else -> {
                         // Update all widgets
-                        println("WidgetUpdater: Updating all widgets")
+                        log.d { "Updating all widgets" }
                         NextUpWidget().updateAll(context)
                         LaunchListWidget().updateAll(context)
                     }
                 }
-                println("WidgetUpdater: Widget update completed for ${widgetClass.simpleName}")
+                log.d { "Widget update completed for ${widgetClass.simpleName}" }
             } catch (e: Exception) {
-                println("WidgetUpdater: ERROR updating widgets: ${e.message}")
-                e.printStackTrace()
+                log.e(e) { "ERROR updating widgets" }
             }
         }
     }
@@ -76,7 +78,7 @@ object WidgetUpdater {
     suspend fun updateAllWidgets(context: Context) {
         withContext(Dispatchers.Main) {
             try {
-                println("WidgetUpdater: Starting updateAllWidgets()")
+                log.d { "Starting updateAllWidgets()" }
                 
                 // Read current appearance values from DataStore ONCE
                 val widgetPreferences: WidgetPreferences by inject(WidgetPreferences::class.java)
@@ -88,27 +90,27 @@ object WidgetUpdater {
                 val hasAccess = widgetPreferences.widgetAccessGrantedFlow.first()
                 val appThemeMode = appPreferences.themeFlow.first().name // System/Light/Dark
                 
-                println("WidgetUpdater: Read from DataStore - Source: $themeSource, AppTheme: $appThemeMode, Alpha: $backgroundAlpha, Radius: $cornerRadius, Access: $hasAccess")
+                log.d { "Read from DataStore - Source: $themeSource, AppTheme: $appThemeMode, Alpha: $backgroundAlpha, Radius: $cornerRadius, Access: $hasAccess" }
                 
                 val glanceManager = GlanceAppWidgetManager(context)
                 val currentTime = System.currentTimeMillis()
                 
                 // Check for NextUpWidget instances
                 val nextUpIds = glanceManager.getGlanceIds(NextUpWidget::class.java)
-                println("WidgetUpdater: Found ${nextUpIds.size} NextUpWidget instances on home screen")
+                log.d { "Found ${nextUpIds.size} NextUpWidget instances on home screen" }
                 
                 // Check for LaunchListWidget instances
                 val launchListIds = glanceManager.getGlanceIds(LaunchListWidget::class.java)
-                println("WidgetUpdater: Found ${launchListIds.size} LaunchListWidget instances on home screen")
+                log.d { "Found ${launchListIds.size} LaunchListWidget instances on home screen" }
                 
                 if (nextUpIds.isEmpty() && launchListIds.isEmpty()) {
-                    println("WidgetUpdater: WARNING - No widgets found on home screen! User needs to add widgets first.")
+                    log.d { "No widgets found on home screen! User needs to add widgets first" }
                     return@withContext
                 }
                 
                 // Update NextUp widgets - Write appearance values directly to Glance state
                 if (nextUpIds.isNotEmpty()) {
-                    println("WidgetUpdater: Updating ${nextUpIds.size} NextUpWidget instances...")
+                    log.d { "Updating ${nextUpIds.size} NextUpWidget instances..." }
                     val nextUpWidget = NextUpWidget()
                     
                     nextUpIds.forEach { glanceId ->
@@ -125,14 +127,14 @@ object WidgetUpdater {
                         }
                         // Trigger update with the new state
                         nextUpWidget.update(context, glanceId)
-                        println("WidgetUpdater: Updated NextUpWidget instance: $glanceId")
+                        log.v { "Updated NextUpWidget instance: $glanceId" }
                     }
-                    println("WidgetUpdater: All NextUpWidget updates complete")
+                    log.d { "All NextUpWidget updates complete" }
                 }
                 
                 // Update LaunchList widgets - Same pattern
                 if (launchListIds.isNotEmpty()) {
-                    println("WidgetUpdater: Updating ${launchListIds.size} LaunchListWidget instances...")
+                    log.d { "Updating ${launchListIds.size} LaunchListWidget instances..." }
                     val launchListWidget = LaunchListWidget()
                     
                     launchListIds.forEach { glanceId ->
@@ -149,17 +151,14 @@ object WidgetUpdater {
                         }
                         // Trigger update with the new state
                         launchListWidget.update(context, glanceId)
-                        println("WidgetUpdater: Updated LaunchListWidget instance: $glanceId")
+                        log.v { "Updated LaunchListWidget instance: $glanceId" }
                     }
-                    println("WidgetUpdater: All LaunchListWidget updates complete")
+                    log.d { "All LaunchListWidget updates complete" }
                 }
                 
-                println("WidgetUpdater: All widget updates completed successfully")
+                log.i { "All widget updates completed successfully" }
             } catch (e: Exception) {
-                println("WidgetUpdater: FATAL ERROR updating all widgets: ${e.message}")
-                println("WidgetUpdater: Exception type: ${e.javaClass.simpleName}")
-                println("WidgetUpdater: Stack trace:")
-                e.printStackTrace()
+                log.e(e) { "FATAL ERROR updating all widgets" }
             }
         }
     }

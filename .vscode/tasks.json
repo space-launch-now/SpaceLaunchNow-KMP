@@ -38,12 +38,11 @@
             "problemMatcher": []
         },
         {
-            "label": "Clean Build",
+            "label": "Install Debug",
             "type": "shell",
             "command": "./gradlew",
             "args": [
-                "clean",
-                "build",
+                "installDebug",
             ],
             "group": "build",
             "presentation": {
@@ -75,7 +74,7 @@
             "type": "shell",
             "command": "./gradlew",
             "args": [
-                "desktopTest"
+                "test"
             ],
             "group": "test",
             "presentation": {

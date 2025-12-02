@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.util
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.HMAC
+import me.calebjones.spacelaunchnow.util.logging.logger
 import dev.whyoleg.cryptography.algorithms.SHA1
 import dev.whyoleg.cryptography.algorithms.SHA256
 
@@ -15,6 +16,8 @@ import dev.whyoleg.cryptography.algorithms.SHA256
  * Uses cryptography-kotlin library for cross-platform hashing (SHA-256 for password, SHA1-HMAC for TOTP)
  */
 object DebugUnlock {
+    private val log = logger()
+    
     // Store the SHA-256 hash of the password "debug2024"
     // To generate a new hash, use: DebugUnlock.hashPassword("yourpassword")
     private const val PASSWORD_HASH =
@@ -86,7 +89,7 @@ object DebugUnlock {
             return false
         } catch (e: Exception) {
             // Log error in debug builds
-            println("TOTP verification error: ${e.message}")
+            log.e(e) { "TOTP verification error" }
             return false
         }
     }

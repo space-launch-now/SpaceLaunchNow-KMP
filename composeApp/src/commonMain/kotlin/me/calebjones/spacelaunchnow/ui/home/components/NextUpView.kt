@@ -70,36 +70,29 @@ fun NextLaunchView(navController: NavController) {
     // in its LaunchedEffect(Unit). The ViewModel is shared, so data flows automatically.
     
     Column {
-
-
         when {
             // STATE 1: Show data if it exists (ALWAYS, even while loading or with error)
             state.data != null -> {
-                println("[FEATURED] 🎯 DISPLAYING: Launch data (${state.data!!.name})")
                 NextLaunchItemView(state.data!!, navController)
             }
 
             // STATE 2: Error with no data
             state.error != null -> {
-                println("[FEATURED] ❌ DISPLAYING: Error message")
                 ErrorMessageView(errorMessage = state.error!!)
             }
 
             // STATE 3: Initial loading (no data yet)
             state.isLoading -> {
-                println("[FEATURED] ⏳ DISPLAYING: Shimmer (initial loading)")
                 NextUpShimmerBox()
             }
 
             // STATE 4: No data, not loading, no error = empty results from filters
             !state.isLoading && state.data == null && state.error == null -> {
-                println("[FEATURED] 📭 DISPLAYING: Empty filter state (no launches match filters)")
                 EmptyStateCard(navController = navController)
             }
 
             // Fallback: should never reach here
             else -> {
-                println("[FEATURED] ⚠️ UNEXPECTED STATE - showing shimmer as fallback")
                 NextUpShimmerBox()
             }
         }

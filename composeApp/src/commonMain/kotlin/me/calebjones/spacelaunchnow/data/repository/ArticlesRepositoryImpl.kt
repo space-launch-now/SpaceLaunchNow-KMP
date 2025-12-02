@@ -1,10 +1,9 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
+import kotlin.time.Clock
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.api.snapi.apis.ArticlesApi
 import me.calebjones.spacelaunchnow.api.snapi.extensions.getArticles
 import me.calebjones.spacelaunchnow.api.snapi.extensions.getArticlesByLaunch
@@ -16,12 +15,14 @@ import me.calebjones.spacelaunchnow.data.model.ApiError
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 class ArticlesRepositoryImpl(
     private val articlesApi: ArticlesApi,
     private val localDataSource: ArticleLocalDataSource? = null
 ) : ArticlesRepository {
 
+    private val log = logger()
     private val json = Json { ignoreUnknownKeys = true }
 
     private suspend fun parseApiError(rawResponse: String): String {
@@ -36,19 +37,17 @@ class ArticlesRepositoryImpl(
 
     override suspend fun getArticles(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedArticleList>> {
         return try {
-            println("=== ArticlesRepository.getArticles ===")
-            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
-            println("Cache available: ${localDataSource != null}")
-            
-            val now = System.now().toEpochMilliseconds()
+            log.d { "getArticles called - limit: $limit, forceRefresh: $forceRefresh, cacheAvailable: ${localDataSource != null}" }
+
+            val now = Clock.System.now().toEpochMilliseconds()
             val staleTimestamp = localDataSource?.getCacheTimestamp("articles")
             
             // Try cache first if available and not forcing refresh
             if (!forceRefresh) {
                 val cachedArticles = localDataSource?.getRecentArticles(limit)
-                println("Cache query result: ${cachedArticles?.size ?: 0} articles found")
+                log.v { "Cache query result: ${cachedArticles?.size ?: 0} articles found" }
                 if (cachedArticles != null && cachedArticles.isNotEmpty()) {
-                    println("✓ CACHE HIT: Returning ${cachedArticles.size} cached articles")
+                    log.i { "Cache hit - Returning ${cachedArticles.size} cached articles" }
                     return Result.success(DataResult(
                         data = PaginatedArticleList(
                             count = cachedArticles.size,
@@ -60,37 +59,37 @@ class ArticlesRepositoryImpl(
                         timestamp = staleTimestamp ?: now
                     ))
                 } else {
-                    println("✗ CACHE MISS: No cached data available, fetching from API")
+                    log.d { "Cache miss - No cached data available, fetching from API" }
                 }
             } else {
-                println("⟳ FORCE REFRESH: Bypassing cache, fetching fresh data from API")
+                log.d { "Force refresh - Bypassing cache, fetching fresh data from API" }
             }
             
-            println("=== ArticlesRepository: Fetching articles from API (limit: $limit, forceRefresh: $forceRefresh) ===")
-            
+            log.d { "Fetching articles from API - limit: $limit" }
+
             val response = articlesApi.getArticles(
                 limit = limit
             )
             
             val body = response.body()
-            println("Successfully fetched ${body.results.size} articles")
-            
+            log.i { "Successfully fetched ${body.results.size} articles from API" }
+
             // Cache the results for future use
             localDataSource?.cacheArticles(body.results)
-            println("✓ API SUCCESS: Fetched and cached ${body.results.size} articles")
-            
+            log.d { "Cached ${body.results.size} articles for future use" }
+
             Result.success(DataResult(
                 data = body,
                 source = DataSource.NETWORK,
                 timestamp = now
             ))
         } catch (e: ResponseException) {
-            println("ResponseException: ${e.message}")
+            log.e(e) { "API error while fetching articles" }
             // On error, try to return stale cache if available
             val staleCached = localDataSource?.getRecentArticles(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("articles")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles due to API error")
+                log.w { "Returning ${staleCached.size} stale cached articles due to API error" }
                 return Result.success(DataResult(
                     data = PaginatedArticleList(
                         count = staleCached.size,
@@ -104,12 +103,12 @@ class ArticlesRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: IOException) {
-            println("IOException: ${e.message}")
+            log.e(e) { "Network error while fetching articles" }
             // On network error, try to return stale cache if available
             val staleCached = localDataSource?.getRecentArticles(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("articles")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles due to network error")
+                log.w { "Returning ${staleCached.size} stale cached articles due to network error" }
                 return Result.success(DataResult(
                     data = PaginatedArticleList(
                         count = staleCached.size,
@@ -123,7 +122,7 @@ class ArticlesRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Failed to get articles: ${e.message}")
+            log.e(e) { "Unexpected error while fetching articles" }
             Result.failure(e)
         }
     }
@@ -133,11 +132,11 @@ class ArticlesRepositoryImpl(
             val response = articlesApi.getFeaturedArticles(limit = limit)
             Result.success(response.body())
         } catch (e: ResponseException) {
-            println("ResponseException in getFeaturedArticles: ${e.message}")
+            log.e(e) { "API error while fetching featured articles" }
             // Try to return stale cache if available
             val staleCached = localDataSource?.getRecentArticles(limit)
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles for featured")
+                log.w { "Returning ${staleCached.size} stale cached articles for featured" }
                 return Result.success(PaginatedArticleList(
                     count = staleCached.size,
                     next = null,
@@ -147,11 +146,11 @@ class ArticlesRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: IOException) {
-            println("IOException in getFeaturedArticles: ${e.message}")
+            log.e(e) { "Network error while fetching featured articles" }
             // Try to return stale cache if available
             val staleCached = localDataSource?.getRecentArticles(limit)
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles for featured (network error)")
+                log.w { "Returning ${staleCached.size} stale cached articles for featured (network error)" }
                 return Result.success(PaginatedArticleList(
                     count = staleCached.size,
                     next = null,
@@ -161,7 +160,7 @@ class ArticlesRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Exception in getFeaturedArticles: ${e.message}")
+            log.e(e) { "Unexpected error while fetching featured articles" }
             Result.failure(e)
         }
     }
@@ -203,11 +202,11 @@ class ArticlesRepositoryImpl(
             )
             Result.success(response.body())
         } catch (e: ResponseException) {
-            println("ResponseException in searchArticles: ${e.message}")
+            log.e(e) { "API error while searching articles for query: '$query'" }
             // Try to return stale cache if available (less ideal for search, but better than nothing)
             val staleCached = localDataSource?.getRecentArticles(limit)
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles for search (warning: not filtered)")
+                log.w { "Returning ${staleCached.size} stale cached articles for search (warning: not filtered by query)" }
                 return Result.success(PaginatedArticleList(
                     count = staleCached.size,
                     next = null,
@@ -217,11 +216,11 @@ class ArticlesRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: IOException) {
-            println("IOException in searchArticles: ${e.message}")
+            log.e(e) { "Network error while searching articles for query: '$query'" }
             // Try to return stale cache if available
             val staleCached = localDataSource?.getRecentArticles(limit)
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("ArticlesRepository: Returning ${staleCached.size} stale cached articles for search (network error)")
+                log.w { "Returning ${staleCached.size} stale cached articles for search (network error)" }
                 return Result.success(PaginatedArticleList(
                     count = staleCached.size,
                     next = null,
@@ -231,7 +230,7 @@ class ArticlesRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Exception in searchArticles: ${e.message}")
+            log.e(e) { "Unexpected error while searching articles for query: '$query'" }
             Result.failure(e)
         }
     }
