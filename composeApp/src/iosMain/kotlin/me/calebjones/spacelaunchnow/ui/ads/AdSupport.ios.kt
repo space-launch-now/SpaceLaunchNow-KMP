@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import me.calebjones.spacelaunchnow.logger
 import androidx.compose.runtime.getValue
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
@@ -25,6 +26,8 @@ import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
 import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
 
+private val log = logger()
+
 /**
  * iOS implementation of AdConsentPopup using Google UMP.
  */
@@ -38,7 +41,7 @@ actual fun AdConsentPopup(
     
     // Only show consent popup if we have a valid ViewController
     if (viewController == null || viewController == "") {
-        println("⚠️ AdConsentPopup: ViewController is null, consent popup will not be shown")
+        log.w { "⚠️ AdConsentPopup: ViewController is null, consent popup will not be shown" }
         return
     }
     
@@ -48,7 +51,7 @@ actual fun AdConsentPopup(
     ConsentPopup(
         consent = consent,
         onFailure = { throwable ->
-            println("❌ Consent popup failure: ${throwable.message}")
+            log.e(throwable) { "❌ Consent popup failure" }
             onFailure?.invoke(throwable)
         }
     )

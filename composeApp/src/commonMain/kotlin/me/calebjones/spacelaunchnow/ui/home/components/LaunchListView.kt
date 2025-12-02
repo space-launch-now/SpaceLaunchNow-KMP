@@ -109,7 +109,6 @@ fun LaunchListView(viewModel: LaunchCarouselViewModel, navController: NavControl
                 // Scroll to the first upcoming launch, centered
                 scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -centerOffset)
                 hasScrolledToPosition = true
-                println("=== LaunchListView: Scrolled to position $upcomingStartIndex ===")
             }
         }
 

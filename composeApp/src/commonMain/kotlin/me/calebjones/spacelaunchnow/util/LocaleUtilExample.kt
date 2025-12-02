@@ -1,5 +1,9 @@
 package me.calebjones.spacelaunchnow.util
 
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+
+private val log = SpaceLogger.getLogger("LocaleUtilExample")
+
 /**
  * Example usage of LocaleUtil
  * 
@@ -9,15 +13,15 @@ package me.calebjones.spacelaunchnow.util
 fun exampleLocaleUsage() {
     // Get the full locale tag (e.g., "en-US", "fr-FR", "ja-JP")
     val localeTag = LocaleUtil.getLocaleTag()
-    println("User's locale: $localeTag")
+    log.d { "User's locale: $localeTag" }
     
     // Get just the language code (e.g., "en", "fr", "ja")
     val language = LocaleUtil.getLanguageCode()
-    println("User's language: $language")
+    log.d { "User's language: $language" }
     
     // Get the country code (e.g., "US", "FR", "JP")
     val country = LocaleUtil.getCountryCode()
-    println("User's country: $country")
+    log.d { "User's country: $country" }
     
     // Example: Customize content based on language
     val greeting = when (language) {
@@ -29,8 +33,8 @@ fun exampleLocaleUsage() {
         "zh" -> "你好"
         else -> "Hello"
     }
-    println("Greeting: $greeting")
+    log.d { "Greeting: $greeting" }
     
     // Example: Use locale tag for API calls or analytics
-    println("Analytics locale: $localeTag")
+    log.d { "Analytics locale: $localeTag" }
 }

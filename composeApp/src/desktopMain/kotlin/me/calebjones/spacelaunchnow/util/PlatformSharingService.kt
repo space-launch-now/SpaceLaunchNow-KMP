@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.util
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.logger
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -10,6 +11,7 @@ import java.net.URI
  * Desktop-specific sharing implementation that copies text to clipboard
  */
 class DesktopSharingService : LaunchSharingService {
+    private val log = logger()
     
     /**
      * Shares a launch by copying formatted text to clipboard
@@ -19,7 +21,7 @@ class DesktopSharingService : LaunchSharingService {
         copyToClipboard(shareText)
         
         // Optional: Show a system notification that text was copied
-        println("Launch info copied to clipboard: ${launch.name}")
+        log.i { "Launch info copied to clipboard: ${launch.name}" }
     }
     
     /**
@@ -45,11 +47,11 @@ class DesktopSharingService : LaunchSharingService {
             try {
                 Desktop.getDesktop().browse(URI(url))
             } catch (e: Exception) {
-                println("Failed to open URL in browser: $e")
+                log.w(e) { "Failed to open URL in browser: $e" }
             }
         }
         
-        println("URL copied to clipboard: $url")
+        log.i { "URL copied to clipboard: $url" }
     }
     
     /**
@@ -61,7 +63,7 @@ class DesktopSharingService : LaunchSharingService {
             val selection = StringSelection(text)
             clipboard.setContents(selection, selection)
         } catch (e: Exception) {
-            println("Failed to copy to clipboard: $e")
+            log.e(e) { "Failed to copy to clipboard: $e" }
         }
     }
 }

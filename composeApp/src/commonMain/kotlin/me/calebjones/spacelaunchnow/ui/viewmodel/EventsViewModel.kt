@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Manages upcoming space events for the home screen.
@@ -19,6 +20,8 @@ import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 class EventsViewModel(
     private val eventsRepository: EventsRepository
 ) : ViewModel() {
+
+    private val log = logger()
 
     // ========== ViewState Properties ==========
 
@@ -43,8 +46,7 @@ class EventsViewModel(
                 val result = eventsRepository.getUpcomingEvents(limit, forceRefresh)
 
                 result.onSuccess { dataResult ->
-                    println("=== EventsViewModel: Received Events ===")
-                    println("Total events: ${dataResult.data.count}")
+                    log.i { "Received events - Total: ${dataResult.data.count}" }
 
                     _eventsState.update {
                         it.copy(

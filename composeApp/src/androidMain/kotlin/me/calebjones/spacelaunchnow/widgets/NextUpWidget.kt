@@ -51,16 +51,19 @@ import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.ui.theme.getWidgetAppearanceBlocking
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.math.abs
 import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class NextUpWidget : GlanceAppWidget() {
 
+    private val log = logger()
+
     // CRITICAL: Must set state definition to use preferences state for force updates
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        println("=== NextUpWidget: provideGlance START for id: $id ===")
+        log.d { "provideGlance START for id: $id" }
         
         val launch = fetchNextLaunch()
         
@@ -74,7 +77,7 @@ class NextUpWidget : GlanceAppWidget() {
             val cornerRadius = prefs[intPreferencesKey("widget_corner_radius")] ?: 16
             
             val themeSource = WidgetThemeSource.fromString(themeSourceName)
-            println("NextUpWidget: Glance state - timestamp=$forceUpdateTimestamp, source=$themeSource, appTheme=$appThemeMode, alpha=$backgroundAlpha, radius=$cornerRadius")
+            log.d { "Glance state - timestamp=$forceUpdateTimestamp, source=$themeSource, appTheme=$appThemeMode, alpha=$backgroundAlpha, radius=$cornerRadius" }
             
             // Select appropriate ColorProviders based on theme source with alpha applied
             val useDynamicColors = themeSource == WidgetThemeSource.DYNAMIC_COLORS
@@ -101,8 +104,7 @@ class NextUpWidget : GlanceAppWidget() {
                 val result = launchRepository.getUpcomingLaunchesNormal(limit = 1)
                 result.getOrNull()?.data?.results?.firstOrNull()
             } catch (e: Exception) {
-                println("Widget: Failed to fetch next launch: ${e.message}")
-                e.printStackTrace()
+                log.e(e) { "Failed to fetch next launch" }
                 null
             }
         }

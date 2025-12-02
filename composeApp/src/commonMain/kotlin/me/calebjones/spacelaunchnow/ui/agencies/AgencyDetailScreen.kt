@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.ui.agencies.compose.AgencyDetailErrorView
 import me.calebjones.spacelaunchnow.ui.agencies.compose.AgencyDetailLoadingView
 import me.calebjones.spacelaunchnow.ui.agencies.compose.AgencyDetailView
@@ -16,6 +17,7 @@ fun AgencyDetailScreen(
     agencyId: Int,
     onNavigateBack: () -> Unit
 ) {
+    val log = SpaceLogger.getLogger("AgencyDetailScreen")
     val viewModel = koinViewModel<AgencyViewModel>()
     val agencyDetails by viewModel.agencyDetails.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -28,14 +30,7 @@ fun AgencyDetailScreen(
     }
 
     // 🎯 INTERSTITIAL AD: Show every 4th detail view visit
-    InterstitialAdHandler(
-        onAdShown = {
-            println("✅ AgencyDetail: Interstitial ad shown successfully")
-        },
-        onAdFailed = { error ->
-            println("❌ AgencyDetail: Interstitial ad failed: $error")
-        }
-    )
+    InterstitialAdHandler()
 
     when {
         error != null -> {

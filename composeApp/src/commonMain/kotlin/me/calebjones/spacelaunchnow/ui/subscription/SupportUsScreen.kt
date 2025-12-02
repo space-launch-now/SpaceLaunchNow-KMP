@@ -114,9 +114,7 @@ fun SupportUsScreen(
 
     // Determine which packages to show based on user's current state
     val userState = determineUserState(subscriptionState)
-    println("User State: $userState")
     val packagesToShow = getPackagesToShow(userState)
-    println("Packages to Show: $packagesToShow")
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -1512,7 +1510,6 @@ data class PackagesToShow(
 private fun determineUserState(
     subscriptionState: SubscriptionState
 ): UserState {
-    println("determineUserState: $subscriptionState")
     return when (subscriptionState.subscriptionType) {
         SubscriptionType.LIFETIME -> UserState.LIFETIME_USER
         SubscriptionType.PREMIUM -> {
@@ -1547,7 +1544,6 @@ private fun determineUserState(
 private fun getPackagesToShow(
     userState: UserState
 ): PackagesToShow {
-    println("getPackagesToShow: $userState")
     return when (userState) {
         UserState.NEW_USER -> PackagesToShow(
             showLifetime = true,

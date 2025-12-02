@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -27,6 +28,7 @@ import kotlin.time.ExperimentalTime
 class StatsViewModel(
     private val launchRepository: LaunchRepository
 ) : ViewModel() {
+    private val log = logger()
 
     // ========== State Properties ==========
 
@@ -70,13 +72,13 @@ class StatsViewModel(
 
                 result.onSuccess { paginatedLaunches: PaginatedLaunchBasicList ->
                     _next24HoursCount.value = paginatedLaunches.count
-                    println("Next 24 hours count: ${paginatedLaunches.count}")
+                    log.i { "Next 24 hours count: ${paginatedLaunches.count}" }
                 }.onFailure { exception: Throwable ->
-                    println("Failed to get next 24 hours count: ${exception.message}")
+                    log.e(exception) { "Failed to get next 24 hours count" }
                     _next24HoursCount.value = 0
                 }
             } catch (exception: Exception) {
-                println("Exception loading next 24 hours count: ${exception.message}")
+                log.e(exception) { "Exception loading next 24 hours count" }
                 _next24HoursCount.value = 0
             }
         }
@@ -100,13 +102,13 @@ class StatsViewModel(
 
                 result.onSuccess { paginatedLaunches: PaginatedLaunchBasicList ->
                     _nextWeekCount.value = paginatedLaunches.count
-                    println("Next week count: ${paginatedLaunches.count}")
+                    log.i { "Next week count: ${paginatedLaunches.count}" }
                 }.onFailure { exception: Throwable ->
-                    println("Failed to get next week count: ${exception.message}")
+                    log.e(exception) { "Failed to get next week count" }
                     _nextWeekCount.value = 0
                 }
             } catch (exception: Exception) {
-                println("Exception loading next week count: ${exception.message}")
+                log.e(exception) { "Exception loading next week count" }
                 _nextWeekCount.value = 0
             }
         }
@@ -130,13 +132,13 @@ class StatsViewModel(
 
                 result.onSuccess { paginatedLaunches: PaginatedLaunchBasicList ->
                     _nextMonthCount.value = paginatedLaunches.count
-                    println("Next month count: ${paginatedLaunches.count}")
+                    log.i { "Next month count: ${paginatedLaunches.count}" }
                 }.onFailure { exception: Throwable ->
-                    println("Failed to get next month count: ${exception.message}")
+                    log.e(exception) { "Failed to get next month count" }
                     _nextMonthCount.value = 0
                 }
             } catch (exception: Exception) {
-                println("Exception loading next month count: ${exception.message}")
+                log.e(exception) { "Exception loading next month count" }
                 _nextMonthCount.value = 0
             }
         }

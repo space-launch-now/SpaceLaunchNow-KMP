@@ -2,12 +2,15 @@ package me.calebjones.spacelaunchnow.data.storage
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import me.calebjones.spacelaunchnow.logger
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import kotlinx.cinterop.ExperimentalForeignApi
 import okio.Path.Companion.toPath
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
+
+private val log = logger()
 
 @OptIn(ExperimentalForeignApi::class)
 private fun getAppGroupDirectory(): String {
@@ -17,11 +20,11 @@ private fun getAppGroupDirectory(): String {
     val containerURL = fileManager.containerURLForSecurityApplicationGroupIdentifier(appGroupId)
     
     return if (containerURL != null) {
-        println("📱 Using App Group container: ${containerURL.path}")
+        log.i { "📱 Using App Group container: ${containerURL.path}" }
         containerURL.path!!
     } else {
         // Fallback to Documents directory if App Group is not available
-        println("⚠️ App Group not available, falling back to Documents directory")
+        log.w { "⚠️ App Group not available, falling back to Documents directory" }
         getDocumentsDirectoryFallback()
     }
 }

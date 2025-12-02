@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 
 /**
@@ -14,6 +15,7 @@ class SubscriptionSyncer(
     private val localStorage: LocalSubscriptionStorage,
     private val billingManager: BillingManager
 ) {
+    private val log = logger()
 
     private val syncScope = CoroutineScope(SupervisorJob())
     private var lastSyncTime = 0L
@@ -24,7 +26,7 @@ class SubscriptionSyncer(
      * Call this once during app initialization
      */
     fun startSyncing() {
-        println("SubscriptionSyncer: Starting background sync")
+        log.i { "Starting background sync" }
 
         // Listen for billing manager purchase state changes
         syncScope.launch {
@@ -34,14 +36,12 @@ class SubscriptionSyncer(
                 // Check if we're in debug/simulation mode
                 val currentData = localStorage.get()
                 if (currentData.isDebugMode) {
-                    println("SubscriptionSyncer: 🎭 Debug mode active (isDebugMode=true), skipping automatic sync")
+                    log.d { "Debug mode active (isDebugMode=true), skipping automatic sync" }
                     return@collect
                 }
 
                 if (currentTime - lastSyncTime > syncCooldownMs) {
-                    println("SubscriptionSyncer: Purchase state updated, syncing...")
-                    println("  isSubscribed=${purchaseState.isSubscribed}, type=${purchaseState.subscriptionType}")
-                    println("  products=${purchaseState.activeProductIds}")
+                    log.d { "Purchase state updated, syncing - isSubscribed=${purchaseState.isSubscribed}, type=${purchaseState.subscriptionType}, products=${purchaseState.activeProductIds}" }
                     lastSyncTime = currentTime
 
                     // Update local storage with new purchase state
@@ -55,15 +55,12 @@ class SubscriptionSyncer(
                         isDebugMode = false // Real sync, not debug mode
                     )
                     
-                    println("SubscriptionSyncer: ✅ Sync complete - isSubscribed=${purchaseState.isSubscribed}")
-
                     val success = localStorage.update(newData)
 
                     if (success) {
-                        println("SubscriptionSyncer: ✅ Sync complete - subscription state persisted successfully")
+                        log.i { "✅ Sync complete - subscription state persisted successfully" }
                     } else {
-                        println("SubscriptionSyncer: ❌ CRITICAL: Failed to persist subscription state!")
-                        println("  User will lose premium access on next app restart")
+                        log.e { "❌ CRITICAL: Failed to persist subscription state! User will lose premium access on next app restart" }
 
                         me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
                             "Failed to persist subscription state during sync",
@@ -80,7 +77,7 @@ class SubscriptionSyncer(
                         localStorage.markNeedsSync()
                     }
                 } else {
-                    println("SubscriptionSyncer: Skipping sync (cooldown period active)")
+                    log.d { "Skipping sync (cooldown period active)" }
                 }
             }
         }
@@ -91,7 +88,7 @@ class SubscriptionSyncer(
      * Call this when user restores purchases or after a purchase
      */
     suspend fun syncNow(): Boolean {
-        println("SubscriptionSyncer: Manual sync requested")
+        log.i { "Manual sync requested" }
         return billingManager.refreshPurchaseState()
     }
 }

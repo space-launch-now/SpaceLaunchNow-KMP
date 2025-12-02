@@ -13,6 +13,7 @@ import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Manages the featured launch display (NextUpView).
@@ -24,6 +25,8 @@ class FeaturedLaunchViewModel(
     private val notificationStateStorage: NotificationStateStorage,
     private val launchCache: LaunchCache
 ) : ViewModel() {
+
+    private val log = logger()
 
     // Featured Launch State
     private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
@@ -37,39 +40,36 @@ class FeaturedLaunchViewModel(
     fun loadFeaturedLaunch(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                println("[FEATURED] === FeaturedLaunchViewModel.loadFeaturedLaunch START ===")
-                println("[FEATURED] forceRefresh: $forceRefresh")
-                
+                log.d { "Loading featured launch - forceRefresh: $forceRefresh" }
+
                 _featuredLaunchState.update {
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
                 }
-                println("[FEATURED] ✓ Set isLoading=true for featured launch state")
+                log.d { "Set isLoading=true for featured launch state" }
 
                 // Wait for actual filter settings from DataStore
                 val currentFilters = notificationStateStorage.stateFlow.first()
                 val filterParams = launchFilterService.getFilterParams(currentFilters)
-                println("[FEATURED] Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}")
+                log.v { "Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
-                println("[FEATURED] Calling repository.getFeaturedLaunch with upcomingWithRecent filter...")
+                log.d { "Calling repository.getFeaturedLaunch with upcomingWithRecent filter..." }
                 val result = launchRepository.getFeaturedLaunch(
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
                     locationIds = filterParams.locationIds
                 )
-                println("[FEATURED] Repository call completed. Success: ${result.isSuccess}")
+                log.d { "Repository call completed. Success: ${result.isSuccess}" }
 
                 result.onSuccess { dataResult ->
                     val paginatedLaunches = dataResult.data
-                    println("[FEATURED] === Repository SUCCESS ===")
-                    println("[FEATURED] Data source: ${dataResult.source}")
-                    println("[FEATURED] Results count: ${paginatedLaunches.results.size}")
-                    println("[FEATURED] Cache timestamp: ${dataResult.timestamp}")
-                    
+                    log.i { "Repository success - Data source: ${dataResult.source}, Results: ${paginatedLaunches.results.size}" }
+                    log.v { "Cache timestamp: ${dataResult.timestamp}" }
+
                     val firstLaunch = paginatedLaunches.results.firstOrNull()
                     if (firstLaunch != null) {
-                        println("[FEATURED] Featured launch: ${firstLaunch.name} (ID: ${firstLaunch.id})")
+                        log.i { "Featured launch: ${firstLaunch.name} (ID: ${firstLaunch.id})" }
                     } else {
-                        println("[FEATURED] ⚠️ WARNING: No launches returned from repository!")
+                        log.w { "No launches returned from repository!" }
                     }
                     
                     _featuredLaunchState.update {
@@ -80,43 +80,36 @@ class FeaturedLaunchViewModel(
                             cacheTimestamp = dataResult.timestamp
                         )
                     }
-                    println("[FEATURED] ✓ Updated featuredLaunchState: hasData=${_featuredLaunchState.value.data != null}, isLoading=${_featuredLaunchState.value.isLoading}")
+                    log.d { "Updated featuredLaunchState: hasData=${_featuredLaunchState.value.data != null}, isLoading=${_featuredLaunchState.value.isLoading}" }
 
                     // Pre-fetch detailed data if we have a launch
                     firstLaunch?.let { launch ->
-                        println("[FEATURED] Pre-fetching launch details for ${launch.id}...")
+                        log.d { "Pre-fetching launch details for ${launch.id}..." }
                         preFetchLaunchDetails(launch.id)
                     }
                 }.onFailure { exception ->
-                    println("[FEATURED] === Repository FAILURE ===")
-                    println("[FEATURED] Exception type: ${exception::class.simpleName}")
-                    println("[FEATURED] Exception message: ${exception.message}")
+                    log.e(exception) { "Repository failure: ${exception.message}" }
                     val errorMsg = formatErrorMessage(exception)
-                    println("[FEATURED] Formatted error: $errorMsg")
-                    
+
                     _featuredLaunchState.update {
                         it.copy(
                             error = errorMsg,
                             isLoading = false
                         )
                     }
-                    println("[FEATURED] ✓ Updated featuredLaunchState with error, isLoading=false")
+                    log.d { "Updated featuredLaunchState with error, isLoading=false" }
                 }
             } catch (exception: Exception) {
-                println("[FEATURED] === EXCEPTION in loadFeaturedLaunch ===")
-                println("[FEATURED] Exception type: ${exception::class.simpleName}")
-                println("[FEATURED] Exception message: ${exception.message}")
-                exception.printStackTrace()
-                
+                log.e(exception) { "Exception in loadFeaturedLaunch: ${exception.message}" }
+
                 _featuredLaunchState.update {
                     it.copy(
                         error = exception.message ?: "Unknown error",
                         isLoading = false
                     )
                 }
-                println("[FEATURED] ✓ Updated featuredLaunchState with exception error, isLoading=false")
+                log.d { "Updated featuredLaunchState with exception error, isLoading=false" }
             }
-            println("[FEATURED] === FeaturedLaunchViewModel.loadFeaturedLaunch END ===")
         }
     }
 
@@ -125,7 +118,7 @@ class FeaturedLaunchViewModel(
             // Pre-cache the detailed launch data for faster detail screen loading
             launchCache.getCachedLaunchDetailed(launchId)
         } catch (e: Exception) {
-            println("[FEATURED] Failed to pre-fetch launch details: ${e.message}")
+            log.w(e) { "Failed to pre-fetch launch details" }
         }
     }
 

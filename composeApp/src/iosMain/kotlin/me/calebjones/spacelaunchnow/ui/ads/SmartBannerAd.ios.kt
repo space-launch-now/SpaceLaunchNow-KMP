@@ -42,6 +42,7 @@ import me.calebjones.spacelaunchnow.LocalPreloadedNavigationLeaderboardAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getOrientation
 import me.calebjones.spacelaunchnow.getPlatform
+import me.calebjones.spacelaunchnow.logger
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
 /**
@@ -64,6 +65,7 @@ actual fun SmartBannerAd(
     onRemoveAdsClick: (() -> Unit)?,
     onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?
 ) {
+    val log = logger()
     // Convert placement type to AdSize for Android implementation
     val adSize = getAdSizeForPlacement(placementType)
     val contextFactory = LocalContextFactory.current
@@ -83,7 +85,7 @@ actual fun SmartBannerAd(
     // Get the actual ad size based on placement type
     val actualAdSize = getAdSizeForPlacement(placementType)
     
-    println("🎯 SmartBannerAd (Android): Using AdSize ${actualAdSize.width}x${actualAdSize.height} for placement $placementType")
+    log.d { "🎯 SmartBannerAd (iOS): Using AdSize ${actualAdSize.width}x${actualAdSize.height} for placement $placementType" }
 
     // Don't show ads if:
     // 1. User has ad-free premium feature
@@ -97,7 +99,7 @@ actual fun SmartBannerAd(
          preloadedNavigationBannerAd == null && preloadedNavigationLargeBannerAd == null && preloadedNavigationLeaderboardAd == null &&
          preloadedLeaderboardAd == null && preloadedFullBannerAd == null && preloadedFluidAd == null)
     ) {
-        println("⚠️ SmartBannerAd: Not showing ad due to conditions.")
+        log.v { "SmartBannerAd: Not showing ad due to conditions." }
         return
     }
 
@@ -129,7 +131,7 @@ actual fun SmartBannerAd(
 
     // If the selected ad is not available, try to find any available ad as fallback
     val availableAd = bannerAd ?: run {
-        println("⚠️ SmartBannerAd: Primary ad ($actualAdSize) not available, trying fallbacks")
+        log.w { "SmartBannerAd: Primary ad ($actualAdSize) not available, trying fallbacks" }
         if (placementType == AdPlacementType.NAVIGATION) {
             // For navigation, prefer navigation ads or basic banner ads
             preloadedNavigationBannerAd ?: preloadedNavigationLargeBannerAd ?: preloadedNavigationLeaderboardAd ?: 
@@ -143,18 +145,18 @@ actual fun SmartBannerAd(
 
     // Safety check: ensure we have a banner ad to show
     if (availableAd == null) {
-        println("⚠️ SmartBannerAd: No preloaded ad available for size $actualAdSize - skipping ad display")
+        log.w { "SmartBannerAd: No preloaded ad available for size $actualAdSize - skipping ad display" }
         return
     }
 
     // 🚀 PERFORMANCE: Fast-path return for failing ads to avoid layout delays
     if (availableAd.state == AdState.FAILING || availableAd.state == AdState.NONE) {
-        println("⚠️ SmartBannerAd: Ad state is ${availableAd.state} - skipping to avoid layout delays")
+        log.v { "SmartBannerAd: Ad state is ${availableAd.state} - skipping to avoid layout delays" }
         return
     }
 
     // Debug logging for ad state
-    println("🎯 SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType")
+    log.v { "SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType" }
 
     // IMPORTANT: Always render BannerAd Composable to trigger load on iOS
     // Show layout when ad is ready, showing, or loading
@@ -217,20 +219,20 @@ actual fun SmartBannerAd(
             
             // Log loading state for debugging
             if (availableAd.state == AdState.LOADING) {
-                println("🔄 SmartBannerAd: Ad is loading for placement $placementType - BannerAd Composable rendered to trigger load")
+                log.d { "🔄 SmartBannerAd: Ad is loading for placement $placementType - BannerAd Composable rendered to trigger load" }
             }
         }
 
         AdState.FAILING, AdState.NONE, AdState.DISMISSED -> {
             // Ad failed to load or was dismissed - don't show anything (no placeholder)
             // This prevents white gaps and invisible barriers when ads fail to load
-            println("⚠️ SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType - hiding ad space")
+            log.v { "SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType - hiding ad space" }
             // Don't render anything - let the layout collapse
         }
 
         else -> {
             // Unknown state or SHOWN (already displayed)
-            println("❓ SmartBannerAd: Unknown ad state ${availableAd.state} for placement $placementType")
+            log.w { "SmartBannerAd: Unknown ad state ${availableAd.state} for placement $placementType" }
         }
     }
 }
@@ -244,8 +246,9 @@ fun SmartBannerAdContent(
     onSizeChanged: ((Dp, Int) -> Unit)?,
     bannerAd: BannerAdHandler,
 ) {
+    val log = logger()
     // Log AdSize dimensions (can't rely on == comparison on iOS since AdSize constants aren't singletons)
-    println("SmartBannerAdContent: adSize dimensions = ${adSize.width}x${adSize.height}")
+    log.v { "SmartBannerAdContent: adSize dimensions = ${adSize.width}x${adSize.height}" }
     
     BoxWithConstraints {
         val availableWidthDp = maxWidth
@@ -274,7 +277,7 @@ fun SmartBannerAdContent(
                         .height(bannerHeight)
                         .onSizeChanged { size ->
                             // Optional: Log the actual size for debugging
-                            println("SmartBannerAd: Available width: ${availableWidthDp}, Height: ${size.height}px, Banner height: ${bannerHeight}")
+                            log.v { "SmartBannerAd: Available width: ${availableWidthDp}, Height: ${size.height}px, Banner height: ${bannerHeight}" }
                             // Call custom callback if provided
                             onSizeChanged?.invoke(availableWidthDp, size.height)
                         },
@@ -297,10 +300,11 @@ fun SmartBannerAdContent(
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 fun getAdSizeForPlacement(placementType: AdPlacementType): AdSize {
+    val log = logger()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val widthSizeClass = windowSizeClass.windowWidthSizeClass
 
-    println("SmartBannerAd: Placement=$placementType, WidthClass=$widthSizeClass")
+    log.v { "SmartBannerAd: Placement=$placementType, WidthClass=$widthSizeClass" }
 
     return when (placementType) {
         AdPlacementType.NAVIGATION -> {

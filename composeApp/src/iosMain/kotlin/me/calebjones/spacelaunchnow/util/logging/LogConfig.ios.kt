@@ -1,0 +1,32 @@
+package me.calebjones.spacelaunchnow.util.logging
+
+import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.platformLogWriter
+import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.util.EnvironmentManager
+
+actual fun platformLogConfig(): LogConfig {
+    val minSeverity = if (BuildConfig.isDebug) {
+        Severity.Debug
+    } else {
+        Severity.Warn
+    }
+    
+    val writers = buildList<LogWriter> {
+        // iOS OSLog for native logging
+        add(platformLogWriter())
+
+        // DataDog integration (if enabled) - always starts with WARN for production safety
+        if (shouldEnableDataDog()) {
+            add(DataDogLogWriter())
+        }
+    }
+
+    return LogConfig(minSeverity, writers)
+}
+
+private fun shouldEnableDataDog(): Boolean {
+    return EnvironmentManager.getEnvBoolean("DATADOG_ENABLED", false)
+}
+

@@ -38,6 +38,7 @@ import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.storage.TemporaryAccessStatus
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.ui.ads.RewardedAdHandler
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
 /**
  * Card component for temporary premium access via rewarded ads.
@@ -64,6 +65,7 @@ fun TemporaryPremiumCard(
     }
     var showRewardedAd by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val log = SpaceLogger.getLogger("TemporaryPremiumCard")
 
     // Check temporary access status for all features
     LaunchedEffect(features) {
@@ -214,7 +216,6 @@ fun TemporaryPremiumCard(
         RewardedAdHandler(
             shouldShow = true,
             onRewardEarned = { rewardAmount, rewardType ->
-                println("🎉 User earned reward: $rewardAmount $rewardType")
                 // Grant temporary access to all features when ad is completed
                 coroutineScope.launch {
                     features.forEach { feature ->
@@ -230,11 +231,11 @@ fun TemporaryPremiumCard(
             },
             onAdShown = {
                 // Ad started showing successfully
-                println("✅ Rewarded ad shown for temporary premium access")
+                log.i { "✅ Rewarded ad shown for temporary premium access" }
             },
             onAdFailed = { error ->
                 // Ad failed to show
-                println("❌ Failed to show rewarded ad: $error")
+                log.e { "❌ Failed to show rewarded ad: $error" }
                 showRewardedAd = false
             }
         )

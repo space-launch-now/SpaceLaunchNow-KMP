@@ -34,6 +34,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Helper class for displaying notifications with consistent formatting
@@ -61,6 +62,8 @@ object NotificationDisplayHelper {
     private const val CHANNEL_NEWS_NAME = "News & Updates"
 
     private const val NOTIFICATION_ID = 1
+
+    private val log = logger()
 
     /**
      * Get the notification channel ID for a specific NotificationTopic
@@ -237,54 +240,54 @@ object NotificationDisplayHelper {
      * This method uses runBlocking to make it synchronous, suitable for notification contexts
      */
     private fun loadImageFromUrlSync(context: Context, imageUrl: String?): Bitmap? {
-        println("🖼️ [ImageLoader] Starting image load...")
-        println("🖼️ [ImageLoader] URL: $imageUrl")
+        log.d("🖼️ [ImageLoader] Starting image load...")
+        log.d("🖼️ [ImageLoader] URL: $imageUrl")
 
         if (imageUrl.isNullOrBlank()) {
-            println("🖼️ [ImageLoader] ❌ URL is null or blank, skipping image load")
+            log.d("🖼️ [ImageLoader] ❌ URL is null or blank, skipping image load")
             return null
         }
 
         return try {
-            println("🖼️ [ImageLoader] Creating ImageLoader and request...")
+            log.d("🖼️ [ImageLoader] Creating ImageLoader and request...")
             val bitmap = runBlocking(Dispatchers.IO) {
-                println("🖼️ [ImageLoader] Running in IO dispatcher...")
+                log.d("🖼️ [ImageLoader] Running in IO dispatcher...")
                 val imageLoader = ImageLoader(context)
-                println("🖼️ [ImageLoader] ImageLoader created: $imageLoader")
+                log.d("🖼️ [ImageLoader] ImageLoader created: $imageLoader")
 
                 val request = ImageRequest.Builder(context)
                     .data(imageUrl)
                     .size(Size(512, 512)) // Limit size for notifications
                     .allowHardware(false) // Software bitmaps required for notifications
                     .build()
-                println("🖼️ [ImageLoader] Request built: ${request.data}")
+                log.d("🖼️ [ImageLoader] Request built: ${request.data}")
 
-                println("🖼️ [ImageLoader] Executing request...")
+                log.d("🖼️ [ImageLoader] Executing request...")
                 val result = imageLoader.execute(request)
-                println("🖼️ [ImageLoader] Result received")
-                println("🖼️ [ImageLoader] Result image: ${result.image}")
-                println("🖼️ [ImageLoader] Result image type: ${result.image?.javaClass?.simpleName}")
+                log.d("🖼️ [ImageLoader] Result received")
+                log.d("🖼️ [ImageLoader] Result image: ${result.image}")
+                log.d("🖼️ [ImageLoader] Result image type: ${result.image?.javaClass?.simpleName}")
 
                 // Coil3 returns a BitmapImage, extract the bitmap using toBitmap()
                 val bitmap = result.image?.toBitmap()
                 if (bitmap != null) {
-                    println("🖼️ [ImageLoader] ✅ Successfully extracted bitmap: ${bitmap.width}x${bitmap.height}")
+                    log.d("🖼️ [ImageLoader] ✅ Successfully extracted bitmap: ${bitmap.width}x${bitmap.height}")
                     bitmap
                 } else {
-                    println("🖼️ [ImageLoader] ❌ Failed to extract bitmap from image")
+                    log.d("🖼️ [ImageLoader] ❌ Failed to extract bitmap from image")
                     null
                 }
             }
 
             if (bitmap != null) {
-                println("🖼️ [ImageLoader] ✅ Final bitmap ready: ${bitmap.width}x${bitmap.height}, config: ${bitmap.config}")
+                log.d("🖼️ [ImageLoader] ✅ Final bitmap ready: ${bitmap.width}x${bitmap.height}, config: ${bitmap.config}")
             } else {
-                println("🖼️ [ImageLoader] ❌ Final bitmap is null")
+                log.d("🖼️ [ImageLoader] ❌ Final bitmap is null")
             }
 
             bitmap
         } catch (e: Exception) {
-            println("🖼️ [ImageLoader] ❌ Exception during image load: ${e.javaClass.simpleName}: ${e.message}")
+            log.d("🖼️ [ImageLoader] ❌ Exception during image load: ${e.javaClass.simpleName}: ${e.message}")
             e.printStackTrace()
             null
         }
@@ -295,39 +298,39 @@ object NotificationDisplayHelper {
      * For use in coroutine contexts
      */
     private suspend fun loadImageFromUrl(context: Context, imageUrl: String?): Bitmap? {
-        println("🖼️ [ImageLoader-Async] Starting async image load...")
-        println("🖼️ [ImageLoader-Async] URL: $imageUrl")
+        log.d("🖼️ [ImageLoader-Async] Starting async image load...")
+        log.d("🖼️ [ImageLoader-Async] URL: $imageUrl")
 
         if (imageUrl.isNullOrBlank()) {
-            println("🖼️ [ImageLoader-Async] ❌ URL is null or blank")
+            log.d("🖼️ [ImageLoader-Async] ❌ URL is null or blank")
             return null
         }
 
         return withContext(Dispatchers.IO) {
             try {
-                println("🖼️ [ImageLoader-Async] Creating ImageLoader...")
+                log.d("🖼️ [ImageLoader-Async] Creating ImageLoader...")
                 val imageLoader = ImageLoader(context)
                 val request = ImageRequest.Builder(context)
                     .data(imageUrl)
                     .size(Size(512, 512)) // Limit size for notifications
                     .allowHardware(false) // Software bitmaps required for notifications
                     .build()
-                println("🖼️ [ImageLoader-Async] Executing request...")
+                log.d("🖼️ [ImageLoader-Async] Executing request...")
 
                 val result = imageLoader.execute(request)
-                println("🖼️ [ImageLoader-Async] Result: ${result.image}")
+                log.d("🖼️ [ImageLoader-Async] Result: ${result.image}")
 
                 // Coil3 returns a BitmapImage, extract the bitmap using toBitmap()
                 val bitmap = result.image?.toBitmap()
                 if (bitmap != null) {
-                    println("🖼️ [ImageLoader-Async] ✅ Bitmap extracted: ${bitmap.width}x${bitmap.height}")
+                    log.d("🖼️ [ImageLoader-Async] ✅ Bitmap extracted: ${bitmap.width}x${bitmap.height}")
                     bitmap
                 } else {
-                    println("🖼️ [ImageLoader-Async] ❌ Failed to extract bitmap")
+                    log.d("🖼️ [ImageLoader-Async] ❌ Failed to extract bitmap")
                     null
                 }
             } catch (e: Exception) {
-                println("🖼️ [ImageLoader-Async] ❌ Exception: ${e.javaClass.simpleName}: ${e.message}")
+                log.e("🖼️ [ImageLoader-Async] ❌ Exception: ${e.javaClass.simpleName}: ${e.message}")
                 e.printStackTrace()
                 null
             }
@@ -339,7 +342,7 @@ object NotificationDisplayHelper {
      * Creates a red badge with white text in the top-right corner
      */
     private fun drawLiveBadge(originalBitmap: Bitmap): Bitmap {
-        println("🎨 [LiveBadge] Drawing LIVE badge on bitmap...")
+        log.d("🎨 [LiveBadge] Drawing LIVE badge on bitmap...")
 
         // Create a mutable copy of the bitmap
         val mutableBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true)
@@ -394,7 +397,7 @@ object NotificationDisplayHelper {
 
         canvas.drawText(text, textX, textY, textPaint)
 
-        println("🎨 [LiveBadge] ✅ LIVE badge drawn successfully")
+        log.d("🎨 [LiveBadge] ✅ LIVE badge drawn successfully")
         return mutableBitmap
     }
 
@@ -413,7 +416,7 @@ object NotificationDisplayHelper {
             val date = inputFormat.parse(launchNet)
 
             if (date == null) {
-                println("⚠️ Failed to parse launch date: $launchNet")
+                log.d("⚠️ Failed to parse launch date: $launchNet")
                 return launchNet
             }
 
@@ -433,7 +436,7 @@ object NotificationDisplayHelper {
                     prefs.getUseUtc()
                 }
             } catch (e: Exception) {
-                println("⚠️ Failed to get UTC preference: ${e.message}")
+                log.e("⚠️ Failed to get UTC preference: ${e.message}")
                 false // Default to local time if preference can't be read
             }
 
@@ -450,7 +453,7 @@ object NotificationDisplayHelper {
             // Append UTC suffix if user prefers UTC display
             if (useUtc) "$formattedTime UTC" else formattedTime
         } catch (e: Exception) {
-            println("⚠️ Failed to parse launch date: $launchNet - ${e.message}")
+            log.e("⚠️ Failed to parse launch date: $launchNet - ${e.message}")
             launchNet // Return original if parsing fails
         }
     }
@@ -546,10 +549,7 @@ object NotificationDisplayHelper {
         )
 
         // Build base notification
-        println("📱 [Notification] Building notification...")
-        println("📱 [Notification] Title: $displayTitle")
-        println("📱 [Notification] Body: $displayBody")
-        println("📱 [Notification] Channel: $channelId")
+        log.d("📱 [Notification] Building notification... Title: $displayTitle Body: $displayBody Channel: $channelId")
 
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
             .setContentTitle(displayTitle)
@@ -561,22 +561,22 @@ object NotificationDisplayHelper {
             .setOnlyAlertOnce(true)
 
         // Load and display image if available using Coil
-        println("📱 [Notification] Image URL from notificationData: ${notificationData.launchImage}")
-        println("📱 [Notification] Webcast available: ${notificationData.webcast}")
+        log.d("📱 [Notification] Image URL from notificationData: ${notificationData.launchImage}")
+        log.d("📱 [Notification] Webcast available: ${notificationData.webcast}")
 
         var imageBitmap = loadImageFromUrlSync(context, notificationData.launchImage)
-        println("📱 [Notification] Image bitmap result: $imageBitmap")
+        log.d("📱 [Notification] Image bitmap result: $imageBitmap")
 
         // Add LIVE badge if webcast is available
         if (imageBitmap != null && notificationData.isWebcastLive()) {
-            println("📱 [Notification] 🔴 Adding LIVE badge (webcast available)")
+            log.d("📱 [Notification] 🔴 Adding LIVE badge (webcast available)")
             imageBitmap = drawLiveBadge(imageBitmap)
         }
 
         if (imageBitmap != null) {
-            println("📱 [Notification] ✅ Setting large icon and BigPictureStyle")
-            println("📱 [Notification] Bitmap size: ${imageBitmap.width}x${imageBitmap.height}")
-            println("📱 [Notification] Bitmap config: ${imageBitmap.config}")
+            log.d("📱 [Notification] ✅ Setting large icon and BigPictureStyle")
+            log.d("📱 [Notification] Bitmap size: ${imageBitmap.width}x${imageBitmap.height}")
+            log.d("📱 [Notification] Bitmap config: ${imageBitmap.config}")
 
             notificationBuilder
                 .setLargeIcon(imageBitmap)
@@ -585,9 +585,9 @@ object NotificationDisplayHelper {
                         .bigPicture(imageBitmap)
                         .bigLargeIcon(null as Bitmap?) // Hide large icon when expanded
                 )
-            println("📱 [Notification] BigPictureStyle applied")
+            log.d("📱 [Notification] BigPictureStyle applied")
         } else {
-            println("📱 [Notification] ❌ No image bitmap, using BigTextStyle fallback")
+            log.d("📱 [Notification] ❌ No image bitmap, using BigTextStyle fallback")
             // Use BigTextStyle if no image available
             notificationBuilder.setStyle(
                 NotificationCompat.BigTextStyle()
@@ -595,26 +595,25 @@ object NotificationDisplayHelper {
             )
         }
 
-        println("📱 [Notification] Building final notification...")
+        log.d("📱 [Notification] Building final notification...")
         val notification = notificationBuilder.build()
-        println("📱 [Notification] Notification built successfully")
+        log.i("📱 [Notification] Notification built successfully")
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        println("📱 [Notification] NotificationManager obtained")
+        log.d("📱 [Notification] NotificationManager obtained")
 
         // Use launchId as the notification tag (collapse key)
         // This ensures multiple notifications for the same launch replace each other
-        println("📱 [Notification] Showing notification with:")
-        println("📱 [Notification]   - Tag: ${notificationData.launchId}")
-        println("📱 [Notification]   - ID: ${notificationData.launchId.hashCode()}")
+        log.i("📱 [Notification] Showing notification with Tag: ${notificationData.launchId} ID: ${notificationData.launchId.hashCode()}")
+
 
         notificationManager.notify(
             notificationData.launchId, // Tag for collapsing notifications
             notificationData.launchId.hashCode(), // Notification ID
             notification
         )
-        println("📱 [Notification] ✅ Notification shown successfully!")
+        log.i("📱 [Notification] ✅ Notification shown successfully!")
     }
 
     /**
@@ -650,6 +649,7 @@ object NotificationDisplayHelper {
         title: String,
         body: String
     ) {
+        log.i("📱 [Notification] Showing basic fallback notification...")
         createNotificationChannels(context)
 
         val intent = Intent(context, MainActivity::class.java).apply {

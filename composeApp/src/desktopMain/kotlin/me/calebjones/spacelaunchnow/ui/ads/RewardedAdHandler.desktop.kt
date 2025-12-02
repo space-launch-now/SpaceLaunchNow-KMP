@@ -1,6 +1,9 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
+import me.calebjones.spacelaunchnow.logger
+
+private val log = logger()
 
 /**
  * Desktop implementation of RewardedAdHandler (no-op).
@@ -15,6 +18,6 @@ actual fun RewardedAdHandler(
 ) {
     // No-op: Desktop doesn't show ads
     if (shouldShow) {
-        println("🎯 RewardedAdHandler (Desktop): Ads not supported, skipping")
+        log.d { "🎯 RewardedAdHandler (Desktop): Ads not supported, skipping" }
     }
 }

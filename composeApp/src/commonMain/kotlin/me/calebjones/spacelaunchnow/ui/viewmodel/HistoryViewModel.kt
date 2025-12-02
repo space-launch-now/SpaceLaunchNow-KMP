@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Manages "This Day in History" launch data for the home screen.
@@ -19,6 +20,8 @@ import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 class HistoryViewModel(
     private val launchRepository: LaunchRepository
 ) : ViewModel() {
+
+    private val log = logger()
 
     // ========== Data Classes ==========
 
@@ -61,8 +64,7 @@ class HistoryViewModel(
                 )
 
                 result.onSuccess { paginatedLaunches ->
-                    println("=== HistoryViewModel: Received History Launches ===")
-                    println("Total launches on $month/$day: ${paginatedLaunches.count}")
+                    log.i { "Received history launches - Total on $month/$day: ${paginatedLaunches.count}" }
 
                     _historyState.update {
                         it.copy(

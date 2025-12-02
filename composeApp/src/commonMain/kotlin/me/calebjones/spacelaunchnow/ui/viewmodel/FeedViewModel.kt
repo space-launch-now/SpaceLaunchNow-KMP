@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Manages news and updates feed data for the home screen:
@@ -24,6 +25,8 @@ class FeedViewModel(
     private val updatesRepository: UpdatesRepository,
     private val articlesRepository: ArticlesRepository
 ) : ViewModel() {
+
+    private val log = logger()
 
     // ========== ViewState Properties ==========
 
@@ -51,8 +54,7 @@ class FeedViewModel(
                 val result = updatesRepository.getLatestUpdates(limit, forceRefresh)
 
                 result.onSuccess { dataResult ->
-                    println("=== FeedViewModel: Received Updates ===")
-                    println("Total updates: ${dataResult.data.count}")
+                    log.i { "Received updates - Total: ${dataResult.data.count}" }
 
                     _updatesState.update {
                         it.copy(
@@ -97,8 +99,7 @@ class FeedViewModel(
                 val result = articlesRepository.getArticles(limit, forceRefresh)
 
                 result.onSuccess { dataResult ->
-                    println("=== FeedViewModel: Received Articles ===")
-                    println("Total articles: ${dataResult.data.count}")
+                    log.i { "Received articles - Total: ${dataResult.data.count}" }
 
                     _articlesState.update {
                         it.copy(
