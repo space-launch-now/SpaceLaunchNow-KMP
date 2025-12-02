@@ -70,7 +70,21 @@ class AndroidBillingManager(
             Result.success(Unit)
         } catch (e: Exception) {
             println("AndroidBillingManager: ❌ Failed to initialize - ${e.message}")
-            DatadogLogger.error("Failed to initialize AndroidBillingManager", e)
+            e.printStackTrace()
+            
+            DatadogLogger.error(
+                "Failed to initialize AndroidBillingManager",
+                e,
+                mapOf(
+                    "error_type" to (e::class.simpleName ?: "Unknown"),
+                    "error_message" to (e.message ?: "No message"),
+                    "error_cause" to (e.cause?.message ?: "No cause"),
+                    "stack_trace" to (e.stackTraceToString().take(500)),
+                    "is_debug" to BuildConfig.IS_DEBUG,
+                    "api_key_configured" to BuildConfig.REVENUECAT_ANDROID_KEY.isNotEmpty(),
+                    "app_user_id" to (appUserId ?: "null")
+                )
+            )
             Result.failure(e)
         }
     }

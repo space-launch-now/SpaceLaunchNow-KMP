@@ -101,15 +101,37 @@ class LocalSubscriptionStorage {
                 println("LocalSubscriptionStorage: ❌ Verification failed - read-back mismatch!")
                 println("  Expected: $data")
                 println("  Read back: $readBack")
+                
+                // Detailed field comparison for debugging
+                val diagnostics = mutableMapOf<String, Any>(
+                    "expected_type" to data.subscriptionType.name,
+                    "read_back_type" to (readBack?.subscriptionType?.name ?: "null"),
+                    "expected_subscribed" to data.isSubscribed,
+                    "read_back_subscribed" to (readBack?.isSubscribed ?: false),
+                    "types_match" to (data.subscriptionType == readBack?.subscriptionType),
+                    "subscribed_match" to (data.isSubscribed == readBack?.isSubscribed),
+                    "entitlements_match" to (data.entitlements == readBack?.entitlements),
+                    "product_ids_match" to (data.productIds == readBack?.productIds),
+                    "read_back_null" to (readBack == null),
+                    "store_file_path" to "${AppDirectories.getAppDataDir()}/subscription_data.json"
+                )
+                
+                // Add entitlement comparison if they differ
+                if (data.entitlements != readBack?.entitlements) {
+                    diagnostics["expected_entitlements"] = data.entitlements.joinToString(",")
+                    diagnostics["read_back_entitlements"] = (readBack?.entitlements?.joinToString(",") ?: "")
+                }
+                
+                // Add product ID comparison if they differ
+                if (data.productIds != readBack?.productIds) {
+                    diagnostics["expected_product_ids"] = data.productIds.joinToString(",")
+                    diagnostics["read_back_product_ids"] = (readBack?.productIds?.joinToString(",") ?: "")
+                }
+                
                 me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
                     "Subscription state verification failed - read-back mismatch",
                     null,
-                    mapOf(
-                        "expected_type" to data.subscriptionType.name,
-                        "read_back_type" to (readBack?.subscriptionType?.name ?: "null"),
-                        "expected_subscribed" to data.isSubscribed,
-                        "read_back_subscribed" to (readBack?.isSubscribed ?: false)
-                    )
+                    diagnostics
                 )
             }
 

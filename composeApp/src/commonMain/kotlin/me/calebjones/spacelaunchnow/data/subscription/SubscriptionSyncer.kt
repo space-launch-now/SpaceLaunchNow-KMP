@@ -64,6 +64,13 @@ class SubscriptionSyncer(
                     } else {
                         println("SubscriptionSyncer: ❌ CRITICAL: Failed to persist subscription state!")
                         println("  User will lose premium access on next app restart")
+                        
+                        // Get current stored data to understand what's persisted
+                        val currentStored = try {
+                            localStorage.get()
+                        } catch (e: Exception) {
+                            null
+                        }
 
                         me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
                             "Failed to persist subscription state during sync",
@@ -72,7 +79,14 @@ class SubscriptionSyncer(
                                 "subscription_type" to purchaseState.subscriptionType.name,
                                 "is_subscribed" to purchaseState.isSubscribed,
                                 "entitlements" to purchaseState.activeEntitlements.joinToString(","),
-                                "product_ids" to purchaseState.activeProductIds.joinToString(",")
+                                "product_ids" to purchaseState.activeProductIds.joinToString(","),
+                                "sync_timestamp" to currentTime,
+                                "time_since_last_sync_ms" to (currentTime - lastSyncTime),
+                                "cooldown_ms" to syncCooldownMs,
+                                "current_stored_type" to (currentStored?.subscriptionType?.name ?: "null"),
+                                "current_stored_subscribed" to (currentStored?.isSubscribed ?: false),
+                                "current_stored_debug_mode" to (currentStored?.isDebugMode ?: false),
+                                "attempted_new_data" to newData.toString()
                             )
                         )
 
