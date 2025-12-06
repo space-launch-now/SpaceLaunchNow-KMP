@@ -5,8 +5,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.workers.NotificationWorker
 
 /**
@@ -18,6 +18,8 @@ import me.calebjones.spacelaunchnow.workers.NotificationWorker
  */
 class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
 
+    private val log = logger()
+
     override fun onCreate() {
         super.onCreate()
         // Create notification channels
@@ -27,20 +29,8 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        println("=== FCM Message Received ===")
-        println("From: ${remoteMessage.from}")
-        println("MessageId: ${remoteMessage.messageId}")
-        println("Data: ${remoteMessage.data}")
-
-        DatadogLogger.info(
-            "FCM notification received - delegating to WorkManager", mapOf(
-                "messageId" to remoteMessage.messageId,
-                "from" to remoteMessage.from,
-                "dataSize" to remoteMessage.data.size,
-                "hasNotificationPayload" to (remoteMessage.notification != null),
-                "data" to remoteMessage.data.toString()
-            )
-        )
+        log.i { "FCM notification received - delegating to WorkManager - messageId: ${remoteMessage.messageId}, from: ${remoteMessage.from}, dataSize: ${remoteMessage.data.size}, hasNotificationPayload: ${remoteMessage.notification != null}" }
+        log.v { "FCM data: ${remoteMessage.data}" }
 
         // CRITICAL: Delegate to WorkManager immediately to avoid execution timeout
         // FCM onMessageReceived has ~10 second window, but image loading can take longer
@@ -65,25 +55,12 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
 
         WorkManager.getInstance(this).enqueue(workRequest)
 
-        println("✅ Notification processing delegated to WorkManager: ${workRequest.id}")
-        DatadogLogger.info(
-            "Notification processing delegated to WorkManager", mapOf(
-                "workRequestId" to workRequest.id.toString(),
-                "messageId" to remoteMessage.messageId
-            )
-        )
+        log.i { "Notification processing delegated to WorkManager - workRequestId: ${workRequest.id}, messageId: ${remoteMessage.messageId}" }
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        println("New FCM token: $token")
-
-        DatadogLogger.info(
-            "New FCM token generated", mapOf(
-                "tokenLength" to token.length,
-                "tokenPrefix" to token.take(10)
-            )
-        )
+        log.i { "New FCM token generated - length: ${token.length}, prefix: ${token.take(10)}" }
 
         // TODO: Send token to backend if needed
     }

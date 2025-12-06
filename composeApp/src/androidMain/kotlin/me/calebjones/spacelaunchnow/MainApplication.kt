@@ -14,6 +14,8 @@ import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.workers.WidgetUpdateWorker
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
@@ -29,26 +31,27 @@ class MainApplication : Application() {
     // Inject dependencies for initialization
     private val billingManager: BillingManager by inject()
 
+    private val log = logger()
+
     override fun onCreate() {
         super.onCreate()
         instance = this
 
-        Log.d("MainApplication", "=== Starting Application onCreate ===")
+        // Initialize logging FIRST - before any other initialization
+        SpaceLogger.initialize()
+        log.i { "=== Starting Application onCreate ===" }
 
         // Initialize BuildConfig FIRST before Koin to set DEBUG flag
         initializeBuildConfig()
-        Log.d(
-            "MainApplication",
-            "BuildConfig initialized, IS_DEBUG = ${me.calebjones.spacelaunchnow.util.BuildConfig.IS_DEBUG}"
-        )
+        log.d { "BuildConfig initialized, IS_DEBUG = ${me.calebjones.spacelaunchnow.util.BuildConfig.IS_DEBUG}" }
 
         // Initialize AppDirectories for KStore file storage
-        Log.d("MainApplication", "Initializing AppDirectories...")
+        log.d { "Initializing AppDirectories..." }
         me.calebjones.spacelaunchnow.data.subscription.AppDirectories.initialize(this)
-        Log.d("MainApplication", "✅ AppDirectories initialized")
+        log.d { "✅ AppDirectories initialized" }
 
         // Now start Koin - BuildConfig.IS_DEBUG is now set
-        Log.d("MainApplication", "Starting Koin...")
+        log.d { "Starting Koin..." }
         try {
             val koin = startKoin {
                 androidLogger(Level.DEBUG)
@@ -56,77 +59,77 @@ class MainApplication : Application() {
                 includes(koinConfig)
             }
 
-            Log.d("MainApplication", "Koin started successfully")
+            log.d { "Koin started successfully" }
 
             // Test if NotificationRepository is registered
             val notificationRepo = koin.koin.getOrNull<NotificationRepository>()
             if (notificationRepo != null) {
-                Log.d("MainApplication", "✅ NotificationRepository is registered")
+                log.d { "✅ NotificationRepository is registered" }
             } else {
-                Log.e("MainApplication", "❌ NotificationRepository is NOT registered!")
+                log.e { "❌ NotificationRepository is NOT registered!" }
             }
 
         } catch (e: Exception) {
-            Log.e("MainApplication", "Failed to start Koin", e)
+            log.e(e) { "Failed to start Koin" }
             throw e
         }
 
         // Initialize Datadog analytics using KMP SDK
-        Log.d("MainApplication", "Initializing Datadog...")
+        log.d { "Initializing Datadog..." }
         try {
             // initializeDatadog reads from .env file via EnvironmentManager
             initializeDatadog(context = this)
-            Log.d("MainApplication", "✅ Datadog initialized successfully")
+            log.d { "✅ Datadog initialized successfully" }
         } catch (e: Exception) {
-            Log.e("MainApplication", "❌ Failed to initialize Datadog", e)
+            log.e(e) { "❌ Failed to initialize Datadog" }
             // Don't crash the app if Datadog fails
         }
 
         // Initialize Billing and Subscription system after Koin is ready
-        Log.d("MainApplication", "Initializing Billing and Subscription system...")
+        log.d { "Initializing Billing and Subscription system..." }
 
         @Suppress("OPT_IN_USAGE")
         kotlinx.coroutines.GlobalScope.launch {
             try {
-                Log.d("MainApplication", "🚀 Starting billing and subscription initialization...")
-                
+                log.d { "🚀 Starting billing and subscription initialization..." }
+
                 // Step 1: Initialize BillingManager (RevenueCat)
                 billingManager.initialize(appUserId = null)
-                Log.d("MainApplication", "✅ BillingManager initialized successfully")
-                
+                log.d { "✅ BillingManager initialized successfully" }
+
                 // Step 2: Initialize and start SubscriptionSyncer
                 // This listens to billing state changes and persists to LocalSubscriptionStorage
                 val syncer = getKoin().get<me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer>()
                 syncer.startSyncing()
-                Log.d("MainApplication", "✅ SubscriptionSyncer started successfully")
-                
+                log.d { "✅ SubscriptionSyncer started successfully" }
+
                 // Step 3: Initialize SubscriptionRepository (loads cached state)
                 val repository = getKoin().get<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
                 repository.initialize()
-                Log.d("MainApplication", "✅ SubscriptionRepository initialized successfully")
-                
+                log.d { "✅ SubscriptionRepository initialized successfully" }
+
                 // Step 4: Force initial sync to ensure purchase state is persisted
                 syncer.syncNow()
-                Log.d("MainApplication", "✅ Initial subscription sync complete")
-                
-                Log.d("MainApplication", "🎉 All billing and subscription systems initialized")
+                log.d { "✅ Initial subscription sync complete" }
+
+                log.i { "🎉 All billing and subscription systems initialized" }
             } catch (e: Exception) {
-                Log.e("MainApplication", "❌ Failed to initialize Billing/Subscription system", e)
+                log.e(e) { "❌ Failed to initialize Billing/Subscription system" }
                 // Don't crash the app if billing fails
             }
         }
 
-        Log.d("MainApplication", "Creating notification channels...")
+        log.d { "Creating notification channels..." }
 
         // Create notification channels for Android O+
         NotificationDisplayHelper.createNotificationChannels(this)
 
-        Log.d("MainApplication", "Scheduling widget updates...")
+        log.d { "Scheduling widget updates..." }
 
         // Schedule widget updates
         scheduleWidgetUpdates()
 
-        Log.d("MainApplication", "=== Application onCreate complete ===")
+        log.i { "=== Application onCreate complete ===" }
     }
 
     private fun scheduleWidgetUpdates() {

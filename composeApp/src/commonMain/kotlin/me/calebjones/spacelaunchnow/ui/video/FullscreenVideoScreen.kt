@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -54,6 +55,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLType
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import kotlin.time.Clock.System
 
+private val log = SpaceLogger.getLogger("FullscreenVideoScreen")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullscreenVideoScreen(
@@ -73,11 +76,11 @@ fun FullscreenVideoScreen(
 
     // Auto-hide controls after 3 seconds
     LaunchedEffect(showControls, lastTapTime) {
-        println("LaunchedEffect triggered - showControls: $showControls, lastTapTime: $lastTapTime")
+        log.v { "LaunchedEffect triggered - showControls: $showControls, lastTapTime: $lastTapTime" }
         if (showControls) {
             delay(3000)
             if (showControls) { // Check again in case user interacted during delay
-                println("Auto-hiding controls after 3 seconds")
+                log.v { "Auto-hiding controls after 3 seconds" }
                 showControls = false
             }
         }
@@ -110,7 +113,6 @@ fun FullscreenVideoScreen(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-                                println("Touch overlay tapped - showing controls")
                                 showControls = true
                                 lastTapTime = System.now().toEpochMilliseconds()
                             }
@@ -120,14 +122,14 @@ fun FullscreenVideoScreen(
         }
 
         // Animated header bar
-        println("Rendering header bar (detailed) - showControls: $showControls")
+        log.v { "Rendering header bar (detailed) - showControls: $showControls" }
         AnimatedVisibility(
             visible = showControls,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.TopCenter)
         ) {
-            println("AnimatedVisibility content block executing (detailed) - showControls: $showControls")
+            log.v { "AnimatedVisibility content block executing (detailed) - showControls: $showControls" }
             Column {
                 Row(
                     modifier = Modifier
@@ -203,7 +205,7 @@ fun FullscreenVideoScreen(
                                 try {
                                     uriHandler.openUri(vidUrl.url)
                                 } catch (e: Exception) {
-                                    println("Failed to open external URL: ${e.message}")
+                                    log.e("Failed to open external URL: ${e.message}")
                                 }
                             },
                             modifier = Modifier.size(40.dp)
@@ -227,7 +229,6 @@ fun FullscreenVideoScreen(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
                         ) {
-                            println("Control area tapped - hiding controls")
                             showControls = false
                         }
                 )
@@ -362,11 +363,11 @@ fun FullscreenVideoScreen(
 
     // Auto-hide controls after 3 seconds
     LaunchedEffect(showControls, lastTapTime) {
-        println("LaunchedEffect (simplified) triggered - showControls: $showControls, lastTapTime: $lastTapTime")
+        log.v { "LaunchedEffect (simplified) triggered - showControls: $showControls, lastTapTime: $lastTapTime" }
         if (showControls) {
             delay(3000)
             if (showControls) { // Check again in case user interacted during delay
-                println("Auto-hiding controls after 3 seconds (simplified)")
+                log.v { "Auto-hiding controls after 3 seconds (simplified)" }
                 showControls = false
             }
         }
@@ -414,7 +415,7 @@ fun FullscreenVideoScreen(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-                                println("Touch overlay tapped - showing controls")
+                                log.v { "Touch overlay tapped - showing controls" }
                                 showControls = true
                                 lastTapTime = System.now().toEpochMilliseconds()
                             }
@@ -424,14 +425,14 @@ fun FullscreenVideoScreen(
         }
 
         // Animated header bar
-        println("Rendering header bar (simplified) - showControls: $showControls")
+        log.v { "Rendering header bar (simplified) - showControls: $showControls" }
         AnimatedVisibility(
             visible = showControls,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.TopCenter)
         ) {
-            println("AnimatedVisibility content block executing (simplified) - showControls: $showControls")
+            log.v { "AnimatedVisibility content block executing (simplified) - showControls: $showControls" }
             Column {
                 Row(
                     modifier = Modifier
@@ -474,7 +475,7 @@ fun FullscreenVideoScreen(
                             try {
                                 uriHandler.openUri(videoUrl)
                             } catch (e: Exception) {
-                                println("Failed to open external URL: ${e.message}")
+                                log.e("Failed to open external URL: ${e.message}")
                             }
                         },
                         modifier = Modifier.size(40.dp)
@@ -497,7 +498,7 @@ fun FullscreenVideoScreen(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
                         ) {
-                            println("Control area tapped - hiding controls")
+                            log.v { "Control area tapped - hiding controls" }
                             showControls = false
                         }
                 )

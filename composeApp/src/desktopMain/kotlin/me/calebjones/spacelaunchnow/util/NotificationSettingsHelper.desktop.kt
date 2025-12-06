@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.util
 
+import me.calebjones.spacelaunchnow.logger
 import java.awt.Desktop
 import java.net.URI
 
@@ -7,6 +8,7 @@ import java.net.URI
  * Desktop implementation for opening system notification settings
  */
 actual object NotificationSettingsHelper {
+    private val log = logger()
     
     /**
      * Opens system notification settings on Desktop platforms
@@ -60,17 +62,17 @@ actual object NotificationSettingsHelper {
                             try {
                                 ProcessBuilder("gnome-control-center").start()
                             } catch (e: Exception) {
-                                println("Could not open notification settings on this Linux distribution")
+                                log.w { "Could not open notification settings on this Linux distribution" }
                             }
                         }
                     }
                 }
                 else -> {
-                    println("Opening system notification settings not supported on this platform: $os")
+                    log.w { "Opening system notification settings not supported on this platform: $os" }
                 }
             }
         } catch (e: Exception) {
-            println("Failed to open system notification settings: ${e.message}")
+            log.e(e) { "Failed to open system notification settings: ${e.message}" }
         }
     }
 }

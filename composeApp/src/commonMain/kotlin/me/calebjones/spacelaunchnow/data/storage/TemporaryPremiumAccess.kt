@@ -12,6 +12,7 @@ import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
@@ -24,6 +25,7 @@ class TemporaryPremiumAccess(
     private val themePreferences: ThemePreferences? = null,
     private val widgetPreferences: WidgetPreferences? = null
 ) {
+    private val log = logger()
 
     companion object {
         private val TEMP_CUSTOM_THEMES_EXPIRES_AT = longPreferencesKey("temp_custom_themes_expires_at")
@@ -41,7 +43,7 @@ class TemporaryPremiumAccess(
     private fun notifyAccessChanged() {
         val newValue = System.now().toEpochMilliseconds()
         _accessChangeTrigger.value = newValue
-        println("🔔 TemporaryPremiumAccess: notifyAccessChanged() -> trigger = $newValue")
+        log.d { "🔔 notifyAccessChanged() -> trigger = $newValue" }
     }
 
     /**
@@ -51,7 +53,7 @@ class TemporaryPremiumAccess(
         val now = System.now()
         val expiresAt = getExpirationTime(feature)
         val hasAccess = expiresAt?.let { now < it } ?: false
-        println("🔍 TemporaryPremiumAccess.hasTemporaryAccess($feature): now=$now, expiresAt=$expiresAt, hasAccess=$hasAccess")
+        log.d { "🔍 hasTemporaryAccess($feature): now=$now, expiresAt=$expiresAt, hasAccess=$hasAccess" }
         return hasAccess
     }
 
@@ -61,35 +63,35 @@ class TemporaryPremiumAccess(
     suspend fun grantTemporaryAccess(feature: PremiumFeature) {
         val expiresAt = System.now().plus(ACCESS_DURATION)
         
-        println("🎁 TemporaryPremiumAccess.grantTemporaryAccess($feature): granting until $expiresAt")
+        log.i { "🎁 grantTemporaryAccess($feature): granting until $expiresAt" }
         
         dataStore.edit { preferences ->
             when (feature) {
                 PremiumFeature.CUSTOM_THEMES -> {
                     preferences[TEMP_CUSTOM_THEMES_EXPIRES_AT] = expiresAt.toEpochMilliseconds()
-                    println("✅ Saved TEMP_CUSTOM_THEMES_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}")
+                    log.d { "✅ Saved TEMP_CUSTOM_THEMES_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}" }
                 }
                 PremiumFeature.ADVANCED_WIDGETS -> {
                     preferences[TEMP_ADVANCED_WIDGETS_EXPIRES_AT] = expiresAt.toEpochMilliseconds()
-                    println("✅ Saved TEMP_ADVANCED_WIDGETS_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}")
+                    log.d { "✅ Saved TEMP_ADVANCED_WIDGETS_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}" }
                 }
                 PremiumFeature.WIDGETS_CUSTOMIZATION -> {
                     preferences[TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT] = expiresAt.toEpochMilliseconds()
-                    println("✅ Saved TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}")
+                    log.d { "✅ Saved TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT = ${expiresAt.toEpochMilliseconds()}" }
                 }
                 else -> {
                     // Only specific features are supported for temporary access
-                    println("❌ TemporaryPremiumAccess: Feature $feature not supported for temporary access")
+                    log.w { "❌ Feature $feature not supported for temporary access" }
                 }
             }
         }
         
-        println("✅ TemporaryPremiumAccess: Granted 24h access to $feature until $expiresAt")
+        log.i { "✅ Granted 24h access to $feature until $expiresAt" }
         notifyAccessChanged()  // Notify listeners that access has changed
         
         // Verify it was saved
         val savedExpiresAt = getExpirationTime(feature)
-        println("🔍 TemporaryPremiumAccess: Verification read for $feature = $savedExpiresAt")
+        log.d { "🔍 Verification read for $feature = $savedExpiresAt" }
     }
 
     /**
@@ -104,7 +106,7 @@ class TemporaryPremiumAccess(
             else -> null
         }
         
-        println("📖 TemporaryPremiumAccess.getExpirationTime($feature): expiresAtMs=$expiresAtMs")
+        log.v { "📖 getExpirationTime($feature): expiresAtMs=$expiresAtMs" }
         return expiresAtMs?.let { Instant.fromEpochMilliseconds(it) }
     }
 
@@ -162,7 +164,7 @@ class TemporaryPremiumAccess(
                 // Reset theme customizations to defaults
                 themePreferences?.let { prefs ->
                     prefs.resetToDefaults()
-                    println("TemporaryPremiumAccess: Reset theme settings to defaults")
+                    log.i { "Reset theme settings to defaults" }
                 }
             }
             PremiumFeature.ADVANCED_WIDGETS -> {
@@ -170,7 +172,7 @@ class TemporaryPremiumAccess(
                 widgetPreferences?.let { prefs ->
                     // Note: ADVANCED_WIDGETS is about access, not customization
                     // So we don't reset settings here, just remove access
-                    println("TemporaryPremiumAccess: Removed advanced widgets access")
+                    log.i { "Removed advanced widgets access" }
                 }
             }
             PremiumFeature.WIDGETS_CUSTOMIZATION -> {
@@ -179,7 +181,7 @@ class TemporaryPremiumAccess(
                     prefs.updateWidgetThemeSource(WidgetThemeSource.FOLLOW_APP_THEME)
                     prefs.updateWidgetBackgroundAlpha(0.95f) // Default alpha
                     prefs.updateWidgetCornerRadius(16) // Default radius
-                    println("TemporaryPremiumAccess: Reset widget customization settings to defaults")
+                    log.i { "Reset widget customization settings to defaults" }
                 }
             }
             else -> {
@@ -203,7 +205,7 @@ class TemporaryPremiumAccess(
                 if (now >= expiresAt) {
                     preferences.remove(TEMP_CUSTOM_THEMES_EXPIRES_AT)
                     expiredFeatures.add(PremiumFeature.CUSTOM_THEMES)
-                    println("TemporaryPremiumAccess: Cleaned up expired custom themes access")
+                    log.i { "Cleaned up expired custom themes access" }
                 }
             }
             
@@ -213,7 +215,7 @@ class TemporaryPremiumAccess(
                 if (now >= expiresAt) {
                     preferences.remove(TEMP_ADVANCED_WIDGETS_EXPIRES_AT)
                     expiredFeatures.add(PremiumFeature.ADVANCED_WIDGETS)
-                    println("TemporaryPremiumAccess: Cleaned up expired advanced widgets access")
+                    log.i { "Cleaned up expired advanced widgets access" }
                 }
             }
             
@@ -223,7 +225,7 @@ class TemporaryPremiumAccess(
                 if (now >= expiresAt) {
                     preferences.remove(TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT)
                     expiredFeatures.add(PremiumFeature.WIDGETS_CUSTOMIZATION)
-                    println("TemporaryPremiumAccess: Cleaned up expired widgets customization access")
+                    log.i { "Cleaned up expired widgets customization access" }
                 }
             }
         }
@@ -248,7 +250,7 @@ class TemporaryPremiumAccess(
             preferences.remove(TEMP_ADVANCED_WIDGETS_EXPIRES_AT)
             preferences.remove(TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT)
         }
-        println("TemporaryPremiumAccess: Cleared all temporary access")
+        log.i { "Cleared all temporary access" }
         notifyAccessChanged()  // Notify listeners that access has changed
     }
 

@@ -17,6 +17,7 @@ import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 data class SettingsUiState(
     val notificationSettings: NotificationState = NotificationState.DEFAULT,
@@ -79,6 +80,7 @@ class SettingsViewModel(
     private val appSettingsViewModel: AppSettingsViewModel,
     private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
+    private val log = logger()
 
     // Separate state flows for available options
     private val _availableAgencies = MutableStateFlow<List<NotificationAgency>>(emptyList())
@@ -161,9 +163,9 @@ class SettingsViewModel(
                 _availableAgencies.value = agencies
                 _availableLocations.value = locations
 
-                println("Loaded ${agencies.size} agencies and ${locations.size} locations")
+                log.i { "Loaded ${agencies.size} agencies and ${locations.size} locations" }
             } catch (e: Exception) {
-                println("Failed to load available agencies/locations: ${e.message}")
+                log.e(e) { "Failed to load available agencies/locations" }
             }
         }
     }
@@ -176,13 +178,13 @@ class SettingsViewModel(
                 if (enabled) {
                     val hasPermission = notificationRepository.requestNotificationPermission()
                     if (!hasPermission) {
-                        println("Notification permission denied")
+                        log.w { "Notification permission denied" }
                         return@launch
                     }
                 }
                 notificationRepository.setNotificationsEnabled(enabled)
             } catch (e: Exception) {
-                println("Failed to update notifications enabled: ${e.message}")
+                log.e(e) { "Failed to update notifications enabled" }
             }
         }
     }
@@ -262,7 +264,7 @@ class SettingsViewModel(
             try {
                 appSettingsViewModel.updateTheme(theme)
             } catch (e: Exception) {
-                println("Failed to update theme: ${e.message}")
+                log.e(e) { "Failed to update theme" }
             }
         }
     }
@@ -272,7 +274,7 @@ class SettingsViewModel(
             try {
                 appSettingsViewModel.updateUseUtc(useUtc)
             } catch (e: Exception) {
-                println("Failed to update UTC setting: ${e.message}")
+                log.e(e) { "Failed to update UTC setting" }
             }
         }
     }
@@ -282,7 +284,7 @@ class SettingsViewModel(
             try {
                 appSettingsViewModel.updateHideTbdLaunches(hide)
             } catch (e: Exception) {
-                println("Failed to update hide TBD launches: ${e.message}")
+                log.e(e) { "Failed to update hide TBD launches" }
             }
         }
     }
@@ -292,10 +294,10 @@ class SettingsViewModel(
             try {
                 val hasPermission = notificationRepository.requestNotificationPermission()
                 if (!hasPermission) {
-                    println("Notification permission denied or not available")
+                    log.w { "Notification permission denied or not available" }
                 }
             } catch (e: Exception) {
-                println("Failed to request notification permission: ${e.message}")
+                log.e(e) { "Failed to request notification permission" }
             }
         }
     }

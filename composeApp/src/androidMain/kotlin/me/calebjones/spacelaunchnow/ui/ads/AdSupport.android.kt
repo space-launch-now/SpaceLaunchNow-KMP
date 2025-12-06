@@ -3,6 +3,8 @@ package me.calebjones.spacelaunchnow.ui.ads
 import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
@@ -25,6 +27,7 @@ import me.calebjones.spacelaunchnow.LocalPreloadedFluidAd
 import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
 import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Android implementation of AdConsentPopup using Google UMP.
@@ -39,7 +42,6 @@ actual fun AdConsentPopup(
     
     // Only show consent popup if we have a valid Activity
     if (activity == null) {
-        println("⚠️ AdConsentPopup: Activity context is null, consent popup will not be shown")
         return
     }
     
@@ -49,7 +51,6 @@ actual fun AdConsentPopup(
     ConsentPopup(
         consent = consent,
         onFailure = { throwable ->
-            println("❌ Consent popup failure: ${throwable.message}")
             onFailure?.invoke(throwable)
         }
     )
@@ -69,7 +70,6 @@ actual fun WithPreloadedAds(
     val activity = context as? Activity
     
     if (activity == null) {
-        println("⚠️ WithPreloadedAds: Activity context is null, ads will not be loaded")
         // Still provide the content but without ads
         content()
         return

@@ -1,128 +1,113 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
+import kotlin.time.Clock
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
 import me.calebjones.spacelaunchnow.api.extensions.getUpdates
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
-import me.calebjones.spacelaunchnow.data.model.ApiError
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import kotlin.time.Clock.System
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 class UpdatesRepositoryImpl(
     private val updatesApi: UpdatesApi,
     private val localDataSource: UpdateLocalDataSource? = null
 ) : UpdatesRepository {
 
-    private val json = Json { ignoreUnknownKeys = true }
-
-    private suspend fun parseApiError(rawResponse: String): String {
-        return try {
-            val apiError = json.decodeFromString<ApiError>(rawResponse)
-            apiError.getErrorMessage()
-        } catch (e: Exception) {
-            // If we can't parse as ApiError, return the raw response
-            rawResponse
-        }
-    }
+    private val log = logger()
 
     override suspend fun getLatestUpdates(
         limit: Int,
         forceRefresh: Boolean
     ): Result<DataResult<PaginatedUpdateEndpointList>> {
         return try {
-            println("=== UpdatesRepository.getLatestUpdates ===")
-            println("Parameters: limit=$limit, forceRefresh=$forceRefresh")
-            println("Cache available: ${localDataSource != null}")
+            log.d { "getLatestUpdates called - limit: $limit, forceRefresh: $forceRefresh, cacheAvailable: ${localDataSource != null}" }
 
-            val now = System.now().toEpochMilliseconds()
+            val now = Clock.System.now().toEpochMilliseconds()
             val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
 
             // Try cache first if available and not forcing refresh
             if (!forceRefresh) {
                 val cachedUpdates = localDataSource?.getRecentUpdates(limit)
-                println("Cache query result: ${cachedUpdates?.size ?: 0} updates found")
+                log.v { "Cache query result: ${'$'}{cachedUpdates?.size ?: 0} updates found" }
                 if (cachedUpdates != null && cachedUpdates.isNotEmpty()) {
-                    println("✓ CACHE HIT: Returning ${cachedUpdates.size} cached updates")
-                    return Result.success(
-                        DataResult(
-                            data = PaginatedUpdateEndpointList(
-                                count = cachedUpdates.size,
-                                next = null,
-                                previous = null,
-                                results = cachedUpdates
-                            ),
-                            source = DataSource.CACHE,
-                            timestamp = staleTimestamp ?: now
-                        )
-                    )
+                    log.i { "Cache hit - Returning ${'$'}{cachedUpdates.size} cached updates" }
+                    return Result.success(DataResult(
+                        data = PaginatedUpdateEndpointList(
+                            count = cachedUpdates.size,
+                            next = null,
+                            previous = null,
+                            results = cachedUpdates
+                        ),
+                        source = DataSource.CACHE,
+                        timestamp = staleTimestamp ?: now
+                    ))
                 } else {
-                    println("✗ CACHE MISS: No cached data available, fetching from API")
+                    log.d { "Cache miss - No cached data available, fetching from API" }
                 }
             } else {
-                println("⟳ FORCE REFRESH: Bypassing cache, fetching fresh data from API")
+                log.d { "Force refresh - Bypassing cache, fetching fresh data from API" }
             }
-
-            println("UpdatesRepository: Fetching updates from API (forceRefresh: $forceRefresh)")
+            
+            log.d { "Fetching updates from API" }
             val response = updatesApi.getLatestUpdates(limit = limit)
             val updates = response.body()
 
             // Cache the results for future use
             localDataSource?.cacheUpdates(updates.results)
-            println("✓ API SUCCESS: Fetched and cached ${updates.results.size} updates")
+            log.i { "Successfully fetched and cached ${'$'}{updates.results.size} updates" }
 
-            Result.success(
-                DataResult(
-                    data = updates,
-                    source = DataSource.NETWORK,
-                    timestamp = now
-                )
-            )
+            Result.success(DataResult(
+                data = updates,
+                source = DataSource.NETWORK,
+                timestamp = now
+            ))
         } catch (e: ResponseException) {
+            log.e(e) { "API error while fetching updates" }
             // On error, try to return stale cache if available
             val staleCached = localDataSource?.getRecentUpdates(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("UpdatesRepository: Returning ${staleCached.size} stale cached updates due to API error")
-                return Result.success(
-                    DataResult(
-                        data = PaginatedUpdateEndpointList(
-                            count = staleCached.size,
-                            next = null,
-                            previous = null,
-                            results = staleCached
-                        ),
-                        source = DataSource.STALE_CACHE,
-                        timestamp = staleTimestamp
-                    )
-                )
+                log.w { "Returning ${'$'}{staleCached.size} stale cached updates due to API error" }
+                return Result.success(DataResult(
+                    data = PaginatedUpdateEndpointList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
+                ))
             }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "Network error while fetching updates" }
             // On network error, try to return stale cache if available
             val staleCached = localDataSource?.getRecentUpdates(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                println("UpdatesRepository: Returning ${staleCached.size} stale cached updates due to network error")
-                return Result.success(
-                    DataResult(
-                        data = PaginatedUpdateEndpointList(
-                            count = staleCached.size,
-                            next = null,
-                            previous = null,
-                            results = staleCached
-                        ),
-                        source = DataSource.STALE_CACHE,
-                        timestamp = staleTimestamp
-                    )
-                )
+                log.w { "Returning ${'$'}{staleCached.size} stale cached updates due to network error" }
+                return Result.success(DataResult(
+                    data = PaginatedUpdateEndpointList(
+                        count = staleCached.size,
+                        next = null,
+                        previous = null,
+                        results = staleCached
+                    ),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = staleTimestamp
+                ))
             }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "Unexpected error while fetching updates" }
             Result.failure(e)
         }
     }

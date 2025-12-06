@@ -65,7 +65,9 @@ import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import org.koin.compose.koinInject
 import kotlin.time.Clock.System
 
@@ -76,6 +78,7 @@ fun DebugSettingsScreen(
     debugViewModel: DebugSettingsViewModel = koinInject(),
     settingsViewModel: SettingsViewModel = koinInject()
 ) {
+    val log = SpaceLogger.getLogger("DebugSettingsScreen")
     val appPreferences = koinInject<me.calebjones.spacelaunchnow.data.storage.AppPreferences>()
     val debugMenuUnlocked by appPreferences.debugMenuUnlockedFlow.collectAsState(initial = false)
 
@@ -192,13 +195,31 @@ fun DebugSettingsScreen(
                 )
             }
 
+            // Logging Configuration Section
+            item {
+                Text(
+                    text = "Logging Configuration",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            item {
+                val loggingPreferences: LoggingPreferences = koinInject()
+                DebugLoggingSettings(
+                    loggingPreferences = loggingPreferences
+                )
+            }
+
             // API URL Section
             item {
                 Text(
                     text = "API Configuration",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
                 )
             }
 
@@ -758,15 +779,14 @@ fun DebugSettingsScreen(
 
                         // Debug logging
                         LaunchedEffect(Unit) {
-                            println("🎭 SubscriptionRepository type: ${subscriptionRepo::class.simpleName}")
-                            println("🎭 SimpleSubscriptionRepository cast: ${if (simpleRepo != null) "✅ Success" else "❌ Failed"}")
+                            log.d { "🎭 SubscriptionRepository type: ${subscriptionRepo::class.simpleName}, SimpleSubscriptionRepository cast: ${if (simpleRepo != null) "✅ Success" else "❌ Failed"}" }
                         }
 
                         // Check if we're in debug mode
                         LaunchedEffect(subscriptionState) {
                             simpleRepo?.let {
                                 isSimulationActive = it.isInDebugMode()
-                                println("🎭 Debug Mode Check: isSimulationActive = $isSimulationActive")
+                                log.d { "🎭 Debug Mode Check: isSimulationActive = $isSimulationActive" }
                             }
                         }
 
@@ -975,7 +995,7 @@ fun DebugSettingsScreen(
                                         coroutineScope.launch {
                                             val hasAccess =
                                                 subscriptionRepo.forceRefreshWidgetAccess()
-                                            println("Widget access refreshed: $hasAccess")
+                                            log.i { "Widget access refreshed: $hasAccess" }
                                         }
                                     },
                                     modifier = Modifier.fillMaxWidth(),
@@ -1003,12 +1023,12 @@ fun DebugSettingsScreen(
                                     try {
                                         val result = subscriptionRepo.restorePurchases()
                                         if (result.isSuccess) {
-                                            println("✅ Restore successful: ${result.getOrNull()}")
+                                            log.i { "✅ Restore successful: ${result.getOrNull()}" }
                                         } else {
-                                            println("❌ Restore failed: ${result.exceptionOrNull()?.message}")
+                                            log.w { "❌ Restore failed: ${result.exceptionOrNull()?.message}" }
                                         }
                                     } catch (e: Exception) {
-                                        println("❌ Restore error: ${e.message}")
+                                        log.e(e) { "❌ Restore error: ${e.message}" }
                                     } finally {
                                         isRestoring = false
                                     }
@@ -1046,12 +1066,12 @@ fun DebugSettingsScreen(
                                     try {
                                         val result = subscriptionRepo.restorePurchases()
                                         if (result.isSuccess) {
-                                            println("✅ Restore successful: ${result.getOrNull()}")
+                                            log.i { "✅ Restore successful: ${result.getOrNull()}" }
                                         } else {
-                                            println("❌ Restore failed: ${result.exceptionOrNull()?.message}")
+                                            log.w { "❌ Restore failed: ${result.exceptionOrNull()?.message}" }
                                         }
                                     } catch (e: Exception) {
-                                        println("❌ Restore error: ${e.message}")
+                                        log.e(e) { "❌ Restore error: ${e.message}" }
                                     } finally {
                                         isRestoring = false
                                     }

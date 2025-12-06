@@ -26,10 +26,12 @@ import me.calebjones.spacelaunchnow.data.notifications.AndroidNotificationPermis
 import me.calebjones.spacelaunchnow.data.notifications.NotificationPermissionManager
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.NotificationSettingsHelper
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
+    private val log = logger()
     private val appPreferences: AppPreferences by inject()
     private val billingClient: BillingClient by inject()
     private val billingManager: BillingManager by inject()
@@ -50,7 +52,7 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_Material_NoActionBar)
         super.onCreate(savedInstanceState)
 
-        println("🔄 ROTATION_DEBUG: onCreate called - savedInstanceState: ${if (savedInstanceState == null) "null (fresh start)" else "not null (restoring)"}")
+        log.v { "onCreate called - savedInstanceState: ${if (savedInstanceState == null) "null (fresh start)" else "not null (restoring)"}" }
 
         // Initialize notification settings helper for Android
         NotificationSettingsHelper.initialize(this)
@@ -61,44 +63,40 @@ class MainActivity : ComponentActivity() {
         // Fresh install logic is now handled in App.kt during app startup
 
         // Ask for notification permission only on first launch (Android 13+) and if not already granted
-        println("=== NOTIFICATION PERMISSION DEBUG ===")
-        println("Android SDK version: ${Build.VERSION.SDK_INT}")
-        println("Is Android 13+: ${Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU}")
-        println("Has notification permission: ${notificationPermissionHandler.hasNotificationPermission()}")
-        println("Has asked for permission before: ${hasAskedNotificationPermission(this)}")
+        log.d { "Notification permission check - SDK: ${Build.VERSION.SDK_INT}, isAndroid13+: ${Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU}, hasPermission: ${notificationPermissionHandler.hasNotificationPermission()}, hasAsked: ${hasAskedNotificationPermission(this)}" }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             !notificationPermissionHandler.hasNotificationPermission() &&
             !hasAskedNotificationPermission(this)
         ) {
-            println("ALL CONDITIONS MET - Requesting notification permission")
+            log.i { "All conditions met - requesting notification permission" }
             notificationPermissionHandler.requestNotificationPermission(this)
             // Don't mark as asked yet - wait for the result
         } else {
-            println("CONDITIONS NOT MET - Skipping permission request")
+            val reasons = mutableListOf<String>()
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                println("  - Android version is below 13")
+                reasons.add("Android version is below 13")
             }
             if (notificationPermissionHandler.hasNotificationPermission()) {
-                println("  - Already has notification permission")
+                reasons.add("Already has notification permission")
             }
             if (hasAskedNotificationPermission(this)) {
-                println("  - Already asked for permission before")
+                reasons.add("Already asked for permission before")
             }
+            log.d { "Conditions not met for permission request - Reasons: ${reasons.joinToString(", ")}" }
         }
-        println("=== END NOTIFICATION PERMISSION DEBUG ===")
 
-        // Extract launch_id from intent if launched from notification
-        val intentLaunchId = intent.getStringExtra("launch_id")
+        // Check if launched from notification (with launch_id)
+        val intentLaunchId = intent?.getStringExtra("launch_id")
         if (intentLaunchId != null) {
-            println("App launched from notification with launch_id: $intentLaunchId")
+            log.i { "App launched from notification - launch_id: $intentLaunchId" }
             notificationLaunchIdState = intentLaunchId
         }
 
-        // Extract navigation destination from intent (e.g., from widget)
-        val navigateTo = intent.getStringExtra("navigate_to")
+        // Check if launched with navigation destination (from widget)
+        val navigateTo = intent?.getStringExtra("navigate_to")
         if (navigateTo != null) {
-            println("App launched with navigation destination: $navigateTo")
+            log.i { "App launched with navigation destination: $navigateTo" }
             navigationDestinationState = navigateTo
         }
 
@@ -151,10 +149,10 @@ class MainActivity : ComponentActivity() {
             val setActivityMethod =
                 billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
             setActivityMethod.invoke(billingClient, this)
-            println("MainActivity: Set billing client activity")
+            log.d { "Set billing client activity" }
         } catch (e: Exception) {
             // Not an Android billing client or method doesn't exist - that's okay
-            println("MainActivity: Billing client doesn't support setActivity - ${e.message}")
+            log.w { "Billing client doesn't support setActivity - ${e.message}" }
         }
 
         // Refresh purchase state to catch any changes made while app was in background
@@ -165,28 +163,28 @@ class MainActivity : ComponentActivity() {
             lastPurchaseRefreshTime = currentTime
             lifecycleScope.launch {
                 try {
-                    println("MainActivity: Syncing purchases with store on resume...")
+                    log.d { "Syncing purchases with store on resume..." }
 
                     // CRITICAL: Sync with store FIRST to get latest subscription status from Google Play
                     // This ensures RevenueCat has the latest data before we query customer info
                     // Fixes issue where trial-to-paid conversions aren't reflected immediately
                     billingManager.syncPurchases()
-                    println("MainActivity: ✅ Store sync complete")
+                    log.d { "Store sync complete" }
 
                     // THEN refresh purchase state (will now have fresh data from the sync above)
-                    println("MainActivity: Refreshing purchase state after sync...")
+                    log.d { "Refreshing purchase state after sync..." }
                     val refreshed = billingManager.refreshPurchaseState()
                     if (refreshed) {
-                        println("MainActivity: ✅ Purchase state refreshed successfully")
+                        log.i { "Purchase state refreshed successfully" }
                     } else {
-                        println("MainActivity: ⚠️ Failed to refresh purchase state")
+                        log.w { "Failed to refresh purchase state" }
                     }
                 } catch (e: Exception) {
-                    println("MainActivity: Error refreshing purchase state: ${e.message}")
+                    log.e(e) { "Error refreshing purchase state" }
                 }
             }
         } else {
-            println("MainActivity: Skipping purchase refresh (cooldown active)")
+            log.d { "Skipping purchase refresh (cooldown active)" }
         }
     }
 
@@ -197,9 +195,9 @@ class MainActivity : ComponentActivity() {
             val setActivityMethod =
                 billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
             setActivityMethod.invoke(billingClient, null)
-            println("MainActivity: Cleared billing client activity")
+            log.d { "Cleared billing client activity" }
         } catch (e: Exception) {
-            println("MainActivity: Could not clear billing client activity - ${e.message}")
+            log.w { "Could not clear billing client activity - ${e.message}" }
         }
     }
 
@@ -210,9 +208,9 @@ class MainActivity : ComponentActivity() {
             val setActivityMethod =
                 billingClient.javaClass.getMethod("setActivity", android.app.Activity::class.java)
             setActivityMethod.invoke(billingClient, null)
-            println("MainActivity: Cleared billing client activity on destroy")
+            log.d { "Cleared billing client activity on destroy" }
         } catch (e: Exception) {
-            println("MainActivity: Could not clear billing client activity on destroy - ${e.message}")
+            log.w { "Could not clear billing client activity on destroy - ${e.message}" }
         }
         NotificationPermissionManager.clearCurrentActivity()
     }
@@ -220,18 +218,18 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        // Handle launch_id from new notification intent
-        val newLaunchId = intent.getStringExtra("launch_id")
+        // Check if new intent has launch_id from notification
+        val newLaunchId = intent?.getStringExtra("launch_id")
         if (newLaunchId != null) {
+            log.i { "New notification intent received - launch_id: $newLaunchId" }
             notificationLaunchIdState = newLaunchId
-            println("New notification intent received with launch_id: $newLaunchId")
         }
 
-        // Handle navigation destination from new intent (e.g., from widget)
-        val navigateTo = intent.getStringExtra("navigate_to")
+        // Check if new intent has navigation destination (from widget)
+        val navigateTo = intent?.getStringExtra("navigate_to")
         if (navigateTo != null) {
+            log.i { "New intent received with navigation destination: $navigateTo" }
             navigationDestinationState = navigateTo
-            println("New intent received with navigation destination: $navigateTo")
         }
     }
 
@@ -254,22 +252,22 @@ class MainActivity : ComponentActivity() {
             NotificationPermissionManager.onPermissionResult(permissionGranted)
 
             if (permissionGranted) {
-                println("Notification permission granted")
+                log.i { "Notification permission granted" }
             } else {
-                println("Notification permission denied")
+                log.i { "Notification permission denied" }
             }
         }
     }
 
     private fun hasAskedNotificationPermission(context: Context): Boolean {
-        val prefs = context.getSharedPreferences("onboarding_prefs", MODE_PRIVATE)
-        val result = prefs.getBoolean("hasAskedForNotificationPermission", false)
-        println("hasAskedNotificationPermission() = $result")
+        val prefs = context.getSharedPreferences("notification_prefs", Context.MODE_PRIVATE)
+        val result = prefs.getBoolean("asked_notification_permission", false)
+        log.v { "hasAskedNotificationPermission() = $result" }
         return result
     }
 
     private fun markNotificationPermissionAsAsked(context: Context) {
-        println("markNotificationPermissionAsAsked() called - setting flag to true")
+        log.d { "markNotificationPermissionAsAsked() called - setting flag to true" }
         context.getSharedPreferences("onboarding_prefs", MODE_PRIVATE)
             .edit { putBoolean("hasAskedForNotificationPermission", true) }
     }

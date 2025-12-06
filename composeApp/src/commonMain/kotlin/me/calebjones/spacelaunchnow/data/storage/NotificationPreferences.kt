@@ -15,8 +15,10 @@ import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
+    private val log = logger()
 
     companion object {
         private val ENABLE_NOTIFICATIONS = booleanPreferencesKey("enable_notifications")
@@ -43,7 +45,7 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
             try {
                 Json.decodeFromString<Map<String, Boolean>>(topicSettingsJson)
             } catch (e: Exception) {
-                println("Failed to parse topic settings, using defaults: ${e.message}")
+                log.w(e) { "Failed to parse topic settings, using defaults: ${e.message}" }
                 default.topicSettings
             }
         } else {
@@ -84,13 +86,7 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
         val agencyNames = getAgencyNames(subscribedAgencies)
         val locationNames = getLocationNames(subscribedLocations)
 
-        println("=== NotificationPreferences: Loading Settings ===")
-        println("Subscribed Agencies (${subscribedAgencies.size}): $subscribedAgencies")
-        println("Agency Names: ${agencyNames.joinToString(", ")}")
-        println("Subscribed Locations (${subscribedLocations.size}): $subscribedLocations")
-        println("Location Names: ${locationNames.joinToString(", ")}")
-        println("Follow All Launches: ${preferences[FOLLOW_ALL_LAUNCHES] ?: default.followAllLaunches}")
-        println("Use Strict Matching: ${preferences[USE_STRICT_MATCHING] ?: default.useStrictMatching}")
+        log.d { "=== NotificationPreferences: Loading Settings - Agencies: ${subscribedAgencies.size} ($agencyNames), Locations: ${subscribedLocations.size} ($locationNames), Follow All: ${preferences[FOLLOW_ALL_LAUNCHES] ?: default.followAllLaunches}, Strict Matching: ${preferences[USE_STRICT_MATCHING] ?: default.useStrictMatching}" }
 
         DatadogLogger.debug(
             "Notification settings loaded", mapOf(
@@ -139,14 +135,7 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
         }
 
         // Log the settings being saved
-        println("NotificationPreferences: Saving notification settings")
-        println("  Agencies (${settings.subscribedAgencies.size}): ${settings.subscribedAgencies} -> $agencyNames")
-        println("  Locations (${settings.subscribedLocations.size}): ${settings.subscribedLocations} -> $locationNames")
-        println("  Enable Notifications: ${settings.enableNotifications}")
-        println("  Follow All Launches: ${settings.followAllLaunches}")
-        println("  Use Strict Matching: ${settings.useStrictMatching}")
-        println("  Hide TBD Launches: ${settings.hideTbdLaunches}")
-        println("  Subscribed Topics: ${settings.subscribedTopics}")
+        log.d { "NotificationPreferences: Saving notification settings - Agencies: ${settings.subscribedAgencies.size} ($agencyNames), Locations: ${settings.subscribedLocations.size} ($locationNames), Enable: ${settings.enableNotifications}, Follow All: ${settings.followAllLaunches}, Strict: ${settings.useStrictMatching}, Hide TBD: ${settings.hideTbdLaunches}" }
 
         DatadogLogger.debug(
             "Saving notification settings",
@@ -176,7 +165,7 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
             preferences[TOPIC_SETTINGS] = Json.encodeToString(settings.topicSettings)
         }
 
-        println("NotificationPreferences: Settings saved successfully")
+        log.i { "NotificationPreferences: Settings saved successfully" }
         DatadogLogger.info("Notification settings saved successfully")
     }
 

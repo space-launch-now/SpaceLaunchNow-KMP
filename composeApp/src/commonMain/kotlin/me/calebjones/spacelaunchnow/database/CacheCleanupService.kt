@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration.Companion.hours
 
 /**
@@ -18,6 +19,8 @@ class CacheCleanupService(
     private val programDataSource: ProgramLocalDataSource,
     private val spacecraftDataSource: SpacecraftLocalDataSource
 ) {
+    private val log = logger()
+    
     private val cleanupScope = CoroutineScope(Dispatchers.Default)
     private val cleanupInterval = 6.hours
     
@@ -31,7 +34,7 @@ class CacheCleanupService(
                 try {
                     performCleanup()
                 } catch (e: Exception) {
-                    println("CacheCleanupService: Error during cleanup: ${e.message}")
+                    log.e(e) { "Error during cleanup: ${e.message}" }
                 }
                 delay(cleanupInterval)
             }
@@ -42,34 +45,34 @@ class CacheCleanupService(
      * Manually trigger a cleanup operation
      */
     suspend fun performCleanup() {
-        println("CacheCleanupService: Starting cache cleanup...")
+        log.i { "Starting cache cleanup..." }
         
         try {
             launchDataSource.deleteExpiredLaunches()
-            println("CacheCleanupService: Cleaned up expired launches")
+            log.d { "Cleaned up expired launches" }
         } catch (e: Exception) {
-            println("CacheCleanupService: Error cleaning launches: ${e.message}")
+            log.e(e) { "Error cleaning launches: ${e.message}" }
         }
         
         try {
             eventDataSource.deleteExpiredEvents()
-            println("CacheCleanupService: Cleaned up expired events")
+            log.d { "Cleaned up expired events" }
         } catch (e: Exception) {
-            println("CacheCleanupService: Error cleaning events: ${e.message}")
+            log.e(e) { "Error cleaning events: ${e.message}" }
         }
         
         try {
             articleDataSource.deleteExpiredArticles()
-            println("CacheCleanupService: Cleaned up expired articles")
+            log.d { "Cleaned up expired articles" }
         } catch (e: Exception) {
-            println("CacheCleanupService: Error cleaning articles: ${e.message}")
+            log.e(e) { "Error cleaning articles: ${e.message}" }
         }
         
         try {
             updateDataSource.deleteExpiredUpdates()
-            println("CacheCleanupService: Cleaned up expired updates")
+            log.d { "Cleaned up expired updates" }
         } catch (e: Exception) {
-            println("CacheCleanupService: Error cleaning updates: ${e.message}")
+            log.e(e) { "Error cleaning updates: ${e.message}" }
         }
         
         try {
@@ -85,7 +88,7 @@ class CacheCleanupService(
         } catch (e: Exception) {
             println("CacheCleanupService: Error cleaning spacecraft: ${e.message}")
         }
-        
-        println("CacheCleanupService: Cache cleanup completed")
+
+        log.i { "Cache cleanup completed" 
     }
 }

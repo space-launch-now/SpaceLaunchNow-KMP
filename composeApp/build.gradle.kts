@@ -243,6 +243,11 @@ kotlin {
 
                 implementation(libs.dd.sdk.kotlin.multiplatform.rum)
                 implementation(libs.dd.sdk.kotlin.multiplatform.logs)
+                
+                // Kermit for multiplatform logging
+                implementation(libs.kermit)
+                implementation(libs.kermit.crashlytics)
+
 
                 // SQLDelight common runtime and coroutines
                 implementation(libs.sqldelight.runtime)
@@ -456,57 +461,73 @@ tasks.register("generateAllApiClients") {
     description = "Generate both Launch Library 2.4.0 and SNAPI v4 API clients"
 }
 
+// Helper to safely copy build outputs (APKs/AABs). Checks for existence, avoids copying
+// when source == destination, and catches IO errors to prevent task failure.
+fun safeCopyOutputFiles(outputsDir: File, extension: String, versionName: String, buildType: String) {
+    try {
+        if (!outputsDir.exists() || !outputsDir.isDirectory) {
+            logger.debug("Output directory does not exist: ${outputsDir.absolutePath}")
+            return
+        }
+        val files = outputsDir.listFiles()?.filter { it.isFile && it.name.endsWith(extension, ignoreCase = true) }
+        if (files.isNullOrEmpty()) {
+            logger.debug("No output files with extension '$extension' found in ${outputsDir.absolutePath}")
+            return
+        }
+        files.forEach { src ->
+            val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}${extension}"
+            val dest = File(outputsDir, newName)
+            // If the source file already has the target name, skip to avoid FileAlreadyExistsException
+            if (src.absoluteFile == dest.absoluteFile) {
+                logger.debug("Source already matches destination name, skipping: ${src.name}")
+                return@forEach
+            }
+            try {
+                src.copyTo(dest, overwrite = true)
+                logger.lifecycle("Copied ${src.name} -> ${dest.name}")
+            } catch (e: java.io.IOException) {
+                logger.warn("I/O error copying ${src.absolutePath} to ${dest.absolutePath}: ${e.message}")
+            } catch (e: Exception) {
+                logger.warn("Unexpected error copying ${src.absolutePath} to ${dest.absolutePath}: ${e.message}")
+            }
+        }
+    } catch (e: Exception) {
+        logger.warn("safeCopyOutputFiles encountered an error: ${e.message}")
+    }
+}
+
+// Replace the previous inline copy logic with calls to the safe helper
 tasks.whenTaskAdded {
     if (name.startsWith("package") && name.endsWith("Debug")) {
         doLast {
             val buildType = "debug"
-            val versionName = android.defaultConfig.versionName
-            val apkDir = file("$buildDir/outputs/apk/$buildType/")
-            apkDir.listFiles()?.forEach { apk ->
-                if (apk.name.endsWith(".apk")) {
-                    val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}.apk"
-                    apk.renameTo(File(apkDir, newName))
-                }
-            }
+            val versionName = android.defaultConfig.versionName ?: computeVersionName()
+            val apkDir = layout.buildDirectory.asFile.get().resolve("outputs/apk/$buildType/")
+            safeCopyOutputFiles(apkDir, ".apk", versionName, buildType)
         }
     }
     if (name.startsWith("package") && name.endsWith("Release")) {
         doLast {
             val buildType = "release"
-            val versionName = android.defaultConfig.versionName
-            val apkDir = file("$buildDir/outputs/apk/$buildType/")
-            apkDir.listFiles()?.forEach { apk ->
-                if (apk.name.endsWith(".apk")) {
-                    val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}.apk"
-                    apk.renameTo(File(apkDir, newName))
-                }
-            }
+            val versionName = android.defaultConfig.versionName ?: computeVersionName()
+            val apkDir = layout.buildDirectory.asFile.get().resolve("outputs/apk/$buildType/")
+            safeCopyOutputFiles(apkDir, ".apk", versionName, buildType)
         }
     }
     if (name.startsWith("bundle") && name.endsWith("Debug")) {
         doLast {
             val buildType = "debug"
-            val versionName = android.defaultConfig.versionName
-            val bundleDir = file("$buildDir/outputs/bundle/$buildType/")
-            bundleDir.listFiles()?.forEach { bundle ->
-                if (bundle.name.endsWith(".aab")) {
-                    val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}.aab"
-                    bundle.renameTo(File(bundleDir, newName))
-                }
-            }
+            val versionName = android.defaultConfig.versionName ?: computeVersionName()
+            val bundleDir = layout.buildDirectory.asFile.get().resolve("outputs/bundle/$buildType/")
+            safeCopyOutputFiles(bundleDir, ".aab", versionName, buildType)
         }
     }
     if (name.startsWith("bundle") && name.endsWith("Release")) {
         doLast {
             val buildType = "release"
-            val versionName = android.defaultConfig.versionName
-            val bundleDir = file("$buildDir/outputs/bundle/$buildType/")
-            bundleDir.listFiles()?.forEach { bundle ->
-                if (bundle.name.endsWith(".aab")) {
-                    val newName = "spacelaunchnow-kmp-v${versionName}-${buildType}.aab"
-                    bundle.renameTo(File(bundleDir, newName))
-                }
-            }
+            val versionName = android.defaultConfig.versionName ?: computeVersionName()
+            val bundleDir = layout.buildDirectory.asFile.get().resolve("outputs/bundle/$buildType/")
+            safeCopyOutputFiles(bundleDir, ".aab", versionName, buildType)
         }
     }
 }

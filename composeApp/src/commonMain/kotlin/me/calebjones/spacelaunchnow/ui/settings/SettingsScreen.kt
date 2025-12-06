@@ -64,6 +64,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.DebugUnlock
 import me.calebjones.spacelaunchnow.util.NotificationSettingsHelper
+import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -201,6 +202,18 @@ fun SettingsScreen(
                         }
                     }
                 }
+                
+                // DIAGNOSTIC LOGGING
+                item {
+                    val loggingPreferences: LoggingPreferences = koinInject()
+                    SectionHeaderText("Diagnostic")
+                    Spacer(Modifier.height(2.dp))
+                    LoggingSettingsSection(
+                        loggingPreferences = loggingPreferences,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
+                
                 // DEBUG
                 if (BuildConfig.IS_DEBUG || debugMenuUnlocked) {
                     item {

@@ -25,14 +25,10 @@ data class WidgetAppearance(
 suspend fun getWidgetAppearanceWithColors(context: Context): WidgetAppearance {
     val widgetPreferences: WidgetPreferences by inject(WidgetPreferences::class.java)
     
-    println("WidgetTheme: Reading widget appearance from DataStore...")
-    
     val themeSource = widgetPreferences.widgetThemeSourceFlow.first()
     val backgroundAlpha = widgetPreferences.widgetBackgroundAlphaFlow.first()
     val cornerRadius = widgetPreferences.widgetCornerRadiusFlow.first()
     val hasAccess = widgetPreferences.widgetAccessGrantedFlow.first()
-    
-    println("WidgetTheme: Read values - Source: $themeSource, Alpha: $backgroundAlpha, Radius: $cornerRadius, Access: $hasAccess")
     
     return WidgetAppearance(
         themeSource = themeSource,
@@ -52,8 +48,6 @@ fun getWidgetAppearanceBlocking(context: Context): WidgetAppearance {
         }
     } catch (e: Exception) {
         // Return default values if preferences can't be read
-        println("Widget: Failed to read widget appearance preferences: ${e.message}")
-        e.printStackTrace()
         WidgetAppearance(
             themeSource = WidgetThemeSource.FOLLOW_APP_THEME,
             backgroundAlpha = 1.0f,

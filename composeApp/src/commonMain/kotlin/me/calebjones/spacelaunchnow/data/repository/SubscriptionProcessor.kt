@@ -10,6 +10,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 @OptIn(FlowPreview::class)
 class SubscriptionProcessor(
@@ -19,6 +20,7 @@ class SubscriptionProcessor(
     private val debounceMs: Long = 300L,
     private val onSubscriptionUpdate: (Set<String>) -> Unit = {}
 ) {
+    private val log = logger()
     private val updateRequests = Channel<NotificationState>(Channel.CONFLATED)
 
     init {
@@ -36,12 +38,12 @@ class SubscriptionProcessor(
     }
 
     private suspend fun updateFCMSubscriptions(state: NotificationState) {
-        println("=== SubscriptionProcessor: Starting FCM update (v4 simple topics) ===")
+        log.d { "=== SubscriptionProcessor: Starting FCM update (v4 simple topics) ===" }
 
         try {
             // Master switch: if notifications disabled, unsubscribe from all
             if (!state.enableNotifications) {
-                println("Notifications disabled - unsubscribing from all topics")
+                log.d { "Notifications disabled - unsubscribing from all topics" }
                 unsubscribeFromAll(state.subscribedTopics)
                 onSubscriptionUpdate(emptySet()) // Update state with empty subscriptions
                 return
@@ -49,15 +51,15 @@ class SubscriptionProcessor(
 
             // Calculate required topics based on state (v4: just version topic)
             val requiredTopics = calculateRequiredTopics(state)
-            println("Required topics: $requiredTopics")
+            log.d { "Required topics: $requiredTopics" }
 
             // Update subscriptions
             val currentTopics = state.subscribedTopics
             val topicsToAdd = requiredTopics - currentTopics
             val topicsToRemove = currentTopics - requiredTopics
 
-            println("Topics to add: $topicsToAdd")
-            println("Topics to remove: $topicsToRemove")
+            log.d { "Topics to add: $topicsToAdd" }
+            log.d { "Topics to remove: $topicsToRemove" }
 
             val actualSubscribedTopics = currentTopics.toMutableSet()
 
@@ -65,10 +67,10 @@ class SubscriptionProcessor(
             topicsToAdd.forEach { topic ->
                 val result = pushMessaging.subscribeToTopic(topic)
                 if (result.isSuccess) {
-                    println("✅ Subscribed to: $topic")
+                    log.i { "✅ Subscribed to: $topic" }
                     actualSubscribedTopics.add(topic)
                 } else {
-                    println("❌ Failed to subscribe to: $topic - ${result.exceptionOrNull()?.message}")
+                    log.w { "❌ Failed to subscribe to: $topic - ${result.exceptionOrNull()?.message}" }
                 }
             }
 
@@ -76,10 +78,10 @@ class SubscriptionProcessor(
             topicsToRemove.forEach { topic ->
                 val result = pushMessaging.unsubscribeFromTopic(topic)
                 if (result.isSuccess) {
-                    println("✅ Unsubscribed from: $topic")
+                    log.i { "✅ Unsubscribed from: $topic" }
                     actualSubscribedTopics.remove(topic)
                 } else {
-                    println("❌ Failed to unsubscribe from: $topic - ${result.exceptionOrNull()?.message}")
+                    log.w { "❌ Failed to unsubscribe from: $topic - ${result.exceptionOrNull()?.message}" }
                 }
             }
 
@@ -87,20 +89,19 @@ class SubscriptionProcessor(
             onSubscriptionUpdate(actualSubscribedTopics)
 
         } catch (e: Exception) {
-            println("❌ SubscriptionProcessor error: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "❌ SubscriptionProcessor error: ${e.message}" }
         }
 
-        println("=== SubscriptionProcessor: Complete ===")
+        log.d { "=== SubscriptionProcessor: Complete ===" }
     }
 
     private suspend fun unsubscribeFromAll(topics: Set<String>) {
         topics.forEach { topic ->
             val result = pushMessaging.unsubscribeFromTopic(topic)
             if (result.isSuccess) {
-                println("✅ Unsubscribed from: $topic")
+                log.i { "✅ Unsubscribed from: $topic" }
             } else {
-                println("❌ Failed to unsubscribe from: $topic")
+                log.w { "❌ Failed to unsubscribe from: $topic" }
             }
         }
     }
@@ -121,7 +122,7 @@ class SubscriptionProcessor(
         val versionTopic = getVersionTopic()
         topics.add(versionTopic)
 
-        println("📡 v4 Simple Topics: Subscribing only to '$versionTopic' (client-side filtering enabled)")
+        log.d { "📡 v4 Simple Topics: Subscribing only to '$versionTopic' (client-side filtering enabled)" }
 
         return topics
     }

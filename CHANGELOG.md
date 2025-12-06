@@ -1,4 +1,4 @@
-# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b28...v5.0.0) (2025-11-28)
+# [5.1.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0...v5.1.0) (2025-11-29)
 
 
 ### Bug Fixes
@@ -6,7 +6,10 @@
 * Address code review feedback - add rate limiting and improve logging ([2bc525a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2bc525a392a0f12e17e7c375a1669a2ef958d82e))
 * **billing:** add error handling and verification to subscription persistence ([ee04eb1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ee04eb1cf49b4090ae352808dc3597d640f81b31))
 * **billing:** add error handling and verification to subscription persistence ([372f5fa](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/372f5fa15d49a6ff6893d9f952bdc61a95d5a307))
+* **docs:** delete old spec files ([9c953d3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9c953d32d0a3240d60d9a00725ac5f4187c9f3d0))
 * improve notification handling ([2a807f1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2a807f10b962e97510e46f9ae3c435a8bee3b174))
+* **release:** update version calculation ([99a5499](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/99a5499b61f11ae5a2421a7f2db040ad550427c0))
+* **release:** update version calculation ([aefaf64](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/aefaf64db54b61521e62754a016a2cd8abac8328))
 * Resolve billing sync issue where subscription updates were blocked ([8b802fc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8b802fcf16688154b912e67d7ce1f0c7987f7871))
 * update launch mass unit from kg to t in vehicle details ([4e8ccb9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4e8ccb923064e784a6b5427f1fb0af599aee81e6))
 
@@ -18,7 +21,7 @@
 
 
 
-# [5.0.0-b28](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b27...v5.0.0-b28) (2025-11-25)
+# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b27...v5.0.0) (2025-11-25)
 
 
 ### Bug Fixes

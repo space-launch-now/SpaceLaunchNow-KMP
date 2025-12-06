@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.data.billing
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
+import me.calebjones.spacelaunchnow.logger
 
 /**
  * Desktop implementation - No billing support
@@ -11,11 +12,12 @@ import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
  * If needed, implement server-side licensing instead.
  */
 actual class BillingClient {
+    private val log = logger()
     
     actual val purchaseUpdates: Flow<PlatformPurchase> = flowOf()
 
     actual suspend fun initialize(): Result<Unit> {
-        println("DesktopBillingClient: No billing support on desktop")
+        log.d { "DesktopBillingClient: No billing support on desktop" }
         return Result.success(Unit)
     }
 

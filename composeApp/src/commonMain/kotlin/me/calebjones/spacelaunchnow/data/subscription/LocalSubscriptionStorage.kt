@@ -8,6 +8,7 @@ import kotlinx.io.files.Path
 import kotlinx.serialization.Serializable
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
 
 /**
@@ -59,6 +60,7 @@ data class LocalSubscriptionData(
  * This provides immediate, synchronous access to subscription status
  */
 class LocalSubscriptionStorage {
+    private val log = logger()
 
     private val store: KStore<LocalSubscriptionData> = storeOf(
         file = Path("${AppDirectories.getAppDataDir()}/subscription_data.json"),
@@ -84,10 +86,7 @@ class LocalSubscriptionStorage {
      */
     suspend fun update(data: LocalSubscriptionData): Boolean {
         return try {
-            println("LocalSubscriptionStorage: 💾 Saving subscription data...")
-            println("  - Subscription Type: ${data.subscriptionType}")
-            println("  - Is Subscribed: ${data.isSubscribed}")
-            println("  - Entitlements: ${data.entitlements}")
+            log.d { "Saving subscription data - Type: ${data.subscriptionType}, Subscribed: ${data.isSubscribed}, Entitlements: ${data.entitlements}" }
 
             store.set(data)
 
@@ -96,37 +95,58 @@ class LocalSubscriptionStorage {
             val success = readBack == data
 
             if (success) {
-                println("LocalSubscriptionStorage: ✅ Subscription data saved and verified successfully")
+                log.i { "Subscription data saved and verified successfully" }
             } else {
-                println("LocalSubscriptionStorage: ❌ Verification failed - read-back mismatch!")
-                println("  Expected: $data")
-                println("  Read back: $readBack")
-                me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
-                    "Subscription state verification failed - read-back mismatch",
-                    null,
-                    mapOf(
-                        "expected_type" to data.subscriptionType.name,
-                        "read_back_type" to (readBack?.subscriptionType?.name ?: "null"),
-                        "expected_subscribed" to data.isSubscribed,
-                        "read_back_subscribed" to (readBack?.isSubscribed ?: false)
-                    )
+  
+                // Detailed field comparison for debugging
+                val diagnostics = mutableMapOf<String, Any>(
+                    "expected_type" to data.subscriptionType.name,
+                    "read_back_type" to (readBack?.subscriptionType?.name ?: "null"),
+                    "expected_subscribed" to data.isSubscribed,
+                    "read_back_subscribed" to (readBack?.isSubscribed ?: false),
+                    "types_match" to (data.subscriptionType == readBack?.subscriptionType),
+                    "subscribed_match" to (data.isSubscribed == readBack?.isSubscribed),
+                    "entitlements_match" to (data.entitlements == readBack?.entitlements),
+                    "product_ids_match" to (data.productIds == readBack?.productIds),
+                    "read_back_null" to (readBack == null),
+                    "store_file_path" to "${AppDirectories.getAppDataDir()}/subscription_data.json"
                 )
+                
+                // Add entitlement comparison if they differ
+                if (data.entitlements != readBack?.entitlements) {
+                    diagnostics["expected_entitlements"] = data.entitlements.joinToString(",")
+                    diagnostics["read_back_entitlements"] = (readBack?.entitlements?.joinToString(",") ?: "")
+                }
+                
+                // Add product ID comparison if they differ
+                if (data.productIds != readBack?.productIds) {
+                    diagnostics["expected_product_ids"] = data.productIds.joinToString(",")
+                    diagnostics["read_back_product_ids"] = (readBack?.productIds?.joinToString(",") ?: "")
+                }
+
+                log.e { 
+                    buildString {
+                        appendLine("❌ Verification failed - read-back mismatch!")
+                        appendLine("Expected: $data")
+                        appendLine("Read back: $readBack")
+                        appendLine("Diagnostics:")
+                        diagnostics.forEach { (key, value) ->
+                            appendLine("  $key: $value")
+                        }
+                    }
+                }
             }
 
             success
         } catch (e: Exception) {
-            println("LocalSubscriptionStorage: ❌ Error saving subscription data: ${e.message}")
-            e.printStackTrace()
-            me.calebjones.spacelaunchnow.analytics.DatadogLogger.error(
-                "Failed to save subscription state to KStore",
-                e,
-                mapOf(
-                    "subscription_type" to data.subscriptionType.name,
-                    "is_subscribed" to data.isSubscribed,
-                    "error_type" to (e::class.simpleName ?: "Unknown"),
-                    "error_message" to (e.message ?: "No message")
-                )
-            )
+            log.e(e) { 
+                buildString {
+                    appendLine("❌ Error saving subscription data")
+                    appendLine("Subscription type: ${data.subscriptionType.name}")
+                    appendLine("Is subscribed: ${data.isSubscribed}")
+                    appendLine("Error: ${e.message}")
+                }
+            }
             false
         }
     }
