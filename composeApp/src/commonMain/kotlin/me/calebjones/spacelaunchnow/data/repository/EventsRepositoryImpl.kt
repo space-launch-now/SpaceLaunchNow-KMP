@@ -1,12 +1,7 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
-import kotlin.time.Clock
 import kotlinx.io.IOException
-
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
-
 import me.calebjones.spacelaunchnow.api.extensions.getEventList
 import me.calebjones.spacelaunchnow.api.extensions.getUpcomingEvents
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
@@ -15,8 +10,9 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpo
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
-import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.util.logging.logger
+import kotlin.time.Clock
+import kotlin.time.Clock.System
 
 
 class EventsRepositoryImpl(
@@ -26,7 +22,10 @@ class EventsRepositoryImpl(
 
     private val log = logger()
 
-    override suspend fun getUpcomingEvents(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedEventEndpointNormalList>> {
+    override suspend fun getUpcomingEvents(
+        limit: Int,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedEventEndpointNormalList>> {
         return try {
             log.d { "getUpcomingEvents called - limit: $limit, forceRefresh: $forceRefresh, cacheAvailable: ${localDataSource != null}" }
 
@@ -40,16 +39,18 @@ class EventsRepositoryImpl(
                 log.v { "Cache query result: ${cachedEvents?.size ?: 0} events found" }
                 if (cachedEvents != null && cachedEvents.isNotEmpty()) {
                     log.i { "Cache hit - Returning ${cachedEvents.size} cached upcoming events" }
-                    return Result.success(DataResult(
-                        data = PaginatedEventEndpointNormalList(
-                            count = cachedEvents.size,
-                            next = null,
-                            previous = null,
-                            results = cachedEvents
-                        ),
-                        source = DataSource.CACHE,
-                        timestamp = staleTimestamp ?: now
-                    ))
+                    return Result.success(
+                        DataResult(
+                            data = PaginatedEventEndpointNormalList(
+                                count = cachedEvents.size,
+                                next = null,
+                                previous = null,
+                                results = cachedEvents
+                            ),
+                            source = DataSource.CACHE,
+                            timestamp = staleTimestamp ?: now
+                        )
+                    )
 
                 } else {
                     log.d { "Cache miss - No cached data available, fetching from API" }
@@ -57,7 +58,7 @@ class EventsRepositoryImpl(
             } else {
                 log.d { "Force refresh - Bypassing cache, fetching fresh data from API" }
             }
-            
+
             log.d { "Fetching upcoming events from API - limit: $limit" }
 
             val response = eventsApi.getUpcomingEvents(
@@ -72,11 +73,13 @@ class EventsRepositoryImpl(
             localDataSource?.cacheEvents(events.results)
             log.d { "Cached ${events.results.size} upcoming events for future use" }
 
-            Result.success(DataResult(
-                data = events,
-                source = DataSource.NETWORK,
-                timestamp = now
-            ))
+            Result.success(
+                DataResult(
+                    data = events,
+                    source = DataSource.NETWORK,
+                    timestamp = now
+                )
+            )
 
         } catch (e: ResponseException) {
             log.e(e) { "API error while fetching upcoming events (status: ${e.response.status})" }
@@ -85,16 +88,18 @@ class EventsRepositoryImpl(
             val staleTimestamp = localDataSource?.getCacheTimestamp("events")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 log.w { "Returning ${staleCached.size} stale cached events due to API error" }
-                return Result.success(DataResult(
-                    data = PaginatedEventEndpointNormalList(
-                        count = staleCached.size,
-                        next = null,
-                        previous = null,
-                        results = staleCached
-                    ),
-                    source = DataSource.STALE_CACHE,
-                    timestamp = staleTimestamp
-                ))
+                return Result.success(
+                    DataResult(
+                        data = PaginatedEventEndpointNormalList(
+                            count = staleCached.size,
+                            next = null,
+                            previous = null,
+                            results = staleCached
+                        ),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = staleTimestamp
+                    )
+                )
 
             }
             Result.failure(e)
@@ -106,16 +111,18 @@ class EventsRepositoryImpl(
             if (staleCached != null && staleCached.isNotEmpty()) {
 
                 log.w { "Returning ${staleCached.size} stale cached events due to network error" }
-                return Result.success(DataResult(
-                    data = PaginatedEventEndpointNormalList(
-                        count = staleCached.size,
-                        next = null,
-                        previous = null,
-                        results = staleCached
-                    ),
-                    source = DataSource.STALE_CACHE,
-                    timestamp = staleTimestamp
-                ))
+                return Result.success(
+                    DataResult(
+                        data = PaginatedEventEndpointNormalList(
+                            count = staleCached.size,
+                            next = null,
+                            previous = null,
+                            results = staleCached
+                        ),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = staleTimestamp
+                    )
+                )
 
             }
             Result.failure(e)
@@ -137,7 +144,7 @@ class EventsRepositoryImpl(
                 typeIds = typeIds,
                 ordering = "date"
             )
-            
+
             val body = response.body()
             log.i { "Successfully fetched ${body.results.size} events by type (status: ${response.status})" }
 
@@ -210,7 +217,7 @@ class EventsRepositoryImpl(
                 upcoming = upcoming,
                 typeIds = typeIds,
                 ordering = "date"
-            )  
+            )
             val body = response.body()
             log.i { "Successfully fetched ${body.results.size} events (status: ${response.status})" }
 

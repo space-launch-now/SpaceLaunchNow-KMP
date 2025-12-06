@@ -55,7 +55,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLType
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import kotlin.time.Clock.System
 
-private val log = SpaceLogger.getLogger("FullscreenVideoScreen")
+private val log by lazy { SpaceLogger.getLogger("FullscreenVideoScreen") }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

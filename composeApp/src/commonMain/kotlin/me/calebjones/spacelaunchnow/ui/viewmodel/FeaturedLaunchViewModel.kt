@@ -10,14 +10,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
- * Manages the featured launch display (NextUpView).
- * Uses dedicated API call with upcomingWithRecent filter.
+ * Manages the featured launch display (NextUpView) and additional featured launches row.
+ * Uses dedicated API call with upcomingWithRecent filter, fetching 4 launches total.
+ * The first launch is displayed in the hero card, remaining 3 are shown in a horizontal row.
  */
 class FeaturedLaunchViewModel(
     private val launchRepository: LaunchRepository,
@@ -28,24 +30,32 @@ class FeaturedLaunchViewModel(
 
     private val log = logger()
 
-    // Featured Launch State
+    // Featured Launch State (hero card - first result)
     private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
     val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> = _featuredLaunchState.asStateFlow()
 
+    // Additional Featured Launches State (row of 3 - results 2-4)
+    private val _additionalFeaturedLaunches = MutableStateFlow(ViewState<List<LaunchNormal>>(data = emptyList()))
+    val additionalFeaturedLaunches: StateFlow<ViewState<List<LaunchNormal>>> = _additionalFeaturedLaunches.asStateFlow()
+
     /**
-     * Loads featured launch using dedicated API call with upcomingWithRecent filter.
+     * Loads featured launches using dedicated API call with upcomingWithRecent filter.
+     * Fetches 4 launches: first for hero card, remaining 3 for additional featured row.
      * 
      * @param forceRefresh If true, bypass cache (user-initiated refresh)
      */
     fun loadFeaturedLaunch(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                log.d { "Loading featured launch - forceRefresh: $forceRefresh" }
+                log.d { "Loading featured launches (4 total) - forceRefresh: $forceRefresh" }
 
                 _featuredLaunchState.update {
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
                 }
-                log.d { "Set isLoading=true for featured launch state" }
+                _additionalFeaturedLaunches.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+                log.d { "Set isLoading=true for featured launch states" }
 
                 // Wait for actual filter settings from DataStore
                 val currentFilters = notificationStateStorage.stateFlow.first()
@@ -65,9 +75,13 @@ class FeaturedLaunchViewModel(
                     log.i { "Repository success - Data source: ${dataResult.source}, Results: ${paginatedLaunches.results.size}" }
                     log.v { "Cache timestamp: ${dataResult.timestamp}" }
 
-                    val firstLaunch = paginatedLaunches.results.firstOrNull()
+                    val allLaunches = paginatedLaunches.results
+                    val firstLaunch = allLaunches.firstOrNull()
+                    val additionalLaunches = if (allLaunches.size > 1) allLaunches.drop(1).take(3) else emptyList()
+                    
                     if (firstLaunch != null) {
                         log.i { "Featured launch: ${firstLaunch.name} (ID: ${firstLaunch.id})" }
+                        log.i { "Additional featured launches: ${additionalLaunches.size}" }
                     } else {
                         log.w { "No launches returned from repository!" }
                     }
@@ -80,7 +94,24 @@ class FeaturedLaunchViewModel(
                             cacheTimestamp = dataResult.timestamp
                         )
                     }
-                    log.d { "Updated featuredLaunchState: hasData=${_featuredLaunchState.value.data != null}, isLoading=${_featuredLaunchState.value.isLoading}" }
+                    
+                    _additionalFeaturedLaunches.update {
+                        it.copy(
+                            data = additionalLaunches,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+                    log.d { "Updated featuredLaunchState: hasData=${_featuredLaunchState.value.data != null}, additionalCount=${additionalLaunches.size}" }
+
+                    // If we got stale data and didn't already force refresh, trigger a background refresh
+                    if (dataResult.source == DataSource.STALE_CACHE && !forceRefresh) {
+                        log.i { "Received stale cache data, triggering background refresh" }
+                        viewModelScope.launch {
+                            loadFeaturedLaunch(forceRefresh = true)
+                        }
+                    }
 
                     // Pre-fetch detailed data if we have a launch
                     firstLaunch?.let { launch ->
@@ -97,14 +128,27 @@ class FeaturedLaunchViewModel(
                             isLoading = false
                         )
                     }
+                    _additionalFeaturedLaunches.update {
+                        it.copy(
+                            error = errorMsg,
+                            isLoading = false
+                        )
+                    }
                     log.d { "Updated featuredLaunchState with error, isLoading=false" }
                 }
             } catch (exception: Exception) {
                 log.e(exception) { "Exception in loadFeaturedLaunch: ${exception.message}" }
 
+                val errorMsg = exception.message ?: "Unknown error"
                 _featuredLaunchState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = errorMsg,
+                        isLoading = false
+                    )
+                }
+                _additionalFeaturedLaunches.update {
+                    it.copy(
+                        error = errorMsg,
                         isLoading = false
                     )
                 }

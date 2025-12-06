@@ -20,10 +20,10 @@ class CacheCleanupService(
     private val spacecraftDataSource: SpacecraftLocalDataSource
 ) {
     private val log = logger()
-    
+
     private val cleanupScope = CoroutineScope(Dispatchers.Default)
     private val cleanupInterval = 6.hours
-    
+
     /**
      * Start the periodic cleanup task
      * Should be called once during app initialization
@@ -40,48 +40,48 @@ class CacheCleanupService(
             }
         }
     }
-    
+
     /**
      * Manually trigger a cleanup operation
      */
     suspend fun performCleanup() {
         log.i { "Starting cache cleanup..." }
-        
+
         try {
             launchDataSource.deleteExpiredLaunches()
             log.d { "Cleaned up expired launches" }
         } catch (e: Exception) {
             log.e(e) { "Error cleaning launches: ${e.message}" }
         }
-        
+
         try {
             eventDataSource.deleteExpiredEvents()
             log.d { "Cleaned up expired events" }
         } catch (e: Exception) {
             log.e(e) { "Error cleaning events: ${e.message}" }
         }
-        
+
         try {
             articleDataSource.deleteExpiredArticles()
             log.d { "Cleaned up expired articles" }
         } catch (e: Exception) {
             log.e(e) { "Error cleaning articles: ${e.message}" }
         }
-        
+
         try {
             updateDataSource.deleteExpiredUpdates()
             log.d { "Cleaned up expired updates" }
         } catch (e: Exception) {
             log.e(e) { "Error cleaning updates: ${e.message}" }
         }
-        
+
         try {
             programDataSource.deleteExpiredPrograms()
             println("CacheCleanupService: Cleaned up expired programs")
         } catch (e: Exception) {
             println("CacheCleanupService: Error cleaning programs: ${e.message}")
         }
-        
+
         try {
             spacecraftDataSource.deleteExpiredSpacecraft()
             println("CacheCleanupService: Cleaned up expired spacecraft")
@@ -89,6 +89,8 @@ class CacheCleanupService(
             println("CacheCleanupService: Error cleaning spacecraft: ${e.message}")
         }
 
-        log.i { "Cache cleanup completed" 
+        log.i {
+            "Cache cleanup completed"
+        }
     }
 }

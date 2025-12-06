@@ -18,7 +18,7 @@ import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.data.config.AdMobConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
-private val log = SpaceLogger.getLogger("GlobalAdManager")
+private val log by lazy { SpaceLogger.getLogger("GlobalAdManager") }
 
 /**
  * Android implementation of GlobalAdManager with BasicAds integration.

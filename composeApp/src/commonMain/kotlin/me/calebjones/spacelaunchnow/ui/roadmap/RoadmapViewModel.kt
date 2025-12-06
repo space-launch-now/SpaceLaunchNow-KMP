@@ -20,16 +20,16 @@ data class RoadmapUiState(
 
 /**
  * ViewModel for the Roadmap screen
- * 
+ *
  * Current implementation uses hardcoded placeholder data.
- * 
+ *
  * TODO: Firebase Remote Config Integration
  * To enable remote configuration:
  * 1. Add Firebase Remote Config dependency to build.gradle.kts
  * 2. Create RemoteConfigRepository in data/repository/
  * 3. Inject repository into this ViewModel
  * 4. Replace loadPlaceholderData() with fetchRemoteRoadmap()
- * 
+ *
  * See docs/features/ROADMAP_FIREBASE_SETUP.md for detailed instructions
  */
 class RoadmapViewModel : ViewModel() {
@@ -49,12 +49,12 @@ class RoadmapViewModel : ViewModel() {
     private fun loadRoadmap() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            
+
             try {
                 // TODO: Replace with Firebase Remote Config fetch
                 // val remoteData = remoteConfigRepository.getRoadmapData()
                 val placeholderData = loadPlaceholderData()
-                
+
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     roadmapData = placeholderData
@@ -103,6 +103,15 @@ class RoadmapViewModel : ViewModel() {
                 ),
                 RoadmapItem(
                     id = "3",
+                    title = "Starship Screen",
+                    description = "Implement dedicated Starship vehicle page with launch history and stats",
+                    status = RoadmapStatus.IN_PROGRESS,
+                    quarter = "End of 2025",
+                    category = RoadmapCategory.FEATURE,
+                    priority = RoadmapPriority.MEDIUM
+                ),
+                RoadmapItem(
+                    id = "4",
                     title = "Schedule page Sorting",
                     description = "Customizable schedule page with advanced sorting options",
                     status = RoadmapStatus.IN_PROGRESS,
@@ -111,7 +120,7 @@ class RoadmapViewModel : ViewModel() {
                     priority = RoadmapPriority.HIGH
                 ),
                 RoadmapItem(
-                    id = "4",
+                    id = "5",
                     title = "Initial iOS Launch",
                     description = "MVP release of the all new Space Launch Now app for iOS devices",
                     status = RoadmapStatus.IN_PROGRESS,
@@ -119,15 +128,7 @@ class RoadmapViewModel : ViewModel() {
                     category = RoadmapCategory.FEATURE,
                     priority = RoadmapPriority.HIGH
                 ),
-                RoadmapItem(
-                    id = "5",
-                    title = "Starship Screen",
-                    description = "Implement dedicated Starship vehicle page with launch history and stats",
-                    status = RoadmapStatus.PLANNED,
-                    quarter = "End of 2025",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.MEDIUM
-                ),
+
                 RoadmapItem(
                     id = "6",
                     title = "Astronauts Profiles",

@@ -16,7 +16,7 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.logger
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
-private val log = logger()
+private val log by lazy { logger() }
 
 /**
  * iOS implementation of RewardedAdHandler using BasicAds library.

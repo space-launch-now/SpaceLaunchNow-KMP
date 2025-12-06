@@ -14,7 +14,7 @@ import com.datadog.kmp.rum.configuration.RumConfiguration
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
-private val log = SpaceLogger.getLogger("DatadogConfig")
+private val log by lazy { SpaceLogger.getLogger("DatadogConfig") }
 
 /**
  * Initialize Datadog RUM for Kotlin Multiplatform

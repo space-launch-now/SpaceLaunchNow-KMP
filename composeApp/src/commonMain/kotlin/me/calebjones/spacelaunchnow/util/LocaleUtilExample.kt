@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.util
 
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
-private val log = SpaceLogger.getLogger("LocaleUtilExample")
+private val log by lazy { SpaceLogger.getLogger("LocaleUtilExample") }
 
 /**
  * Example usage of LocaleUtil

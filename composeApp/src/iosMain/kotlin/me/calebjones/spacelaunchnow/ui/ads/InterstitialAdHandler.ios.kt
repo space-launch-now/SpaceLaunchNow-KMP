@@ -19,7 +19,7 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import org.koin.compose.koinInject
 
-private val log = logger()
+private val log by lazy { logger() }
 
 /**
  * iOS implementation of InterstitialAdHandler using BasicAds library.

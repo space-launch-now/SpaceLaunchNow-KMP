@@ -16,7 +16,7 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
-private val log = SpaceLogger.getLogger("RewardedAdHandler")
+private val log by lazy { SpaceLogger.getLogger("RewardedAdHandler") }
 
 /**
  * Android implementation of RewardedAdHandler using BasicAds library.

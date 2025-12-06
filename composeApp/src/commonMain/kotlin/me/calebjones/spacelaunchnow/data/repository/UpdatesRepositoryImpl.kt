@@ -1,10 +1,7 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
-import kotlin.time.Clock
 import kotlinx.io.IOException
-import kotlinx.serialization.json.Json
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
 import me.calebjones.spacelaunchnow.api.extensions.getUpdates
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
@@ -12,8 +9,9 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndp
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
-import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.util.logging.logger
+import kotlin.time.Clock
+import kotlin.time.Clock.System
 
 class UpdatesRepositoryImpl(
     private val updatesApi: UpdatesApi,
@@ -38,23 +36,25 @@ class UpdatesRepositoryImpl(
                 log.v { "Cache query result: ${'$'}{cachedUpdates?.size ?: 0} updates found" }
                 if (cachedUpdates != null && cachedUpdates.isNotEmpty()) {
                     log.i { "Cache hit - Returning ${'$'}{cachedUpdates.size} cached updates" }
-                    return Result.success(DataResult(
-                        data = PaginatedUpdateEndpointList(
-                            count = cachedUpdates.size,
-                            next = null,
-                            previous = null,
-                            results = cachedUpdates
-                        ),
-                        source = DataSource.CACHE,
-                        timestamp = staleTimestamp ?: now
-                    ))
+                    return Result.success(
+                        DataResult(
+                            data = PaginatedUpdateEndpointList(
+                                count = cachedUpdates.size,
+                                next = null,
+                                previous = null,
+                                results = cachedUpdates
+                            ),
+                            source = DataSource.CACHE,
+                            timestamp = staleTimestamp ?: now
+                        )
+                    )
                 } else {
                     log.d { "Cache miss - No cached data available, fetching from API" }
                 }
             } else {
                 log.d { "Force refresh - Bypassing cache, fetching fresh data from API" }
             }
-            
+
             log.d { "Fetching updates from API" }
             val response = updatesApi.getLatestUpdates(limit = limit)
             val updates = response.body()
@@ -63,11 +63,13 @@ class UpdatesRepositoryImpl(
             localDataSource?.cacheUpdates(updates.results)
             log.i { "Successfully fetched and cached ${'$'}{updates.results.size} updates" }
 
-            Result.success(DataResult(
-                data = updates,
-                source = DataSource.NETWORK,
-                timestamp = now
-            ))
+            Result.success(
+                DataResult(
+                    data = updates,
+                    source = DataSource.NETWORK,
+                    timestamp = now
+                )
+            )
         } catch (e: ResponseException) {
             log.e(e) { "API error while fetching updates" }
             // On error, try to return stale cache if available
@@ -75,16 +77,18 @@ class UpdatesRepositoryImpl(
             val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 log.w { "Returning ${'$'}{staleCached.size} stale cached updates due to API error" }
-                return Result.success(DataResult(
-                    data = PaginatedUpdateEndpointList(
-                        count = staleCached.size,
-                        next = null,
-                        previous = null,
-                        results = staleCached
-                    ),
-                    source = DataSource.STALE_CACHE,
-                    timestamp = staleTimestamp
-                ))
+                return Result.success(
+                    DataResult(
+                        data = PaginatedUpdateEndpointList(
+                            count = staleCached.size,
+                            next = null,
+                            previous = null,
+                            results = staleCached
+                        ),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = staleTimestamp
+                    )
+                )
             }
             Result.failure(e)
         } catch (e: IOException) {
@@ -94,16 +98,18 @@ class UpdatesRepositoryImpl(
             val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 log.w { "Returning ${'$'}{staleCached.size} stale cached updates due to network error" }
-                return Result.success(DataResult(
-                    data = PaginatedUpdateEndpointList(
-                        count = staleCached.size,
-                        next = null,
-                        previous = null,
-                        results = staleCached
-                    ),
-                    source = DataSource.STALE_CACHE,
-                    timestamp = staleTimestamp
-                ))
+                return Result.success(
+                    DataResult(
+                        data = PaginatedUpdateEndpointList(
+                            count = staleCached.size,
+                            next = null,
+                            previous = null,
+                            results = staleCached
+                        ),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = staleTimestamp
+                    )
+                )
             }
             Result.failure(e)
         } catch (e: Exception) {

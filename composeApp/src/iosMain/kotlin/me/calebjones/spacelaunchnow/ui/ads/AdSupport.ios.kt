@@ -26,7 +26,7 @@ import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
 import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
 
-private val log = logger()
+private val log by lazy { logger() }
 
 /**
  * iOS implementation of AdConsentPopup using Google UMP.

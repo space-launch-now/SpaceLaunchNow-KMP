@@ -31,7 +31,7 @@ class MainApplication : Application() {
     // Inject dependencies for initialization
     private val billingManager: BillingManager by inject()
 
-    private val log = logger()
+    private val log by lazy { logger() }
 
     override fun onCreate() {
         super.onCreate()

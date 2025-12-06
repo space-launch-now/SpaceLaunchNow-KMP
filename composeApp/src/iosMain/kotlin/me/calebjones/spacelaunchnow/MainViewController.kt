@@ -15,7 +15,7 @@ import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import org.koin.core.context.startKoin
 import org.koin.mp.KoinPlatform.getKoin
 
-private val log = logger()
+private val log by lazy { logger() }
 private var koinInitialized = false
 
 // Shared state for navigation from iOS

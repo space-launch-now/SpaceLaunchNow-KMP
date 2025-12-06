@@ -62,7 +62,7 @@ import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
 
 
-private val log = SpaceLogger.getLogger("App")
+private val log by lazy { SpaceLogger.getLogger("App") }
 
 /**
  * CompositionLocal to provide the useUtc setting throughout the app

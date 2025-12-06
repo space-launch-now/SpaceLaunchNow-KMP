@@ -19,7 +19,7 @@ import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
 
-private val log = SpaceLogger.getLogger("InterstitialAdHandler")
+private val log by lazy { SpaceLogger.getLogger("InterstitialAdHandler") }
 
 /**
  * Android implementation of InterstitialAdHandler using BasicAds library.

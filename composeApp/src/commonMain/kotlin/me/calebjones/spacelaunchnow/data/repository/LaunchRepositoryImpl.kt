@@ -49,17 +49,23 @@ class LaunchRepositoryImpl(
 
     override suspend fun getUpcomingLaunchesList(limit: Int): Result<PaginatedLaunchBasicList> {
         return try {
+            log.d { "getUpcomingLaunchesList - limit: $limit" }
             val response = launchesApi.launchesMiniList(
                 limit = limit,
                 upcoming = true,
                 ordering = "net" // Order by launch time
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} upcoming launches (mini list)" }
+            Result.success(launches)
         } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getUpcomingLaunchesList: ${e.message}" }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getUpcomingLaunchesList: ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getUpcomingLaunchesList: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -77,16 +83,16 @@ class LaunchRepositoryImpl(
             // Create cache key for featured launch
             val cacheKey = buildCacheKey("featured_launch", agencyIds, locationIds)
 
-            // STALE-WHILE-REVALIDATE: Check for stale data
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(1)
+            // STALE-WHILE-REVALIDATE: Check for stale data (up to 4 featured launches)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(4)
             val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
 
             // Try fresh cache if available and not forcing refresh
             if (!forceRefresh) {
-                val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(1)
+                val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(4)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                    log.i { "Cache hit - Returning fresh cached featured launch" }
+                    log.i { "Cache hit - Returning ${cachedLaunches.size} fresh cached featured launches" }
                     return Result.success(
                         DataResult(
                             data = PaginatedLaunchNormalList(
@@ -109,7 +115,7 @@ class LaunchRepositoryImpl(
                         log.d { "Stale cache filtered to zero, fetching from API" }
                         // Continue to API call
                     } else {
-                        log.i { "Returning stale featured launch" }
+                        log.i { "Returning ${filteredStale.size} stale featured launches" }
                         return Result.success(
                             DataResult(
                                 data = PaginatedLaunchNormalList(
@@ -141,10 +147,10 @@ class LaunchRepositoryImpl(
 
             // Calculate time window: 1 hour before now
             val oneHourAgo = Clock.System.now() - 1.hours
-            log.d { "Making API call - limit: 1, netGt: $oneHourAgo, agencyIds: $agencyIds, locationIds: $locationIds, statusIds: $statusIds" }
+            log.d { "Making API call - limit: 4, netGt: $oneHourAgo, agencyIds: $agencyIds, locationIds: $locationIds, statusIds: $statusIds" }
 
             val response = launchesApi.getLaunchList(
-                limit = 1,
+                limit = 4,
                 netGt = oneHourAgo,
                 ordering = "net",
                 lspId = agencyIds,
@@ -165,9 +171,9 @@ class LaunchRepositoryImpl(
             if (launches.results.isEmpty()) {
                 log.w { "API returned NO launches!" }
             } else {
-                // Cache only the first result as featured launch
-                localDataSource?.cacheNormalLaunches(launches.results.take(1))
-                log.i { "Successfully fetched and cached featured launch: ${launches.results.first().name}" }
+                // Cache all 4 featured launches
+                localDataSource?.cacheNormalLaunches(launches.results.take(4))
+                log.i { "Successfully fetched and cached ${launches.results.size} featured launches" }
             }
 
             Result.success(
@@ -178,9 +184,9 @@ class LaunchRepositoryImpl(
                 )
             )
         } catch (e: ResponseException) {
-            log.e(e) { "API error while fetching featured launch" }
+            log.e(e) { "API error while fetching featured launches" }
             // On error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(1)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(4)
             if (staleCached != null && staleCached.isNotEmpty()) {
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
                 if (filteredStale.isNotEmpty()) {
@@ -393,18 +399,24 @@ class LaunchRepositoryImpl(
         netLt: Instant?
     ): Result<PaginatedLaunchBasicList> {
         return try {
+            log.d { "getUpcomingLaunchesList - limit: $limit, netGt: $netGt, netLt: $netLt" }
             val response = launchesApi.getLaunchMiniList(
                 limit = limit,
                 netGt = netGt,
                 netLt = netLt,
                 ordering = "net"
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} launches with time window filter" }
+            Result.success(launches)
         } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getUpcomingLaunchesList (time window): ${e.message}" }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getUpcomingLaunchesList (time window): ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getUpcomingLaunchesList (time window): ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -545,6 +557,7 @@ class LaunchRepositoryImpl(
         limit: Int
     ): Result<PaginatedLaunchNormalList> {
         return try {
+            log.d { "getLaunchesByDayAndMonth - day: $day, month: $month, limit: $limit" }
             val response = launchesApi.getLaunchList(
                 limit = limit,
                 previous = true,
@@ -552,12 +565,17 @@ class LaunchRepositoryImpl(
                 netMonth = listOf(month.toDouble()),
                 ordering = "-net" // Most recent first
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} launches for day $day, month $month" }
+            Result.success(launches)
         } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getLaunchesByDayAndMonth: ${e.message}" }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getLaunchesByDayAndMonth: ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getLaunchesByDayAndMonth: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -635,13 +653,19 @@ class LaunchRepositoryImpl(
 
     override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> {
         return try {
+            log.d { "getAgencyDetails - id: $id" }
             val response = agenciesApi.agenciesRetrieve(id)
-            Result.success(response.body())
+            val agency = response.body()
+            log.i { "✅ API SUCCESS: Fetched agency details: ${agency.name} (ID: $id)" }
+            Result.success(agency)
         } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getAgencyDetails for ID $id: ${e.message}" }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getAgencyDetails for ID $id: ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getAgencyDetails for ID $id: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -761,14 +785,18 @@ class LaunchRepositoryImpl(
         upcoming: Boolean? = null
     ): Result<PaginatedLaunchNormalList> {
         return try {
+            log.d { "searchLaunches - query: '$query', limit: $limit, upcoming: $upcoming" }
             val response = launchesApi.getLaunchList(
                 search = query,
                 limit = limit,
                 upcoming = upcoming,
                 ordering = "net"
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Search returned ${launches.results.size} launches for query '$query'" }
+            Result.success(launches)
         } catch (e: Exception) {
+            log.e(e) { "❌ ERROR in searchLaunches for query '$query': ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -779,14 +807,18 @@ class LaunchRepositoryImpl(
         upcoming: Boolean = true
     ): Result<PaginatedLaunchNormalList> {
         return try {
+            log.d { "getLaunchesByCompany - lspIds: $lspIds, limit: $limit, upcoming: $upcoming" }
             val response = launchesApi.getLaunchList(
                 lspId = lspIds,
                 limit = limit,
                 upcoming = upcoming,
                 ordering = "net"
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} launches for companies $lspIds" }
+            Result.success(launches)
         } catch (e: Exception) {
+            log.e(e) { "❌ ERROR in getLaunchesByCompany for lspIds $lspIds: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -796,14 +828,18 @@ class LaunchRepositoryImpl(
         upcoming: Boolean = true
     ): Result<PaginatedLaunchNormalList> {
         return try {
+            log.d { "getCrewedLaunches - limit: $limit, upcoming: $upcoming" }
             val response = launchesApi.getLaunchList(
                 isCrewed = true,
                 limit = limit,
                 upcoming = upcoming,
                 ordering = "net"
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} crewed launches" }
+            Result.success(launches)
         } catch (e: Exception) {
+            log.e(e) { "❌ ERROR in getCrewedLaunches: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }

@@ -45,7 +45,7 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
-private val log = SpaceLogger.getLogger("SmartBannerAd")
+private val log by lazy { SpaceLogger.getLogger("SmartBannerAd") }
 
 /**
  * Android implementation of SmartBannerAd using BasicAds library.

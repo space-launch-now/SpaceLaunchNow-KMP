@@ -3,7 +3,7 @@ package me.calebjones.spacelaunchnow.ui.ads
 import androidx.compose.runtime.Composable
 import me.calebjones.spacelaunchnow.logger
 
-private val log = logger()
+private val log by lazy { logger() }
 
 /**
  * Desktop implementation of InterstitialAdHandler (no-op).

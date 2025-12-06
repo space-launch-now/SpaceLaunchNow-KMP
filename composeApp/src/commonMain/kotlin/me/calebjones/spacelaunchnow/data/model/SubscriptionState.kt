@@ -7,7 +7,7 @@ import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Clock.System
 import kotlin.time.ExperimentalTime
 
-private val log = SpaceLogger.getLogger("SubscriptionState")
+private val log by lazy { SpaceLogger.getLogger("SubscriptionState") }
 
 /**
  * Subscription state model

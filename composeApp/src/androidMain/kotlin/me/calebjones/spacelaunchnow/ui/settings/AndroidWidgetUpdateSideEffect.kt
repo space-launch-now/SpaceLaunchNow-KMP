@@ -9,7 +9,7 @@ import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.widgets.WidgetUpdater
 import org.koin.compose.viewmodel.koinViewModel
 
-private val log = SpaceLogger.getLogger("AndroidWidgetUpdateSideEffect")
+private val log by lazy { SpaceLogger.getLogger("AndroidWidgetUpdateSideEffect") }
 
 /**
  * Android implementation of widget update side effect.

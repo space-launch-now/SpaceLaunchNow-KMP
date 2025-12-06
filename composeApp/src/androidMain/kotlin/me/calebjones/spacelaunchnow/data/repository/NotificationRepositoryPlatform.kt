@@ -12,7 +12,7 @@ object PermissionHelper : KoinComponent {
     val context: Context by inject()
 }
 
-private val log = SpaceLogger.getLogger("NotificationRepository")
+private val log by lazy { SpaceLogger.getLogger("NotificationRepository") }
 
 actual suspend fun requestPlatformNotificationPermission(): Boolean {
 

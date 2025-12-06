@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import me.calebjones.spacelaunchnow.logger
 
-private val log = logger()
+private val log by lazy { logger() }
 
 /**
  * Desktop implementation of SmartBannerAd (no-op).

@@ -10,7 +10,7 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-private val log = logger()
+private val log by lazy { logger() }
 
 @OptIn(ExperimentalForeignApi::class)
 private fun getAppGroupDirectory(): String {
