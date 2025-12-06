@@ -1,0 +1,37 @@
+-- Migration from version 1 to version 2
+-- Adds ProgramCache and SpacecraftCache tables for Starship feature
+
+-- Create ProgramCache table
+CREATE TABLE IF NOT EXISTS ProgramCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    image_url TEXT,
+    info_url TEXT,
+    wiki_url TEXT,
+    start_date INTEGER,
+    end_date INTEGER,
+    json_data TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_program_expires ON ProgramCache(expires_at);
+
+-- Create SpacecraftCache table
+CREATE TABLE IF NOT EXISTS SpacecraftCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    serial_number TEXT,
+    status_id INTEGER,
+    status_name TEXT,
+    description TEXT,
+    spacecraft_config_id INTEGER,
+    spacecraft_config_name TEXT,
+    json_data TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_spacecraft_expires ON SpacecraftCache(expires_at);
+CREATE INDEX IF NOT EXISTS idx_spacecraft_config ON SpacecraftCache(spacecraft_config_id);

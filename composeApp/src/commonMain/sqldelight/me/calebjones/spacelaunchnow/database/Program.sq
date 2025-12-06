@@ -1,0 +1,48 @@
+-- Program table for caching program data (e.g., Starship program)
+
+CREATE TABLE ProgramCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    image_url TEXT,
+    info_url TEXT,
+    wiki_url TEXT,
+    start_date INTEGER, -- stored as epoch milliseconds
+    end_date INTEGER, -- stored as epoch milliseconds
+    json_data TEXT NOT NULL, -- Full serialized ProgramNormal object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Index for cache expiration queries
+CREATE INDEX idx_program_expires ON ProgramCache(expires_at);
+
+-- Program queries
+insertOrReplaceProgram:
+INSERT OR REPLACE INTO ProgramCache (
+    id, name, description, image_url, info_url, wiki_url,
+    start_date, end_date, json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getProgramById:
+SELECT * FROM ProgramCache 
+WHERE id = ? AND expires_at > ?;
+
+getProgramByIdStale:
+SELECT * FROM ProgramCache 
+WHERE id = ?;
+
+getAllPrograms:
+SELECT * FROM ProgramCache 
+WHERE expires_at > ?
+ORDER BY name ASC
+LIMIT ?;
+
+deleteExpiredPrograms:
+DELETE FROM ProgramCache WHERE expires_at < ?;
+
+deleteProgramById:
+DELETE FROM ProgramCache WHERE id = ?;
+
+clearAllPrograms:
+DELETE FROM ProgramCache;

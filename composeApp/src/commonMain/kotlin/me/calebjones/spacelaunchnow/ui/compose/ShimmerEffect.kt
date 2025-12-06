@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.ui.compose
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -151,5 +152,118 @@ fun PlainShimmerCard(
             modifier = Modifier
                 .fillMaxSize()
         )
+    }
+}
+
+// ========== Starship Dashboard Shimmers ==========
+
+/**
+ * Shimmer loading state for the Starship Overview tab.
+ * Shows placeholders for program info, livestream, next launch, and updates.
+ */
+@Composable
+fun StarshipOverviewShimmer() {
+    Column(
+        modifier = Modifier
+            .shimmer()
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Program info card shimmer
+        PlainShimmerCard(height = 180)
+        
+        // Livestream/video placeholder shimmer
+        PlainShimmerCard(height = 200)
+        
+        // Next launch card shimmer
+        PlainShimmerCard(height = 160)
+        
+        // Updates section shimmer (horizontal scroll)
+        UpdatesShimmer(cardCount = 3)
+    }
+}
+
+/**
+ * Shimmer loading state for the Starship Events tab.
+ * Shows placeholders for events list, updates, and news.
+ */
+@Composable
+fun StarshipEventsShimmer() {
+    Column(
+        modifier = Modifier
+            .shimmer()
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Events list shimmer - vertical list of cards
+        repeat(4) {
+            PlainShimmerCard(height = 100)
+        }
+        
+        // Updates section
+        PlainShimmerCard(height = 24, width = 100) // Section header
+        UpdatesShimmer(cardCount = 3)
+        
+        // News section  
+        PlainShimmerCard(height = 24, width = 80) // Section header
+        LaunchListShimmer(cardCount = 2)
+    }
+}
+
+/**
+ * Shimmer loading state for the Starship Vehicles tab.
+ * Shows placeholders for spacecraft grid.
+ */
+@Composable
+fun StarshipVehiclesShimmer() {
+    Column(
+        modifier = Modifier
+            .shimmer()
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Grid-like layout for vehicles (2 columns simulated)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            PlainShimmerCard(
+                height = 200,
+                modifier = Modifier.weight(1f)
+            )
+            PlainShimmerCard(
+                height = 200,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            PlainShimmerCard(
+                height = 200,
+                modifier = Modifier.weight(1f)
+            )
+            PlainShimmerCard(
+                height = 200,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            PlainShimmerCard(
+                height = 200,
+                modifier = Modifier.weight(1f)
+            )
+            PlainShimmerCard(
+                height = 200,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }

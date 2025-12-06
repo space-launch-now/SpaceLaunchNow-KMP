@@ -1,22 +1,37 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 
 interface EventsRepository {
-    
+
     /**
      * Get a list of upcoming events
      */
-    suspend fun getUpcomingEvents(limit: Int = 10, forceRefresh: Boolean = false): Result<DataResult<PaginatedEventEndpointNormalList>>
-    
+    suspend fun getUpcomingEvents(
+        limit: Int = 10,
+        forceRefresh: Boolean = false
+    ): Result<DataResult<PaginatedEventEndpointNormalList>>
+
     /**
      * Get events by type
      */
-    suspend fun getEventsByType(typeIds: List<Int>, limit: Int = 10): Result<PaginatedEventEndpointNormalList>
-    
+    suspend fun getEventsByType(
+        typeIds: List<Int>,
+        limit: Int = 10
+    ): Result<PaginatedEventEndpointNormalList>
+
+    /**
+     * Get events by program
+     */
+    suspend fun getEventsByProgram(
+        programId: Int,
+        limit: Int = 20,
+        upcoming: Boolean? = true,
+        forceRefresh: Boolean = false
+    ): Result<DataResult<PaginatedEventEndpointNormalList>>
+
     /**
      * Get all events with pagination
      */

@@ -4,14 +4,7 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
@@ -19,7 +12,6 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
@@ -35,6 +27,7 @@ import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
+import me.calebjones.spacelaunchnow.navigation.Starship
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.platform.ContextFactory
@@ -51,22 +44,23 @@ import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
+import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
-import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.NotificationSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationScreen
+import me.calebjones.spacelaunchnow.ui.starship.StarshipScreen
 import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
-import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
+
 
 private val log = SpaceLogger.getLogger("App")
 
@@ -88,21 +82,21 @@ fun isTabletOrDesktop(): Boolean {
         log.v { "Platform is Desktop - using tablet layout" }
         return true
     }
-    
+
     // For mobile devices (Android/iOS), check BOTH width and height classes
     // A true tablet should have EXPANDED in at least one dimension even when rotated
     // This prevents phones in landscape from being treated as tablets
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    
+
     val widthClass = windowSizeClass.windowWidthSizeClass
     val heightClass = windowSizeClass.windowHeightSizeClass
-    
+
     // Only treat as tablet if width is EXPANDED (>= 840dp) 
     // AND height is at least MEDIUM (>= 480dp) to ensure it's not just a phone rotated
     val isTablet = widthClass == WindowWidthSizeClass.EXPANDED
-    
+
     log.v { "Width: $widthClass, Height: $heightClass, isTablet: $isTablet" }
-    
+
     return isTablet
 }
 
@@ -120,12 +114,14 @@ fun SpaceLaunchNowApp(
     val useUtc = false
 
     val navController = rememberNavController()
-    
+
     // Determine current window size for layout decisions - now dynamic
     val currentIsTabletSize = isTabletOrDesktop()
+
     log.v { "Dynamic layout detection: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}" }
     
     log.v { "SpaceLaunchNowApp recomposing - NavController: ${navController.hashCode()}, using dynamic layout: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}" }
+
 
     // Handle notification-based navigation
     LaunchedEffect(notificationLaunchId) {
@@ -161,8 +157,9 @@ fun SpaceLaunchNowApp(
     LaunchedEffect(Unit) {
         // Run all initialization on background thread to avoid blocking UI on iOS
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+
             log.i { "=== APP START DEBUG INFO ===" }
-            
+
             try {
                 // Lazy inject repositories only when needed (on background thread)
                 val koin = org.koin.mp.KoinPlatform.getKoin()
@@ -178,9 +175,9 @@ fun SpaceLaunchNowApp(
                 } else {
                     emptyList()
                 }
-                
+
                 val adInitSuccess = AdInitializer.initialize(context = contextFactory.getActivity())
-                
+
                 if (adInitSuccess) {
                     AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
                 }
@@ -235,13 +232,13 @@ fun SpaceLaunchNowApp(
         LocalContextFactory provides contextFactory
     ) {
         BetaWarningDialog()
-        
+
         // Show consent popup (platform-specific implementation)
         // Must be inside CompositionLocalProvider to access LocalContextFactory
         AdConsentPopup(
             onFailure = { log.w(it) { "Consent popup failure" } }
         )
-        
+
         // Wrap content with preloaded ads (platform-specific: Android/iOS preloads, Desktop no-op)
         WithPreloadedAds(
             context = contextFactory.getActivity()
@@ -368,9 +365,12 @@ fun SpaceLaunchNowApp(
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }
+                    composableWithCompositionLocal<Starship> {
+                        StarshipScreen(navController = navController)
+                    }
                 }
             }
-            
+
             // Dynamic layout switching while preserving navigation state
             if (currentIsTabletSize) {
                 TabletDesktopLayout(
@@ -380,7 +380,7 @@ fun SpaceLaunchNowApp(
                 )
             } else {
                 PhoneLayout(
-                    navController = navController, 
+                    navController = navController,
                     themeOption = themeOption,
                     content = navHostContent
                 )

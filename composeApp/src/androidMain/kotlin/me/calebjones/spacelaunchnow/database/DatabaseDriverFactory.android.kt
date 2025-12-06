@@ -9,7 +9,8 @@ actual class DatabaseDriverFactory(private val context: Context) {
         return AndroidSqliteDriver(
             schema = SpaceLaunchDatabase.Schema,
             context = context,
-            name = "spacelaunchnow.db"
+            name = "spacelaunchnow.db",
+            callback = AndroidSqliteDriver.Callback(SpaceLaunchDatabase.Schema)
         )
     }
 }

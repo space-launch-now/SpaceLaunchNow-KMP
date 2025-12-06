@@ -67,7 +67,11 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
+                apiVersion = "2.1"
+                languageVersion = "2.1"
                 optIn("kotlin.time.ExperimentalTime")
+                optIn("kotlin.io.encoding.ExperimentalEncodingApi")
+                optIn("kotlin.ExperimentalStdlibApi")
             }
         }
         named { it.lowercase().startsWith("ios") }.configureEach {
@@ -97,7 +101,7 @@ kotlin {
 
                 // JDK cryptography provider for Desktop
                 implementation(libs.cryptography.provider.jdk)
-                
+
                 // SQLDelight JVM driver
                 implementation(libs.sqldelight.sqlite.driver)
 
@@ -144,7 +148,7 @@ kotlin {
                 implementation(libs.purchases.either)
                 implementation(libs.purchases.result)
                 implementation(libs.basicAds)
-                
+
                 // SQLDelight Android driver
                 implementation(libs.sqldelight.android.driver)
             }
@@ -167,7 +171,7 @@ kotlin {
                 implementation(libs.purchases.result)
 
                 implementation(libs.basicAds)
-                
+
                 // SQLDelight iOS driver
                 implementation(libs.sqldelight.native.driver)
             }
@@ -225,7 +229,7 @@ kotlin {
 
                 // DataStore for persistent storage
                 implementation(libs.androidx.datastore.preferences)
-                
+
                 // KStore for simple local storage
                 implementation(libs.kstore)
                 implementation(libs.kstore.file)
@@ -243,6 +247,7 @@ kotlin {
                 // Kermit for multiplatform logging
                 implementation(libs.kermit)
                 implementation(libs.kermit.crashlytics)
+
 
                 // SQLDelight common runtime and coroutines
                 implementation(libs.sqldelight.runtime)
@@ -532,6 +537,8 @@ sqldelight {
     databases {
         create("SpaceLaunchDatabase") {
             packageName.set("me.calebjones.spacelaunchnow.database")
+            // Version 2 adds ProgramCache and SpacecraftCache tables for Starship feature
+            version = 2
         }
     }
 }

@@ -37,6 +37,7 @@ import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
+import me.calebjones.spacelaunchnow.navigation.Starship
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.ui.about.AboutLibrariesScreen
@@ -151,7 +152,8 @@ private fun PhoneContentWrapper(
         
         // Default padding for main routes  
         Home::class.qualifiedName,
-        Settings::class.qualifiedName -> true
+        Settings::class.qualifiedName,
+        Starship::class.qualifiedName -> true
         
         // Full padding for list routes
         Schedule::class.qualifiedName -> true

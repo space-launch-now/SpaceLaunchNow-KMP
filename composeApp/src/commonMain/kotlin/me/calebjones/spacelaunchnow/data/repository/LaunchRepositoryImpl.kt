@@ -646,15 +646,17 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getNextLaunch(
+    override suspend fun getNextStarshipLaunch(
         limit: Int,
-        forceRefresh: Boolean
+        forceRefresh: Boolean,
+        programId: List<Int>?
     ): Result<PaginatedLaunchNormalList> {
         return try {
             val response = launchesApi.getLaunchList(
                 limit = limit,
                 upcoming = true,
-                ordering = "net" // Order by launch time
+                ordering = "net",
+                program = programId
             )
 
             // Verbose debug logging for API response

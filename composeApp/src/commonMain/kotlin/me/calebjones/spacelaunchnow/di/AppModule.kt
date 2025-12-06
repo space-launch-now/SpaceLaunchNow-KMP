@@ -15,13 +15,23 @@ import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
+import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
+import me.calebjones.spacelaunchnow.data.repository.LauncherRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
+import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
+import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
+import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
+import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
@@ -38,7 +48,9 @@ import me.calebjones.spacelaunchnow.database.CacheCleanupService
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
+import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
+import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
@@ -59,6 +71,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.StarshipViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
@@ -92,6 +105,8 @@ val appModule = module {
     single { EventLocalDataSource(get(), get()) }
     single { ArticleLocalDataSource(get(), get()) }
     single { UpdateLocalDataSource(get(), get()) }
+    single { ProgramLocalDataSource(get(), get()) }
+    single { SpacecraftLocalDataSource(get(), get()) }
 
     single<LaunchRepository> {
         LaunchRepositoryImpl(
@@ -118,6 +133,7 @@ val appModule = module {
     viewModelOf(::EventsViewModel)
     viewModelOf(::HistoryViewModel)
     viewModelOf(::StatsViewModel)
+    viewModelOf(::StarshipViewModel)
 
     viewModelOf(::ScheduleViewModel)
     singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
@@ -126,6 +142,11 @@ val appModule = module {
     viewModelOf(::AgencyViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
+    singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
+    singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
+    singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
+    singleOf(::LauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
+    singleOf(::SpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
     single<EventsRepository> {
         EventsRepositoryImpl(
             eventsApi = get(),
@@ -147,7 +168,9 @@ val appModule = module {
             launchDataSource = get(),
             eventDataSource = get(),
             articleDataSource = get(),
-            updateDataSource = get()
+            updateDataSource = get(),
+            programDataSource = get(),
+            spacecraftDataSource = get()
         )
     }
 

@@ -51,6 +51,7 @@ import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLType
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import kotlin.time.Clock.System
 
@@ -376,7 +377,7 @@ fun FullscreenVideoScreen(
     val vidUrl = remember(videoUrl) {
         VidURL(
             url = videoUrl,
-            type = null,  // VidURLType is optional
+            type = VidURLType(1, "Local"),  // VidURLType is optional
             language = null,  // Language is optional
             title = launchName,
             description = null,

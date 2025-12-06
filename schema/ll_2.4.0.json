@@ -5503,119 +5503,6 @@
         }
       }
     },
-    "/api/ll/2.4.0/config/notice_types/": {
-      "get": {
-        "operationId": "config_notice_types_list",
-        "description": "#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/config/notice_types/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/config/notice_types/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
-        "parameters": [
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "Number of results to return per page.",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "The initial index from which to return the results.",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "ordering",
-            "required": false,
-            "in": "query",
-            "description": "Which field to use when ordering the results.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "description": "A search term.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "tags": [
-          "config"
-        ],
-        "security": [
-          {
-            "tokenAuth": []
-          },
-          {
-            "cookieAuth": []
-          },
-          {
-            "basicAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedNoticeTypeList"
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/ll/2.4.0/config/notice_types/{id}/": {
-      "get": {
-        "operationId": "config_notice_types_retrieve",
-        "description": "#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/config/notice_types/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/config/notice_types/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "A unique integer value identifying this Notices Type.",
-            "required": true
-          }
-        ],
-        "tags": [
-          "config"
-        ],
-        "security": [
-          {
-            "tokenAuth": []
-          },
-          {
-            "cookieAuth": []
-          },
-          {
-            "basicAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NoticeType"
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    },
     "/api/ll/2.4.0/config/orbits/": {
       "get": {
         "operationId": "config_orbits_list",
@@ -5951,119 +5838,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProgramType"
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/ll/2.4.0/config/road_closure_statuses/": {
-      "get": {
-        "operationId": "config_road_closure_statuses_list",
-        "description": "#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/config/road_closure_statuses/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/config/road_closure_statuses/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
-        "parameters": [
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "Number of results to return per page.",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "The initial index from which to return the results.",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "ordering",
-            "required": false,
-            "in": "query",
-            "description": "Which field to use when ordering the results.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "description": "A search term.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "tags": [
-          "config"
-        ],
-        "security": [
-          {
-            "tokenAuth": []
-          },
-          {
-            "cookieAuth": []
-          },
-          {
-            "basicAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedRoadClosureStatusList"
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/ll/2.4.0/config/road_closure_statuses/{id}/": {
-      "get": {
-        "operationId": "config_road_closure_statuses_retrieve",
-        "description": "#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/config/road_closure_statuses/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/config/road_closure_statuses/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "A unique integer value identifying this Road Closure Type.",
-            "required": true
-          }
-        ],
-        "tags": [
-          "config"
-        ],
-        "security": [
-          {
-            "tokenAuth": []
-          },
-          {
-            "cookieAuth": []
-          },
-          {
-            "basicAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RoadClosureStatus"
                 }
               }
             },
@@ -6629,111 +6403,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VidURLType"
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/ll/2.4.0/dashboard/starship/": {
-      "get": {
-        "operationId": "dashboard_starship_list",
-        "description": "#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/dashboard/starship/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/dashboard/starship/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
-        "tags": [
-          "dashboard"
-        ],
-        "security": [
-          {
-            "tokenAuth": []
-          },
-          {
-            "cookieAuth": []
-          },
-          {
-            "basicAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StarshipDashboardNormal"
-                  }
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/ll/2.4.0/dashboard/starship/detailed/": {
-      "get": {
-        "operationId": "dashboard_starship_detailed_list",
-        "description": "#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/dashboard/starship/detailed/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/dashboard/starship/detailed/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
-        "tags": [
-          "dashboard"
-        ],
-        "security": [
-          {
-            "tokenAuth": []
-          },
-          {
-            "cookieAuth": []
-          },
-          {
-            "basicAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StarshipDashboardDetailed"
-                  }
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/ll/2.4.0/dashboard/starship/mini/": {
-      "get": {
-        "operationId": "dashboard_starship_mini_list",
-        "description": "#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/dashboard/starship/mini/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/dashboard/starship/mini/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
-        "tags": [
-          "dashboard"
-        ],
-        "security": [
-          {
-            "tokenAuth": []
-          },
-          {
-            "cookieAuth": []
-          },
-          {
-            "basicAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StarshipDashboardList"
-                  }
                 }
               }
             },
@@ -12116,7 +11785,7 @@
     "/api/ll/2.4.0/launches/": {
       "get": {
         "operationId": "launches_list",
-        "description": "#### Filters\nParameters - `agency_launch_attempt_count`, `agency_launch_attempt_count__gt`, `agency_launch_attempt_count__gte`, `agency_launch_attempt_count__lt`, `agency_launch_attempt_count__lte`, `agency_launch_attempt_count_year`, `agency_launch_attempt_count_year__gt`, `agency_launch_attempt_count_year__gte`, `agency_launch_attempt_count_year__lt`, `agency_launch_attempt_count_year__lte`, `id`, `include_suborbital`, `is_crewed`, `last_updated__gte`, `last_updated__lte`, `launch_designator`, `launcher_config__id`, `location__ids`, `location_launch_attempt_count`, `location_launch_attempt_count__gt`, `location_launch_attempt_count__gte`, `location_launch_attempt_count__lt`, `location_launch_attempt_count__lte`, `location_launch_attempt_count_year`, `location_launch_attempt_count_year__gt`, `location_launch_attempt_count_year__gte`, `location_launch_attempt_count_year__lt`, `location_launch_attempt_count_year__lte`, `lsp__id`, `lsp__name`, `mission__orbit__celestial_body__id`, `mission__orbit__name`, `mission__orbit__name__icontains`, `name`, `net__day`, `net__gt`, `net__gte`, `net__lt`, `net__lte`, `net__month`, `net__year`, `orbital_launch_attempt_count`, `orbital_launch_attempt_count__gt`, `orbital_launch_attempt_count__gte`, `orbital_launch_attempt_count__lt`, `orbital_launch_attempt_count__lte`, `orbital_launch_attempt_count_year`, `orbital_launch_attempt_count_year__gt`, `orbital_launch_attempt_count_year__gte`, `orbital_launch_attempt_count_year__lt`, `orbital_launch_attempt_count_year__lte`, `pad`, `pad__location`, `pad__location__celestial_body__id`, `pad_launch_attempt_count`, `pad_launch_attempt_count__gt`, `pad_launch_attempt_count__gte`, `pad_launch_attempt_count__lt`, `pad_launch_attempt_count__lte`, `pad_launch_attempt_count_year`, `pad_launch_attempt_count_year__gt`, `pad_launch_attempt_count_year__gte`, `pad_launch_attempt_count_year__lt`, `pad_launch_attempt_count_year__lte`, `previous`, `program`, `related_lsp__id`, `related_lsp__name`, `rocket__configuration__full_name`, `rocket__configuration__full_name__icontains`, `rocket__configuration__id`, `rocket__configuration__manufacturer__name`, `rocket__configuration__manufacturer__name__icontains`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__id`, `rocket__spacecraftflight__spacecraft__name`, `rocket__spacecraftflight__spacecraft__name__icontains`, `serial_number`, `slug`, `spacecraft_config__ids`, `status`, `status__ids`, `upcoming`, `upcoming_with_recent`, `video_url`, `window_end__gt`, `window_end__gte`, `window_end__lt`, `window_end__lte`, `window_start__gt`, `window_start__gte`, `window_start__lt`, `window_start__lte`\n\nExample - [/launches/?pad__location=13](./?pad__location=13)\n\n#### Search\nFields searched - `launch_designator`, `launch_service_provider__name`, `mission__name`, `name`, `pad__location__name`, `pad__name`, `rocket__configuration__manufacturer__abbrev`, `rocket__configuration__manufacturer__name`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__name`\n\nExample - [/launches/?search=Starlink](./?search=Starlink)\n\n#### Ordering\nFields - `id`, `last_updated`, `name`, `net`\n\nExample - [/launches/?ordering=-last_updated](./?ordering=-last_updated)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/launches/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/launches/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
+        "description": "#### Filters\nParameters - `agency_launch_attempt_count`, `agency_launch_attempt_count__gt`, `agency_launch_attempt_count__gte`, `agency_launch_attempt_count__lt`, `agency_launch_attempt_count__lte`, `agency_launch_attempt_count_year`, `agency_launch_attempt_count_year__gt`, `agency_launch_attempt_count_year__gte`, `agency_launch_attempt_count_year__lt`, `agency_launch_attempt_count_year__lte`, `id`, `include_suborbital`, `is_crewed`, `last_updated__gte`, `last_updated__lte`, `launch_designator`, `launcher_config__id`, `location__ids`, `location_launch_attempt_count`, `location_launch_attempt_count__gt`, `location_launch_attempt_count__gte`, `location_launch_attempt_count__lt`, `location_launch_attempt_count__lte`, `location_launch_attempt_count_year`, `location_launch_attempt_count_year__gt`, `location_launch_attempt_count_year__gte`, `location_launch_attempt_count_year__lt`, `location_launch_attempt_count_year__lte`, `lsp__id`, `lsp__name`, `mission__agency__ids`, `mission__orbit__celestial_body__id`, `mission__orbit__name`, `mission__orbit__name__icontains`, `name`, `net__day`, `net__gt`, `net__gte`, `net__lt`, `net__lte`, `net__month`, `net__year`, `orbital_launch_attempt_count`, `orbital_launch_attempt_count__gt`, `orbital_launch_attempt_count__gte`, `orbital_launch_attempt_count__lt`, `orbital_launch_attempt_count__lte`, `orbital_launch_attempt_count_year`, `orbital_launch_attempt_count_year__gt`, `orbital_launch_attempt_count_year__gte`, `orbital_launch_attempt_count_year__lt`, `orbital_launch_attempt_count_year__lte`, `pad`, `pad__location`, `pad__location__celestial_body__id`, `pad_launch_attempt_count`, `pad_launch_attempt_count__gt`, `pad_launch_attempt_count__gte`, `pad_launch_attempt_count__lt`, `pad_launch_attempt_count__lte`, `pad_launch_attempt_count_year`, `pad_launch_attempt_count_year__gt`, `pad_launch_attempt_count_year__gte`, `pad_launch_attempt_count_year__lt`, `pad_launch_attempt_count_year__lte`, `previous`, `program`, `related_lsp__id`, `related_lsp__name`, `rocket__configuration__full_name`, `rocket__configuration__full_name__icontains`, `rocket__configuration__id`, `rocket__configuration__manufacturer__name`, `rocket__configuration__manufacturer__name__icontains`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__id`, `rocket__spacecraftflight__spacecraft__name`, `rocket__spacecraftflight__spacecraft__name__icontains`, `serial_number`, `slug`, `spacecraft_config__ids`, `status`, `status__ids`, `upcoming`, `upcoming_with_recent`, `video_url`, `window_end__gt`, `window_end__gte`, `window_end__lt`, `window_end__lte`, `window_start__gt`, `window_start__gte`, `window_start__lt`, `window_start__lte`\n\nExample - [/launches/?pad__location=13](./?pad__location=13)\n\n#### Search\nFields searched - `launch_designator`, `launch_service_provider__name`, `mission__name`, `name`, `pad__location__name`, `pad__name`, `rocket__configuration__manufacturer__abbrev`, `rocket__configuration__manufacturer__name`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__name`\n\nExample - [/launches/?search=Starlink](./?search=Starlink)\n\n#### Ordering\nFields - `id`, `last_updated`, `name`, `net`\n\nExample - [/launches/?ordering=-last_updated](./?ordering=-last_updated)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/launches/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/launches/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
         "parameters": [
           {
             "in": "query",
@@ -12375,6 +12044,19 @@
               }
             },
             "description": "Comma-separated launch service provider names.",
+            "explode": false,
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "mission__agency__ids",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Comma-separated mission agency IDs.",
             "explode": false,
             "style": "form"
           },
@@ -12966,7 +12648,7 @@
     "/api/ll/2.4.0/launches/{id}/": {
       "get": {
         "operationId": "launches_retrieve",
-        "description": "#### Filters\nParameters - `agency_launch_attempt_count`, `agency_launch_attempt_count__gt`, `agency_launch_attempt_count__gte`, `agency_launch_attempt_count__lt`, `agency_launch_attempt_count__lte`, `agency_launch_attempt_count_year`, `agency_launch_attempt_count_year__gt`, `agency_launch_attempt_count_year__gte`, `agency_launch_attempt_count_year__lt`, `agency_launch_attempt_count_year__lte`, `id`, `include_suborbital`, `is_crewed`, `last_updated__gte`, `last_updated__lte`, `launch_designator`, `launcher_config__id`, `location__ids`, `location_launch_attempt_count`, `location_launch_attempt_count__gt`, `location_launch_attempt_count__gte`, `location_launch_attempt_count__lt`, `location_launch_attempt_count__lte`, `location_launch_attempt_count_year`, `location_launch_attempt_count_year__gt`, `location_launch_attempt_count_year__gte`, `location_launch_attempt_count_year__lt`, `location_launch_attempt_count_year__lte`, `lsp__id`, `lsp__name`, `mission__orbit__celestial_body__id`, `mission__orbit__name`, `mission__orbit__name__icontains`, `name`, `net__day`, `net__gt`, `net__gte`, `net__lt`, `net__lte`, `net__month`, `net__year`, `orbital_launch_attempt_count`, `orbital_launch_attempt_count__gt`, `orbital_launch_attempt_count__gte`, `orbital_launch_attempt_count__lt`, `orbital_launch_attempt_count__lte`, `orbital_launch_attempt_count_year`, `orbital_launch_attempt_count_year__gt`, `orbital_launch_attempt_count_year__gte`, `orbital_launch_attempt_count_year__lt`, `orbital_launch_attempt_count_year__lte`, `pad`, `pad__location`, `pad__location__celestial_body__id`, `pad_launch_attempt_count`, `pad_launch_attempt_count__gt`, `pad_launch_attempt_count__gte`, `pad_launch_attempt_count__lt`, `pad_launch_attempt_count__lte`, `pad_launch_attempt_count_year`, `pad_launch_attempt_count_year__gt`, `pad_launch_attempt_count_year__gte`, `pad_launch_attempt_count_year__lt`, `pad_launch_attempt_count_year__lte`, `previous`, `program`, `related_lsp__id`, `related_lsp__name`, `rocket__configuration__full_name`, `rocket__configuration__full_name__icontains`, `rocket__configuration__id`, `rocket__configuration__manufacturer__name`, `rocket__configuration__manufacturer__name__icontains`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__id`, `rocket__spacecraftflight__spacecraft__name`, `rocket__spacecraftflight__spacecraft__name__icontains`, `serial_number`, `slug`, `spacecraft_config__ids`, `status`, `status__ids`, `upcoming`, `upcoming_with_recent`, `video_url`, `window_end__gt`, `window_end__gte`, `window_end__lt`, `window_end__lte`, `window_start__gt`, `window_start__gte`, `window_start__lt`, `window_start__lte`\n\nExample - [/launches/?pad__location=13](./?pad__location=13)\n\n#### Search\nFields searched - `launch_designator`, `launch_service_provider__name`, `mission__name`, `name`, `pad__location__name`, `pad__name`, `rocket__configuration__manufacturer__abbrev`, `rocket__configuration__manufacturer__name`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__name`\n\nExample - [/launches/?search=Starlink](./?search=Starlink)\n\n#### Ordering\nFields - `id`, `last_updated`, `name`, `net`\n\nExample - [/launches/?ordering=-last_updated](./?ordering=-last_updated)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/launches/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/launches/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
+        "description": "#### Filters\nParameters - `agency_launch_attempt_count`, `agency_launch_attempt_count__gt`, `agency_launch_attempt_count__gte`, `agency_launch_attempt_count__lt`, `agency_launch_attempt_count__lte`, `agency_launch_attempt_count_year`, `agency_launch_attempt_count_year__gt`, `agency_launch_attempt_count_year__gte`, `agency_launch_attempt_count_year__lt`, `agency_launch_attempt_count_year__lte`, `id`, `include_suborbital`, `is_crewed`, `last_updated__gte`, `last_updated__lte`, `launch_designator`, `launcher_config__id`, `location__ids`, `location_launch_attempt_count`, `location_launch_attempt_count__gt`, `location_launch_attempt_count__gte`, `location_launch_attempt_count__lt`, `location_launch_attempt_count__lte`, `location_launch_attempt_count_year`, `location_launch_attempt_count_year__gt`, `location_launch_attempt_count_year__gte`, `location_launch_attempt_count_year__lt`, `location_launch_attempt_count_year__lte`, `lsp__id`, `lsp__name`, `mission__agency__ids`, `mission__orbit__celestial_body__id`, `mission__orbit__name`, `mission__orbit__name__icontains`, `name`, `net__day`, `net__gt`, `net__gte`, `net__lt`, `net__lte`, `net__month`, `net__year`, `orbital_launch_attempt_count`, `orbital_launch_attempt_count__gt`, `orbital_launch_attempt_count__gte`, `orbital_launch_attempt_count__lt`, `orbital_launch_attempt_count__lte`, `orbital_launch_attempt_count_year`, `orbital_launch_attempt_count_year__gt`, `orbital_launch_attempt_count_year__gte`, `orbital_launch_attempt_count_year__lt`, `orbital_launch_attempt_count_year__lte`, `pad`, `pad__location`, `pad__location__celestial_body__id`, `pad_launch_attempt_count`, `pad_launch_attempt_count__gt`, `pad_launch_attempt_count__gte`, `pad_launch_attempt_count__lt`, `pad_launch_attempt_count__lte`, `pad_launch_attempt_count_year`, `pad_launch_attempt_count_year__gt`, `pad_launch_attempt_count_year__gte`, `pad_launch_attempt_count_year__lt`, `pad_launch_attempt_count_year__lte`, `previous`, `program`, `related_lsp__id`, `related_lsp__name`, `rocket__configuration__full_name`, `rocket__configuration__full_name__icontains`, `rocket__configuration__id`, `rocket__configuration__manufacturer__name`, `rocket__configuration__manufacturer__name__icontains`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__id`, `rocket__spacecraftflight__spacecraft__name`, `rocket__spacecraftflight__spacecraft__name__icontains`, `serial_number`, `slug`, `spacecraft_config__ids`, `status`, `status__ids`, `upcoming`, `upcoming_with_recent`, `video_url`, `window_end__gt`, `window_end__gte`, `window_end__lt`, `window_end__lte`, `window_start__gt`, `window_start__gte`, `window_start__lt`, `window_start__lte`\n\nExample - [/launches/?pad__location=13](./?pad__location=13)\n\n#### Search\nFields searched - `launch_designator`, `launch_service_provider__name`, `mission__name`, `name`, `pad__location__name`, `pad__name`, `rocket__configuration__manufacturer__abbrev`, `rocket__configuration__manufacturer__name`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__name`\n\nExample - [/launches/?search=Starlink](./?search=Starlink)\n\n#### Ordering\nFields - `id`, `last_updated`, `name`, `net`\n\nExample - [/launches/?ordering=-last_updated](./?ordering=-last_updated)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/launches/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/launches/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
         "parameters": [
           {
             "in": "path",
@@ -13010,7 +12692,7 @@
     "/api/ll/2.4.0/launches/detailed/": {
       "get": {
         "operationId": "launches_detailed_list",
-        "description": "#### Filters\nParameters - `agency_launch_attempt_count`, `agency_launch_attempt_count__gt`, `agency_launch_attempt_count__gte`, `agency_launch_attempt_count__lt`, `agency_launch_attempt_count__lte`, `agency_launch_attempt_count_year`, `agency_launch_attempt_count_year__gt`, `agency_launch_attempt_count_year__gte`, `agency_launch_attempt_count_year__lt`, `agency_launch_attempt_count_year__lte`, `id`, `include_suborbital`, `is_crewed`, `last_updated__gte`, `last_updated__lte`, `launch_designator`, `launcher_config__id`, `location__ids`, `location_launch_attempt_count`, `location_launch_attempt_count__gt`, `location_launch_attempt_count__gte`, `location_launch_attempt_count__lt`, `location_launch_attempt_count__lte`, `location_launch_attempt_count_year`, `location_launch_attempt_count_year__gt`, `location_launch_attempt_count_year__gte`, `location_launch_attempt_count_year__lt`, `location_launch_attempt_count_year__lte`, `lsp__id`, `lsp__name`, `mission__orbit__celestial_body__id`, `mission__orbit__name`, `mission__orbit__name__icontains`, `name`, `net__day`, `net__gt`, `net__gte`, `net__lt`, `net__lte`, `net__month`, `net__year`, `orbital_launch_attempt_count`, `orbital_launch_attempt_count__gt`, `orbital_launch_attempt_count__gte`, `orbital_launch_attempt_count__lt`, `orbital_launch_attempt_count__lte`, `orbital_launch_attempt_count_year`, `orbital_launch_attempt_count_year__gt`, `orbital_launch_attempt_count_year__gte`, `orbital_launch_attempt_count_year__lt`, `orbital_launch_attempt_count_year__lte`, `pad`, `pad__location`, `pad__location__celestial_body__id`, `pad_launch_attempt_count`, `pad_launch_attempt_count__gt`, `pad_launch_attempt_count__gte`, `pad_launch_attempt_count__lt`, `pad_launch_attempt_count__lte`, `pad_launch_attempt_count_year`, `pad_launch_attempt_count_year__gt`, `pad_launch_attempt_count_year__gte`, `pad_launch_attempt_count_year__lt`, `pad_launch_attempt_count_year__lte`, `previous`, `program`, `related_lsp__id`, `related_lsp__name`, `rocket__configuration__full_name`, `rocket__configuration__full_name__icontains`, `rocket__configuration__id`, `rocket__configuration__manufacturer__name`, `rocket__configuration__manufacturer__name__icontains`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__id`, `rocket__spacecraftflight__spacecraft__name`, `rocket__spacecraftflight__spacecraft__name__icontains`, `serial_number`, `slug`, `spacecraft_config__ids`, `status`, `status__ids`, `upcoming`, `upcoming_with_recent`, `video_url`, `window_end__gt`, `window_end__gte`, `window_end__lt`, `window_end__lte`, `window_start__gt`, `window_start__gte`, `window_start__lt`, `window_start__lte`\n\nExample - [/launches/detailed/?pad__location=13](./?pad__location=13)\n\n#### Search\nFields searched - `launch_designator`, `launch_service_provider__name`, `mission__name`, `name`, `pad__location__name`, `pad__name`, `rocket__configuration__manufacturer__abbrev`, `rocket__configuration__manufacturer__name`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__name`\n\nExample - [/launches/detailed/?search=Starlink](./?search=Starlink)\n\n#### Ordering\nFields - `id`, `last_updated`, `name`, `net`\n\nExample - [/launches/detailed/?ordering=-last_updated](./?ordering=-last_updated)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/launches/detailed/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/launches/detailed/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
+        "description": "#### Filters\nParameters - `agency_launch_attempt_count`, `agency_launch_attempt_count__gt`, `agency_launch_attempt_count__gte`, `agency_launch_attempt_count__lt`, `agency_launch_attempt_count__lte`, `agency_launch_attempt_count_year`, `agency_launch_attempt_count_year__gt`, `agency_launch_attempt_count_year__gte`, `agency_launch_attempt_count_year__lt`, `agency_launch_attempt_count_year__lte`, `id`, `include_suborbital`, `is_crewed`, `last_updated__gte`, `last_updated__lte`, `launch_designator`, `launcher_config__id`, `location__ids`, `location_launch_attempt_count`, `location_launch_attempt_count__gt`, `location_launch_attempt_count__gte`, `location_launch_attempt_count__lt`, `location_launch_attempt_count__lte`, `location_launch_attempt_count_year`, `location_launch_attempt_count_year__gt`, `location_launch_attempt_count_year__gte`, `location_launch_attempt_count_year__lt`, `location_launch_attempt_count_year__lte`, `lsp__id`, `lsp__name`, `mission__agency__ids`, `mission__orbit__celestial_body__id`, `mission__orbit__name`, `mission__orbit__name__icontains`, `name`, `net__day`, `net__gt`, `net__gte`, `net__lt`, `net__lte`, `net__month`, `net__year`, `orbital_launch_attempt_count`, `orbital_launch_attempt_count__gt`, `orbital_launch_attempt_count__gte`, `orbital_launch_attempt_count__lt`, `orbital_launch_attempt_count__lte`, `orbital_launch_attempt_count_year`, `orbital_launch_attempt_count_year__gt`, `orbital_launch_attempt_count_year__gte`, `orbital_launch_attempt_count_year__lt`, `orbital_launch_attempt_count_year__lte`, `pad`, `pad__location`, `pad__location__celestial_body__id`, `pad_launch_attempt_count`, `pad_launch_attempt_count__gt`, `pad_launch_attempt_count__gte`, `pad_launch_attempt_count__lt`, `pad_launch_attempt_count__lte`, `pad_launch_attempt_count_year`, `pad_launch_attempt_count_year__gt`, `pad_launch_attempt_count_year__gte`, `pad_launch_attempt_count_year__lt`, `pad_launch_attempt_count_year__lte`, `previous`, `program`, `related_lsp__id`, `related_lsp__name`, `rocket__configuration__full_name`, `rocket__configuration__full_name__icontains`, `rocket__configuration__id`, `rocket__configuration__manufacturer__name`, `rocket__configuration__manufacturer__name__icontains`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__id`, `rocket__spacecraftflight__spacecraft__name`, `rocket__spacecraftflight__spacecraft__name__icontains`, `serial_number`, `slug`, `spacecraft_config__ids`, `status`, `status__ids`, `upcoming`, `upcoming_with_recent`, `video_url`, `window_end__gt`, `window_end__gte`, `window_end__lt`, `window_end__lte`, `window_start__gt`, `window_start__gte`, `window_start__lt`, `window_start__lte`\n\nExample - [/launches/detailed/?pad__location=13](./?pad__location=13)\n\n#### Search\nFields searched - `launch_designator`, `launch_service_provider__name`, `mission__name`, `name`, `pad__location__name`, `pad__name`, `rocket__configuration__manufacturer__abbrev`, `rocket__configuration__manufacturer__name`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__name`\n\nExample - [/launches/detailed/?search=Starlink](./?search=Starlink)\n\n#### Ordering\nFields - `id`, `last_updated`, `name`, `net`\n\nExample - [/launches/detailed/?ordering=-last_updated](./?ordering=-last_updated)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/launches/detailed/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/launches/detailed/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
         "parameters": [
           {
             "in": "query",
@@ -13269,6 +12951,19 @@
               }
             },
             "description": "Comma-separated launch service provider names.",
+            "explode": false,
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "mission__agency__ids",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Comma-separated mission agency IDs.",
             "explode": false,
             "style": "form"
           },
@@ -13860,7 +13555,7 @@
     "/api/ll/2.4.0/launches/mini/": {
       "get": {
         "operationId": "launches_mini_list",
-        "description": "#### Filters\nParameters - `agency_launch_attempt_count`, `agency_launch_attempt_count__gt`, `agency_launch_attempt_count__gte`, `agency_launch_attempt_count__lt`, `agency_launch_attempt_count__lte`, `agency_launch_attempt_count_year`, `agency_launch_attempt_count_year__gt`, `agency_launch_attempt_count_year__gte`, `agency_launch_attempt_count_year__lt`, `agency_launch_attempt_count_year__lte`, `id`, `include_suborbital`, `is_crewed`, `last_updated__gte`, `last_updated__lte`, `launch_designator`, `launcher_config__id`, `location__ids`, `location_launch_attempt_count`, `location_launch_attempt_count__gt`, `location_launch_attempt_count__gte`, `location_launch_attempt_count__lt`, `location_launch_attempt_count__lte`, `location_launch_attempt_count_year`, `location_launch_attempt_count_year__gt`, `location_launch_attempt_count_year__gte`, `location_launch_attempt_count_year__lt`, `location_launch_attempt_count_year__lte`, `lsp__id`, `lsp__name`, `mission__orbit__celestial_body__id`, `mission__orbit__name`, `mission__orbit__name__icontains`, `name`, `net__day`, `net__gt`, `net__gte`, `net__lt`, `net__lte`, `net__month`, `net__year`, `orbital_launch_attempt_count`, `orbital_launch_attempt_count__gt`, `orbital_launch_attempt_count__gte`, `orbital_launch_attempt_count__lt`, `orbital_launch_attempt_count__lte`, `orbital_launch_attempt_count_year`, `orbital_launch_attempt_count_year__gt`, `orbital_launch_attempt_count_year__gte`, `orbital_launch_attempt_count_year__lt`, `orbital_launch_attempt_count_year__lte`, `pad`, `pad__location`, `pad__location__celestial_body__id`, `pad_launch_attempt_count`, `pad_launch_attempt_count__gt`, `pad_launch_attempt_count__gte`, `pad_launch_attempt_count__lt`, `pad_launch_attempt_count__lte`, `pad_launch_attempt_count_year`, `pad_launch_attempt_count_year__gt`, `pad_launch_attempt_count_year__gte`, `pad_launch_attempt_count_year__lt`, `pad_launch_attempt_count_year__lte`, `previous`, `program`, `related_lsp__id`, `related_lsp__name`, `rocket__configuration__full_name`, `rocket__configuration__full_name__icontains`, `rocket__configuration__id`, `rocket__configuration__manufacturer__name`, `rocket__configuration__manufacturer__name__icontains`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__id`, `rocket__spacecraftflight__spacecraft__name`, `rocket__spacecraftflight__spacecraft__name__icontains`, `serial_number`, `slug`, `spacecraft_config__ids`, `status`, `status__ids`, `upcoming`, `upcoming_with_recent`, `video_url`, `window_end__gt`, `window_end__gte`, `window_end__lt`, `window_end__lte`, `window_start__gt`, `window_start__gte`, `window_start__lt`, `window_start__lte`\n\nExample - [/launches/mini/?pad__location=13](./?pad__location=13)\n\n#### Search\nFields searched - `launch_designator`, `launch_service_provider__name`, `mission__name`, `name`, `pad__location__name`, `pad__name`, `rocket__configuration__manufacturer__abbrev`, `rocket__configuration__manufacturer__name`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__name`\n\nExample - [/launches/mini/?search=Starlink](./?search=Starlink)\n\n#### Ordering\nFields - `id`, `last_updated`, `name`, `net`\n\nExample - [/launches/mini/?ordering=-last_updated](./?ordering=-last_updated)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/launches/mini/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/launches/mini/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
+        "description": "#### Filters\nParameters - `agency_launch_attempt_count`, `agency_launch_attempt_count__gt`, `agency_launch_attempt_count__gte`, `agency_launch_attempt_count__lt`, `agency_launch_attempt_count__lte`, `agency_launch_attempt_count_year`, `agency_launch_attempt_count_year__gt`, `agency_launch_attempt_count_year__gte`, `agency_launch_attempt_count_year__lt`, `agency_launch_attempt_count_year__lte`, `id`, `include_suborbital`, `is_crewed`, `last_updated__gte`, `last_updated__lte`, `launch_designator`, `launcher_config__id`, `location__ids`, `location_launch_attempt_count`, `location_launch_attempt_count__gt`, `location_launch_attempt_count__gte`, `location_launch_attempt_count__lt`, `location_launch_attempt_count__lte`, `location_launch_attempt_count_year`, `location_launch_attempt_count_year__gt`, `location_launch_attempt_count_year__gte`, `location_launch_attempt_count_year__lt`, `location_launch_attempt_count_year__lte`, `lsp__id`, `lsp__name`, `mission__agency__ids`, `mission__orbit__celestial_body__id`, `mission__orbit__name`, `mission__orbit__name__icontains`, `name`, `net__day`, `net__gt`, `net__gte`, `net__lt`, `net__lte`, `net__month`, `net__year`, `orbital_launch_attempt_count`, `orbital_launch_attempt_count__gt`, `orbital_launch_attempt_count__gte`, `orbital_launch_attempt_count__lt`, `orbital_launch_attempt_count__lte`, `orbital_launch_attempt_count_year`, `orbital_launch_attempt_count_year__gt`, `orbital_launch_attempt_count_year__gte`, `orbital_launch_attempt_count_year__lt`, `orbital_launch_attempt_count_year__lte`, `pad`, `pad__location`, `pad__location__celestial_body__id`, `pad_launch_attempt_count`, `pad_launch_attempt_count__gt`, `pad_launch_attempt_count__gte`, `pad_launch_attempt_count__lt`, `pad_launch_attempt_count__lte`, `pad_launch_attempt_count_year`, `pad_launch_attempt_count_year__gt`, `pad_launch_attempt_count_year__gte`, `pad_launch_attempt_count_year__lt`, `pad_launch_attempt_count_year__lte`, `previous`, `program`, `related_lsp__id`, `related_lsp__name`, `rocket__configuration__full_name`, `rocket__configuration__full_name__icontains`, `rocket__configuration__id`, `rocket__configuration__manufacturer__name`, `rocket__configuration__manufacturer__name__icontains`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__id`, `rocket__spacecraftflight__spacecraft__name`, `rocket__spacecraftflight__spacecraft__name__icontains`, `serial_number`, `slug`, `spacecraft_config__ids`, `status`, `status__ids`, `upcoming`, `upcoming_with_recent`, `video_url`, `window_end__gt`, `window_end__gte`, `window_end__lt`, `window_end__lte`, `window_start__gt`, `window_start__gte`, `window_start__lt`, `window_start__lte`\n\nExample - [/launches/mini/?pad__location=13](./?pad__location=13)\n\n#### Search\nFields searched - `launch_designator`, `launch_service_provider__name`, `mission__name`, `name`, `pad__location__name`, `pad__name`, `rocket__configuration__manufacturer__abbrev`, `rocket__configuration__manufacturer__name`, `rocket__configuration__name`, `rocket__spacecraftflight__spacecraft__name`\n\nExample - [/launches/mini/?search=Starlink](./?search=Starlink)\n\n#### Ordering\nFields - `id`, `last_updated`, `name`, `net`\n\nExample - [/launches/mini/?ordering=-last_updated](./?ordering=-last_updated)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/launches/mini/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/launches/mini/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
         "parameters": [
           {
             "in": "query",
@@ -14119,6 +13814,19 @@
               }
             },
             "description": "Comma-separated launch service provider names.",
+            "explode": false,
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "mission__agency__ids",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Comma-separated mission agency IDs.",
             "explode": false,
             "style": "form"
           },
@@ -19340,8 +19048,16 @@
     "/api/ll/2.4.0/updates/": {
       "get": {
         "operationId": "updates_list",
-        "description": "#### Filters\nParameters - `created_on`, `launch`, `launch__launch_service_provider`, `program`\n\nExample - [/updates/?launch__launch_service_provider=121](./?launch__launch_service_provider=121)\n\n#### Ordering\nFields - `created_on`\n\nExample - [/updates/?ordering=-created_on](./?ordering=-created_on)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/updates/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/updates/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
+        "description": "#### Filters\nParameters - `all__program`, `created_on`, `created_on__gt`, `created_on__gte`, `created_on__lt`, `created_on__lte`, `event__program`, `launch`, `launch__launch_service_provider`, `launch__program`, `program`\n\nExample - [/updates/?all__program=1](./?all__program=1)\n\n#### Ordering\nFields - `created_on`\n\nExample - [/updates/?ordering=-created_on](./?ordering=-created_on)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/updates/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/updates/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
         "parameters": [
+          {
+            "in": "query",
+            "name": "all__program",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by program ID to get all updates including from launch or events."
+          },
           {
             "in": "query",
             "name": "created_on",
@@ -19349,6 +19065,50 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "in": "query",
+            "name": "created_on__gt",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "created_on__gte",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "created_on__lt",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "created_on__lte",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "event__program",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "explode": true,
+            "style": "form"
           },
           {
             "in": "query",
@@ -19364,6 +19124,18 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "launch__program",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "explode": true,
+            "style": "form"
           },
           {
             "name": "limit",
@@ -19440,8 +19212,16 @@
     "/api/ll/2.4.0/updates/{id}/": {
       "get": {
         "operationId": "updates_retrieve",
-        "description": "#### Filters\nParameters - `created_on`, `launch`, `launch__launch_service_provider`, `program`\n\nExample - [/updates/?launch__launch_service_provider=121](./?launch__launch_service_provider=121)\n\n#### Ordering\nFields - `created_on`\n\nExample - [/updates/?ordering=-created_on](./?ordering=-created_on)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/updates/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/updates/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
+        "description": "#### Filters\nParameters - `all__program`, `created_on`, `created_on__gt`, `created_on__gte`, `created_on__lt`, `created_on__lte`, `event__program`, `launch`, `launch__launch_service_provider`, `launch__program`, `program`\n\nExample - [/updates/?all__program=1](./?all__program=1)\n\n#### Ordering\nFields - `created_on`\n\nExample - [/updates/?ordering=-created_on](./?ordering=-created_on)\n\n#### Number of results\nUse `limit` to control the number of objects in the response (max 100)\n\nExample - [/updates/?limit=2](./?limit=2)\n\n#### Format\nSwitch to JSON output - [/updates/?format=json](./?format=json)\n\n#### Help\nFind all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)",
         "parameters": [
+          {
+            "in": "query",
+            "name": "all__program",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by program ID to get all updates including from launch or events."
+          },
           {
             "in": "path",
             "name": "id",
@@ -21256,8 +21036,7 @@
           },
           "date": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "format": "date-time"
           },
           "slug": {
             "type": "string",
@@ -21404,8 +21183,7 @@
           },
           "date": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "format": "date-time"
           },
           "slug": {
             "type": "string",
@@ -21497,8 +21275,7 @@
           },
           "date": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "format": "date-time"
           },
           "slug": {
             "type": "string",
@@ -21601,8 +21378,7 @@
           },
           "date": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "format": "date-time"
           }
         },
         "required": [
@@ -21652,8 +21428,7 @@
           },
           "date": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "format": "date-time"
           },
           "slug": {
             "type": "string",
@@ -22765,69 +22540,6 @@
           "code",
           "id",
           "name"
-        ]
-      },
-      "LaunchAndEventsDetailed": {
-        "type": "object",
-        "properties": {
-          "launches": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LaunchDetailed"
-            }
-          },
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EventNormal"
-            }
-          }
-        },
-        "required": [
-          "events",
-          "launches"
-        ]
-      },
-      "LaunchAndEventsList": {
-        "type": "object",
-        "properties": {
-          "launches": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LaunchBasic"
-            }
-          },
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EventEndpointList"
-            }
-          }
-        },
-        "required": [
-          "events",
-          "launches"
-        ]
-      },
-      "LaunchAndEventsNormal": {
-        "type": "object",
-        "properties": {
-          "launches": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LaunchNormal"
-            }
-          },
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EventNormal"
-            }
-          }
-        },
-        "required": [
-          "events",
-          "launches"
         ]
       },
       "LaunchBasic": {
@@ -24955,50 +24667,6 @@
           "id"
         ]
       },
-      "Notice": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "readOnly": true
-          },
-          "type": {
-            "$ref": "#/components/schemas/NoticeType"
-          },
-          "date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "url": {
-            "type": "string",
-            "format": "uri",
-            "maxLength": 200
-          }
-        },
-        "required": [
-          "date",
-          "id",
-          "type",
-          "url"
-        ]
-      },
-      "NoticeType": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "maxLength": 255
-          }
-        },
-        "required": [
-          "id",
-          "name"
-        ]
-      },
       "Orbit": {
         "type": "object",
         "properties": {
@@ -26829,37 +26497,6 @@
           }
         }
       },
-      "PaginatedNoticeTypeList": {
-        "type": "object",
-        "required": [
-          "count",
-          "results"
-        ],
-        "properties": {
-          "count": {
-            "type": "integer",
-            "example": 123
-          },
-          "next": {
-            "type": "string",
-            "nullable": true,
-            "format": "uri",
-            "example": "http://api.example.org/accounts/?offset=400&limit=100"
-          },
-          "previous": {
-            "type": "string",
-            "nullable": true,
-            "format": "uri",
-            "example": "http://api.example.org/accounts/?offset=200&limit=100"
-          },
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NoticeType"
-            }
-          }
-        }
-      },
       "PaginatedOrbitList": {
         "type": "object",
         "required": [
@@ -27166,37 +26803,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ProgramType"
-            }
-          }
-        }
-      },
-      "PaginatedRoadClosureStatusList": {
-        "type": "object",
-        "required": [
-          "count",
-          "results"
-        ],
-        "properties": {
-          "count": {
-            "type": "integer",
-            "example": 123
-          },
-          "next": {
-            "type": "string",
-            "nullable": true,
-            "format": "uri",
-            "example": "http://api.example.org/accounts/?offset=400&limit=100"
-          },
-          "previous": {
-            "type": "string",
-            "nullable": true,
-            "format": "uri",
-            "example": "http://api.example.org/accounts/?offset=200&limit=100"
-          },
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RoadClosureStatus"
             }
           }
         }
@@ -28498,6 +28104,12 @@
           },
           "type": {
             "$ref": "#/components/schemas/ProgramType"
+          },
+          "vid_urls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VidURL"
+            }
           }
         },
         "required": [
@@ -28513,6 +28125,7 @@
           "start_date",
           "type",
           "url",
+          "vid_urls",
           "wiki_url"
         ]
       },
@@ -28531,54 +28144,6 @@
         },
         "required": [
           "id"
-        ]
-      },
-      "RoadClosure": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "readOnly": true
-          },
-          "title": {
-            "type": "string",
-            "maxLength": 1048
-          },
-          "status": {
-            "$ref": "#/components/schemas/RoadClosureStatus"
-          },
-          "window_start": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "window_end": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "status",
-          "title",
-          "window_end",
-          "window_start"
-        ]
-      },
-      "RoadClosureStatus": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "maxLength": 255
-          }
-        },
-        "required": [
-          "id",
-          "name"
         ]
       },
       "RocketDetailed": {
@@ -30768,195 +30333,6 @@
           "url"
         ]
       },
-      "StarshipDashboardDetailed": {
-        "type": "object",
-        "properties": {
-          "response_mode": {
-            "type": "string",
-            "readOnly": true,
-            "default": "detailed"
-          },
-          "updates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Update"
-            }
-          },
-          "live_streams": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VidURLs"
-            }
-          },
-          "road_closures": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RoadClosure"
-            }
-          },
-          "notices": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Notice"
-            }
-          },
-          "vehicles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LauncherDetailed"
-            }
-          },
-          "orbiters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SpacecraftNormal"
-            }
-          },
-          "upcoming": {
-            "$ref": "#/components/schemas/LaunchAndEventsDetailed"
-          },
-          "previous": {
-            "$ref": "#/components/schemas/LaunchAndEventsDetailed"
-          }
-        },
-        "required": [
-          "live_streams",
-          "notices",
-          "orbiters",
-          "previous",
-          "response_mode",
-          "road_closures",
-          "upcoming",
-          "updates",
-          "vehicles"
-        ]
-      },
-      "StarshipDashboardList": {
-        "type": "object",
-        "properties": {
-          "response_mode": {
-            "type": "string",
-            "readOnly": true,
-            "default": "list"
-          },
-          "updates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Update"
-            }
-          },
-          "live_streams": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VidURLs"
-            }
-          },
-          "road_closures": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RoadClosure"
-            }
-          },
-          "notices": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Notice"
-            }
-          },
-          "vehicles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LauncherDetailed"
-            }
-          },
-          "orbiters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SpacecraftNormal"
-            }
-          },
-          "upcoming": {
-            "$ref": "#/components/schemas/LaunchAndEventsList"
-          },
-          "previous": {
-            "$ref": "#/components/schemas/LaunchAndEventsList"
-          }
-        },
-        "required": [
-          "live_streams",
-          "notices",
-          "orbiters",
-          "previous",
-          "response_mode",
-          "road_closures",
-          "upcoming",
-          "updates",
-          "vehicles"
-        ]
-      },
-      "StarshipDashboardNormal": {
-        "type": "object",
-        "properties": {
-          "response_mode": {
-            "type": "string",
-            "readOnly": true,
-            "default": "normal"
-          },
-          "updates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Update"
-            }
-          },
-          "live_streams": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VidURLs"
-            }
-          },
-          "road_closures": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RoadClosure"
-            }
-          },
-          "notices": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Notice"
-            }
-          },
-          "vehicles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LauncherDetailed"
-            }
-          },
-          "orbiters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SpacecraftNormal"
-            }
-          },
-          "upcoming": {
-            "$ref": "#/components/schemas/LaunchAndEventsNormal"
-          },
-          "previous": {
-            "$ref": "#/components/schemas/LaunchAndEventsNormal"
-          }
-        },
-        "required": [
-          "live_streams",
-          "notices",
-          "orbiters",
-          "previous",
-          "response_mode",
-          "road_closures",
-          "upcoming",
-          "updates",
-          "vehicles"
-        ]
-      },
       "TimelineEvent": {
         "type": "object",
         "properties": {
@@ -31142,12 +30518,7 @@
             "format": "uri"
           },
           "type": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/VidURLType"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/VidURLType"
           },
           "language": {
             "allOf": [
@@ -31192,36 +30563,6 @@
         "required": [
           "id",
           "name"
-        ]
-      },
-      "VidURLs": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "nullable": true,
-            "maxLength": 200
-          },
-          "description": {
-            "type": "string",
-            "nullable": true,
-            "maxLength": 800
-          },
-          "image": {
-            "type": "string",
-            "format": "uri",
-            "nullable": true,
-            "readOnly": true
-          },
-          "url": {
-            "type": "string",
-            "format": "uri",
-            "readOnly": true
-          }
-        },
-        "required": [
-          "image",
-          "url"
         ]
       }
     },

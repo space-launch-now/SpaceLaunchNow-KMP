@@ -3,12 +3,16 @@ package me.calebjones.spacelaunchnow.data.repository
 import io.ktor.client.plugins.ResponseException
 import kotlin.time.Clock
 import kotlinx.io.IOException
+import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
+import me.calebjones.spacelaunchnow.api.extensions.getUpdates
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
+import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class UpdatesRepositoryImpl(
@@ -18,13 +22,16 @@ class UpdatesRepositoryImpl(
 
     private val log = logger()
 
-    override suspend fun getLatestUpdates(limit: Int, forceRefresh: Boolean): Result<DataResult<PaginatedUpdateEndpointList>> {
+    override suspend fun getLatestUpdates(
+        limit: Int,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedUpdateEndpointList>> {
         return try {
             log.d { "getLatestUpdates called - limit: $limit, forceRefresh: $forceRefresh, cacheAvailable: ${localDataSource != null}" }
 
             val now = Clock.System.now().toEpochMilliseconds()
             val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
-            
+
             // Try cache first if available and not forcing refresh
             if (!forceRefresh) {
                 val cachedUpdates = localDataSource?.getRecentUpdates(limit)
@@ -51,7 +58,7 @@ class UpdatesRepositoryImpl(
             log.d { "Fetching updates from API" }
             val response = updatesApi.getLatestUpdates(limit = limit)
             val updates = response.body()
-            
+
             // Cache the results for future use
             localDataSource?.cacheUpdates(updates.results)
             log.i { "Successfully fetched and cached ${'$'}{updates.results.size} updates" }
@@ -101,6 +108,49 @@ class UpdatesRepositoryImpl(
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "Unexpected error while fetching updates" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getUpdatesByProgram(
+        allProgram: Int,
+        limit: Int,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedUpdateEndpointList>> {
+        return try {
+            println("=== UpdatesRepository.getUpdatesByProgram ===")
+            println("Parameters: allProgram=$allProgram, limit=$limit, forceRefresh=$forceRefresh")
+
+            val now = System.now().toEpochMilliseconds()
+
+            // For now, skip caching for program-specific queries
+            // TODO: Add program-specific caching if needed
+
+            println("UpdatesRepository: Fetching program $allProgram updates from API")
+            val response = updatesApi.getUpdates(
+                limit = limit,
+                allProgram = allProgram,
+                ordering = "-created_on"
+            )
+            val updates = response.body()
+
+            println("✓ API SUCCESS: Fetched ${updates.results.size} updates for program $allProgram")
+
+            Result.success(
+                DataResult(
+                    data = updates,
+                    source = DataSource.NETWORK,
+                    timestamp = now
+                )
+            )
+        } catch (e: ResponseException) {
+            println("UpdatesRepository: API error for program $allProgram: ${e.message}")
+            Result.failure(e)
+        } catch (e: IOException) {
+            println("UpdatesRepository: Network error for program $allProgram: ${e.message}")
+            Result.failure(e)
+        } catch (e: Exception) {
+            println("UpdatesRepository: Unexpected error for program $allProgram: ${e.message}")
             Result.failure(e)
         }
     }

@@ -1,8 +1,8 @@
 package me.calebjones.spacelaunchnow.api.extensions
 
-import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Extension functions for EventsApi to provide clean, named-parameter interfaces
@@ -19,6 +19,7 @@ suspend fun EventsApi.getEventList(
     ordering: String? = null,
     typeIds: List<Int>? = null,
     agencyIds: List<Int>? = null,
+    program: List<Int>? = null,
     dateGt: Instant? = null,
     dateGte: Instant? = null,
     dateLt: Instant? = null,
@@ -39,7 +40,7 @@ suspend fun EventsApi.getEventList(
     offset = null,
     ordering = ordering,
     previous = null,
-    program = null,
+    program = program,
     search = search,
     slug = null,
     type = null,
@@ -76,3 +77,17 @@ suspend fun EventsApi.getEventsByType(
     ordering = ordering,
     typeIds = typeIds
 )
+
+/**
+ * Get events for Starship program (program ID = 1)
+ */
+suspend fun EventsApi.getStarshipEvents(
+    limit: Int = 20,
+    upcoming: Boolean? = true
+) = getEventList(
+    limit = limit,
+    upcoming = upcoming,
+    program = listOf(1),
+    ordering = "date"
+)
+

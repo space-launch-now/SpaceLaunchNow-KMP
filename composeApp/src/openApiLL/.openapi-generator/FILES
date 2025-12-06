@@ -25,7 +25,6 @@ docs/CelestialBodyNormal.md
 docs/CelestialBodyType.md
 docs/ConfigApi.md
 docs/Country.md
-docs/DashboardApi.md
 docs/DockingEventDetailedSerializerForSpacestation.md
 docs/DockingEventEndpointNormal.md
 docs/DockingEventForChaserNormal.md
@@ -63,9 +62,6 @@ docs/LandingLocation.md
 docs/LandingType.md
 docs/LandingsApi.md
 docs/Language.md
-docs/LaunchAndEventsDetailed.md
-docs/LaunchAndEventsList.md
-docs/LaunchAndEventsNormal.md
 docs/LaunchBasic.md
 docs/LaunchDetailed.md
 docs/LaunchMini.md
@@ -97,8 +93,6 @@ docs/MissionPatchDetailed.md
 docs/MissionPatchesApi.md
 docs/MissionType.md
 docs/NetPrecision.md
-docs/Notice.md
-docs/NoticeType.md
 docs/Orbit.md
 docs/PadDetailed.md
 docs/PadDetailedSerializerNoLocation.md
@@ -154,7 +148,6 @@ docs/PaginatedMissionPatchDetailedList.md
 docs/PaginatedMissionPatchList.md
 docs/PaginatedMissionTypeList.md
 docs/PaginatedNetPrecisionList.md
-docs/PaginatedNoticeTypeList.md
 docs/PaginatedOrbitList.md
 docs/PaginatedPadDetailedList.md
 docs/PaginatedPayloadDetailedList.md
@@ -165,7 +158,6 @@ docs/PaginatedPayloadTypeList.md
 docs/PaginatedProgramMiniList.md
 docs/PaginatedProgramNormalList.md
 docs/PaginatedProgramTypeList.md
-docs/PaginatedRoadClosureStatusList.md
 docs/PaginatedSpaceStationDetailedEndpointList.md
 docs/PaginatedSpaceStationEndpointList.md
 docs/PaginatedSpaceStationStatusList.md
@@ -203,8 +195,6 @@ docs/ProgramMini.md
 docs/ProgramNormal.md
 docs/ProgramType.md
 docs/ProgramsApi.md
-docs/RoadClosure.md
-docs/RoadClosureStatus.md
 docs/RocketDetailed.md
 docs/RocketNormal.md
 docs/SocialMedia.md
@@ -245,9 +235,6 @@ docs/SpacewalkEndpointNormal.md
 docs/SpacewalkList.md
 docs/SpacewalkNormal.md
 docs/SpacewalksApi.md
-docs/StarshipDashboardDetailed.md
-docs/StarshipDashboardList.md
-docs/StarshipDashboardNormal.md
 docs/TimelineEvent.md
 docs/TimelineEventType.md
 docs/Update.md
@@ -255,14 +242,12 @@ docs/UpdateEndpoint.md
 docs/UpdatesApi.md
 docs/VidURL.md
 docs/VidURLType.md
-docs/VidURLs.md
 settings.gradle.kts
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/AgenciesApi.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/ApiThrottleApi.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/AstronautsApi.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/CelestialBodiesApi.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/ConfigApi.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/DashboardApi.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/DockingEventsApi.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/EventsApi.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/apis/ExpeditionsApi.kt
@@ -350,9 +335,6 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Land
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/LandingLocation.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/LandingType.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Language.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/LaunchAndEventsDetailed.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/LaunchAndEventsList.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/LaunchAndEventsNormal.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/LaunchBasic.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/LaunchDetailed.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/LaunchMini.kt
@@ -378,8 +360,6 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Miss
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/MissionPatchDetailed.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/MissionType.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/NetPrecision.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Notice.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/NoticeType.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Orbit.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PadDetailed.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PadDetailedSerializerNoLocation.kt
@@ -434,7 +414,6 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Pagi
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedMissionPatchList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedMissionTypeList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedNetPrecisionList.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedNoticeTypeList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedOrbitList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedPadDetailedList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedPayloadDetailedList.kt
@@ -445,7 +424,6 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Pagi
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedProgramMiniList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedProgramNormalList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedProgramTypeList.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedRoadClosureStatusList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedSpaceStationDetailedEndpointList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedSpaceStationEndpointList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/PaginatedSpaceStationStatusList.kt
@@ -480,8 +458,6 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Payl
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/ProgramMini.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/ProgramNormal.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/ProgramType.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/RoadClosure.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/RoadClosureStatus.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/RocketDetailed.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/RocketNormal.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/SocialMedia.kt
@@ -516,13 +492,9 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Spac
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/SpacewalkEndpointNormal.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/SpacewalkList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/SpacewalkNormal.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/StarshipDashboardDetailed.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/StarshipDashboardList.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/StarshipDashboardNormal.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/TimelineEvent.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/TimelineEventType.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/Update.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/UpdateEndpoint.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/VidURL.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/VidURLType.kt
-src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/launchlibrary/models/VidURLs.kt
