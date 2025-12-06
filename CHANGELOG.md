@@ -1,3 +1,20 @@
+# [5.2.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.1.0...v5.2.0) (2025-12-06)
+
+
+### Bug Fixes
+
+* add TestSpaceLoggerInit utility and initialize logger in tests ([8c5e0cf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8c5e0cf3e0662380c182deeb6dfce15cac461558))
+* **logging:** enhance error logging in billing and subscription management ([a8b4042](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a8b4042772ee1fc0c365d13f9a4c26b2179b9b2b))
+
+
+### Features
+
+* add additional featured launches to home screen ([c60bcb9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c60bcb9b276e1ad59e406722be8527f44fa2abdf))
+* implement starship dashboard ([e66f372](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e66f372f42a2aebb0258c34c1898295c5858df0d))
+* **logging:** replace println with kermit logging and enable users to turn on logging ([8ecab93](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8ecab93070dc9487ed8ba47d36f0182d33ef9982))
+
+
+
 # [5.1.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0...v5.1.0) (2025-11-29)
 
 
@@ -54,15 +71,6 @@
 ### Bug Fixes
 
 * theme issue switching light to dark ([a2bcf2e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a2bcf2e2dbfc93b6586e31ba140184223941764d))
-
-
-
-# [5.0.0-b25](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b24...v5.0.0-b25) (2025-11-19)
-
-
-### Bug Fixes
-
-* **ci:** add verbose flag to archive step in release workflow [skip ci] ([8d6709c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8d6709cdd9560efccd07a4c4cf13e23360c7b3f2))
 
 
 

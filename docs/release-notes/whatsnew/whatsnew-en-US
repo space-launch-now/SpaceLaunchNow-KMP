@@ -1,10 +1,10 @@
 ### Bug Fixes
 
-* Address code review feedback - add rate limiting and improve logging
-* **billing:** add error handling and verification to subscription persistence
-* **billing:** add error handling and verification to subscription persistence
-* **docs:** delete old spec files
-* improve notification handling
-* **release:** update version calculation
-* **release:** update version calculation
-* Resolve billing sync issue where subscription updates were blocked...
+* add TestSpaceLoggerInit utility and initialize logger in tests
+* **logging:** enhance error logging in billing and subscription management
+
+### Features
+
+* add additional featured launches to home screen
+* implement starship dashboard
+* **logging:** replace println with kermit logging and enable users to turn on logging
