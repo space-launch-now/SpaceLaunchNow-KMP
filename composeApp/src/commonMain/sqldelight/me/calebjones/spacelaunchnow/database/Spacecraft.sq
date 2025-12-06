@@ -1,0 +1,66 @@
+-- Spacecraft table for caching spacecraft data (e.g., Starship vehicles)
+
+CREATE TABLE SpacecraftCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    serial_number TEXT,
+    status_id INTEGER,
+    status_name TEXT,
+    description TEXT,
+    spacecraft_config_id INTEGER,
+    spacecraft_config_name TEXT,
+    json_data TEXT NOT NULL, -- Full serialized SpacecraftEndpointDetailed object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Index for cache expiration and config queries
+CREATE INDEX idx_spacecraft_expires ON SpacecraftCache(expires_at);
+CREATE INDEX idx_spacecraft_config ON SpacecraftCache(spacecraft_config_id);
+
+-- Spacecraft queries
+insertOrReplaceSpacecraft:
+INSERT OR REPLACE INTO SpacecraftCache (
+    id, name, serial_number, status_id, status_name, description,
+    spacecraft_config_id, spacecraft_config_name, json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getSpacecraftById:
+SELECT * FROM SpacecraftCache 
+WHERE id = ? AND expires_at > ?;
+
+getSpacecraftByIdStale:
+SELECT * FROM SpacecraftCache 
+WHERE id = ?;
+
+getSpacecraftByConfigId:
+SELECT * FROM SpacecraftCache 
+WHERE spacecraft_config_id = ? AND expires_at > ?
+ORDER BY id ASC
+LIMIT ?;
+
+getSpacecraftByConfigIdStale:
+SELECT * FROM SpacecraftCache 
+WHERE spacecraft_config_id = ?
+ORDER BY id ASC
+LIMIT ?;
+
+getAllSpacecraft:
+SELECT * FROM SpacecraftCache 
+WHERE expires_at > ?
+ORDER BY id ASC
+LIMIT ?;
+
+getAllSpacecraftStale:
+SELECT * FROM SpacecraftCache 
+ORDER BY id ASC
+LIMIT ?;
+
+deleteExpiredSpacecraft:
+DELETE FROM SpacecraftCache WHERE expires_at < ?;
+
+deleteSpacecraftById:
+DELETE FROM SpacecraftCache WHERE id = ?;
+
+clearAllSpacecraft:
+DELETE FROM SpacecraftCache;

@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.data.model
 
 import kotlinx.serialization.Serializable
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 @Serializable
 data class NotificationState(
@@ -27,6 +28,8 @@ data class NotificationState(
     val lastError: String? = null
 ) {
     companion object {
+        private val log = logger()
+        
         /**
          * Get default agency IDs for all available agencies (using numeric IDs for v4 filtering)
          */
@@ -90,7 +93,7 @@ data class NotificationState(
     fun withAgencyEnabled(agencyId: String, enabled: Boolean): NotificationState {
         // Prevent unchecking the last agency - require at least one to be checked
         if (!enabled && subscribedAgencies.size == 1 && subscribedAgencies.contains(agencyId)) {
-            println("⚠️ Cannot uncheck last agency - at least one must be selected")
+            log.w { "⚠️ Cannot uncheck last agency - at least one must be selected" }
             return this  // Return unchanged state
         }
 
@@ -116,7 +119,7 @@ data class NotificationState(
     fun withLocationEnabled(locationId: String, enabled: Boolean): NotificationState {
         // Prevent unchecking the last location - require at least one to be checked
         if (!enabled && subscribedLocations.size == 1 && subscribedLocations.contains(locationId)) {
-            println("⚠️ Cannot uncheck last location - at least one must be selected")
+            log.w { "⚠️ Cannot uncheck last location - at least one must be selected" }
             return this  // Return unchanged state
         }
 

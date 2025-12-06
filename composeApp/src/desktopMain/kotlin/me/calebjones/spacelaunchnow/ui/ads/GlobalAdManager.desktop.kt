@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
+import me.calebjones.spacelaunchnow.logger
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.data.config.AdMobConfig
 import me.calebjones.spacelaunchnow.util.BuildConfig
@@ -11,8 +12,10 @@ import me.calebjones.spacelaunchnow.util.BuildConfig
 actual class GlobalAdManager actual constructor(
     private val contextFactory: ContextFactory?
 ) {
+    private val log = logger()
+    
     actual fun initializeAndPreload() {
-        println("🎯 GlobalAdManager (Desktop): Ads not supported, skipping initialization")
+        log.d { "🎯 GlobalAdManager (Desktop): Ads not supported, skipping initialization" }
     }
     
     actual fun shouldShowInterstitialOnDetailView(): Boolean {

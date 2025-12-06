@@ -22,14 +22,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import kotlin.time.Instant
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
-import me.calebjones.spacelaunchnow.LocalUseUtc
+import kotlin.time.Instant
 
 /**
  * Common interface to extract launch data needed for the card header

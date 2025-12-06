@@ -3,12 +3,109 @@ package me.calebjones.spacelaunchnow.api.extensions
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherConfigDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherConfigNormalList
 
 /**
  * Extension functions for LauncherConfigurationsApi to provide cleaner, named-parameter interfaces
  * instead of the verbose generated API methods
  */
+
+/**
+ * Get launcher configurations (rocket types) with program filter and pagination.
+ * 
+ * LauncherConfig represents a rocket type/variant (e.g., "Super Heavy", "Falcon 9 Block 5").
+ * This is the "category" level - individual launchers (boosters) belong to a configuration.
+ * 
+ * @param programIds Filter by program IDs (e.g., [1] for Starship program)
+ * @param limit Number of results per page (max 100)
+ * @param offset Pagination offset
+ * @param search Search term for name, manufacturer, etc.
+ * @param active Filter by active status
+ * @param reusable Filter by reusability
+ * @param ordering Field to order by (e.g., "name", "-total_launch_count")
+ */
+suspend fun LauncherConfigurationsApi.getConfigurationsByProgram(
+    programIds: List<Int>? = null,
+    limit: Int? = null,
+    offset: Int? = null,
+    search: String? = null,
+    active: Boolean? = null,
+    reusable: Boolean? = null,
+    ordering: String? = null
+): HttpResponse<PaginatedLauncherConfigDetailedList> = launcherConfigurationsDetailedList(
+    program = programIds,
+    limit = limit,
+    offset = offset,
+    search = search,
+    active = active,
+    reusable = reusable,
+    ordering = ordering,
+    // All unused parameters set to null
+    attemptedLandings = null,
+    attemptedLandingsGt = null,
+    attemptedLandingsGte = null,
+    attemptedLandingsLt = null,
+    attemptedLandingsLte = null,
+    consecutiveSuccessfulLandings = null,
+    consecutiveSuccessfulLandingsGt = null,
+    consecutiveSuccessfulLandingsGte = null,
+    consecutiveSuccessfulLandingsLt = null,
+    consecutiveSuccessfulLandingsLte = null,
+    consecutiveSuccessfulLaunches = null,
+    consecutiveSuccessfulLaunchesGt = null,
+    consecutiveSuccessfulLaunchesGte = null,
+    consecutiveSuccessfulLaunchesLt = null,
+    consecutiveSuccessfulLaunchesLte = null,
+    failedLandings = null,
+    failedLandingsGt = null,
+    failedLandingsGte = null,
+    failedLandingsLt = null,
+    failedLandingsLte = null,
+    failedLaunches = null,
+    failedLaunchesGt = null,
+    failedLaunchesGte = null,
+    failedLaunchesLt = null,
+    failedLaunchesLte = null,
+    families = null,
+    familiesContains = null,
+    fullName = null,
+    fullNameContains = null,
+    isPlaceholder = null,
+    maidenFlight = null,
+    maidenFlightDay = null,
+    maidenFlightGt = null,
+    maidenFlightGte = null,
+    maidenFlightLt = null,
+    maidenFlightLte = null,
+    maidenFlightMonth = null,
+    maidenFlightYear = null,
+    manufacturerName = null,
+    manufacturerNameContains = null,
+    name = null,
+    nameContains = null,
+    pendingLaunches = null,
+    pendingLaunchesGt = null,
+    pendingLaunchesGte = null,
+    pendingLaunchesLt = null,
+    pendingLaunchesLte = null,
+    programContains = null,
+    successfulLandings = null,
+    successfulLandingsGt = null,
+    successfulLandingsGte = null,
+    successfulLandingsLt = null,
+    successfulLandingsLte = null,
+    successfulLaunches = null,
+    successfulLaunchesGt = null,
+    successfulLaunchesGte = null,
+    successfulLaunchesLt = null,
+    successfulLaunchesLte = null,
+    totalLaunchCount = null,
+    totalLaunchCountGt = null,
+    totalLaunchCountGte = null,
+    totalLaunchCountLt = null,
+    totalLaunchCountLte = null
+)
 
 /**
  * Get launcher configuration list with commonly used parameters

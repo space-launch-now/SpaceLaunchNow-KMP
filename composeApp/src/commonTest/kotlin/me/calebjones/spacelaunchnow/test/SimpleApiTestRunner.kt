@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.test
 
 import kotlinx.coroutines.runBlocking
 
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import kotlin.test.Test
@@ -10,72 +11,70 @@ import kotlin.test.Test
  * Test runner for SimpleApiTest - converts the main function into a test
  */
 class SimpleApiTestRunner {
+    private val log = logger()
 
     @Test
     fun runSimpleApiTest() = runBlocking {
-        println("Testing Launch Library API v2.4.0...")
-        println("=".repeat(50))
+        log.i { "Testing Launch Library API v2.4.0..." }
+        log.i { "=".repeat(50) }
 
         val baseUrl = "https://spacelaunchnow.app/"
         val apiKey = EnvironmentManager.getEnv("API_KEY", "")
 
         try {
             // Test 1: Try to create the API client
-            println("\n1. Creating LaunchesApi client:")
+            log.i { "\n1. Creating LaunchesApi client:" }
             val launchesApi = LaunchesApi(baseUrl).apply {
                 // Configure API authentication
                 setApiKey(apiKey, "Authorization")
                 setApiKeyPrefix("Token", "Authorization")
             }
-            println("✓ LaunchesApi created successfully")
-            println("✓ API Key configured: ${if (apiKey.isNotEmpty()) "Yes" else "No (using default)"}")
+            log.i { "✓ LaunchesApi created successfully" }
+            log.i { "✓ API Key configured: ${if (apiKey.isNotEmpty()) "Yes" else "No (using default)"}" }
 
             // Test 2: Try different response modes
-            println("\n2. Testing different response modes:")
+            log.i { "\n2. Testing different response modes:" }
 
             // Test list mode
-            println("\n  Testing list:")
+            log.i { "\n  Testing list:" }
             try {
                 val listResponse = launchesApi.launchesMiniList(
                     limit = 1
                 )
-                println("  ✓ List mode request successful: ${listResponse.status}")
+                log.i { "  ✓ List mode request successful: ${listResponse.status}" }
 
                 // Try to deserialize
                 val listBody = listResponse.body()
-                println("  ✓ List mode deserialization successful")
-                println("  Result count: ${listBody.count}")
-                println("  Results size: ${listBody.results.size}")
+                log.i { "  ✓ List mode deserialization successful" }
+                log.i { "  Result count: ${listBody.count}" }
+                log.i { "  Results size: ${listBody.results.size}" }
                 if (listBody.results.isNotEmpty()) {
-                    println("  First result response_mode: ${listBody.results.first().responseMode}")
+                    log.i { "  First result response_mode: ${listBody.results.first().responseMode}" }
                 }
             } catch (e: Exception) {
-                println("  ✗ List mode failed: ${e}: ${e.message}")
-                e.printStackTrace()
+                log.e(e) { "  ✗ List mode failed" }
             }
 
             // Test normal mode
-            println("\n  Testing normal:")
+            log.i { "\n  Testing normal:" }
             try {
                 val normalResponse = launchesApi.launchesList(
                     limit = 1
                 )
-                println("  ✓ Normal mode request successful: ${normalResponse.status}")
+                log.i { "  ✓ Normal mode request successful: ${normalResponse.status}" }
 
                 val normalBody = normalResponse.body()
-                println("  ✓ Normal mode deserialization successful")
-                println("  Result count: ${normalBody.count}")
+                log.i { "  ✓ Normal mode deserialization successful" }
+                log.i { "  Result count: ${normalBody.count}" }
                 if (normalBody.results.isNotEmpty()) {
-                    println("  First result response_mode: ${normalBody.results.first().responseMode}")
+                    log.i { "  First result response_mode: ${normalBody.results.first().responseMode}" }
                 }
             } catch (e: Exception) {
-                println("  ✗ Normal mode failed: ${e}: ${e.message}")
-                e.printStackTrace()
+                log.e(e) { "  ✗ Normal mode failed" }
             }
 
         } catch (e: Exception) {
-            println("✗ Test failed: ${e}: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "✗ Test failed" }
         }
     }
 }

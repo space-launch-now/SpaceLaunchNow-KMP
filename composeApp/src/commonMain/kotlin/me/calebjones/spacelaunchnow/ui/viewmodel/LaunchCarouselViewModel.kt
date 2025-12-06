@@ -16,6 +16,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Manages the bidirectional launch carousel (LaunchListView).
@@ -26,6 +27,8 @@ class LaunchCarouselViewModel(
     private val launchFilterService: LaunchFilterService,
     private val notificationStateStorage: NotificationStateStorage
 ) : ViewModel() {
+
+    private val log = logger()
 
     private val _upcomingLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
     val upcomingLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> = _upcomingLaunchesState
@@ -87,8 +90,8 @@ class LaunchCarouselViewModel(
     ) {
         viewModelScope.launch {
             try {
-                println("[CAROUSEL] === LaunchCarouselViewModel.loadLaunches START ===")
-                
+                log.d { "Loading launches - upcomingLimit: $upcomingLimit, previousLimit: $previousLimit, forceRefresh: $forceRefresh" }
+
                 // Update states: loading started
                 _upcomingLaunchesState.update {
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
@@ -99,10 +102,10 @@ class LaunchCarouselViewModel(
 
                 // Wait for actual filter settings from DataStore
                 val currentFilters = notificationStateStorage.stateFlow.first()
-                println("[CAROUSEL] Filter Settings: followAll=${currentFilters.followAllLaunches}")
-                
+                log.v { "Filter settings - followAllLaunches: ${currentFilters.followAllLaunches}" }
+
                 val filterParams = launchFilterService.getFilterParams(currentFilters)
-                println("[CAROUSEL] Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}")
+                log.d { "Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
                 // Load both in parallel for better performance
                 val upcomingDeferred = async {
@@ -124,7 +127,7 @@ class LaunchCarouselViewModel(
 
                 // Handle upcoming launches result
                 upcomingDeferred.await().onSuccess { dataResult ->
-                    println("[CAROUSEL] Upcoming launches loaded: ${dataResult.data.results.size} items")
+                    log.i { "Upcoming launches loaded: ${dataResult.data.results.size} items" }
                     _upcomingLaunchesState.update {
                         it.copy(
                             data = dataResult.data.results,
@@ -134,7 +137,7 @@ class LaunchCarouselViewModel(
                         )
                     }
                 }.onFailure { exception ->
-                    println("[CAROUSEL] Upcoming launches failed: ${exception.message}")
+                    log.e(exception) { "Upcoming launches failed" }
                     _upcomingLaunchesState.update {
                         it.copy(
                             error = formatErrorMessage(exception),
@@ -145,7 +148,7 @@ class LaunchCarouselViewModel(
 
                 // Handle previous launches result
                 previousDeferred.await().onSuccess { dataResult ->
-                    println("[CAROUSEL] Previous launches loaded: ${dataResult.data.results.size} items")
+                    log.i { "Previous launches loaded: ${dataResult.data.results.size} items" }
                     _previousLaunchesState.update {
                         it.copy(
                             data = dataResult.data.results,
@@ -155,7 +158,7 @@ class LaunchCarouselViewModel(
                         )
                     }
                 }.onFailure { exception ->
-                    println("[CAROUSEL] Previous launches failed: ${exception.message}")
+                    log.e(exception) { "Previous launches failed" }
                     _previousLaunchesState.update {
                         it.copy(
                             error = formatErrorMessage(exception),
@@ -164,12 +167,10 @@ class LaunchCarouselViewModel(
                     }
                 }
                 
-                println("[CAROUSEL] === LaunchCarouselViewModel.loadLaunches END ===")
+                log.d { "Launches loading completed" }
             } catch (exception: Exception) {
-                println("[CAROUSEL] === EXCEPTION in loadLaunches ===")
-                println("[CAROUSEL] ${exception.message}")
-                exception.printStackTrace()
-                
+                log.e(exception) { "Exception in loadLaunches" }
+
                 _upcomingLaunchesState.update {
                     it.copy(error = exception.message ?: "Unknown error", isLoading = false)
                 }

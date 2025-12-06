@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.logger
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
@@ -32,6 +33,8 @@ fun initKoin() {
  * This avoids complex ObjC interop issues
  */
 class KoinHelper : KoinComponent {
+    private val log = logger()
+    
     val launchRepository: LaunchRepository by inject()
     val subscriptionRepository: SubscriptionRepository by inject()
     val widgetPreferences: WidgetPreferences by inject()
@@ -68,7 +71,6 @@ class KoinHelper : KoinComponent {
         return try {
             subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
         } catch (e: Exception) {
-            println("KoinHelper: Failed to check widget access: ${e.message}")
             false // Default to locked if check fails
         }
         */
@@ -82,7 +84,7 @@ class KoinHelper : KoinComponent {
         return try {
             widgetPreferences.widgetBackgroundAlphaFlow.first().toFloat()
         } catch (e: Exception) {
-            println("KoinHelper: Failed to get widget background alpha: ${e.message}")
+            log.e(e) { "Failed to get widget background alpha" }
             0.75f // Default value
         }
     }
@@ -95,7 +97,7 @@ class KoinHelper : KoinComponent {
         return try {
             widgetPreferences.widgetCornerRadiusFlow.first().toFloat()
         } catch (e: Exception) {
-            println("KoinHelper: Failed to get widget corner radius: ${e.message}")
+            log.e(e) { "Failed to get widget corner radius" }
             16f // Default value
         }
     }

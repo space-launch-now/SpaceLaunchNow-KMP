@@ -19,6 +19,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.MissionPatch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramType
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -40,6 +41,7 @@ import kotlinx.serialization.encoding.*
  * @param endDate 
  * @param missionPatches 
  * @param type 
+ * @param vidUrls 
  */
 @Serializable
 
@@ -69,7 +71,9 @@ data class ProgramNormal (
 
     @SerialName(value = "mission_patches") @Required val missionPatches: kotlin.collections.List<MissionPatch>,
 
-    @SerialName(value = "type") @Required val type: ProgramType
+    @SerialName(value = "type") @Required val type: ProgramType,
+
+    @SerialName(value = "vid_urls") @Required val vidUrls: kotlin.collections.List<VidURL>
 
 ) {
 

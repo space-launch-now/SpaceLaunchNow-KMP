@@ -22,7 +22,7 @@ actual fun formatLocalDateTime(localDateTime: LocalDateTime, useUtc: Boolean): S
 
         // Use user's locale from LocaleUtil for consistent locale handling
         val userLocale = Locale.forLanguageTag(LocaleUtil.getLocaleTag())
-        val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+        val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.SHORT)
             .withLocale(userLocale)
 
         val formatted = javaDateTime.format(formatter)

@@ -10,11 +10,14 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import me.calebjones.spacelaunchnow.MainActivity
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 class LaunchNotificationWorker(
     private val context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
+
+    private val log = logger()
 
     companion object {
         private const val CHANNEL_ID = "launch_notifications"
@@ -30,10 +33,12 @@ class LaunchNotificationWorker(
             val launchTime = inputData.getString("launch_time") ?: "Soon"
             val launchId = inputData.getString("launch_id")
 
+            log.i { "Showing launch notification - name: $launchName, time: $launchTime, id: $launchId" }
             showLaunchNotification(launchName, launchTime, launchId)
 
             return Result.success()
         } catch (e: Exception) {
+            log.e(e) { "Failed to show launch notification: ${e.message}" }
             return Result.failure()
         }
     }

@@ -9,6 +9,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Clock.System
@@ -29,10 +30,12 @@ class LaunchLocalDataSource(
     
     // Debug cache duration (1 minutes for testing)
     private val debugCacheDuration = 1.minutes
+
+    private val log = logger()
     
     private suspend fun getEffectiveCacheDuration(): kotlin.time.Duration {
         return if (appPreferences.isDebugShortCacheTtlEnabled()) {
-            println("⚠️ DEBUG MODE: Using short cache TTL (1 minutes) instead of ${cacheDuration.inWholeHours} hour")
+            log.w { "⚠️ DEBUG MODE: Using short cache TTL (1 minutes) instead of ${cacheDuration.inWholeHours} hour" }
             debugCacheDuration
         } else {
             cacheDuration
@@ -84,6 +87,9 @@ class LaunchLocalDataSource(
                 try {
                     json.decodeFromString<LaunchBasic>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e (e) {
+                        "Error decoding LaunchBasic from cache: ${e.message}"
+                    }
                     null
                 }
             }
@@ -97,6 +103,9 @@ class LaunchLocalDataSource(
                 try {
                     json.decodeFromString<LaunchBasic>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e (e) {
+                        "Error decoding LaunchBasic from cache: ${e.message}"
+                    }
                     null
                 }
             }
@@ -148,9 +157,10 @@ class LaunchLocalDataSource(
             .mapNotNull { cached ->
                 try {
                     val ageMinutes = (now - cached.cached_at) / 60000
-                    println("  Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
+                    log.v("Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
                     json.decodeFromString<LaunchNormal>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e (e) { "Error decoding LaunchNormal from cache: ${e.message}" }
                     null
                 }
             }
@@ -164,9 +174,10 @@ class LaunchLocalDataSource(
             .mapNotNull { cached ->
                 try {
                     val ageMinutes = (now - cached.cached_at) / 60000
-                    println("  Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
+                    log.v { "Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})" }
                     json.decodeFromString<LaunchNormal>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e(e) { "Error decoding LaunchNormal from cache: ${e.message}" }
                     null
                 }
             }
@@ -207,7 +218,7 @@ class LaunchLocalDataSource(
         val cached = queries.getDetailedById(id, now).executeAsOneOrNull()
         return cached?.let {
             val ageMinutes = (now - it.cached_at) / 60000
-            println("  Cache entry age: ${ageMinutes} minutes (cached at ${it.cached_at}, expires at ${it.expires_at})")
+            log.v { "Cache entry age: ${ageMinutes} minutes (cached at ${it.cached_at}, expires at ${it.expires_at})" }
             json.decodeFromString<LaunchDetailed>(it.json_data)
         }
     }
@@ -221,6 +232,7 @@ class LaunchLocalDataSource(
                 try {
                     json.decodeFromString<LaunchNormal>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e(e) { "Error decoding LaunchNormal from cache: ${e.message}" }
                     null
                 }
             }
@@ -234,6 +246,7 @@ class LaunchLocalDataSource(
                 try {
                     json.decodeFromString<LaunchNormal>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e(e) { "Error decoding LaunchNormal from cache: ${e.message}" }
                     null
                 }
             }
@@ -244,6 +257,7 @@ class LaunchLocalDataSource(
             try {
                 json.decodeFromString<LaunchDetailed>(it.json_data)
             } catch (e: Exception) {
+                log.e(e) { "Error decoding LaunchDetailed from cache: ${e.message}" }
                 null
             }
         }

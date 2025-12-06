@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
 
 enum class ScheduleTab { Upcoming, Previous }
@@ -36,6 +37,8 @@ data class ScheduleUiState(
 class ScheduleViewModel(
     private val launchesApi: LaunchesApi
 ) : ViewModel() {
+
+    private val log = logger()
 
     private val _uiState = MutableStateFlow(ScheduleUiState())
     val uiState: StateFlow<ScheduleUiState> = _uiState.asStateFlow()
@@ -99,28 +102,26 @@ class ScheduleViewModel(
 
     fun refresh() {
         viewModelScope.launch {
-            println("=== ScheduleViewModel.refresh() called ===")
+            log.d { "Refresh called - reloading both tabs" }
             _uiState.value = _uiState.value.copy(isRefreshing = true)
-            println("Set isRefreshing = true")
             invalidateCache()
             
             // Reload both tabs
-            println("Loading Upcoming tab...")
+            log.d { "Loading Upcoming tab..." }
             loadTab(ScheduleTab.Upcoming, reset = true)
-            println("Loading Previous tab...")
+            log.d { "Loading Previous tab..." }
             loadTab(ScheduleTab.Previous, reset = true)
             
             // Wait a bit for both to complete
             delay(500)
-            println("Setting isRefreshing = false")
             _uiState.value = _uiState.value.copy(isRefreshing = false)
-            println("=== ScheduleViewModel.refresh() completed ===")
+            log.d { "Refresh completed" }
         }
     }
 
     private fun loadTab(tab: ScheduleTab, reset: Boolean) {
         viewModelScope.launch {
-            println("=== loadTab: $tab, reset=$reset ===")
+            log.d { "Loading tab: $tab, reset: $reset" }
             val requestVersion = queryVersion
             val tabState = getTabState(tab)
             
@@ -132,11 +133,11 @@ class ScheduleViewModel(
             if (hasExistingData && reset) {
                 // Background refresh - keep showing existing data
                 updateTabState(tab, tabState.copy(isRefreshing = true, error = null))
-                println("Set isRefreshing=true for $tab (has ${tabState.items.size} existing items)")
+                log.v { "Set isRefreshing=true for $tab (has ${tabState.items.size} existing items)" }
             } else {
                 // Initial load or pagination - show loading state
                 updateTabState(tab, tabState.copy(isLoading = true, error = null))
-                println("Set isLoading=true for $tab")
+                log.v { "Set isLoading=true for $tab" }
             }
 
             try {
@@ -145,14 +146,10 @@ class ScheduleViewModel(
                 val ordering = if (tab == ScheduleTab.Upcoming) "net" else "-net"
                 val searchQuery = _uiState.value.searchQuery.takeIf { it.isNotBlank() }
 
-                println("=== API Call Starting ===")
-                println("Tab: $tab")
-                println("Parameters: offset=$offset, limit=$limit, ordering=$ordering")
-                println("Search query: ${searchQuery ?: "none"}")
-                println("Previous: ${tab == ScheduleTab.Previous}, Upcoming: ${tab == ScheduleTab.Upcoming}")
-                
+                log.d { "API call starting - tab: $tab, offset: $offset, limit: $limit, ordering: $ordering, search: ${searchQuery ?: "none"}" }
+
                 val page: PaginatedLaunchBasicList = if (tab == ScheduleTab.Previous) {
-                    println("Calling launchesApi.launchesMiniList for PREVIOUS launches...")
+                    log.d { "Calling launchesApi.launchesMiniList for PREVIOUS launches..." }
                     val response = launchesApi.launchesMiniList(
                         limit = limit,
                         offset = offset,
@@ -160,10 +157,10 @@ class ScheduleViewModel(
                         ordering = ordering,
                         search = searchQuery
                     )
-                    println("API Response received - Status: ${response.status}")
+                    log.v { "API Response received - Status: ${response.status}" }
                     response.body()
                 } else {
-                    println("Calling launchesApi.launchesMiniList for UPCOMING launches...")
+                    log.d { "Calling launchesApi.launchesMiniList for UPCOMING launches..." }
                     val response = launchesApi.launchesMiniList(
                         limit = limit,
                         offset = offset,
@@ -171,22 +168,18 @@ class ScheduleViewModel(
                         ordering = ordering,
                         search = searchQuery
                     )
-                    println("API Response received - Status: ${response.status}")
+                    log.d { "API Response received - Status: ${response.status}" }
                     response.body()
                 }
 
-                println("=== API Call Completed ===")
-                println("Received ${page.results.size} launches for $tab")
-                println("Total count: ${page.count}")
-                println("Has next page: ${page.next != null}")
+                log.i { "Received ${page.results.size} launches for $tab - Total count: ${page.count}, Has next: ${page.next != null}" }
                 if (page.results.isNotEmpty()) {
-                    println("First launch: ${page.results.first().name}")
-                    println("Last launch: ${page.results.last().name}")
+                    log.v { "First launch: ${page.results.first().name}, Last launch: ${page.results.last().name}" }
                 }
                 
                 // Ignore if query changed during request
                 if (requestVersion != queryVersion) {
-                    println("Query version changed, ignoring results")
+                    log.d { "Query version changed, ignoring results" }
                     return@launch
                 }
 
@@ -196,7 +189,7 @@ class ScheduleViewModel(
                     tabState.items + page.results
                 }
 
-                println("Updating $tab state with ${newItems.size} total items")
+                log.d { "Updating $tab state with ${newItems.size} total items" }
                 updateTabState(
                     tab,
                     TabState(
@@ -209,10 +202,10 @@ class ScheduleViewModel(
                         cachedQuery = _uiState.value.searchQuery
                     )
                 )
-                println("=== loadTab: $tab completed successfully ===")
+                log.i { "loadTab completed successfully for $tab" }
 
             } catch (t: Throwable) {
-                println("=== loadTab: $tab failed with error: ${t.message} ===")
+                log.e(t) { "loadTab failed for $tab" }
                 updateTabState(
                     tab,
                     tabState.copy(
@@ -246,16 +239,14 @@ class ScheduleViewModel(
     }
 
     private fun invalidateCache() {
-        println("=== Invalidating cache ===")
-        println("Before - Upcoming timestamp: ${_uiState.value.upcomingTab.cacheTimestamp}")
-        println("Before - Previous timestamp: ${_uiState.value.previousTab.cacheTimestamp}")
-        
+        log.d { "Invalidating cache - Upcoming timestamp: ${_uiState.value.upcomingTab.cacheTimestamp}, Previous timestamp: ${_uiState.value.previousTab.cacheTimestamp}" }
+
         _uiState.value = _uiState.value.copy(
             upcomingTab = _uiState.value.upcomingTab.copy(cacheTimestamp = null, cachedQuery = ""),
             previousTab = _uiState.value.previousTab.copy(cacheTimestamp = null, cachedQuery = "")
         )
         
-        println("After - Cache invalidated (timestamps cleared)")
+        log.d { "Cache invalidated (timestamps cleared)" }
     }
 
     private fun getTabState(tab: ScheduleTab): TabState {

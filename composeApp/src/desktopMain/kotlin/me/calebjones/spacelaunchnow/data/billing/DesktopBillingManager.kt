@@ -6,12 +6,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.logger
 
 /**
  * Desktop implementation of BillingManager - No billing support
  * Desktop apps don't have in-app purchases, so this is a no-op implementation
  */
 class DesktopBillingManager : BillingManager {
+    private val log = logger()
     
     private val _isInitialized = MutableStateFlow(true) // Always initialized
     override val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
@@ -30,42 +32,42 @@ class DesktopBillingManager : BillingManager {
     override val purchaseState: StateFlow<PurchaseState> = _purchaseState.asStateFlow()
     
     override suspend fun initialize(appUserId: String?): Result<Unit> {
-        println("DesktopBillingManager: ℹ️ No billing support on desktop platform")
+        log.d { "DesktopBillingManager: ℹ️ No billing support on desktop platform" }
         return Result.success(Unit)
     }
     
     override suspend fun refreshPurchaseState(): Boolean {
-        println("DesktopBillingManager: ℹ️ No purchase state to refresh on desktop")
+        log.d { "DesktopBillingManager: ℹ️ No purchase state to refresh on desktop" }
         return true
     }
     
     override suspend fun getAvailableProducts(): Result<List<ProductInfo>> {
-        println("DesktopBillingManager: ℹ️ No products available on desktop platform")
+        log.d { "DesktopBillingManager: ℹ️ No products available on desktop platform" }
         return Result.success(emptyList())
     }
     
     override suspend fun launchPurchaseFlow(productId: String, basePlanId: String?): Result<Unit> {
-        println("DesktopBillingManager: ⚠️ In-app purchases not supported on desktop platform")
+        log.w { "DesktopBillingManager: ⚠️ In-app purchases not supported on desktop platform" }
         return Result.failure(UnsupportedOperationException("In-app purchases not supported on desktop"))
     }
     
     override suspend fun restorePurchases(): Result<PurchaseState> {
-        println("DesktopBillingManager: ℹ️ No purchases to restore on desktop")
+        log.d { "DesktopBillingManager: ℹ️ No purchases to restore on desktop" }
         return Result.success(_purchaseState.value)
     }
     
     override suspend fun syncPurchases() {
-        println("DesktopBillingManager: ℹ️ No purchases to sync on desktop")
+        log.d { "DesktopBillingManager: ℹ️ No purchases to sync on desktop" }
         // No-op
     }
     
     override fun hasEntitlement(entitlementId: String): Boolean {
-        println("DesktopBillingManager: ℹ️ No entitlements on desktop platform")
+        log.d { "DesktopBillingManager: ℹ️ No entitlements on desktop platform" }
         return false
     }
     
     override fun getActiveEntitlements(): Set<String> {
-        println("DesktopBillingManager: ℹ️ No active entitlements on desktop")
+        log.d { "DesktopBillingManager: ℹ️ No active entitlements on desktop" }
         return emptySet()
     }
 }

@@ -61,10 +61,8 @@ fun BetaWarningDialog(
             "",
             "Please check the Roadmap section in Settings to see planned features and progress.",
             "",
-            "Your feedback and support is incredibly valuable to me - please let me know if there's something missing.",
-            "",
             "Thank you to everyone who has supported this project for the last ten years!"
-        )
+        ) 
 
         AlertDialog(
             onDismissRequest = {

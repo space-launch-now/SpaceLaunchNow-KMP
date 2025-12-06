@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import me.calebjones.spacelaunchnow.BuildConfig
-import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.analytics.DatadogRUM
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
@@ -33,6 +33,8 @@ class AndroidBillingManager(
     private val context: Context
 ) : BillingManager {
 
+    private val log = logger()
+
     private val _isInitialized = MutableStateFlow(false)
     override val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
 
@@ -44,7 +46,7 @@ class AndroidBillingManager(
 
     override suspend fun initialize(appUserId: String?): Result<Unit> {
         return try {
-            println("AndroidBillingManager: Initializing RevenueCat for Android (debug=${BuildConfig.IS_DEBUG})")
+            log.d { "Initializing RevenueCat for Android - debug: ${BuildConfig.IS_DEBUG}, appUserId: $appUserId" }
 
             // Configure RevenueCat
             Purchases.logLevel = if (BuildConfig.IS_DEBUG) LogLevel.DEBUG else LogLevel.WARN
@@ -53,7 +55,7 @@ class AndroidBillingManager(
                 this.appUserId = appUserId
             }
 
-            println("AndroidBillingManager: RevenueCat configured")
+            log.d { "RevenueCat configured" }
             _isInitialized.value = true
 
             // Initial sync with store (silent, no UI)
@@ -62,15 +64,14 @@ class AndroidBillingManager(
             // Load initial purchase state
             val success = refreshPurchaseState()
             if (success) {
-                println("AndroidBillingManager: ✅ Initialization successful")
+                log.i { "Initialization successful" }
             } else {
-                println("AndroidBillingManager: ⚠️  Initialization completed but failed to load customer info")
+                log.w { "Initialization completed but failed to load customer info" }
             }
 
             Result.success(Unit)
         } catch (e: Exception) {
-            println("AndroidBillingManager: ❌ Failed to initialize - ${e.message}")
-            DatadogLogger.error("Failed to initialize AndroidBillingManager", e)
+            log.e(e) { "Failed to initialize AndroidBillingManager - ${e.message}" }
             Result.failure(e)
         }
     }
@@ -79,35 +80,26 @@ class AndroidBillingManager(
         return suspendCancellableCoroutine { continuation ->
             try {
                 if (!_isInitialized.value) {
-                    println("AndroidBillingManager: ❌ Cannot refresh - not initialized")
+                    log.w { "Cannot refresh - not initialized" }
                     continuation.resume(false)
                     return@suspendCancellableCoroutine
                 }
 
-                println("AndroidBillingManager: 🔄 Refreshing purchase state...")
+                log.d { "Refreshing purchase state..." }
 
                 purchases.getCustomerInfo(
                     onError = { error ->
-                        println("AndroidBillingManager: ❌ Failed to get customer info - ${error.message}")
-                        DatadogLogger.error(
-                            "Failed to get customer info",
-                            null,
-                            mapOf(
-                                "error_message" to (error.message ?: "unknown"),
-                                "error_code" to error.code.name
-                            )
-                        )
+                        log.e { "Failed to get customer info - message: ${error.message}, code: ${error.code.name}" }
                         continuation.resume(false)
                     },
                     onSuccess = { customerInfo ->
                         updatePurchaseState(customerInfo)
-                        println("AndroidBillingManager: ✅ Purchase state refreshed")
+                        log.i { "Purchase state refreshed" }
                         continuation.resume(true)
                     }
                 )
             } catch (e: Exception) {
-                println("AndroidBillingManager: ❌ Exception refreshing purchase state - ${e.message}")
-                DatadogLogger.error("Exception refreshing purchase state", e)
+                log.e(e) { "Exception refreshing purchase state" }
                 continuation.resume(false)
             }
         }
@@ -119,7 +111,7 @@ class AndroidBillingManager(
                 return Result.failure(IllegalStateException("BillingManager not initialized"))
             }
 
-            println("AndroidBillingManager: 🔄 Loading available products...")
+            log.d { "Loading available products..." }
             val offerings = purchases.awaitOfferings()
 
             val products = offerings.current?.availablePackages?.map { pkg ->
@@ -134,11 +126,10 @@ class AndroidBillingManager(
                 )
             } ?: emptyList()
 
-            println("AndroidBillingManager: ✅ Found ${products.size} products")
+            log.i { "Found ${products.size} available products" }
             Result.success(products)
         } catch (e: Exception) {
-            println("AndroidBillingManager: ❌ Failed to get products - ${e.message}")
-            DatadogLogger.error("Failed to get available products", e)
+            log.e(e) { "Failed to get available products" }
             Result.failure(e)
         }
     }
@@ -149,7 +140,7 @@ class AndroidBillingManager(
                 return Result.failure(IllegalStateException("BillingManager not initialized"))
             }
 
-            println("AndroidBillingManager: 🛒 Starting purchase flow for $productId")
+            log.i { "Starting purchase flow - productId: $productId, basePlanId: $basePlanId" }
 
             val offerings = purchases.awaitOfferings()
             val pkg = offerings.current?.availablePackages?.find {
@@ -160,23 +151,11 @@ class AndroidBillingManager(
             val result = purchases.awaitPurchase(pkg)
             updatePurchaseState(result.customerInfo)
 
-            println("AndroidBillingManager: ✅ Purchase successful")
-            DatadogLogger.info(
-                "Purchase completed",
-                mapOf(
-                    "product_id" to productId,
-                    "base_plan_id" to (basePlanId ?: "default")
-                )
-            )
+            log.i { "Purchase completed - productId: $productId, basePlanId: ${basePlanId ?: "default"}" }
 
             Result.success(Unit)
         } catch (e: Exception) {
-            println("AndroidBillingManager: ❌ Purchase failed - ${e.message}")
-            DatadogLogger.error(
-                "Purchase failed",
-                e,
-                mapOf("product_id" to productId)
-            )
+            log.e(e) { "Purchase failed - productId: $productId" }
             Result.failure(e)
         }
     }
@@ -189,28 +168,21 @@ class AndroidBillingManager(
                     return@suspendCancellableCoroutine
                 }
 
-                println("AndroidBillingManager: 🔄 Restoring purchases...")
+                log.i { "Restoring purchases..." }
 
                 purchases.restorePurchases(
                     onError = { error ->
-                        println("AndroidBillingManager: ❌ Restore failed - ${error.message}")
-                        DatadogLogger.error(
-                            "Restore purchases failed",
-                            null,
-                            mapOf("error" to error.message)
-                        )
+                        log.e { "Restore failed - ${error.message}" }
                         continuation.resume(Result.failure(Exception(error.message)))
                     },
                     onSuccess = { customerInfo ->
                         updatePurchaseState(customerInfo)
-                        println("AndroidBillingManager: ✅ Purchases restored")
-                        DatadogLogger.info("Purchases restored successfully")
+                        log.i { "Purchases restored successfully" }
                         continuation.resume(Result.success(_purchaseState.value))
                     }
                 )
             } catch (e: Exception) {
-                println("AndroidBillingManager: ❌ Exception restoring purchases - ${e.message}")
-                DatadogLogger.error("Exception restoring purchases", e)
+                log.e(e) { "Exception restoring purchases" }
                 continuation.resume(Result.failure(e))
             }
         }
@@ -224,21 +196,21 @@ class AndroidBillingManager(
                     return@suspendCancellableCoroutine
                 }
 
-                println("AndroidBillingManager: 🔄 Syncing purchases with store...")
+                log.d { "Syncing purchases with store..." }
 
                 purchases.syncPurchases(
                     onError = { error ->
-                        println("AndroidBillingManager: ⚠️  Sync failed - ${error.message}")
+                        log.w { "Sync failed - ${error.message}" }
                         continuation.resume(Unit)
                     },
                     onSuccess = { customerInfo ->
                         updatePurchaseState(customerInfo)
-                        println("AndroidBillingManager: ✅ Purchases synced")
+                        log.i { "Purchases synced" }
                         continuation.resume(Unit)
                     }
                 )
             } catch (e: Exception) {
-                println("AndroidBillingManager: ⚠️  Exception syncing purchases - ${e.message}")
+                log.w { "Exception syncing purchases - ${e.message}" }
                 continuation.resume(Unit)
             }
         }
@@ -256,7 +228,7 @@ class AndroidBillingManager(
      * Update purchase state from RevenueCat CustomerInfo
      */
     private fun updatePurchaseState(customerInfo: CustomerInfo) {
-        println("AndroidBillingManager: 📊 Updating purchase state...")
+        log.d { "Updating purchase state..." }
 
         val activeEntitlements = customerInfo.entitlements.active.keys
 
@@ -277,11 +249,7 @@ class AndroidBillingManager(
         val subscriptionType = determineSubscriptionType(activeEntitlements, productIds)
         val features = determineFeatures(subscriptionType)
 
-        println("AndroidBillingManager: 📊 Purchase state:")
-        println("  • Subscription Type: $subscriptionType")
-        println("  • Active Entitlements: $activeEntitlements")
-        println("  • Product IDs: $productIds")
-        println("  • Features: ${features.size} features")
+        log.i { "Purchase state updated - type: $subscriptionType, entitlements: $activeEntitlements, products: $productIds, features: ${features.size}" }
 
         _purchaseState.value = PurchaseState(
             isSubscribed = subscriptionType != SubscriptionType.FREE,
@@ -313,57 +281,47 @@ class AndroidBillingManager(
         entitlements: Set<String>,
         productIds: Set<String>
     ): SubscriptionType {
-        println("AndroidBillingManager: 🔍 Determining subscription type...")
-        println(
-            "AndroidBillingManager  📋 Input Entitlements: ${
-                entitlements.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }
-            }"
-        )
-        println(
-            "AndroidBillingManager  📦 Input Product IDs: ${
-                productIds.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }
-            }"
-        )
+        log.d { "Determining subscription type - entitlements: ${entitlements.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }}, products: ${productIds.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }}" }
 
         // Check entitlements first (most reliable)
         val result = when {
             // Check for premium entitlement (all variations)
             entitlements.contains("premium") -> {
-                println("AndroidBillingManager  ✅ Match: Found 'premium' entitlement → PREMIUM")
+                log.v { "Match: Found 'premium' entitlement → PREMIUM" }
                 SubscriptionType.PREMIUM
             }
 
             entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_PRO) -> {
-                println("AndroidBillingManager  ✅ Match: Found '${SubscriptionProducts.RC_ENTITLEMENT_PRO}' entitlement → PREMIUM")
+                log.v { "Match: Found '${SubscriptionProducts.RC_ENTITLEMENT_PRO}' entitlement → PREMIUM" }
                 SubscriptionType.PREMIUM
             }
 
             // Check for lifetime/founder entitlements (all variations)
             entitlements.contains("founder") -> {
-                println("AndroidBillingManager  ✅ Match: Found 'founder' entitlement → LIFETIME")
+                log.v { "Match: Found 'founder' entitlement → LIFETIME" }
                 SubscriptionType.LIFETIME
             }
 
             entitlements.contains("lifetime") -> {
-                println("AndroidBillingManager  ✅ Match: Found 'lifetime' entitlement → LIFETIME")
+                log.v { "Match: Found 'lifetime' entitlement → LIFETIME" }
                 SubscriptionType.LIFETIME
             }
 
             entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_LIFETIME) -> {
-                println("AndroidBillingManager  ✅ Match: Found '${SubscriptionProducts.RC_ENTITLEMENT_LIFETIME}' entitlement → LIFETIME")
+                log.v { "Match: Found '${SubscriptionProducts.RC_ENTITLEMENT_LIFETIME}' entitlement → LIFETIME" }
                 SubscriptionType.LIFETIME
             }
 
             // Check for legacy entitlement
             entitlements.contains(SubscriptionProducts.RC_ENTITLEMENT_LEGACY) -> {
-                println("AndroidBillingManager  ✅ Match: Found '${SubscriptionProducts.RC_ENTITLEMENT_LEGACY}' entitlement → LEGACY")
+                log.v { "Match: Found '${SubscriptionProducts.RC_ENTITLEMENT_LEGACY}' entitlement → LEGACY" }
                 SubscriptionType.LEGACY
             }
 
             // Fallback to product ID matching for legacy purchases
             productIds.any { it.contains("lifetime", ignoreCase = true) } -> {
                 val matchedProduct = productIds.first { it.contains("lifetime", ignoreCase = true) }
-                println("AndroidBillingManager  ✅ Match: Found lifetime product ID '$matchedProduct' → LIFETIME")
+                log.v { "Match: Found lifetime product ID '$matchedProduct' → LIFETIME" }
                 SubscriptionType.LIFETIME
             }
 
@@ -377,36 +335,23 @@ class AndroidBillingManager(
                             it.contains("yearly", ignoreCase = true) ||
                             it.contains("monthly", ignoreCase = true)
                 }
-                println("AndroidBillingManager  ✅ Match: Found premium product ID '$matchedProduct' → PREMIUM")
+                log.v { "Match: Found premium product ID '$matchedProduct' → PREMIUM" }
                 SubscriptionType.PREMIUM
             }
 
             // Check for any active subscription or purchase (legacy)
             productIds.isNotEmpty() -> {
-                println("AndroidBillingManager  ⚠️  Fallback: Unknown product IDs present → LEGACY")
-                println("AndroidBillingManager      Products: ${productIds.joinToString(", ")}")
+                log.w { "Fallback: Unknown product IDs present → LEGACY - Products: ${productIds.joinToString(", ")}" }
                 SubscriptionType.LEGACY
             }
 
             else -> {
-                println("AndroidBillingManager  ❌ No entitlements or products found → FREE")
+                log.d { "No entitlements or products found → FREE" }
                 SubscriptionType.FREE
             }
         }
 
-        println("AndroidBillingManager  🎯 Final Determination: $result")
-
-        // Log to Datadog for monitoring
-        DatadogLogger.info(
-            "AndroidBillingManager - subscription type determined",
-            mapOf(
-                "subscription_type" to result.name,
-                "entitlements_count" to entitlements.size,
-                "product_ids_count" to productIds.size,
-                "entitlements" to entitlements.joinToString(","),
-                "product_ids" to productIds.joinToString(",")
-            )
-        )
+        log.i { "Subscription type determined: $result - entitlements: ${entitlements.size}, products: ${productIds.size}" }
 
         return result
     }

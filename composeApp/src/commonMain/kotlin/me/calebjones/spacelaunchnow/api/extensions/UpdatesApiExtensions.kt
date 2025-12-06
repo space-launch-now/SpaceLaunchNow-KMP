@@ -1,9 +1,9 @@
 package me.calebjones.spacelaunchnow.api.extensions
 
-import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
+import kotlin.time.Instant
 
 /**
  * Extension functions for UpdatesApi to provide cleaner, named-parameter interfaces
@@ -20,6 +20,7 @@ suspend fun UpdatesApi.getUpdates(
     launch: String? = null,
     launchServiceProvider: Int? = null,
     program: Int? = null,
+    allProgram: Int? = null,
     search: String? = null,
     createdOn: Instant? = null
 ): HttpResponse<PaginatedUpdateEndpointList> = updatesList(
@@ -30,7 +31,9 @@ suspend fun UpdatesApi.getUpdates(
     offset = offset,
     ordering = ordering,
     program = program,
-    search = search
+    search = search,
+    allProgram = allProgram
+
 )
 
 /**
@@ -42,3 +45,15 @@ suspend fun UpdatesApi.getLatestUpdates(
     limit = limit,
     ordering = "-created_on"
 )
+
+/**
+ * Get updates for Starship program (program ID = 1)
+ */
+suspend fun UpdatesApi.getStarshipUpdates(
+    limit: Int = 20
+): HttpResponse<PaginatedUpdateEndpointList> = getUpdates(
+    limit = limit,
+    program = 1,
+    ordering = "-created_on"
+)
+

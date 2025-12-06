@@ -14,7 +14,6 @@ actual object RevenueCatConfig {
     actual val apiKey: String
         get() {
             val key = AppSecrets.revenueCatIosKey
-            println("RevenueCatConfig.apiKey loaded: ${if (key.isNotEmpty()) "${key.take(10)}..." else "EMPTY"}")
             return key
         }
 
@@ -22,5 +21,5 @@ actual object RevenueCatConfig {
 
     // For iOS, we'll use a simple debug check
     // You can enhance this based on your build configuration
-    actual val isDebug: Boolean = true // TODO: Set based on your iOS build configuration
+    actual val isDebug: Boolean = true
 }

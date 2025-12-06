@@ -34,7 +34,6 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherStatus
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.MissionType
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.NoticeType
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Orbit
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAgencyTypeList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautRoleList
@@ -55,11 +54,9 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchStat
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherStatusList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedMissionTypeList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedNetPrecisionList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedNoticeTypeList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedOrbitList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedPayloadTypeList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedProgramTypeList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedRoadClosureStatusList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpaceStationStatusList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacecraftConfigTypeList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacecraftStatusList
@@ -67,7 +64,6 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedTimelineEv
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedVidURLTypeList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadType
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.RoadClosureStatus
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationStatus
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigType
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftStatus
@@ -1488,79 +1484,6 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/notice_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/notice_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
-     * @param limit Number of results to return per page. (optional)
-     * @param offset The initial index from which to return the results. (optional)
-     * @param ordering Which field to use when ordering the results. (optional)
-     * @param search A search term. (optional)
-     * @return PaginatedNoticeTypeList
-     */
-    @Suppress("UNCHECKED_CAST")
-    open suspend fun configNoticeTypesList(limit: kotlin.Int? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null): HttpResponse<PaginatedNoticeTypeList> {
-
-        val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
-
-        val localVariableBody = 
-            io.ktor.client.utils.EmptyContent
-
-        val localVariableQuery = mutableMapOf<String, List<String>>()
-        limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
-        offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
-        ordering?.apply { localVariableQuery["ordering"] = listOf("$ordering") }
-        search?.apply { localVariableQuery["search"] = listOf("$search") }
-        val localVariableHeaders = mutableMapOf<String, String>()
-
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/api/ll/2.4.0/config/notice_types/",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
-
-        return request(
-            localVariableConfig,
-            localVariableBody,
-            localVariableAuthNames
-        ).wrap()
-    }
-
-
-    /**
-     * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/notice_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/notice_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
-     * @param id A unique integer value identifying this Notices Type.
-     * @return NoticeType
-     */
-    @Suppress("UNCHECKED_CAST")
-    open suspend fun configNoticeTypesRetrieve(id: kotlin.Int): HttpResponse<NoticeType> {
-
-        val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
-
-        val localVariableBody = 
-            io.ktor.client.utils.EmptyContent
-
-        val localVariableQuery = mutableMapOf<String, List<String>>()
-        val localVariableHeaders = mutableMapOf<String, String>()
-
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/api/ll/2.4.0/config/notice_types/{id}/".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
-
-        return request(
-            localVariableConfig,
-            localVariableBody,
-            localVariableAuthNames
-        ).wrap()
-    }
-
-
-    /**
-     * 
      * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
@@ -1765,79 +1688,6 @@ open class ConfigApi : ApiClient {
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
             "/api/ll/2.4.0/config/program_types/{id}/".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
-
-        return request(
-            localVariableConfig,
-            localVariableBody,
-            localVariableAuthNames
-        ).wrap()
-    }
-
-
-    /**
-     * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/road_closure_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/road_closure_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
-     * @param limit Number of results to return per page. (optional)
-     * @param offset The initial index from which to return the results. (optional)
-     * @param ordering Which field to use when ordering the results. (optional)
-     * @param search A search term. (optional)
-     * @return PaginatedRoadClosureStatusList
-     */
-    @Suppress("UNCHECKED_CAST")
-    open suspend fun configRoadClosureStatusesList(limit: kotlin.Int? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, search: kotlin.String? = null): HttpResponse<PaginatedRoadClosureStatusList> {
-
-        val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
-
-        val localVariableBody = 
-            io.ktor.client.utils.EmptyContent
-
-        val localVariableQuery = mutableMapOf<String, List<String>>()
-        limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
-        offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
-        ordering?.apply { localVariableQuery["ordering"] = listOf("$ordering") }
-        search?.apply { localVariableQuery["search"] = listOf("$search") }
-        val localVariableHeaders = mutableMapOf<String, String>()
-
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/api/ll/2.4.0/config/road_closure_statuses/",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
-
-        return request(
-            localVariableConfig,
-            localVariableBody,
-            localVariableAuthNames
-        ).wrap()
-    }
-
-
-    /**
-     * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/road_closure_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/road_closure_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
-     * @param id A unique integer value identifying this Road Closure Type.
-     * @return RoadClosureStatus
-     */
-    @Suppress("UNCHECKED_CAST")
-    open suspend fun configRoadClosureStatusesRetrieve(id: kotlin.Int): HttpResponse<RoadClosureStatus> {
-
-        val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
-
-        val localVariableBody = 
-            io.ktor.client.utils.EmptyContent
-
-        val localVariableQuery = mutableMapOf<String, List<String>>()
-        val localVariableHeaders = mutableMapOf<String, String>()
-
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/api/ll/2.4.0/config/road_closure_statuses/{id}/".replace("{" + "id" + "}", "$id"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = true,

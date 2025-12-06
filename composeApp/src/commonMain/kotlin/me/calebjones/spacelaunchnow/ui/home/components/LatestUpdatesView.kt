@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -161,11 +162,21 @@ fun LatestUpdatesView(
 fun UpdateCard(
     update: UpdateEndpoint,
     modifier: Modifier = Modifier,
-    navController: NavController? = null
+    navController: NavController? = null,
+    fillMaxWidth: Boolean = false
 ) {
+    val comment = update.comment ?: "No comment"
+    
+    val cardModifier = if (fillMaxWidth) {
+        modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+    } else {
+        modifier.size(280.dp, 90.dp)
+    }
+
     Card(
-        modifier = modifier
-            .size(280.dp, 120.dp)
+        modifier = cardModifier
             .clickable {
                 if (navController != null) {
                     if (update.launch != null) {
@@ -180,58 +191,62 @@ fun UpdateCard(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp)
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Author profile image with proper error, placeholder, and loading states
-                SubcomposeAsyncImage(
-                    model = update.profileImage ?: "",
-                    contentDescription = "Author profile",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                    loading = {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    },
-                    error = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surfaceContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Person,
-                                contentDescription = "Profile placeholder",
-                                modifier = Modifier.size(32.dp),
-                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                            )
-                        }
+            // Author profile image - vertically centered
+            SubcomposeAsyncImage(
+                model = update.profileImage ?: "",
+                contentDescription = "Author profile",
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+                loading = {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
-                )
+                },
+                error = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "Profile placeholder",
+                            modifier = Modifier.size(32.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            )
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                // Author name and date row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Author name
                     Text(
                         text = update.createdBy ?: "Unknown",
                         fontSize = 12.sp,
@@ -239,48 +254,46 @@ fun UpdateCard(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
-
-                    // Update subject (what it's about)
-                    val updateSubject: String? = when {
-                        update.launch != null -> update.launch.name
-                        update.event != null -> update.event.name
-                        update.program != null -> update.program.name
-                        else -> "General Update"
-                    }
-
-                    if (updateSubject != null) {
+                    
+                    update.createdOn?.let { createdOn ->
                         Text(
-                            text = updateSubject,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            text = formatUpdateDate(createdOn),
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            maxLines = 1
                         )
                     }
+                }
 
-                    // Comment
+                // Update subject (what it's about)
+                val updateSubject: String? = when {
+                    update.launch != null -> update.launch.name
+                    update.event != null -> update.event.name
+                    update.program != null -> update.program.name
+                    else -> "General Update"
+                }
+
+                if (updateSubject != null) {
                     Text(
-                        text = update.comment ?: "No comment",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = 14.sp,
-                        modifier = Modifier.padding(horizontal = 0.dp, vertical = 8.dp)
+                        text = updateSubject,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
-            }
 
-            // Created date aligned to bottom right corner
-            update.createdOn?.let { createdOn ->
+                // Comment
                 Text(
-                    text = formatUpdateDate(createdOn),
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    maxLines = 1,
-                    modifier = Modifier.align(Alignment.BottomEnd)
+                    text = comment,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = if (fillMaxWidth) 4 else 1,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 16.sp
                 )
             }
         }

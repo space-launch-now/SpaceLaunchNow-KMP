@@ -6,17 +6,15 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import kotlin.time.Duration.Companion.hours
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 
 class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
+
+    private val log = logger()
 
     private val _nextLaunch = MutableStateFlow<LaunchDetailed?>(null)
     val nextLaunch: StateFlow<LaunchDetailed?> = _nextLaunch
@@ -32,6 +30,7 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
             try {
                 // Set loading state to true
                 _isLoading.value = true
+                log.d { "Fetching next launch..." }
 
                 // Using normal mode to get LaunchNormal objects
                 val futureDeferred = async {
@@ -43,22 +42,18 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
                 val futureResult = futureDeferred.await()
 
                 futureResult.onSuccess { paginatedLaunches: PaginatedLaunchDetailedList ->
-                    println("=== VIEWMODEL: RECEIVED PAGINATED LAUNCHES ===")
-                    println("Total launches: ${paginatedLaunches.results.size}")
-                    println("Count: ${paginatedLaunches.count}")
-                    println("Next page: ${paginatedLaunches.next}")
-                    println("Previous page: ${paginatedLaunches.previous}")
+                    log.d { "Received paginated launches - Total: ${paginatedLaunches.results.size}, Count: ${paginatedLaunches.count}" }
                     paginatedLaunches.results.forEachIndexed { index, launch ->
-                        println("Launch $index: ${launch.name} - ${launch.net} - ID: ${launch.id}")
+                        log.v { "Launch $index: ${launch.name} - ${launch.net} - ID: ${launch.id}" }
                     }
-                    println("=== END VIEWMODEL LAUNCHES ===")
-                    
+
                     if (paginatedLaunches.results.isNotEmpty()) {
                         _nextLaunch.value = paginatedLaunches.results.first()
                         _isLoading.value = false
+                        log.i { "Successfully loaded next launch: ${paginatedLaunches.results.first().name}" }
                     } else {
                         // If results are empty
-                        println("No launches returned from API.")
+                        log.w { "No launches returned from API" }
                         _nextLaunch.value = null
                         _isLoading.value = false
                     }
@@ -71,13 +66,14 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
                             exception.message!!.substringAfter("API Error: ")
                         else -> exception.message ?: "Unknown error occurred"
                     }
-                    println("Failed to get upcoming launches: $errorMessage")
+                    log.e(exception) { "Failed to get upcoming launches: $errorMessage" }
                     _error.value = errorMessage
                     _nextLaunch.value = null
                     _isLoading.value = false
                 }
 
             } catch (exception: Exception) {
+                log.e(exception) { "Unexpected error while fetching next launch" }
                 _error.value = exception.message
                 _isLoading.value = false
             }

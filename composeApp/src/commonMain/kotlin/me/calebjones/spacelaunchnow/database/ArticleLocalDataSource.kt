@@ -8,6 +8,7 @@ import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Clock.System
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 class ArticleLocalDataSource(
     database: SpaceLaunchDatabase,
@@ -18,10 +19,12 @@ class ArticleLocalDataSource(
     
     private val cacheDuration = 1.hours
     private val debugCacheDuration = 2.minutes
+
+    private val log = logger()
     
     private suspend fun getEffectiveCacheDuration(): kotlin.time.Duration {
         return if (appPreferences.isDebugShortCacheTtlEnabled()) {
-            println("⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${cacheDuration.inWholeHours} hours")
+            log.w { "⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${cacheDuration.inWholeHours} hours" }
             debugCacheDuration
         } else {
             cacheDuration
@@ -65,9 +68,10 @@ class ArticleLocalDataSource(
             .mapNotNull { cached ->
                 try {
                     val ageMinutes = (now - cached.cached_at) / 60000
-                    println("  Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})")
+                    log.v { "Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})" }
                     json.decodeFromString<Article>(cached.json_data)
                 } catch (e: Exception) {
+                    log.e { "Error decoding Article from cache: ${e.message}" }
                     null
                 }
             }

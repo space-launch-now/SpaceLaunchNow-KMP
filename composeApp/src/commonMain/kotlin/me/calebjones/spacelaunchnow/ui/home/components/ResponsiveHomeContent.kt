@@ -84,6 +84,7 @@ fun ResponsiveHomeContent(
 
     // Collect all ViewStates from domain-specific ViewModels
     val featuredLaunchState by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
+    val additionalFeaturedLaunchesState by featuredLaunchViewModel.additionalFeaturedLaunches.collectAsStateWithLifecycle()
     val upcomingLaunchesState by launchCarouselViewModel.upcomingLaunchesState.collectAsStateWithLifecycle()
     val previousLaunchesState by launchCarouselViewModel.previousLaunchesState.collectAsStateWithLifecycle()
     val updatesState by feedViewModel.updatesState.collectAsStateWithLifecycle()
@@ -367,6 +368,15 @@ fun ResponsiveHomeContent(
                     }
                 }
             }
+            
+            // Featured Launches Row - shows next 3 upcoming launches
+            item(key = "tablet_featured_launches_row") {
+                FeaturedLaunchesRow(
+                    launchesState = additionalFeaturedLaunchesState,
+                    navController = navController
+                )
+            }
+            
             item { Spacer(modifier = Modifier.height(12.dp)) }
             item {                         // Quick Stats
                 Column(modifier = Modifier.padding(8.dp)) {
@@ -485,6 +495,14 @@ fun ResponsiveHomeContent(
             }
 
             item(key = "next_launch_view") { NextLaunchView(navController = navController) }
+
+            // Featured Launches Row - shows next 3 upcoming launches
+            item(key = "featured_launches_row") {
+                FeaturedLaunchesRow(
+                    launchesState = additionalFeaturedLaunchesState,
+                    navController = navController
+                )
+            }
 
             // Quick Stats
             item {

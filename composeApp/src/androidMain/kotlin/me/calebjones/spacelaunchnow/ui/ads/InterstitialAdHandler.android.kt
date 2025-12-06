@@ -16,7 +16,10 @@ import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
+
+private val log by lazy { SpaceLogger.getLogger("InterstitialAdHandler") }
 
 /**
  * Android implementation of InterstitialAdHandler using BasicAds library.
@@ -43,8 +46,6 @@ actual fun InterstitialAdHandler(
     // 🚀 USE PRELOADED AD: Get preloaded interstitial ad from CompositionLocal
     val preloadedInterstitialAd = LocalPreloadedInterstitialAd.current
 
-    println("🎯 InterstitialAdHandler: hasAdFree=$hasAdFree, isLoading=${subscriptionState.isLoading}, isMobile=${getPlatform().type.isMobile}, hasContext=${contextFactory != null}, hasPreloadedAd=${preloadedInterstitialAd != null}")
-
     // Don't show ads if:
     // 1. Subscription state is still loading (prevents race condition)
     // 2. User has ad-free premium feature
@@ -57,7 +58,6 @@ actual fun InterstitialAdHandler(
         contextFactory == null ||
         preloadedInterstitialAd == null
     ) {
-        println("⚠️ InterstitialAdHandler: Not showing ad due to conditions.")
         return
     }
 
@@ -95,18 +95,14 @@ actual fun InterstitialAdHandler(
                     appendLine("Next in: $remaining visits")
                 }
             }
-
-            println(debugMessage)
         }
     }
 
     if (!shouldShowAd) {
-        println("⏭️ InterstitialAdHandler: Not time to show ad yet.")
         return
     }
 
     if (adShownThisSession) {
-        println("⏭️ InterstitialAdHandler: Ad already shown in this session.")
         return
     }
 
@@ -117,40 +113,40 @@ actual fun InterstitialAdHandler(
     LaunchedEffect(interstitialAd.state) {
         when (interstitialAd.state) {
             AdState.READY -> {
-                println("🎯 InterstitialAd: Ad loaded successfully and ready to show")
+                log.d { "Ad loaded successfully and ready to show" }
             }
 
             AdState.SHOWING -> {
-                println("✅ InterstitialAd: Ad is showing!")
+                log.d { "Ad is showing!" }
                 onAdShown?.invoke()
             }
 
             AdState.DISMISSED -> {
-                println("🎯 InterstitialAd: Ad dismissed by user")
+                log.d { "Ad dismissed by user" }
                 adShownThisSession = true // Mark as shown
             }
 
             AdState.FAILING -> {
-                println("❌ InterstitialAd: Ad failed to load")
+                log.e { "Ad failed to load" }
                 onAdFailed?.invoke("Failed to load")
                 adShownThisSession = true // Don't retry in this session
             }
 
             AdState.LOADING -> {
-                println("⏳ InterstitialAd: Ad is loading...")
+                log.d { "Ad is loading..." }
             }
 
             AdState.SHOWN -> {
-                println("✅ InterstitialAd: Ad has finished showing")
+                log.i { "Ad has finished showing" }
                 adShownThisSession = true // Mark as shown
             }
 
             AdState.NONE -> {
-                println("⚪ InterstitialAd: Initial state")
+                log.v { "Initial state" }
             }
 
             else -> {
-                println("🔄 InterstitialAd: State: ${interstitialAd.state}")
+                log.d { "State: ${interstitialAd.state}" }
             }
         }
     }
@@ -165,7 +161,7 @@ actual fun InterstitialAdHandler(
         !subscriptionState.isLoading &&
         !subscriptionState.isSubscribed // ADDITIONAL CHECK: Verify subscription state directly
     ) {
-        println("🎯 InterstitialAd: FINAL GATE - Showing ad to free user")
+        log.i { "FINAL GATE - Showing ad to free user" }
         InterstitialAd(loadedAd = interstitialAd)
     } else if (!adShownThisSession && interstitialAd.state == AdState.READY) {
         // Ad is ready but we're NOT showing it - log why
@@ -175,7 +171,7 @@ actual fun InterstitialAdHandler(
             subscriptionState.isSubscribed -> "isSubscribed=true"
             else -> "unknown"
         }
-        println("⛔ InterstitialAd: BLOCKED - Not showing ad because: $reason")
+        log.i { "BLOCKED - Not showing ad because: $reason" }
     }
 }
 

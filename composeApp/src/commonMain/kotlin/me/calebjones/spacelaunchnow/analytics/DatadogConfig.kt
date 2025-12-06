@@ -12,6 +12,9 @@ import com.datadog.kmp.rum.RumActionType
 import com.datadog.kmp.rum.RumErrorSource
 import com.datadog.kmp.rum.configuration.RumConfiguration
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+
+private val log by lazy { SpaceLogger.getLogger("DatadogConfig") }
 
 /**
  * Initialize Datadog RUM for Kotlin Multiplatform
@@ -20,9 +23,8 @@ import me.calebjones.spacelaunchnow.util.EnvironmentManager
 fun initializeDatadog(context: Any? = null) {
     // context should be application context on Android and can be null on iOS
     val datadogEnabled = EnvironmentManager.getEnvBoolean("DATADOG_ENABLED", false)
-    print("Datadog Enabled: $datadogEnabled")
     if (!datadogEnabled) {
-        println("Datadog is disabled")
+        log.i { "Datadog is disabled" }
         return
     }
 
@@ -30,7 +32,7 @@ fun initializeDatadog(context: Any? = null) {
     val appEnvironment = EnvironmentManager.getEnv("DATADOG_ENVIRONMENT", "development")
 
     if (appClientToken.isEmpty()) {
-        println("Datadog client token not found")
+        log.w { "Datadog client token not found" }
         return
     }
 
@@ -78,38 +80,6 @@ internal expect fun rumPlatformSetup(rumConfigurationBuilder: RumConfiguration.B
 // Helper functions for common RUM operations
 object DatadogRUM {
     /**
-     * Track a custom action (button click, navigation, etc.)
-     * Note: Actions are tracked automatically by platform-specific configurations.
-     * This is a placeholder for when manual action tracking is added to the SDK.
-     */
-    fun trackAction(
-        name: String,
-        type: RumActionType = RumActionType.CUSTOM,
-        attributes: Map<String, Any?> = emptyMap()
-    ) {
-        // Manual RUM event tracking not yet available in KMP SDK
-        // Events are tracked automatically via platform configurations
-        println("Datadog Action: $name (type=$type, attributes=$attributes)")
-    }
-
-    /**
-     * Track an error with optional throwable and attributes
-     * Note: Errors are tracked automatically via crash tracking.
-     * This is a placeholder for when manual error tracking is added to the SDK.
-     */
-    fun trackError(
-        message: String,
-        source: RumErrorSource = RumErrorSource.SOURCE,
-        throwable: Throwable? = null,
-        attributes: Map<String, Any?> = emptyMap()
-    ) {
-        // Manual RUM event tracking not yet available in KMP SDK
-        // Crashes are tracked automatically
-        println("Datadog Error: $message (source=$source, throwable=$throwable, attributes=$attributes)")
-        throwable?.printStackTrace()
-    }
-
-    /**
      * Set user information for tracking across Datadog
      * @param id User identifier (e.g., RevenueCat user ID)
      * @param name Optional user name
@@ -128,7 +98,7 @@ object DatadogRUM {
             email = email,
             extraInfo = extraInfo
         )
-        println("Datadog User Set: id=$id, extraInfo=$extraInfo")
+        log.i { "Datadog User Set: id=$id, extraInfo=$extraInfo" }
     }
 
     /**
@@ -136,7 +106,7 @@ object DatadogRUM {
      */
     fun clearUser() {
         Datadog.clearAllData()
-        println("Datadog User Cleared")
+        log.i { "Datadog User Cleared" }
     }
 }
 
@@ -150,7 +120,7 @@ object DatadogLogger {
     fun initialize() {
         logger = Logger.Builder()
             .setNetworkInfoEnabled(true)
-            .setPrintLogsToConsole(true)
+            .setPrintLogsToConsole(false)
             .setRemoteSampleRate(100f)
             .setBundleWithRumEnabled(true)
             .setName("SLN")
@@ -159,28 +129,21 @@ object DatadogLogger {
 
     fun debug(message: String, attributes: Map<String, Any?> = emptyMap()) {
         logger?.debug(message, null, attributes)
-        println("DEBUG: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
     }
 
     fun info(message: String, attributes: Map<String, Any?> = emptyMap()) {
         logger?.info(message, null, attributes)
-        println("INFO: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
     }
 
     fun warn(message: String, attributes: Map<String, Any?> = emptyMap()) {
         logger?.warn(message, null, attributes)
-        println("WARN: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
     }
 
     fun error(message: String, throwable: Throwable? = null, attributes: Map<String, Any?> = emptyMap()) {
         logger?.error(message, throwable, attributes)
-        println("ERROR: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
-        throwable?.printStackTrace()
     }
 
     fun critical(message: String, throwable: Throwable? = null, attributes: Map<String, Any?> = emptyMap()) {
         logger?.critical(message, throwable, attributes)
-        println("CRITICAL: $message ${if (attributes.isNotEmpty()) "- $attributes" else ""}")
-        throwable?.printStackTrace()
     }
 }

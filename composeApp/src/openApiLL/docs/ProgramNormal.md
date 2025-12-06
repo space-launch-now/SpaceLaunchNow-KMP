@@ -17,6 +17,7 @@
 | **endDate** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
 | **missionPatches** | [**kotlin.collections.List&lt;MissionPatch&gt;**](MissionPatch.md) |  |  |
 | **type** | [**ProgramType**](ProgramType.md) |  |  |
+| **vidUrls** | [**kotlin.collections.List&lt;VidURL&gt;**](VidURL.md) |  |  |
 
 
 

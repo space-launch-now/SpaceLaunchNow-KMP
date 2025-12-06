@@ -17,6 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.ui.home.components.ResponsiveHomeContent
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
@@ -27,6 +30,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -89,6 +93,11 @@ fun HomeScreen(navController: NavController) {
     // Simplified pull-to-refresh state
     var isRefreshing by remember { mutableStateOf(false) }
 
+    // Get current day/month for This Day in History refresh
+    val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentDay = currentDate.day
+    val currentMonth = currentDate.month.number
+
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
@@ -99,6 +108,7 @@ fun HomeScreen(navController: NavController) {
             feedViewModel.refreshAll()
             eventsViewModel.refresh()
             statsViewModel.refresh()
+            historyViewModel.refresh(day = currentDay, month = currentMonth)
             isRefreshing = false
         }
     )
@@ -134,9 +144,12 @@ fun HomeScreen(navController: NavController) {
             onRetry = {
                 isRefreshing = true
                 launchesViewModel.refresh()
+                featuredLaunchViewModel.refresh()
+                launchCarouselViewModel.refresh()
                 feedViewModel.refreshAll()
                 eventsViewModel.refresh()
                 statsViewModel.refresh()
+                historyViewModel.refresh(day = currentDay, month = currentMonth)
                 isRefreshing = false
             }
         )

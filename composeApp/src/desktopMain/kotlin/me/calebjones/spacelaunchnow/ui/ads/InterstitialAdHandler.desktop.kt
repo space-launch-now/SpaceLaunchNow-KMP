@@ -1,6 +1,9 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
+import me.calebjones.spacelaunchnow.logger
+
+private val log by lazy { logger() }
 
 /**
  * Desktop implementation of InterstitialAdHandler (no-op).
@@ -12,5 +15,5 @@ actual fun InterstitialAdHandler(
     onAdFailed: ((String) -> Unit)?
 ) {
     // No-op: Desktop doesn't show ads
-    println("🎯 InterstitialAdHandler (Desktop): Ads not supported, skipping")
+    log.d { "🎯 InterstitialAdHandler (Desktop): Ads not supported, skipping" }
 }

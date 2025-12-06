@@ -26,30 +26,14 @@ import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
-/**
- * Represents the state of a view section on the Home Screen
- *
- * @param data The actual data (can be a single object or list)
- * @param isLoading True if currently loading data
- * @param isUserInitiated True if the load was triggered by user action (pull-to-refresh/retry)
- * @param error Error message if the load failed, null otherwise
- * @param dataSource Where the data originated from (network, cache, or stale cache)
- * @param cacheTimestamp When the data was originally cached (epoch milliseconds)
- */
-data class ViewState<T>(
-    val data: T,
-    val isLoading: Boolean = false,
-    val isUserInitiated: Boolean = false,
-    val error: String? = null,
-    val dataSource: me.calebjones.spacelaunchnow.data.model.DataSource = me.calebjones.spacelaunchnow.data.model.DataSource.NETWORK,
-    val cacheTimestamp: Long? = null
-)
+// ViewState is now in ViewState.kt - imported from same package
 
 /**
  * Consolidated ViewModel for the Home Screen that manages:
@@ -75,6 +59,8 @@ class HomeViewModel(
     private val launchFilterService: LaunchFilterService,
     private val notificationStateStorage: NotificationStateStorage
 ) : ViewModel() {
+
+    private val log = logger()
 
     // ========== NEW ViewState-based State Management ==========
 
@@ -186,7 +172,7 @@ class HomeViewModel(
                 launch(kotlinx.coroutines.Dispatchers.IO) { loadNextMonth() }
 
             } catch (exception: Exception) {
-                println("HomeViewModel: Error loading home screen data: ${exception.message}")
+                log.e(exception) { "Error loading home screen data" }
             }
         }
     }
@@ -200,40 +186,36 @@ class HomeViewModel(
     fun loadFeaturedLaunch(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                println("[FEATURED] === HomeViewModel.loadFeaturedLaunch START ===")
-                println("[FEATURED] forceRefresh: $forceRefresh")
-                println("[FEATURED] Current featuredLaunchState: isLoading=${_featuredLaunchState.value.isLoading}, hasData=${_featuredLaunchState.value.data != null}, error=${_featuredLaunchState.value.error}")
+                log.d { "Loading featured launch - forceRefresh: $forceRefresh, currentState: isLoading=${_featuredLaunchState.value.isLoading}, hasData=${_featuredLaunchState.value.data != null}" }
 
                 _featuredLaunchState.update {
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
                 }
-                println("[FEATURED] ✓ Set isLoading=true for featured launch state")
+                log.d { "Set isLoading=true for featured launch state" }
 
                 // Wait for actual filter settings from DataStore
                 val currentFilters = notificationStateStorage.stateFlow.first()
                 val filterParams = launchFilterService.getFilterParams(currentFilters)
-                println("[FEATURED] Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}")
+                log.v { "Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
-                println("[FEATURED] Calling repository.getFeaturedLaunch with upcomingWithRecent filter...")
+                log.d { "Calling repository.getFeaturedLaunch with upcomingWithRecent filter..." }
                 val result = launchRepository.getFeaturedLaunch(
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
                     locationIds = filterParams.locationIds
                 )
-                println("[FEATURED] Repository call completed. Success: ${result.isSuccess}")
+                log.d { "Repository call completed. Success: ${result.isSuccess}" }
 
                 result.onSuccess { dataResult ->
                     val paginatedLaunches = dataResult.data
-                    println("[FEATURED] === Repository SUCCESS ===")
-                    println("[FEATURED] Data source: ${dataResult.source}")
-                    println("[FEATURED] Results count: ${paginatedLaunches.results.size}")
-                    println("[FEATURED] Cache timestamp: ${dataResult.timestamp}")
+                    log.i { "Repository success - Data source: ${dataResult.source}, Results: ${paginatedLaunches.results.size}" }
+                    log.v { "Cache timestamp: ${dataResult.timestamp}" }
 
                     val firstLaunch = paginatedLaunches.results.firstOrNull()
                     if (firstLaunch != null) {
-                        println("[FEATURED] Featured launch: ${firstLaunch.name} (ID: ${firstLaunch.id})")
+                        log.i { "Featured launch: ${firstLaunch.name} (ID: ${firstLaunch.id})" }
                     } else {
-                        println("[FEATURED] ⚠️ WARNING: No launches returned from repository!")
+                        log.w { "No launches returned from repository!" }
                     }
 
                     _featuredLaunchState.update {
@@ -244,19 +226,16 @@ class HomeViewModel(
                             cacheTimestamp = dataResult.timestamp
                         )
                     }
-                    println("[FEATURED] ✓ Updated featuredLaunchState: hasData=${_featuredLaunchState.value.data != null}, isLoading=${_featuredLaunchState.value.isLoading}")
+                    log.d { "Updated featuredLaunchState: hasData=${_featuredLaunchState.value.data != null}, isLoading=${_featuredLaunchState.value.isLoading}" }
 
                     // Pre-fetch detailed data if we have a launch
                     firstLaunch?.let { launch ->
-                        println("[FEATURED] Pre-fetching launch details for ${launch.id}...")
+                        log.d { "Pre-fetching launch details for ${launch.id}..." }
                         preFetchLaunchDetails(launch.id)
                     }
                 }.onFailure { exception ->
-                    println("[FEATURED] === Repository FAILURE ===")
-                    println("[FEATURED] Exception type: ${exception::class.simpleName}")
-                    println("[FEATURED] Exception message: ${exception.message}")
+                    log.e(exception) { "Repository failure: ${exception.message}" }
                     val errorMsg = formatErrorMessage(exception)
-                    println("[FEATURED] Formatted error: $errorMsg")
 
                     _featuredLaunchState.update {
                         it.copy(
@@ -264,13 +243,10 @@ class HomeViewModel(
                             isLoading = false
                         )
                     }
-                    println("[FEATURED] ✓ Updated featuredLaunchState with error, isLoading=false")
+                    log.d { "Updated featuredLaunchState with error, isLoading=false" }
                 }
             } catch (exception: Exception) {
-                println("[FEATURED] === EXCEPTION in loadFeaturedLaunch ===")
-                println("[FEATURED] Exception type: ${exception::class.simpleName}")
-                println("[FEATURED] Exception message: ${exception.message}")
-                exception.printStackTrace()
+                log.e(exception) { "Exception in loadFeaturedLaunch: ${exception.message}" }
 
                 _featuredLaunchState.update {
                     it.copy(
@@ -278,9 +254,8 @@ class HomeViewModel(
                         isLoading = false
                     )
                 }
-                println("[FEATURED] ✓ Updated featuredLaunchState with exception error, isLoading=false")
+                log.d { "Updated featuredLaunchState with exception error, isLoading=false" }
             }
-            println("[FEATURED] === HomeViewModel.loadFeaturedLaunch END ===")
         }
     }
 
@@ -303,14 +278,10 @@ class HomeViewModel(
 
                 // Wait for actual filter settings from DataStore (not the default initial value)
                 val currentFilters = notificationStateStorage.stateFlow.first()
-                println("=== HomeViewModel Filter Settings ===")
-                println("followAllLaunches: ${currentFilters.followAllLaunches}")
-                println("subscribedAgencies: ${currentFilters.subscribedAgencies}")
-                println("subscribedLocations: ${currentFilters.subscribedLocations}")
+                log.v { "Filter settings - followAllLaunches: ${currentFilters.followAllLaunches}, subscribedAgencies: ${currentFilters.subscribedAgencies}, subscribedLocations: ${currentFilters.subscribedLocations}" }
 
                 val filterParams = launchFilterService.getFilterParams(currentFilters)
-                println("filterParams.agencyIds: ${filterParams.agencyIds}")
-                println("filterParams.locationIds: ${filterParams.locationIds}")
+                log.d { "Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
                 // Load both upcoming and previous in parallel
                 val upcomingDeferred = async {
@@ -553,7 +524,7 @@ class HomeViewModel(
 
                 onComplete()
             } catch (exception: Exception) {
-                println("HomeViewModel: Error during refreshAll: ${exception.message}")
+                log.e(exception) { "Error during refreshAll" }
                 onComplete()
             }
         }
@@ -585,8 +556,7 @@ class HomeViewModel(
                 )
 
                 result.onSuccess { paginatedLaunches ->
-                    println("=== HomeViewModel: Received History Launches ===")
-                    println("Total launches on $month/$day: ${paginatedLaunches.count}")
+                    log.i { "Received history launches - Total on $month/$day: ${paginatedLaunches.count}" }
 
                     _historyState.update {
                         it.copy(
@@ -634,13 +604,13 @@ class HomeViewModel(
 
                 result.onSuccess { paginatedLaunches ->
                     _next24HoursCount.value = paginatedLaunches.count
-                    println("Next 24 hours count: ${paginatedLaunches.count}")
+                    log.d { "Next 24 hours count: ${paginatedLaunches.count}" }
                 }.onFailure { exception ->
-                    println("Failed to get next 24 hours count: ${exception.message}")
+                    log.w(exception) { "Failed to get next 24 hours count" }
                     _next24HoursCount.value = 0
                 }
             } catch (exception: Exception) {
-                println("Exception loading next 24 hours count: ${exception.message}")
+                log.e(exception) { "Exception loading next 24 hours count" }
                 _next24HoursCount.value = 0
             }
         }
@@ -663,13 +633,13 @@ class HomeViewModel(
 
                 result.onSuccess { paginatedLaunches ->
                     _nextWeekCount.value = paginatedLaunches.count
-                    println("Next week count: ${paginatedLaunches.count}")
+                    log.d { "Next week count: ${paginatedLaunches.count}" }
                 }.onFailure { exception ->
-                    println("Failed to get next week count: ${exception.message}")
+                    log.w(exception) { "Failed to get next week count" }
                     _nextWeekCount.value = 0
                 }
             } catch (exception: Exception) {
-                println("Exception loading next week count: ${exception.message}")
+                log.e(exception) { "Exception loading next week count" }
                 _nextWeekCount.value = 0
             }
         }
@@ -692,13 +662,13 @@ class HomeViewModel(
 
                 result.onSuccess { paginatedLaunches ->
                     _nextMonthCount.value = paginatedLaunches.count
-                    println("Next month count: ${paginatedLaunches.count}")
+                    log.d { "Next month count: ${paginatedLaunches.count}" }
                 }.onFailure { exception ->
-                    println("Failed to get next month count: ${exception.message}")
+                    log.w(exception) { "Failed to get next month count" }
                     _nextMonthCount.value = 0
                 }
             } catch (exception: Exception) {
-                println("Exception loading next month count: ${exception.message}")
+                log.e(exception) { "Exception loading next month count" }
                 _nextMonthCount.value = 0
             }
         }
@@ -711,20 +681,20 @@ class HomeViewModel(
     private fun preFetchLaunchDetails(launchId: String) {
         viewModelScope.launch {
             try {
-                println("Pre-fetching detailed data for launch: $launchId")
+                log.d { "Pre-fetching detailed data for launch: $launchId" }
                 val result = launchRepository.getLaunchDetails(launchId)
 
                 result.onSuccess { launchDetailed ->
                     // Cache the detailed launch data for instant access later
                     launchCache.cacheLaunchDetailed(launchDetailed)
-                    println("Successfully pre-fetched and cached detailed data for launch: ${launchDetailed.name}")
+                    log.d { "Successfully pre-fetched and cached detailed data for launch: ${launchDetailed.name}" }
                 }.onFailure { exception ->
-                    println("Failed to pre-fetch detailed data for launch $launchId: ${exception.message}")
+                    log.w(exception) { "Failed to pre-fetch detailed data for launch $launchId" }
                     // Don't show error to user since this is background prefetch
                     // The detail screen will handle the error when the user actually navigates to it
                 }
             } catch (exception: Exception) {
-                println("Exception during pre-fetch for launch $launchId: ${exception.message}")
+                log.w(exception) { "Exception during pre-fetch for launch $launchId" }
                 // Silently fail - this is a background optimization, not critical
             }
         }

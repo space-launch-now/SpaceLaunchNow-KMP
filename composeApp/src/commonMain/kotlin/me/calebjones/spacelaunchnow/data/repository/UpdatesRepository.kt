@@ -4,5 +4,14 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndp
 import me.calebjones.spacelaunchnow.data.model.DataResult
 
 interface UpdatesRepository {
-    suspend fun getLatestUpdates(limit: Int = 10, forceRefresh: Boolean = false): Result<DataResult<PaginatedUpdateEndpointList>>
+    suspend fun getLatestUpdates(
+        limit: Int = 10,
+        forceRefresh: Boolean = false
+    ): Result<DataResult<PaginatedUpdateEndpointList>>
+
+    suspend fun getUpdatesByProgram(
+        allProgram: Int,
+        limit: Int = 20,
+        forceRefresh: Boolean = false
+    ): Result<DataResult<PaginatedUpdateEndpointList>>
 }

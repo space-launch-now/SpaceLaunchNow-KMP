@@ -44,7 +44,7 @@ data class VidURL (
 
     @SerialName(value = "url") @Required val url: kotlin.String,
 
-    @SerialName(value = "type") @Required val type: VidURLType?,
+    @SerialName(value = "type") @Required val type: VidURLType,
 
     @SerialName(value = "language") @Required val language: Language?,
 

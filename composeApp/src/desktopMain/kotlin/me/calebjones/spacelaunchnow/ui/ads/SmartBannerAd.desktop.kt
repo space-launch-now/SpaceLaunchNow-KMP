@@ -3,6 +3,9 @@ package me.calebjones.spacelaunchnow.ui.ads
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import me.calebjones.spacelaunchnow.logger
+
+private val log by lazy { logger() }
 
 /**
  * Desktop implementation of SmartBannerAd (no-op).
@@ -18,5 +21,5 @@ actual fun SmartBannerAd(
     onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?
 ) {
     // No-op: Desktop doesn't show ads
-    println("🎯 SmartBannerAd (Desktop): Ads not supported, skipping")
+    log.d { "🎯 SmartBannerAd (Desktop): Ads not supported, skipping" }
 }

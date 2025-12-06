@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * ViewModel for subscription management
@@ -21,6 +22,8 @@ class SubscriptionViewModel(
     private val repository: SubscriptionRepository,
     private val billingManager: BillingManager
 ) : ViewModel() {
+
+    private val log = logger()
 
     // Subscription state from repository
     val subscriptionState: StateFlow<SubscriptionState> = repository.state
@@ -52,10 +55,10 @@ class SubscriptionViewModel(
             billingManager.getAvailableProducts().fold(
                 onSuccess = { products ->
                     _availableProducts.value = products
-                    println("SubscriptionViewModel: Loaded ${products.size} products from BillingManager")
+                    log.i { "Loaded ${products.size} products from BillingManager" }
                 },
                 onFailure = { error ->
-                    println("SubscriptionViewModel: Failed to load products - ${error.message}")
+                    log.e(error) { "Failed to load products" }
                 }
             )
         }
@@ -83,7 +86,7 @@ class SubscriptionViewModel(
                         )
                     },
                     onFailure = { error ->
-                        println("SubscriptionViewModel: Failed to load subscription pricing - ${error.message}")
+                        log.e(error) { "Failed to load subscription pricing" }
                     }
                 )
 
@@ -98,7 +101,7 @@ class SubscriptionViewModel(
                         )
                     },
                     onFailure = { error ->
-                        println("SubscriptionViewModel: Failed to load lifetime pricing - ${error.message}")
+                        log.e(error) { "Failed to load lifetime pricing" }
                     }
                 )
         }
@@ -144,14 +147,14 @@ class SubscriptionViewModel(
                         isProcessing = false,
                         successMessage = "Purchase completed successfully!"
                     )
-                    println("SubscriptionViewModel: ✅ Purchase successful for $productId")
+                    log.i { "Purchase successful for $productId" }
                 },
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
                         errorMessage = error.message ?: "Purchase failed"
                     )
-                    println("SubscriptionViewModel: ❌ Purchase failed: ${error.message}")
+                    log.e(error) { "Purchase failed for $productId" }
                 }
             )
         }

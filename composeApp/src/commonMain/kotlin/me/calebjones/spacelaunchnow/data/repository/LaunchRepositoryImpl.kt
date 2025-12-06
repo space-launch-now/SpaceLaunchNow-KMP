@@ -23,6 +23,7 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
@@ -33,6 +34,7 @@ class LaunchRepositoryImpl(
     private val localDataSource: LaunchLocalDataSource? = null
 ) : LaunchRepository {
 
+    private val log = logger()
     private val json = Json { ignoreUnknownKeys = true }
 
     private suspend fun parseApiError(rawResponse: String): String {
@@ -47,17 +49,23 @@ class LaunchRepositoryImpl(
 
     override suspend fun getUpcomingLaunchesList(limit: Int): Result<PaginatedLaunchBasicList> {
         return try {
+            log.d { "getUpcomingLaunchesList - limit: $limit" }
             val response = launchesApi.launchesMiniList(
                 limit = limit,
                 upcoming = true,
                 ordering = "net" // Order by launch time
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} upcoming launches (mini list)" }
+            Result.success(launches)
         } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getUpcomingLaunchesList: ${e.message}" }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getUpcomingLaunchesList: ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getUpcomingLaunchesList: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -68,24 +76,23 @@ class LaunchRepositoryImpl(
         locationIds: List<Int>?
     ): Result<DataResult<PaginatedLaunchNormalList>> {
         return try {
-            println("[FEATURED] === LaunchRepository.getFeaturedLaunch ===")
-            println("[FEATURED] Parameters: forceRefresh=$forceRefresh, agencyIds=$agencyIds, locationIds=$locationIds")
+            log.d { "getFeaturedLaunch called - forceRefresh: $forceRefresh, agencyIds: $agencyIds, locationIds: $locationIds" }
 
             val now = Clock.System.now().toEpochMilliseconds()
 
             // Create cache key for featured launch
             val cacheKey = buildCacheKey("featured_launch", agencyIds, locationIds)
 
-            // STALE-WHILE-REVALIDATE: Check for stale data
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(1)
+            // STALE-WHILE-REVALIDATE: Check for stale data (up to 4 featured launches)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(4)
             val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
 
             // Try fresh cache if available and not forcing refresh
             if (!forceRefresh) {
-                val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(1)
+                val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(4)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                    println("[FEATURED] ✓ CACHE HIT: Returning fresh cached featured launch")
+                    log.i { "Cache hit - Returning ${cachedLaunches.size} fresh cached featured launches" }
                     return Result.success(
                         DataResult(
                             data = PaginatedLaunchNormalList(
@@ -102,13 +109,13 @@ class LaunchRepositoryImpl(
                     // Filter stale cache by user preferences
                     val filteredStale =
                         filterLaunchesByPreferences(staleCached!!, agencyIds, locationIds)
-                    println("[FEATURED] ⏳ STALE CACHE: Found ${filteredStale.size}/${staleCached.size} filtered stale launches")
+                    log.v { "Stale cache - Found ${filteredStale.size}/${staleCached.size} filtered stale launches" }
 
                     if (filteredStale.isEmpty()) {
-                        println("[FEATURED] ⚠️ Stale cache filtered to zero, will fetch from API")
+                        log.d { "Stale cache filtered to zero, fetching from API" }
                         // Continue to API call
                     } else {
-                        println("[FEATURED] Returning stale featured launch")
+                        log.i { "Returning ${filteredStale.size} stale featured launches" }
                         return Result.success(
                             DataResult(
                                 data = PaginatedLaunchNormalList(
@@ -126,9 +133,9 @@ class LaunchRepositoryImpl(
             }
 
             // Fetch from API using custom time window (1 hour before now)
-            println("[FEATURED] 📡 Fetching featured launch from API with netGt=(now - 1 hour)...")
+            log.d { "Fetching featured launch from API with netGt=(now - 1 hour)" }
             val hideTbd = withContext(Dispatchers.Default) { appPreferences.getHideTbdLaunches() }
-            println("[FEATURED] HideTBD preference: $hideTbd")
+            log.v { "HideTBD preference: $hideTbd" }
 
             // Build status filter: exclude TBD (id=2) and TBC (id=8) if hideTbd is enabled
             // Include all other statuses: Go(1), Success(3), Failure(4), Hold(5), In Flight(6), Partial Failure(7), Deployed(9)
@@ -140,34 +147,33 @@ class LaunchRepositoryImpl(
 
             // Calculate time window: 1 hour before now
             val oneHourAgo = Clock.System.now() - 1.hours
-            println("[FEATURED] Making API call with: limit=1, netGt=$oneHourAgo, agencyIds=$agencyIds, locationIds=$locationIds, statusIds=$statusIds")
+            log.d { "Making API call - limit: 4, netGt: $oneHourAgo, agencyIds: $agencyIds, locationIds: $locationIds, statusIds: $statusIds" }
 
             val response = launchesApi.getLaunchList(
-                limit = 1,
+                limit = 4,
                 netGt = oneHourAgo,
                 ordering = "net",
                 lspId = agencyIds,
                 locationIds = locationIds,
                 statusIds = statusIds
             )
-            println("[FEATURED] ✓ API response received with status: ${response.status}")
-            println("[FEATURED] 🌐 Request URL: ${response.response.request.url}")
+            log.d { "API response received - status: ${response.status}, url: ${response.response.request.url}" }
 
             val launches = response.body()
-            println("[FEATURED] API returned ${launches.results.size} launches (filtered by status at API level)")
-            println("[FEATURED] 📦 Full API Response: count=${launches.count}, next=${launches.next}, previous=${launches.previous}")
+            log.i { "API returned ${launches.results.size} launches (filtered by status at API level)" }
+            log.v { "Full API response - count: ${launches.count}, next: ${launches.next}, previous: ${launches.previous}" }
 
             // Log each launch returned
             launches.results.forEachIndexed { index, launch ->
-                println("[FEATURED] 📋 Launch[$index]: name='${launch.name}', id=${launch.id}, net=${launch.net}, status=${launch.status?.name}")
+                log.v { "Launch[$index]: name='${launch.name}', id=${launch.id}, net=${launch.net}, status=${launch.status?.name}" }
             }
 
             if (launches.results.isEmpty()) {
-                println("[FEATURED] ⚠️ WARNING: API returned NO launches!")
+                log.w { "API returned NO launches!" }
             } else {
-                // Cache only the first result as featured launch
-                localDataSource?.cacheNormalLaunches(launches.results.take(1))
-                println("[FEATURED] ✓ API SUCCESS: Fetched and cached featured launch: ${launches.results.first().name}")
+                // Cache all 4 featured launches
+                localDataSource?.cacheNormalLaunches(launches.results.take(4))
+                log.i { "Successfully fetched and cached ${launches.results.size} featured launches" }
             }
 
             Result.success(
@@ -178,13 +184,13 @@ class LaunchRepositoryImpl(
                 )
             )
         } catch (e: ResponseException) {
-            println("[FEATURED] ResponseException: ${e.message}")
+            log.e(e) { "API error while fetching featured launches" }
             // On error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(1)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(4)
             if (staleCached != null && staleCached.isNotEmpty()) {
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
                 if (filteredStale.isNotEmpty()) {
-                    println("[FEATURED] ⚠️ API ERROR: Returning ${filteredStale.size} filtered stale featured launch as fallback")
+                    log.w { "Returning ${filteredStale.size} filtered stale featured launch as fallback" }
                     return Result.success(
                         DataResult(
                             data = PaginatedLaunchNormalList(
@@ -201,13 +207,13 @@ class LaunchRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: IOException) {
-            println("[FEATURED] IOException: ${e.message}")
+            log.e(e) { "Network error while fetching featured launch" }
             // On network error, try to return stale cache if available
             val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(1)
             if (staleCached != null && staleCached.isNotEmpty()) {
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
                 if (filteredStale.isNotEmpty()) {
-                    println("[FEATURED] ⚠️ NETWORK ERROR: Returning ${filteredStale.size} filtered stale featured launch as fallback")
+                    log.w { "Returning ${filteredStale.size} filtered stale featured launch as fallback (network error)" }
                     return Result.success(
                         DataResult(
                             data = PaginatedLaunchNormalList(
@@ -224,7 +230,7 @@ class LaunchRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: Exception) {
-            println("[FEATURED] Exception: ${e.message}")
+            log.e(e) { "Unexpected error while fetching featured launch" }
             Result.failure(e)
         }
     }
@@ -236,8 +242,7 @@ class LaunchRepositoryImpl(
         locationIds: List<Int>?
     ): Result<DataResult<PaginatedLaunchNormalList>> {
         return try {
-            println("=== LaunchRepository.getUpcomingLaunchesNormal ===")
-            println("Parameters: limit=$limit, forceRefresh=$forceRefresh, agencyIds=$agencyIds, locationIds=$locationIds")
+            log.d { "getUpcomingLaunchesNormal - limit: $limit, forceRefresh: $forceRefresh, agencyIds: $agencyIds, locationIds: $locationIds" }
 
             val now = Clock.System.now().toEpochMilliseconds()
 
@@ -253,7 +258,7 @@ class LaunchRepositoryImpl(
             if (!forceRefresh) {
                 val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(limit)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                    println("✓ CACHE HIT: Returning ${cachedLaunches.size} fresh cached launches")
+                    log.i { "✅ CACHE HIT: Returning ${cachedLaunches.size} fresh cached launches" }
                     return Result.success(
                         DataResult(
                             data = PaginatedLaunchNormalList(
@@ -270,21 +275,13 @@ class LaunchRepositoryImpl(
                     // Filter stale cache by user preferences (agency and location)
                     val filteredStale =
                         filterLaunchesByPreferences(staleCached!!, agencyIds, locationIds)
-                    println("[FEATURED] ⏳ STALE CACHE: Found ${filteredStale.size}/${staleCached.size} filtered stale launches (filters: agencies=$agencyIds, locations=$locationIds)")
+                    log.d { "⏳ STALE CACHE: Found ${filteredStale.size}/${staleCached.size} filtered stale launches (filters: agencies=$agencyIds, locations=$locationIds)" }
                     if (filteredStale.isEmpty()) {
-                        println("[FEATURED] ⚠️ WARNING: Stale cache was filtered to zero results! All ${staleCached.size} cached launches were filtered out.")
-                        println("[FEATURED] Filter criteria - agencyIds: $agencyIds, locationIds: $locationIds")
-                        println(
-                            "[FEATURED] Sample cached launches: ${
-                                staleCached.take(3)
-                                    .map { "${it.name} (LSP: ${it.launchServiceProvider?.id})" }
-                            }"
-                        )
-                        println("[FEATURED] Will fetch fresh data from API since filters eliminated all cached results")
+                        log.w { "⚠️ WARNING: Stale cache was filtered to zero results! All ${staleCached.size} cached launches were filtered out. Filter criteria - agencyIds: $agencyIds, locationIds: $locationIds. Sample cached launches: ${staleCached.take(3).map { "${it.name} (LSP: ${it.launchServiceProvider?.id})" }}. Will fetch fresh data from API." }
                         // DON'T return here - continue to API call to get filtered results
                     } else {
                         // Only return early if we have stale data that passed filters
-                        println("[FEATURED] Returning stale data immediately, will revalidate in background")
+                        log.d { "Returning stale data immediately, will revalidate in background" }
                         return Result.success(
                             DataResult(
                                 data = PaginatedLaunchNormalList(
@@ -302,9 +299,9 @@ class LaunchRepositoryImpl(
             }
 
             // Fetch from API (either no cache, expired, or force refresh)
-            println("[FEATURED] 📡 Fetching from API (no fresh cache available)...")
+            log.d { "📡 Fetching from API (no fresh cache available)..." }
             val hideTbd = withContext(Dispatchers.Default) { appPreferences.getHideTbdLaunches() }
-            println("[FEATURED] HideTBD preference: $hideTbd")
+            log.v { "HideTBD preference: $hideTbd" }
 
             // Build status filter: exclude TBD (id=2) and TBC (id=8) if hideTbd is enabled
             // Include all other statuses: Go(1), Success(3), Failure(4), Hold(5), In Flight(6), Partial Failure(7), Deployed(9)
@@ -318,7 +315,7 @@ class LaunchRepositoryImpl(
             // Flexible mode (OR logic) would require two API calls and merge, which is deferred for MVP.
             // The API parameters use: (lsp__id IN agencies) AND (location__ids IN locations)
             // TODO: Implement flexible mode - see LAUNCH_FILTERS_HOME_INTEGRATION.md Phase 7
-            println("[FEATURED] Making API call with: limit=$limit, agencyIds=$agencyIds, locationIds=$locationIds, statusIds=$statusIds")
+            log.d { "Making API call with: limit=$limit, agencyIds=$agencyIds, locationIds=$locationIds, statusIds=$statusIds" }
             val response = launchesApi.getLaunchList(
                 limit = limit,
                 upcoming = true,
@@ -327,18 +324,18 @@ class LaunchRepositoryImpl(
                 locationIds = locationIds,
                 statusIds = statusIds
             )
-            println("[FEATURED] ✓ API response received with status: ${response.status}")
+            log.d { "✅ API response received with status: ${response.status}" }
 
             val launches = response.body()
-            println("[FEATURED] API returned ${launches.results.size} launches (filtered by status at API level)")
+            log.i { "API returned ${launches.results.size} launches (filtered by status at API level)" }
 
             if (launches.results.isEmpty()) {
-                println("[FEATURED] ⚠️ WARNING: API returned NO launches!")
+                log.w { "⚠️ WARNING: API returned NO launches!" }
             }
 
             // Cache the results for future use
             localDataSource?.cacheNormalLaunches(launches.results)
-            println("[FEATURED] ✓ API SUCCESS: Fetched and cached ${launches.results.size} upcoming launches (filters: agencies=$agencyIds, locations=$locationIds, statusIds=$statusIds)")
+            log.i { "✅ API SUCCESS: Fetched and cached ${launches.results.size} upcoming launches (filters: agencies=$agencyIds, locations=$locationIds, statusIds=$statusIds)" }
 
             Result.success(
                 DataResult(
@@ -354,7 +351,7 @@ class LaunchRepositoryImpl(
             if (staleCached != null && staleCached.isNotEmpty()) {
                 // Filter stale cache by user preferences
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
-                println("⚠️ API ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached launches as fallback")
+                log.w { "⚠️ API ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached launches as fallback" }
                 return Result.success(
                     DataResult(
                         data = PaginatedLaunchNormalList(
@@ -376,7 +373,7 @@ class LaunchRepositoryImpl(
             if (staleCached != null && staleCached.isNotEmpty()) {
                 // Filter stale cache by user preferences
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
-                println("⚠️ NETWORK ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached launches as fallback")
+                log.w { "⚠️ NETWORK ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached launches as fallback" }
                 return Result.success(
                     DataResult(
                         data = PaginatedLaunchNormalList(
@@ -402,18 +399,24 @@ class LaunchRepositoryImpl(
         netLt: Instant?
     ): Result<PaginatedLaunchBasicList> {
         return try {
+            log.d { "getUpcomingLaunchesList - limit: $limit, netGt: $netGt, netLt: $netLt" }
             val response = launchesApi.getLaunchMiniList(
                 limit = limit,
                 netGt = netGt,
                 netLt = netLt,
                 ordering = "net"
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} launches with time window filter" }
+            Result.success(launches)
         } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getUpcomingLaunchesList (time window): ${e.message}" }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getUpcomingLaunchesList (time window): ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getUpcomingLaunchesList (time window): ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -425,8 +428,7 @@ class LaunchRepositoryImpl(
         locationIds: List<Int>?
     ): Result<DataResult<PaginatedLaunchNormalList>> {
         return try {
-            println("=== LaunchRepository.getPreviousLaunchesNormal ===")
-            println("Parameters: limit=$limit, forceRefresh=$forceRefresh, agencyIds=$agencyIds, locationIds=$locationIds")
+            log.d { "getPreviousLaunchesNormal - limit: $limit, forceRefresh: $forceRefresh, agencyIds: $agencyIds, locationIds: $locationIds" }
 
             val now = Clock.System.now().toEpochMilliseconds()
 
@@ -442,7 +444,7 @@ class LaunchRepositoryImpl(
             if (!forceRefresh) {
                 val cachedLaunches = localDataSource?.getPreviousNormalLaunches(limit)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                    println("✓ CACHE HIT: Returning ${cachedLaunches.size} fresh cached previous launches")
+                    log.i { "✅ CACHE HIT: Returning ${cachedLaunches.size} fresh cached previous launches" }
                     return Result.success(
                         DataResult(
                             data = PaginatedLaunchNormalList(
@@ -459,7 +461,7 @@ class LaunchRepositoryImpl(
                     // Apply user preference filters to stale cached data
                     val filteredStale =
                         filterLaunchesByPreferences(staleCached!!, agencyIds, locationIds)
-                    println("⏳ STALE CACHE: Returning ${filteredStale.size} filtered stale previous launches")
+                    log.d { "⏳ STALE CACHE: Returning ${filteredStale.size} filtered stale previous launches" }
                     return Result.success(
                         DataResult(
                             data = PaginatedLaunchNormalList(
@@ -491,7 +493,7 @@ class LaunchRepositoryImpl(
 
             // Cache the results for future use
             localDataSource?.cacheNormalLaunches(launches.results)
-            println("✓ API SUCCESS: Fetched and cached ${launches.results.size} previous launches (filters: agencies=$agencyIds, locations=$locationIds)")
+            log.i { "✅ API SUCCESS: Fetched and cached ${launches.results.size} previous launches (filters: agencies=$agencyIds, locations=$locationIds)" }
 
             Result.success(
                 DataResult(
@@ -507,7 +509,7 @@ class LaunchRepositoryImpl(
             if (staleCached != null && staleCached.isNotEmpty()) {
                 // Apply user preference filters to stale cached data
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
-                println("⚠️ API ERROR: Returning ${filteredStale.size} filtered stale cached previous launches as fallback")
+                log.w { "⚠️ API ERROR: Returning ${filteredStale.size} filtered stale cached previous launches as fallback" }
                 return Result.success(
                     DataResult(
                         data = PaginatedLaunchNormalList(
@@ -529,7 +531,7 @@ class LaunchRepositoryImpl(
             if (staleCached != null && staleCached.isNotEmpty()) {
                 // Filter stale cache by user preferences
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
-                println("⚠️ NETWORK ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached previous launches as fallback")
+                log.w { "⚠️ NETWORK ERROR: Returning ${filteredStale.size}/${staleCached.size} filtered stale cached previous launches as fallback" }
                 return Result.success(
                     DataResult(
                         data = PaginatedLaunchNormalList(
@@ -555,6 +557,7 @@ class LaunchRepositoryImpl(
         limit: Int
     ): Result<PaginatedLaunchNormalList> {
         return try {
+            log.d { "getLaunchesByDayAndMonth - day: $day, month: $month, limit: $limit" }
             val response = launchesApi.getLaunchList(
                 limit = limit,
                 previous = true,
@@ -562,12 +565,17 @@ class LaunchRepositoryImpl(
                 netMonth = listOf(month.toDouble()),
                 ordering = "-net" // Most recent first
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} launches for day $day, month $month" }
+            Result.success(launches)
         } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getLaunchesByDayAndMonth: ${e.message}" }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getLaunchesByDayAndMonth: ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getLaunchesByDayAndMonth: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -577,8 +585,7 @@ class LaunchRepositoryImpl(
         forceRefresh: Boolean
     ): Result<LaunchDetailed> {
         return try {
-            println("=== LaunchRepository.getLaunchDetails ===")
-            println("Parameters: id=$id, forceRefresh=$forceRefresh")
+            log.d { "getLaunchDetails - id: $id, forceRefresh: $forceRefresh" }
 
             // STALE-WHILE-REVALIDATE: Check for stale data
             val staleCached = localDataSource?.getDetailedLaunchStale(id)
@@ -587,10 +594,10 @@ class LaunchRepositoryImpl(
             if (!forceRefresh) {
                 val cachedLaunch = localDataSource?.getDetailedLaunch(id)
                 if (cachedLaunch != null) {
-                    println("✓ CACHE HIT: Returning fresh cached detailed launch: ${cachedLaunch.name}")
+                    log.i { "✅ CACHE HIT: Returning fresh cached detailed launch: ${cachedLaunch.name}" }
                     return Result.success(cachedLaunch)
                 } else if (staleCached != null) {
-                    println("⏳ STALE CACHE: Returning stale detailed launch: ${staleCached.name}")
+                    log.d { "⏳ STALE CACHE: Returning stale detailed launch: ${staleCached.name}" }
                 }
             }
 
@@ -600,7 +607,7 @@ class LaunchRepositoryImpl(
             // Check if it's an error response
             if (response.status >= 400) {
                 val rawResponse = response.response.bodyAsText()
-                println("HTTP Error ${response.status}: $rawResponse")
+                log.e { "HTTP Error ${response.status}: $rawResponse" }
                 return Result.failure(Exception("API Error ${response.status}: $rawResponse"))
             }
 
@@ -608,20 +615,20 @@ class LaunchRepositoryImpl(
 
             // Cache the detailed launch for future use
             localDataSource?.cacheDetailedLaunch(body)
-            println("✓ API SUCCESS: Fetched and cached detailed launch: ${body.name}")
+            log.i { "✅ API SUCCESS: Fetched and cached detailed launch: ${body.name}" }
 
             Result.success(body)
         } catch (e: ResponseException) {
-            println("ResponseException in getLaunchDetails for ID $id: ${e.message}")
+            log.e(e) { "ResponseException in getLaunchDetails for ID $id" }
             // Try to get the error response body
             try {
                 val errorBody = e.response.bodyAsText()
-                println("Error response body: $errorBody")
+                log.e { "Error response body: $errorBody" }
 
                 // On error, try to return stale cache if available
                 val staleCached = localDataSource?.getDetailedLaunchStale(id)
                 if (staleCached != null) {
-                    println("⚠️ API ERROR: Returning stale cached detailed launch as fallback: ${staleCached.name}")
+                    log.w { "⚠️ API ERROR: Returning stale cached detailed launch as fallback: ${staleCached.name}" }
                     return Result.success(staleCached)
                 }
 
@@ -630,68 +637,68 @@ class LaunchRepositoryImpl(
                 Result.failure(e)
             }
         } catch (e: IOException) {
-            println("IOException in getLaunchDetails for ID $id: ${e.message}")
+            log.e(e) { "IOException in getLaunchDetails for ID $id" }
             // On network error, try to return stale cache if available
             val staleCached = localDataSource?.getDetailedLaunchStale(id)
             if (staleCached != null) {
-                println("⚠️ NETWORK ERROR: Returning stale cached detailed launch as fallback: ${staleCached.name}")
+                log.w { "⚠️ NETWORK ERROR: Returning stale cached detailed launch as fallback: ${staleCached.name}" }
                 return Result.success(staleCached)
             }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Exception in getLaunchDetails for ID $id: ${e::class.simpleName}: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "Exception in getLaunchDetails for ID $id: ${e::class.simpleName}" }
             Result.failure(e)
         }
     }
 
     override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> {
         return try {
+            log.d { "getAgencyDetails - id: $id" }
             val response = agenciesApi.agenciesRetrieve(id)
-            Result.success(response.body())
+            val agency = response.body()
+            log.i { "✅ API SUCCESS: Fetched agency details: ${agency.name} (ID: $id)" }
+            Result.success(agency)
         } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getAgencyDetails for ID $id: ${e.message}" }
             Result.failure(e)
         } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getAgencyDetails for ID $id: ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getAgencyDetails for ID $id: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
 
-    override suspend fun getNextLaunch(
+    override suspend fun getNextStarshipLaunch(
         limit: Int,
-        forceRefresh: Boolean
+        forceRefresh: Boolean,
+        programId: List<Int>?
     ): Result<PaginatedLaunchNormalList> {
         return try {
             val response = launchesApi.getLaunchList(
                 limit = limit,
                 upcoming = true,
-                ordering = "net" // Order by launch time
+                ordering = "net",
+                program = programId
             )
 
-            // Print raw response for debugging
+            // Verbose debug logging for API response
             val rawResponse = response.response.bodyAsText()
-            println("=== FULL API RESPONSE DEBUG ===")
-            println("Request URL: ${response.response.request.url}")
-            println("Request headers: ${response.response.request.headers}")
-            println("Response status: ${response.status}")
-            println("Response headers: ${response.response.headers}")
-            println("Response length: ${rawResponse.length} characters")
-            println("=== FULL RESPONSE BODY ===")
-            println(rawResponse)
-            println("=== END FULL RESPONSE ===")
+            log.v { "API Response Debug - URL: ${response.response.request.url}, Status: ${response.status}, Length: ${rawResponse.length} chars" }
+            log.v { "Full Response Body: $rawResponse" }
 
             // Check if it's an error response
             if (response.status >= 400) {
                 val errorMessage = parseApiError(rawResponse)
-                println("HTTP Error ${response.status}: $errorMessage")
+                log.e { "HTTP Error ${response.status}: $errorMessage" }
                 return Result.failure(Exception("API Error ${response.status}: $errorMessage"))
             }
 
             // Check if response looks like an error (contains "detail" field)
             if (rawResponse.contains("\"detail\"")) {
                 val errorMessage = parseApiError(rawResponse)
-                println("API returned error response: $errorMessage")
+                log.e { "API returned error response: $errorMessage" }
                 return Result.failure(Exception("API Error: $errorMessage"))
             }
 
@@ -699,22 +706,21 @@ class LaunchRepositoryImpl(
             val body = response.body()
             Result.success(body)
         } catch (e: ResponseException) {
-            println("ResponseException in getNextLaunch: ${e.message}")
+            log.e(e) { "ResponseException in getNextLaunch: ${e.message}" }
             // Try to get the error response body
             try {
                 val errorBody = e.response.bodyAsText()
                 val errorMessage = parseApiError(errorBody)
-                println("Error response body: $errorMessage")
+                log.e { "Error response body: $errorMessage" }
                 Result.failure(Exception("API Error: $errorMessage"))
             } catch (bodyException: Exception) {
                 Result.failure(e)
             }
         } catch (e: IOException) {
-            println("IOException in getNextLaunch: ${e.message}")
+            log.e(e) { "IOException in getNextLaunch: ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Exception in getNextLaunch: ${e::class.simpleName}: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "Exception in getNextLaunch: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -729,29 +735,22 @@ class LaunchRepositoryImpl(
                 ordering = "net"
             )
 
-            // Print raw response for debugging
+            // Verbose debug logging for API response
             val rawResponse = response.response.bodyAsText()
-            println("=== FULL API RESPONSE DEBUG ===")
-            println("Request URL: ${response.response.request.url}")
-            println("Request headers: ${response.response.request.headers}")
-            println("Response status: ${response.status}")
-            println("Response headers: ${response.response.headers}")
-            println("Response length: ${rawResponse.length} characters")
-            println("=== FULL RESPONSE BODY ===")
-            println(rawResponse)
-            println("=== END FULL RESPONSE ===")
+            log.v { "API Response Debug - URL: ${response.response.request.url}, Status: ${response.status}, Length: ${rawResponse.length} chars" }
+            log.v { "Full Response Body: $rawResponse" }
 
             // Check if it's an error response
             if (response.status >= 400) {
                 val errorMessage = parseApiError(rawResponse)
-                println("HTTP Error ${response.status}: $errorMessage")
+                log.e { "HTTP Error ${response.status}: $errorMessage" }
                 return Result.failure(Exception("API Error ${response.status}: $errorMessage"))
             }
 
             // Check if response looks like an error (contains "detail" field)
             if (rawResponse.contains("\"detail\"")) {
                 val errorMessage = parseApiError(rawResponse)
-                println("API returned error response: $errorMessage")
+                log.e { "API returned error response: $errorMessage" }
                 return Result.failure(Exception("API Error: $errorMessage"))
             }
 
@@ -759,22 +758,21 @@ class LaunchRepositoryImpl(
             val body = response.body()
             Result.success(body)
         } catch (e: ResponseException) {
-            println("ResponseException in getNextLaunch: ${e.message}")
+            log.e(e) { "ResponseException in getNextDetailedLaunch: ${e.message}" }
             // Try to get the error response body
             try {
                 val errorBody = e.response.bodyAsText()
                 val errorMessage = parseApiError(errorBody)
-                println("Error response body: $errorMessage")
+                log.e { "Error response body: $errorMessage" }
                 Result.failure(Exception("API Error: $errorMessage"))
             } catch (bodyException: Exception) {
                 Result.failure(e)
             }
         } catch (e: IOException) {
-            println("IOException in getNextLaunch: ${e.message}")
+            log.e(e) { "IOException in getNextDetailedLaunch: ${e.message}" }
             Result.failure(e)
         } catch (e: Exception) {
-            println("Exception in getNextLaunch: ${e::class.simpleName}: ${e.message}")
-            e.printStackTrace()
+            log.e(e) { "Exception in getNextDetailedLaunch: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -787,14 +785,18 @@ class LaunchRepositoryImpl(
         upcoming: Boolean? = null
     ): Result<PaginatedLaunchNormalList> {
         return try {
+            log.d { "searchLaunches - query: '$query', limit: $limit, upcoming: $upcoming" }
             val response = launchesApi.getLaunchList(
                 search = query,
                 limit = limit,
                 upcoming = upcoming,
                 ordering = "net"
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Search returned ${launches.results.size} launches for query '$query'" }
+            Result.success(launches)
         } catch (e: Exception) {
+            log.e(e) { "❌ ERROR in searchLaunches for query '$query': ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -805,14 +807,18 @@ class LaunchRepositoryImpl(
         upcoming: Boolean = true
     ): Result<PaginatedLaunchNormalList> {
         return try {
+            log.d { "getLaunchesByCompany - lspIds: $lspIds, limit: $limit, upcoming: $upcoming" }
             val response = launchesApi.getLaunchList(
                 lspId = lspIds,
                 limit = limit,
                 upcoming = upcoming,
                 ordering = "net"
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} launches for companies $lspIds" }
+            Result.success(launches)
         } catch (e: Exception) {
+            log.e(e) { "❌ ERROR in getLaunchesByCompany for lspIds $lspIds: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -822,14 +828,18 @@ class LaunchRepositoryImpl(
         upcoming: Boolean = true
     ): Result<PaginatedLaunchNormalList> {
         return try {
+            log.d { "getCrewedLaunches - limit: $limit, upcoming: $upcoming" }
             val response = launchesApi.getLaunchList(
                 isCrewed = true,
                 limit = limit,
                 upcoming = upcoming,
                 ordering = "net"
             )
-            Result.success(response.body())
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} crewed launches" }
+            Result.success(launches)
         } catch (e: Exception) {
+            log.e(e) { "❌ ERROR in getCrewedLaunches: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }

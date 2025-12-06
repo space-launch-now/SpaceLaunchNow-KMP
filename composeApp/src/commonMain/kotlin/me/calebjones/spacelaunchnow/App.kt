@@ -4,14 +4,7 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
@@ -19,7 +12,6 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
@@ -35,6 +27,7 @@ import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
+import me.calebjones.spacelaunchnow.navigation.Starship
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.platform.ContextFactory
@@ -51,21 +44,25 @@ import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
+import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
-import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.NotificationSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationScreen
+import me.calebjones.spacelaunchnow.ui.starship.StarshipScreen
 import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
-import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
+
+
+private val log by lazy { SpaceLogger.getLogger("App") }
 
 /**
  * CompositionLocal to provide the useUtc setting throughout the app
@@ -82,24 +79,24 @@ val LocalContextFactory =
 fun isTabletOrDesktop(): Boolean {
     // Desktop platform always uses tablet layout
     if (getPlatform().type.isDesktop) {
-        println("🔄 ROTATION_DEBUG: Platform is Desktop - using tablet layout")
+        log.v { "Platform is Desktop - using tablet layout" }
         return true
     }
-    
+
     // For mobile devices (Android/iOS), check BOTH width and height classes
     // A true tablet should have EXPANDED in at least one dimension even when rotated
     // This prevents phones in landscape from being treated as tablets
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    
+
     val widthClass = windowSizeClass.windowWidthSizeClass
     val heightClass = windowSizeClass.windowHeightSizeClass
-    
+
     // Only treat as tablet if width is EXPANDED (>= 840dp) 
     // AND height is at least MEDIUM (>= 480dp) to ensure it's not just a phone rotated
     val isTablet = widthClass == WindowWidthSizeClass.EXPANDED
-    
-    println("🔄 ROTATION_DEBUG: Width: $widthClass, Height: $heightClass, isTablet: $isTablet")
-    
+
+    log.v { "Width: $widthClass, Height: $heightClass, isTablet: $isTablet" }
+
     return isTablet
 }
 
@@ -117,17 +114,19 @@ fun SpaceLaunchNowApp(
     val useUtc = false
 
     val navController = rememberNavController()
-    
+
     // Determine current window size for layout decisions - now dynamic
     val currentIsTabletSize = isTabletOrDesktop()
-    println("🔄 ROTATION_DEBUG: Dynamic layout detection: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}")
+
+    log.v { "Dynamic layout detection: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}" }
     
-    println("🔄 ROTATION_DEBUG: SpaceLaunchNowApp recomposing - NavController: ${navController.hashCode()}, using dynamic layout: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}")
+    log.v { "SpaceLaunchNowApp recomposing - NavController: ${navController.hashCode()}, using dynamic layout: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}" }
+
 
     // Handle notification-based navigation
     LaunchedEffect(notificationLaunchId) {
         if (notificationLaunchId != null) {
-            println("Navigating to launch detail for ID: $notificationLaunchId")
+            log.d { "Navigating to launch detail for ID: $notificationLaunchId" }
             navController.navigate(
                 LaunchDetail(
                     notificationLaunchId
@@ -142,14 +141,14 @@ fun SpaceLaunchNowApp(
     LaunchedEffect(navigationDestination) {
         when (navigationDestination) {
             "subscription" -> {
-                println("Navigating to SupportUs screen from widget")
+                log.d { "Navigating to SupportUs screen from widget" }
                 navController.navigate(SupportUs)
                 onNavigationDestinationConsumed()
             }
 
             null -> {} // No navigation destination
             else -> {
-                println("Unknown navigation destination: $navigationDestination")
+                log.w { "Unknown navigation destination: $navigationDestination" }
                 onNavigationDestinationConsumed()
             }
         }
@@ -158,8 +157,9 @@ fun SpaceLaunchNowApp(
     LaunchedEffect(Unit) {
         // Run all initialization on background thread to avoid blocking UI on iOS
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
-            println("=== APP START DEBUG INFO ===")
-            
+
+            log.i { "=== APP START DEBUG INFO ===" }
+
             try {
                 // Lazy inject repositories only when needed (on background thread)
                 val koin = org.koin.mp.KoinPlatform.getKoin()
@@ -175,9 +175,9 @@ fun SpaceLaunchNowApp(
                 } else {
                     emptyList()
                 }
-                
+
                 val adInitSuccess = AdInitializer.initialize(context = contextFactory.getActivity())
-                
+
                 if (adInitSuccess) {
                     AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
                 }
@@ -185,9 +185,9 @@ fun SpaceLaunchNowApp(
                 try {
                     // Get and print FCM token
                     val token = pushMessaging.getToken()
-                    println("FCM Token: $token")
+                    log.d { "FCM Token: $token" }
                 } catch (e: Exception) {
-                    println("Failed to get FCM token: ${e.message}")
+                    log.w(e) { "Failed to get FCM token" }
                 }
 
                 try {
@@ -196,35 +196,32 @@ fun SpaceLaunchNowApp(
 
                     // Get and print current state (using the new state flow)
                     val currentState = notificationRepository.state.value
-                    println("Current state:")
-                    println("  - Notifications enabled: ${currentState.enableNotifications}")
-                    println("  - Follow all launches: ${currentState.followAllLaunches}")
-                    println("  - Use strict matching: ${currentState.useStrictMatching}")
-                    println("  - Subscribed agencies: ${currentState.subscribedAgencies.size}")
-                    println("  - Subscribed locations: ${currentState.subscribedLocations.size}")
-                    println("  - Topic settings: ${currentState.topicSettings}")
-                    println("  - Subscribed FCM topics: ${currentState.subscribedTopics.size}")
+                    log.d { "Current state:" }
+                    log.d { "  - Notifications enabled: ${currentState.enableNotifications}" }
+                    log.d { "  - Follow all launches: ${currentState.followAllLaunches}" }
+                    log.d { "  - Use strict matching: ${currentState.useStrictMatching}" }
+                    log.d { "  - Subscribed agencies: ${currentState.subscribedAgencies.size}" }
+                    log.d { "  - Subscribed locations: ${currentState.subscribedLocations.size}" }
+                    log.d { "  - Topic settings: ${currentState.topicSettings}" }
+                    log.d { "  - Subscribed FCM topics: ${currentState.subscribedTopics.size}" }
 
-                    println("Settings loaded - state management handled by repository")
+                    log.i { "Settings loaded - state management handled by repository" }
                 } catch (e: Exception) {
-                    println("Failed to initialize notifications: ${e.message}")
-                    e.printStackTrace()
+                    log.e(e) { "Failed to initialize notifications" }
                 }
 
                 try {
                     // Initialize subscription billing
                     subscriptionRepository.initialize()
-                    println("Subscription repository initialized successfully")
+                    log.i { "Subscription repository initialized successfully" }
                 } catch (e: Exception) {
-                    println("Failed to initialize subscription repository: ${e.message}")
-                    e.printStackTrace()
+                    log.e(e) { "Failed to initialize subscription repository" }
                 }
             } catch (e: Exception) {
-                println("Failed during app initialization: ${e.message}")
-                e.printStackTrace()
+                log.e(e) { "Failed during app initialization" }
             }
 
-            println("=== END APP START DEBUG INFO ===")
+            log.i { "=== END APP START DEBUG INFO ===" }
         }
     }
 
@@ -235,13 +232,13 @@ fun SpaceLaunchNowApp(
         LocalContextFactory provides contextFactory
     ) {
         BetaWarningDialog()
-        
+
         // Show consent popup (platform-specific implementation)
         // Must be inside CompositionLocalProvider to access LocalContextFactory
         AdConsentPopup(
-            onFailure = { println("Consent popup failure: ${it.message}") }
+            onFailure = { log.w(it) { "Consent popup failure" } }
         )
-        
+
         // Wrap content with preloaded ads (platform-specific: Android/iOS preloads, Desktop no-op)
         WithPreloadedAds(
             context = contextFactory.getActivity()
@@ -368,9 +365,12 @@ fun SpaceLaunchNowApp(
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }
+                    composableWithCompositionLocal<Starship> {
+                        StarshipScreen(navController = navController)
+                    }
                 }
             }
-            
+
             // Dynamic layout switching while preserving navigation state
             if (currentIsTabletSize) {
                 TabletDesktopLayout(
@@ -380,7 +380,7 @@ fun SpaceLaunchNowApp(
                 )
             } else {
                 PhoneLayout(
-                    navController = navController, 
+                    navController = navController,
                     themeOption = themeOption,
                     content = navHostContent
                 )

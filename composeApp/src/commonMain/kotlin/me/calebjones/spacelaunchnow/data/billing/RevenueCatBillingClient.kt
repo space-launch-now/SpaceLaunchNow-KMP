@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import me.calebjones.spacelaunchnow.data.model.Platform
 import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
 import me.calebjones.spacelaunchnow.data.model.ProductPricing
+import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.ExperimentalTime
 
 /**
@@ -27,6 +28,8 @@ import kotlin.time.ExperimentalTime
 class RevenueCatBillingClient(
     private val revenueCatManager: RevenueCatManager
 ) {
+
+    private val log = logger()
 
     /**
      * Lazy access to Purchases instance to avoid accessing before initialization
@@ -233,7 +236,7 @@ class RevenueCatBillingClient(
                 pkg.identifier == packageIdentifier
             }
             if (matchedPackage != null) {
-                println("RevenueCat: Mapped $productId:$basePlanId → $packageIdentifier")
+                log.d { "Mapped $productId:$basePlanId → $packageIdentifier" }
                 return matchedPackage
             }
         }
@@ -244,10 +247,10 @@ class RevenueCatBillingClient(
         }
 
         if (fallbackPackage != null) {
-            println("RevenueCat: Found package by product ID: ${fallbackPackage.identifier}")
+            log.d { "Found package by product ID: ${fallbackPackage.identifier}" }
         } else {
-            println("RevenueCat: ⚠️ No package found for $productId:$basePlanId")
-            println("  Available packages: ${currentOffering.availablePackages.map { it.identifier }}")
+            log.w { "No package found for $productId:$basePlanId" }
+            log.w { "Available packages: ${currentOffering.availablePackages.map { it.identifier }}" }
         }
 
         return fallbackPackage

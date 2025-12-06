@@ -159,6 +159,7 @@ suspend fun LaunchesApi.getLaunchList(
     netMonth: List<Double>? = null,
     pad: Int? = null,
     locationIds: List<Int>? = null,
+    program: List<Int>? = null,
     upcomingWithRecent: Boolean? = null
 ): HttpResponse<PaginatedLaunchNormalList> = launchesList(
     agencyLaunchAttemptCount = null,
@@ -229,7 +230,7 @@ suspend fun LaunchesApi.getLaunchList(
     padLaunchAttemptCountYearLt = null,
     padLaunchAttemptCountYearLte = null,
     previous = previous,
-    program = null,
+    program = program,
     relatedLspId = relatedLspId,
     relatedLspName = null,
     rocketConfigurationFullName = null,
@@ -258,4 +259,17 @@ suspend fun LaunchesApi.getLaunchList(
     windowStartGte = null,
     windowStartLt = null,
     windowStartLte = null
+)
+
+/**
+ * Get Starship launches filtered by program ID = 1
+ */
+suspend fun LaunchesApi.getStarshipLaunches(
+    limit: Int = 10,
+    upcoming: Boolean? = true
+): HttpResponse<PaginatedLaunchNormalList> = getLaunchList(
+    limit = limit,
+    upcoming = upcoming,
+    program = listOf(1),
+    ordering = "net"
 )

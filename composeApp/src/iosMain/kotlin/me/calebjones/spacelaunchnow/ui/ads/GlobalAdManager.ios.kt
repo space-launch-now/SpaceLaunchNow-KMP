@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock.System
 import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.getPlatform
+import me.calebjones.spacelaunchnow.logger
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.data.config.AdMobConfig
@@ -30,6 +31,7 @@ import me.calebjones.spacelaunchnow.data.config.AdMobConfig
 actual class GlobalAdManager actual constructor(
     private val contextFactory: ContextFactory?
 ) {
+    private val log = logger()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     // Initialization and configuration state
@@ -76,11 +78,11 @@ actual class GlobalAdManager actual constructor(
     actual fun initializeAndPreload() {
         // Note: iOS doesn't require a context factory, only Android does
         if (contextFactory == null && getPlatform().type == PlatformType.ANDROID) {
-            println("🚫 GlobalAdManager: No context factory on Android, skipping initialization")
+            log.w { "🚫 GlobalAdManager: No context factory on Android, skipping initialization" }
             return
         }
 
-        println("🚀 GlobalAdManager: Fast initialization for ad optimization on ${getPlatform().type}...")
+        log.d { "🚀 GlobalAdManager: Fast initialization for ad optimization on ${getPlatform().type}..." }
 
         // 🚀 PERFORMANCE: Mark as ready immediately for faster startup
         // Configuration happens synchronously now instead of in coroutine
@@ -90,7 +92,7 @@ actual class GlobalAdManager actual constructor(
         // Setup configurations synchronously for instant availability
         setupAdConfigurations()
 
-        println("✅ GlobalAdManager: Instant initialization complete - ads ready to load!")
+        log.i { "✅ GlobalAdManager: Instant initialization complete - ads ready to load!" }
     }
 
     private fun setupAdConfigurations() {
@@ -121,7 +123,7 @@ actual class GlobalAdManager actual constructor(
             priority = AdPriority.HIGH  // Upgraded to HIGH for inline list ads
         )
 
-        println("📝 GlobalAdManager: Configured ${adConfigurations.size} essential ad sizes (instant setup)")
+        log.d { "📝 GlobalAdManager: Configured ${adConfigurations.size} essential ad sizes (instant setup)" }
     }
 
     /**
@@ -142,7 +144,7 @@ actual class GlobalAdManager actual constructor(
     fun trackAdLoadStart(adSize: AdSize): String {
         val trackingId = "${adSize}_${System.now().toEpochMilliseconds()}"
         adLoadStartTimes[trackingId] = System.now().toEpochMilliseconds()
-        println("🏁 GlobalAdManager: Started tracking ad load for $adSize (ID: $trackingId)")
+        log.d { "🏁 GlobalAdManager: Started tracking ad load for $adSize (ID: $trackingId)" }
         return trackingId
     }
 
@@ -162,7 +164,7 @@ actual class GlobalAdManager actual constructor(
             }
 
             val status = if (success) "✅" else "❌"
-            println("📊 GlobalAdManager: $status Ad load completed in ${loadTime}ms for $adSize")
+            log.d { "📊 GlobalAdManager: $status Ad load completed in ${loadTime}ms for $adSize" }
         }
     }
 
@@ -252,11 +254,11 @@ actual class GlobalAdManager actual constructor(
 
         val shouldShow = shouldShowByCount && enoughTimeElapsed
 
-        println("🎯 InterstitialAd: Visit #$detailViewVisitCount, ShouldShow: $shouldShow (Count: $shouldShowByCount, Time: $enoughTimeElapsed)")
+        log.d { "🎯 InterstitialAd: Visit #$detailViewVisitCount, ShouldShow: $shouldShow (Count: $shouldShowByCount, Time: $enoughTimeElapsed)" }
 
         if (shouldShow) {
             lastInterstitialShownAt = currentTime
-            println("📅 InterstitialAd: Timestamp updated to $currentTime")
+            log.d { "📅 InterstitialAd: Timestamp updated to $currentTime" }
         }
 
         return shouldShow
@@ -268,7 +270,7 @@ actual class GlobalAdManager actual constructor(
     actual fun resetDetailViewCounter() {
         detailViewVisitCount = 0
         lastInterstitialShownAt = 0L
-        println("🔄 InterstitialAd: Counter reset")
+        log.d { "🔄 InterstitialAd: Counter reset" }
     }
 
     /**
