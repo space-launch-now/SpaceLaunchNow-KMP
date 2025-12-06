@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.data.billing.MockBillingManager
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.MockSubscriptionRepository
+import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -34,6 +35,7 @@ class SubscriptionViewModelTest {
     
     @BeforeTest
     fun setup() {
+        TestSpaceLoggerInit.ensureInitialized()
         Dispatchers.setMain(testDispatcher)
         billingManager = MockBillingManager()
         repository = MockSubscriptionRepository()

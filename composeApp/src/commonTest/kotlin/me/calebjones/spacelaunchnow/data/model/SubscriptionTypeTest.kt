@@ -1,9 +1,16 @@
 package me.calebjones.spacelaunchnow.data.model
 
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 
 class SubscriptionTypeTest {
+
+    @BeforeTest
+    fun setup() {
+        TestSpaceLoggerInit.ensureInitialized()
+    }
 
     @Test
     fun `fromProductId should return PREMIUM for premium product IDs`() {

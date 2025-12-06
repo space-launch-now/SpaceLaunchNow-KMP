@@ -1,8 +1,10 @@
 package me.calebjones.spacelaunchnow.data.model
 
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 
 /**
  * Tests for NotificationFilter - Platform-agnostic notification filtering logic
@@ -15,6 +17,13 @@ import kotlin.test.assertTrue
  * - LocationId = "0" (Other/Unknown location)
  */
 class NotificationFilterTest {
+
+    companion object {
+        init {
+            // Initialize SpaceLogger before any test data is created
+            TestSpaceLoggerInit.ensureInitialized()
+        }
+    }
 
     // Helper to create topic settings with specific topics enabled
     private fun topicSettings(vararg enabledTypes: String): Map<String, Boolean> {

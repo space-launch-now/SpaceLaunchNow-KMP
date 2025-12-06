@@ -1,6 +1,8 @@
 package me.calebjones.spacelaunchnow.data.services
 
 import me.calebjones.spacelaunchnow.data.model.NotificationState
+import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -10,6 +12,11 @@ import kotlin.test.assertTrue
 class LaunchFilterServiceTest {
     
     private val service = LaunchFilterService()
+
+    @BeforeTest
+    fun setup() {
+        TestSpaceLoggerInit.ensureInitialized()
+    }
     
     @Test
     fun `getAgencyIds returns null when followAllLaunches is true`() {

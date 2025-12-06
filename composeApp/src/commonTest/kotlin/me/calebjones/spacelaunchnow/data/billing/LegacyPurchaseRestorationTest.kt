@@ -1,15 +1,22 @@
 package me.calebjones.spacelaunchnow.data.billing
 
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 
 /**
  * Tests for legacy purchase restoration functionality
  */
 class LegacyPurchaseRestorationTest {
+
+    @BeforeTest
+    fun setup() {
+        TestSpaceLoggerInit.ensureInitialized()
+    }
 
     @Test
     fun `legacy product IDs should be recognized as LEGACY subscription type`() {

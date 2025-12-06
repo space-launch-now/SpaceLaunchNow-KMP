@@ -5,13 +5,20 @@ import kotlinx.coroutines.runBlocking
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
+import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
  * Test runner for SimpleApiTest - converts the main function into a test
  */
 class SimpleApiTestRunner {
-    private val log = logger()
+    private val log by lazy { logger() }
+
+    @BeforeTest
+    fun setup() {
+        TestSpaceLoggerInit.ensureInitialized()
+    }
 
     @Test
     fun runSimpleApiTest() = runBlocking {
