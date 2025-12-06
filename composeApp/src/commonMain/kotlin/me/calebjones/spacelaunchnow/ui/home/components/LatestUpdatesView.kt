@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -161,11 +162,21 @@ fun LatestUpdatesView(
 fun UpdateCard(
     update: UpdateEndpoint,
     modifier: Modifier = Modifier,
-    navController: NavController? = null
+    navController: NavController? = null,
+    fillMaxWidth: Boolean = false
 ) {
+    val comment = update.comment ?: "No comment"
+    
+    val cardModifier = if (fillMaxWidth) {
+        modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+    } else {
+        modifier.size(280.dp, 120.dp)
+    }
+
     Card(
-        modifier = modifier
-            .size(280.dp, 120.dp)
+        modifier = cardModifier
             .clickable {
                 if (navController != null) {
                     if (update.launch != null) {
@@ -180,9 +191,9 @@ fun UpdateCard(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(12.dp)
         ) {
             Row(
@@ -226,21 +237,35 @@ fun UpdateCard(
                 )
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f),
+                    modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    // Author name
-                    Text(
-                        text = update.createdBy ?: "Unknown",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    // Author name and date row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = update.createdBy ?: "Unknown",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        update.createdOn?.let { createdOn ->
+                            Text(
+                                text = formatUpdateDate(createdOn),
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                maxLines = 1
+                            )
+                        }
+                    }
 
                     // Update subject (what it's about)
                     val updateSubject: String? = when {
@@ -262,26 +287,14 @@ fun UpdateCard(
 
                     // Comment
                     Text(
-                        text = update.comment ?: "No comment",
+                        text = comment,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 2,
+                        maxLines = if (fillMaxWidth) 4 else 2,
                         overflow = TextOverflow.Ellipsis,
-                        lineHeight = 14.sp,
-                        modifier = Modifier.padding(horizontal = 0.dp, vertical = 8.dp)
+                        lineHeight = 16.sp
                     )
                 }
-            }
-
-            // Created date aligned to bottom right corner
-            update.createdOn?.let { createdOn ->
-                Text(
-                    text = formatUpdateDate(createdOn),
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    maxLines = 1,
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                )
             }
         }
     }

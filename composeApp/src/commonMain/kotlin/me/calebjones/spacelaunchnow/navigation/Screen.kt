@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
@@ -57,6 +58,9 @@ data object Agencies
 data class AgencyDetail(val agencyId: Int)
 
 @Serializable
+data object Starship
+
+@Serializable
 data class FullscreenVideo(
     val launchId: String,
     val videoUrl: String,
@@ -68,5 +72,6 @@ data class FullscreenVideo(
 sealed class Screen(val label: String, val icon: ImageVector) {
     data object Home : Screen("Home", Icons.Filled.Home)
     data object Schedule : Screen("Schedule", Icons.AutoMirrored.Filled.List)
+    data object Starship : Screen("Starship", Icons.Filled.RocketLaunch)
     data object Settings : Screen("Settings", Icons.Filled.Settings)
 }

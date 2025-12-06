@@ -45,10 +45,17 @@ open class UpdatesApi : ApiClient {
 
     /**
      * 
-     * #### Filters Parameters - &#x60;created_on&#x60;, &#x60;launch&#x60;, &#x60;launch__launch_service_provider&#x60;, &#x60;program&#x60;  Example - [/updates/?launch__launch_service_provider&#x3D;121](./?launch__launch_service_provider&#x3D;121)  #### Ordering Fields - &#x60;created_on&#x60;  Example - [/updates/?ordering&#x3D;-created_on](./?ordering&#x3D;-created_on)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/updates/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/updates/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Filters Parameters - &#x60;all__program&#x60;, &#x60;created_on&#x60;, &#x60;created_on__gt&#x60;, &#x60;created_on__gte&#x60;, &#x60;created_on__lt&#x60;, &#x60;created_on__lte&#x60;, &#x60;event__program&#x60;, &#x60;launch&#x60;, &#x60;launch__launch_service_provider&#x60;, &#x60;launch__program&#x60;, &#x60;program&#x60;  Example - [/updates/?all__program&#x3D;1](./?all__program&#x3D;1)  #### Ordering Fields - &#x60;created_on&#x60;  Example - [/updates/?ordering&#x3D;-created_on](./?ordering&#x3D;-created_on)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/updates/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/updates/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * @param allProgram Filter by program ID to get all updates including from launch or events. (optional)
      * @param createdOn  (optional)
+     * @param createdOnGt  (optional)
+     * @param createdOnGte  (optional)
+     * @param createdOnLt  (optional)
+     * @param createdOnLte  (optional)
+     * @param eventProgram  (optional)
      * @param launch  (optional)
      * @param launchLaunchServiceProvider  (optional)
+     * @param launchProgram  (optional)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -57,7 +64,7 @@ open class UpdatesApi : ApiClient {
      * @return PaginatedUpdateEndpointList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun updatesList(createdOn: kotlin.time.Instant? = null, launch: kotlin.String? = null, launchLaunchServiceProvider: kotlin.Int? = null, limit: kotlin.Int? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, program: kotlin.Int? = null, search: kotlin.String? = null): HttpResponse<PaginatedUpdateEndpointList> {
+    open suspend fun updatesList(allProgram: kotlin.Int? = null, createdOn: kotlin.time.Instant? = null, createdOnGt: kotlin.time.Instant? = null, createdOnGte: kotlin.time.Instant? = null, createdOnLt: kotlin.time.Instant? = null, createdOnLte: kotlin.time.Instant? = null, eventProgram: kotlin.collections.List<kotlin.Int>? = null, launch: kotlin.String? = null, launchLaunchServiceProvider: kotlin.Int? = null, launchProgram: kotlin.collections.List<kotlin.Int>? = null, limit: kotlin.Int? = null, offset: kotlin.Int? = null, ordering: kotlin.String? = null, program: kotlin.Int? = null, search: kotlin.String? = null): HttpResponse<PaginatedUpdateEndpointList> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 
@@ -65,9 +72,16 @@ open class UpdatesApi : ApiClient {
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
+        allProgram?.apply { localVariableQuery["all__program"] = listOf("$allProgram") }
         createdOn?.apply { localVariableQuery["created_on"] = listOf("$createdOn") }
+        createdOnGt?.apply { localVariableQuery["created_on__gt"] = listOf("$createdOnGt") }
+        createdOnGte?.apply { localVariableQuery["created_on__gte"] = listOf("$createdOnGte") }
+        createdOnLt?.apply { localVariableQuery["created_on__lt"] = listOf("$createdOnLt") }
+        createdOnLte?.apply { localVariableQuery["created_on__lte"] = listOf("$createdOnLte") }
+        eventProgram?.apply { localVariableQuery["event__program"] = toMultiValue(this, "multi") }
         launch?.apply { localVariableQuery["launch"] = listOf("$launch") }
         launchLaunchServiceProvider?.apply { localVariableQuery["launch__launch_service_provider"] = listOf("$launchLaunchServiceProvider") }
+        launchProgram?.apply { localVariableQuery["launch__program"] = toMultiValue(this, "multi") }
         limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
         offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
         ordering?.apply { localVariableQuery["ordering"] = listOf("$ordering") }
@@ -93,12 +107,13 @@ open class UpdatesApi : ApiClient {
 
     /**
      * 
-     * #### Filters Parameters - &#x60;created_on&#x60;, &#x60;launch&#x60;, &#x60;launch__launch_service_provider&#x60;, &#x60;program&#x60;  Example - [/updates/?launch__launch_service_provider&#x3D;121](./?launch__launch_service_provider&#x3D;121)  #### Ordering Fields - &#x60;created_on&#x60;  Example - [/updates/?ordering&#x3D;-created_on](./?ordering&#x3D;-created_on)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/updates/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/updates/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Filters Parameters - &#x60;all__program&#x60;, &#x60;created_on&#x60;, &#x60;created_on__gt&#x60;, &#x60;created_on__gte&#x60;, &#x60;created_on__lt&#x60;, &#x60;created_on__lte&#x60;, &#x60;event__program&#x60;, &#x60;launch&#x60;, &#x60;launch__launch_service_provider&#x60;, &#x60;launch__program&#x60;, &#x60;program&#x60;  Example - [/updates/?all__program&#x3D;1](./?all__program&#x3D;1)  #### Ordering Fields - &#x60;created_on&#x60;  Example - [/updates/?ordering&#x3D;-created_on](./?ordering&#x3D;-created_on)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/updates/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/updates/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Update.
+     * @param allProgram Filter by program ID to get all updates including from launch or events. (optional)
      * @return UpdateEndpoint
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun updatesRetrieve(id: kotlin.Int): HttpResponse<UpdateEndpoint> {
+    open suspend fun updatesRetrieve(id: kotlin.Int, allProgram: kotlin.Int? = null): HttpResponse<UpdateEndpoint> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 
@@ -106,6 +121,7 @@ open class UpdatesApi : ApiClient {
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
+        allProgram?.apply { localVariableQuery["all__program"] = listOf("$allProgram") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
         val localVariableConfig = RequestConfig<kotlin.Any?>(

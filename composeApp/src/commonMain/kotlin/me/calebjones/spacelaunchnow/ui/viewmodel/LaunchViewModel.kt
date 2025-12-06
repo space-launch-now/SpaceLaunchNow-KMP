@@ -15,13 +15,7 @@ import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-
-data class VideoPlayerState(
-    val selectedVideoIndex: Int = 0,
-    val isPlayerVisible: Boolean = false,
-    val isFullscreen: Boolean = false,
-    val availableVideos: List<VidURL> = emptyList()
-)
+import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 
 class LaunchViewModel(
     private val repository: LaunchRepository,

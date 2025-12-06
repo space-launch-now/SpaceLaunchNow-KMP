@@ -32,24 +32,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
-/**
- * Represents the state of a view section on the Home Screen
- *
- * @param data The actual data (can be a single object or list)
- * @param isLoading True if currently loading data
- * @param isUserInitiated True if the load was triggered by user action (pull-to-refresh/retry)
- * @param error Error message if the load failed, null otherwise
- * @param dataSource Where the data originated from (network, cache, or stale cache)
- * @param cacheTimestamp When the data was originally cached (epoch milliseconds)
- */
-data class ViewState<T>(
-    val data: T,
-    val isLoading: Boolean = false,
-    val isUserInitiated: Boolean = false,
-    val error: String? = null,
-    val dataSource: me.calebjones.spacelaunchnow.data.model.DataSource = me.calebjones.spacelaunchnow.data.model.DataSource.NETWORK,
-    val cacheTimestamp: Long? = null
-)
+// ViewState is now in ViewState.kt - imported from same package
 
 /**
  * Consolidated ViewModel for the Home Screen that manages:

@@ -127,16 +127,12 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 | *ConfigApi* | [**configMissionTypesRetrieve**](docs/ConfigApi.md#configmissiontypesretrieve) | **GET** /api/ll/2.4.0/config/mission_types/{id}/ |  |
 | *ConfigApi* | [**configNetPrecisionsList**](docs/ConfigApi.md#confignetprecisionslist) | **GET** /api/ll/2.4.0/config/net_precisions/ |  |
 | *ConfigApi* | [**configNetPrecisionsRetrieve**](docs/ConfigApi.md#confignetprecisionsretrieve) | **GET** /api/ll/2.4.0/config/net_precisions/{id}/ |  |
-| *ConfigApi* | [**configNoticeTypesList**](docs/ConfigApi.md#confignoticetypeslist) | **GET** /api/ll/2.4.0/config/notice_types/ |  |
-| *ConfigApi* | [**configNoticeTypesRetrieve**](docs/ConfigApi.md#confignoticetypesretrieve) | **GET** /api/ll/2.4.0/config/notice_types/{id}/ |  |
 | *ConfigApi* | [**configOrbitsList**](docs/ConfigApi.md#configorbitslist) | **GET** /api/ll/2.4.0/config/orbits/ |  |
 | *ConfigApi* | [**configOrbitsRetrieve**](docs/ConfigApi.md#configorbitsretrieve) | **GET** /api/ll/2.4.0/config/orbits/{id}/ |  |
 | *ConfigApi* | [**configPayloadTypesList**](docs/ConfigApi.md#configpayloadtypeslist) | **GET** /api/ll/2.4.0/config/payload_types/ |  |
 | *ConfigApi* | [**configPayloadTypesRetrieve**](docs/ConfigApi.md#configpayloadtypesretrieve) | **GET** /api/ll/2.4.0/config/payload_types/{id}/ |  |
 | *ConfigApi* | [**configProgramTypesList**](docs/ConfigApi.md#configprogramtypeslist) | **GET** /api/ll/2.4.0/config/program_types/ |  |
 | *ConfigApi* | [**configProgramTypesRetrieve**](docs/ConfigApi.md#configprogramtypesretrieve) | **GET** /api/ll/2.4.0/config/program_types/{id}/ |  |
-| *ConfigApi* | [**configRoadClosureStatusesList**](docs/ConfigApi.md#configroadclosurestatuseslist) | **GET** /api/ll/2.4.0/config/road_closure_statuses/ |  |
-| *ConfigApi* | [**configRoadClosureStatusesRetrieve**](docs/ConfigApi.md#configroadclosurestatusesretrieve) | **GET** /api/ll/2.4.0/config/road_closure_statuses/{id}/ |  |
 | *ConfigApi* | [**configSpaceStationStatusesList**](docs/ConfigApi.md#configspacestationstatuseslist) | **GET** /api/ll/2.4.0/config/space_station_statuses/ |  |
 | *ConfigApi* | [**configSpaceStationStatusesRetrieve**](docs/ConfigApi.md#configspacestationstatusesretrieve) | **GET** /api/ll/2.4.0/config/space_station_statuses/{id}/ |  |
 | *ConfigApi* | [**configSpacecraftConfigurationTypesList**](docs/ConfigApi.md#configspacecraftconfigurationtypeslist) | **GET** /api/ll/2.4.0/config/spacecraft_configuration_types/ |  |
@@ -147,9 +143,6 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 | *ConfigApi* | [**configTimelineEventTypesRetrieve**](docs/ConfigApi.md#configtimelineeventtypesretrieve) | **GET** /api/ll/2.4.0/config/timeline_event_types/{id}/ |  |
 | *ConfigApi* | [**configVidurlTypesList**](docs/ConfigApi.md#configvidurltypeslist) | **GET** /api/ll/2.4.0/config/vidurl_types/ |  |
 | *ConfigApi* | [**configVidurlTypesRetrieve**](docs/ConfigApi.md#configvidurltypesretrieve) | **GET** /api/ll/2.4.0/config/vidurl_types/{id}/ |  |
-| *DashboardApi* | [**dashboardStarshipDetailedList**](docs/DashboardApi.md#dashboardstarshipdetailedlist) | **GET** /api/ll/2.4.0/dashboard/starship/detailed/ |  |
-| *DashboardApi* | [**dashboardStarshipList**](docs/DashboardApi.md#dashboardstarshiplist) | **GET** /api/ll/2.4.0/dashboard/starship/ |  |
-| *DashboardApi* | [**dashboardStarshipMiniList**](docs/DashboardApi.md#dashboardstarshipminilist) | **GET** /api/ll/2.4.0/dashboard/starship/mini/ |  |
 | *DockingEventsApi* | [**dockingEventsList**](docs/DockingEventsApi.md#dockingeventslist) | **GET** /api/ll/2.4.0/docking_events/ |  |
 | *DockingEventsApi* | [**dockingEventsRetrieve**](docs/DockingEventsApi.md#dockingeventsretrieve) | **GET** /api/ll/2.4.0/docking_events/{id}/ |  |
 | *EventsApi* | [**eventsDetailedList**](docs/EventsApi.md#eventsdetailedlist) | **GET** /api/ll/2.4.0/events/detailed/ |  |
@@ -277,9 +270,6 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.LandingLocation](docs/LandingLocation.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.LandingType](docs/LandingType.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.Language](docs/Language.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchAndEventsDetailed](docs/LaunchAndEventsDetailed.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchAndEventsList](docs/LaunchAndEventsList.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchAndEventsNormal](docs/LaunchAndEventsNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic](docs/LaunchBasic.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed](docs/LaunchDetailed.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchMini](docs/LaunchMini.md)
@@ -305,8 +295,6 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.MissionPatchDetailed](docs/MissionPatchDetailed.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.MissionType](docs/MissionType.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision](docs/NetPrecision.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.Notice](docs/Notice.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.NoticeType](docs/NoticeType.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.Orbit](docs/Orbit.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PadDetailed](docs/PadDetailed.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PadDetailedSerializerNoLocation](docs/PadDetailedSerializerNoLocation.md)
@@ -361,7 +349,6 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedMissionPatchList](docs/PaginatedMissionPatchList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedMissionTypeList](docs/PaginatedMissionTypeList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedNetPrecisionList](docs/PaginatedNetPrecisionList.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedNoticeTypeList](docs/PaginatedNoticeTypeList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedOrbitList](docs/PaginatedOrbitList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedPadDetailedList](docs/PaginatedPadDetailedList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedPayloadDetailedList](docs/PaginatedPayloadDetailedList.md)
@@ -372,7 +359,6 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedProgramMiniList](docs/PaginatedProgramMiniList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedProgramNormalList](docs/PaginatedProgramNormalList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedProgramTypeList](docs/PaginatedProgramTypeList.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedRoadClosureStatusList](docs/PaginatedRoadClosureStatusList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpaceStationDetailedEndpointList](docs/PaginatedSpaceStationDetailedEndpointList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpaceStationEndpointList](docs/PaginatedSpaceStationEndpointList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpaceStationStatusList](docs/PaginatedSpaceStationStatusList.md)
@@ -407,8 +393,6 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini](docs/ProgramMini.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal](docs/ProgramNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramType](docs/ProgramType.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.RoadClosure](docs/RoadClosure.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.RoadClosureStatus](docs/RoadClosureStatus.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.RocketDetailed](docs/RocketDetailed.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.RocketNormal](docs/RocketNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SocialMedia](docs/SocialMedia.md)
@@ -443,16 +427,12 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkEndpointNormal](docs/SpacewalkEndpointNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkList](docs/SpacewalkList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkNormal](docs/SpacewalkNormal.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.StarshipDashboardDetailed](docs/StarshipDashboardDetailed.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.StarshipDashboardList](docs/StarshipDashboardList.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.StarshipDashboardNormal](docs/StarshipDashboardNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent](docs/TimelineEvent.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEventType](docs/TimelineEventType.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.Update](docs/Update.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint](docs/UpdateEndpoint.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL](docs/VidURL.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLType](docs/VidURLType.md)
- - [me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLs](docs/VidURLs.md)
 
 
 <a id="documentation-for-authorization"></a>

@@ -62,7 +62,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.SpacecraftDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.TimelineCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
-import me.calebjones.spacelaunchnow.ui.viewmodel.VideoPlayerState
+import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor

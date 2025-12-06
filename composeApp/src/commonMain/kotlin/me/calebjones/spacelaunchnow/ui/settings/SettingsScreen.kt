@@ -239,6 +239,12 @@ fun SettingsScreen(
                     SettingsCardRow {
                         Column(Modifier.fillMaxWidth()) {
                             SettingsNavigationRow(
+                                title = "Starship",
+                                subtitle = "Track Starship development, launches, and events",
+                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Starship) }
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
                                 title = "Rockets",
                                 subtitle = "Browse launcher configurations and details",
                                 onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Rockets) }

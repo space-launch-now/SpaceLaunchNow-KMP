@@ -14,7 +14,9 @@ class CacheCleanupService(
     private val launchDataSource: LaunchLocalDataSource,
     private val eventDataSource: EventLocalDataSource,
     private val articleDataSource: ArticleLocalDataSource,
-    private val updateDataSource: UpdateLocalDataSource
+    private val updateDataSource: UpdateLocalDataSource,
+    private val programDataSource: ProgramLocalDataSource,
+    private val spacecraftDataSource: SpacecraftLocalDataSource
 ) {
     private val cleanupScope = CoroutineScope(Dispatchers.Default)
     private val cleanupInterval = 6.hours
@@ -68,6 +70,20 @@ class CacheCleanupService(
             println("CacheCleanupService: Cleaned up expired updates")
         } catch (e: Exception) {
             println("CacheCleanupService: Error cleaning updates: ${e.message}")
+        }
+        
+        try {
+            programDataSource.deleteExpiredPrograms()
+            println("CacheCleanupService: Cleaned up expired programs")
+        } catch (e: Exception) {
+            println("CacheCleanupService: Error cleaning programs: ${e.message}")
+        }
+        
+        try {
+            spacecraftDataSource.deleteExpiredSpacecraft()
+            println("CacheCleanupService: Cleaned up expired spacecraft")
+        } catch (e: Exception) {
+            println("CacheCleanupService: Error cleaning spacecraft: ${e.message}")
         }
         
         println("CacheCleanupService: Cache cleanup completed")
