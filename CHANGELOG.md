@@ -1,3 +1,12 @@
+## [5.2.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.2...v5.2.3) (2025-12-07)
+
+
+### Bug Fixes
+
+* add updates section to display for launch details view ([8956ffe](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8956ffedd489deef34f03a03517f06568ea9b6b6))
+
+
+
 ## [5.2.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.1...v5.2.2) (2025-12-07)
 
 
@@ -53,24 +62,6 @@
 
 * add Roadmap feature with dedicated screen and ViewModel ([29f7b1e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/29f7b1ee9e336b8de10dbd00264742b178f189d2))
 * optimize ad loading and initialization for improved performance ([3882498](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/38824986b84ebb7b41ac5a4006b94dac6111319b))
-
-
-
-# [5.0.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b27...v5.0.0) (2025-11-25)
-
-
-### Bug Fixes
-
-* implement viewstate migration ([2e90ffd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2e90ffd1114b08c6ce330d93b21e0100f8a5f712))
-* include changes ([4ac4e28](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4ac4e2882dd9dbda2e3f93972ccf225bcfd45823))
-* remove forced versioning for automatic semantic versioning ([b5d1552](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b5d15520952da8937f16d882f44070a58adca918))
-* update location IDs in LaunchFilterServiceTest to reflect correct expansions ([d03a5e8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d03a5e8412a3cef7ce928c68bc82c515809194c6))
-
-
-### Features
-
-* filter home page split viewmodels in the home screen and add additional filters ([16274be](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/16274bea4c3b3d2a961183a44f61221a4430b332))
-* Implement Launch Filters for Home Screen Integration ([42d0bf6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/42d0bf68631bb7f5acaba0b52b1cbaafd34348e3))
 
 
 
