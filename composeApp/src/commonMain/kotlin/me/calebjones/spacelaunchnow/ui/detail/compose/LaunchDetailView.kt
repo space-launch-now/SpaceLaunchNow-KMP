@@ -52,6 +52,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyDetailsCa
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyLaunchStatistics
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LandingDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchLocationCard
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchUpdatesSection
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchVehicleDetailedStatistics
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchVehicleDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.MissionDetailsCard
@@ -419,6 +420,17 @@ private fun LaunchDetailContentInBody(
                         TimelineCard(timeline = launch.timeline)
                     }
 
+                    // Updates Section
+                    if (launch.updates.isNotEmpty()) {
+                        Text(
+                            text = "Updates",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                        LaunchUpdatesSection(updates = launch.updates)
+                    }
+
                     // Related News Section
                     if (relatedNews.isNotEmpty() || isNewsLoading || newsError != null) {
                         Text(
@@ -598,6 +610,18 @@ private fun LaunchDetailContentInBody(
                     )
                     Spacer(Modifier.height(16.dp))
                     TimelineCard(timeline = launch.timeline)
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                // 4.5. Updates Section
+                if (launch.updates.isNotEmpty()) {
+                    Text(
+                        text = "Updates",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    LaunchUpdatesSection(updates = launch.updates)
                     Spacer(Modifier.height(16.dp))
                 }
 
