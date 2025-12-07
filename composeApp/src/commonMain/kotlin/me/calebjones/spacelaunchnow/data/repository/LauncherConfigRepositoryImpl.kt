@@ -27,7 +27,8 @@ class LauncherConfigRepositoryImpl(
             val response = launcherConfigurationsApi.getConfigurationsByProgram(
                 programIds = listOf(programId),
                 limit = limit,
-                offset = offset
+                offset = offset,
+                isPlaceholder = false
             )
 
             val configs = response.body()
@@ -59,7 +60,8 @@ class LauncherConfigRepositoryImpl(
                 programIds = null,
                 limit = limit,
                 offset = offset,
-                search = search
+                search = search,
+                isPlaceholder = false
             )
 
             val configs = response.body()

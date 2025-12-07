@@ -20,7 +20,8 @@ class SpacecraftRepositoryImpl(
     override suspend fun getSpacecraftByConfig(
         configId: Int,
         limit: Int,
-        forceRefresh: Boolean
+        forceRefresh: Boolean,
+        isPlaceholder: Boolean?
     ): Result<DataResult<List<SpacecraftEndpointDetailed>>> {
         return try {
             println("=== SpacecraftRepository.getSpacecraftByConfig ===")
@@ -49,7 +50,8 @@ class SpacecraftRepositoryImpl(
             val response = spacecraftApi.getSpacecraftByConfig(
                 configId = configId,
                 limit = limit,
-                ordering = "-id"
+                ordering = "-id",
+                isPlaceholder = isPlaceholder
             )
 
             val spacecraftList = response.body().results
@@ -83,7 +85,8 @@ class SpacecraftRepositoryImpl(
     private suspend fun handleConfigError(
         e: Exception,
         configId: Int,
-        limit: Int
+        limit: Int,
+        isPlaceholder: Boolean? = null
     ): Result<DataResult<List<SpacecraftEndpointDetailed>>> {
         val staleCached = localDataSource?.getSpacecraftByConfigIdStale(configId, limit)
         val staleTimestamp = localDataSource?.getCacheTimestamp()
@@ -130,7 +133,8 @@ class SpacecraftRepositoryImpl(
         limit: Int,
         offset: Int,
         inSpace: Boolean?,
-        search: String?
+        search: String?,
+        isPlaceholder: Boolean?
     ): Result<PaginatedSpacecraftEndpointDetailedList> {
         return try {
             println("=== SpacecraftRepository.getSpacecraft ===")
@@ -141,7 +145,8 @@ class SpacecraftRepositoryImpl(
                 offset = offset,
                 inSpace = inSpace,
                 search = search,
-                ordering = "-flights_count"
+                ordering = "-flights_count",
+                isPlaceholder = isPlaceholder
             )
 
             val spacecraft = response.body()

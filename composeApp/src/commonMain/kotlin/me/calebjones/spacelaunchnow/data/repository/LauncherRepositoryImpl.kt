@@ -19,7 +19,8 @@ class LauncherRepositoryImpl(
         offset: Int,
         search: String?,
         ordering: String?,
-        launcherConfigId: Int?
+        launcherConfigId: Int?,
+        isPlaceholder: Boolean?
     ): Result<PaginatedLauncherDetailedList> {
         return try {
             println("=== LauncherRepository.getLaunchers ===")
@@ -30,6 +31,7 @@ class LauncherRepositoryImpl(
                 offset = offset,
                 search = search,
                 ordering = ordering,
+                isPlaceholder = false,
                 launcherConfigIds = launcherConfigId?.let { listOf(it) }
             )
 
@@ -59,6 +61,7 @@ class LauncherRepositoryImpl(
             offset = offset,
             search = null,
             ordering = "-id",
+            isPlaceholder = false,
             launcherConfigId = configId
         )
     }

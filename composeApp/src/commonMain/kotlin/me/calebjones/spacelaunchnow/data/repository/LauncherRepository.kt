@@ -7,7 +7,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherDe
  * Repository interface for launcher (booster/first stage) data
  */
 interface LauncherRepository {
-    
+
     /**
      * Get launchers with optional search/filter and pagination
      */
@@ -16,7 +16,8 @@ interface LauncherRepository {
         offset: Int = 0,
         search: String? = null,
         ordering: String? = null,
-        launcherConfigId: Int? = null
+        launcherConfigId: Int? = null,
+        isPlaceholder: Boolean? = null
     ): Result<PaginatedLauncherDetailedList>
 
     /**

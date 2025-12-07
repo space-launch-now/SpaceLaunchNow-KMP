@@ -12,7 +12,8 @@ interface SpacecraftRepository {
     suspend fun getSpacecraftByConfig(
         configId: Int,
         limit: Int = 20,
-        forceRefresh: Boolean = false
+        forceRefresh: Boolean = false,
+        isPlaceholder: Boolean? = null
     ): Result<DataResult<List<SpacecraftEndpointDetailed>>>
 
     /**
@@ -27,7 +28,8 @@ interface SpacecraftRepository {
         limit: Int = 20,
         offset: Int = 0,
         inSpace: Boolean? = null,
-        search: String? = null
+        search: String? = null,
+        isPlaceholder: Boolean?
     ): Result<PaginatedSpacecraftEndpointDetailedList>
 }
 

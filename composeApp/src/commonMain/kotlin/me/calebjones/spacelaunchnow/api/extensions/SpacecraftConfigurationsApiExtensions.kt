@@ -7,17 +7,17 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigDet
 
 /**
  * Extension functions for SpacecraftConfigurationsApi to provide clean, named-parameter interfaces.
- * 
+ *
  * NOTE: SpacecraftConfigurationsApi does NOT have a `program` filter like LauncherConfigurationsApi.
  * We can filter by `agency` (SpaceX = 121) instead, or filter client-side after fetching.
  */
 
 /**
  * Get spacecraft configurations (spacecraft types) with agency filter and pagination.
- * 
+ *
  * SpacecraftConfig represents a spacecraft type/model (e.g., "Starship", "Dragon 2").
  * This is the "category" level - individual spacecraft belong to a configuration.
- * 
+ *
  * @param agencyId Filter by agency ID (e.g., 121 for SpaceX)
  * @param limit Number of results per page (max 100)
  * @param offset Pagination offset

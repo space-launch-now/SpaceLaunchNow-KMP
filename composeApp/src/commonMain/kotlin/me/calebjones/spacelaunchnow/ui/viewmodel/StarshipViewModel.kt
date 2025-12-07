@@ -558,7 +558,8 @@ class StarshipViewModel(
         } else {
             spacecraftRepository.getSpacecraft(
                 limit = StarshipConstants.VEHICLES_LIMIT,
-                search = "Starship"
+                search = "Starship",
+                isPlaceholder = false
             ).map { it.results }
         }
 
@@ -654,7 +655,8 @@ class StarshipViewModel(
             spacecraftRepository.getSpacecraft(
                 limit = StarshipConstants.VEHICLES_LIMIT,
                 offset = spacecraftOffset,
-                search = selectedConfig?.name ?: "Starship"
+                search = selectedConfig?.name ?: "Starship",
+                isPlaceholder = false
             )
                 .onSuccess { spacecraft ->
                     println("[STARSHIP] More spacecraft loaded: ${spacecraft.results.size} ships (offset: $spacecraftOffset)")

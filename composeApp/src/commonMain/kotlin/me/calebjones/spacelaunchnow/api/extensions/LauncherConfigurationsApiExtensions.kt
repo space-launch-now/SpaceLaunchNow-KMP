@@ -13,10 +13,10 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherCo
 
 /**
  * Get launcher configurations (rocket types) with program filter and pagination.
- * 
+ *
  * LauncherConfig represents a rocket type/variant (e.g., "Super Heavy", "Falcon 9 Block 5").
  * This is the "category" level - individual launchers (boosters) belong to a configuration.
- * 
+ *
  * @param programIds Filter by program IDs (e.g., [1] for Starship program)
  * @param limit Number of results per page (max 100)
  * @param offset Pagination offset
@@ -32,7 +32,8 @@ suspend fun LauncherConfigurationsApi.getConfigurationsByProgram(
     search: String? = null,
     active: Boolean? = null,
     reusable: Boolean? = null,
-    ordering: String? = null
+    ordering: String? = null,
+    isPlaceholder: Boolean? = null
 ): HttpResponse<PaginatedLauncherConfigDetailedList> = launcherConfigurationsDetailedList(
     program = programIds,
     limit = limit,
@@ -71,7 +72,7 @@ suspend fun LauncherConfigurationsApi.getConfigurationsByProgram(
     familiesContains = null,
     fullName = null,
     fullNameContains = null,
-    isPlaceholder = null,
+    isPlaceholder = isPlaceholder,
     maidenFlight = null,
     maidenFlightDay = null,
     maidenFlightGt = null,
