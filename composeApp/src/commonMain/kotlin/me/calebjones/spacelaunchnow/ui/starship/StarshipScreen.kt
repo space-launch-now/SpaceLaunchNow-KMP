@@ -21,6 +21,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +62,7 @@ fun StarshipScreen(
     // Collect per-section states
     val programState by viewModel.programState.collectAsStateWithLifecycle()
     val nextLaunchState by viewModel.nextLaunchState.collectAsStateWithLifecycle()
+    val historyLaunchesState by viewModel.historyLaunchesState.collectAsStateWithLifecycle()
     val updatesState by viewModel.updatesState.collectAsStateWithLifecycle()
     val eventsState by viewModel.eventsState.collectAsStateWithLifecycle()
     val newsState by viewModel.newsState.collectAsStateWithLifecycle()
@@ -188,6 +190,7 @@ fun StarshipScreen(
                         0 -> StarshipOverviewTab(
                             programState = programState,
                             nextLaunchState = nextLaunchState,
+                            historyLaunchesState = historyLaunchesState,
                             updatesState = updatesState,
                             videoPlayerState = videoPlayerState,
                             navController = navController,

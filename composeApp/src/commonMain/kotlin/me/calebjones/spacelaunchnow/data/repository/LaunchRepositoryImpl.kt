@@ -725,6 +725,125 @@ class LaunchRepositoryImpl(
         }
     }
 
+    override suspend fun getStarshipHistoryLaunches(
+        limit: Int,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedLaunchNormalList>> {
+        return try {
+            log.d { "getStarshipHistoryLaunches - limit: $limit, forceRefresh: $forceRefresh" }
+
+            val now = Clock.System.now().toEpochMilliseconds()
+            val cacheKey = "starship_history"
+
+            // STALE-WHILE-REVALIDATE: Check for stale data
+            val staleCached = localDataSource?.getStarshipHistoryStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
+            val hasStaleData = staleCached != null && staleCached.isNotEmpty()
+
+            // Try fresh cache if available and not forcing refresh
+            if (!forceRefresh) {
+                val cachedLaunches = localDataSource?.getStarshipHistory(limit)
+                if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
+                    log.i { "Cache hit - Returning ${cachedLaunches.size} fresh cached Starship history launches" }
+                    return Result.success(
+                        DataResult(
+                            data = PaginatedLaunchNormalList(
+                                count = cachedLaunches.size,
+                                next = null,
+                                previous = null,
+                                results = cachedLaunches
+                            ),
+                            source = DataSource.CACHE,
+                            timestamp = staleTimestamp ?: now
+                        )
+                    )
+                } else if (hasStaleData) {
+                    log.i { "Returning ${staleCached!!.size} stale Starship history launches" }
+                    return Result.success(
+                        DataResult(
+                            data = PaginatedLaunchNormalList(
+                                count = staleCached.size,
+                                next = null,
+                                previous = null,
+                                results = staleCached
+                            ),
+                            source = DataSource.STALE_CACHE,
+                            timestamp = staleTimestamp ?: now
+                        )
+                    )
+                }
+            }
+
+            // Fetch from API - all previous Starship launches (program=1)
+            log.d { "Fetching Starship history from API with program=1, previous=true" }
+            val response = launchesApi.getLaunchList(
+                limit = limit,
+                previous = true,
+                ordering = "-net", // Newest first
+                program = listOf(1) // Starship program
+            )
+
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} Starship history launches" }
+
+            // Cache the results with 1-month TTL
+            localDataSource?.cacheStarshipHistory(launches.results)
+
+            Result.success(
+                DataResult(
+                    data = launches,
+                    source = DataSource.NETWORK,
+                    timestamp = now
+                )
+            )
+        } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getStarshipHistoryLaunches: ${e.message}" }
+            // On API error, try to return stale cache if available
+            val staleCached = localDataSource?.getStarshipHistoryStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("starship_history")
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                log.w { "⚠️ API ERROR: Returning ${staleCached.size} stale Starship history launches as fallback" }
+                return Result.success(
+                    DataResult(
+                        data = PaginatedLaunchNormalList(
+                            count = staleCached.size,
+                            next = null,
+                            previous = null,
+                            results = staleCached
+                        ),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = staleTimestamp
+                    )
+                )
+            }
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getStarshipHistoryLaunches: ${e.message}" }
+            // On network error, try to return stale cache if available
+            val staleCached = localDataSource?.getStarshipHistoryStale(limit)
+            val staleTimestamp = localDataSource?.getCacheTimestamp("starship_history")
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                log.w { "⚠️ NETWORK ERROR: Returning ${staleCached.size} stale Starship history launches as fallback" }
+                return Result.success(
+                    DataResult(
+                        data = PaginatedLaunchNormalList(
+                            count = staleCached.size,
+                            next = null,
+                            previous = null,
+                            results = staleCached
+                        ),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = staleTimestamp
+                    )
+                )
+            }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getStarshipHistoryLaunches: ${e::class.simpleName}: ${e.message}" }
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getNextDetailedLaunch(
         limit: Int
     ): Result<PaginatedLaunchDetailedList> {

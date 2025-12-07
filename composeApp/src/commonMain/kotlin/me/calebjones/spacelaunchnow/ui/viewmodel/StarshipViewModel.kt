@@ -80,6 +80,9 @@ class StarshipViewModel(
     private val _nextLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
     val nextLaunchState: StateFlow<ViewState<LaunchNormal?>> = _nextLaunchState.asStateFlow()
 
+    private val _historyLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
+    val historyLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> = _historyLaunchesState.asStateFlow()
+
     private val _updatesState = MutableStateFlow(ViewState(data = emptyList<UpdateEndpoint>()))
     val updatesState: StateFlow<ViewState<List<UpdateEndpoint>>> = _updatesState.asStateFlow()
 
@@ -211,7 +214,10 @@ class StarshipViewModel(
             // Priority 2: Next launch (prominent display)
             val launchJob = async { loadNextLaunch(forceRefresh) }
 
-            // Priority 3: Background data (IO dispatcher)
+            // Priority 3: History launches for timeline
+            val historyJob = async { loadHistoryLaunches(forceRefresh) }
+
+            // Priority 4: Background data (IO dispatcher)
             launch(Dispatchers.Default) { loadUpdates(forceRefresh) }
         }
     }
@@ -358,6 +364,36 @@ class StarshipViewModel(
             }
             .onFailure { exception ->
                 _nextLaunchState.update {
+                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                }
+            }
+    }
+
+    private suspend fun loadHistoryLaunches(forceRefresh: Boolean) {
+        _historyLaunchesState.update {
+            it.copy(
+                isLoading = true,
+                isUserInitiated = forceRefresh,
+                error = null
+            )
+        }
+
+        launchRepository.getStarshipHistoryLaunches(
+            limit = 50,
+            forceRefresh = forceRefresh
+        )
+            .onSuccess { dataResult ->
+                _historyLaunchesState.update {
+                    it.copy(
+                        data = dataResult.data.results,
+                        isLoading = false,
+                        dataSource = dataResult.source,
+                        cacheTimestamp = dataResult.timestamp
+                    )
+                }
+            }
+            .onFailure { exception ->
+                _historyLaunchesState.update {
                     it.copy(error = formatErrorMessage(exception), isLoading = false)
                 }
             }

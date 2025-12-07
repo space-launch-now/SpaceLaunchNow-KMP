@@ -263,13 +263,80 @@ class LaunchLocalDataSource(
         }
     }
     
+    // Starship history operations with 1-month TTL
+    suspend fun cacheStarshipHistory(launches: List<LaunchNormal>) {
+        val now = System.now().toEpochMilliseconds()
+        val oneMonthMs = 2592000000L // 30 days in milliseconds
+        val expiresAt = now + oneMonthMs
+        
+        launches.forEach { launch ->
+            queries.insertOrReplaceNormal(
+                id = launch.id,
+                name = launch.name ?: "",
+                status_id = launch.status?.id?.toLong(),
+                status_name = launch.status?.name,
+                net = launch.net?.toEpochMilliseconds(),
+                window_end = launch.windowEnd?.toEpochMilliseconds(),
+                window_start = launch.windowStart?.toEpochMilliseconds(),
+                launch_service_provider_id = launch.launchServiceProvider?.id?.toLong(),
+                launch_service_provider_name = launch.launchServiceProvider?.name,
+                rocket_configuration_id = launch.rocket?.configuration?.id?.toLong(),
+                rocket_configuration_name = launch.rocket?.configuration?.name,
+                pad_name = launch.pad?.name,
+                location_name = launch.pad?.location?.name,
+                image_url = launch.image?.imageUrl,
+                mission_name = launch.mission?.name,
+                mission_description = launch.mission?.description,
+                json_data = json.encodeToString(launch),
+                cached_at = now,
+                expires_at = expiresAt
+            )
+        }
+    }
+    
+    suspend fun getStarshipHistory(limit: Int): List<LaunchNormal> {
+        val now = System.now().toEpochMilliseconds()
+        return queries.getPreviousNormal(now, now, limit.toLong())
+            .executeAsList()
+            .mapNotNull { cached ->
+                try {
+                    json.decodeFromString<LaunchNormal>(cached.json_data)
+                } catch (e: Exception) {
+                    log.e(e) { "Error decoding Starship history from cache: ${e.message}" }
+                    null
+                }
+            }
+            .filter { launch ->
+                // Only return launches from Starship program (ID = 1)
+                launch.program?.any { it.id == 1 } == true
+            }
+    }
+    
+    suspend fun getStarshipHistoryStale(limit: Int): List<LaunchNormal> {
+        val now = System.now().toEpochMilliseconds()
+        return queries.getPreviousNormalStale(now, limit.toLong())
+            .executeAsList()
+            .mapNotNull { cached ->
+                try {
+                    json.decodeFromString<LaunchNormal>(cached.json_data)
+                } catch (e: Exception) {
+                    log.e(e) { "Error decoding stale Starship history from cache: ${e.message}" }
+                    null
+                }
+            }
+            .filter { launch ->
+                // Only return launches from Starship program (ID = 1)
+                launch.program?.any { it.id == 1 } == true
+            }
+    }
+    
     // Cache metadata operations
     
     /**
      * Gets the timestamp of when data for a specific cache key was last cached.
      * Returns the most recent cached_at timestamp for launches in the specified category.
      * 
-     * @param key Cache category: "upcoming_launches", "previous_launches", etc.
+     * @param key Cache category: "upcoming_launches", "previous_launches", "starship_history", etc.
      * @return Timestamp in milliseconds since epoch, or null if no cached data exists
      */
     suspend fun getCacheTimestamp(key: String): Long? {
@@ -281,6 +348,10 @@ class LaunchLocalDataSource(
                 queries.getUpcomingNormalStale(now, 1).executeAsOneOrNull()?.cached_at
             }
             "previous_launches" -> {
+                val now = System.now().toEpochMilliseconds()
+                queries.getPreviousNormalStale(now, 1).executeAsOneOrNull()?.cached_at
+            }
+            "starship_history" -> {
                 val now = System.now().toEpochMilliseconds()
                 queries.getPreviousNormalStale(now, 1).executeAsOneOrNull()?.cached_at
             }

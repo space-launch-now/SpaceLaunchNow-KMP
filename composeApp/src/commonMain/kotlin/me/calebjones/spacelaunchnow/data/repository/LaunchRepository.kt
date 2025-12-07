@@ -51,6 +51,11 @@ interface LaunchRepository {
         programId: List<Int>? = null
     ): Result<PaginatedLaunchNormalList>
 
+    suspend fun getStarshipHistoryLaunches(
+        limit: Int,
+        forceRefresh: Boolean = false
+    ): Result<DataResult<PaginatedLaunchNormalList>>
+
     suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList>
 }
  
