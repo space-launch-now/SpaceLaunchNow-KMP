@@ -194,13 +194,15 @@ fun FeaturedLaunchRowCard(
                             tint = MaterialTheme.colorScheme.secondary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formatLocationAndPad(launch),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        launch.pad?.location?.name?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -214,7 +216,7 @@ fun FeaturedLaunchRowCard(
                             contentColor = Color.White
                         ) {
                             Text(
-                                text = status.name.uppercase(),
+                                text = status.abbrev?.uppercase() ?: status.name.uppercase(),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Medium,
