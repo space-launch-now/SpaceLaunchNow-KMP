@@ -1,3 +1,12 @@
+## [5.2.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.1...v5.2.2) (2025-12-07)
+
+
+### Bug Fixes
+
+* imrprove Starship history launches feature with timeline ([adc6797](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/adc6797842fb96d5cc6edefb15801858c73ff14f))
+
+
+
 ## [5.2.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.0...v5.2.1) (2025-12-07)
 
 
@@ -62,15 +71,6 @@
 
 * filter home page split viewmodels in the home screen and add additional filters ([16274be](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/16274bea4c3b3d2a961183a44f61221a4430b332))
 * Implement Launch Filters for Home Screen Integration ([42d0bf6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/42d0bf68631bb7f5acaba0b52b1cbaafd34348e3))
-
-
-
-# [5.0.0-b27](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b26...v5.0.0-b27) (2025-11-25)
-
-
-### Bug Fixes
-
-* iOS widget respects light mode ([b8c2bdb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b8c2bdb49c142d1fcc18beff281efd34c1a74833))
 
 
 
