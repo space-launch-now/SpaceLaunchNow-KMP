@@ -16,13 +16,14 @@ suspend fun SpacecraftApi.getSpacecraftByConfig(
     configId: Int,
     limit: Int? = null,
     inSpace: Boolean? = null,
-    ordering: String? = null
+    ordering: String? = null,
+    isPlaceholder: Boolean?
 ): HttpResponse<PaginatedSpacecraftEndpointDetailedList> = spacecraftDetailedList(
     spacecraftConfig = configId,
     limit = limit,
     inSpace = inSpace,
     ordering = ordering,
-    isPlaceholder = null,
+    isPlaceholder = isPlaceholder,
     name = null,
     offset = null,
     search = null,
