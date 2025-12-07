@@ -1,3 +1,12 @@
+## [5.2.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.0...v5.2.1) (2025-12-07)
+
+
+### Bug Fixes
+
+* dont show placeholder objects ([6a4bda2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6a4bda24fb964664d494d0f2e58f052ef9af5172))
+
+
+
 # [5.2.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.1.0...v5.2.0) (2025-12-06)
 
 
@@ -62,15 +71,6 @@
 ### Bug Fixes
 
 * iOS widget respects light mode ([b8c2bdb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b8c2bdb49c142d1fcc18beff281efd34c1a74833))
-
-
-
-# [5.0.0-b26](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.0.0-b25...v5.0.0-b26) (2025-11-21)
-
-
-### Bug Fixes
-
-* theme issue switching light to dark ([a2bcf2e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a2bcf2e2dbfc93b6586e31ba140184223941764d))
 
 
 

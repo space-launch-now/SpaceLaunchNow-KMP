@@ -1,10 +1,3 @@
 ### Bug Fixes
 
-* add TestSpaceLoggerInit utility and initialize logger in tests
-* **logging:** enhance error logging in billing and subscription management
-
-### Features
-
-* add additional featured launches to home screen
-* implement starship dashboard
-* **logging:** replace println with kermit logging and enable users to turn on logging
+* dont show placeholder objects
