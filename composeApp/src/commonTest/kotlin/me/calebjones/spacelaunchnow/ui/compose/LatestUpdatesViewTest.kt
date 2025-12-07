@@ -20,13 +20,14 @@ class LatestUpdatesViewTest {
         comment: String? = "Test comment",
         createdBy: String? = "TestUser",
         profileImage: String? = "https://example.com/profile.jpg",
-        createdOn: Instant? = null
+        createdOn: Instant? = null,
+        infoUrl: String? = null
     ): UpdateEndpoint {
         return UpdateEndpoint(
             id = id,
             profileImage = profileImage,
             comment = comment,
-            infoUrl = null,
+            infoUrl = infoUrl,
             createdBy = createdBy,
             launch = null,
             event = null,
@@ -179,5 +180,31 @@ class LatestUpdatesViewTest {
                 (updateWithoutImage.createdBy?.firstOrNull()?.uppercaseChar() ?: "?")
 
         assertEquals("https://via.placeholder.com/48x48/CCCCCC/000000?text=U", fallbackImageUrl)
+    }
+
+    @Test
+    fun testUpdateWithInfoUrl() {
+        val updateWithInfoUrl = createMockUpdate(
+            id = 789,
+            comment = "Launch delayed due to weather",
+            infoUrl = "https://www.spacex.com/launches"
+        )
+
+        val updateWithoutInfoUrl = createMockUpdate(
+            id = 790,
+            comment = "Launch proceeding as scheduled"
+        )
+
+        // Test that infoUrl is correctly stored
+        assertEquals("https://www.spacex.com/launches", updateWithInfoUrl.infoUrl)
+        assertEquals(null, updateWithoutInfoUrl.infoUrl)
+        
+        // Verify the button should be shown when infoUrl is available
+        val shouldShowButton = updateWithInfoUrl.infoUrl != null
+        assertEquals(true, shouldShowButton)
+        
+        // Verify the button should not be shown when infoUrl is null
+        val shouldNotShowButton = updateWithoutInfoUrl.infoUrl != null
+        assertEquals(false, shouldNotShowButton)
     }
 }
