@@ -50,6 +50,7 @@ import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyLaunchStatistics
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.FlightClubCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LandingDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchLocationCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchUpdatesSection
@@ -418,6 +419,12 @@ private fun LaunchDetailContentInBody(
                             fontWeight = FontWeight.Bold
                         )
                         TimelineCard(timeline = launch.timeline)
+                        
+                        // Flight Club link
+                        launch.flightclubUrl?.let { url ->
+                            Spacer(Modifier.height(8.dp))
+                            FlightClubCard(flightClubUrl = url)
+                        }
                     }
 
                     // Updates Section
@@ -610,6 +617,12 @@ private fun LaunchDetailContentInBody(
                     )
                     Spacer(Modifier.height(16.dp))
                     TimelineCard(timeline = launch.timeline)
+                    
+                    // Flight Club link
+                    launch.flightclubUrl?.let { url ->
+                        Spacer(Modifier.height(8.dp))
+                        FlightClubCard(flightClubUrl = url)
+                    }
                     Spacer(Modifier.height(16.dp))
                 }
 

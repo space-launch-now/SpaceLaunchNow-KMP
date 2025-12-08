@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,7 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEventType
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TimelineCard(timeline: List<TimelineEvent>) {
@@ -82,44 +87,52 @@ fun TimelineEventRow(
     isLast: Boolean
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {
         // Timeline indicator column (dot and connecting lines)
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.width(24.dp)
+        Box(
+            modifier = Modifier
+                .width(24.dp)
+                .fillMaxHeight(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            // Top connecting line (if not first item) - extends from previous item
+            // Top line segment (from top to dot center)
             if (!isFirst) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
-                        .height(20.dp)
+                        .height(10.dp)
+                        .align(Alignment.TopCenter)
                         .background(MaterialTheme.colorScheme.outline)
                 )
             }
-
-            // Timeline dot
+            
+            // Bottom line segment (from dot center to bottom)
+            if (!isLast) {
+                Box(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .fillMaxHeight()
+                        .padding(top = 10.dp)
+                        .align(Alignment.TopCenter)
+                        .background(MaterialTheme.colorScheme.outline)
+                )
+            }
+            
+            // Timeline dot - positioned to align with title center
             Box(
                 modifier = Modifier
+                    .padding(top = 4.dp)
                     .size(12.dp)
                     .background(
                         MaterialTheme.colorScheme.primary,
                         CircleShape
                     )
             )
-
-            // Bottom connecting line (if not last item) - extends to next item
-            if (!isLast) {
-                Box(
-                    modifier = Modifier
-                        .width(2.dp)
-                        .height(44.dp)
-                        .background(MaterialTheme.colorScheme.outline)
-                )
-            }
         }
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -138,21 +151,20 @@ fun TimelineEventRow(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    // Event abbreviation/name
+                    // Title abbreviation/name
                     Text(
                         text = event.type?.abbrev ?: "Event",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    // Event description
+                    // Description
                     if (!event.type?.description.isNullOrEmpty()) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = event.type?.description ?: "",
+                            text = event.type.description,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            lineHeight = 18.sp
                         )
                     }
                 }
@@ -165,6 +177,113 @@ fun TimelineEventRow(
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
+        }
+    }
+}
+
+// region Sample Data
+
+private val sampleTimelineEvents = listOf(
+    TimelineEvent(
+        type = TimelineEventType(
+            id = 1,
+            abbrev = "T-0",
+            description = "Liftoff"
+        ),
+        relativeTime = "00:00:00"
+    ),
+    TimelineEvent(
+        type = TimelineEventType(
+            id = 2,
+            abbrev = "Max-Q",
+            description = "Maximum dynamic pressure"
+        ),
+        relativeTime = "00:01:12"
+    ),
+    TimelineEvent(
+        type = TimelineEventType(
+            id = 3,
+            abbrev = "MECO",
+            description = "Main engine cutoff"
+        ),
+        relativeTime = "00:02:33"
+    ),
+    TimelineEvent(
+        type = TimelineEventType(
+            id = 4,
+            abbrev = "Stage Sep",
+            description = "First stage separation"
+        ),
+        relativeTime = "00:02:36"
+    ),
+    TimelineEvent(
+        type = TimelineEventType(
+            id = 5,
+            abbrev = "SES-1",
+            description = "Second engine start 1"
+        ),
+        relativeTime = "00:02:44"
+    ),
+    TimelineEvent(
+        type = TimelineEventType(
+            id = 6,
+            abbrev = "Fairing Sep",
+            description = "Fairing separation"
+        ),
+        relativeTime = "00:03:15"
+    )
+)
+
+// endregion
+
+// region Previews
+
+@Preview
+@Composable
+private fun TimelineCardPreview() {
+    MaterialTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            TimelineCard(
+                timeline = sampleTimelineEvents.take(4)
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TimelineCardExpandedPreview() {
+    MaterialTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            TimelineCard(
+                timeline = sampleTimelineEvents
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TimelineCardSingleItemPreview() {
+    MaterialTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            TimelineCard(
+                timeline = sampleTimelineEvents.take(1)
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TimelineEventRowPreview() {
+    MaterialTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            TimelineEventRow(
+                event = sampleTimelineEvents.first(),
+                isFirst = true,
+                isLast = true
+            )
         }
     }
 }
