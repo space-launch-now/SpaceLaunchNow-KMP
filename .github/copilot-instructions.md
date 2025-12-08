@@ -322,6 +322,8 @@ launchesApi.getLaunchMiniList(limit = 10, upcoming = true)
 
 ### Adding New Screens/Features
 
+For ANY UI work - make sure Previews are made for new componenets. Prefer common composables instead of creating new ones where ever possible. Additionally any datetime handling should use the DateTimeUtil class for consistency that support the UTC toggle. Always remember to keep accessibility in mind when creating new components.
+
 1. Add screen to `Screen.kt` sealed class
 2. Create ViewModel extending `ViewModel` with StateFlow properties
 3. Register ViewModel in `AppModule.kt` using `viewModelOf(::YourViewModel)`
@@ -361,3 +363,5 @@ ALWAYS avoid using magic ID's or magic strings, use a data class where ever you 
 - [ ] Create utility extensions for common filtering patterns (getCrewedLaunches,
   getLaunchesByCompany)
 - [ ] Update all existing test files to use extension functions instead of generated methods
+
+
