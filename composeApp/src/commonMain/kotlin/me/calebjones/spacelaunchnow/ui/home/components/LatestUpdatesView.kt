@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -46,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
+import com.valentinilk.shimmer.shimmer
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.InfoCircle
@@ -54,8 +52,12 @@ import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.UpdatesShimmer
 import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock.System
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -173,13 +175,13 @@ fun UpdateCard(
 ) {
     val comment = update.comment ?: "No comment"
     val uriHandler = LocalUriHandler.current
-    
+
     val cardModifier = if (fillMaxWidth) {
         modifier
             .fillMaxWidth()
-            .wrapContentHeight()
+            .height(100.dp)
     } else {
-        modifier.size(280.dp, if (update.infoUrl != null) 120.dp else 90.dp)
+        modifier.size(320.dp, 100.dp)
     }
 
     Card(
@@ -198,140 +200,151 @@ fun UpdateCard(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(8.dp)
         ) {
-            Row(
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Author profile image - vertically centered
-                SubcomposeAsyncImage(
-                    model = update.profileImage ?: "",
-                    contentDescription = "Author profile",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                    loading = {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    },
-                    error = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surfaceContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Person,
-                                contentDescription = "Profile placeholder",
-                                modifier = Modifier.size(32.dp),
-                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                            )
-                        }
-                    }
-                )
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.SpaceEvenly
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
-                    // Author name and date row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                    // Author profile image
+                    SubcomposeAsyncImage(
+                        model = update.profileImage ?: "",
+                        contentDescription = "Author profile",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
+                        loading = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        },
+                        error = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.surfaceContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Person,
+                                    contentDescription = "Profile placeholder",
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                )
+                            }
+                        }
+                    )
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            text = update.createdBy ?: "Unknown",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f)
-                        )
-                        
-                        update.createdOn?.let { createdOn ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.Top
+                        ) {
                             Text(
-                                text = formatUpdateDate(createdOn),
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                maxLines = 1
+                                text = update.createdBy ?: "Unknown",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+
+                            update.createdOn?.let { createdOn ->
+                                Text(
+                                    text = formatUpdateDate(createdOn),
+                                    fontSize = 10.sp,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                        alpha = 0.7f
+                                    ),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+
+                        // Update subject (what it's about)
+                        val updateSubject: String? = when {
+                            update.launch != null -> update.launch.name
+                            update.event != null -> update.event.name
+                            update.program != null -> update.program.name
+                            else -> "General Update"
+                        }
+
+                        if (updateSubject != null) {
+                            Text(
+                                text = updateSubject,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
-                    }
 
-                    // Update subject (what it's about)
-                    val updateSubject: String? = when {
-                        update.launch != null -> update.launch.name
-                        update.event != null -> update.event.name
-                        update.program != null -> update.program.name
-                        else -> "General Update"
-                    }
-
-                    if (updateSubject != null) {
+                        // Comment
                         Text(
-                            text = updateSubject,
+                            text = comment,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = 16.sp
+                        )
+
+                    }
+                }
+                // Source link at bottom with icon and URL
+                update.infoUrl?.let { url ->
+                    Row(
+
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.clickable {
+                            try {
+                                uriHandler.openUri(url)
+                            } catch (_: Throwable) {
+                                // Silently handle URL opening errors
+                            }
+                        }
+                            .fillMaxWidth()
+                            .padding(start = 56.dp)
+                    ) {
+                        Icon(
+                            imageVector = FontAwesomeIcons.Solid.InfoCircle,
+                            contentDescription = "Source",
+                            modifier = Modifier.size(12.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = url,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
-
-                    // Comment
-                    Text(
-                        text = comment,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = if (fillMaxWidth) 4 else 1,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = 16.sp
-                    )
-                }
-            }
-            
-            // Info URL button if available
-            update.infoUrl?.let { url ->
-                Button(
-                    onClick = { 
-                        try {
-                            uriHandler.openUri(url)
-                        } catch (_: Throwable) {
-                            // Silently handle URL opening errors
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-                ) {
-                    Icon(
-                        imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                        contentDescription = "Information",
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Source",
-                        style = MaterialTheme.typography.labelMedium
-                    )
                 }
             }
         }
@@ -353,7 +366,8 @@ fun UpdateLoadingCard(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             // Profile image placeholder
             Box(
@@ -377,18 +391,21 @@ fun UpdateLoadingCard(
                 // Loading placeholders
                 Box(
                     modifier = Modifier
+                        .shimmer()
                         .height(12.dp)
                         .fillMaxWidth(0.4f)
                         .clip(RoundedCornerShape(6.dp)),
                 )
                 Box(
                     modifier = Modifier
+                        .shimmer()
                         .height(14.dp)
                         .fillMaxWidth(0.9f)
                         .clip(RoundedCornerShape(7.dp)),
                 )
                 Box(
                     modifier = Modifier
+                        .shimmer()
                         .height(14.dp)
                         .fillMaxWidth(0.7f)
                         .clip(RoundedCornerShape(7.dp)),
@@ -489,3 +506,161 @@ private fun formatUpdateDate(createdOn: Instant): String {
         "recently"
     }
 }
+
+// region Preview Data
+
+/**
+ * Sample updates for preview purposes
+ */
+private val sampleUpdateWithInfoUrl = UpdateEndpoint(
+    id = 1,
+    profileImage = null,
+    comment = "Vehicle is vertical on the pad. Weather looking good for tomorrow's launch attempt. All systems nominal.",
+    infoUrl = "https://example.com/update1",
+    createdBy = "SpaceX",
+    launch = null,
+    event = null,
+    program = null,
+    createdOn = System.now() - 30.minutes
+)
+
+private val sampleUpdateWithoutInfoUrl = UpdateEndpoint(
+    id = 2,
+    profileImage = null,
+    comment = "Static fire test completed successfully. All systems nominal.",
+    infoUrl = null,
+    createdBy = "Launch Director",
+    launch = null,
+    event = null,
+    program = null,
+    createdOn = System.now() - 2.hours
+)
+
+private val sampleUpdateLongComment = UpdateEndpoint(
+    id = 3,
+    profileImage = null,
+    comment = "Weather forecast updated: 80% chance of favorable conditions for launch window. Upper level winds are within acceptable limits. Ground weather team confirms go for propellant loading.",
+    infoUrl = "https://example.com/weather",
+    createdBy = "45th Weather Squadron",
+    launch = null,
+    event = null,
+    program = null,
+    createdOn = System.now() - 1.days
+)
+
+private val sampleUpdateOld = UpdateEndpoint(
+    id = 4,
+    profileImage = null,
+    comment = "Payload integration complete. Fairing encapsulation scheduled for tomorrow.",
+    infoUrl = null,
+    createdBy = "Mission Integration Team",
+    launch = null,
+    event = null,
+    program = null,
+    createdOn = System.now() - 5.days
+)
+
+// endregion
+
+// region Previews
+
+@Preview
+@Composable
+private fun UpdateCardWithInfoUrlPreview() {
+    MaterialTheme {
+        UpdateCard(
+            update = sampleUpdateWithInfoUrl,
+            navController = null,
+            fillMaxWidth = false
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun UpdateCardWithoutInfoUrlPreview() {
+    MaterialTheme {
+        UpdateCard(
+            update = sampleUpdateWithoutInfoUrl,
+            navController = null,
+            fillMaxWidth = false
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun UpdateCardFullWidthWithInfoUrlPreview() {
+    MaterialTheme {
+        UpdateCard(
+            update = sampleUpdateWithInfoUrl,
+            navController = null,
+            fillMaxWidth = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun UpdateCardFullWidthWithoutInfoUrlPreview() {
+    MaterialTheme {
+        UpdateCard(
+            update = sampleUpdateWithoutInfoUrl,
+            navController = null,
+            fillMaxWidth = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun UpdateCardLongCommentPreview() {
+    MaterialTheme {
+        UpdateCard(
+            update = sampleUpdateLongComment,
+            navController = null,
+            fillMaxWidth = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun UpdateCardOldDatePreview() {
+    MaterialTheme {
+        UpdateCard(
+            update = sampleUpdateOld,
+            navController = null,
+            fillMaxWidth = false
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun UpdateLoadingCardPreview() {
+    MaterialTheme {
+        UpdateLoadingCard()
+    }
+}
+
+@Preview
+@Composable
+private fun ErrorCardPreview() {
+    MaterialTheme {
+        ErrorCard(
+            error = "Network connection failed",
+            onRetry = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun EmptyUpdatesCardPreview() {
+    MaterialTheme {
+        EmptyUpdatesCard()
+    }
+}
+
+// endregion
