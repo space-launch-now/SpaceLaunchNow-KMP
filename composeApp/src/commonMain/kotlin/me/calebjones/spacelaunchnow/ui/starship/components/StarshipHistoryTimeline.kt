@@ -34,6 +34,7 @@ import coil3.compose.AsyncImage
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDate
@@ -204,8 +205,9 @@ private fun NextLaunchTimelineCard(
 
             // Launch date
             launch.net?.let { net ->
+                val useUtc = LocalUseUtc.current
                 Text(
-                    text = formatLaunchDate(net),
+                    text = formatLaunchDate(net, useUtc),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -286,8 +288,9 @@ private fun HistoryTimelineCard(
 
             // Launch date
             launch.net?.let { net ->
+                val useUtc = LocalUseUtc.current
                 Text(
-                    text = formatLaunchDate(net),
+                    text = formatLaunchDate(net, useUtc),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

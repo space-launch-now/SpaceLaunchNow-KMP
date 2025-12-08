@@ -107,6 +107,10 @@ class MainActivity : ComponentActivity() {
                 initialValue = ThemeOption.System,
                 lifecycle = this.lifecycle
             )
+            val useUtc by appPreferences.useUtcFlow.collectAsStateWithLifecycle(
+                initialValue = false,
+                lifecycle = this.lifecycle
+            )
 
             // Determine if we should use dark theme for system bars
             val isDarkTheme = when (themeOption) {
@@ -134,6 +138,7 @@ class MainActivity : ComponentActivity() {
             SpaceLaunchNowApp(
                 contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(this),
                 themeOption = themeOption,
+                useUtc = useUtc,
                 notificationLaunchId = notificationLaunchIdState,
                 onNotificationLaunchIdConsumed = { notificationLaunchIdState = null },
                 navigationDestination = navigationDestinationState,
