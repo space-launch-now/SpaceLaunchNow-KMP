@@ -42,7 +42,7 @@ import me.calebjones.spacelaunchnow.LocalPreloadedNavigationLeaderboardAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getOrientation
 import me.calebjones.spacelaunchnow.getPlatform
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
 /**
@@ -65,7 +65,7 @@ actual fun SmartBannerAd(
     onRemoveAdsClick: (() -> Unit)?,
     onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?
 ) {
-    val log = logger()
+    val log = SpaceLogger.getLogger("SmartBannerAd")
     // Convert placement type to AdSize for Android implementation
     val adSize = getAdSizeForPlacement(placementType)
     val contextFactory = LocalContextFactory.current
@@ -246,7 +246,7 @@ fun SmartBannerAdContent(
     onSizeChanged: ((Dp, Int) -> Unit)?,
     bannerAd: BannerAdHandler,
 ) {
-    val log = logger()
+    val log = SpaceLogger.getLogger("SmartBannerAdContent")
     // Log AdSize dimensions (can't rely on == comparison on iOS since AdSize constants aren't singletons)
     log.v { "SmartBannerAdContent: adSize dimensions = ${adSize.width}x${adSize.height}" }
     
@@ -300,7 +300,7 @@ fun SmartBannerAdContent(
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
 fun getAdSizeForPlacement(placementType: AdPlacementType): AdSize {
-    val log = logger()
+    val log = SpaceLogger.getLogger("getAdSizeForPlacement")
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val widthSizeClass = windowSizeClass.windowWidthSizeClass
 

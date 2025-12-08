@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,7 +19,7 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import org.koin.compose.koinInject
 
-private val log by lazy { logger() }
+private val log by lazy { SpaceLogger.getLogger("InterstitialAdHandler") }
 
 /**
  * iOS implementation of InterstitialAdHandler using BasicAds library.

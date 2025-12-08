@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import me.calebjones.spacelaunchnow.data.model.PushMessage
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * iOS implementation of PushMessaging using Firebase Cloud Messaging
