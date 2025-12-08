@@ -1,3 +1,5 @@
 ### Bug Fixes
 
-* ios build
+* enhance UpdateCard
+* fix UTC toggle support across the app
+* update copilot instructions
