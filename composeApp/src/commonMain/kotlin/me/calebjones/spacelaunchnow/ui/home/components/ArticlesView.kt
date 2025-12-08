@@ -38,6 +38,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.viewmodel.koinViewModel
@@ -233,8 +234,9 @@ fun ArticleItem(article: Article) {
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.labelSmall
                     )
+                    val useUtc = LocalUseUtc.current
                     Text(
-                        text = formatPublishedDate(article.publishedAt),
+                        text = formatPublishedDate(article.publishedAt, useUtc),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 9.sp
@@ -308,9 +310,9 @@ fun NewsItemShimmer() {
 /**
  * Format published date to human readable format using locale-aware formatting
  */
-private fun formatPublishedDate(instant: Instant): String {
+private fun formatPublishedDate(instant: Instant, useUtc: Boolean): String {
     return try {
-        DateTimeUtil.formatLaunchDate(instant)
+        DateTimeUtil.formatLaunchDate(instant, useUtc)
     } catch (e: Exception) {
         "Unknown date"
     }

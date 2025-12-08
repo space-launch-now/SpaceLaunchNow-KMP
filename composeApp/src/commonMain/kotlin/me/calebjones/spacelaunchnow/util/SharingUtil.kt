@@ -22,10 +22,11 @@ object SharingFormatUtil {
 
     /**
      * Formats launch information for sharing
+     * @param useUtc If true, displays time in UTC instead of local timezone
      */
-    fun formatLaunchShareText(launch: LaunchNormal): String {
+    fun formatLaunchShareText(launch: LaunchNormal, useUtc: Boolean = false): String {
         val title = LaunchFormatUtil.formatLaunchTitle(launch)
-        val launchTime = launch.net?.let { DateTimeUtil.formatLaunchDate(it) } ?: "TBD"
+        val launchTime = launch.net?.let { DateTimeUtil.formatLaunchDate(it, useUtc) } ?: "TBD"
 
         val launchUrl = "https://spacelaunchnow.app/launch/${launch.slug}"
 

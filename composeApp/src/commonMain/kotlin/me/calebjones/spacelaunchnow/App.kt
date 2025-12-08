@@ -104,14 +104,14 @@ fun isTabletOrDesktop(): Boolean {
 fun SpaceLaunchNowApp(
     contextFactory: ContextFactory,
     themeOption: ThemeOption = ThemeOption.System,
+    useUtc: Boolean = false,
     notificationLaunchId: String? = null,
     onNotificationLaunchIdConsumed: () -> Unit = {},
     navigationDestination: String? = null,
     onNavigationDestinationConsumed: () -> Unit = {}
 ) {
-    // Use default for useUtc to avoid Koin injection during composition on iOS
+    // useUtc is now passed as parameter from platform-specific code
     // Theme is now passed as parameter from platform-specific code
-    val useUtc = false
 
     val navController = rememberNavController()
 

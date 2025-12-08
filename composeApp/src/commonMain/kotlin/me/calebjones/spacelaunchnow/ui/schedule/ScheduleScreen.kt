@@ -69,6 +69,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
@@ -382,7 +383,8 @@ private fun ScheduleLaunchCard(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val imageUrl = launch.image?.thumbnailUrl ?: launch.image?.imageUrl
-            val dateText = DateTimeUtil.formatDateWithPrecisionFallback(launch)
+            val useUtc = LocalUseUtc.current
+            val dateText = DateTimeUtil.formatDateWithPrecisionFallback(launch, useUtc)
             val title = launch.name ?: "Unknown Launch"
             val location = launch.locationName ?: "Unknown Location"
             val mission = launch.launchServiceProvider.name
