@@ -7,7 +7,7 @@ import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 
 actual fun platformLogConfig(): LogConfig {
-    val minSeverity = if (BuildConfig.isDebug) {
+    val minSeverity = if (BuildConfig.IS_DEBUG) {
         Severity.Debug
     } else {
         Severity.Warn

@@ -3,7 +3,7 @@ package me.calebjones.spacelaunchnow.ui.ads
 import app.lexilabs.basic.ads.BasicAds
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.RequestConfiguration
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * iOS implementation of AdInitializer using BasicAds library

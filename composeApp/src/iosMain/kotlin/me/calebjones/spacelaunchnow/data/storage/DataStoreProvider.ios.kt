@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.data.storage
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import kotlinx.cinterop.ExperimentalForeignApi
 import okio.Path.Companion.toPath
@@ -10,7 +10,7 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-private val log by lazy { logger() }
+private val log by lazy { SpaceLogger.getLogger("DataStoreProvider") }
 
 @OptIn(ExperimentalForeignApi::class)
 private fun getAppGroupDirectory(): String {

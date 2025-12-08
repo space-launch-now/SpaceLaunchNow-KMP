@@ -13,10 +13,10 @@ import me.calebjones.spacelaunchnow.LocalContextFactory
 import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getPlatform
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
-private val log by lazy { logger() }
+private val log by lazy { SpaceLogger.getLogger("RewardedAdHandler") }
 
 /**
  * iOS implementation of RewardedAdHandler using BasicAds library.

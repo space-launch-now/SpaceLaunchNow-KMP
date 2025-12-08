@@ -12,12 +12,12 @@ import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.di.koinConfig
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import org.koin.core.context.startKoin
 import org.koin.mp.KoinPlatform.getKoin
 
-private val log by lazy { logger() }
+private val log by lazy { SpaceLogger.getLogger("MainViewController") }
 private var koinInitialized = false
 
 // Shared state for navigation from iOS
@@ -32,6 +32,8 @@ fun MainViewController() = ComposeUIViewController {
     // Initialize BuildConfig and Koin once before the app starts
     if (!koinInitialized) {
         initializeBuildConfig()
+        // Initialize SpaceLogger before any logging calls
+        SpaceLogger.initialize()
         startKoin(koinConfig)
         koinInitialized = true
         

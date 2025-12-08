@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import androidx.compose.runtime.getValue
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
@@ -26,7 +26,7 @@ import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
 import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
 
-private val log by lazy { logger() }
+private val log by lazy { SpaceLogger.getLogger("AdSupport") }
 
 /**
  * iOS implementation of AdConsentPopup using Google UMP.

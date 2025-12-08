@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.starship.components
 
-import androidx.activity.compose.BackHandler
+import me.calebjones.spacelaunchnow.ui.components.PlatformBackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -75,7 +75,7 @@ fun StarshipVehiclesTab(
     modifier: Modifier = Modifier
 ) {
     // Handle Android back button when at VEHICLES level
-    BackHandler(enabled = navigationLevel == VehicleNavigationLevel.VEHICLES) {
+    PlatformBackHandler(enabled = navigationLevel == VehicleNavigationLevel.VEHICLES) {
         onNavigateBack()
     }
 
