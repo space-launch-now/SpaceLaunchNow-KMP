@@ -1,3 +1,9 @@
 ### Bug Fixes
 
-* update AgencyChip and its display as well as the featured launch row location and status
+* add flightclub button
+* add preview data and adjust layout
+* enhance timeline layout
+
+### Features
+
+* add info URL button to Update cards
