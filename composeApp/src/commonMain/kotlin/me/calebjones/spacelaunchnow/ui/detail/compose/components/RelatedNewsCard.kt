@@ -40,6 +40,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 
 @Composable
@@ -195,8 +196,9 @@ fun RelatedNewsItem(article: Article) {
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.labelSmall
                     )
+                    val useUtc = LocalUseUtc.current
                     Text(
-                        text = DateTimeUtil.formatLaunchDate(article.publishedAt),
+                        text = DateTimeUtil.formatLaunchDate(article.publishedAt, useUtc),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 9.sp

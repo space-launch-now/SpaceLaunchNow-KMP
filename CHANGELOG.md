@@ -1,3 +1,23 @@
+## [5.3.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.1...v5.3.2) (2025-12-08)
+
+
+### Bug Fixes
+
+* enhance UpdateCard ([f080e84](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f080e84ea1afb2ba6c0614a2b316ce5e0802854f))
+* fix UTC toggle support across the app ([59299ee](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/59299ee594673811aaa7cc87d1d4675af6e1e57e))
+* update copilot instructions ([ce75fad](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ce75fad48dba534da91e1623d40e9e65977807fb))
+
+
+
+## [5.3.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.0...v5.3.1) (2025-12-08)
+
+
+### Bug Fixes
+
+* ios build ([ea59a8e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ea59a8e5b307f6175d0cae26f5ebd8db048ce689))
+
+
+
 # [5.3.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.4...v5.3.0) (2025-12-08)
 
 
@@ -29,24 +49,6 @@
 ### Bug Fixes
 
 * add updates section to display for launch details view ([8956ffe](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8956ffedd489deef34f03a03517f06568ea9b6b6))
-
-
-
-## [5.2.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.1...v5.2.2) (2025-12-07)
-
-
-### Bug Fixes
-
-* imrprove Starship history launches feature with timeline ([adc6797](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/adc6797842fb96d5cc6edefb15801858c73ff14f))
-
-
-
-## [5.2.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.0...v5.2.1) (2025-12-07)
-
-
-### Bug Fixes
-
-* dont show placeholder objects ([6a4bda2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6a4bda24fb964664d494d0f2e58f052ef9af5172))
 
 
 

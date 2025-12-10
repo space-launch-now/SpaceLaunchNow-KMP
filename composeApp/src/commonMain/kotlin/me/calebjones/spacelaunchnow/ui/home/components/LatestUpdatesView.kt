@@ -47,6 +47,11 @@ import com.valentinilk.shimmer.shimmer
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.InfoCircle
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
@@ -290,7 +295,7 @@ fun UpdateCard(
                             update.launch != null -> update.launch.name
                             update.event != null -> update.event.name
                             update.program != null -> update.program.name
-                            else -> "General Update"
+                            else -> null
                         }
 
                         if (updateSubject != null) {
@@ -308,7 +313,7 @@ fun UpdateCard(
                             text = comment,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 2,
+                            maxLines = if (updateSubject.isNullOrEmpty()) 3 else 2,
                             overflow = TextOverflow.Ellipsis,
                             lineHeight = 16.sp
                         )
@@ -542,7 +547,34 @@ private val sampleUpdateLongComment = UpdateEndpoint(
     comment = "Weather forecast updated: 80% chance of favorable conditions for launch window. Upper level winds are within acceptable limits. Ground weather team confirms go for propellant loading.",
     infoUrl = "https://example.com/weather",
     createdBy = "45th Weather Squadron",
-    launch = null,
+    launch = LaunchBasic(
+        id = "1",
+        name = "Falcon 9 Test Flight",
+        status = LaunchStatus(
+            id = 1,
+            name = "Test"
+        ),
+        net = System.now() - 3.days,
+        windowEnd = null,
+        windowStart = null,
+        url = "TODO()",
+        slug = "TODO()",
+        launchDesignator = "TODO()",
+        netPrecision = NetPrecision(
+            id = 1
+        ),
+        image = null,
+        launchServiceProvider = AgencyMini(
+            id = 1,
+            url = "TODO()",
+            name = "TODO",
+            type = AgencyType(
+                id = 1
+            )
+        ),
+        infographic = "TODO()",
+        locationName = "TODO()",
+    ),
     event = null,
     program = null,
     createdOn = System.now() - 1.days
@@ -554,7 +586,34 @@ private val sampleUpdateOld = UpdateEndpoint(
     comment = "Payload integration complete. Fairing encapsulation scheduled for tomorrow.",
     infoUrl = null,
     createdBy = "Mission Integration Team",
-    launch = null,
+    launch = LaunchBasic(
+        id = "1",
+        name = "Falcon 9 Test Flight",
+        status = LaunchStatus(
+            id = 1,
+            name = "Test"
+        ),
+        net = System.now() - 3.days,
+        windowEnd = null,
+        windowStart = null,
+        url = "TODO()",
+        slug = "TODO()",
+        launchDesignator = "TODO()",
+        netPrecision = NetPrecision(
+            id = 1
+        ),
+        image = null,
+        launchServiceProvider = AgencyMini(
+            id = 1,
+            url = "TODO()",
+            name = "TODO",
+            type = AgencyType(
+                id = 1
+            )
+        ),
+        infographic = "TODO()",
+        locationName = "TODO()",
+    ),
     event = null,
     program = null,
     createdOn = System.now() - 5.days

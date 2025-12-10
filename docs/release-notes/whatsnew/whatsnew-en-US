@@ -1,9 +1,5 @@
 ### Bug Fixes
 
-* add flightclub button
-* add preview data and adjust layout
-* enhance timeline layout
-
-### Features
-
-* add info URL button to Update cards
+* enhance UpdateCard
+* fix UTC toggle support across the app
+* update copilot instructions

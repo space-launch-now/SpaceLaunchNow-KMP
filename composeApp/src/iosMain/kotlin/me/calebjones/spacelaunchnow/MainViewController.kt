@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow
 
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.window.ComposeUIViewController
@@ -8,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -79,8 +81,13 @@ fun MainViewController() = ComposeUIViewController {
     val navigationDestination by navigationDestinationState
     val notificationLaunchId by notificationLaunchIdState
     
+    // Collect useUtc preference for reactive updates
+    val appPreferences = getKoin().get<AppPreferences>()
+    val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
+    
     SpaceLaunchNowApp(
         contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(),
+        useUtc = useUtc,
         navigationDestination = navigationDestination,
         onNavigationDestinationConsumed = {
             navigationDestinationState.value = null

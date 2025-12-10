@@ -33,9 +33,11 @@ fun main() {
 private fun DesktopApp() {
     val appPreferences = getKoin().get<AppPreferences>()
     val themeOption by appPreferences.themeFlow.collectAsState(initial = ThemeOption.System)
+    val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
     
     SpaceLaunchNowApp(
         contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(null),
-        themeOption = themeOption
+        themeOption = themeOption,
+        useUtc = useUtc
     )
 }
