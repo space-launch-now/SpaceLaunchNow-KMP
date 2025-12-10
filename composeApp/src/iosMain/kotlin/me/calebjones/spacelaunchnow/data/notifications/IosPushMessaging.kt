@@ -4,63 +4,56 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import me.calebjones.spacelaunchnow.data.model.PushMessage
-import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * iOS implementation of PushMessaging using Firebase Cloud Messaging
  * 
- * TODO: Complete Kotlin/Native interop with Swift FCMBridge
- * For now, this is a placeholder that allows compilation.
- * The actual Firebase integration is implemented in Swift (AppDelegate.swift, FCMBridge.swift)
- * and will be connected via Objective-C bridging header once the iOS project is properly configured.
+ * Communicates with Swift FCMBridge via IosPushMessagingBridge.
+ * The bridge uses a simple request/callback pattern:
+ * 1. Kotlin requests an operation (token, subscribe, unsubscribe)
+ * 2. Swift FCMBridge checks the pendingOperation property
+ * 3. Swift performs the operation and calls provideToken/provideSubscribeResult/etc.
+ * 4. Kotlin resumes the suspended coroutine with the result
+ * 
+ * Swift components:
+ * - FCMBridge.swift: Provides Firebase Messaging functionality
+ * - AppDelegate.swift: Initializes Firebase, handles notifications and tokens
+ * - iOSApp.swift: Registers AppDelegate with @UIApplicationDelegateAdaptor
  */
+
 actual class PushMessaging actual constructor() {
-    private val log = logger()
+    private val log = SpaceLogger.getLogger("IosPushMessaging")
 
     private val _messages = MutableSharedFlow<PushMessage>()
     actual val messages: Flow<PushMessage> = _messages.asSharedFlow()
 
-    actual suspend fun subscribeToTopic(topic: String): Result<Unit> {
-        log.i { "Subscribing to FCM topic: $topic" }
-        log.w { "⚠️ TODO: Implement Kotlin/Native interop with Swift FCMBridge" }
-        log.i { "💡 Firebase integration is implemented in Swift (AppDelegate.swift)" }
-        log.i { "💡 Connect via Objective-C bridging header after Xcode configuration" }
-        
-        // For now, return success to allow app to compile and run
-        // The Swift FCMBridge will handle actual subscriptions when called from iOS
-        return Result.success(Unit)
+    actual suspend fun subscribeToTopic(topic: String): Result<Unit> = suspendCoroutine { continuation ->
+        log.i { "Subscribing to topic: $topic" }
+        IosPushMessagingBridge.requestSubscribe(topic) { result ->
+            continuation.resume(result)
+        }
     }
 
-    actual suspend fun unsubscribeFromTopic(topic: String): Result<Unit> {
-        log.i { "Unsubscribing from FCM topic: $topic" }
-        log.w { "⚠️ TODO: Implement Kotlin/Native interop with Swift FCMBridge" }
-        return Result.success(Unit)
+    actual suspend fun unsubscribeFromTopic(topic: String): Result<Unit> = suspendCoroutine { continuation ->
+        log.i { "Unsubscribing from topic: $topic" }
+        IosPushMessagingBridge.requestUnsubscribe(topic) { result ->
+            continuation.resume(result)
+        }
     }
 
-    actual suspend fun getToken(): Result<String> {
+    actual suspend fun getToken(): Result<String> = suspendCoroutine { continuation ->
         log.i { "Getting FCM token" }
-        log.w { "⚠️ TODO: Implement Kotlin/Native interop with Swift FCMBridge" }
-        log.i { "💡 Token will be available once Firebase is configured in Xcode" }
         
-        // Return failure for now since token isn't available yet
-        return Result.failure(Exception("FCM token not yet implemented - configure Firebase in Xcode first"))
+        IosPushMessagingBridge.requestToken { result ->
+            result.onSuccess { token ->
+                log.i { "SUCCESS - Got FCM token: ${token.take(20)}..." }
+            }.onFailure { error ->
+                log.e { "ERROR - Failed to get FCM token: ${error.message}" }
+            }
+            continuation.resume(result)
+        }
     }
 }
-
-/**
- * IMPLEMENTATION NOTE:
- * =====================
- * The full FCM implementation exists in Swift files:
- * - iosApp/iosApp/AppDelegate.swift (Firebase initialization, notification handling)
- * - iosApp/iosApp/FCMBridge.swift (Swift bridge for Kotlin access)
- * 
- * To complete the integration:
- * 1. Add Firebase SPM package to Xcode project
- * 2. Configure APNs in Firebase Console  
- * 3. Add Push Notification capability in Xcode
- * 4. Add GoogleService-Info.plist to Xcode project
- * 5. Create Objective-C bridging header to expose FCMBridge to Kotlin
- * 6. Update this file to call into Swift FCMBridge via cinterop
- * 
- * See docs/notifications/IOS_FCM_MANUAL_STEPS.md for detailed instructions.
- */

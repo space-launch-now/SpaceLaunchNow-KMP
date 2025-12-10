@@ -2,6 +2,7 @@ import UIKit
 import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
+import ComposeApp
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     
@@ -13,6 +14,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Initialize Firebase
         FirebaseApp.configure()
         
+        // Initialize FCMBridge early so it registers its NSNotification observer
+        // before any Kotlin code tries to post notifications
+        _ = FCMBridge.shared
+        
         // Set delegates
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
@@ -21,9 +26,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         UNUserNotificationCenter.current().requestAuthorization(
             options: [.alert, .badge, .sound]
         ) { granted, error in
-            print("Notification permission granted: \(granted)")
+            print("🔔 Notification permission granted: \(granted)")
             if let error = error {
-                print("Error requesting notifications: \(error.localizedDescription)")
+                print("❌ Error requesting notifications: \(error.localizedDescription)")
+            } else if granted {
+                print("✅ Notification permissions granted successfully")
+            } else {
+                print("⚠️ Notification permissions denied by user")
             }
         }
         
@@ -55,34 +64,65 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        print("APNs device token: \(deviceToken)")
+        let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        print("✅ APNs device token registered: \(tokenString.prefix(20))...")
         Messaging.messaging().apnsToken = deviceToken
+        print("✅ APNs token set on Firebase Messaging")
+        
+        // Process any pending Kotlin FCM requests now that we have APNs token
+        FCMBridge.shared.processPendingKotlinRequests()
     }
     
     func application(
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        print("Failed to register for remote notifications: \(error.localizedDescription)")
+        print("❌ CRITICAL: Failed to register for remote notifications")
+        print("❌ Error: \(error.localizedDescription)")
+        print("❌ This device will NOT receive push notifications")
     }
     
     // MARK: - FCM Token
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("FCM token: \(fcmToken ?? "nil")")
-        
-        // Store token for Kotlin access
+        print("\n========================================")
+        print("🔑 FCM REGISTRATION TOKEN RECEIVED")
+        print("========================================")
         if let token = fcmToken {
+            print("✅ FCM Token: \(token)")
+            print("📋 Copy this token to test notifications in Firebase Console")
+            
+            // Store token for Kotlin access
             FCMBridge.shared.setCurrentToken(token)
+            print("✅ Token stored in FCMBridge")
+            
+            // Send token notification
+            let dataDict: [String: String] = ["token": token]
+            NotificationCenter.default.post(
+                name: Notification.Name("FCMToken"),
+                object: nil,
+                userInfo: dataDict
+            )
+            print("✅ Token notification posted")
+            
+            // Process any pending Kotlin requests (e.g., getToken() calls)
+            FCMBridge.shared.processPendingKotlinRequests()
+            print("✅ Processed pending Kotlin FCM requests")
+            
+            // Auto-subscribe to debug topic for testing
+            print("\n🔧 DEBUG: Auto-subscribing to k_debug_v4 topic...")
+            Messaging.messaging().subscribe(toTopic: "k_debug_v4") { error in
+                if let error = error {
+                    print("❌ Failed to subscribe to k_debug_v4: \(error.localizedDescription)")
+                } else {
+                    print("✅ Successfully subscribed to k_debug_v4 topic")
+                    print("📱 Device will now receive notifications sent to this topic")
+                }
+            }
+        } else {
+            print("❌ FCM token is nil - notifications will NOT work")
         }
-        
-        // Send token notification
-        let dataDict: [String: String] = ["token": fcmToken ?? ""]
-        NotificationCenter.default.post(
-            name: Notification.Name("FCMToken"),
-            object: nil,
-            userInfo: dataDict
-        )
+        print("========================================\n")
     }
     
     // MARK: - Background Notification Handling
@@ -94,7 +134,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
     ) {
-        print("=== FCM Message Received (Background/Killed) ===")
+        print("\n========================================")
+        print("📩 FCM NOTIFICATION RECEIVED (Background/Killed)")
+        print("========================================")
+        print("App State: \(UIApplication.shared.applicationState.rawValue) (0=active, 1=inactive, 2=background)")
         print("UserInfo: \(userInfo)")
         
         // Parse notification data
@@ -126,7 +169,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) {
         let userInfo = notification.request.content.userInfo
         
-        print("=== FCM Message Received (Foreground) ===")
+        print("\n========================================")
+        print("📩 FCM NOTIFICATION RECEIVED (Foreground)")
+        print("========================================")
+        print("Title: \(notification.request.content.title)")
+        print("Body: \(notification.request.content.body)")
         print("UserInfo: \(userInfo)")
         
         // Apply client-side filtering
@@ -359,10 +406,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         task.resume()
     }
     
-    // MARK: - Client-Side Filtering (matches Android implementation)
+    // MARK: - Client-Side Filtering (uses shared Kotlin NotificationFilter)
     
     private func shouldShowNotification(userInfo: [AnyHashable: Any]) -> Bool {
-        // Convert userInfo to String dictionary
+        // Convert userInfo to String dictionary for Kotlin interop
         var dataMap: [String: String] = [:]
         for (key, value) in userInfo {
             if let keyString = key as? String, let valueString = value as? String {
@@ -370,27 +417,23 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
         
-        // Use the FCMBridge filter
-        return FCMBridge.shared.shouldShowNotification(data: dataMap)
+        // Use shared Kotlin filter logic (same as Android)
+        // This ensures consistent filtering behavior across platforms
+        return IosNotificationBridge.shared.shouldShowNotification(data: dataMap)
     }
     
     // MARK: - Deep Linking
     
     private func handleNotificationTap(userInfo: [AnyHashable: Any]) {
-        // TODO: Implement deep linking
-        // Example: Navigate to launch detail screen
-        
+        // Navigate to launch detail screen when notification is tapped
         guard let launchId = userInfo["launch_id"] as? String else {
+            print("⚠️ No launch_id found in notification userInfo")
             return
         }
         
-        print("💡 TODO: Navigate to launch detail for ID: \(launchId)")
-        // Post notification for app to handle navigation
-        NotificationCenter.default.post(
-            name: Notification.Name("OpenLaunchDetail"),
-            object: nil,
-            userInfo: ["launchId": launchId]
-        )
+        print("🚀 Navigating to launch detail for ID: \(launchId)")
+        // Call Kotlin function to trigger navigation
+        MainViewControllerKt.setNotificationLaunchId(launchId: launchId)
     }
 }
 

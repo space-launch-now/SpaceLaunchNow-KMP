@@ -21,9 +21,18 @@ private var koinInitialized = false
 // Shared state for navigation from iOS
 private val navigationDestinationState = mutableStateOf<String?>(null)
 
+// Shared state for notification-based navigation
+private val notificationLaunchIdState = mutableStateOf<String?>(null)
+
 // Public function for iOS to trigger navigation
 fun setNavigationDestination(destination: String?) {
     navigationDestinationState.value = destination
+}
+
+// Public function for iOS to trigger navigation from notification
+fun setNotificationLaunchId(launchId: String?) {
+    log.i { "iOS: Setting notification launch ID: $launchId" }
+    notificationLaunchIdState.value = launchId
 }
 
 fun MainViewController() = ComposeUIViewController { 
@@ -68,12 +77,17 @@ fun MainViewController() = ComposeUIViewController {
     }
     
     val navigationDestination by navigationDestinationState
+    val notificationLaunchId by notificationLaunchIdState
     
     SpaceLaunchNowApp(
         contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(),
         navigationDestination = navigationDestination,
         onNavigationDestinationConsumed = {
             navigationDestinationState.value = null
+        },
+        notificationLaunchId = notificationLaunchId,
+        onNotificationLaunchIdConsumed = {
+            notificationLaunchIdState.value = null
         }
     ) 
 }

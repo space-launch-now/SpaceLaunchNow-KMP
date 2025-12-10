@@ -1,8 +1,13 @@
 import Foundation
 import FirebaseMessaging
+import ComposeApp
 
 /// Bridge between Swift Firebase SDK and Kotlin Multiplatform code
 /// Provides FCM functionality to Kotlin/Native via Objective-C compatible APIs
+///
+/// Communication with Kotlin:
+/// - Checks IosPushMessagingBridge.pendingOperation to see what Kotlin needs
+/// - Calls IosPushMessagingBridge.provideToken/provideSubscribeResult/etc. with results
 @objc public class FCMBridge: NSObject {
     
     @objc public static let shared = FCMBridge()
@@ -11,25 +16,60 @@ import FirebaseMessaging
     
     private override init() {
         super.init()
+        
+        print("🔧 FCMBridge: Initializing...")
+        
+        // Listen for notifications from Kotlin when it makes FCM requests
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleKotlinRequest),
+            name: NSNotification.Name("KotlinFCMRequestPending"),
+            object: nil
+        )
+        
+        print("✅ FCMBridge: Initialized and listening for Kotlin requests")
+    }
+    
+    @objc private func handleKotlinRequest() {
+        print("📞 FCMBridge: Received notification of pending Kotlin request")
+        processPendingKotlinRequests()
     }
     
     // MARK: - Token Management
     
     @objc public func setCurrentToken(_ token: String) {
         self.currentToken = token
+        print("🔑 FCMBridge: Token set, processing any pending Kotlin requests")
+        processPendingKotlinRequests()
+    }
+    
+    /// Synchronous token getter - returns cached token or nil
+    @objc public func getCurrentToken() -> String? {
+        if let token = currentToken {
+            print("🔑 FCMBridge: getCurrentToken() returning cached token: \(token.prefix(20))...")
+        } else {
+            print("⚠️ FCMBridge: getCurrentToken() returning nil - no token available yet")
+        }
+        return currentToken
     }
     
     @objc public func getToken(completion: @escaping (String?, Error?) -> Void) {
+        print("🔑 FCMBridge: getToken() called")
+        
         if let token = currentToken {
+            print("✅ FCMBridge: Returning cached token: \(token.prefix(20))...")
             completion(token, nil)
             return
         }
         
+        print("⏳ FCMBridge: No cached token, fetching from Firebase...")
         Messaging.messaging().token { token, error in
             if let token = token {
+                print("✅ FCMBridge: Successfully fetched token from Firebase: \(token.prefix(20))...")
                 self.currentToken = token
                 completion(token, nil)
             } else {
+                print("❌ FCMBridge: Failed to fetch token from Firebase: \(error?.localizedDescription ?? "unknown error")")
                 completion(nil, error)
             }
         }
@@ -41,13 +81,13 @@ import FirebaseMessaging
         _ topic: String,
         completion: @escaping (Error?) -> Void
     ) {
-        print("FCMBridge: Subscribing to topic: \(topic)")
+        print("📢 FCMBridge: subscribeToTopic() called for topic: \(topic)")
         Messaging.messaging().subscribe(toTopic: topic) { error in
             if let error = error {
-                print("FCMBridge: ERROR - Failed to subscribe to topic \(topic): \(error.localizedDescription)")
+                print("❌ FCMBridge: Failed to subscribe to topic '\(topic)': \(error.localizedDescription)")
                 completion(error)
             } else {
-                print("FCMBridge: SUCCESS - Subscribed to topic: \(topic)")
+                print("✅ FCMBridge: Successfully subscribed to topic: \(topic)")
                 completion(nil)
             }
         }
@@ -57,47 +97,65 @@ import FirebaseMessaging
         _ topic: String,
         completion: @escaping (Error?) -> Void
     ) {
-        print("FCMBridge: Unsubscribing from topic: \(topic)")
+        print("🔕 FCMBridge: unsubscribeFromTopic() called for topic: \(topic)")
         Messaging.messaging().unsubscribe(fromTopic: topic) { error in
             if let error = error {
-                print("FCMBridge: ERROR - Failed to unsubscribe from topic \(topic): \(error.localizedDescription)")
+                print("❌ FCMBridge: Failed to unsubscribe from topic '\(topic)': \(error.localizedDescription)")
                 completion(error)
             } else {
-                print("FCMBridge: SUCCESS - Unsubscribed from topic: \(topic)")
+                print("✅ FCMBridge: Successfully unsubscribed from topic: \(topic)")
                 completion(nil)
             }
         }
     }
     
-    // MARK: - Client-Side Filtering (Simplified)
+    // MARK: - Kotlin Bridge Integration
     
-    /// Apply client-side filtering based on notification data
-    /// This is a simplified version that checks basic conditions
-    /// TODO: Integrate with shared Kotlin NotificationFilter once interop is complete
-    @objc public func shouldShowNotification(data: [String: String]) -> Bool {
-        print("=== FCMBridge: Evaluating notification filter ===")
-        print("Data: \(data)")
+    /// Check for pending Kotlin requests and fulfill them
+    /// Should be called periodically or when FCM token is available
+    @objc public func processPendingKotlinRequests() {
+        print("🔍 FCMBridge: Checking for pending Kotlin requests...")
+        let bridge = IosPushMessagingBridge.shared
+        print("🔍 FCMBridge: Current pending operation: \(bridge.pendingOperation)")
         
-        // For now, allow all notifications
-        // TODO: Load user preferences and apply filtering logic
-        // This should match the logic in NotificationFilter.kt from commonMain
-        
-        // Basic check: If notification_type is missing, suppress
-        guard let notificationType = data["notification_type"] else {
-            print("🔇 BLOCKED: Missing notification_type")
-            return false
+        switch bridge.pendingOperation {
+        case .getToken:
+            print("📞 FCMBridge: Processing GET_TOKEN request from Kotlin")
+            if let token = currentToken {
+                bridge.provideToken(token: token, errorMessage: nil)
+            } else {
+                // Fetch token asynchronously
+                getToken { token, error in
+                    if let token = token {
+                        bridge.provideToken(token: token, errorMessage: nil)
+                    } else {
+                        bridge.provideToken(token: nil, errorMessage: error?.localizedDescription ?? "Unknown error")
+                    }
+                }
+            }
+            
+        case .subscribe:
+            if let topic = bridge.lastRequestedTopic {
+                print("📞 FCMBridge: Processing SUBSCRIBE request for topic: \(topic)")
+                subscribeToTopic(topic) { error in
+                    bridge.provideSubscribeResult(errorMessage: error?.localizedDescription)
+                }
+            }
+            
+        case .unsubscribe:
+            if let topic = bridge.lastRequestedTopic {
+                print("📞 FCMBridge: Processing UNSUBSCRIBE request for topic: \(topic)")
+                unsubscribeFromTopic(topic) { error in
+                    bridge.provideUnsubscribeResult(errorMessage: error?.localizedDescription)
+                }
+            }
+            
+        default:
+            // No pending operation (NONE case)
+            print("✨ FCMBridge: No pending operation (NONE)")
+            break
         }
         
-        print("Notification type: \(notificationType)")
-        
-        // TODO: Implement full filtering logic:
-        // 1. Check if notifications are globally enabled
-        // 2. Check webcast-only filter
-        // 3. Check notification type settings
-        // 4. Check agency/location subscriptions
-        
-        // For now, allow all valid notifications
-        print("✅ ALLOWED: Notification passed basic validation (full filtering TODO)")
-        return true
+        print("✅ FCMBridge: Finished processing pending requests")
     }
 }
