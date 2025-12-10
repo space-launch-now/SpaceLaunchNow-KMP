@@ -1,3 +1,12 @@
+## [5.3.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.2...v5.3.3) (2025-12-10)
+
+
+### Bug Fixes
+
+* implement notification handling for iOS ([0e527be](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0e527bef7fb8ca15503fb925331ecadf0ae57718))
+
+
+
 ## [5.3.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.1...v5.3.2) (2025-12-08)
 
 
@@ -40,15 +49,6 @@
 ### Bug Fixes
 
 * update AgencyChip and its display as well as the featured launch row location and status ([cf0fb2c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cf0fb2c9b689dca16f0b02560a00cc4a2de7fc27))
-
-
-
-## [5.2.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.2...v5.2.3) (2025-12-07)
-
-
-### Bug Fixes
-
-* add updates section to display for launch details view ([8956ffe](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8956ffedd489deef34f03a03517f06568ea9b6b6))
 
 
 

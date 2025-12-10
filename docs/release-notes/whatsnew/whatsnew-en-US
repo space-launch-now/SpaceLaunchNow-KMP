@@ -1,5 +1,3 @@
 ### Bug Fixes
 
-* enhance UpdateCard
-* fix UTC toggle support across the app
-* update copilot instructions
+* implement notification handling for iOS
