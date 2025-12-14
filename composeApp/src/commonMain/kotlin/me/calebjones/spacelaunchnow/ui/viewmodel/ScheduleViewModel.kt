@@ -82,6 +82,9 @@ class ScheduleViewModel(
                 }
             }
             
+            // Pre-load filter options on app launch (uses cache if available)
+            loadFilterOptions()
+            
             // Now load tabs with correct filter state
             loadTab(ScheduleTab.Upcoming, reset = true)
             loadTab(ScheduleTab.Previous, reset = true)
