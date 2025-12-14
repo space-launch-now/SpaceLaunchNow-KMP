@@ -1,3 +1,17 @@
+# [5.4.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.3...v5.4.0) (2025-12-14)
+
+
+### Bug Fixes
+
+* pre-load filter options on app launch ([9c05d48](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9c05d48e008e7a45c022157b3847968682bd1486))
+
+
+### Features
+
+* implement filter options for Schedule Screen ([5a5d999](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5a5d999d60589a32043273f58b1c412d195849ca))
+
+
+
 ## [5.3.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.2...v5.3.3) (2025-12-10)
 
 
@@ -40,15 +54,6 @@
 ### Features
 
 * add info URL button to Update cards ([49c8dcf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/49c8dcf22639e7866ffbeb1ca59f7d46c6eae596))
-
-
-
-## [5.2.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.3...v5.2.4) (2025-12-07)
-
-
-### Bug Fixes
-
-* update AgencyChip and its display as well as the featured launch row location and status ([cf0fb2c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cf0fb2c9b689dca16f0b02560a00cc4a2de7fc27))
 
 
 

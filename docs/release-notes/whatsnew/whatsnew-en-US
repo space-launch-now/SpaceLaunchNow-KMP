@@ -1,3 +1,7 @@
 ### Bug Fixes
 
-* implement notification handling for iOS
+* pre-load filter options on app launch
+
+### Features
+
+* implement filter options for Schedule Screen
