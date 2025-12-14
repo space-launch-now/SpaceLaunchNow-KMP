@@ -27,6 +27,8 @@ import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
+import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepositoryImpl
@@ -47,6 +49,7 @@ import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
 import me.calebjones.spacelaunchnow.database.CacheCleanupService
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
+import me.calebjones.spacelaunchnow.database.FilterOptionsLocalDataSource
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
@@ -107,6 +110,7 @@ val appModule = module {
     single { UpdateLocalDataSource(get(), get()) }
     single { ProgramLocalDataSource(get(), get()) }
     single { SpacecraftLocalDataSource(get(), get()) }
+    single { FilterOptionsLocalDataSource(get(), get()) }
 
     single<LaunchRepository> {
         LaunchRepositoryImpl(
@@ -147,6 +151,16 @@ val appModule = module {
     singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
     singleOf(::LauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
     singleOf(::SpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
+    single<ScheduleFilterRepository> {
+        ScheduleFilterRepositoryImpl(
+            agenciesApi = get(),
+            programsApi = get(),
+            launcherConfigurationsApi = get(),
+            locationsApi = get(),
+            configApi = get(),
+            localDataSource = get()
+        )
+    }
     single<EventsRepository> {
         EventsRepositoryImpl(
             eventsApi = get(),

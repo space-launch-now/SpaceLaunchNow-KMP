@@ -15,19 +15,23 @@ import kotlin.time.Instant
 
 /**
  * Get launch mini list with commonly used parameters
+ * 
+ * Note: API only supports single rocketConfigurationId, not multiple.
+ * For filtering by multiple rockets, make separate API calls.
  */
 @OptIn(ExperimentalTime::class)
 suspend fun LaunchesApi.getLaunchMiniList(
     limit: Int? = null,
+    offset: Int? = null,
     upcoming: Boolean? = null,
     previous: Boolean? = null,
     ordering: String? = null,
     status: Int? = null,
     statusIds: List<Int>? = null,
     search: String? = null,
-    lspId: List<Int>? = null,
+    lspId: List<Int>? = null, // Agency/LSP IDs (supports multiple)
     relatedLspId: List<Int>? = null,
-    rocketConfigurationId: Int? = null,
+    rocketConfigurationId: Int? = null, // Rocket config ID (single only, API limitation)
     isCrewed: Boolean? = null,
     includeSuborbital: Boolean? = null,
     netGt: Instant? = null,
@@ -35,7 +39,8 @@ suspend fun LaunchesApi.getLaunchMiniList(
     netDay: List<Double>? = null,
     netMonth: List<Double>? = null,
     pad: Int? = null,
-    locationIds: List<Int>? = null
+    locationIds: List<Int>? = null, // Location IDs (supports multiple)
+    program: List<Int>? = null // Program IDs (supports multiple)
 ): HttpResponse<PaginatedLaunchBasicList> = launchesMiniList(
     agencyLaunchAttemptCount = null,
     agencyLaunchAttemptCountGt = null,
@@ -79,7 +84,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
     netLte = null,
     netMonth = netMonth,
     netYear = null,
-    offset = null,
+    offset = offset,
     orbitalLaunchAttemptCount = null,
     orbitalLaunchAttemptCountGt = null,
     orbitalLaunchAttemptCountGte = null,
@@ -105,7 +110,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
     padLaunchAttemptCountYearLt = null,
     padLaunchAttemptCountYearLte = null,
     previous = previous,
-    program = null,
+    program = program,
     relatedLspId = relatedLspId,
     relatedLspName = null,
     rocketConfigurationFullName = null,
@@ -138,19 +143,23 @@ suspend fun LaunchesApi.getLaunchMiniList(
 
 /**
  * Get launch normal list with commonly used parameters
+ * 
+ * Note: API only supports single rocketConfigurationId, not multiple.
+ * For filtering by multiple rockets, make separate API calls.
  */
 @OptIn(ExperimentalTime::class)
 suspend fun LaunchesApi.getLaunchList(
     limit: Int? = null,
+    offset: Int? = null,
     upcoming: Boolean? = null,
     previous: Boolean? = null,
     ordering: String? = null,
     status: Int? = null,
     statusIds: List<Int>? = null,
     search: String? = null,
-    lspId: List<Int>? = null,
+    lspId: List<Int>? = null, // Agency/LSP IDs (supports multiple)
     relatedLspId: List<Int>? = null,
-    rocketConfigurationId: Int? = null,
+    rocketConfigurationId: Int? = null, // Rocket config ID (single only, API limitation)
     isCrewed: Boolean? = null,
     includeSuborbital: Boolean? = null,
     netGt: Instant? = null,
@@ -158,8 +167,8 @@ suspend fun LaunchesApi.getLaunchList(
     netDay: List<Double>? = null,
     netMonth: List<Double>? = null,
     pad: Int? = null,
-    locationIds: List<Int>? = null,
-    program: List<Int>? = null,
+    locationIds: List<Int>? = null, // Location IDs (supports multiple)
+    program: List<Int>? = null, // Program IDs (supports multiple)
     upcomingWithRecent: Boolean? = null
 ): HttpResponse<PaginatedLaunchNormalList> = launchesList(
     agencyLaunchAttemptCount = null,
@@ -204,7 +213,7 @@ suspend fun LaunchesApi.getLaunchList(
     netLte = null,
     netMonth = netMonth,
     netYear = null,
-    offset = null,
+    offset = offset,
     orbitalLaunchAttemptCount = null,
     orbitalLaunchAttemptCountGt = null,
     orbitalLaunchAttemptCountGte = null,

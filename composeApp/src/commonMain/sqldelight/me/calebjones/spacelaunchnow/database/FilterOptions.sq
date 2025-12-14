@@ -1,0 +1,143 @@
+-- Filter options tables for Schedule Screen filtering
+-- Stores available filter options with expiration for caching
+
+CREATE TABLE FilterableAgency (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    abbreviation TEXT,
+    is_featured INTEGER NOT NULL DEFAULT 1, -- Only featured agencies for filter dropdown
+    cached_at INTEGER NOT NULL, -- Timestamp when cached
+    expires_at INTEGER NOT NULL -- Timestamp when cache expires
+);
+
+CREATE TABLE FilterableProgram (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    abbreviation TEXT,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE TABLE FilterableRocket (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE TABLE FilterableLocation (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE TABLE FilterableStatus (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    abbreviation TEXT,
+    description TEXT,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Agency queries
+insertOrReplaceAgency:
+INSERT OR REPLACE INTO FilterableAgency (id, name, abbreviation, is_featured, cached_at, expires_at)
+VALUES (?, ?, ?, ?, ?, ?);
+
+getAllAgencies:
+SELECT * FROM FilterableAgency 
+WHERE expires_at > ? AND is_featured = 1
+ORDER BY name ASC;
+
+getAllAgenciesStale:
+SELECT * FROM FilterableAgency
+WHERE is_featured = 1 
+ORDER BY name ASC;
+
+deleteExpiredAgencies:
+DELETE FROM FilterableAgency WHERE expires_at < ?;
+
+clearAllAgencies:
+DELETE FROM FilterableAgency;
+
+-- Program queries
+insertOrReplaceProgram:
+INSERT OR REPLACE INTO FilterableProgram (id, name, abbreviation, cached_at, expires_at)
+VALUES (?, ?, ?, ?, ?);
+
+getAllPrograms:
+SELECT * FROM FilterableProgram 
+WHERE expires_at > ?
+ORDER BY name ASC;
+
+getAllProgramsStale:
+SELECT * FROM FilterableProgram 
+ORDER BY name ASC;
+
+deleteExpiredPrograms:
+DELETE FROM FilterableProgram WHERE expires_at < ?;
+
+clearAllPrograms:
+DELETE FROM FilterableProgram;
+
+-- Rocket queries
+insertOrReplaceRocket:
+INSERT OR REPLACE INTO FilterableRocket (id, name, cached_at, expires_at)
+VALUES (?, ?, ?, ?);
+
+getAllRockets:
+SELECT * FROM FilterableRocket 
+WHERE expires_at > ?
+ORDER BY name ASC;
+
+getAllRocketsStale:
+SELECT * FROM FilterableRocket 
+ORDER BY name ASC;
+
+deleteExpiredRockets:
+DELETE FROM FilterableRocket WHERE expires_at < ?;
+
+clearAllRockets:
+DELETE FROM FilterableRocket;
+
+-- Location queries
+insertOrReplaceLocation:
+INSERT OR REPLACE INTO FilterableLocation (id, name, cached_at, expires_at)
+VALUES (?, ?, ?, ?);
+
+getAllLocations:
+SELECT * FROM FilterableLocation 
+WHERE expires_at > ?
+ORDER BY name ASC;
+
+getAllLocationsStale:
+SELECT * FROM FilterableLocation 
+ORDER BY name ASC;
+
+deleteExpiredLocations:
+DELETE FROM FilterableLocation WHERE expires_at < ?;
+
+clearAllLocations:
+DELETE FROM FilterableLocation;
+
+-- Status queries
+insertOrReplaceStatus:
+INSERT OR REPLACE INTO FilterableStatus (id, name, abbreviation, description, cached_at, expires_at)
+VALUES (?, ?, ?, ?, ?, ?);
+
+getAllStatuses:
+SELECT * FROM FilterableStatus 
+WHERE expires_at > ?
+ORDER BY name ASC;
+
+getAllStatusesStale:
+SELECT * FROM FilterableStatus 
+ORDER BY name ASC;
+
+deleteExpiredStatuses:
+DELETE FROM FilterableStatus WHERE expires_at < ?;
+
+clearAllStatuses:
+DELETE FROM FilterableStatus;

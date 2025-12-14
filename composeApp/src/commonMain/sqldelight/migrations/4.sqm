@@ -1,0 +1,15 @@
+-- Migration from version 4 to version 5
+-- Adds FilterableStatus table for launch status filtering
+
+-- Create FilterableStatus table
+CREATE TABLE FilterableStatus (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    abbreviation TEXT,
+    description TEXT,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Create index on expires_at for faster cache cleanup queries
+CREATE INDEX IF NOT EXISTS idx_status_expires ON FilterableStatus(expires_at);

@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -26,16 +28,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -68,16 +74,17 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.LocalUseUtc
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.isTabletOrDesktop
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.viewmodel.koinViewModel
-import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
-import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 
 @Composable
 fun ScheduleScreen(
@@ -104,14 +111,15 @@ private fun ScheduleContent(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
+    val isTablet = isTabletOrDesktop()
 
     val upcomingListState = rememberLazyListState()
     val previousListState = rememberLazyListState()
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = uiState.isRefreshing,
-        onRefresh = { 
-            viewModel.refresh() 
+        onRefresh = {
+            viewModel.refresh()
         }
     )
 
@@ -123,7 +131,8 @@ private fun ScheduleContent(
     // Sync tab selection when user swipes pages
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         if (!pagerState.isScrollInProgress) {
-            val newTab = if (pagerState.currentPage == 0) ScheduleTab.Upcoming else ScheduleTab.Previous
+            val newTab =
+                if (pagerState.currentPage == 0) ScheduleTab.Upcoming else ScheduleTab.Previous
             if (newTab != uiState.selectedTab) {
                 viewModel.selectTab(newTab)
             }
@@ -217,6 +226,24 @@ private fun ScheduleContent(
                             fontSize = 36.sp,
                             modifier = Modifier.weight(1f)
                         )
+                        // Filter button with badge
+                        if (uiState.filterState.hasActiveFilters()) {
+                            BadgedBox(
+                                badge = {
+                                    Badge {
+                                        Text("${uiState.filterState.activeFilterCount()}")
+                                    }
+                                }
+                            ) {
+                                IconButton(onClick = { viewModel.openFilterSheet() }) {
+                                    Icon(Icons.Default.FilterList, contentDescription = "Filter")
+                                }
+                            }
+                        } else {
+                            IconButton(onClick = { viewModel.openFilterSheet() }) {
+                                Icon(Icons.Default.FilterList, contentDescription = "Filter")
+                            }
+                        }
                         IconButton(onClick = { viewModel.toggleSearchExpanded(true) }) {
                             Icon(Icons.Default.Search, contentDescription = "Search")
                         }
@@ -226,28 +253,78 @@ private fun ScheduleContent(
 
             // Tabs
             val selectedTabIndex = if (uiState.selectedTab == ScheduleTab.Upcoming) 0 else 1
+            val hasActiveFilters = uiState.filterState.hasActiveFilters()
             PrimaryTabRow(selectedTabIndex = selectedTabIndex) {
                 Tab(
                     selected = uiState.selectedTab == ScheduleTab.Upcoming,
                     onClick = { onTabSelected(ScheduleTab.Upcoming) },
-                    text = { Text("Upcoming") }
+                    text = {
+                        val count = uiState.upcomingTab.totalCount
+                        val isLoading = uiState.upcomingTab.isLoading
+                        if (hasActiveFilters && count != null && count > 1 && !isLoading) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Upcoming")
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Badge {
+                                    Text(
+                                        text = count.toString(),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                            }
+                        } else {
+                            Text("Upcoming")
+                        }
+                    }
                 )
                 Tab(
                     selected = uiState.selectedTab == ScheduleTab.Previous,
                     onClick = { onTabSelected(ScheduleTab.Previous) },
-                    text = { Text("Previous") }
+                    text = {
+                        val count = uiState.previousTab.totalCount
+                        val isLoading = uiState.previousTab.isLoading
+                        if (hasActiveFilters && count != null && count > 1 && !isLoading) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Previous")
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Badge {
+                                    Text(
+                                        text = count.toString(),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                            }
+                        } else {
+                            Text("Previous")
+                        }
+                    }
                 )
             }
 
             Divider()
+
+            // Loading indicator for refreshing (filter changes, pull-to-refresh)
+            if (uiState.selectedTab == ScheduleTab.Upcoming && uiState.upcomingTab.isRefreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            } else if (uiState.selectedTab == ScheduleTab.Previous && uiState.previousTab.isRefreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
 
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 val tab = if (page == 0) ScheduleTab.Upcoming else ScheduleTab.Previous
-                val tabState = if (tab == ScheduleTab.Upcoming) uiState.upcomingTab else uiState.previousTab
-                val listState = if (tab == ScheduleTab.Upcoming) upcomingListState else previousListState
+                val tabState =
+                    if (tab == ScheduleTab.Upcoming) uiState.upcomingTab else uiState.previousTab
+                val listState =
+                    if (tab == ScheduleTab.Upcoming) upcomingListState else previousListState
 
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -296,17 +373,17 @@ private fun ScheduleContent(
                             launch = launch,
                             onClick = { onLaunchClick(launch.id) }
                         )
-                        
-                        // 🚀 PERFORMANCE BOOST: Show inline banner ad every 5 items for maximum visibility
-                        // This dramatically improves show rate by embedding ads in the content feed
-                        if ((index + 1) % 25 == 0 && index < tabState.items.size - 1) {
-                            SmartBannerAd(
-                                placementType = AdPlacementType.CONTENT,
-                                showRemoveAdsButton = false,
-                                showCard = true,
-                                modifier = Modifier.padding(vertical = 4.dp)
-                            )
-                        }
+
+                        // // 🚀 PERFORMANCE BOOST: Show inline banner ad every 5 items for maximum visibility
+                        // // This dramatically improves show rate by embedding ads in the content feed
+                        // if ((index + 1) % 25 == 0 && index < tabState.items.size - 1) {
+                        //     SmartBannerAd(
+                        //         placementType = AdPlacementType.CONTENT,
+                        //         showRemoveAdsButton = false,
+                        //         showCard = true,
+                        //         modifier = Modifier.padding(vertical = 4.dp)
+                        //     )
+                        // }
                     }
 
                     if (tabState.isLoading && tabState.items.isNotEmpty()) {
@@ -339,6 +416,42 @@ private fun ScheduleContent(
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
+
+        // Filter UI - responsive: bottom sheet for phone, side sheet for tablet/desktop
+        if (isTablet) {
+            ScheduleFilterSideSheet(
+                isOpen = uiState.isFilterSheetOpen,
+                currentFilterState = uiState.filterState,
+                agencies = uiState.filterOptions.agencies,
+                programs = uiState.filterOptions.programs,
+                rockets = uiState.filterOptions.rockets,
+                locations = uiState.filterOptions.locations,
+                statuses = uiState.filterOptions.statuses,
+                isLoading = uiState.isLoadingFilterOptions,
+                onApplyFilters = { newFilterState ->
+                    viewModel.applyFilters(newFilterState)
+                },
+                onReloadOptions = { viewModel.reloadFilterOptions() },
+                onDismiss = { viewModel.closeFilterSheet() },
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        } else {
+            ScheduleFilterBottomSheet(
+                isOpen = uiState.isFilterSheetOpen,
+                currentFilterState = uiState.filterState,
+                agencies = uiState.filterOptions.agencies,
+                programs = uiState.filterOptions.programs,
+                rockets = uiState.filterOptions.rockets,
+                locations = uiState.filterOptions.locations,
+                statuses = uiState.filterOptions.statuses,
+                isLoading = uiState.isLoadingFilterOptions,
+                onApplyFilters = { newFilterState ->
+                    viewModel.applyFilters(newFilterState)
+                },
+                onReloadOptions = { viewModel.reloadFilterOptions() },
+                onDismiss = { viewModel.closeFilterSheet() }
+            )
+        }
     }
 }
 

@@ -5,10 +5,12 @@ import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchersApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LocationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ProgramsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpacecraftApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpacecraftConfigurationsApi
@@ -122,6 +124,28 @@ val apiModule = module {
 
     single<ProgramsApi> {
         ProgramsApi(
+            baseUrl = get<String>(named("BaseUrl")),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
+            httpClientConfig = httpClientConfig,
+        ).apply {
+            setApiKey(get<String>(named("API_KEY")), "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
+    }
+
+    single<LocationsApi> {
+        LocationsApi(
+            baseUrl = get<String>(named("BaseUrl")),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
+            httpClientConfig = httpClientConfig,
+        ).apply {
+            setApiKey(get<String>(named("API_KEY")), "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
+    }
+
+    single<ConfigApi> {
+        ConfigApi(
             baseUrl = get<String>(named("BaseUrl")),
             httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,

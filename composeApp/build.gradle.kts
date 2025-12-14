@@ -538,7 +538,10 @@ sqldelight {
         create("SpaceLaunchDatabase") {
             packageName.set("me.calebjones.spacelaunchnow.database")
             // Version 2 adds ProgramCache and SpacecraftCache tables for Starship feature
-            version = 2
+            // Version 3 adds FilterableAgency, FilterableProgram, FilterableRocket, FilterableLocation tables for Schedule Screen filtering
+            // Version 4 adds is_featured column to FilterableAgency
+            // Version 5 adds FilterableStatus table for launch status filtering
+            version = 5
         }
     }
 }

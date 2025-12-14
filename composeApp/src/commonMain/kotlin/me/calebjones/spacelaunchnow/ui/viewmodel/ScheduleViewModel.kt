@@ -7,9 +7,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
+import me.calebjones.spacelaunchnow.data.model.FilterOption
+import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.ui.schedule.ScheduleFilterState
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
 
@@ -22,7 +27,8 @@ data class TabState(
     val error: String? = null,
     val endReached: Boolean = false,
     val cacheTimestamp: Long? = null,
-    val cachedQuery: String = ""
+    val cachedQuery: String = "",
+    val totalCount: Int? = null // Total count from API (when filtering)
 )
 
 data class ScheduleUiState(
@@ -31,11 +37,25 @@ data class ScheduleUiState(
     val isSearchExpanded: Boolean = false,
     val upcomingTab: TabState = TabState(),
     val previousTab: TabState = TabState(),
-    val isRefreshing: Boolean = false
+    val isRefreshing: Boolean = false,
+    val filterState: ScheduleFilterState = ScheduleFilterState(),
+    val isFilterSheetOpen: Boolean = false,
+    val filterOptions: FilterOptions = FilterOptions(),
+    val isLoadingFilterOptions: Boolean = false
+)
+
+data class FilterOptions(
+    val agencies: List<FilterOption> = emptyList(),
+    val programs: List<FilterOption> = emptyList(),
+    val rockets: List<FilterOption> = emptyList(),
+    val locations: List<FilterOption> = emptyList(),
+    val statuses: List<FilterOption> = emptyList()
 )
 
 class ScheduleViewModel(
-    private val launchesApi: LaunchesApi
+    private val launchesApi: LaunchesApi,
+    private val appPreferences: AppPreferences,
+    private val filterRepository: ScheduleFilterRepository
 ) : ViewModel() {
 
     private val log = logger()
@@ -47,14 +67,43 @@ class ScheduleViewModel(
     private var queryVersion = 0
 
     init {
-        // Initialize both tabs on first launch
-        loadTab(ScheduleTab.Upcoming, reset = true)
-        loadTab(ScheduleTab.Previous, reset = true)
+        // Load saved filter state FIRST, then load data
+        viewModelScope.launch {
+            // Get initial filter state synchronously
+            val savedFilterState = appPreferences.getScheduleFilterState()
+            if (_uiState.value.filterState != savedFilterState) {
+                log.d { "Filter state loaded from preferences on init: ${savedFilterState.activeFilterCount()} filters" }
+                _uiState.value = _uiState.value.copy(filterState = savedFilterState)
+                
+                // Always invalidate cache on app start if filters exist to prevent showing wrong data
+                if (savedFilterState.hasActiveFilters()) {
+                    log.d { "Invalidating cache on init due to active filters" }
+                    invalidateCache()
+                }
+            }
+            
+            // Now load tabs with correct filter state
+            loadTab(ScheduleTab.Upcoming, reset = true)
+            loadTab(ScheduleTab.Previous, reset = true)
+            
+            // Continue observing filter state changes
+            appPreferences.scheduleFilterStateFlow.collect { newFilterState ->
+                if (_uiState.value.filterState != newFilterState) {
+                    log.d { "Filter state changed: ${newFilterState.activeFilterCount()} filters" }
+                    _uiState.value = _uiState.value.copy(filterState = newFilterState)
+
+                    // Invalidate cache and reload when filters change
+                    invalidateCache()
+                    loadTab(ScheduleTab.Upcoming, reset = true)
+                    loadTab(ScheduleTab.Previous, reset = true)
+                }
+            }
+        }
     }
 
     fun selectTab(tab: ScheduleTab) {
         _uiState.value = _uiState.value.copy(selectedTab = tab)
-        
+
         // Load if not already loaded
         val tabState = getTabState(tab)
         if (tabState.items.isEmpty() && !hasValidCache(tab)) {
@@ -105,13 +154,13 @@ class ScheduleViewModel(
             log.d { "Refresh called - reloading both tabs" }
             _uiState.value = _uiState.value.copy(isRefreshing = true)
             invalidateCache()
-            
+
             // Reload both tabs
             log.d { "Loading Upcoming tab..." }
             loadTab(ScheduleTab.Upcoming, reset = true)
             log.d { "Loading Previous tab..." }
             loadTab(ScheduleTab.Previous, reset = true)
-            
+
             // Wait a bit for both to complete
             delay(500)
             _uiState.value = _uiState.value.copy(isRefreshing = false)
@@ -124,12 +173,12 @@ class ScheduleViewModel(
             log.d { "Loading tab: $tab, reset: $reset" }
             val requestVersion = queryVersion
             val tabState = getTabState(tab)
-            
+
             // Stale-while-revalidate pattern:
             // - If we have existing data and are resetting (refresh), show data with isRefreshing
             // - If no data or paginating, use isLoading
             val hasExistingData = tabState.items.isNotEmpty()
-            
+
             if (hasExistingData && reset) {
                 // Background refresh - keep showing existing data
                 updateTabState(tab, tabState.copy(isRefreshing = true, error = null))
@@ -145,28 +194,43 @@ class ScheduleViewModel(
                 val limit = 25
                 val ordering = if (tab == ScheduleTab.Upcoming) "net" else "-net"
                 val searchQuery = _uiState.value.searchQuery.takeIf { it.isNotBlank() }
+                val filterState = _uiState.value.filterState
 
-                log.d { "API call starting - tab: $tab, offset: $offset, limit: $limit, ordering: $ordering, search: ${searchQuery ?: "none"}" }
+                log.d { "API call starting - tab: $tab, offset: $offset, limit: $limit, ordering: $ordering, search: ${searchQuery ?: "none"}, filters: ${filterState.activeFilterCount()}" }
 
                 val page: PaginatedLaunchBasicList = if (tab == ScheduleTab.Previous) {
-                    log.d { "Calling launchesApi.launchesMiniList for PREVIOUS launches..." }
-                    val response = launchesApi.launchesMiniList(
+                    log.d { "Calling launchesApi.getLaunchMiniList for PREVIOUS launches..." }
+                    val response = launchesApi.getLaunchMiniList(
                         limit = limit,
                         offset = offset,
                         previous = true,
                         ordering = ordering,
-                        search = searchQuery
+                        search = searchQuery,
+                        lspId = filterState.selectedAgencyIds.takeIf { it.isNotEmpty() }?.toList(),
+                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }?.toList(),
+                        program = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }?.toList(),
+                        rocketConfigurationId = filterState.selectedRocketIds.firstOrNull(), // API limitation: single ID only
+                        isCrewed = filterState.isCrewed,
+                        includeSuborbital = filterState.includeSuborbital,
+                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }?.toList()
                     )
                     log.v { "API Response received - Status: ${response.status}" }
                     response.body()
                 } else {
-                    log.d { "Calling launchesApi.launchesMiniList for UPCOMING launches..." }
-                    val response = launchesApi.launchesMiniList(
+                    log.d { "Calling launchesApi.getLaunchMiniList for UPCOMING launches..." }
+                    val response = launchesApi.getLaunchMiniList(
                         limit = limit,
                         offset = offset,
                         upcoming = true,
                         ordering = ordering,
-                        search = searchQuery
+                        search = searchQuery,
+                        lspId = filterState.selectedAgencyIds.takeIf { it.isNotEmpty() }?.toList(),
+                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }?.toList(),
+                        program = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }?.toList(),
+                        rocketConfigurationId = filterState.selectedRocketIds.firstOrNull(), // API limitation: single ID only
+                        isCrewed = filterState.isCrewed,
+                        includeSuborbital = filterState.includeSuborbital,
+                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }?.toList()
                     )
                     log.d { "API Response received - Status: ${response.status}" }
                     response.body()
@@ -176,7 +240,7 @@ class ScheduleViewModel(
                 if (page.results.isNotEmpty()) {
                     log.v { "First launch: ${page.results.first().name}, Last launch: ${page.results.last().name}" }
                 }
-                
+
                 // Ignore if query changed during request
                 if (requestVersion != queryVersion) {
                     log.d { "Query version changed, ignoring results" }
@@ -199,7 +263,8 @@ class ScheduleViewModel(
                         error = null,
                         endReached = page.next == null || page.results.isEmpty(),
                         cacheTimestamp = now(),
-                        cachedQuery = _uiState.value.searchQuery
+                        cachedQuery = _uiState.value.searchQuery,
+                        totalCount = page.count
                     )
                 )
                 log.i { "loadTab completed successfully for $tab" }
@@ -223,7 +288,7 @@ class ScheduleViewModel(
             // Cache is still valid, no need to reload
             return
         }
-        
+
         val tabState = getTabState(tab)
         if (tabState.items.isEmpty()) {
             loadTab(tab, reset = true)
@@ -245,7 +310,7 @@ class ScheduleViewModel(
             upcomingTab = _uiState.value.upcomingTab.copy(cacheTimestamp = null, cachedQuery = ""),
             previousTab = _uiState.value.previousTab.copy(cacheTimestamp = null, cachedQuery = "")
         )
-        
+
         log.d { "Cache invalidated (timestamps cleared)" }
     }
 
@@ -264,4 +329,100 @@ class ScheduleViewModel(
     }
 
     private fun now() = System.now().toEpochMilliseconds()
+
+    // Filter management
+    fun openFilterSheet() {
+        _uiState.value = _uiState.value.copy(isFilterSheetOpen = true)
+        loadFilterOptions()
+    }
+
+    fun closeFilterSheet() {
+        _uiState.value = _uiState.value.copy(isFilterSheetOpen = false)
+    }
+
+    fun applyFilters(newFilterState: ScheduleFilterState) {
+        viewModelScope.launch {
+            log.d { "Applying filters - ${newFilterState.activeFilterCount()} active" }
+
+            // Save to preferences
+            appPreferences.updateScheduleFilterState(newFilterState)
+
+            // Update UI state
+            _uiState.value = _uiState.value.copy(
+                filterState = newFilterState,
+                isFilterSheetOpen = false
+            )
+
+            // Invalidate cache and reload with new filters
+            invalidateCache()
+            loadTab(ScheduleTab.Upcoming, reset = true)
+            loadTab(ScheduleTab.Previous, reset = true)
+        }
+    }
+
+    fun clearFilters() {
+        applyFilters(ScheduleFilterState())
+    }
+
+    fun reloadFilterOptions() {
+        viewModelScope.launch {
+            log.d { "Force reloading filter options from API" }
+            _uiState.value = _uiState.value.copy(isLoadingFilterOptions = true)
+
+            try {
+                // Force refresh from API (bypasses cache)
+                val agencies = filterRepository.getAgencies(forceRefresh = true).getOrNull() ?: emptyList()
+                val programs = filterRepository.getPrograms(forceRefresh = true).getOrNull() ?: emptyList()
+                val rockets = filterRepository.getRockets(forceRefresh = true).getOrNull() ?: emptyList()
+                val locations = filterRepository.getLocations(forceRefresh = true).getOrNull() ?: emptyList()
+
+                _uiState.value = _uiState.value.copy(
+                    filterOptions = FilterOptions(
+                        agencies = agencies,
+                        programs = programs,
+                        rockets = rockets,
+                        locations = locations
+                    ),
+                    isLoadingFilterOptions = false
+                )
+
+                log.i { "Filter options reloaded - Agencies: ${agencies.size}, Programs: ${programs.size}, Rockets: ${rockets.size}, Locations: ${locations.size}" }
+            } catch (e: Exception) {
+                log.e(e) { "Failed to reload filter options" }
+                _uiState.value = _uiState.value.copy(isLoadingFilterOptions = false)
+            }
+        }
+    }
+
+    private fun loadFilterOptions() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoadingFilterOptions = true)
+
+            try {
+                // Load all filter options in parallel (from cache if available)
+                val agencies = filterRepository.getAgencies().getOrNull() ?: emptyList()
+                val programs = filterRepository.getPrograms().getOrNull() ?: emptyList()
+                // val rockets = filterRepository.getRockets().getOrNull() ?: emptyList()
+                val rockets = emptyList<FilterOption>()
+                val locations = filterRepository.getLocations().getOrNull() ?: emptyList()
+                val statuses = filterRepository.getStatuses().getOrNull() ?: emptyList()
+
+                _uiState.value = _uiState.value.copy(
+                    filterOptions = FilterOptions(
+                        agencies = agencies,
+                        programs = programs,
+                        rockets = rockets,
+                        locations = locations,
+                        statuses = statuses
+                    ),
+                    isLoadingFilterOptions = false
+                )
+
+                log.i { "Filter options loaded - Agencies: ${agencies.size}, Programs: ${programs.size}, Rockets: ${rockets.size}, Locations: ${locations.size}, Statuses: ${statuses.size}" }
+            } catch (e: Exception) {
+                log.e(e) { "Failed to load filter options" }
+                _uiState.value = _uiState.value.copy(isLoadingFilterOptions = false)
+            }
+        }
+    }
 }

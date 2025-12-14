@@ -1,0 +1,48 @@
+-- Migration from version 2 to version 3
+-- Adds FilterOptions tables for Schedule Screen filtering
+
+-- Create FilterableAgency table
+CREATE TABLE IF NOT EXISTS FilterableAgency (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    abbreviation TEXT,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_agency_expires ON FilterableAgency(expires_at);
+CREATE INDEX IF NOT EXISTS idx_agency_name ON FilterableAgency(name);
+
+-- Create FilterableProgram table
+CREATE TABLE IF NOT EXISTS FilterableProgram (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    abbreviation TEXT,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_program_filter_expires ON FilterableProgram(expires_at);
+CREATE INDEX IF NOT EXISTS idx_program_filter_name ON FilterableProgram(name);
+
+-- Create FilterableRocket table
+CREATE TABLE IF NOT EXISTS FilterableRocket (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_rocket_expires ON FilterableRocket(expires_at);
+CREATE INDEX IF NOT EXISTS idx_rocket_name ON FilterableRocket(name);
+
+-- Create FilterableLocation table
+CREATE TABLE IF NOT EXISTS FilterableLocation (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_location_expires ON FilterableLocation(expires_at);
+CREATE INDEX IF NOT EXISTS idx_location_name ON FilterableLocation(name);

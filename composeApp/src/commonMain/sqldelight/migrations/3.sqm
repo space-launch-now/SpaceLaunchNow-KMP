@@ -1,0 +1,8 @@
+-- Migration from version 3 to version 4
+-- Adds is_featured column to FilterableAgency table
+
+-- Add is_featured column to FilterableAgency
+ALTER TABLE FilterableAgency ADD COLUMN is_featured INTEGER NOT NULL DEFAULT 1;
+
+-- Create index on is_featured for faster queries
+CREATE INDEX IF NOT EXISTS idx_agency_featured ON FilterableAgency(is_featured);
