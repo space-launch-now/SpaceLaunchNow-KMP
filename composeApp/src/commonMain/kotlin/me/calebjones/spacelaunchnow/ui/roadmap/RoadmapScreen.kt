@@ -23,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -349,6 +350,7 @@ private fun StatusBadge(status: RoadmapStatus) {
 private fun getStatusColor(status: RoadmapStatus): Color {
     return when (status) {
         RoadmapStatus.COMPLETED -> Color(0xFF4CAF50) // Green
+        RoadmapStatus.IN_TESTING -> Color(0xFF9C27B0) // Purple
         RoadmapStatus.IN_PROGRESS -> Color(0xFF2196F3) // Blue
         RoadmapStatus.PLANNED -> Color(0xFFFFC107) // Amber
         RoadmapStatus.BACKLOG -> Color(0xFF9E9E9E) // Grey
@@ -357,6 +359,7 @@ private fun getStatusColor(status: RoadmapStatus): Color {
 
 private fun getStatusIcon(status: RoadmapStatus) = when (status) {
     RoadmapStatus.COMPLETED -> Icons.Filled.CheckCircle
+    RoadmapStatus.IN_TESTING -> Icons.Filled.Science
     RoadmapStatus.IN_PROGRESS -> Icons.Filled.Pending
     RoadmapStatus.PLANNED -> Icons.Filled.Schedule
     RoadmapStatus.BACKLOG -> Icons.Filled.ThumbUp
