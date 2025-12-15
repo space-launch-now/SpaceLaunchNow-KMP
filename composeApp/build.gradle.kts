@@ -151,6 +151,10 @@ kotlin {
 
                 // SQLDelight Android driver
                 implementation(libs.sqldelight.android.driver)
+
+                // Google Play In-App Review
+                implementation(libs.play.core.review)
+                implementation(libs.play.core.review.ktx)
             }
         }
 

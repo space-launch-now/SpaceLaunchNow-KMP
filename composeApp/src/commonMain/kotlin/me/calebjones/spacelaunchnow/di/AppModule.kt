@@ -15,12 +15,12 @@ import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
 import me.calebjones.spacelaunchnow.data.repository.LauncherRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
@@ -60,6 +60,7 @@ import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapViewModel
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
@@ -81,6 +82,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
@@ -128,6 +130,14 @@ val appModule = module {
     }
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
+
+    // App rating ViewModel - using standard viewModel DSL
+    viewModel {
+        AppRatingViewModel(
+            appRatingManager = get(),
+            appPreferences = get()
+        )
+    }
 
     // Domain-specific ViewModels
     viewModelOf(::LaunchesViewModel)

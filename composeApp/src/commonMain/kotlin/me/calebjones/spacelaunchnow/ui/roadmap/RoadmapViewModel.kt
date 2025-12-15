@@ -105,7 +105,7 @@ class RoadmapViewModel : ViewModel() {
                     id = "3",
                     title = "Starship Screen",
                     description = "Implement dedicated Starship vehicle page with launch history and stats",
-                    status = RoadmapStatus.IN_PROGRESS,
+                    status = RoadmapStatus.IN_TESTING,
                     quarter = "End of 2025",
                     category = RoadmapCategory.FEATURE,
                     priority = RoadmapPriority.MEDIUM
@@ -114,7 +114,7 @@ class RoadmapViewModel : ViewModel() {
                     id = "4",
                     title = "Schedule page Sorting",
                     description = "Customizable schedule page with advanced sorting options",
-                    status = RoadmapStatus.IN_PROGRESS,
+                    status = RoadmapStatus.IN_TESTING,
                     quarter = "Early December 2025",
                     category = RoadmapCategory.FEATURE,
                     priority = RoadmapPriority.HIGH
@@ -166,7 +166,7 @@ class RoadmapViewModel : ViewModel() {
                     priority = RoadmapPriority.MEDIUM
                 )
             ),
-            lastUpdated = "November 2025",
+            lastUpdated = "December 2025",
             message = "This roadmap represents planned features and is subject to change based on user feedback and priorities."
         )
     }

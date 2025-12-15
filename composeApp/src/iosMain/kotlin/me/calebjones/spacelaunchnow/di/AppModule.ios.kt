@@ -5,6 +5,7 @@ import me.calebjones.spacelaunchnow.data.billing.createBillingManager
 import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
+import me.calebjones.spacelaunchnow.rating.AppRatingManager
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.createPlatformSharingService
 import org.koin.core.qualifier.named
@@ -23,6 +24,9 @@ val iosModule = module {
 
     // Sharing functionality
     single<LaunchSharingService> { createPlatformSharingService() }
+
+    // App rating manager
+    single { AppRatingManager() }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {

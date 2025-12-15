@@ -85,6 +85,10 @@ fun SettingsScreen(
     val debugMenuUnlocked by appPreferences.debugMenuUnlockedFlow.collectAsState(initial = false)
     val coroutineScope = rememberCoroutineScope()
 
+    // App rating for feedback dialog
+    val appRatingViewModel: me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel = koinViewModel()
+    val shouldShowFeedback by appRatingViewModel.shouldShowFeedbackDialog.collectAsState()
+
     // Tap counter for debug unlock
     var tapCount by remember { mutableStateOf(0) }
     var showPasswordDialog by remember { mutableStateOf(false) }
@@ -285,6 +289,14 @@ fun SettingsScreen(
                     Spacer(Modifier.height(4.dp))
                     SettingsCardRow {
                         SettingsNavigationRow(
+                            title = "Send Feedback",
+                            subtitle = "Report issues or suggest improvements",
+                            onClick = { appRatingViewModel.showFeedbackDialog() }
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    SettingsCardRow {
+                        SettingsNavigationRow(
                             title = "About Details",
                             onClick = onAbout
                         )
@@ -447,6 +459,29 @@ fun SettingsScreen(
                     Text("Cancel")
                 }
             }
+        )
+    }
+
+    // Feedback dialog
+    if (shouldShowFeedback) {
+        me.calebjones.spacelaunchnow.ui.components.FeedbackDialog(
+            onSendEmail = {
+                appRatingViewModel.onFeedbackSent()
+                me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openEmail(
+                    recipient = "hello@spacelaunchnow.app",
+                    subject = "SpaceLaunchNow Feedback",
+                    body = "I'd like to share feedback about SpaceLaunchNow:\n\n"
+                )
+            },
+            onOpenGitHub = {
+                appRatingViewModel.onFeedbackSent()
+                uriHandler.openUri("https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/new")
+            },
+            onOpenDiscord = {
+                appRatingViewModel.onFeedbackSent()
+                uriHandler.openUri("https://discord.gg/WVfzEDW")
+            },
+            onDismiss = { appRatingViewModel.dismissFeedbackDialog() }
         )
     }
 }

@@ -27,6 +27,7 @@ data class RoadmapItem(
 @Serializable
 enum class RoadmapStatus(val displayName: String) {
     COMPLETED("Completed"),
+    IN_TESTING("In Testing"),
     IN_PROGRESS("In Progress"),
     PLANNED("Planned"),
     BACKLOG("Backlog")

@@ -6,6 +6,7 @@ import me.calebjones.spacelaunchnow.data.storage.createAppSettingsDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
+import me.calebjones.spacelaunchnow.rating.AppRatingManager
 import me.calebjones.spacelaunchnow.util.AndroidSharingService
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
@@ -31,6 +32,9 @@ val androidModule = module {
 
     // Sharing functionality
     single<LaunchSharingService> { AndroidSharingService(androidContext()) }
+
+    // App rating manager (Activity will be passed at call time)
+    single { AppRatingManager() }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {
