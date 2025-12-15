@@ -1,3 +1,13 @@
+# [5.5.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.4.0...v5.5.0) (2025-12-15)
+
+
+### Features
+
+* Add 'In Testing' status to roadmap and update relevant items ([8e198cd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8e198cdb0e32fa806d5fdb64488415f42c3db3a0))
+* Implement app rating feature with dialogs for user feedback and native review requests ([224e4df](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/224e4df4c7ddac2d1b5ac3595b52f95593f16e00))
+
+
+
 # [5.4.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.3...v5.4.0) (2025-12-14)
 
 
@@ -38,22 +48,6 @@
 ### Bug Fixes
 
 * ios build ([ea59a8e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ea59a8e5b307f6175d0cae26f5ebd8db048ce689))
-
-
-
-# [5.3.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.2.4...v5.3.0) (2025-12-08)
-
-
-### Bug Fixes
-
-* add flightclub button ([96d38c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/96d38c6d34878c76a190cb5b645c708cdb3c1d50))
-* add preview data and adjust layout ([e4092ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e4092ff1490fdc7b12aa488bd4533bccfbcbba00))
-* enhance timeline layout ([d271f87](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d271f87490213f746ec0bbd0c18cf8cfadc63593))
-
-
-### Features
-
-* add info URL button to Update cards ([49c8dcf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/49c8dcf22639e7866ffbeb1ca59f7d46c6eae596))
 
 
 

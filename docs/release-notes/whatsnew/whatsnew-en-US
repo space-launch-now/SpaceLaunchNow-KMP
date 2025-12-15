@@ -1,7 +1,4 @@
-### Bug Fixes
-
-* pre-load filter options on app launch
-
 ### Features
 
-* implement filter options for Schedule Screen
+* Add 'In Testing' status to roadmap and update relevant items
+* Implement app rating feature with dialogs for user feedback and native review requests
