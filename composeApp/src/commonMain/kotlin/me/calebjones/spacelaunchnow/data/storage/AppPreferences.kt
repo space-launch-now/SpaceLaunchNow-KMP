@@ -38,6 +38,13 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
         // Schedule filter state
         private val SCHEDULE_FILTER_STATE = stringPreferencesKey("schedule_filter_state")
+
+        // App rating preferences
+        private val APP_LAUNCH_COUNT = longPreferencesKey("app_launch_count")
+        private val LAST_RATING_PROMPT_DATE = longPreferencesKey("last_rating_prompt_date")
+        private val RATING_DIALOG_SHOWN_COUNT = longPreferencesKey("rating_dialog_shown_count")
+        private val USER_HAS_RATED = booleanPreferencesKey("user_has_rated")
+        private val USER_GAVE_FEEDBACK = booleanPreferencesKey("user_gave_feedback")
     }
 
     val themeFlow: Flow<ThemeOption> = dataStore.data.map { preferences ->
@@ -173,5 +180,78 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         } else {
             ScheduleFilterState()
         }
+    }
+
+    // App rating methods
+    val appLaunchCountFlow: Flow<Long> = dataStore.data.map { preferences ->
+        preferences[APP_LAUNCH_COUNT] ?: 0L
+    }
+
+    suspend fun incrementLaunchCount() {
+        dataStore.edit { preferences ->
+            val currentCount = preferences[APP_LAUNCH_COUNT] ?: 0L
+            preferences[APP_LAUNCH_COUNT] = currentCount + 1
+        }
+    }
+
+    suspend fun getAppLaunchCount(): Long {
+        return dataStore.data.map { it[APP_LAUNCH_COUNT] }.first() ?: 0L
+    }
+
+    val lastRatingPromptDateFlow: Flow<Long?> = dataStore.data.map { preferences ->
+        preferences[LAST_RATING_PROMPT_DATE]
+    }
+
+    suspend fun updateLastRatingPromptDate(timestamp: Long) {
+        dataStore.edit { preferences ->
+            preferences[LAST_RATING_PROMPT_DATE] = timestamp
+        }
+    }
+
+    suspend fun getLastRatingPromptDate(): Long? {
+        return dataStore.data.map { it[LAST_RATING_PROMPT_DATE] }.first()
+    }
+
+    val ratingDialogShownCountFlow: Flow<Long> = dataStore.data.map { preferences ->
+        preferences[RATING_DIALOG_SHOWN_COUNT] ?: 0L
+    }
+
+    suspend fun incrementRatingDialogShownCount() {
+        dataStore.edit { preferences ->
+            val currentCount = preferences[RATING_DIALOG_SHOWN_COUNT] ?: 0L
+            preferences[RATING_DIALOG_SHOWN_COUNT] = currentCount + 1
+        }
+    }
+
+    suspend fun getRatingDialogShownCount(): Long {
+        return dataStore.data.map { it[RATING_DIALOG_SHOWN_COUNT] }.first() ?: 0L
+    }
+
+    val userHasRatedFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[USER_HAS_RATED] ?: false
+    }
+
+    suspend fun setUserHasRated(hasRated: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[USER_HAS_RATED] = hasRated
+        }
+    }
+
+    suspend fun hasUserRated(): Boolean {
+        return dataStore.data.map { it[USER_HAS_RATED] }.first() ?: false
+    }
+
+    val userGaveFeedbackFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[USER_GAVE_FEEDBACK] ?: false
+    }
+
+    suspend fun setUserGaveFeedback(gaveFeedback: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[USER_GAVE_FEEDBACK] = gaveFeedback
+        }
+    }
+
+    suspend fun hasUserGivenFeedback(): Boolean {
+        return dataStore.data.map { it[USER_GAVE_FEEDBACK] }.first() ?: false
     }
 }

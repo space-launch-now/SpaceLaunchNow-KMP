@@ -1,10 +1,17 @@
 package me.calebjones.spacelaunchnow
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
@@ -56,6 +63,7 @@ import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationScreen
 import me.calebjones.spacelaunchnow.ui.starship.StarshipScreen
 import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
+import me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -166,6 +174,10 @@ fun SpaceLaunchNowApp(
                 val notificationRepository = koin.get<NotificationRepository>()
                 val subscriptionRepository = koin.get<SubscriptionRepository>()
                 val pushMessaging = koin.get<PushMessaging>()
+                val appRatingViewModel = koin.get<AppRatingViewModel>()
+
+                // Record app launch for rating tracking
+                appRatingViewModel.recordAppLaunch()
 
                 // Initialize ads using platform-specific abstraction
                 val testDeviceIds = if (BuildConfig.IS_DEBUG) {
@@ -227,17 +239,88 @@ fun SpaceLaunchNowApp(
 
     // Provide the useUtc setting and contextFactory throughout the app
     // Ad-related CompositionLocals are provided by WithPreloadedAds wrapper
-    CompositionLocalProvider(
-        LocalUseUtc provides useUtc,
-        LocalContextFactory provides contextFactory
-    ) {
-        BetaWarningDialog()
+    // Wrap everything in theme so dialogs get proper theming
+    me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme(themeOption = themeOption) {
+        CompositionLocalProvider(
+            LocalUseUtc provides useUtc,
+            LocalContextFactory provides contextFactory
+        ) {
+            BetaWarningDialog()
 
         // Show consent popup (platform-specific implementation)
         // Must be inside CompositionLocalProvider to access LocalContextFactory
         AdConsentPopup(
             onFailure = { log.w(it) { "Consent popup failure" } }
         )
+
+        // App rating integration - shows enjoyment dialog first, then native review or feedback
+        val appRatingViewModel: AppRatingViewModel = koinInject()
+        val shouldShowEnjoymentDialog by appRatingViewModel.shouldShowEnjoymentDialog.collectAsState()
+        val shouldShowFeedbackDialog by appRatingViewModel.shouldShowFeedbackDialog.collectAsState()
+        val shouldShowNativeReview by appRatingViewModel.shouldShowNativeReview.collectAsState()
+        
+        // Delay showing the dialog until user has been in the app for a bit
+        var showDelayedDialog by remember { mutableStateOf(false) }
+        LaunchedEffect(shouldShowEnjoymentDialog) {
+            log.i { "LaunchedEffect: shouldShowEnjoymentDialog=$shouldShowEnjoymentDialog, showDelayedDialog=$showDelayedDialog" }
+            if (shouldShowEnjoymentDialog && !showDelayedDialog) {
+                log.i { "⏱️ Rating dialog conditions met, delaying 5 seconds before showing..." }
+                kotlinx.coroutines.delay(5_000) // 5 seconds - let user actually use the app
+                showDelayedDialog = true
+                log.i { "✅ Delay complete, setting showDelayedDialog=true" }
+            } else if (!shouldShowEnjoymentDialog) {
+                log.d { "Resetting showDelayedDialog to false" }
+                showDelayedDialog = false // Reset when conditions no longer met
+            }
+        }
+        
+        // Show enjoyment dialog after delay
+        log.i { "Checking if should render dialog: showDelayedDialog=$showDelayedDialog" }
+        if (showDelayedDialog) {
+            log.i { "🎨 Rendering AppRatingDialog now" }
+            me.calebjones.spacelaunchnow.ui.components.AppRatingDialog(
+                onYesEnjoyingApp = { appRatingViewModel.onUserEnjoyingApp() },
+                onNoNotEnjoying = { appRatingViewModel.onUserNotEnjoyingApp() },
+                onNotNow = { appRatingViewModel.onNotNow() },
+                onDismiss = { appRatingViewModel.dismissEnjoymentDialog() }
+            )
+        }
+        
+        // Show feedback dialog if user said they're not enjoying
+        if (shouldShowFeedbackDialog) {
+            me.calebjones.spacelaunchnow.ui.components.FeedbackDialog(
+                onSendEmail = {
+                    me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openEmail(
+                        recipient = "support@spacelaunchnow.me",
+                        subject = "Space Launch Now Feedback",
+                        body = "Hi, I'd like to share some feedback about the app:\n\n"
+                    )
+                    appRatingViewModel.onFeedbackSent() // Track that they sent feedback
+                },
+                onOpenGitHub = {
+                    me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openUrl(
+                        "https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/new"
+                    )
+                    appRatingViewModel.onFeedbackSent() // Track that they sent feedback
+                },
+                onOpenDiscord = {
+                    me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openUrl(
+                        "https://discord.gg/WVfzEDW"
+                    )
+                    appRatingViewModel.onFeedbackSent() // Track that they sent feedback
+                },
+                onDismiss = { appRatingViewModel.dismissFeedbackDialog() }
+            )
+        }
+        
+        // Trigger native review if user confirmed they're enjoying the app
+        LaunchedEffect(shouldShowNativeReview) {
+            if (shouldShowNativeReview) {
+                val activity = contextFactory.getActivity()
+                log.i { "Triggering native in-app review with activity: ${activity?.javaClass?.simpleName}" }
+                appRatingViewModel.requestReview(activity)
+            }
+        }
 
         // Wrap content with preloaded ads (platform-specific: Android/iOS preloads, Desktop no-op)
         WithPreloadedAds(
@@ -385,6 +468,7 @@ fun SpaceLaunchNowApp(
                     content = navHostContent
                 )
             }
+        }
         }
     }
 }

@@ -50,6 +50,11 @@ class MainApplication : Application() {
         me.calebjones.spacelaunchnow.data.subscription.AppDirectories.initialize(this)
         log.d { "✅ AppDirectories initialized" }
 
+        // Initialize ExternalLinkHandler for feedback/support
+        log.d { "Initializing ExternalLinkHandler..." }
+        me.calebjones.spacelaunchnow.util.ExternalLinkHandler.initialize(this)
+        log.d { "✅ ExternalLinkHandler initialized" }
+
         // Now start Koin - BuildConfig.IS_DEBUG is now set
         log.d { "Starting Koin..." }
         try {
