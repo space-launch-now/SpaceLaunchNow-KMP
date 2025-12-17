@@ -272,6 +272,12 @@ fun SettingsScreen(
                                 subtitle = "Explore space agencies and their missions",
                                 onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Agencies) }
                             )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
+                                title = "ISS Tracking",
+                                subtitle = "Live tracking, orbit path, crew, and NASA live stream",
+                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SpaceStationDetail(4)) }
+                            )
                         }
                     }
                 }

@@ -1,13 +1,13 @@
 package me.calebjones.spacelaunchnow.ui.detail.compose.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import chaintech.videoplayer.model.VideoPlayerConfig
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 
 /**
@@ -19,7 +19,8 @@ fun VideoPlayerCard(
     launchName: String,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
-    onVideoSelected: (Int) -> Unit
+    onVideoSelected: (Int) -> Unit,
+    playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false)
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -32,7 +33,7 @@ fun VideoPlayerCard(
             onSetPlayerVisible = onSetPlayerVisible,
             onNavigateToFullscreen = onNavigateToFullscreen,
             onVideoSelected = onVideoSelected,
-            modifier = Modifier.padding(16.dp)
+            playerConfig = playerConfig
         )
     }
 }

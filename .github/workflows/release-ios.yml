@@ -59,6 +59,7 @@ jobs:
           DATADOG_CLIENT_TOKEN=${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID=${{ secrets.DATADOG_APPLICATION_ID }}
           DATADOG_ENVIRONMENT=${{ secrets.DATADOG_ENVIRONMENT }}
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
           EOF
 
       - name: Generate iOS Secrets.plist

@@ -21,5 +21,6 @@ expect object AppSecrets {
     val dataDogApplicationId: String
     val dataDogEnv: String
 
-
+    // Google Maps API Key
+    val mapsApiKey: String
 }

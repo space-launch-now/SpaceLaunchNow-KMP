@@ -16,9 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 
 /**
  * Card displaying station specifications and statistics
@@ -34,18 +38,17 @@ fun StationSpecsCard(
 
     if (!hasSpecs) return
 
+    Text(
+        text = "Station Statistics",
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    )
+
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Station Statistics",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(Modifier.height(12.dp))
 
             // Crew and vehicles row
             Row(
@@ -85,7 +88,7 @@ fun StationSpecsCard(
                 station.height?.let { height ->
                     StatItem(
                         label = "Height",
-                        value = "${String.format("%.1f", height)} m",
+                        value = "${NumberFormatUtil.formatDecimal(height, 1)} m",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -97,7 +100,7 @@ fun StationSpecsCard(
                 station.width?.let { width ->
                     StatItem(
                         label = "Width",
-                        value = "${String.format("%.1f", width)} m",
+                        value = "${NumberFormatUtil.formatDecimal(width, 1)} m",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -115,7 +118,7 @@ fun StationSpecsCard(
                 station.mass?.let { mass ->
                     StatItem(
                         label = "Mass",
-                        value = "${String.format("%,.0f", mass)} kg",
+                        value = "${NumberFormatUtil.formatNumber(mass)} kg",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -133,26 +136,13 @@ fun StationSpecsCard(
                 }
             }
 
-            // Additional info
-            if (station.founded != null || station.orbit != null) {
-                Spacer(Modifier.height(12.dp))
-            }
-
             station.founded?.let { founded ->
                 val useUtc = LocalUseUtc.current
+                val tz = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
+                val foundedInstant = founded.atStartOfDayIn(tz)
                 StatItem(
                     label = "Founded",
-                    value = DateTimeUtil.formatLaunchDate(founded, useUtc)
-                )
-            }
-
-            station.orbit?.let { orbit ->
-                if (station.founded != null) {
-                    Spacer(Modifier.height(8.dp))
-                }
-                StatItem(
-                    label = "Orbit",
-                    value = orbit
+                    value = DateTimeUtil.formatLaunchDate(foundedInstant, useUtc)
                 )
             }
         }
