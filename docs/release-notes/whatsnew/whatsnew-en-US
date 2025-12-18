@@ -1,4 +1,3 @@
-### Features
+### Bug Fixes
 
-* Add 'In Testing' status to roadmap and update relevant items
-* Implement app rating feature with dialogs for user feedback and native review requests
+* update feedback issue link in SettingsScreen
