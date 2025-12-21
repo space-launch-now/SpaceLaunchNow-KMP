@@ -155,11 +155,42 @@ val apiModule = module {
         }
     }
 
+    single<me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpaceStationsApi> {
+        me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpaceStationsApi(
+            baseUrl = get<String>(named("BaseUrl")),
+            httpClientEngine = get<HttpClientEngine>(),
+            httpClientConfig = httpClientConfig,
+        ).apply {
+            setApiKey(get<String>(named("API_KEY")), "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
+    }
+
+    single<me.calebjones.spacelaunchnow.api.launchlibrary.apis.ExpeditionsApi> {
+        me.calebjones.spacelaunchnow.api.launchlibrary.apis.ExpeditionsApi(
+            baseUrl = get<String>(named("BaseUrl")),
+            httpClientEngine = get<HttpClientEngine>(),
+            httpClientConfig = httpClientConfig,
+        ).apply {
+            setApiKey(get<String>(named("API_KEY")), "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
+    }
+
     // SNAPI (Spaceflight News API) - separate base URL, no auth required
     single<ArticlesApi> {
         ArticlesApi(
             baseUrl = "https://api.spaceflightnewsapi.net",
             httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
+            httpClientConfig = httpClientConfig,
+        )
+        // No API key required for SNAPI
+    }
+
+    single<me.calebjones.spacelaunchnow.api.snapi.apis.ReportsApi> {
+        me.calebjones.spacelaunchnow.api.snapi.apis.ReportsApi(
+            baseUrl = "https://api.spaceflightnewsapi.net",
+            httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
         // No API key required for SNAPI

@@ -71,6 +71,7 @@ import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.getPlatform
+import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
 import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.viewmodel.ProductType
@@ -227,6 +228,14 @@ fun SupportUsScreen(
                                 "Unlock all premium features including widgets and more!",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 24.dp)
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = "✨ All plans unlock all features",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 24.dp)
                         )
                     }
@@ -1016,6 +1025,9 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
 
 @Composable
 private fun FinePrint() {
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+    val platformType = getPlatform().type
+    
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -1038,13 +1050,54 @@ private fun FinePrint() {
         )
 
         Text(
-            text = "All subscriptions are processed securely through Google Play or the App Store. " +
-                    "You can manage or cancel your subscription at any time through your account settings. " +
-                    "No refunds for partial subscription periods.",
+            text = "Purchases are processed securely through ${when (platformType) {
+                PlatformType.ANDROID -> "Google Play"
+                PlatformType.IOS -> "the App Store"
+                else -> "your platform's store"
+            }}.",
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+        )
+
+        Text(
+            text = "Any purchase above unlocks all premium features. " +
+                    "Subscriptions auto-renew until canceled. " +
+                    "You can manage or cancel your subscription at any time by following the link below.",
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         )
+        
+        // Manage Subscriptions Button (platform-specific)
+        if (platformType.isMobile) {
+            Spacer(Modifier.height(8.dp))
+            TextButton(
+                onClick = {
+                    val url = when (platformType) {
+                        PlatformType.ANDROID -> "https://play.google.com/store/account/subscriptions"
+                        PlatformType.IOS -> "https://apps.apple.com/account/subscriptions"
+                        else -> null
+                    }
+                    url?.let { uriHandler.openUri(it) }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.OpenInNew,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(Modifier.size(4.dp))
+                Text(
+                    text = when (platformType) {
+                        PlatformType.ANDROID -> "Manage Subscriptions on Google Play"
+                        PlatformType.IOS -> "Manage Subscriptions in App Store"
+                        else -> "Manage Subscriptions"
+                    },
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }
     }
 }
 

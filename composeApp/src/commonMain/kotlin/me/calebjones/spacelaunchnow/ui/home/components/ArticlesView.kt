@@ -37,8 +37,8 @@ import coil3.compose.SubcomposeAsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
-import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.LocalUseUtc
+import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.koin.compose.viewmodel.koinViewModel
@@ -80,7 +80,7 @@ fun ArticlesView() {
                         )
                     }
                     // Show stale articles
-                    Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                    Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         state.data.take(5).forEach { article ->
                             ArticleItem(article = article)
                         }
@@ -95,7 +95,7 @@ fun ArticlesView() {
         // STATE 2 & 3: Loading with existing data
         state.isLoading && state.data.isNotEmpty() -> {
             Box {
-                Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
                     state.data.take(5).forEach { article ->
                         ArticleItem(article = article)
                     }
@@ -113,7 +113,7 @@ fun ArticlesView() {
 
         // Data available (not loading, no error)
         state.data.isNotEmpty() && state.error == null -> {
-            Column(modifier = Modifier.padding(vertical = 16.dp)) {
+            Column(modifier = Modifier.padding(vertical = 4.dp)) {
                 state.data.take(5).forEach { article ->
                     ArticleItem(article = article)
                 }

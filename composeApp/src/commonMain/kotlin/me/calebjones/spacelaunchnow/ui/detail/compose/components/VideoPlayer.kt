@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import chaintech.videoplayer.model.VideoPlayerConfig
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
@@ -49,7 +50,8 @@ fun VideoPlayer(
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false)
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -64,7 +66,8 @@ fun VideoPlayer(
             isPlayerVisible = videoPlayerState.isPlayerVisible,
             onSetPlayerVisible = onSetPlayerVisible,
             onNavigateToFullscreen = onNavigateToFullscreen,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            playerConfig = playerConfig
         )
 
         // Video picker (only show if there are multiple videos)

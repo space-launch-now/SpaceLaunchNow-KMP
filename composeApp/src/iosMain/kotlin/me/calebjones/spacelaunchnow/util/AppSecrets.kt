@@ -51,6 +51,10 @@ actual object AppSecrets {
 
     actual val dataDogEnv: String
         get() = getStringResource("Secrets", "plist", "dataDogEnv") ?: "production"
+
+    // Google Maps API Key
+    actual val mapsApiKey: String
+        get() = getStringResource("Secrets", "plist", "mapsApiKey") ?: ""
 }
 
 internal fun getStringResource(filename: String, fileType: String, valueKey: String): String? {

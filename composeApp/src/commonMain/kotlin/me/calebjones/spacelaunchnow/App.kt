@@ -1,14 +1,12 @@
 package me.calebjones.spacelaunchnow
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,6 +32,7 @@ import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
+import me.calebjones.spacelaunchnow.navigation.SpaceStationDetail
 import me.calebjones.spacelaunchnow.navigation.Starship
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
@@ -127,7 +126,7 @@ fun SpaceLaunchNowApp(
     val currentIsTabletSize = isTabletOrDesktop()
 
     log.v { "Dynamic layout detection: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}" }
-    
+
     log.v { "SpaceLaunchNowApp recomposing - NavController: ${navController.hashCode()}, using dynamic layout: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}" }
 
 
@@ -247,228 +246,242 @@ fun SpaceLaunchNowApp(
         ) {
             BetaWarningDialog()
 
-        // Show consent popup (platform-specific implementation)
-        // Must be inside CompositionLocalProvider to access LocalContextFactory
-        AdConsentPopup(
-            onFailure = { log.w(it) { "Consent popup failure" } }
-        )
-
-        // App rating integration - shows enjoyment dialog first, then native review or feedback
-        val appRatingViewModel: AppRatingViewModel = koinInject()
-        val shouldShowEnjoymentDialog by appRatingViewModel.shouldShowEnjoymentDialog.collectAsState()
-        val shouldShowFeedbackDialog by appRatingViewModel.shouldShowFeedbackDialog.collectAsState()
-        val shouldShowNativeReview by appRatingViewModel.shouldShowNativeReview.collectAsState()
-        
-        // Delay showing the dialog until user has been in the app for a bit
-        var showDelayedDialog by remember { mutableStateOf(false) }
-        LaunchedEffect(shouldShowEnjoymentDialog) {
-            log.i { "LaunchedEffect: shouldShowEnjoymentDialog=$shouldShowEnjoymentDialog, showDelayedDialog=$showDelayedDialog" }
-            if (shouldShowEnjoymentDialog && !showDelayedDialog) {
-                log.i { "⏱️ Rating dialog conditions met, delaying 5 seconds before showing..." }
-                kotlinx.coroutines.delay(5_000) // 5 seconds - let user actually use the app
-                showDelayedDialog = true
-                log.i { "✅ Delay complete, setting showDelayedDialog=true" }
-            } else if (!shouldShowEnjoymentDialog) {
-                log.d { "Resetting showDelayedDialog to false" }
-                showDelayedDialog = false // Reset when conditions no longer met
-            }
-        }
-        
-        // Show enjoyment dialog after delay
-        log.i { "Checking if should render dialog: showDelayedDialog=$showDelayedDialog" }
-        if (showDelayedDialog) {
-            log.i { "🎨 Rendering AppRatingDialog now" }
-            me.calebjones.spacelaunchnow.ui.components.AppRatingDialog(
-                onYesEnjoyingApp = { appRatingViewModel.onUserEnjoyingApp() },
-                onNoNotEnjoying = { appRatingViewModel.onUserNotEnjoyingApp() },
-                onNotNow = { appRatingViewModel.onNotNow() },
-                onDismiss = { appRatingViewModel.dismissEnjoymentDialog() }
+            // Show consent popup (platform-specific implementation)
+            // Must be inside CompositionLocalProvider to access LocalContextFactory
+            AdConsentPopup(
+                onFailure = { log.w(it) { "Consent popup failure" } }
             )
-        }
-        
-        // Show feedback dialog if user said they're not enjoying
-        if (shouldShowFeedbackDialog) {
-            me.calebjones.spacelaunchnow.ui.components.FeedbackDialog(
-                onSendEmail = {
-                    me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openEmail(
-                        recipient = "support@spacelaunchnow.me",
-                        subject = "Space Launch Now Feedback",
-                        body = "Hi, I'd like to share some feedback about the app:\n\n"
-                    )
-                    appRatingViewModel.onFeedbackSent() // Track that they sent feedback
-                },
-                onOpenGitHub = {
-                    me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openUrl(
-                        "https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/new"
-                    )
-                    appRatingViewModel.onFeedbackSent() // Track that they sent feedback
-                },
-                onOpenDiscord = {
-                    me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openUrl(
-                        "https://discord.gg/WVfzEDW"
-                    )
-                    appRatingViewModel.onFeedbackSent() // Track that they sent feedback
-                },
-                onDismiss = { appRatingViewModel.dismissFeedbackDialog() }
-            )
-        }
-        
-        // Trigger native review if user confirmed they're enjoying the app
-        LaunchedEffect(shouldShowNativeReview) {
-            if (shouldShowNativeReview) {
-                val activity = contextFactory.getActivity()
-                log.i { "Triggering native in-app review with activity: ${activity?.javaClass?.simpleName}" }
-                appRatingViewModel.requestReview(activity)
-            }
-        }
 
-        // Wrap content with preloaded ads (platform-specific: Android/iOS preloads, Desktop no-op)
-        WithPreloadedAds(
-            context = contextFactory.getActivity()
-        ) {
-            // Hoisted NavHost - preserved across layout switches to maintain navigation state
-            val navHostContent: @Composable () -> Unit = {
-                NavHost(
-                    navController = navController,
-                    startDestination = Home,
-                ) {
-                    composableWithCompositionLocal<Home> {
-                        HomeScreen(navController = navController)
-                    }
-                    composableWithCompositionLocal<Schedule> {
-                        ScheduleScreen(
-                            onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
-                        )
-                    }
-                    composableWithCompositionLocal<Settings> {
-                        SettingsScreen(
-                            navController = navController,
-                            onOpenNotificationSettings = {
-                                navController.navigate(NotificationSettings)
-                            },
-                            onOpenDebugSettings = {
-                                navController.navigate(DebugSettings)
-                            },
-                            onOpenAboutLibraries = {
-                                navController.navigate(AboutLibraries)
-                            }
-                        )
-                    }
-                    composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
-                        val launchDetail = backStackEntry.toRoute<LaunchDetail>()
-                        LaunchDetailScreen(
-                            launchId = launchDetail.launchId,
-                            onNavigateBack = { navController.popBackStack() },
-                            navController = navController
-                        )
-                    }
-                    composableWithCompositionLocal<EventDetail> { backStackEntry ->
-                        val eventDetail = backStackEntry.toRoute<EventDetail>()
-                        EventDetailScreen(
-                            eventId = eventDetail.eventId,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
-                        val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
-                        AgencyDetailScreen(
-                            agencyId = agencyDetail.agencyId,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
-                        val fullscreenVideo = backStackEntry.toRoute<FullscreenVideo>()
-                        FullscreenVideoScreen(
-                            videoUrl = fullscreenVideo.videoUrl,
-                            launchName = fullscreenVideo.launchName,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<NotificationSettings> {
-                        NotificationSettingsScreen(
-                            navController = navController,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<DebugSettings> {
-                        DebugSettingsScreen(
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<AboutLibraries> {
-                        AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
-                    }
-                    composableWithCompositionLocal<SupportUs> {
-                        SupportUsScreen(
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<ThemeCustomization> {
-                        ThemeCustomizationScreen(
-                            navController = navController
-                        )
-                    }
-                    composableWithCompositionLocal<CalendarSync> {
-                        CalendarSyncScreen(
-                            navController = navController
-                        )
-                    }
-                    composableWithCompositionLocal<Roadmap> {
-                        RoadmapScreen(
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<Rockets> {
-                        RocketListScreen(
-                            onNavigateToRocketDetail = { id ->
-                                navController.navigate(RocketDetail(id))
-                            },
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<RocketDetail> { backStackEntry ->
-                        val rocketDetail = backStackEntry.toRoute<RocketDetail>()
-                        RocketDetailScreen(
-                            rocketId = rocketDetail.rocketId,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<Agencies> {
-                        AgencyListScreen(
-                            onNavigateToAgencyDetail = { id ->
-                                navController.navigate(AgencyDetail(id))
-                            },
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
-                        val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
-                        AgencyDetailScreen(
-                            agencyId = agencyDetail.agencyId,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    composableWithCompositionLocal<Starship> {
-                        StarshipScreen(navController = navController)
-                    }
+            // App rating integration - shows enjoyment dialog first, then native review or feedback
+            val appRatingViewModel: AppRatingViewModel = koinInject()
+            val shouldShowEnjoymentDialog by appRatingViewModel.shouldShowEnjoymentDialog.collectAsState()
+            val shouldShowFeedbackDialog by appRatingViewModel.shouldShowFeedbackDialog.collectAsState()
+            val shouldShowNativeReview by appRatingViewModel.shouldShowNativeReview.collectAsState()
+
+            // Delay showing the dialog until user has been in the app for a bit
+            var showDelayedDialog by remember { mutableStateOf(false) }
+            LaunchedEffect(shouldShowEnjoymentDialog) {
+                log.i { "LaunchedEffect: shouldShowEnjoymentDialog=$shouldShowEnjoymentDialog, showDelayedDialog=$showDelayedDialog" }
+                if (shouldShowEnjoymentDialog && !showDelayedDialog) {
+                    log.i { "⏱️ Rating dialog conditions met, delaying 5 seconds before showing..." }
+                    kotlinx.coroutines.delay(5_000) // 5 seconds - let user actually use the app
+                    showDelayedDialog = true
+                    log.i { "✅ Delay complete, setting showDelayedDialog=true" }
+                } else if (!shouldShowEnjoymentDialog) {
+                    log.d { "Resetting showDelayedDialog to false" }
+                    showDelayedDialog = false // Reset when conditions no longer met
                 }
             }
 
-            // Dynamic layout switching while preserving navigation state
-            if (currentIsTabletSize) {
-                TabletDesktopLayout(
-                    navController = navController,
-                    themeOption = themeOption,
-                    content = navHostContent
-                )
-            } else {
-                PhoneLayout(
-                    navController = navController,
-                    themeOption = themeOption,
-                    content = navHostContent
+            // Show enjoyment dialog after delay
+            log.i { "Checking if should render dialog: showDelayedDialog=$showDelayedDialog" }
+            if (showDelayedDialog) {
+                log.i { "🎨 Rendering AppRatingDialog now" }
+                me.calebjones.spacelaunchnow.ui.components.AppRatingDialog(
+                    onYesEnjoyingApp = { appRatingViewModel.onUserEnjoyingApp() },
+                    onNoNotEnjoying = { appRatingViewModel.onUserNotEnjoyingApp() },
+                    onNotNow = { appRatingViewModel.onNotNow() },
+                    onDismiss = { appRatingViewModel.dismissEnjoymentDialog() }
                 )
             }
-        }
+
+            // Show feedback dialog if user said they're not enjoying
+            if (shouldShowFeedbackDialog) {
+                me.calebjones.spacelaunchnow.ui.components.FeedbackDialog(
+                    onSendEmail = {
+                        me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openEmail(
+                            recipient = "support@spacelaunchnow.me",
+                            subject = "Space Launch Now Feedback",
+                            body = "Hi, I'd like to share some feedback about the app:\n\n"
+                        )
+                        appRatingViewModel.onFeedbackSent() // Track that they sent feedback
+                    },
+                    onOpenGitHub = {
+                        me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openUrl(
+                            "https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/new"
+                        )
+                        appRatingViewModel.onFeedbackSent() // Track that they sent feedback
+                    },
+                    onOpenDiscord = {
+                        me.calebjones.spacelaunchnow.util.ExternalLinkHandler.openUrl(
+                            "https://discord.gg/WVfzEDW"
+                        )
+                        appRatingViewModel.onFeedbackSent() // Track that they sent feedback
+                    },
+                    onDismiss = { appRatingViewModel.dismissFeedbackDialog() }
+                )
+            }
+
+            // Trigger native review if user confirmed they're enjoying the app
+            LaunchedEffect(shouldShowNativeReview) {
+                if (shouldShowNativeReview) {
+                    val activity = contextFactory.getActivity()
+                    log.i { "Triggering native in-app review with activity: ${activity?.javaClass?.simpleName}" }
+                    appRatingViewModel.requestReview(activity)
+                }
+            }
+
+            // Wrap content with preloaded ads (platform-specific: Android/iOS preloads, Desktop no-op)
+            WithPreloadedAds(
+                context = contextFactory.getActivity()
+            ) {
+                // Hoisted NavHost - preserved across layout switches to maintain navigation state
+                val navHostContent: @Composable () -> Unit = {
+                    NavHost(
+                        navController = navController,
+                        startDestination = Home,
+                    ) {
+                        composableWithCompositionLocal<Home> {
+                            HomeScreen(navController = navController)
+                        }
+                        composableWithCompositionLocal<Schedule> {
+                            ScheduleScreen(
+                                onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
+                            )
+                        }
+                        composableWithCompositionLocal<Settings> {
+                            SettingsScreen(
+                                navController = navController,
+                                onOpenNotificationSettings = {
+                                    navController.navigate(NotificationSettings)
+                                },
+                                onOpenDebugSettings = {
+                                    navController.navigate(DebugSettings)
+                                },
+                                onOpenAboutLibraries = {
+                                    navController.navigate(AboutLibraries)
+                                }
+                            )
+                        }
+                        composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
+                            val launchDetail = backStackEntry.toRoute<LaunchDetail>()
+                            LaunchDetailScreen(
+                                launchId = launchDetail.launchId,
+                                onNavigateBack = { navController.popBackStack() },
+                                navController = navController
+                            )
+                        }
+                        composableWithCompositionLocal<EventDetail> { backStackEntry ->
+                            val eventDetail = backStackEntry.toRoute<EventDetail>()
+                            EventDetailScreen(
+                                eventId = eventDetail.eventId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
+                            val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                            AgencyDetailScreen(
+                                agencyId = agencyDetail.agencyId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<SpaceStationDetail> { backStackEntry ->
+                            val stationDetail = backStackEntry.toRoute<SpaceStationDetail>()
+                            me.calebjones.spacelaunchnow.ui.spacestation.SpaceStationDetailScreen(
+                                stationId = stationDetail.stationId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
+                            val fullscreenVideo = backStackEntry.toRoute<FullscreenVideo>()
+                            FullscreenVideoScreen(
+                                videoUrl = fullscreenVideo.videoUrl,
+                                launchName = fullscreenVideo.launchName,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<NotificationSettings> {
+                            NotificationSettingsScreen(
+                                navController = navController,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<DebugSettings> {
+                            DebugSettingsScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<AboutLibraries> {
+                            AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
+                        }
+                        composableWithCompositionLocal<SupportUs> {
+                            SupportUsScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<ThemeCustomization> {
+                            ThemeCustomizationScreen(
+                                navController = navController
+                            )
+                        }
+                        composableWithCompositionLocal<CalendarSync> {
+                            CalendarSyncScreen(
+                                navController = navController
+                            )
+                        }
+                        composableWithCompositionLocal<Roadmap> {
+                            RoadmapScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<Rockets> {
+                            RocketListScreen(
+                                onNavigateToRocketDetail = { id ->
+                                    navController.navigate(RocketDetail(id))
+                                },
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<RocketDetail> { backStackEntry ->
+                            val rocketDetail = backStackEntry.toRoute<RocketDetail>()
+                            RocketDetailScreen(
+                                rocketId = rocketDetail.rocketId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<Agencies> {
+                            AgencyListScreen(
+                                onNavigateToAgencyDetail = { id ->
+                                    navController.navigate(AgencyDetail(id))
+                                },
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
+                            val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                            AgencyDetailScreen(
+                                agencyId = agencyDetail.agencyId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<SpaceStationDetail> { backStackEntry ->
+                            val stationDetail = backStackEntry.toRoute<SpaceStationDetail>()
+                            me.calebjones.spacelaunchnow.ui.spacestation.SpaceStationDetailScreen(
+                                stationId = stationDetail.stationId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<Starship> {
+                            StarshipScreen(navController = navController)
+                        }
+                    }
+                }
+
+                // Dynamic layout switching while preserving navigation state
+                if (currentIsTabletSize) {
+                    TabletDesktopLayout(
+                        navController = navController,
+                        themeOption = themeOption,
+                        content = navHostContent
+                    )
+                } else {
+                    PhoneLayout(
+                        navController = navController,
+                        themeOption = themeOption,
+                        content = navHostContent
+                    )
+                }
+            }
         }
     }
 }
