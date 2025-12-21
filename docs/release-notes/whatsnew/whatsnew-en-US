@@ -1,3 +1,5 @@
-### Bug Fixes
+### Features
 
-* update feedback issue link in SettingsScreen
+* add on commit
+* enhance SupportUsScreen with subscription management details and platform-specific links
+* implement experimental ISS page
