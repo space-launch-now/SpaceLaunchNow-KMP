@@ -206,7 +206,7 @@ fun SettingsScreen(
                         }
                     }
                 }
-                
+
                 // DIAGNOSTIC LOGGING
                 item {
                     val loggingPreferences: LoggingPreferences = koinInject()
@@ -217,7 +217,7 @@ fun SettingsScreen(
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
                 }
-                
+
                 // DEBUG
                 if (BuildConfig.IS_DEBUG || debugMenuUnlocked) {
                     item {
@@ -481,7 +481,7 @@ fun SettingsScreen(
             },
             onOpenGitHub = {
                 appRatingViewModel.onFeedbackSent()
-                uriHandler.openUri("https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/new")
+                uriHandler.openUri("https://github.com/space-launch-now/feedback/issues/new")
             },
             onOpenDiscord = {
                 appRatingViewModel.onFeedbackSent()

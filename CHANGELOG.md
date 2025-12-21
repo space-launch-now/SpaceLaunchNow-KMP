@@ -1,3 +1,12 @@
+## [5.5.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.5.0...v5.5.1) (2025-12-18)
+
+
+### Bug Fixes
+
+* update feedback issue link in SettingsScreen ([9c2a6b6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9c2a6b6b2c3c24a5a24ad6d394a39f1c931f2435))
+
+
+
 # [5.5.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.4.0...v5.5.0) (2025-12-15)
 
 
@@ -39,15 +48,6 @@
 * enhance UpdateCard ([f080e84](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f080e84ea1afb2ba6c0614a2b316ce5e0802854f))
 * fix UTC toggle support across the app ([59299ee](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/59299ee594673811aaa7cc87d1d4675af6e1e57e))
 * update copilot instructions ([ce75fad](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ce75fad48dba534da91e1623d40e9e65977807fb))
-
-
-
-## [5.3.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.0...v5.3.1) (2025-12-08)
-
-
-### Bug Fixes
-
-* ios build ([ea59a8e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ea59a8e5b307f6175d0cae26f5ebd8db048ce689))
 
 
 
