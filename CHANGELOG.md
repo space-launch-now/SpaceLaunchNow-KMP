@@ -1,3 +1,12 @@
+## [5.6.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.6.0...v5.6.1) (2025-12-22)
+
+
+### Bug Fixes
+
+* allow changes not sent for review in deployment summary ([45d395d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/45d395d5b66613b5b2453c78370df833df255027))
+
+
+
 # [5.6.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.5.1...v5.6.0) (2025-12-21)
 
 
@@ -39,15 +48,6 @@
 ### Features
 
 * implement filter options for Schedule Screen ([5a5d999](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5a5d999d60589a32043273f58b1c412d195849ca))
-
-
-
-## [5.3.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.2...v5.3.3) (2025-12-10)
-
-
-### Bug Fixes
-
-* implement notification handling for iOS ([0e527be](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0e527bef7fb8ca15503fb925331ecadf0ae57718))
 
 
 

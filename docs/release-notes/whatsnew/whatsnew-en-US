@@ -1,5 +1,3 @@
-### Features
+### Bug Fixes
 
-* add on commit
-* enhance SupportUsScreen with subscription management details and platform-specific links
-* implement experimental ISS page
+* allow changes not sent for review in deployment summary
