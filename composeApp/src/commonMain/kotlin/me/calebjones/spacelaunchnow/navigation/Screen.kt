@@ -58,6 +58,9 @@ data object Agencies
 data class AgencyDetail(val agencyId: Int)
 
 @Serializable
+data class SpaceStationDetail(val stationId: Int)
+
+@Serializable
 data object Starship
 
 @Serializable

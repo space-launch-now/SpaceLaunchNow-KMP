@@ -1,3 +1,23 @@
+## [5.6.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.6.0...v5.6.1) (2025-12-22)
+
+
+### Bug Fixes
+
+* allow changes not sent for review in deployment summary ([45d395d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/45d395d5b66613b5b2453c78370df833df255027))
+
+
+
+# [5.6.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.5.1...v5.6.0) (2025-12-21)
+
+
+### Features
+
+* add on commit ([bb6406b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb6406bddc8477bbe47b59dd6c19f736399a32c6))
+* enhance SupportUsScreen with subscription management details and platform-specific links ([2a283d2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2a283d23ca43074e86fe2cbd8856cd249ba08af1))
+* implement experimental ISS page ([bbfdc11](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bbfdc1189303422304640a031d650c5f706e3b02))
+
+
+
 ## [5.5.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.5.0...v5.5.1) (2025-12-18)
 
 
@@ -28,26 +48,6 @@
 ### Features
 
 * implement filter options for Schedule Screen ([5a5d999](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5a5d999d60589a32043273f58b1c412d195849ca))
-
-
-
-## [5.3.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.2...v5.3.3) (2025-12-10)
-
-
-### Bug Fixes
-
-* implement notification handling for iOS ([0e527be](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0e527bef7fb8ca15503fb925331ecadf0ae57718))
-
-
-
-## [5.3.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.1...v5.3.2) (2025-12-08)
-
-
-### Bug Fixes
-
-* enhance UpdateCard ([f080e84](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f080e84ea1afb2ba6c0614a2b316ce5e0802854f))
-* fix UTC toggle support across the app ([59299ee](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/59299ee594673811aaa7cc87d1d4675af6e1e57e))
-* update copilot instructions ([ce75fad](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ce75fad48dba534da91e1623d40e9e65977807fb))
 
 
 

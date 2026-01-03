@@ -200,6 +200,7 @@ jobs:
           DATADOG_CLIENT_TOKEN=${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID=${{ secrets.DATADOG_APPLICATION_ID }}
           DATADOG_ENVIRONMENT=${{ secrets.DATADOG_ENVIRONMENT }}
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
           EOF
 
       - name: Decode Google Services JSON
@@ -338,6 +339,7 @@ jobs:
           DATADOG_CLIENT_TOKEN=${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID=${{ secrets.DATADOG_APPLICATION_ID }}
           DATADOG_ENVIRONMENT=${{ secrets.DATADOG_ENVIRONMENT }}
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
           EOF
 
       - name: Decode Google Services JSON
@@ -429,6 +431,7 @@ jobs:
           status: completed
           mappingFile: ${{ steps.artifacts.outputs.mapping }}
           whatsNewDirectory: docs/release-notes/whatsnew/
+          changesNotSentForReview: true
 
       - name: Play Store Deployment Summary
         run: |

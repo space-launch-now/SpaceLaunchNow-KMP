@@ -3,6 +3,8 @@ package me.calebjones.spacelaunchnow.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import me.calebjones.spacelaunchnow.UserViewModel
+import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
+import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepositoryImpl
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.UserRepository
 import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
@@ -76,6 +78,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.SpaceStationViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StarshipViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
@@ -156,6 +159,12 @@ val appModule = module {
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
+
+    // Space Station tracking
+    singleOf(::IssTrackingRepositoryImpl) {
+        bind<IssTrackingRepository>()
+    }
+    viewModelOf(::SpaceStationViewModel)
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
     singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
     singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }

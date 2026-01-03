@@ -21,4 +21,7 @@ actual object AppSecrets {
     actual val dataDogClientToken: String = ""
     actual val dataDogApplicationId: String = ""
     actual val dataDogEnv: String = "development"
+
+    // Google Maps API Key (Desktop doesn't use maps, so empty string)
+    actual val mapsApiKey: String = ""
 }

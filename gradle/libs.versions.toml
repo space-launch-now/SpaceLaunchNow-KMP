@@ -70,6 +70,9 @@ app-rating = "1.0.1"
 composeMediaPlayer = "1.0.48"
 workRuntime = "2.11.0"
 
+# Google Maps Compose for Android
+maps-compose = "6.1.0"
+
 purchases-kmp = "1.9.0+14.3.0"
 shadowglow = "1.0.0"
 kstore = "1.0.0"
@@ -168,6 +171,9 @@ compose-icons-octicons = { module = "br.com.devsrsouza.compose.icons:octicons", 
 compose-icons-simpleIcons = { module = "br.com.devsrsouza.compose.icons:simple-icons", version.ref = "composeIcons" }
 compose-icons-tablerIcons = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "composeIcons" }
 compose-media-player = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "composeMediaPlayer" }
+
+# Google Maps Compose for Android
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 
 firebase-bom = { module = "com.google.firebase:firebase-bom", version = "34.4.0" }
 # Optional, include if using firebase auth

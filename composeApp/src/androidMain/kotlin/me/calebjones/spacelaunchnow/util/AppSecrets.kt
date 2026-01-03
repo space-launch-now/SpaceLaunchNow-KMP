@@ -22,4 +22,7 @@ actual object AppSecrets {
     actual val dataDogClientToken: String = BuildConfig.DATADOG_CLIENT_TOKEN
     actual val dataDogApplicationId: String = BuildConfig.DATADOG_APPLICATION_ID
     actual val dataDogEnv: String = BuildConfig.DATADOG_ENVIRONMENT
+
+    // Google Maps API Key
+    actual val mapsApiKey: String = BuildConfig.MAPS_API_KEY
 }

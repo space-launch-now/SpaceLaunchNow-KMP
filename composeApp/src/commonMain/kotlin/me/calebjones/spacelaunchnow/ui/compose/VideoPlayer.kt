@@ -50,7 +50,8 @@ fun LaunchVideoPlayer(
     isPlayerVisible: Boolean = false,
     onSetPlayerVisible: ((Boolean) -> Unit)? = null,
     onNavigateToFullscreen: ((String, String) -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false)
 ) {
     val uriHandler = LocalUriHandler.current
 
@@ -74,9 +75,7 @@ fun LaunchVideoPlayer(
                 VideoPlayerComposable(
                     modifier = Modifier.fillMaxSize(),
                     playerHost = playerHost,
-                    playerConfig = VideoPlayerConfig(
-                        isFullScreenEnabled = false
-                    )
+                    playerConfig = playerConfig
                 )
 
                 // Fullscreen button overlay

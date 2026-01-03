@@ -155,6 +155,9 @@ kotlin {
                 // Google Play In-App Review
                 implementation(libs.play.core.review)
                 implementation(libs.play.core.review.ktx)
+
+                // Google Maps Compose for Android
+                implementation(libs.maps.compose)
             }
         }
 
@@ -341,6 +344,9 @@ android {
         val datadogEnabled = envProps.getProperty("DATADOG_ENABLED")?.lowercase() ?: "false"
         val datadogEnvironment = envProps.getProperty("DATADOG_ENVIRONMENT") ?: "production"
 
+        // Google Maps API Key
+        val mapsApiKey = envProps.getProperty("MAPS_API_KEY") ?: ""
+
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         buildConfigField("String", "REVENUECAT_ANDROID_KEY", "\"$revenueCatAndroidKey\"")
         buildConfigField("String", "REVENUECAT_IOS_KEY", "\"$revenueCatIosKey\"")
@@ -366,6 +372,9 @@ android {
         buildConfigField("boolean", "DATADOG_ENABLED", "$datadogEnabled")
         buildConfigField("String", "DATADOG_ENVIRONMENT", "\"$datadogEnvironment\"")
 
+        // Google Maps API Key
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+
         // Add version information to BuildConfig
         buildConfigField("String", "VERSION_NAME", "\"${computeVersionName()}\"")
         buildConfigField("int", "VERSION_CODE", "${computeVersionCode()}")
@@ -373,6 +382,7 @@ android {
         versionCode = computeVersionCode()
         versionName = computeVersionName()
         manifestPlaceholders["appName"] = "Space Launch Now"
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     // Bundle configuration for 16KB optimization
