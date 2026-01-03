@@ -41,15 +41,57 @@ object IosNotificationBridge : KoinComponent {
      * @return true if notification should be displayed, false if it should be suppressed
      */
     fun shouldShowNotification(data: Map<String, String>): Boolean {
-        log.d { "Evaluating notification filter from iOS..." }
+        log.i { "========================================" }
+        log.i { "🔍 [KOTLIN] EVALUATING NOTIFICATION FILTER" }
+        log.i { "========================================" }
         
         // Get current notification state (use cache if available, refresh in background)
         val state = getCachedOrFetchState()
         
+        // Print current notification settings
+        log.i { "⚙️ [KOTLIN] Current Notification State:" }
+        log.i { "   - Notifications Enabled: ${state.enableNotifications}" }
+        log.i { "   - Follow All Launches: ${state.followAllLaunches}" }
+        log.i { "   - Use Strict Matching: ${state.useStrictMatching}" }
+        log.i { "   - Hide TBD Launches: ${state.hideTbdLaunches}" }
+        log.i { "" }
+        log.i { "⏰ [KOTLIN] Timing Settings (Topics):" }
+        state.topicSettings.forEach { (topic, enabled) ->
+            log.i { "   - $topic: ${if (enabled) "✅" else "❌"}" }
+        }
+        log.i { "" }
+        log.i { "🚀 [KOTLIN] Agency Filter:" }
+        if (state.subscribedAgencies.isEmpty()) {
+            log.i { "   - No agencies subscribed (will block all)" }
+        } else {
+            log.i { "   - ${state.subscribedAgencies.size} agencies subscribed: ${state.subscribedAgencies.take(10)}${if (state.subscribedAgencies.size > 10) "..." else ""}" }
+        }
+        log.i { "" }
+        log.i { "📍 [KOTLIN] Location Filter:" }
+        if (state.subscribedLocations.isEmpty()) {
+            log.i { "   - No locations subscribed (will block all)" }
+        } else {
+            log.i { "   - ${state.subscribedLocations.size} locations subscribed: ${state.subscribedLocations.take(10)}${if (state.subscribedLocations.size > 10) "..." else ""}" }
+        }
+        log.i { "" }
+        
+        // Print notification data being evaluated
+        log.i { "📩 [KOTLIN] Evaluating Notification:" }
+        log.i { "   - Type: ${data["notification_type"]}" }
+        log.i { "   - Launch: ${data["launch_name"]}" }
+        log.i { "   - Agency ID: ${data["agency_id"]}" }
+        log.i { "   - Location ID: ${data["location_id"]}" }
+        log.i { "   - Webcast: ${data["webcast"]}" }
+        log.i { "   - Webcast Live: ${data["webcast_live"]}" }
+        log.i { "" }
+        
         // Use shared filter logic
+        log.i { "🔄 [KOTLIN] Running shared NotificationFilter logic..." }
         val result = NotificationFilter.shouldShowFromMap(data, state)
         
-        log.d { "Filter result: ${if (result) "SHOW" else "SUPPRESS"}" }
+        log.i { "" }
+        log.i { "🎯 [KOTLIN] Filter Decision: ${if (result) "SHOW ✅" else "SUPPRESS 🔇"}" }
+        log.i { "========================================" }
         return result
     }
     

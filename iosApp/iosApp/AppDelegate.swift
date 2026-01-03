@@ -11,41 +11,67 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
         
+        print("\n🚀 ========================================")
+        print("🚀 APP LAUNCH - Initializing Notifications")
+        print("🚀 ========================================\n")
+        
         // Initialize Firebase
+        print("1️⃣ Configuring Firebase...")
         FirebaseApp.configure()
+        print("✅ Firebase configured\n")
         
         // Initialize FCMBridge early so it registers its NSNotification observer
         // before any Kotlin code tries to post notifications
+        print("2️⃣ Initializing FCM Bridge...")
         _ = FCMBridge.shared
+        print("✅ FCM Bridge initialized\n")
+        
+        // Initialize ShareHelper to listen for share requests from Kotlin
+        print("2️⃣.5 Initializing Share Helper...")
+        _ = ShareHelper.shared
+        print("✅ Share Helper initialized\n")
         
         // Set delegates
+        print("3️⃣ Setting notification delegates...")
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
+        print("✅ Delegates set\n")
         
         // Request notification permissions
+        print("4️⃣ Requesting notification permissions...")
         UNUserNotificationCenter.current().requestAuthorization(
             options: [.alert, .badge, .sound]
         ) { granted, error in
-            print("🔔 Notification permission granted: \(granted)")
+            print("\n📋 NOTIFICATION PERMISSION RESULT:")
             if let error = error {
-                print("❌ Error requesting notifications: \(error.localizedDescription)")
+                print("❌ Error: \(error.localizedDescription)")
             } else if granted {
-                print("✅ Notification permissions granted successfully")
+                print("✅ GRANTED - User allowed notifications")
             } else {
-                print("⚠️ Notification permissions denied by user")
+                print("❌ DENIED - User rejected notifications")
+                print("⚠️  Go to Settings → Space Launch Now → Notifications to enable")
             }
+            print("")
         }
         
+        print("5️⃣ Registering for remote notifications...")
         application.registerForRemoteNotifications()
+        print("✅ Registration request sent (waiting for APNs response...)\n")
         
         // Clear badge when app launches
-        UIApplication.shared.applicationIconBadgeNumber = 0
+        if #available(iOS 16.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(0)
+        } else {
+            UIApplication.shared.applicationIconBadgeNumber = 0
+        }
         
         // Handle notification if app was launched from notification tap
         if let notificationUserInfo = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
-            print("App launched from notification tap")
+            print("📱 App launched from notification tap")
             handleNotificationTap(userInfo: notificationUserInfo)
         }
+        
+        print("🚀 App launch complete - monitoring for notifications...\n")
         
         return true
     }
@@ -54,8 +80,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Clear badge when app becomes active
-        print("App became active - clearing badge")
-        UIApplication.shared.applicationIconBadgeNumber = 0
+        print("\n📱 App became active - clearing badge")
+        if #available(iOS 16.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(0)
+        } else {
+            UIApplication.shared.applicationIconBadgeNumber = 0
+        }
+    }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        print("\n🌙 App entered background - background notifications should still work")
     }
     
     // MARK: - APNs Token
@@ -65,9 +99,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        print("✅ APNs device token registered: \(tokenString.prefix(20))...")
+        print("\n" + String(repeating: "=", count: 60))
+        print("✅ APNS DEVICE TOKEN REGISTERED")
+        print(String(repeating: "=", count: 60))
+        print("Token: \(tokenString.prefix(20))...\(tokenString.suffix(20))")
+        print("Full Token: \(tokenString)")
+        print(String(repeating: "=", count: 60) + "\n")
+        
         Messaging.messaging().apnsToken = deviceToken
         print("✅ APNs token set on Firebase Messaging")
+        print("⏳ Waiting for FCM token...\n")
         
         // Process any pending Kotlin FCM requests now that we have APNs token
         FCMBridge.shared.processPendingKotlinRequests()
@@ -77,9 +118,17 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        print("❌ CRITICAL: Failed to register for remote notifications")
-        print("❌ Error: \(error.localizedDescription)")
-        print("❌ This device will NOT receive push notifications")
+        print("\n" + String(repeating: "=", count: 60))
+        print("❌ CRITICAL: FAILED TO REGISTER FOR REMOTE NOTIFICATIONS")
+        print(String(repeating: "=", count: 60))
+        print("Error: \(error.localizedDescription)")
+        print("\nPossible causes:")
+        print("1. Running on iOS Simulator (APNs not supported)")
+        print("2. Missing Push Notification capability in Xcode")
+        print("3. Invalid provisioning profile")
+        print("4. Network issues")
+        print("\n⚠️  This device will NOT receive push notifications!")
+        print(String(repeating: "=", count: 60) + "\n")
     }
     
     // MARK: - FCM Token
@@ -127,18 +176,43 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     // MARK: - Background Notification Handling
     
-    /// Called when notification is received while app is in BACKGROUND or KILLED state
-    /// This is where FCM notifications arrive when app is not in foreground
+    /// Called when notification is received while app is in ANY state (active, background, killed)
+    /// This is the PRIMARY handler for FCM data-only messages with content-available: 1
+    /// For data-only messages to work in background:
+    /// 1. Message must include "content-available": 1 (becomes "content-available": true in userInfo)
+    /// 2. Message data is at ROOT level of userInfo, not nested
+    /// 3. This method receives the message and must display local notification if needed
     func application(
         _ application: UIApplication,
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
     ) {
         print("\n========================================")
-        print("📩 FCM NOTIFICATION RECEIVED (Background/Killed)")
+        print("📩 FCM NOTIFICATION RECEIVED (Completion Handler)")
         print("========================================")
         print("App State: \(UIApplication.shared.applicationState.rawValue) (0=active, 1=inactive, 2=background)")
-        print("UserInfo: \(userInfo)")
+        
+        // Log background refresh status
+        let backgroundRefreshStatus = UIApplication.shared.backgroundRefreshStatus
+        print("Background Refresh Status: \(backgroundRefreshStatusString(backgroundRefreshStatus))")
+        if backgroundRefreshStatus == .denied || backgroundRefreshStatus == .restricted {
+            print("⚠️  WARNING: Background App Refresh is disabled!")
+            print("⚠️  Notifications may not work when app is killed")
+            print("⚠️  Enable in Settings → General → Background App Refresh")
+        }
+        
+        // Check if this is a data-only message
+        let hasContentAvailable = (userInfo["aps"] as? [String: Any])?["content-available"] as? Int == 1
+        print("Content-Available: \(hasContentAvailable ? "YES (data-only)" : "NO (notification)")")
+        
+        if !hasContentAvailable {
+            print("⚠️  WARNING: Message does NOT have content-available: 1")
+            print("⚠️  This means it won't wake the app when killed")
+            print("⚠️  Backend must send: apns.payload.aps.content-available = 1")
+        }
+        
+        print("UserInfo keys: \(userInfo.keys)")
+        print("Full UserInfo: \(userInfo)")
         
         // Parse notification data
         guard let notificationData = parseNotificationData(from: userInfo) else {
@@ -148,14 +222,40 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
         
         // Apply client-side filtering
-        if shouldShowNotification(userInfo: userInfo) {
+        let shouldShow = shouldShowNotification(userInfo: userInfo)
+        
+        if shouldShow {
             print("✅ Notification passed filters, displaying")
             
-            // Create and display local notification with parsed content
+            // ALWAYS create and display local notification regardless of app state
+            // This ensures notifications show when app is:
+            // - Killed (background delivery)
+            // - Background (already not in foreground)
+            // - Foreground (will show as banner)
             displayNotification(data: notificationData, userInfo: userInfo)
+            
+            // Save to history (displayed and shown)
+            saveNotificationToHistory(
+                data: notificationData,
+                userInfo: userInfo,
+                wasFiltered: false,
+                filterReason: nil,
+                wasShown: true
+            )
+            
             completionHandler(.newData)
         } else {
             print("🔇 Notification filtered out by user preferences")
+            
+            // Save to history (filtered and not shown)
+            saveNotificationToHistory(
+                data: notificationData,
+                userInfo: userInfo,
+                wasFiltered: true,
+                filterReason: "Filtered by user notification preferences",
+                wasShown: false
+            )
+            
             completionHandler(.noData)
         }
     }
@@ -176,18 +276,34 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("Body: \(notification.request.content.body)")
         print("UserInfo: \(userInfo)")
         
-        // Apply client-side filtering
-        if shouldShowNotification(userInfo: userInfo) {
-            print("✅ Notification passed filters, showing to user")
-            // Show notification even when app is in foreground
-            if #available(iOS 14.0, *) {
-                completionHandler([.banner, .badge, .sound])
+        // Parse notification data for history
+        if let notificationData = parseNotificationData(from: userInfo) {
+            // Apply client-side filtering
+            let shouldShow = shouldShowNotification(userInfo: userInfo)
+            
+            if shouldShow {
+                print("✅ Notification passed filters, showing to user")
+                
+                // Note: History is saved in didReceiveRemoteNotification handler
+                // to avoid duplicates when app is in foreground
+                
+                // Show notification even when app is in foreground
+                if #available(iOS 14.0, *) {
+                    completionHandler([.banner, .badge, .sound])
+                } else {
+                    completionHandler([.alert, .badge, .sound])
+                }
             } else {
-                completionHandler([.alert, .badge, .sound])
+                print("🔇 Notification filtered out by user preferences")
+                
+                // Note: History is saved in didReceiveRemoteNotification handler
+                // to avoid duplicates when app is in foreground
+                
+                completionHandler([]) // Don't show notification
             }
         } else {
-            print("🔇 Notification filtered out by user preferences")
-            completionHandler([]) // Don't show notification
+            print("⚠️ Failed to parse notification data for history")
+            completionHandler([])
         }
     }
     
@@ -208,23 +324,43 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     /// Parse notification data from FCM payload
     private func parseNotificationData(from userInfo: [AnyHashable: Any]) -> NotificationData? {
+        print("\n🔍 [Parse] Parsing notification data...")
+        print("🔍 [Parse] Raw userInfo keys: \(userInfo.keys)")
+        
         // Extract data from FCM payload
-        // FCM sends data in the "data" key for data-only messages
-        // Or directly in userInfo for notification messages
+        // For DATA-ONLY messages (content-available: 1):
+        //   - Data is at ROOT level of userInfo
+        //   - Format: ["notification_type": "value", "launch_id": "value", ...]
+        // For NOTIFICATION messages:
+        //   - May have nested "data" key
+        //   - Or data mixed with "aps" and "gcm.message_id"
         
         var data: [String: String] = [:]
         
-        // Try to get data from FCM data payload first
-        if let fcmData = userInfo["data"] as? [String: String] {
-            data = fcmData
-        } else {
-            // Fall back to direct userInfo parsing
-            for (key, value) in userInfo {
-                if let keyString = key as? String, let valueString = value as? String {
+        // FIRST: Try to extract data from root level (data-only messages)
+        for (key, value) in userInfo {
+            if let keyString = key as? String {
+                // Skip FCM/APNS metadata keys
+                if keyString == "aps" || keyString.hasPrefix("gcm.") || keyString.hasPrefix("google.c.") {
+                    continue
+                }
+                // Convert value to string
+                if let valueString = value as? String {
                     data[keyString] = valueString
+                } else {
+                    // Handle non-string values (numbers, etc.)
+                    data[keyString] = String(describing: value)
                 }
             }
         }
+        
+        // SECOND: If no data found at root, try nested "data" key (legacy support)
+        if data.isEmpty, let fcmData = userInfo["data"] as? [String: String] {
+            print("🔍 [Parse] Found nested 'data' key")
+            data = fcmData
+        }
+        
+        print("🔍 [Parse] Extracted data keys: \(data.keys.sorted())")
         
         // Parse required fields
         guard let notificationType = data["notification_type"],
@@ -234,11 +370,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
               let launchLocation = data["launch_location"],
               let agencyId = data["agency_id"],
               let locationId = data["location_id"] else {
-            print("❌ Missing required notification fields")
+            print("❌ [Parse] Missing required notification fields")
+            print("❌ [Parse] Available fields: \(data.keys.sorted())")
+            print("❌ [Parse] notification_type: \(data["notification_type"] ?? "missing")")
+            print("❌ [Parse] launch_id: \(data["launch_id"] ?? "missing")")
+            print("❌ [Parse] launch_name: \(data["launch_name"] ?? "missing")")
             return nil
         }
         
-        return NotificationData(
+        let notificationData = NotificationData(
             notificationType: notificationType,
             launchId: launchId,
             launchUuid: data["launch_uuid"] ?? "",
@@ -251,6 +391,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             agencyId: agencyId,
             locationId: locationId
         )
+        
+        print("✅ [Parse] Successfully parsed notification data")
+        print("✅ [Parse] Type: \(notificationType), Launch: \(launchName)")
+        
+        return notificationData
     }
     
     /// Display notification with proper formatting (matches Android implementation)
@@ -409,17 +554,112 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Client-Side Filtering (uses shared Kotlin NotificationFilter)
     
     private func shouldShowNotification(userInfo: [AnyHashable: Any]) -> Bool {
+        print("\n========================================")
+        print("🔍 [iOS SWIFT] EVALUATING NOTIFICATION FILTER")
+        print("========================================")
+        
         // Convert userInfo to String dictionary for Kotlin interop
+        // Extract data from root level (data-only messages) or nested "data" key
         var dataMap: [String: String] = [:]
+        
+        // Extract from root level first (skipping metadata)
         for (key, value) in userInfo {
-            if let keyString = key as? String, let valueString = value as? String {
-                dataMap[keyString] = valueString
+            if let keyString = key as? String {
+                // Skip FCM/APNS metadata keys
+                if keyString == "aps" || keyString.hasPrefix("gcm.") || keyString.hasPrefix("google.c.") {
+                    continue
+                }
+                // Convert value to string
+                if let valueString = value as? String {
+                    dataMap[keyString] = valueString
+                } else {
+                    dataMap[keyString] = String(describing: value)
+                }
             }
         }
         
+        // Fall back to nested "data" key if no data at root
+        if dataMap.isEmpty, let fcmData = userInfo["data"] as? [String: String] {
+            dataMap = fcmData
+        }
+        
+        // Print notification data being evaluated
+        print("📩 [iOS SWIFT] Notification Data:")
+        print("   - Type: \(dataMap["notification_type"] ?? "unknown")")
+        print("   - Launch: \(dataMap["launch_name"] ?? "unknown")")
+        print("   - Agency ID: \(dataMap["agency_id"] ?? "unknown")")
+        print("   - Location ID: \(dataMap["location_id"] ?? "unknown")")
+        print("   - Webcast: \(dataMap["webcast"] ?? "false")")
+        print("   - Webcast Live: \(dataMap["webcast_live"] ?? "false")")
+        
+        print("\n📲 [iOS SWIFT] Calling Kotlin bridge for filter evaluation...")
+        
         // Use shared Kotlin filter logic (same as Android)
         // This ensures consistent filtering behavior across platforms
-        return IosNotificationBridge.shared.shouldShowNotification(data: dataMap)
+        let result = IosNotificationBridge.shared.shouldShowNotification(data: dataMap)
+        
+        print("\n🎯 [iOS SWIFT] Filter Decision: \(result ? "SHOW ✅" : "SUPPRESS 🔇")")
+        print("========================================\n")
+        
+        return result
+    }
+    
+    // MARK: - Notification History
+    
+    /// Save notification to history for debugging
+    private func saveNotificationToHistory(
+        data: NotificationData,
+        userInfo: [AnyHashable: Any],
+        wasFiltered: Bool,
+        filterReason: String?,
+        wasShown: Bool
+    ) {
+        // Log full notification JSON
+        if let jsonData = try? JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            print("📦 Full Notification JSON:\n\(jsonString)")
+        }
+        
+        print("💾 Saving to history: wasFiltered=\(wasFiltered), wasShown=\(wasShown)")
+        
+        // Convert userInfo to parallel arrays for Kotlin interop
+        var keys: [String] = []
+        var values: [String] = []
+        
+        for (key, value) in userInfo {
+            if let keyString = key as? String {
+                keys.append(keyString)
+                values.append(String(describing: value))
+            }
+        }
+        
+        // Format display title and body (same logic as displayNotification)
+        let displayTitle = data.isWebcastLive() ? "🔴 \(data.launchName)" : data.launchName
+        let displayBody = getNotificationBody(data: data)
+        
+        // Call Kotlin bridge to save notification
+        IosPushMessagingBridge.shared.saveNotificationToHistory(
+            notificationType: data.notificationType,
+            launchId: data.launchId,
+            launchUuid: data.launchUuid,
+            launchName: data.launchName,
+            launchImage: data.launchImage,
+            launchNet: data.launchNet,
+            launchLocation: data.launchLocation,
+            webcast: data.webcast,
+            webcastLive: data.webcastLive,
+            agencyId: data.agencyId,
+            locationId: data.locationId,
+            displayedTitle: displayTitle,
+            displayedBody: displayBody,
+            rawDataKeys: keys,
+            rawDataValues: values,
+            wasFiltered: wasFiltered,
+            filterReason: filterReason,
+            wasShown: wasShown
+        )
+        
+        print("💾 Saved notification to history: \(data.launchName) (filtered: \(wasFiltered))")
     }
     
     // MARK: - Deep Linking
@@ -434,6 +674,21 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("🚀 Navigating to launch detail for ID: \(launchId)")
         // Call Kotlin function to trigger navigation
         MainViewControllerKt.setNotificationLaunchId(launchId: launchId)
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func backgroundRefreshStatusString(_ status: UIBackgroundRefreshStatus) -> String {
+        switch status {
+        case .available:
+            return "✅ Available"
+        case .denied:
+            return "❌ DENIED by user"
+        case .restricted:
+            return "⚠️  RESTRICTED by system"
+        @unknown default:
+            return "❓ Unknown"
+        }
     }
 }
 

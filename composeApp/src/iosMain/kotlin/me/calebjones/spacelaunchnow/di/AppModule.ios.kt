@@ -4,6 +4,7 @@ import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.billing.createBillingManager
 import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
+import me.calebjones.spacelaunchnow.data.storage.createNotificationHistoryDataStore
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.rating.AppRatingManager
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
@@ -16,6 +17,7 @@ val iosModule = module {
     single { createDataStore("notification_settings") }
     single(named("DebugDataStore")) { createDebugDataStore() }
     single(named("AppSettingsDataStore")) { createDataStore("app_settings") }
+    single(named("NotificationHistoryDataStore")) { createNotificationHistoryDataStore() }
 
     // Billing
     single<BillingManager> { createBillingManager() }
