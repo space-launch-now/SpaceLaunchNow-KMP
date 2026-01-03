@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -455,6 +457,101 @@ fun DebugSettingsScreen(
                 }
             }
 
+            // FCM Token Section
+            item {
+                Text(
+                    text = "FCM Token",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            item {
+                val fcmToken by debugViewModel.fcmToken.collectAsStateWithLifecycle()
+                val clipboardManager = LocalClipboardManager.current
+
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "📱 Device FCM Token",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = "Use this token to send test notifications from Firebase Console",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        // Token display
+                        if (fcmToken != null) {
+                            OutlinedTextField(
+                                value = fcmToken ?: "",
+                                onValueChange = {},
+                                readOnly = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                textStyle = MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                    fontSize = 11.sp
+                                ),
+                                maxLines = 3
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        fcmToken?.let {
+                                            clipboardManager.setText(AnnotatedString(it))
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("Token copied to clipboard")
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = fcmToken != null && !fcmToken!!.startsWith("Error") && !fcmToken!!.startsWith("Exception")
+                                ) {
+                                    Text("Copy Token")
+                                }
+
+                                OutlinedButton(
+                                    onClick = { debugViewModel.fetchFcmToken() },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = !isLoading
+                                ) {
+                                    Text("Refresh")
+                                }
+                            }
+                        } else {
+                            Button(
+                                onClick = { debugViewModel.fetchFcmToken() },
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = !isLoading
+                            ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text("Get FCM Token")
+                            }
+                        }
+                    }
+                }
+            }
+
             // Notification Permissions Section
             item {
                 Text(
@@ -713,6 +810,211 @@ fun DebugSettingsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
+                    }
+                }
+            }
+
+            // Notification History Section
+            item {
+                Text(
+                    text = "Notification History",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            item {
+                val notificationHistory by debugViewModel.notificationHistory.collectAsStateWithLifecycle()
+                val notificationStats by debugViewModel.notificationStats.collectAsStateWithLifecycle()
+
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "📝 Received Notifications (Last 100)",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = "View all notifications received by this device, including filtered ones",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        // Stats display
+                        notificationStats?.let { stats ->
+                            HorizontalDivider()
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = "Statistics:",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "• Total Received: ${stats.totalReceived}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    text = "• Displayed: ${stats.totalDisplayed} ✅",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = "• Filtered: ${stats.totalFiltered} 🔇",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = { debugViewModel.loadNotificationHistory() },
+                                modifier = Modifier.weight(1f),
+                                enabled = !isLoading
+                            ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text("Load History")
+                            }
+
+                            OutlinedButton(
+                                onClick = { debugViewModel.clearNotificationHistory() },
+                                modifier = Modifier.weight(1f),
+                                enabled = !isLoading && notificationHistory.isNotEmpty()
+                            ) {
+                                Text("Clear")
+                            }
+                        }
+
+                        // History list
+                        if (notificationHistory.isNotEmpty()) {
+                            HorizontalDivider()
+                            Text(
+                                text = "Recent Notifications:",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            // Show latest 5 notifications
+                            notificationHistory.take(5).forEach { item ->
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = if (item.wasFiltered) {
+                                            MaterialTheme.colorScheme.errorContainer
+                                        } else {
+                                            MaterialTheme.colorScheme.primaryContainer
+                                        }
+                                    )
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(12.dp),
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                text = item.launchName ?: "Unknown Launch",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                                Text(
+                                                    text = if (item.wasShown) "👁️" else "🚫",
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                                Text(
+                                                    text = if (item.wasFiltered) "🔇" else "✅",
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                            }
+                                        }
+                                        Text(
+                                            text = "Type: ${item.notificationType}",
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                        Text(
+                                            text = "Received: ${item.receivedAt}",
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                        Text(
+                                            text = "Filtered: ${if (item.wasFiltered) "Yes" else "No"} | Shown: ${if (item.wasShown) "Yes" else "No"}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = if (item.wasShown) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                        )
+                                        if (item.wasFiltered) {
+                                            Text(
+                                                text = "Reason: ${item.filterReason ?: "Unknown"}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
+                                        
+                                        // Show raw JSON data
+                                        if (item.rawData.isNotEmpty()) {
+                                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                                            Text(
+                                                text = "📦 Raw FCM Data:",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                            Card(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                colors = CardDefaults.cardColors(
+                                                    containerColor = MaterialTheme.colorScheme.surface
+                                                )
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier.padding(8.dp),
+                                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                                ) {
+                                                    item.rawData.forEach { (key, value) ->
+                                                        Text(
+                                                            text = "$key: $value",
+                                                            style = MaterialTheme.typography.bodySmall,
+                                                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (notificationHistory.size > 5) {
+                                Text(
+                                    text = "... and ${notificationHistory.size - 5} more (total: ${notificationHistory.size})",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = "No notifications received yet. Send a test notification or wait for a real FCM notification.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }

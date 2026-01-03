@@ -42,6 +42,7 @@ import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
+import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
@@ -316,6 +317,21 @@ val debugModule = module {
         DebugPreferences(debugDataStore)
     }
 
+    // Notification history storage for debugging
+    single {
+        val historyDataStore = get<DataStore<Preferences>>(named("NotificationHistoryDataStore"))
+        NotificationHistoryStorage(historyDataStore)
+    }
+
     // DebugSettingsViewModel - now uses BillingManager (Phase 7 complete!)
-    viewModelOf(::DebugSettingsViewModel)
+    viewModel {
+        DebugSettingsViewModel(
+            debugPreferences = getOrNull(),
+            billingManager = getOrNull(),
+            launchRepository = getOrNull(),
+            notificationRepository = getOrNull(),
+            pushMessaging = getOrNull(),
+            notificationHistoryStorage = get()  // NOT optional - we need this!
+        )
+    }
 }

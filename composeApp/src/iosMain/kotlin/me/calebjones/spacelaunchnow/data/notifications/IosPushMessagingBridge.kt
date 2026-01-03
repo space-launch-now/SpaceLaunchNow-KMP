@@ -1,6 +1,13 @@
 package me.calebjones.spacelaunchnow.data.notifications
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSNotificationName
 
@@ -18,8 +25,13 @@ import platform.Foundation.NSNotificationName
  * Communication uses NSNotificationCenter to avoid cinterop complexity.
  * Swift FCMBridge already listens for "KotlinFCMRequestPending" notifications.
  */
-object IosPushMessagingBridge {
+object IosPushMessagingBridge : KoinComponent {
     private val log = SpaceLogger.getLogger("IosPushMessagingBridge")
+    
+    private val historyStorage: NotificationHistoryStorage by inject()
+    
+    // Coroutine scope for async operations
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     
     // Notification name that Swift FCMBridge listens for
     private val KOTLIN_FCM_REQUEST_NOTIFICATION: NSNotificationName = "KotlinFCMRequestPending"
@@ -191,6 +203,70 @@ object IosPushMessagingBridge {
                 unsubscribeCallback = null
                 lastRequestedTopic = null
                 pendingOperation = Operation.NONE
+            }
+        }
+    }
+    
+    // ===== Notification History Support =====
+    
+    /**
+     * Swift calls this to save a notification to history
+     * This is called from AppDelegate when a notification is received
+     */
+    fun saveNotificationToHistory(
+        notificationType: String,
+        launchId: String?,
+        launchUuid: String?,
+        launchName: String?,
+        launchImage: String?,
+        launchNet: String?,
+        launchLocation: String?,
+        webcast: String?,
+        webcastLive: String?,
+        agencyId: String?,
+        locationId: String?,
+        displayedTitle: String?,
+        displayedBody: String?,
+        rawDataKeys: List<String>,
+        rawDataValues: List<String>,
+        wasFiltered: Boolean,
+        filterReason: String?,
+        wasShown: Boolean
+    ) {
+        // Convert parallel arrays to map
+        val rawData = rawDataKeys.zip(rawDataValues).toMap()
+        
+        log.i { "📝 Saving notification to history:" }
+        log.i { "  Launch: $launchName" }
+        log.i { "  Filtered: $wasFiltered" }
+        log.i { "  Shown: $wasShown" }
+        log.i { "  Filter Reason: ${filterReason ?: "none"}" }
+        log.i { "  Raw Data JSON: $rawData" }
+        
+        scope.launch {
+            try {
+                historyStorage.addNotification(
+                    notificationType = notificationType,
+                    launchId = launchId,
+                    launchUuid = launchUuid,
+                    launchName = launchName,
+                    launchImage = launchImage,
+                    launchNet = launchNet,
+                    launchLocation = launchLocation,
+                    webcast = webcast,
+                    webcastLive = webcastLive,
+                    agencyId = agencyId,
+                    locationId = locationId,
+                    displayedTitle = displayedTitle,
+                    displayedBody = displayedBody,
+                    rawData = rawData,
+                    wasFiltered = wasFiltered,
+                    filterReason = filterReason,
+                    wasShown = wasShown
+                )
+                log.i { "✅ Saved notification to history: $launchName (filtered=$wasFiltered, shown=$wasShown)" }
+            } catch (e: Exception) {
+                log.e { "❌ Failed to save notification to history: ${e.message}" }
             }
         }
     }

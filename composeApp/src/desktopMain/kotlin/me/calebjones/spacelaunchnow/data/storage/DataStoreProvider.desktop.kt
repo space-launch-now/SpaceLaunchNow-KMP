@@ -16,3 +16,9 @@ actual fun createDebugDataStore(): DataStore<Preferences> {
         produceFile = { "debug_settings.preferences_pb".toPath() }
     )
 }
+
+actual fun createNotificationHistoryDataStore(): DataStore<Preferences> {
+    return PreferenceDataStoreFactory.createWithPath(
+        produceFile = { "notification_history.preferences_pb".toPath() }
+    )
+}

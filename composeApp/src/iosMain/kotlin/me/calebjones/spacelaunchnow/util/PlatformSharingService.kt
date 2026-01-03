@@ -1,17 +1,26 @@
 package me.calebjones.spacelaunchnow.util
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import platform.UIKit.UIActivityViewController
-import platform.UIKit.UIApplication
-import platform.Foundation.NSString
-import platform.Foundation.create
-import kotlinx.cinterop.ExperimentalForeignApi
+import platform.Foundation.NSNotificationCenter
 
 /**
- * iOS-specific sharing implementation using UIActivityViewController
+ * iOS-specific sharing implementation that bridges to Swift's ShareHelper.
+ * 
+ * This uses NSNotificationCenter to communicate with Swift code because:
+ * 1. Kotlin/Native UIKit bindings don't expose popoverPresentationController
+ * 2. UIActivityViewController on iPad requires popover configuration
+ * 3. Swift can properly handle the UIKit APIs
+ * 
+ * The ShareHelper.swift in the iOS app receives these notifications and
+ * presents the share sheet with proper iPad popover support.
  */
-@OptIn(ExperimentalForeignApi::class)
 class IOSSharingService : LaunchSharingService {
+    
+    companion object {
+        // Notification names must match ShareHelper.swift
+        private const val SHARE_TEXT_NOTIFICATION = "SpaceLaunchNow.ShareText"
+        private const val SHARE_URL_NOTIFICATION = "SpaceLaunchNow.ShareURL"
+    }
     
     override suspend fun shareLaunch(launch: LaunchNormal) {
         val shareText = SharingFormatUtil.formatLaunchShareText(launch)
@@ -28,19 +37,11 @@ class IOSSharingService : LaunchSharingService {
     }
     
     private fun shareText(text: String) {
-        val nsString = NSString.create(string = text)
-        val activityItems = listOf(nsString)
-        
-        val activityViewController = UIActivityViewController(
-            activityItems = activityItems,
-            applicationActivities = null
-        )
-        
-        val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
-        rootViewController?.presentViewController(
-            viewControllerToPresent = activityViewController,
-            animated = true,
-            completion = null
+        // Post notification to Swift ShareHelper
+        NSNotificationCenter.defaultCenter.postNotificationName(
+            aName = SHARE_TEXT_NOTIFICATION,
+            `object` = null,
+            userInfo = mapOf("text" to text)
         )
     }
 }
