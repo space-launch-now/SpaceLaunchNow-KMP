@@ -277,7 +277,13 @@ class LaunchRepositoryImpl(
                         filterLaunchesByPreferences(staleCached!!, agencyIds, locationIds)
                     log.d { "⏳ STALE CACHE: Found ${filteredStale.size}/${staleCached.size} filtered stale launches (filters: agencies=$agencyIds, locations=$locationIds)" }
                     if (filteredStale.isEmpty()) {
-                        log.w { "⚠️ WARNING: Stale cache was filtered to zero results! All ${staleCached.size} cached launches were filtered out. Filter criteria - agencyIds: $agencyIds, locationIds: $locationIds. Sample cached launches: ${staleCached.take(3).map { "${it.name} (LSP: ${it.launchServiceProvider?.id})" }}. Will fetch fresh data from API." }
+                        log.w {
+                            "⚠️ WARNING: Stale cache was filtered to zero results! All ${staleCached.size} cached launches were filtered out. Filter criteria - agencyIds: $agencyIds, locationIds: $locationIds. Sample cached launches: ${
+                                staleCached.take(
+                                    3
+                                ).map { "${it.name} (LSP: ${it.launchServiceProvider?.id})" }
+                            }. Will fetch fresh data from API."
+                        }
                         // DON'T return here - continue to API call to get filtered results
                     } else {
                         // Only return early if we have stale data that passed filters
@@ -615,7 +621,7 @@ class LaunchRepositoryImpl(
 
             // Cache the detailed launch for future use
             localDataSource?.cacheDetailedLaunch(body)
-            log.i { "✅ API SUCCESS: Fetched and cached detailed launch: ${body.name}" }
+            log.i { "✅ API SUCCESS: Fetched and cached detailed launch: ${body.name} (ID: ${body.id})" }
 
             Result.success(body)
         } catch (e: ResponseException) {
