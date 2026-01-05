@@ -431,7 +431,6 @@ jobs:
           status: completed
           mappingFile: ${{ steps.artifacts.outputs.mapping }}
           whatsNewDirectory: docs/release-notes/whatsnew/
-          changesNotSentForReview: true
 
       - name: Play Store Deployment Summary
         run: |
