@@ -15,7 +15,7 @@ import kotlin.time.Instant
 
 /**
  * Get launch mini list with commonly used parameters
- * 
+ *
  * Note: API only supports single rocketConfigurationId, not multiple.
  * For filtering by multiple rockets, make separate API calls.
  */
@@ -40,7 +40,10 @@ suspend fun LaunchesApi.getLaunchMiniList(
     netMonth: List<Double>? = null,
     pad: Int? = null,
     locationIds: List<Int>? = null, // Location IDs (supports multiple)
-    program: List<Int>? = null // Program IDs (supports multiple)
+    program: List<Int>? = null, // Program IDs (supports multiple)
+    orbitIds: List<Int>? = null, // Orbit IDs (supports multiple)
+    missionTypeIds: List<Int>? = null, // Mission Type IDs (supports multiple)
+    launcherConfigFamilyIds: List<Int>? = null // Launcher Config Family IDs (supports multiple)
 ): HttpResponse<PaginatedLaunchBasicList> = launchesMiniList(
     agencyLaunchAttemptCount = null,
     agencyLaunchAttemptCountGt = null,
@@ -59,6 +62,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
     lastUpdatedLte = null,
     launchDesignator = null,
     launcherConfigId = null,
+    launcherConfigFamilyIds = launcherConfigFamilyIds?.map { it.toDouble() },
     limit = limit,
     locationIds = locationIds,
     locationLaunchAttemptCount = null,
@@ -73,9 +77,11 @@ suspend fun LaunchesApi.getLaunchMiniList(
     locationLaunchAttemptCountYearLte = null,
     lspId = lspId,
     lspName = null,
+    missionAgencyIds = null,
     missionOrbitCelestialBodyId = null,
     missionOrbitName = null,
     missionOrbitNameIcontains = null,
+    missionTypeIds = missionTypeIds,
     name = null,
     netDay = netDay,
     netGt = netGt,
@@ -85,6 +91,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
     netMonth = netMonth,
     netYear = null,
     offset = offset,
+    orbitIds = orbitIds,
     orbitalLaunchAttemptCount = null,
     orbitalLaunchAttemptCountGt = null,
     orbitalLaunchAttemptCountGte = null,
@@ -143,7 +150,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
 
 /**
  * Get launch normal list with commonly used parameters
- * 
+ *
  * Note: API only supports single rocketConfigurationId, not multiple.
  * For filtering by multiple rockets, make separate API calls.
  */
@@ -169,7 +176,10 @@ suspend fun LaunchesApi.getLaunchList(
     pad: Int? = null,
     locationIds: List<Int>? = null, // Location IDs (supports multiple)
     program: List<Int>? = null, // Program IDs (supports multiple)
-    upcomingWithRecent: Boolean? = null
+    upcomingWithRecent: Boolean? = null,
+    orbitIds: List<Int>? = null, // Orbit IDs (supports multiple)
+    missionTypeIds: List<Int>? = null, // Mission Type IDs (supports multiple)
+    launcherConfigFamilyIds: List<Int>? = null // Launcher Config Family IDs (supports multiple)
 ): HttpResponse<PaginatedLaunchNormalList> = launchesList(
     agencyLaunchAttemptCount = null,
     agencyLaunchAttemptCountGt = null,
@@ -188,6 +198,7 @@ suspend fun LaunchesApi.getLaunchList(
     lastUpdatedLte = null,
     launchDesignator = null,
     launcherConfigId = null,
+    launcherConfigFamilyIds = launcherConfigFamilyIds?.map { it.toDouble() },
     limit = limit,
     locationIds = locationIds,
     locationLaunchAttemptCount = null,
@@ -202,9 +213,11 @@ suspend fun LaunchesApi.getLaunchList(
     locationLaunchAttemptCountYearLte = null,
     lspId = lspId,
     lspName = null,
+    missionAgencyIds = null,
     missionOrbitCelestialBodyId = null,
     missionOrbitName = null,
     missionOrbitNameIcontains = null,
+    missionTypeIds = missionTypeIds,
     name = null,
     netDay = netDay,
     netGt = netGt,
@@ -214,6 +227,7 @@ suspend fun LaunchesApi.getLaunchList(
     netMonth = netMonth,
     netYear = null,
     offset = offset,
+    orbitIds = orbitIds,
     orbitalLaunchAttemptCount = null,
     orbitalLaunchAttemptCountGt = null,
     orbitalLaunchAttemptCountGte = null,

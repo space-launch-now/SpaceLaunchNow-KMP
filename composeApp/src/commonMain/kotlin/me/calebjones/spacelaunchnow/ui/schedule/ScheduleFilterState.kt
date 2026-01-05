@@ -13,6 +13,9 @@ data class ScheduleFilterState(
     val selectedProgramIds: Set<Int> = emptySet(),
     val selectedRocketIds: Set<Int> = emptySet(),
     val selectedStatusIds: Set<Int> = emptySet(),
+    val selectedOrbitIds: Set<Int> = emptySet(),
+    val selectedMissionTypeIds: Set<Int> = emptySet(),
+    val selectedLauncherConfigFamilyIds: Set<Int> = emptySet(),
     val isCrewed: Boolean? = null,
     val includeSuborbital: Boolean? = null,
     val dateStart: Long? = null,  // Epoch millis
@@ -23,14 +26,17 @@ data class ScheduleFilterState(
      */
     fun hasActiveFilters(): Boolean =
         selectedAgencyIds.isNotEmpty() ||
-        selectedLocationIds.isNotEmpty() ||
-        selectedProgramIds.isNotEmpty() ||
-        selectedRocketIds.isNotEmpty() ||
-        selectedStatusIds.isNotEmpty() ||
-        isCrewed != null ||
-        includeSuborbital != null ||
-        dateStart != null ||
-        dateEnd != null
+                selectedLocationIds.isNotEmpty() ||
+                selectedProgramIds.isNotEmpty() ||
+                selectedRocketIds.isNotEmpty() ||
+                selectedStatusIds.isNotEmpty() ||
+                selectedOrbitIds.isNotEmpty() ||
+                selectedMissionTypeIds.isNotEmpty() ||
+                selectedLauncherConfigFamilyIds.isNotEmpty() ||
+                isCrewed != null ||
+                includeSuborbital != null ||
+                dateStart != null ||
+                dateEnd != null
 
     /**
      * Returns the total count of active filter criteria
@@ -42,6 +48,9 @@ data class ScheduleFilterState(
         if (selectedProgramIds.isNotEmpty()) count++
         if (selectedRocketIds.isNotEmpty()) count++
         if (selectedStatusIds.isNotEmpty()) count++
+        if (selectedOrbitIds.isNotEmpty()) count++
+        if (selectedMissionTypeIds.isNotEmpty()) count++
+        if (selectedLauncherConfigFamilyIds.isNotEmpty()) count++
         if (isCrewed != null) count++
         if (includeSuborbital != null) count++
         if (dateStart != null || dateEnd != null) count++

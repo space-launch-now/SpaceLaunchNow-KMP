@@ -46,7 +46,7 @@ data class VidURL (
 
     @SerialName(value = "type") @Required val type: VidURLType,
 
-    @SerialName(value = "language") @Required val language: Language?,
+    @SerialName(value = "language") @Required val language: Language,
 
     @SerialName(value = "priority") val priority: kotlin.Int? = null,
 

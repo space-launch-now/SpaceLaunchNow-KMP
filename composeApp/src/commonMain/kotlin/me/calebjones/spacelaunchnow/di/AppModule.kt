@@ -176,6 +176,7 @@ val appModule = module {
             agenciesApi = get(),
             programsApi = get(),
             launcherConfigurationsApi = get(),
+            launcherConfigurationFamiliesApi = get(),
             locationsApi = get(),
             configApi = get(),
             localDataSource = get()

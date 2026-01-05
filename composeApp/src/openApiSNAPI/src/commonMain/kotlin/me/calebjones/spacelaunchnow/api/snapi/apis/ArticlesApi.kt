@@ -112,7 +112,7 @@ open class ArticlesApi : ApiClient {
         newsSite?.apply { localVariableQuery["news_site"] = listOf("$newsSite") }
         newsSiteExclude?.apply { localVariableQuery["news_site_exclude"] = listOf("$newsSiteExclude") }
         offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
-        ordering?.apply { localVariableQuery["ordering"] = toMultiValue(this, "csv") { it.value } }
+        ordering?.apply { localVariableQuery["ordering"] = toMultiValue(this, "csv") }
         publishedAtGt?.apply { localVariableQuery["published_at_gt"] = listOf("$publishedAtGt") }
         publishedAtGte?.apply { localVariableQuery["published_at_gte"] = listOf("$publishedAtGte") }
         publishedAtLt?.apply { localVariableQuery["published_at_lt"] = listOf("$publishedAtLt") }

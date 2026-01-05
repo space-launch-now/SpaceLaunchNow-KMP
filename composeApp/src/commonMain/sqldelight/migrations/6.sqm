@@ -1,0 +1,6 @@
+-- Migration from version 6 to version 7
+-- Adds abbreviation column to FilterableRocket table
+
+-- Add abbreviation column to FilterableRocket
+ALTER TABLE FilterableRocket ADD COLUMN abbreviation TEXT;
+
