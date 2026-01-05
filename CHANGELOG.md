@@ -1,3 +1,19 @@
+# [5.7.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.6.1...v5.7.0) (2026-01-05)
+
+
+### Bug Fixes
+
+* adjust filters for schedule screen ([d2f75d1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d2f75d15bced185166b29a6121af38773aadd443))
+* improve handling placeholder spacecraft in details card ([4a49489](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4a494898f89395dcbb9f3f70b7db5ab8d60407fd))
+* part two of the filter ([4b692b8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4b692b8440c1d7d778386c7b66ac473a6845ace5))
+
+
+### Features
+
+* add background ios notifications and fix sharing ([2234466](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2234466171b5e5b81a2a1b49c1f360140ba32313))
+
+
+
 ## [5.6.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.6.0...v5.6.1) (2025-12-22)
 
 
@@ -34,20 +50,6 @@
 
 * Add 'In Testing' status to roadmap and update relevant items ([8e198cd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8e198cdb0e32fa806d5fdb64488415f42c3db3a0))
 * Implement app rating feature with dialogs for user feedback and native review requests ([224e4df](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/224e4df4c7ddac2d1b5ac3595b52f95593f16e00))
-
-
-
-# [5.4.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.3.3...v5.4.0) (2025-12-14)
-
-
-### Bug Fixes
-
-* pre-load filter options on app launch ([9c05d48](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9c05d48e008e7a45c022157b3847968682bd1486))
-
-
-### Features
-
-* implement filter options for Schedule Screen ([5a5d999](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5a5d999d60589a32043273f58b1c412d195849ca))
 
 
 
