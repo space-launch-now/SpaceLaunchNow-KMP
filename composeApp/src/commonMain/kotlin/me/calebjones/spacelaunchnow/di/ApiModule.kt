@@ -7,6 +7,7 @@ import io.ktor.client.plugins.logging.Logging
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationFamiliesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchersApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
@@ -47,6 +48,17 @@ val apiModule = module {
 
     single<LauncherConfigurationsApi> {
         LauncherConfigurationsApi(
+            baseUrl = get<String>(named("BaseUrl")),
+            httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
+            httpClientConfig = httpClientConfig,
+        ).apply {
+            setApiKey(get<String>(named("API_KEY")), "Authorization")
+            setApiKeyPrefix("Token", "Authorization")
+        }
+    }
+
+    single<LauncherConfigurationFamiliesApi> {
+        LauncherConfigurationFamiliesApi(
             baseUrl = get<String>(named("BaseUrl")),
             httpClientEngine = get<HttpClientEngine>(), // Use platform-specific engine from Koin
             httpClientConfig = httpClientConfig,

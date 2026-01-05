@@ -195,12 +195,16 @@ fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoL
                     add(InfoTileData(Icons.Filled.LocationOn, "Destination", it))
                 }
 
-                spacecraft.flightsCount?.let {
-                    add(InfoTileData(CustomIcons.RocketLaunch, "Total Flights", "$it"))
+                if (spacecraft.isPlaceholder != true) {
+                    spacecraft.flightsCount?.let {
+                        add(InfoTileData(CustomIcons.RocketLaunch, "Total Flights", "$it"))
+                    }
                 }
 
-                spacecraft.missionEndsCount?.let {
-                    add(InfoTileData(Icons.Filled.CheckCircle, "Completed Missions", "$it"))
+                if (spacecraft.isPlaceholder != true) {
+                    spacecraft.missionEndsCount?.let {
+                        add(InfoTileData(Icons.Filled.CheckCircle, "Completed Missions", "$it"))
+                    }
                 }
 
                 spacecraftFlight.missionEnd?.let {
@@ -223,44 +227,52 @@ fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoL
                     )
                 }
 
-                spacecraft.timeInSpace?.let {
-                    add(
-                        InfoTileData(
-                            Icons.Filled.Satellite,
-                            "Time in Space",
-                            parseIsoDurationToHumanReadable(it)
+                if (spacecraft.isPlaceholder != true) {
+                    spacecraft.timeInSpace?.let {
+                        add(
+                            InfoTileData(
+                                Icons.Filled.Satellite,
+                                "Time in Space",
+                                parseIsoDurationToHumanReadable(it)
+                            )
                         )
-                    )
+                    }
                 }
 
-                spacecraft.timeDocked?.let {
-                    add(
-                        InfoTileData(
-                            Icons.Filled.SatelliteAlt,
-                            "Time Docked",
-                            parseIsoDurationToHumanReadable(it)
+                if (spacecraft.isPlaceholder != true) {
+                    spacecraft.timeDocked?.let {
+                        add(
+                            InfoTileData(
+                                Icons.Filled.SatelliteAlt,
+                                "Time Docked",
+                                parseIsoDurationToHumanReadable(it)
+                            )
                         )
-                    )
+                    }
                 }
 
-                spacecraftFlight.turnAroundTime?.let {
-                    add(
-                        InfoTileData(
-                            Icons.Filled.Refresh,
-                            "Turnaround Time",
-                            parseIsoDurationToHumanReadable(it)
+                if (spacecraft.isPlaceholder != true) {
+                    spacecraftFlight.turnAroundTime?.let {
+                        add(
+                            InfoTileData(
+                                Icons.Filled.Refresh,
+                                "Turnaround Time",
+                                parseIsoDurationToHumanReadable(it)
+                            )
                         )
-                    )
+                    }
                 }
 
-                spacecraft.fastestTurnaround?.let {
-                    add(
-                        InfoTileData(
-                            Icons.Filled.Speed,
-                            "Fastest Turnaround",
-                            parseIsoDurationToHumanReadable(it)
+                if (spacecraft.isPlaceholder != true) {
+                    spacecraft.fastestTurnaround?.let {
+                        add(
+                            InfoTileData(
+                                Icons.Filled.Speed,
+                                "Fastest Turnaround",
+                                parseIsoDurationToHumanReadable(it)
+                            )
                         )
-                    )
+                    }
                 }
 
                 spacecraftFlight.landing?.type?.name?.let {
@@ -271,6 +283,7 @@ fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoL
                     add(InfoTileData(Icons.Filled.Place, "Landing Location", it))
                 }
             }
+
 
             if (infoTiles.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -296,6 +309,7 @@ fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoL
                     }
                 }
             }
+
 
             // Crew information
             if (spacecraftFlight.launchCrew.isNotEmpty() ||

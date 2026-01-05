@@ -43,6 +43,9 @@ fun ScheduleFilterSideSheet(
     rockets: List<FilterOption>,
     locations: List<FilterOption>,
     statuses: List<FilterOption>,
+    orbits: List<FilterOption>,
+    missionTypes: List<FilterOption>,
+    launcherConfigFamilies: List<FilterOption>,
     isLoading: Boolean,
     onApplyFilters: (ScheduleFilterState) -> Unit,
     onReloadOptions: () -> Unit,
@@ -50,6 +53,13 @@ fun ScheduleFilterSideSheet(
     modifier: Modifier = Modifier
 ) {
     var pendingFilterState by remember(currentFilterState) { mutableStateOf(currentFilterState) }
+
+    // Handler for clearing all filters and auto-applying
+    val onClearAll: () -> Unit = {
+        val emptyState = ScheduleFilterState()
+        pendingFilterState = emptyState
+        onApplyFilters(emptyState)
+    }
 
     AnimatedVisibility(
         visible = isOpen,
@@ -97,11 +107,15 @@ fun ScheduleFilterSideSheet(
                     rockets = rockets,
                     locations = locations,
                     statuses = statuses,
+                    orbits = orbits,
+                    missionTypes = missionTypes,
+                    launcherConfigFamilies = launcherConfigFamilies,
                     isLoading = isLoading,
                     onFilterStateChange = { newState ->
                         pendingFilterState = newState
                     },
                     onReloadOptions = onReloadOptions,
+                    onClearAll = onClearAll,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)

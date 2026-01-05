@@ -9,10 +9,14 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
+import me.calebjones.spacelaunchnow.data.model.NotificationHistoryItem
+import me.calebjones.spacelaunchnow.data.model.NotificationStats
+import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugSettings
+import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import kotlin.random.Random
 
@@ -28,7 +32,9 @@ class DebugSettingsViewModel(
     private val debugPreferences: DebugPreferences? = null,
     private val billingManager: BillingManager? = null,
     private val launchRepository: LaunchRepository? = null,
-    private val notificationRepository: NotificationRepository? = null
+    private val notificationRepository: NotificationRepository? = null,
+    private val pushMessaging: PushMessaging? = null,
+    private val notificationHistoryStorage: NotificationHistoryStorage? = null
 ) : ViewModel() {
 
     private val _debugSettings = MutableStateFlow(
@@ -49,6 +55,16 @@ class DebugSettingsViewModel(
     private val _detailedMessage = MutableStateFlow<String?>(null)
     val detailedMessage: StateFlow<String?> = _detailedMessage.asStateFlow()
 
+    private val _fcmToken = MutableStateFlow<String?>(null)
+    val fcmToken: StateFlow<String?> = _fcmToken.asStateFlow()
+
+    // Notification History
+    private val _notificationHistory = MutableStateFlow<List<NotificationHistoryItem>>(emptyList())
+    val notificationHistory: StateFlow<List<NotificationHistoryItem>> = _notificationHistory.asStateFlow()
+
+    private val _notificationStats = MutableStateFlow<NotificationStats?>(null)
+    val notificationStats: StateFlow<NotificationStats?> = _notificationStats.asStateFlow()
+
     val isDebugMode: Boolean = BuildConfig.IS_DEBUG
 
     init {
@@ -56,6 +72,15 @@ class DebugSettingsViewModel(
             viewModelScope.launch {
                 debugPreferences.debugSettingsFlow.collect { settings ->
                     _debugSettings.value = settings
+                }
+            }
+        }
+
+        // Collect notification history
+        if (notificationHistoryStorage != null) {
+            viewModelScope.launch {
+                notificationHistoryStorage.historyFlow.collect { history ->
+                    _notificationHistory.value = history
                 }
             }
         }
@@ -172,6 +197,34 @@ class DebugSettingsViewModel(
                     "Notification permission flag reset - will be asked on next app launch"
             } catch (e: Exception) {
                 _statusMessage.value = "Failed to reset permission flag: ${e.message}"
+            }
+        }
+    }
+
+    fun fetchFcmToken() {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                if (pushMessaging == null) {
+                    _fcmToken.value = "PushMessaging not available"
+                    return@launch
+                }
+
+                pushMessaging.getToken().fold(
+                    onSuccess = { token ->
+                        _fcmToken.value = token
+                        _statusMessage.value = "FCM token retrieved"
+                    },
+                    onFailure = { error ->
+                        _fcmToken.value = "Error: ${error.message}"
+                        _statusMessage.value = "Failed to get FCM token: ${error.message}"
+                    }
+                )
+            } catch (e: Exception) {
+                _fcmToken.value = "Exception: ${e.message}"
+                _statusMessage.value = "Error fetching FCM token: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -480,6 +533,50 @@ class DebugSettingsViewModel(
                 _detailedMessage.value = detailedInfo
             } catch (e: Exception) {
                 _statusMessage.value = "❌ Error triggering test notification: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    // Notification History Functions
+    fun loadNotificationHistory() {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                if (notificationHistoryStorage == null) {
+                    _statusMessage.value = "Notification history not available"
+                    return@launch
+                }
+
+                val history = notificationHistoryStorage.getHistory()
+                val stats = notificationHistoryStorage.getStats()
+                _notificationHistory.value = history
+                _notificationStats.value = stats
+                _statusMessage.value = "Loaded ${history.size} notifications"
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to load history: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun clearNotificationHistory() {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                if (notificationHistoryStorage == null) {
+                    _statusMessage.value = "Notification history not available"
+                    return@launch
+                }
+
+                notificationHistoryStorage.clearHistory()
+                _notificationHistory.value = emptyList()
+                _notificationStats.value = null
+                _statusMessage.value = "Notification history cleared"
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to clear history: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

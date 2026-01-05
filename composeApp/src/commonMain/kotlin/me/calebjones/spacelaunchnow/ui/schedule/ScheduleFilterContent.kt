@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,7 +27,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -56,9 +56,13 @@ fun ScheduleFilterContent(
     rockets: List<FilterOption>,
     locations: List<FilterOption>,
     statuses: List<FilterOption>,
+    orbits: List<FilterOption>,
+    missionTypes: List<FilterOption>,
+    launcherConfigFamilies: List<FilterOption>,
     isLoading: Boolean,
     onFilterStateChange: (ScheduleFilterState) -> Unit,
     onReloadOptions: (() -> Unit)? = null,
+    onClearAll: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var filterState by remember(currentFilterState) { mutableStateOf(currentFilterState) }
@@ -74,7 +78,7 @@ fun ScheduleFilterContent(
         AlertDialog(
             onDismissRequest = { showReloadConfirmDialog = false },
             title = { Text("Reload Filter Options?") },
-            text = { 
+            text = {
                 Text("This will re-download all filter options from the server. This may take a few moments and will refresh the list of agencies, programs, rockets, locations, and statuses.")
             },
             confirmButton = {
@@ -133,7 +137,12 @@ fun ScheduleFilterContent(
                                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 ),
                                 onClick = {
-                                    filterState = ScheduleFilterState()
+                                    // Use the onClearAll handler if provided, otherwise just update local state
+                                    if (onClearAll != null) {
+                                        onClearAll()
+                                    } else {
+                                        filterState = ScheduleFilterState()
+                                    }
                                 }
                             ) {
                                 Text(
@@ -175,7 +184,7 @@ fun ScheduleFilterContent(
                             )
                         }
                     }
-                    
+
                     // Work In Progress indicator
                     Card(
                         colors = CardDefaults.cardColors(
@@ -294,6 +303,51 @@ fun ScheduleFilterContent(
                         onSelectionChange = { newSelection ->
                             filterState =
                                 filterState.copy(selectedStatusIds = newSelection.toSet())
+                        }
+                    )
+                }
+            }
+
+            // Orbits filter
+            if (orbits.isNotEmpty()) {
+                item {
+                    FilterSection(
+                        title = "Orbits",
+                        options = orbits,
+                        selectedIds = filterState.selectedOrbitIds.toList(),
+                        onSelectionChange = { newSelection ->
+                            filterState =
+                                filterState.copy(selectedOrbitIds = newSelection.toSet())
+                        }
+                    )
+                }
+            }
+
+            // Mission Types filter
+            if (missionTypes.isNotEmpty()) {
+                item {
+                    FilterSection(
+                        title = "Mission Types",
+                        options = missionTypes,
+                        selectedIds = filterState.selectedMissionTypeIds.toList(),
+                        onSelectionChange = { newSelection ->
+                            filterState =
+                                filterState.copy(selectedMissionTypeIds = newSelection.toSet())
+                        }
+                    )
+                }
+            }
+
+            // Launcher Config Families filter
+            if (launcherConfigFamilies.isNotEmpty()) {
+                item {
+                    FilterSection(
+                        title = "Launcher Families",
+                        options = launcherConfigFamilies,
+                        selectedIds = filterState.selectedLauncherConfigFamilyIds.toList(),
+                        onSelectionChange = { newSelection ->
+                            filterState =
+                                filterState.copy(selectedLauncherConfigFamilyIds = newSelection.toSet())
                         }
                     )
                 }

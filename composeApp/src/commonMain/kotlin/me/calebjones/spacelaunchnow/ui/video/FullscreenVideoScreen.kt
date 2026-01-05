@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -50,9 +49,11 @@ import chaintech.videoplayer.host.MediaPlayerHost
 import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import kotlinx.coroutines.delay
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Language
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLType
 import me.calebjones.spacelaunchnow.util.VideoUtil
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Clock.System
 
 private val log by lazy { SpaceLogger.getLogger("FullscreenVideoScreen") }
@@ -378,7 +379,7 @@ fun FullscreenVideoScreen(
         VidURL(
             url = videoUrl,
             type = VidURLType(1, "Local"),  // VidURLType is optional
-            language = null,  // Language is optional
+            language = Language(1, "English", "code"),  // Language is optional
             title = launchName,
             description = null,
             source = null,

@@ -2,6 +2,8 @@ package me.calebjones.spacelaunchnow
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.data.notifications.IosPushMessagingBridge
+import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -25,6 +27,9 @@ fun initKoin() {
     if (koinInstance == null) {
         val app = startKoin(koinConfig)
         koinInstance = app.koin
+        
+        // Note: IosPushMessagingBridge now uses KoinComponent with by inject()
+        // so it automatically gets NotificationHistoryStorage when Koin starts
     }
 }
 

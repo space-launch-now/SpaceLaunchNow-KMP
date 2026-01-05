@@ -9,6 +9,7 @@ import me.calebjones.spacelaunchnow.api.extensions.getProgramList
 import me.calebjones.spacelaunchnow.api.extensions.getStatusList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationFamiliesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LocationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ProgramsApi
@@ -21,6 +22,7 @@ class ScheduleFilterRepositoryImpl(
     private val agenciesApi: AgenciesApi,
     private val programsApi: ProgramsApi,
     private val launcherConfigurationsApi: LauncherConfigurationsApi,
+    private val launcherConfigurationFamiliesApi: LauncherConfigurationFamiliesApi,
     private val locationsApi: LocationsApi,
     private val configApi: ConfigApi,
     private val localDataSource: FilterOptionsLocalDataSource? = null
@@ -159,17 +161,15 @@ class ScheduleFilterRepositoryImpl(
                 log.v { "Fetched ${page.results.size} programs (total: ${allPrograms.size}/${page.count})" }
             } while (allPrograms.size < page.count)
 
-            val programs = allPrograms
-
-            log.i { "✅ API SUCCESS: Fetched ${programs.size} programs" }
+            log.i { "✅ API SUCCESS: Fetched ${allPrograms.size} programs" }
 
             // Clear old cache and insert fresh data
             localDataSource?.clearAllPrograms()
             localDataSource?.cachePrograms(
-                programs.map { Triple(it.id, it.name, null) }
+                allPrograms.map { Triple(it.id, it.name, null) }
             )
 
-            Result.success(programs.map {
+            Result.success(allPrograms.map {
                 FilterOption(
                     id = it.id,
                     name = it.name,
@@ -229,7 +229,7 @@ class ScheduleFilterRepositoryImpl(
                         FilterOption(
                             id = it.id.toInt(),
                             name = it.name,
-                            abbreviation = null
+                            abbreviation = it.abbreviation
                         )
                     })
                 }
@@ -260,14 +260,16 @@ class ScheduleFilterRepositoryImpl(
             // Clear old cache and insert fresh data
             localDataSource?.clearAllRockets()
             localDataSource?.cacheRockets(
-                allRockets.map { Pair(it.id, it.fullName ?: it.name) }
+                allRockets.map {
+                    Triple(it.id, it.fullName ?: it.name, it.manufacturer?.abbrev)
+                }
             )
 
             Result.success(allRockets.map {
                 FilterOption(
                     id = it.id,
                     name = it.fullName ?: it.name,
-                    abbreviation = null
+                    abbreviation = it.manufacturer?.abbrev
                 )
             })
         } catch (e: ResponseException) {
@@ -281,7 +283,7 @@ class ScheduleFilterRepositoryImpl(
                     FilterOption(
                         id = it.id.toInt(),
                         name = it.name,
-                        abbreviation = null
+                        abbreviation = it.abbreviation
                     )
                 })
             }
@@ -298,7 +300,7 @@ class ScheduleFilterRepositoryImpl(
                     FilterOption(
                         id = it.id.toInt(),
                         name = it.name,
-                        abbreviation = null
+                        abbreviation = it.abbreviation
                     )
                 })
             }
@@ -425,7 +427,8 @@ class ScheduleFilterRepositoryImpl(
 
             // Fetch from API with pagination
             log.d { "Fetching statuses from API (ordering: name)" }
-            val allStatuses = mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus>()
+            val allStatuses =
+                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus>()
             var offset = 0
             val limit = 100
 
@@ -446,13 +449,13 @@ class ScheduleFilterRepositoryImpl(
             // Clear old cache and insert fresh data
             localDataSource?.clearAllStatuses()
             localDataSource?.cacheStatuses(
-                allStatuses.map { 
+                allStatuses.map {
                     me.calebjones.spacelaunchnow.database.Tuple4(
-                        it.id, 
-                        it.name, 
-                        it.abbrev, 
+                        it.id,
+                        it.name,
+                        it.abbrev,
                         it.description
-                    ) 
+                    )
                 }
             )
 
@@ -499,6 +502,285 @@ class ScheduleFilterRepositoryImpl(
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "❌ UNEXPECTED ERROR in getStatuses: ${e::class.simpleName}: ${e.message}" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getOrbits(forceRefresh: Boolean): Result<List<FilterOption>> {
+        return try {
+            log.d { "getOrbits - forceRefresh: $forceRefresh" }
+
+            // Try cache first if not forcing refresh
+            if (!forceRefresh) {
+                val cached = localDataSource?.getAllOrbits()
+                if (cached != null && cached.isNotEmpty()) {
+                    log.i { "Cache hit - Returning ${cached.size} cached orbits" }
+                    return Result.success(cached.map {
+                        FilterOption(
+                            id = it.id.toInt(),
+                            name = it.name,
+                            abbreviation = it.abbreviation
+                        )
+                    })
+                }
+            }
+
+            // Fetch from API with pagination
+            log.d { "Fetching orbits from API (ordering: name)" }
+            val allOrbits =
+                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.Orbit>()
+            var offset = 0
+            val limit = 100
+
+            do {
+                val response = configApi.configOrbitsList(
+                    limit = limit,
+                    offset = offset,
+                    ordering = "name"
+                )
+                val page = response.body()
+                allOrbits.addAll(page.results)
+                offset += limit
+                log.v { "Fetched ${page.results.size} orbits (total: ${allOrbits.size}/${page.count})" }
+            } while (allOrbits.size < page.count)
+
+            log.i { "✅ API SUCCESS: Fetched ${allOrbits.size} orbits" }
+
+            // Clear old cache and insert fresh data
+            localDataSource?.clearAllOrbits()
+            localDataSource?.cacheOrbits(
+                allOrbits.map { Triple(it.id, it.name, it.abbrev) }
+            )
+
+            Result.success(allOrbits.map {
+                FilterOption(
+                    id = it.id,
+                    name = it.name,
+                    abbreviation = it.abbrev
+                )
+            })
+        } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getOrbits: ${e.message}" }
+
+            // Try stale cache as fallback
+            val stale = localDataSource?.getAllOrbitsStale()
+            if (stale != null && stale.isNotEmpty()) {
+                log.w { "Using stale cache (${stale.size} orbits)" }
+                return Result.success(stale.map {
+                    FilterOption(
+                        id = it.id.toInt(),
+                        name = it.name,
+                        abbreviation = it.abbreviation
+                    )
+                })
+            }
+
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getOrbits: ${e.message}" }
+
+            // Try stale cache as fallback
+            val stale = localDataSource?.getAllOrbitsStale()
+            if (stale != null && stale.isNotEmpty()) {
+                log.w { "Using stale cache (${stale.size} orbits)" }
+                return Result.success(stale.map {
+                    FilterOption(
+                        id = it.id.toInt(),
+                        name = it.name,
+                        abbreviation = it.abbreviation
+                    )
+                })
+            }
+
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getOrbits: ${e::class.simpleName}: ${e.message}" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getMissionTypes(forceRefresh: Boolean): Result<List<FilterOption>> {
+        return try {
+            log.d { "getMissionTypes - forceRefresh: $forceRefresh" }
+
+            // Try cache first if not forcing refresh
+            if (!forceRefresh) {
+                val cached = localDataSource?.getAllMissionTypes()
+                if (cached != null && cached.isNotEmpty()) {
+                    log.i { "Cache hit - Returning ${cached.size} cached mission types" }
+                    return Result.success(cached.map {
+                        FilterOption(
+                            id = it.id.toInt(),
+                            name = it.name,
+                            abbreviation = null
+                        )
+                    })
+                }
+            }
+
+            // Fetch from API with pagination
+            log.d { "Fetching mission types from API (ordering: name)" }
+            val allMissionTypes =
+                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.MissionType>()
+            var offset = 0
+            val limit = 100
+
+            do {
+                val response = configApi.configMissionTypesList(
+                    limit = limit,
+                    offset = offset,
+                    ordering = "name"
+                )
+                val page = response.body()
+                allMissionTypes.addAll(page.results)
+                offset += limit
+                log.v { "Fetched ${page.results.size} mission types (total: ${allMissionTypes.size}/${page.count})" }
+            } while (allMissionTypes.size < page.count)
+
+            log.i { "✅ API SUCCESS: Fetched ${allMissionTypes.size} mission types" }
+
+            // Clear old cache and insert fresh data
+            localDataSource?.clearAllMissionTypes()
+            localDataSource?.cacheMissionTypes(
+                allMissionTypes.map { Pair(it.id, it.name ?: "Unknown Mission Type") }
+            )
+
+            Result.success(allMissionTypes.map {
+                FilterOption(
+                    id = it.id,
+                    name = it.name ?: "Unknown Mission Type",
+                    abbreviation = null
+                )
+            })
+        } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getMissionTypes: ${e.message}" }
+
+            // Try stale cache as fallback
+            val stale = localDataSource?.getAllMissionTypesStale()
+            if (stale != null && stale.isNotEmpty()) {
+                log.w { "Using stale cache (${stale.size} mission types)" }
+                return Result.success(stale.map {
+                    FilterOption(
+                        id = it.id.toInt(),
+                        name = it.name,
+                        abbreviation = null
+                    )
+                })
+            }
+
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getMissionTypes: ${e.message}" }
+
+            // Try stale cache as fallback
+            val stale = localDataSource?.getAllMissionTypesStale()
+            if (stale != null && stale.isNotEmpty()) {
+                log.w { "Using stale cache (${stale.size} mission types)" }
+                return Result.success(stale.map {
+                    FilterOption(
+                        id = it.id.toInt(),
+                        name = it.name,
+                        abbreviation = null
+                    )
+                })
+            }
+
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getMissionTypes: ${e::class.simpleName}: ${e.message}" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getLauncherConfigFamilies(forceRefresh: Boolean): Result<List<FilterOption>> {
+        return try {
+            log.d { "getLauncherConfigFamilies - forceRefresh: $forceRefresh" }
+
+            // Try cache first if not forcing refresh
+            if (!forceRefresh) {
+                val cached = localDataSource?.getAllLauncherConfigFamilies()
+                if (cached != null && cached.isNotEmpty()) {
+                    log.i { "Cache hit - Returning ${cached.size} cached launcher config families" }
+                    return Result.success(cached.map {
+                        FilterOption(
+                            id = it.id.toInt(),
+                            name = it.name,
+                            abbreviation = null
+                        )
+                    })
+                }
+            }
+
+            // Fetch from API with pagination
+            log.d { "Fetching launcher config families from API (ordering: name)" }
+            val allLauncherConfigFamilies =
+                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigFamilyNormal>()
+            var offset = 0
+            val limit = 100
+
+            do {
+                val response = launcherConfigurationFamiliesApi.launcherConfigurationFamiliesList(
+                    limit = limit,
+                    offset = offset,
+                    ordering = "name"
+                )
+                val page = response.body()
+                allLauncherConfigFamilies.addAll(page.results)
+                offset += limit
+                log.v { "Fetched ${page.results.size} launcher config families (total: ${allLauncherConfigFamilies.size}/${page.count})" }
+            } while (allLauncherConfigFamilies.size < page.count)
+
+            log.i { "✅ API SUCCESS: Fetched ${allLauncherConfigFamilies.size} launcher config families" }
+
+            // Clear old cache and insert fresh data
+            localDataSource?.clearAllLauncherConfigFamilies()
+            localDataSource?.cacheLauncherConfigFamilies(
+                allLauncherConfigFamilies.map { Pair(it.id, it.name ?: "Unknown Family") }
+            )
+
+            Result.success(allLauncherConfigFamilies.map {
+                FilterOption(
+                    id = it.id,
+                    name = it.name ?: "Unknown Family",
+                    abbreviation = null
+                )
+            })
+        } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getLauncherConfigFamilies: ${e.message}" }
+
+            // Try stale cache as fallback
+            val stale = localDataSource?.getAllLauncherConfigFamiliesStale()
+            if (stale != null && stale.isNotEmpty()) {
+                log.w { "Using stale cache (${stale.size} launcher config families)" }
+                return Result.success(stale.map {
+                    FilterOption(
+                        id = it.id.toInt(),
+                        name = it.name,
+                        abbreviation = null
+                    )
+                })
+            }
+
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getLauncherConfigFamilies: ${e.message}" }
+
+            // Try stale cache as fallback
+            val stale = localDataSource?.getAllLauncherConfigFamiliesStale()
+            if (stale != null && stale.isNotEmpty()) {
+                log.w { "Using stale cache (${stale.size} launcher config families)" }
+                return Result.success(stale.map {
+                    FilterOption(
+                        id = it.id.toInt(),
+                        name = it.name,
+                        abbreviation = null
+                    )
+                })
+            }
+
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getLauncherConfigFamilies: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }

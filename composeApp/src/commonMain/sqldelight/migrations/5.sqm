@@ -1,0 +1,33 @@
+-- Migration from version 5 to version 6
+-- Adds FilterableOrbit, FilterableMissionType, and FilterableLauncherConfigFamily tables
+
+-- Create FilterableOrbit table
+CREATE TABLE FilterableOrbit (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    abbreviation TEXT,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Create FilterableMissionType table
+CREATE TABLE FilterableMissionType (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Create FilterableLauncherConfigFamily table
+CREATE TABLE FilterableLauncherConfigFamily (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Create indexes on expires_at for faster cache cleanup queries
+CREATE INDEX IF NOT EXISTS idx_orbit_expires ON FilterableOrbit(expires_at);
+CREATE INDEX IF NOT EXISTS idx_mission_type_expires ON FilterableMissionType(expires_at);
+CREATE INDEX IF NOT EXISTS idx_launcher_config_family_expires ON FilterableLauncherConfigFamily(expires_at);
+

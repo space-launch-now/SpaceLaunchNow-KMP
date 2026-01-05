@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -77,8 +77,6 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.isTabletOrDesktop
-import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
-import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
@@ -427,6 +425,9 @@ private fun ScheduleContent(
                 rockets = uiState.filterOptions.rockets,
                 locations = uiState.filterOptions.locations,
                 statuses = uiState.filterOptions.statuses,
+                orbits = uiState.filterOptions.orbits,
+                missionTypes = uiState.filterOptions.missionTypes,
+                launcherConfigFamilies = uiState.filterOptions.launcherConfigFamilies,
                 isLoading = uiState.isLoadingFilterOptions,
                 onApplyFilters = { newFilterState ->
                     viewModel.applyFilters(newFilterState)
@@ -444,6 +445,9 @@ private fun ScheduleContent(
                 rockets = uiState.filterOptions.rockets,
                 locations = uiState.filterOptions.locations,
                 statuses = uiState.filterOptions.statuses,
+                orbits = uiState.filterOptions.orbits,
+                missionTypes = uiState.filterOptions.missionTypes,
+                launcherConfigFamilies = uiState.filterOptions.launcherConfigFamilies,
                 isLoading = uiState.isLoadingFilterOptions,
                 onApplyFilters = { newFilterState ->
                     viewModel.applyFilters(newFilterState)

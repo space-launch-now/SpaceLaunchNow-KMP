@@ -250,7 +250,7 @@ kotlin {
 
                 implementation(libs.dd.sdk.kotlin.multiplatform.rum)
                 implementation(libs.dd.sdk.kotlin.multiplatform.logs)
-                
+
                 // Kermit for multiplatform logging
                 implementation(libs.kermit)
                 implementation(libs.kermit.crashlytics)
@@ -477,13 +477,19 @@ tasks.register("generateAllApiClients") {
 
 // Helper to safely copy build outputs (APKs/AABs). Checks for existence, avoids copying
 // when source == destination, and catches IO errors to prevent task failure.
-fun safeCopyOutputFiles(outputsDir: File, extension: String, versionName: String, buildType: String) {
+fun safeCopyOutputFiles(
+    outputsDir: File,
+    extension: String,
+    versionName: String,
+    buildType: String
+) {
     try {
         if (!outputsDir.exists() || !outputsDir.isDirectory) {
             logger.debug("Output directory does not exist: ${outputsDir.absolutePath}")
             return
         }
-        val files = outputsDir.listFiles()?.filter { it.isFile && it.name.endsWith(extension, ignoreCase = true) }
+        val files = outputsDir.listFiles()
+            ?.filter { it.isFile && it.name.endsWith(extension, ignoreCase = true) }
         if (files.isNullOrEmpty()) {
             logger.debug("No output files with extension '$extension' found in ${outputsDir.absolutePath}")
             return
@@ -555,7 +561,9 @@ sqldelight {
             // Version 3 adds FilterableAgency, FilterableProgram, FilterableRocket, FilterableLocation tables for Schedule Screen filtering
             // Version 4 adds is_featured column to FilterableAgency
             // Version 5 adds FilterableStatus table for launch status filtering
-            version = 5
+            // Version 6 adds FilterableOrbit, FilterableMissionType, and FilterableLauncherConfigFamily tables
+            // Version 7 adds abbreviation column to FilterableRocket table
+            version = 7
         }
     }
 }

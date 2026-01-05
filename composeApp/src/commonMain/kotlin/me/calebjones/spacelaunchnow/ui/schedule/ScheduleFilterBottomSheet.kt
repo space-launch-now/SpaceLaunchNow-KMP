@@ -3,7 +3,6 @@ package me.calebjones.spacelaunchnow.ui.schedule
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -39,12 +38,22 @@ fun ScheduleFilterBottomSheet(
     rockets: List<FilterOption>,
     locations: List<FilterOption>,
     statuses: List<FilterOption>,
+    orbits: List<FilterOption>,
+    missionTypes: List<FilterOption>,
+    launcherConfigFamilies: List<FilterOption>,
     isLoading: Boolean,
     onApplyFilters: (ScheduleFilterState) -> Unit,
     onReloadOptions: () -> Unit,
     onDismiss: () -> Unit
 ) {
     var pendingFilterState by remember(currentFilterState) { mutableStateOf(currentFilterState) }
+
+    // Handler for clearing all filters and auto-applying
+    val onClearAll: () -> Unit = {
+        val emptyState = ScheduleFilterState()
+        pendingFilterState = emptyState
+        onApplyFilters(emptyState)
+    }
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
@@ -86,11 +95,15 @@ fun ScheduleFilterBottomSheet(
                     rockets = rockets,
                     locations = locations,
                     statuses = statuses,
+                    orbits = orbits,
+                    missionTypes = missionTypes,
+                    launcherConfigFamilies = launcherConfigFamilies,
                     isLoading = isLoading,
                     onFilterStateChange = { newState ->
                         pendingFilterState = newState
                     },
                     onReloadOptions = onReloadOptions,
+                    onClearAll = onClearAll,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)

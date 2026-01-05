@@ -49,7 +49,10 @@ data class FilterOptions(
     val programs: List<FilterOption> = emptyList(),
     val rockets: List<FilterOption> = emptyList(),
     val locations: List<FilterOption> = emptyList(),
-    val statuses: List<FilterOption> = emptyList()
+    val statuses: List<FilterOption> = emptyList(),
+    val orbits: List<FilterOption> = emptyList(),
+    val missionTypes: List<FilterOption> = emptyList(),
+    val launcherConfigFamilies: List<FilterOption> = emptyList()
 )
 
 class ScheduleViewModel(
@@ -74,21 +77,21 @@ class ScheduleViewModel(
             if (_uiState.value.filterState != savedFilterState) {
                 log.d { "Filter state loaded from preferences on init: ${savedFilterState.activeFilterCount()} filters" }
                 _uiState.value = _uiState.value.copy(filterState = savedFilterState)
-                
+
                 // Always invalidate cache on app start if filters exist to prevent showing wrong data
                 if (savedFilterState.hasActiveFilters()) {
                     log.d { "Invalidating cache on init due to active filters" }
                     invalidateCache()
                 }
             }
-            
+
             // Pre-load filter options on app launch (uses cache if available)
             loadFilterOptions()
-            
+
             // Now load tabs with correct filter state
             loadTab(ScheduleTab.Upcoming, reset = true)
             loadTab(ScheduleTab.Previous, reset = true)
-            
+
             // Continue observing filter state changes
             appPreferences.scheduleFilterStateFlow.collect { newFilterState ->
                 if (_uiState.value.filterState != newFilterState) {
@@ -210,12 +213,21 @@ class ScheduleViewModel(
                         ordering = ordering,
                         search = searchQuery,
                         lspId = filterState.selectedAgencyIds.takeIf { it.isNotEmpty() }?.toList(),
-                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }?.toList(),
-                        program = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }?.toList(),
+                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
+                        program = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
                         rocketConfigurationId = filterState.selectedRocketIds.firstOrNull(), // API limitation: single ID only
                         isCrewed = filterState.isCrewed,
                         includeSuborbital = filterState.includeSuborbital,
-                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }?.toList()
+                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
+                        orbitIds = filterState.selectedOrbitIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
+                        missionTypeIds = filterState.selectedMissionTypeIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
+                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }
+                            ?.toList()
                     )
                     log.v { "API Response received - Status: ${response.status}" }
                     response.body()
@@ -228,12 +240,21 @@ class ScheduleViewModel(
                         ordering = ordering,
                         search = searchQuery,
                         lspId = filterState.selectedAgencyIds.takeIf { it.isNotEmpty() }?.toList(),
-                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }?.toList(),
-                        program = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }?.toList(),
+                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
+                        program = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
                         rocketConfigurationId = filterState.selectedRocketIds.firstOrNull(), // API limitation: single ID only
                         isCrewed = filterState.isCrewed,
                         includeSuborbital = filterState.includeSuborbital,
-                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }?.toList()
+                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
+                        orbitIds = filterState.selectedOrbitIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
+                        missionTypeIds = filterState.selectedMissionTypeIds.takeIf { it.isNotEmpty() }
+                            ?.toList(),
+                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }
+                            ?.toList()
                     )
                     log.d { "API Response received - Status: ${response.status}" }
                     response.body()
@@ -374,22 +395,38 @@ class ScheduleViewModel(
 
             try {
                 // Force refresh from API (bypasses cache)
-                val agencies = filterRepository.getAgencies(forceRefresh = true).getOrNull() ?: emptyList()
-                val programs = filterRepository.getPrograms(forceRefresh = true).getOrNull() ?: emptyList()
-                val rockets = filterRepository.getRockets(forceRefresh = true).getOrNull() ?: emptyList()
-                val locations = filterRepository.getLocations(forceRefresh = true).getOrNull() ?: emptyList()
+                val agencies =
+                    filterRepository.getAgencies(forceRefresh = true).getOrNull() ?: emptyList()
+                val programs =
+                    filterRepository.getPrograms(forceRefresh = true).getOrNull() ?: emptyList()
+                val rockets = emptyList<FilterOption>()
+                val locations =
+                    filterRepository.getLocations(forceRefresh = true).getOrNull() ?: emptyList()
+                val statuses =
+                    filterRepository.getStatuses(forceRefresh = true).getOrNull() ?: emptyList()
+                val orbits =
+                    filterRepository.getOrbits(forceRefresh = true).getOrNull() ?: emptyList()
+                val missionTypes =
+                    filterRepository.getMissionTypes(forceRefresh = true).getOrNull() ?: emptyList()
+                val launcherConfigFamilies =
+                    filterRepository.getLauncherConfigFamilies(forceRefresh = true).getOrNull()
+                        ?: emptyList()
 
                 _uiState.value = _uiState.value.copy(
                     filterOptions = FilterOptions(
                         agencies = agencies,
                         programs = programs,
                         rockets = rockets,
-                        locations = locations
+                        locations = locations,
+                        statuses = statuses,
+                        orbits = orbits,
+                        missionTypes = missionTypes,
+                        launcherConfigFamilies = launcherConfigFamilies
                     ),
                     isLoadingFilterOptions = false
                 )
 
-                log.i { "Filter options reloaded - Agencies: ${agencies.size}, Programs: ${programs.size}, Rockets: ${rockets.size}, Locations: ${locations.size}" }
+                log.i { "Filter options reloaded - Agencies: ${agencies.size}, Programs: ${programs.size}, Rockets: ${rockets.size}, Locations: ${locations.size}, Statuses: ${statuses.size}, Orbits: ${orbits.size}, Mission Types: ${missionTypes.size}, Launcher Config Families: ${launcherConfigFamilies.size}" }
             } catch (e: Exception) {
                 log.e(e) { "Failed to reload filter options" }
                 _uiState.value = _uiState.value.copy(isLoadingFilterOptions = false)
@@ -409,6 +446,10 @@ class ScheduleViewModel(
                 val rockets = emptyList<FilterOption>()
                 val locations = filterRepository.getLocations().getOrNull() ?: emptyList()
                 val statuses = filterRepository.getStatuses().getOrNull() ?: emptyList()
+                val orbits = filterRepository.getOrbits().getOrNull() ?: emptyList()
+                val missionTypes = filterRepository.getMissionTypes().getOrNull() ?: emptyList()
+                val launcherConfigFamilies =
+                    filterRepository.getLauncherConfigFamilies().getOrNull() ?: emptyList()
 
                 _uiState.value = _uiState.value.copy(
                     filterOptions = FilterOptions(
@@ -416,12 +457,15 @@ class ScheduleViewModel(
                         programs = programs,
                         rockets = rockets,
                         locations = locations,
-                        statuses = statuses
+                        statuses = statuses,
+                        orbits = orbits,
+                        missionTypes = missionTypes,
+                        launcherConfigFamilies = launcherConfigFamilies
                     ),
                     isLoadingFilterOptions = false
                 )
 
-                log.i { "Filter options loaded - Agencies: ${agencies.size}, Programs: ${programs.size}, Rockets: ${rockets.size}, Locations: ${locations.size}, Statuses: ${statuses.size}" }
+                log.i { "Filter options loaded - Agencies: ${agencies.size}, Programs: ${programs.size}, Rockets: ${rockets.size}, Locations: ${locations.size}, Statuses: ${statuses.size}, Orbits: ${orbits.size}, Mission Types: ${missionTypes.size}, Launcher Config Families: ${launcherConfigFamilies.size}" }
             } catch (e: Exception) {
                 log.e(e) { "Failed to load filter options" }
                 _uiState.value = _uiState.value.copy(isLoadingFilterOptions = false)

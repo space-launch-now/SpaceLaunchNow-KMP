@@ -234,6 +234,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                                 maxLines = 4,
+                                minLines = 4,
                                 overflow = TextOverflow.Ellipsis
                             )
                         }

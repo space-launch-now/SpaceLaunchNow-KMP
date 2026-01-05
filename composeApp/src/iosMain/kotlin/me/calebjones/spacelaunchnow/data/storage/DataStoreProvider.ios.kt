@@ -54,3 +54,10 @@ actual fun createDebugDataStore(): DataStore<Preferences> {
         produceFile = { "$containerPath/debug_settings.preferences_pb".toPath() }
     )
 }
+
+actual fun createNotificationHistoryDataStore(): DataStore<Preferences> {
+    val containerPath = getAppGroupDirectory()
+    return PreferenceDataStoreFactory.createWithPath(
+        produceFile = { "$containerPath/notification_history.preferences_pb".toPath() }
+    )
+}

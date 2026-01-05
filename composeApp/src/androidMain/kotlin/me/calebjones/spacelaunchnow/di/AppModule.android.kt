@@ -5,6 +5,7 @@ import me.calebjones.spacelaunchnow.data.billing.createBillingManager
 import me.calebjones.spacelaunchnow.data.storage.createAppSettingsDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
+import me.calebjones.spacelaunchnow.data.storage.createNotificationHistoryDataStore
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.rating.AppRatingManager
 import me.calebjones.spacelaunchnow.util.AndroidSharingService
@@ -19,6 +20,7 @@ val androidModule = module {
     single { createDataStore(androidContext()) }
     single(named("DebugDataStore")) { createDebugDataStore(androidContext()) }
     single(named("AppSettingsDataStore")) { createAppSettingsDataStore(androidContext()) }
+    single(named("NotificationHistoryDataStore")) { createNotificationHistoryDataStore(androidContext()) }
 
     // Platform-specific BillingManager
     single<BillingManager> {

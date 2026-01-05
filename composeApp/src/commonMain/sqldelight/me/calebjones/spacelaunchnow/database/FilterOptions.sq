@@ -21,6 +21,7 @@ CREATE TABLE FilterableProgram (
 CREATE TABLE FilterableRocket (
     id INTEGER NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
+    abbreviation TEXT,
     cached_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
 );
@@ -84,8 +85,8 @@ DELETE FROM FilterableProgram;
 
 -- Rocket queries
 insertOrReplaceRocket:
-INSERT OR REPLACE INTO FilterableRocket (id, name, cached_at, expires_at)
-VALUES (?, ?, ?, ?);
+INSERT OR REPLACE INTO FilterableRocket (id, name, abbreviation, cached_at, expires_at)
+VALUES (?, ?, ?, ?, ?);
 
 getAllRockets:
 SELECT * FROM FilterableRocket 
@@ -141,3 +142,86 @@ DELETE FROM FilterableStatus WHERE expires_at < ?;
 
 clearAllStatuses:
 DELETE FROM FilterableStatus;
+
+CREATE TABLE FilterableOrbit (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    abbreviation TEXT,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE TABLE FilterableMissionType (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE TABLE FilterableLauncherConfigFamily (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Orbit queries
+insertOrReplaceOrbit:
+INSERT OR REPLACE INTO FilterableOrbit (id, name, abbreviation, cached_at, expires_at)
+VALUES (?, ?, ?, ?, ?);
+
+getAllOrbits:
+SELECT * FROM FilterableOrbit
+WHERE expires_at > ?
+ORDER BY name ASC;
+
+getAllOrbitsStale:
+SELECT * FROM FilterableOrbit
+ORDER BY name ASC;
+
+deleteExpiredOrbits:
+DELETE FROM FilterableOrbit WHERE expires_at < ?;
+
+clearAllOrbits:
+DELETE FROM FilterableOrbit;
+
+-- Mission Type queries
+insertOrReplaceMissionType:
+INSERT OR REPLACE INTO FilterableMissionType (id, name, cached_at, expires_at)
+VALUES (?, ?, ?, ?);
+
+getAllMissionTypes:
+SELECT * FROM FilterableMissionType
+WHERE expires_at > ?
+ORDER BY name ASC;
+
+getAllMissionTypesStale:
+SELECT * FROM FilterableMissionType
+ORDER BY name ASC;
+
+deleteExpiredMissionTypes:
+DELETE FROM FilterableMissionType WHERE expires_at < ?;
+
+clearAllMissionTypes:
+DELETE FROM FilterableMissionType;
+
+-- Launcher Config Family queries
+insertOrReplaceLauncherConfigFamily:
+INSERT OR REPLACE INTO FilterableLauncherConfigFamily (id, name, cached_at, expires_at)
+VALUES (?, ?, ?, ?);
+
+getAllLauncherConfigFamilies:
+SELECT * FROM FilterableLauncherConfigFamily
+WHERE expires_at > ?
+ORDER BY name ASC;
+
+getAllLauncherConfigFamiliesStale:
+SELECT * FROM FilterableLauncherConfigFamily
+ORDER BY name ASC;
+
+deleteExpiredLauncherConfigFamilies:
+DELETE FROM FilterableLauncherConfigFamily WHERE expires_at < ?;
+
+clearAllLauncherConfigFamilies:
+DELETE FROM FilterableLauncherConfigFamily;
+
