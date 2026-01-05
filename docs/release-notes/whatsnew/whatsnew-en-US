@@ -1,9 +1,3 @@
 ### Bug Fixes
 
-* adjust filters for schedule screen
-* improve handling placeholder spacecraft in details card
-* part two of the filter
-
-### Features
-
-* add background ios notifications and fix sharing
+* remove unnecessary changesNotSentForReview flag from deployment summary

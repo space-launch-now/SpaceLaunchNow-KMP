@@ -1,3 +1,12 @@
+## [5.7.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.0...v5.7.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* remove unnecessary changesNotSentForReview flag from deployment summary ([ce82b44](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ce82b4463914d373ea7ddd14a00ac662313cb4de))
+
+
+
 # [5.7.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.6.1...v5.7.0) (2026-01-05)
 
 
@@ -40,16 +49,6 @@
 ### Bug Fixes
 
 * update feedback issue link in SettingsScreen ([9c2a6b6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9c2a6b6b2c3c24a5a24ad6d394a39f1c931f2435))
-
-
-
-# [5.5.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.4.0...v5.5.0) (2025-12-15)
-
-
-### Features
-
-* Add 'In Testing' status to roadmap and update relevant items ([8e198cd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8e198cdb0e32fa806d5fdb64488415f42c3db3a0))
-* Implement app rating feature with dialogs for user feedback and native review requests ([224e4df](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/224e4df4c7ddac2d1b5ac3595b52f95593f16e00))
 
 
 
