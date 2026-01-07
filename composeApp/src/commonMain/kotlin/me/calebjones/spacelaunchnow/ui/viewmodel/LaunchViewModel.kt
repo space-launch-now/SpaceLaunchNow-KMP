@@ -144,9 +144,7 @@ class LaunchViewModel(
     // Video Player State Management
 
     private fun updateVideoPlayerState(launch: LaunchDetailed) {
-        val youTubeVideos = launch.vidUrls.filter {
-            me.calebjones.spacelaunchnow.util.VideoUtil.isYouTubeUrl(it.url)
-        }
+        val youTubeVideos = launch.vidUrls
 
         _videoPlayerState.value = _videoPlayerState.value.copy(
             availableVideos = youTubeVideos,

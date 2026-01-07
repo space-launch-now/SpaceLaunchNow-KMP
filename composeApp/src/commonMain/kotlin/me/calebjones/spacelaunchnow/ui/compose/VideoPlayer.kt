@@ -225,14 +225,19 @@ fun LaunchVideoPlayer(
                     }
                 }
 
-                // Open in browser button
-                IconButton(
+                // Open in app button
+                Button(
                     onClick = { uriHandler.openUri(vidUrl.url) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.OpenInNew,
-                        contentDescription = "Open in browser",
-                        tint = MaterialTheme.colorScheme.primary
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.size(4.dp))
+                    Text(
+                        text = "Open in App",
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
             }
