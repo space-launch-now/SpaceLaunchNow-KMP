@@ -1,3 +1,12 @@
+## [5.7.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.1...v5.7.2) (2026-01-07)
+
+
+### Bug Fixes
+
+* update video player button to open in app and remove video filtering ([0ae0536](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0ae053611cd78ca1cd24b968e9d768193aaac2e1))
+
+
+
 ## [5.7.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.0...v5.7.1) (2026-01-05)
 
 
@@ -40,15 +49,6 @@
 * add on commit ([bb6406b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb6406bddc8477bbe47b59dd6c19f736399a32c6))
 * enhance SupportUsScreen with subscription management details and platform-specific links ([2a283d2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2a283d23ca43074e86fe2cbd8856cd249ba08af1))
 * implement experimental ISS page ([bbfdc11](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bbfdc1189303422304640a031d650c5f706e3b02))
-
-
-
-## [5.5.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.5.0...v5.5.1) (2025-12-18)
-
-
-### Bug Fixes
-
-* update feedback issue link in SettingsScreen ([9c2a6b6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9c2a6b6b2c3c24a5a24ad6d394a39f1c931f2435))
 
 
 
