@@ -1,3 +1,12 @@
+## [5.7.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.3...v5.7.4) (2026-01-15)
+
+
+### Bug Fixes
+
+* **logging:** debug sample rate control ([4d369b9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4d369b949fdc3aa1f1c978d220f757fcd8afdcdf))
+
+
+
 ## [5.7.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.2...v5.7.3) (2026-01-15)
 
 
@@ -38,15 +47,6 @@
 ### Features
 
 * add background ios notifications and fix sharing ([2234466](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2234466171b5e5b81a2a1b49c1f360140ba32313))
-
-
-
-## [5.6.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.6.0...v5.6.1) (2025-12-22)
-
-
-### Bug Fixes
-
-* allow changes not sent for review in deployment summary ([45d395d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/45d395d5b66613b5b2453c78370df833df255027))
 
 
 
