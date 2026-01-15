@@ -214,6 +214,21 @@ fun DebugSettingsScreen(
                 )
             }
 
+            // Test Logging Section
+            item {
+                Text(
+                    text = "Test Logging",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            item {
+                TestLoggingButtons()
+            }
+
             // API URL Section
             item {
                 Text(

@@ -1,19 +1,21 @@
 package me.calebjones.spacelaunchnow
 
 import android.app.Application
-import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import me.calebjones.spacelaunchnow.analytics.initializeDatadog
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
+import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.workers.WidgetUpdateWorker
@@ -80,11 +82,24 @@ class MainApplication : Application() {
         }
 
         // Initialize Datadog analytics using KMP SDK
-        log.d { "Initializing Datadog..." }
+        // IMPORTANT: Only initialize if diagnostic logging is enabled to prevent excessive costs
+        log.d { "Checking Datadog initialization requirements..." }
         try {
-            // initializeDatadog reads from .env file via EnvironmentManager
-            initializeDatadog(context = this)
-            log.d { "✅ Datadog initialized successfully" }
+            val loggingPrefs = getKoin().get<LoggingPreferences>()
+            val isDiagnosticLoggingEnabled = runBlocking {
+                loggingPrefs.isUserLoggingEnabled.first()
+            }
+            val isDebugMode = runBlocking {
+                loggingPrefs.isDebugModeEnabled.first()
+            }
+
+            if (isDiagnosticLoggingEnabled || isDebugMode || BuildConfig.IS_DEBUG) {
+                log.d { "Initializing Datadog (diagnostic logging enabled)..." }
+                initializeDatadog(context = this)
+                log.d { "✅ Datadog initialized successfully" }
+            } else {
+                log.i { "⏭️ Datadog initialization skipped (diagnostic logging disabled - saves costs)" }
+            }
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to initialize Datadog" }
             // Don't crash the app if Datadog fails
@@ -104,12 +119,14 @@ class MainApplication : Application() {
 
                 // Step 2: Initialize and start SubscriptionSyncer
                 // This listens to billing state changes and persists to LocalSubscriptionStorage
-                val syncer = getKoin().get<me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer>()
+                val syncer =
+                    getKoin().get<me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer>()
                 syncer.startSyncing()
                 log.d { "✅ SubscriptionSyncer started successfully" }
 
                 // Step 3: Initialize SubscriptionRepository (loads cached state)
-                val repository = getKoin().get<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
+                val repository =
+                    getKoin().get<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
                 repository.initialize()
                 log.d { "✅ SubscriptionRepository initialized successfully" }
 

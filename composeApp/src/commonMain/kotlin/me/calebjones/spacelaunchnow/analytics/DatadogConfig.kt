@@ -8,8 +8,6 @@ import com.datadog.kmp.log.Logs
 import com.datadog.kmp.log.configuration.LogsConfiguration
 import com.datadog.kmp.privacy.TrackingConsent
 import com.datadog.kmp.rum.Rum
-import com.datadog.kmp.rum.RumActionType
-import com.datadog.kmp.rum.RumErrorSource
 import com.datadog.kmp.rum.configuration.RumConfiguration
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -19,12 +17,15 @@ private val log by lazy { SpaceLogger.getLogger("DatadogConfig") }
 /**
  * Initialize Datadog RUM for Kotlin Multiplatform
  * Following official docs: https://docs.datadoghq.com/real_user_monitoring/application_monitoring/kotlin_multiplatform/setup/
+ *
+ * IMPORTANT: This function should only be called when diagnostic logging is enabled
+ * or when in debug mode to prevent excessive logging costs.
  */
 fun initializeDatadog(context: Any? = null) {
     // context should be application context on Android and can be null on iOS
     val datadogEnabled = EnvironmentManager.getEnvBoolean("DATADOG_ENABLED", false)
     if (!datadogEnabled) {
-        log.i { "Datadog is disabled" }
+        log.i { "Datadog is disabled via environment variable" }
         return
     }
 
@@ -57,10 +58,12 @@ fun initializeDatadog(context: Any? = null) {
     // Initialize global logger
     DatadogLogger.initialize()
 
-    DatadogLogger.info("Datadog initialized successfully", mapOf(
-        "environment" to appEnvironment,
-        "rum_enabled" to applicationId.isNotEmpty()
-    ))
+    DatadogLogger.info(
+        "Datadog initialized successfully", mapOf(
+            "environment" to appEnvironment,
+            "rum_enabled" to applicationId.isNotEmpty()
+        )
+    )
 }
 
 fun initializeRum(applicationId: String) {
@@ -121,8 +124,8 @@ object DatadogLogger {
         logger = Logger.Builder()
             .setNetworkInfoEnabled(true)
             .setPrintLogsToConsole(false)
-            .setRemoteSampleRate(100f)
-            .setBundleWithRumEnabled(true)
+            .setRemoteSampleRate(1f)
+            .setBundleWithRumEnabled(false)
             .setName("SLN")
             .build()
     }
@@ -139,11 +142,19 @@ object DatadogLogger {
         logger?.warn(message, null, attributes)
     }
 
-    fun error(message: String, throwable: Throwable? = null, attributes: Map<String, Any?> = emptyMap()) {
+    fun error(
+        message: String,
+        throwable: Throwable? = null,
+        attributes: Map<String, Any?> = emptyMap()
+    ) {
         logger?.error(message, throwable, attributes)
     }
 
-    fun critical(message: String, throwable: Throwable? = null, attributes: Map<String, Any?> = emptyMap()) {
+    fun critical(
+        message: String,
+        throwable: Throwable? = null,
+        attributes: Map<String, Any?> = emptyMap()
+    ) {
         logger?.critical(message, throwable, attributes)
     }
 }

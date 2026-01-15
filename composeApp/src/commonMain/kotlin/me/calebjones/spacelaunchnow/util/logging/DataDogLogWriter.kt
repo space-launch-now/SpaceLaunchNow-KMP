@@ -11,7 +11,9 @@ import me.calebjones.spacelaunchnow.analytics.DatadogLogger
  * CRITICAL: Automatically includes RevenueCat User ID on all logs
  */
 class DataDogLogWriter : LogWriter(), ConfigurableLogWriter {
-    override var minSeverity: Severity = Severity.Verbose
+    // Default to ERROR only to prevent excessive Datadog costs
+    // Higher log levels only enabled when diagnostic logging is on
+    override var minSeverity: Severity = Severity.Error
 
     override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
         // Respect per-writer severity (default WARN+ for production)

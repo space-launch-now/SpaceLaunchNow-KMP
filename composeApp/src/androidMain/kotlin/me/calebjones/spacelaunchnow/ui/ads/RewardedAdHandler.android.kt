@@ -74,7 +74,7 @@ actual fun RewardedAdHandler(
             }
 
             AdState.SHOWING -> {
-                log.i { "Ad is showing!" }
+                log.d { "Ad is showing!" }
                 onAdShown?.invoke()
             }
 
@@ -92,10 +92,10 @@ actual fun RewardedAdHandler(
             }
 
             AdState.SHOWN -> {
-                log.i { "Ad has finished showing" }
+                log.d { "Ad has finished showing" }
                 // Grant reward when ad completes (SHOWN state)
                 if (!rewardGranted) {
-                    log.i { "User earned reward!" }
+                    log.d { "User earned reward!" }
                     onRewardEarned?.invoke(1, "reward")
                     rewardGranted = true
                 }
@@ -116,7 +116,7 @@ actual fun RewardedAdHandler(
         RewardedAd(
             loadedAd = rewardedAd,
             onRewardEarned = {
-                log.i { "User earned reward!" }
+                log.d { "User earned reward!" }
                 onRewardEarned?.invoke(1, "reward") // Default reward values
             }
         )

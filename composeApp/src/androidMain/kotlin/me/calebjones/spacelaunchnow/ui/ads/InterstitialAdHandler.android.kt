@@ -137,7 +137,7 @@ actual fun InterstitialAdHandler(
             }
 
             AdState.SHOWN -> {
-                log.i { "Ad has finished showing" }
+                log.d { "Ad has finished showing" }
                 adShownThisSession = true // Mark as shown
             }
 
@@ -161,7 +161,7 @@ actual fun InterstitialAdHandler(
         !subscriptionState.isLoading &&
         !subscriptionState.isSubscribed // ADDITIONAL CHECK: Verify subscription state directly
     ) {
-        log.i { "FINAL GATE - Showing ad to free user" }
+        log.d { "FINAL GATE - Showing ad to free user" }
         InterstitialAd(loadedAd = interstitialAd)
     } else if (!adShownThisSession && interstitialAd.state == AdState.READY) {
         // Ad is ready but we're NOT showing it - log why
@@ -171,7 +171,7 @@ actual fun InterstitialAdHandler(
             subscriptionState.isSubscribed -> "isSubscribed=true"
             else -> "unknown"
         }
-        log.i { "BLOCKED - Not showing ad because: $reason" }
+        log.d { "BLOCKED - Not showing ad because: $reason" }
     }
 }
 

@@ -74,11 +74,11 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
             // Debug mode: full diagnostics
             prefs[DEBUG_MODE_ENABLED] == true -> Severity.Debug
 
-            // User enabled: track flows
-            prefs[USER_LOGGING_ENABLED] == true -> Severity.Info
+            // User enabled diagnostic logging: track at WARNING level
+            prefs[USER_LOGGING_ENABLED] == true -> Severity.Warn
 
-            // Default: only errors (WARN, ERROR, ASSERT)
-            else -> Severity.Warn
+            // Default: ONLY critical errors (ERROR, ASSERT) - prevents excessive costs
+            else -> Severity.Error
         }
     }
 

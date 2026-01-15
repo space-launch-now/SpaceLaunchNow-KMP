@@ -25,7 +25,7 @@ actual object AdInitializer {
             log.d { "🎯 AdInitializer (iOS): Initializing BasicAds (no context required)" }
             BasicAds.initialize(null) // iOS doesn't require context
             isInitialized = true
-            log.i { "✅ AdInitializer (iOS): BasicAds initialized successfully" }
+            log.d { "✅ AdInitializer (iOS): BasicAds initialized successfully" }
             true
         } catch (e: Exception) {
             log.e(e) { "❌ AdInitializer (iOS): Failed to initialize BasicAds: ${e.message}" }
@@ -42,7 +42,7 @@ actual object AdInitializer {
                 tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE,
                 testDeviceIds = testDeviceIds
             )
-            log.i { "✅ AdInitializer (iOS): Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})" }
+            log.d { "✅ AdInitializer (iOS): Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})" }
         } catch (e: Exception) {
             log.e(e) { "❌ AdInitializer (iOS): Failed to configure: ${e.message}" }
         }

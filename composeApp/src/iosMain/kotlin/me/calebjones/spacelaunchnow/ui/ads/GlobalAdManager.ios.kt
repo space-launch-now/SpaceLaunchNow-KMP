@@ -92,7 +92,7 @@ actual class GlobalAdManager actual constructor(
         // Setup configurations synchronously for instant availability
         setupAdConfigurations()
 
-        log.i { "✅ GlobalAdManager: Instant initialization complete - ads ready to load!" }
+        log.d { "✅ GlobalAdManager: Instant initialization complete - ads ready to load!" }
     }
 
     private fun setupAdConfigurations() {
