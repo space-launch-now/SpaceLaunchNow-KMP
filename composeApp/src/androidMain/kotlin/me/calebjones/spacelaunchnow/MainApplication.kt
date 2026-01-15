@@ -81,21 +81,39 @@ class MainApplication : Application() {
             throw e
         }
 
+        // Re-initialize SpaceLogger with LoggingPreferences to enable dynamic severity updates
+        log.d { "Re-initializing SpaceLogger with LoggingPreferences..." }
+        try {
+            val loggingPrefs = getKoin().get<LoggingPreferences>()
+            SpaceLogger.initialize(loggingPreferences = loggingPrefs)
+            log.d { "✅ SpaceLogger preferences observer configured" }
+        } catch (e: Exception) {
+            log.w(e) { "Failed to configure SpaceLogger preferences observer" }
+        }
+
         // Initialize Datadog analytics using KMP SDK
         // IMPORTANT: Only initialize if diagnostic logging is enabled to prevent excessive costs
         log.d { "Checking Datadog initialization requirements..." }
         try {
             val loggingPrefs = getKoin().get<LoggingPreferences>()
-            val isDiagnosticLoggingEnabled = runBlocking {
-                loggingPrefs.isUserLoggingEnabled.first()
+            val debugPrefs =
+                getKoin().get<me.calebjones.spacelaunchnow.data.storage.DebugPreferences>()
+
+            val consoleSeverity = runBlocking {
+                loggingPrefs.getConsoleSeverity().first()
             }
-            val isDebugMode = runBlocking {
-                loggingPrefs.isDebugModeEnabled.first()
+            val sampleRate = runBlocking {
+                debugPrefs.debugSettingsFlow.first().datadogSampleRate
             }
 
-            if (isDiagnosticLoggingEnabled || isDebugMode || BuildConfig.IS_DEBUG) {
-                log.d { "Initializing Datadog (diagnostic logging enabled)..." }
-                initializeDatadog(context = this)
+            // Initialize Datadog if console logging is more verbose than production default (Warn)
+            if (consoleSeverity <= co.touchlab.kermit.Severity.Debug || BuildConfig.IS_DEBUG) {
+                log.d { "Initializing Datadog (diagnostic logging enabled) with ${sampleRate.toInt()}% sample rate..." }
+                initializeDatadog(
+                    context = this,
+                    sampleRate = sampleRate,
+                    debugPreferences = debugPrefs
+                )
                 log.d { "✅ Datadog initialized successfully" }
             } else {
                 log.i { "⏭️ Datadog initialization skipped (diagnostic logging disabled - saves costs)" }

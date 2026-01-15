@@ -24,7 +24,7 @@ expect fun resetNotificationPermissionAskedFlag()
 
 /**
  * ViewModel for debug settings
- * 
+ *
  * Phase 7: Updated to use platform-agnostic BillingManager instead of RevenueCatManager
  */
 @OptIn(kotlin.time.ExperimentalTime::class)
@@ -60,7 +60,8 @@ class DebugSettingsViewModel(
 
     // Notification History
     private val _notificationHistory = MutableStateFlow<List<NotificationHistoryItem>>(emptyList())
-    val notificationHistory: StateFlow<List<NotificationHistoryItem>> = _notificationHistory.asStateFlow()
+    val notificationHistory: StateFlow<List<NotificationHistoryItem>> =
+        _notificationHistory.asStateFlow()
 
     private val _notificationStats = MutableStateFlow<NotificationStats?>(null)
     val notificationStats: StateFlow<NotificationStats?> = _notificationStats.asStateFlow()
@@ -129,7 +130,24 @@ class DebugSettingsViewModel(
                 val topicType = if (useDebug) "debug_v3" else "prod_v3"
                 _statusMessage.value = "Switched to $topicType topics"
             } catch (e: Exception) {
-                _statusMessage.value = "Failed to update topic setting: ${e.message}"
+                _statusMessage.value = "Failed to update topics: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun setDatadogSampleRate(rate: Float) {
+        if (debugPreferences == null) return
+
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                debugPreferences.setDatadogSampleRate(rate)
+                _statusMessage.value =
+                    "Datadog sample rate updated to ${rate.toInt()}% (requires restart)"
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to update sample rate: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
@@ -247,7 +265,11 @@ class DebugSettingsViewModel(
                     appendLine("• Initialized: $isInitialized")
                     appendLine("• Is Subscribed: ${purchaseState.isSubscribed}")
                     appendLine("• Subscription Type: ${purchaseState.subscriptionType?.name ?: "FREE"}")
-                    appendLine("• Active Entitlements: ${billingManager.getActiveEntitlements().joinToString()}")
+                    appendLine(
+                        "• Active Entitlements: ${
+                            billingManager.getActiveEntitlements().joinToString()
+                        }"
+                    )
                     appendLine("• User ID: ${purchaseState.userId ?: "Anonymous"}")
                 }
                 _detailedMessage.value = message
@@ -358,7 +380,11 @@ class DebugSettingsViewModel(
                         val message = buildString {
                             appendLine("🔄 Restore Purchases:")
                             appendLine("✅ Restore successful")
-                            appendLine("Active Entitlements: ${billingManager.getActiveEntitlements().joinToString()}")
+                            appendLine(
+                                "Active Entitlements: ${
+                                    billingManager.getActiveEntitlements().joinToString()
+                                }"
+                            )
                             appendLine("Is Subscribed: ${purchaseState.isSubscribed}")
                         }
                         _detailedMessage.value = message
@@ -394,19 +420,25 @@ class DebugSettingsViewModel(
                                 appendLine("\n💡 Try refreshing products first")
                             } else {
                                 appendLine("✅ Available Products: ${products.size}")
-                                
+
                                 // Group by type
-                                val lifetime = products.find { 
-                                    it.basePlanId?.contains("lifetime", ignoreCase = true) == true ||
-                                    it.productId.contains("lifetime", ignoreCase = true) ||
-                                    it.productId.contains("pro", ignoreCase = true)
+                                val lifetime = products.find {
+                                    it.basePlanId?.contains(
+                                        "lifetime",
+                                        ignoreCase = true
+                                    ) == true ||
+                                            it.productId.contains("lifetime", ignoreCase = true) ||
+                                            it.productId.contains("pro", ignoreCase = true)
                                 }
-                                val annual = products.find { 
+                                val annual = products.find {
                                     it.basePlanId?.contains("annual", ignoreCase = true) == true ||
-                                    it.basePlanId?.contains("yearly", ignoreCase = true) == true
+                                            it.basePlanId?.contains(
+                                                "yearly",
+                                                ignoreCase = true
+                                            ) == true
                                 }
-                                val monthly = products.find { 
-                                    it.basePlanId?.contains("monthly", ignoreCase = true) == true 
+                                val monthly = products.find {
+                                    it.basePlanId?.contains("monthly", ignoreCase = true) == true
                                 }
 
                                 lifetime?.let { product ->

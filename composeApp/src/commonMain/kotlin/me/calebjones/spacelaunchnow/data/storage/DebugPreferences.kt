@@ -15,6 +15,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         private val CUSTOM_API_BASE_URL = stringPreferencesKey("debug_custom_api_base_url")
         private val USE_CUSTOM_API_URL = booleanPreferencesKey("debug_use_custom_api_url")
         private val USE_FCM_DEBUG_TOPICS = booleanPreferencesKey("debug_use_fcm_debug_topics")
+        private val DATADOG_SAMPLE_RATE = floatPreferencesKey("debug_datadog_sample_rate")
 
         // Debug subscription simulation keys
         private val DEBUG_SUBSCRIPTION_ACTIVE = booleanPreferencesKey("debug_subscription_active")
@@ -36,6 +37,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
             useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
+            datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 1f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
             debugSubscriptionType = preferences[DEBUG_SUBSCRIPTION_TYPE],
             debugSubscriptionProductId = preferences[DEBUG_SUBSCRIPTION_PRODUCT_ID]
@@ -74,6 +76,16 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     suspend fun setUseDebugTopics(useDebug: Boolean) {
         dataStore.edit { preferences ->
             preferences[USE_FCM_DEBUG_TOPICS] = useDebug
+        }
+    }
+
+    /**
+     * Set Datadog remote logging sample rate (0-100%)
+     * Controls what percentage of logs are sent to Datadog servers
+     */
+    suspend fun setDatadogSampleRate(rate: Float) {
+        dataStore.edit { preferences ->
+            preferences[DATADOG_SAMPLE_RATE] = rate.coerceIn(0f, 100f)
         }
     }
 
@@ -152,6 +164,7 @@ data class DebugSettings(
     val useCustomApiUrl: Boolean = false,
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
     val useDebugTopics: Boolean = false,
+    val datadogSampleRate: Float = 1f,
     val debugSubscriptionActive: Boolean = false,
     val debugSubscriptionType: String? = null,
     val debugSubscriptionProductId: String? = null

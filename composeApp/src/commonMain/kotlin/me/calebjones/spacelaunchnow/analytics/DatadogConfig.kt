@@ -9,6 +9,7 @@ import com.datadog.kmp.log.configuration.LogsConfiguration
 import com.datadog.kmp.privacy.TrackingConsent
 import com.datadog.kmp.rum.Rum
 import com.datadog.kmp.rum.configuration.RumConfiguration
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
@@ -20,8 +21,16 @@ private val log by lazy { SpaceLogger.getLogger("DatadogConfig") }
  *
  * IMPORTANT: This function should only be called when diagnostic logging is enabled
  * or when in debug mode to prevent excessive logging costs.
+ *
+ * @param context Application context on Android, null on iOS
+ * @param sampleRate Optional sample rate override (0-100%). If null, uses debug settings or defaults to 1%
+ * @param debugPreferences Optional DebugPreferences to observe sample rate changes dynamically
  */
-fun initializeDatadog(context: Any? = null) {
+fun initializeDatadog(
+    context: Any? = null,
+    sampleRate: Float? = null,
+    debugPreferences: me.calebjones.spacelaunchnow.data.storage.DebugPreferences? = null
+) {
     // context should be application context on Android and can be null on iOS
     val datadogEnabled = EnvironmentManager.getEnvBoolean("DATADOG_ENABLED", false)
     if (!datadogEnabled) {
@@ -55,15 +64,10 @@ fun initializeDatadog(context: Any? = null) {
     val logsConfig = LogsConfiguration.Builder().build()
     Logs.enable(logsConfig)
 
-    // Initialize global logger
-    DatadogLogger.initialize()
-
-    DatadogLogger.info(
-        "Datadog initialized successfully", mapOf(
-            "environment" to appEnvironment,
-            "rum_enabled" to applicationId.isNotEmpty()
-        )
-    )
+    // Initialize global logger with sample rate (default 1% for cost savings)
+    // Pass debugPreferences to enable dynamic sample rate updates
+    val effectiveSampleRate = sampleRate ?: 1f
+    DatadogLogger.initialize(effectiveSampleRate, debugPreferences)
 }
 
 fun initializeRum(applicationId: String) {
@@ -119,15 +123,53 @@ object DatadogRUM {
  */
 object DatadogLogger {
     private var logger: Logger? = null
+    private var currentSampleRate: Float = 1f
+    private var observerJob: kotlinx.coroutines.Job? = null
 
-    fun initialize() {
+    /**
+     * Initialize Datadog logger with configurable sample rate
+     * @param sampleRate Percentage of logs to send to Datadog (0-100). Default: 1% for cost savings
+     * @param debugPreferences Optional DebugPreferences to observe sample rate changes dynamically
+     */
+    fun initialize(
+        sampleRate: Float = 1f,
+        debugPreferences: me.calebjones.spacelaunchnow.data.storage.DebugPreferences? = null
+    ) {
+        val coercedSampleRate = sampleRate.coerceIn(0f, 100f)
+        buildLogger(coercedSampleRate)
+
+        // Cancel previous observer if any
+        observerJob?.cancel()
+
+        // Observe sample rate changes if debugPreferences provided
+        debugPreferences?.let { prefs ->
+            observerJob =
+                kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default).launch {
+                    prefs.debugSettingsFlow.collect { settings ->
+                        val newRate = settings.datadogSampleRate.coerceIn(0f, 100f)
+                        if (newRate != currentSampleRate) {
+                            log.i { "Sample rate changed from $currentSampleRate% to $newRate%, rebuilding logger..." }
+                            buildLogger(newRate)
+                        }
+                    }
+                }
+        }
+    }
+
+    /**
+     * Build or rebuild the logger with the specified sample rate
+     */
+    private fun buildLogger(sampleRate: Float) {
+        currentSampleRate = sampleRate
         logger = Logger.Builder()
             .setNetworkInfoEnabled(true)
             .setPrintLogsToConsole(false)
-            .setRemoteSampleRate(1f)
+            .setRemoteSampleRate(sampleRate)
             .setBundleWithRumEnabled(false)
             .setName("SLN")
             .build()
+        // Log the initialization with the actual Datadog logger (after it's created)
+        logger?.info("DatadogLogger initialized with sample rate: $sampleRate%")
     }
 
     fun debug(message: String, attributes: Map<String, Any?> = emptyMap()) {

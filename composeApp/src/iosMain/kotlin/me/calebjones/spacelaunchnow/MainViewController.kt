@@ -12,8 +12,8 @@ import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.di.koinConfig
-import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.core.context.startKoin
 import org.koin.mp.KoinPlatform.getKoin
 
@@ -37,7 +37,7 @@ fun setNotificationLaunchId(launchId: String?) {
     notificationLaunchIdState.value = launchId
 }
 
-fun MainViewController() = ComposeUIViewController { 
+fun MainViewController() = ComposeUIViewController {
     // Initialize BuildConfig and Koin once before the app starts
     if (!koinInitialized) {
         initializeBuildConfig()
@@ -45,46 +45,56 @@ fun MainViewController() = ComposeUIViewController {
         SpaceLogger.initialize()
         startKoin(koinConfig)
         koinInitialized = true
-        
+
+        // Re-initialize SpaceLogger with LoggingPreferences to enable dynamic severity updates
+        try {
+            val loggingPrefs =
+                getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
+            SpaceLogger.initialize(loggingPreferences = loggingPrefs)
+            log.d { "✅ SpaceLogger preferences observer configured" }
+        } catch (e: Exception) {
+            log.w(e) { "Failed to configure SpaceLogger preferences observer" }
+        }
+
         // Initialize Billing and Subscription system on background thread
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 log.i { "iOS: 🚀 Starting billing and subscription initialization..." }
-                
+
                 // Step 1: Initialize BillingManager (RevenueCat)
                 val billingManager = getKoin().get<BillingManager>()
                 billingManager.initialize(appUserId = null)
                 log.i { "iOS: ✅ BillingManager initialized successfully" }
-                
+
                 // Step 2: Initialize and start SubscriptionSyncer
                 // This listens to billing state changes and persists to LocalSubscriptionStorage
                 val syncer = getKoin().get<SubscriptionSyncer>()
                 syncer.startSyncing()
                 log.i { "iOS: ✅ SubscriptionSyncer started successfully" }
-                
+
                 // Step 3: Initialize SubscriptionRepository (loads cached state)
                 val repository = getKoin().get<SubscriptionRepository>()
                 repository.initialize()
                 log.i { "iOS: ✅ SubscriptionRepository initialized successfully" }
-                
+
                 // Step 4: Force initial sync to ensure purchase state is persisted
                 syncer.syncNow()
                 log.i { "iOS: ✅ Initial subscription sync complete" }
-                
+
                 log.i { "iOS: 🎉 All billing and subscription systems initialized" }
             } catch (e: Exception) {
                 log.e(e) { "iOS: ❌ Failed to initialize billing/subscription system" }
             }
         }
     }
-    
+
     val navigationDestination by navigationDestinationState
     val notificationLaunchId by notificationLaunchIdState
-    
+
     // Collect useUtc preference for reactive updates
     val appPreferences = getKoin().get<AppPreferences>()
     val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
-    
+
     SpaceLaunchNowApp(
         contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(),
         useUtc = useUtc,
@@ -96,5 +106,5 @@ fun MainViewController() = ComposeUIViewController {
         onNotificationLaunchIdConsumed = {
             notificationLaunchIdState.value = null
         }
-    ) 
+    )
 }

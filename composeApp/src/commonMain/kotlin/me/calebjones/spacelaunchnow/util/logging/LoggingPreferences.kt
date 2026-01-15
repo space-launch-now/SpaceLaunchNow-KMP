@@ -4,100 +4,91 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import co.touchlab.kermit.Severity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * Manages user logging preferences with DataStore
+ * Manages logging severity preferences with DataStore
+ *
+ * Stores severity levels directly - no boolean flag mapping needed!
  *
  * Default behavior:
- * - Console: WARN+ (always shows critical issues)
- * - DataDog: WARN+ (minimizes remote logging costs)
- *
- * User enables logging:
- * - Console: INFO+ (shows user actions)
- * - DataDog: INFO+ (track user flows for support)
- *
- * Debug mode (dev menu):
- * - Console: ALL (verbose debugging)
- * - DataDog: DEBUG+ (full diagnostics)
+ * - Console: WARN (always shows critical issues in production)
+ * - DataDog: Disabled by default (user must enable in Settings)
+ * - DataDog Severity: WARN when enabled (configurable in Debug menu)
  */
 class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
 
     companion object {
-        private val USER_LOGGING_ENABLED = booleanPreferencesKey("user_logging_enabled")
-        private val DEBUG_MODE_ENABLED = booleanPreferencesKey("debug_logging_enabled")
+        private val CONSOLE_SEVERITY = stringPreferencesKey("console_severity")
+        private val DATADOG_SEVERITY = stringPreferencesKey("datadog_severity")
+        private val DATADOG_ENABLED = booleanPreferencesKey("datadog_enabled")
     }
 
     /**
-     * Whether user has enabled logging (Settings -> Enable Logging)
-     * Default: false (only WARN+ logs)
+     * Get current console logging severity
+     * Default: WARN
      */
-    val isUserLoggingEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
-        prefs[USER_LOGGING_ENABLED] ?: false
-    }
-
-    /**
-     * Whether debug mode is active (Debug Menu -> Debug Logging)
-     * Default: false
-     */
-    val isDebugModeEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
-        prefs[DEBUG_MODE_ENABLED] ?: false
-    }
-
-    /**
-     * Get effective severity for console logging
-     */
-    fun getConsoleSeverity(isDebugBuild: Boolean): Flow<Severity> = dataStore.data.map { prefs ->
-        when {
-            // Debug menu override (highest priority)
-            prefs[DEBUG_MODE_ENABLED] == true -> Severity.Verbose
-
-            // Debug builds always show DEBUG+
-            isDebugBuild -> Severity.Debug
-
-            // User enabled logging shows INFO+
-            prefs[USER_LOGGING_ENABLED] == true -> Severity.Info
-
-            // Default: only critical issues (WARN+)
-            else -> Severity.Warn
+    fun getConsoleSeverity(): Flow<Severity> = dataStore.data.map { prefs ->
+        val severityName = prefs[CONSOLE_SEVERITY] ?: Severity.Warn.name
+        try {
+            Severity.valueOf(severityName)
+        } catch (e: IllegalArgumentException) {
+            Severity.Warn // Fallback if corrupted
         }
     }
 
     /**
-     * Get effective severity for DataDog remote logging
-     * More conservative to reduce costs and noise
+     * Get current DataDog logging severity
+     * Default: WARN
+     * Note: This is only used if DataDog is enabled
      */
     fun getDataDogSeverity(): Flow<Severity> = dataStore.data.map { prefs ->
-        when {
-            // Debug mode: full diagnostics
-            prefs[DEBUG_MODE_ENABLED] == true -> Severity.Debug
-
-            // User enabled diagnostic logging: track at WARNING level
-            prefs[USER_LOGGING_ENABLED] == true -> Severity.Warn
-
-            // Default: ONLY critical errors (ERROR, ASSERT) - prevents excessive costs
-            else -> Severity.Error
+        val severityName = prefs[DATADOG_SEVERITY] ?: Severity.Warn.name
+        try {
+            Severity.valueOf(severityName)
+        } catch (e: IllegalArgumentException) {
+            Severity.Warn // Fallback if corrupted
         }
     }
 
     /**
-     * Enable/disable user logging (Settings screen)
+     * Check if DataDog is enabled
+     * Default: false (disabled)
      */
-    suspend fun setUserLoggingEnabled(enabled: Boolean) {
+    fun isDataDogEnabled(): Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[DATADOG_ENABLED] ?: false
+    }
+
+    /**
+     * Set console logging severity directly
+     */
+    suspend fun setConsoleSeverity(severity: Severity) {
         dataStore.edit { prefs ->
-            prefs[USER_LOGGING_ENABLED] = enabled
+            prefs[CONSOLE_SEVERITY] = severity.name
         }
     }
 
     /**
-     * Enable/disable debug mode (Debug menu)
+     * Set DataDog logging severity directly
      */
-    suspend fun setDebugModeEnabled(enabled: Boolean) {
+    suspend fun setDataDogSeverity(severity: Severity) {
         dataStore.edit { prefs ->
-            prefs[DEBUG_MODE_ENABLED] = enabled
+            prefs[DATADOG_SEVERITY] = severity.name
+        }
+    }
+
+    /**
+     * Enable or disable DataDog completely
+     */
+    suspend fun setDataDogEnabled(enabled: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[DATADOG_ENABLED] = enabled
         }
     }
 }
+
+
 

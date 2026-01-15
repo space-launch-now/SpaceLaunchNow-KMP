@@ -24,18 +24,18 @@ import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 
 /**
  * Settings section for user-controlled diagnostic logging
- * 
- * Allows users to opt-in to INFO+ logging to help with troubleshooting
+ *
+ * Toggle to enable/disable DataDog completely (severity configured in Debug menu)
  */
 @Composable
 fun LoggingSettingsSection(
     loggingPreferences: LoggingPreferences,
     modifier: Modifier = Modifier
 ) {
-    val isUserLoggingEnabled by loggingPreferences.isUserLoggingEnabled
+    val isDatadogEnabled by loggingPreferences.isDataDogEnabled()
         .collectAsState(initial = false)
     val coroutineScope = rememberCoroutineScope()
-    
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -46,18 +46,18 @@ fun LoggingSettingsSection(
                 "Diagnostic Logging",
                 style = MaterialTheme.typography.titleMedium
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
-                "Help us improve by sharing diagnostic logs. " +
-                "Only errors are logged by default.",
+                "Help us improve by sharing diagnostic logs to Datadog. " +
+                        "Go to Debug Settings to configure the logging level.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(12.dp))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -69,18 +69,18 @@ fun LoggingSettingsSection(
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
-                        if (isUserLoggingEnabled) "Logging app activity" 
-                        else "Only logging errors",
+                        if (isDatadogEnabled) "Datadog enabled"
+                        else "Datadog disabled",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 Switch(
-                    checked = isUserLoggingEnabled,
+                    checked = isDatadogEnabled,
                     onCheckedChange = { enabled ->
                         coroutineScope.launch {
-                            loggingPreferences.setUserLoggingEnabled(enabled)
+                            loggingPreferences.setDataDogEnabled(enabled)
                         }
                     }
                 )

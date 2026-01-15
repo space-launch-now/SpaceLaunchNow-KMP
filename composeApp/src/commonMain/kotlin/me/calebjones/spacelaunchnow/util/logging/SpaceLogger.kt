@@ -1,7 +1,7 @@
 package me.calebjones.spacelaunchnow.util.logging
 
-import co.touchlab.kermit.Logger
 import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
 import kotlinx.coroutines.CoroutineScope
@@ -53,8 +53,9 @@ object SpaceLogger {
 
         // CRITICAL FIX: Create a custom Logger instance with StaticConfig
         // This prevents Kermit's default platform writers from being used
+        // Initialize with Severity.Verbose to allow individual writers to control filtering
         val staticConfig = StaticConfig(
-            minSeverity = logConfig.minSeverity,
+            minSeverity = Severity.Verbose,
             logWriterList = logConfig.writers
         )
         baseLogger = Logger(staticConfig, BASE_TAG)
@@ -71,13 +72,15 @@ object SpaceLogger {
     private fun observePreferences(prefs: LoggingPreferences) {
         CoroutineScope(Dispatchers.Default).launch {
             combine(
-                prefs.getConsoleSeverity(me.calebjones.spacelaunchnow.util.BuildConfig.IS_DEBUG),
-                prefs.getDataDogSeverity()
-            ) { consoleSev, dataDogSev ->
-                Pair(consoleSev, dataDogSev)
-            }.collect { (consoleSev, dataDogSev) ->
+                prefs.getConsoleSeverity(),
+                prefs.getDataDogSeverity(),
+                prefs.isDataDogEnabled()
+            ) { consoleSev, dataDogSev, dataDogEnabled ->
+                Triple(consoleSev, dataDogSev, dataDogEnabled)
+            }.collect { (consoleSev, dataDogSev, dataDogEnabled) ->
                 setConsoleSeverity(consoleSev)
-                setDataDogSeverity(dataDogSev)
+                // If DataDog is disabled, set severity to Assert (no logs)
+                setDataDogSeverity(if (dataDogEnabled) dataDogSev else Severity.Assert)
             }
         }
     }
@@ -89,7 +92,8 @@ object SpaceLogger {
      * Uses our custom Logger instance (not the global singleton)
      */
     fun getLogger(tag: String): Logger {
-        val logger = baseLogger ?: error("SpaceLogger not initialized! Call SpaceLogger.initialize() first")
+        val logger =
+            baseLogger ?: error("SpaceLogger not initialized! Call SpaceLogger.initialize() first")
         val fullTag = if (tag.isEmpty()) BASE_TAG else "$BASE_TAG-$tag"
 
         return logger.withTag(fullTag)

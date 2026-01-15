@@ -18,7 +18,16 @@ fun main() {
 
     // Initialize Koin before starting the app (similar to Android)
     startKoin(koinConfig)
-    
+
+    // Initialize SpaceLogger with LoggingPreferences to enable dynamic severity updates
+    try {
+        val loggingPrefs =
+            getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
+        me.calebjones.spacelaunchnow.util.logging.SpaceLogger.initialize(loggingPreferences = loggingPrefs)
+    } catch (e: Exception) {
+        // Logging not critical for Desktop
+    }
+
     application {
         Window(
             title = "Space Launch Now",
@@ -34,7 +43,7 @@ private fun DesktopApp() {
     val appPreferences = getKoin().get<AppPreferences>()
     val themeOption by appPreferences.themeFlow.collectAsState(initial = ThemeOption.System)
     val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
-    
+
     SpaceLaunchNowApp(
         contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(null),
         themeOption = themeOption,

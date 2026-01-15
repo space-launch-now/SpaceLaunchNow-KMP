@@ -30,12 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Severity
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 
 /**
  * Debug menu section for developer logging controls
- * 
+ *
  * Provides granular logging level selectors for Console and DataDog destinations
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,11 +45,11 @@ fun DebugLoggingSettings(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    // Get current console severity based on debug build and preferences
-    val consoleSeverity by loggingPreferences.getConsoleSeverity(BuildConfig.IS_DEBUG)
+    // Get current console severity based on preferences
+    val consoleSeverity by loggingPreferences.getConsoleSeverity()
         .collectAsState(initial = Severity.Warn)
     val dataDogSeverity by loggingPreferences.getDataDogSeverity()
-        .collectAsState(initial = Severity.Warn)
+        .collectAsState(initial = Severity.Error)
 
     // Available severity levels
     val severityLevels = listOf(
@@ -70,16 +69,16 @@ fun DebugLoggingSettings(
                 "Developer Logging",
                 style = MaterialTheme.typography.titleMedium
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 "Control log verbosity for console output and remote DataDog logging. " +
-                "Higher verbosity levels may impact performance.",
+                        "Higher verbosity levels may impact performance.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(16.dp))
@@ -119,24 +118,8 @@ fun DebugLoggingSettings(
                             text = { Text(label) },
                             onClick = {
                                 coroutineScope.launch {
-                                    // Set the appropriate preference based on severity
-                                    when (severity) {
-                                        Severity.Verbose -> {
-                                            loggingPreferences.setDebugModeEnabled(true)
-                                        }
-                                        Severity.Debug -> {
-                                            loggingPreferences.setDebugModeEnabled(false)
-                                            loggingPreferences.setUserLoggingEnabled(false)
-                                        }
-                                        Severity.Info -> {
-                                            loggingPreferences.setDebugModeEnabled(false)
-                                            loggingPreferences.setUserLoggingEnabled(true)
-                                        }
-                                        else -> { // Warn, Error
-                                            loggingPreferences.setDebugModeEnabled(false)
-                                            loggingPreferences.setUserLoggingEnabled(false)
-                                        }
-                                    }
+                                    // Set console severity directly
+                                    loggingPreferences.setConsoleSeverity(severity)
                                 }
                                 consoleExpanded = false
                             }
@@ -182,22 +165,8 @@ fun DebugLoggingSettings(
                             text = { Text(label) },
                             onClick = {
                                 coroutineScope.launch {
-                                    // DataDog severity is controlled separately
-                                    // This would require extending LoggingPreferences
-                                    // For now, it follows the same rules as console
-                                    when (severity) {
-                                        Severity.Verbose, Severity.Debug -> {
-                                            loggingPreferences.setDebugModeEnabled(true)
-                                        }
-                                        Severity.Info -> {
-                                            loggingPreferences.setDebugModeEnabled(false)
-                                            loggingPreferences.setUserLoggingEnabled(true)
-                                        }
-                                        else -> { // Warn, Error
-                                            loggingPreferences.setDebugModeEnabled(false)
-                                            loggingPreferences.setUserLoggingEnabled(false)
-                                        }
-                                    }
+                                    // Set DataDog severity independently
+                                    loggingPreferences.setDataDogSeverity(severity)
                                 }
                                 dataDogExpanded = false
                             }
@@ -205,11 +174,11 @@ fun DebugLoggingSettings(
                     }
                 }
             }
-            
+
             // Warning when verbose/debug mode is on
             if (consoleSeverity <= Severity.Debug) {
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Surface(
                     color = if (consoleSeverity == Severity.Verbose)
                         MaterialTheme.colorScheme.errorContainer
@@ -240,27 +209,27 @@ fun DebugLoggingSettings(
                     }
                 }
             }
-            
+
             // Current Log Levels Display (kept for reference)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Text(
                 "Current Settings",
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             LogLevelRow(
                 destination = "Console Output",
                 severity = consoleSeverity
             )
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             LogLevelRow(
                 destination = "DataDog Remote",
                 severity = dataDogSeverity
@@ -284,7 +253,7 @@ private fun LogLevelRow(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         SeverityChip(severity)
     }
 }
@@ -298,7 +267,7 @@ private fun SeverityChip(severity: Severity) {
         Severity.Warn -> MaterialTheme.colorScheme.secondary to "WARN+"
         Severity.Error, Severity.Assert -> MaterialTheme.colorScheme.error to "ERROR+"
     }
-    
+
     Surface(
         shape = MaterialTheme.shapes.small,
         color = color
