@@ -1,3 +1,12 @@
+## [5.7.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.2...v5.7.3) (2026-01-15)
+
+
+### Bug Fixes
+
+* **logging:** decrease datadog logging ([1c36455](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1c3645588b0396c7e238ea887da2dcbed49817a1))
+
+
+
 ## [5.7.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.1...v5.7.2) (2026-01-07)
 
 
@@ -38,17 +47,6 @@
 ### Bug Fixes
 
 * allow changes not sent for review in deployment summary ([45d395d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/45d395d5b66613b5b2453c78370df833df255027))
-
-
-
-# [5.6.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.5.1...v5.6.0) (2025-12-21)
-
-
-### Features
-
-* add on commit ([bb6406b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb6406bddc8477bbe47b59dd6c19f736399a32c6))
-* enhance SupportUsScreen with subscription management details and platform-specific links ([2a283d2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2a283d23ca43074e86fe2cbd8856cd249ba08af1))
-* implement experimental ISS page ([bbfdc11](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bbfdc1189303422304640a031d650c5f706e3b02))
 
 
 

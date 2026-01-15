@@ -1,3 +1,3 @@
 ### Bug Fixes
 
-* update video player button to open in app and remove video filtering
+* **logging:** decrease datadog logging
