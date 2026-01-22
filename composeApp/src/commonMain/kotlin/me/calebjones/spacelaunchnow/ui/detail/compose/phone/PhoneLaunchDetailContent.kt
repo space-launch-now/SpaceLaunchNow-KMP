@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailTab
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.CombinedLaunchOverviewCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
@@ -120,6 +122,15 @@ fun PhoneLaunchDetailContent(
                 Spacer(Modifier.height(16.dp))
             }
         }
+
+        // Ad Banner above tabs
+        SmartBannerAd(
+            modifier = Modifier.fillMaxWidth(),
+            placementType = AdPlacementType.INTERSTITIAL,
+            showRemoveAdsButton = true,
+            onRemoveAdsClick = onNavigateToSettings
+        )
+        Spacer(Modifier.height(16.dp))
 
         // Tab Row for tab selection
         PrimaryTabRow(

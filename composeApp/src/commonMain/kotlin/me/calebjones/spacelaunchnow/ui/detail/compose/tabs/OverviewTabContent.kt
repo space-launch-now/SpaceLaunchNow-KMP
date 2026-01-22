@@ -54,15 +54,6 @@ fun OverviewTabContent(
         QuickStatsGrid(launch = launch)
         Spacer(Modifier.height(16.dp))
 
-        SmartBannerAd(
-            modifier = Modifier.fillMaxWidth(),
-            placementType = AdPlacementType.INTERSTITIAL,
-            showRemoveAdsButton = true,
-            onRemoveAdsClick = onNavigateToSettings
-        )
-        Spacer(Modifier.height(16.dp))
-
-
         // Timeline Card
         if (launch.timeline.isNotEmpty()) {
             Text(
