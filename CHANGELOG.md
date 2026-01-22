@@ -1,3 +1,12 @@
+## [5.7.5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.4...v5.7.5) (2026-01-22)
+
+
+### Bug Fixes
+
+* add tabs to launch detaial, refactor several other issues ([e98b01e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e98b01eefa6967ce41993f6b98bccdb95948a302))
+
+
+
 ## [5.7.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.3...v5.7.4) (2026-01-15)
 
 
@@ -31,22 +40,6 @@
 ### Bug Fixes
 
 * remove unnecessary changesNotSentForReview flag from deployment summary ([ce82b44](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ce82b4463914d373ea7ddd14a00ac662313cb4de))
-
-
-
-# [5.7.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.6.1...v5.7.0) (2026-01-05)
-
-
-### Bug Fixes
-
-* adjust filters for schedule screen ([d2f75d1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d2f75d15bced185166b29a6121af38773aadd443))
-* improve handling placeholder spacecraft in details card ([4a49489](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4a494898f89395dcbb9f3f70b7db5ab8d60407fd))
-* part two of the filter ([4b692b8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4b692b8440c1d7d778386c7b66ac473a6845ace5))
-
-
-### Features
-
-* add background ios notifications and fix sharing ([2234466](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2234466171b5e5b81a2a1b49c1f360140ba32313))
 
 
 
