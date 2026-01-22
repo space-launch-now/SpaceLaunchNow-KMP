@@ -61,10 +61,13 @@ object VideoUtil {
      * Gets the appropriate title for a video
      */
     fun getVideoTitle(vidUrl: VidURL, launchName: String): String {
-        return when {
-            !vidUrl.title.isNullOrBlank() -> vidUrl.title
-            vidUrl.live == true -> "$launchName - Live Stream"
-            else -> "$launchName - Video"
+        val title = if (vidUrl.title.isNullOrBlank()) launchName else vidUrl.title
+        val publish =
+            if (vidUrl.publisher.isNullOrBlank()) getVideoSourceName(vidUrl) else vidUrl.publisher
+
+        if (vidUrl.live == true) {
+            return "$title - $publish (Live)"
         }
+        return "$title - $publish"
     }
 }

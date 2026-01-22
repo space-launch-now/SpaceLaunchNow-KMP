@@ -16,7 +16,7 @@ import kotlin.time.Instant
 suspend fun ArticlesApi.getArticles(
     limit: Int? = null,
     offset: Int? = null,
-    ordering: List<ArticlesApi.OrderingArticlesList>? = null,
+    ordering: List<String>? = null,
     search: String? = null,
     isFeatured: Boolean? = null,
     hasLaunch: Boolean? = null,
@@ -26,10 +26,15 @@ suspend fun ArticlesApi.getArticles(
     publishedAtGte: Instant? = null,
     publishedAtLte: Instant? = null
 ): HttpResponse<PaginatedArticleList> {
+    // Convert string ordering values to enum by matching the value property
+    val orderingEnums = ordering?.mapNotNull { orderValue ->
+        ArticlesApi.OrderingArticlesList.entries.find { it.value == orderValue }
+    }
+
     return articlesList(
         limit = limit,
         offset = offset,
-        ordering = ordering,
+        ordering = orderingEnums,
         search = search,
         isFeatured = isFeatured,
         hasLaunch = hasLaunch,
@@ -46,7 +51,7 @@ suspend fun ArticlesApi.getArticles(
  */
 suspend fun ArticlesApi.getFeaturedArticles(
     limit: Int? = null,
-    ordering: List<ArticlesApi.OrderingArticlesList>? = listOf(ArticlesApi.OrderingArticlesList.MinusPublished_at)
+    ordering: List<String>? = listOf("-published_at")
 ): HttpResponse<PaginatedArticleList> {
     return getArticles(
         limit = limit,
@@ -61,12 +66,17 @@ suspend fun ArticlesApi.getFeaturedArticles(
 suspend fun ArticlesApi.getArticlesByLaunch(
     launchIds: List<String>,
     limit: Int? = null,
-    ordering: List<ArticlesApi.OrderingArticlesList>? = listOf(ArticlesApi.OrderingArticlesList.MinusPublished_at)
+    ordering: List<String>? = listOf("-published_at")
 ): HttpResponse<PaginatedArticleList> {
+    // Convert string ordering values to enum by matching the value property
+    val orderingEnums = ordering?.mapNotNull { orderValue ->
+        ArticlesApi.OrderingArticlesList.entries.find { it.value == orderValue }
+    }
+
     return articlesList(
         launch = launchIds,
         limit = limit,
-        ordering = ordering
+        ordering = orderingEnums
     )
 }
 
@@ -76,7 +86,7 @@ suspend fun ArticlesApi.getArticlesByLaunch(
 suspend fun ArticlesApi.searchArticles(
     query: String,
     limit: Int? = null,
-    ordering: List<ArticlesApi.OrderingArticlesList>? = listOf(ArticlesApi.OrderingArticlesList.MinusPublished_at)
+    ordering: List<String>? = listOf("-published_at")
 ): HttpResponse<PaginatedArticleList> {
     return getArticles(
         search = query,

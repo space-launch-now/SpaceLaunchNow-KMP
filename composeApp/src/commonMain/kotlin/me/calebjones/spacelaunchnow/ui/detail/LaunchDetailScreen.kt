@@ -18,12 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
-import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailView
-import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailErrorView
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailLoadingView
-import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
+import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailView
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -37,19 +37,19 @@ fun LaunchDetailScreen(
     val log = SpaceLogger.getLogger("LaunchDetailScreen")
     val viewModel = koinViewModel<LaunchViewModel>()
     val launchCache = koinInject<LaunchCache>()
-    
+
     // Check if we have pre-loaded detailed data in cache
     val cachedLaunchDetailed = remember(launchId) { launchCache.getCachedLaunchDetailed(launchId) }
     val launchDetails by viewModel.launchDetails.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val videoPlayerState by viewModel.videoPlayerState.collectAsState()
-    
+
     // Related news state
     val relatedNews by viewModel.relatedNews.collectAsState()
     val isNewsLoading by viewModel.isNewsLoading.collectAsState()
     val newsError by viewModel.newsError.collectAsState()
-    
+
     // Determine current launch data
     val currentLaunch = cachedLaunchDetailed ?: launchDetails
 
@@ -63,7 +63,7 @@ fun LaunchDetailScreen(
             viewModel.fetchRelatedNews(launchId)
         }
     )
-    
+
     // Stop refreshing when loading completes
     LaunchedEffect(isLoading) {
         if (!isLoading && isRefreshing) {
@@ -80,7 +80,7 @@ fun LaunchDetailScreen(
             // No preloaded data and not currently loading, fetch from API
             viewModel.fetchLaunchDetails(launchId)
         }
-        
+
         // Fetch related news for this launch
         viewModel.fetchRelatedNews(launchId)
     }
@@ -90,7 +90,7 @@ fun LaunchDetailScreen(
 
     // Only render the view when we have launch data, show loading/error states otherwise
     val errorMessage = error
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -139,7 +139,7 @@ fun LaunchDetailScreen(
                 LaunchDetailLoadingView(onNavigateBack = onNavigateBack)
             }
         }
-        
+
         // Pull-to-refresh indicator
         PullRefreshIndicator(
             refreshing = isRefreshing,

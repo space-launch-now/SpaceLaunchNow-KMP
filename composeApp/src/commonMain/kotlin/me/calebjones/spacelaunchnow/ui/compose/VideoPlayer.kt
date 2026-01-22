@@ -25,8 +25,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -204,7 +208,8 @@ fun LaunchVideoPlayer(
                     // Source/Publisher
                     Text(
                         text = VideoUtil.getVideoSourceName(vidUrl),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
@@ -242,14 +247,27 @@ fun LaunchVideoPlayer(
                 }
             }
 
-            // Video description
-            if (!vidUrl.description.isNullOrBlank()) {
-                Text(
-                    text = vidUrl.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            // Video description (collapsible)
+            vidUrl.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                var expanded by remember { mutableStateOf(false) }
+                var hasOverflow by remember { mutableStateOf(false) }
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = desc,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = if (expanded) Int.MAX_VALUE else 2,
+                        overflow = TextOverflow.Ellipsis,
+                        onTextLayout = { result ->
+                            if (!expanded) hasOverflow = result.hasVisualOverflow
+                        }
+                    )
+                    if (hasOverflow || expanded) {
+                        TextButton(onClick = { expanded = !expanded }) {
+                            Text(if (expanded) "Show less" else "Show more")
+                        }
+                    }
+                }
             }
         }
     }

@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -51,7 +53,8 @@ fun VideoPlayer(
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false)
+    playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false),
+    showVideoPicker: Boolean = true
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -70,21 +73,50 @@ fun VideoPlayer(
             playerConfig = playerConfig
         )
 
-        // Video picker (only show if there are multiple videos)
-        if (videoPlayerState.availableVideos.size > 1) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Text(
-                    text = "Select Video",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                VideoPickerDropdown(
-                    videos = videoPlayerState.availableVideos,
-                    selectedIndex = videoPlayerState.selectedVideoIndex,
-                    launchName = launchName,
-                    onVideoSelected = onVideoSelected
-                )
-            }
+        // Video picker (only show if there are multiple videos and showVideoPicker is true)
+        if (showVideoPicker && videoPlayerState.availableVideos.size > 1) {
+            VideoPickerCard(
+                videos = videoPlayerState.availableVideos,
+                selectedIndex = videoPlayerState.selectedVideoIndex,
+                launchName = launchName,
+                onVideoSelected = onVideoSelected,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun VideoPickerCard(
+    videos: List<VidURL>,
+    selectedIndex: Int,
+    launchName: String,
+    onVideoSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Select Video",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            VideoPickerDropdown(
+                videos = videos,
+                selectedIndex = selectedIndex,
+                launchName = launchName,
+                onVideoSelected = onVideoSelected
+            )
         }
     }
 }
