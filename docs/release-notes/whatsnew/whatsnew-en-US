@@ -1,3 +1,3 @@
 ### Bug Fixes
 
-* **logging:** decrease datadog logging
+* **logging:** debug sample rate control
