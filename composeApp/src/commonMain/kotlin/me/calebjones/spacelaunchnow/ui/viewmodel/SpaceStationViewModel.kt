@@ -308,12 +308,18 @@ class SpaceStationViewModel(
         try {
             issTrackingRepository.getCurrentPosition()
                 .onSuccess { position ->
+                    val latLng = LatLng(position.latitude, position.longitude)
+                    
                     _issPositionData.value = IssPositionData(
-                        position = LatLng(position.latitude, position.longitude),
+                        position = latLng,
                         altitude = position.altitude,
                         velocity = position.velocity,
                         visibility = position.visibility
                     )
+                    
+                    // Also update the legacy issPosition field
+                    _issPosition.value = latLng
+                    
                     log.i { "ISS POSITION: Lat=${position.latitude}, Lon=${position.longitude}, Alt=${position.altitude}km, Velocity=${position.velocity}km/h, Visibility=${position.visibility}" }
                 }
                 .onFailure { exception ->

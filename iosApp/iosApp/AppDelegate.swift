@@ -3,6 +3,7 @@ import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
 import ComposeApp
+import GoogleMaps
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     
@@ -14,6 +15,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("\n🚀 ========================================")
         print("🚀 APP LAUNCH - Initializing Notifications")
         print("🚀 ========================================\n")
+        
+        // Initialize Google Maps with API key
+        print("0️⃣ Configuring Google Maps...")
+        let apiKey = AppSecrets.shared.mapsApiKey
+        if !apiKey.isEmpty {
+            GMSServices.provideAPIKey(apiKey)
+            print("✅ Google Maps configured with API key\n")
+        } else {
+            print("⚠️ Warning: Google Maps API key not found in AppSecrets\n")
+        }
         
         // Initialize Firebase
         print("1️⃣ Configuring Firebase...")

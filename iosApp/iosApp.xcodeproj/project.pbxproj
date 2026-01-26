@@ -51,6 +51,7 @@
 		F907BC612EC38A4800C05E19 /* DatadogSessionReplay in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC602EC38A4800C05E19 /* DatadogSessionReplay */; };
 		F907BC632EC38A4800C05E19 /* DatadogTrace in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC622EC38A4800C05E19 /* DatadogTrace */; };
 		F907BC652EC38A4800C05E19 /* DatadogWebViewTracking in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC642EC38A4800C05E19 /* DatadogWebViewTracking */; };
+		F9B127162F0C36A5005426E1 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = F9B127152F0C36A5005426E1 /* GoogleMaps */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -161,6 +162,7 @@
 				3C35B95E2EA97ED900E28A01 /* GoogleUserMessagingPlatform in Frameworks */,
 				3CC6E4C92EAC8A84002F6FE9 /* FirebaseAnalyticsCore in Frameworks */,
 				3CC6E4CD2EAC8A84002F6FE9 /* FirebaseAppCheck in Frameworks */,
+				F9B127162F0C36A5005426E1 /* GoogleMaps in Frameworks */,
 				3CE6841E2E9D513C00AA177C /* PurchasesHybridCommon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -305,6 +307,7 @@
 				F907BC502EC38A3F00C05E19 /* DatadogSessionReplay */,
 				F907BC522EC38A3F00C05E19 /* DatadogTrace */,
 				F907BC542EC38A3F00C05E19 /* DatadogWebViewTracking */,
+				F9B127152F0C36A5005426E1 /* GoogleMaps */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* SpaceLaunchNow.app */;
@@ -344,6 +347,7 @@
 				3C35B95C2EA97ED900E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */,
 				3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */,
+				F9B127142F0C36A5005426E1 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -794,6 +798,14 @@
 				minimumVersion = 3.2.0;
 			};
 		};
+		F9B127142F0C36A5005426E1 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.7.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -941,6 +953,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */;
 			productName = DatadogWebViewTracking;
+		};
+		F9B127152F0C36A5005426E1 /* GoogleMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F9B127142F0C36A5005426E1 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+			productName = GoogleMaps;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
