@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailErrorView
@@ -142,6 +143,9 @@ fun LaunchDetailScreen(
                         navController?.navigate(
                             me.calebjones.spacelaunchnow.navigation.SupportUs
                         )
+                    },
+                    onEventClick = { eventId ->
+                        navController?.navigate(EventDetail(eventId = eventId))
                     }
                 )
             }

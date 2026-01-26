@@ -1,10 +1,10 @@
 package me.calebjones.spacelaunchnow.data.notifications
 
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.tasks.await
-import com.google.firebase.messaging.FirebaseMessaging
 import me.calebjones.spacelaunchnow.data.model.PushMessage
 import me.calebjones.spacelaunchnow.util.logging.logger
 
@@ -52,6 +52,7 @@ actual class PushMessaging actual constructor() {
     }
 
     fun onMessageReceived(message: PushMessage) {
+        log.d { "Received notif FCM message: $message" }
         _messages.tryEmit(message)
     }
 }

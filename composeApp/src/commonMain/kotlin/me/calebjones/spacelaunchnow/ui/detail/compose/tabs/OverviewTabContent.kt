@@ -51,7 +51,8 @@ fun OverviewTabContent(
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
-    onNavigateToSettings: (() -> Unit)? = null
+    onNavigateToSettings: (() -> Unit)? = null,
+    onEventClick: ((Int) -> Unit)? = null
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -101,7 +102,8 @@ fun OverviewTabContent(
             RelatedEventsCard(
                 events = relatedEvents,
                 isLoading = isEventsLoading,
-                error = eventsError
+                error = eventsError,
+                onEventClick = { event -> onEventClick?.invoke(event.id) }
             )
             Spacer(Modifier.height(16.dp))
         }

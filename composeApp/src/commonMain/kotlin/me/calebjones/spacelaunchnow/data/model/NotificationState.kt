@@ -23,6 +23,12 @@ data class NotificationState(
     // v4: Only contains version topic like "k_prod_v4" or "k_debug_v4"
     val subscribedTopics: Set<String> = emptySet(),
 
+    // V5 Extended Filter Preferences
+    val v5Preferences: V5FilterPreferences = V5FilterPreferences.DEFAULT,
+
+    // V5 Migration State
+    val hasCompletedV5Migration: Boolean = false,
+
     // UI state
     val isLoading: Boolean = false,
     val lastError: String? = null
@@ -163,6 +169,25 @@ data class NotificationState(
 
     fun withLoading(loading: Boolean): NotificationState {
         return copy(isLoading = loading)
+    }
+
+    // V5 State update helpers
+    fun withV5Preferences(preferences: V5FilterPreferences): NotificationState {
+        return copy(v5Preferences = preferences)
+    }
+
+    fun withV5MigrationComplete(): NotificationState {
+        return copy(
+            hasCompletedV5Migration = true,
+            v5Preferences = v5Preferences.withMigrationComplete()
+        )
+    }
+
+    /**
+     * Check if V5 migration has been completed
+     */
+    fun isV5MigrationComplete(): Boolean {
+        return hasCompletedV5Migration && v5Preferences.hasV5Migration
     }
 }
 

@@ -82,6 +82,7 @@ fun PhoneLaunchDetailContent(
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
+    onEventClick: ((Int) -> Unit)? = null,
     openUrl: (String) -> Unit
 ) {
     val tabs = LaunchDetailTab.values()
@@ -166,7 +167,8 @@ fun PhoneLaunchDetailContent(
                     onSetPlayerVisible = onSetPlayerVisible,
                     onNavigateToFullscreen = onNavigateToFullscreen,
                     onVideoSelected = onVideoSelected,
-                    onNavigateToSettings = onNavigateToSettings
+                    onNavigateToSettings = onNavigateToSettings,
+                    onEventClick = onEventClick
                 )
             }
 

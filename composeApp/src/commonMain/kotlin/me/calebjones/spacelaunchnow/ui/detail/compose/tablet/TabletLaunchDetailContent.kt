@@ -62,6 +62,7 @@ fun TabletLaunchDetailContent(
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
+    onEventClick: ((Int) -> Unit)? = null,
     openUrl: (String) -> Unit
 ) {
     Row(
@@ -133,7 +134,8 @@ fun TabletLaunchDetailContent(
                 RelatedEventsCard(
                     events = relatedEvents,
                     isLoading = isEventsLoading,
-                    error = eventsError
+                    error = eventsError,
+                    onEventClick = { event -> onEventClick?.invoke(event.id) }
                 )
             }
 
