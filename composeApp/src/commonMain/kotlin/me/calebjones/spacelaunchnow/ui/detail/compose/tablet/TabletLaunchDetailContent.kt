@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
@@ -29,6 +30,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchVehicleDe
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.MissionDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.PadQuickStatsRow
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.QuickStatsGrid
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedEventsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.SpacecraftDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.TimelineCard
@@ -40,7 +42,7 @@ import kotlin.time.Clock.System
  * Tablet/Desktop-specific layout for launch detail view.
  *
  * Displays a two-column layout:
- * - Left Column: Overview, Timeline, Updates, News, Mission, Location, Spacecraft, Agency
+ * - Left Column: Overview, Timeline, Updates, Events, News, Mission, Location, Spacecraft, Agency
  * - Right Column: Video player, Rocket details, Landing details, Agency statistics
  *
  * No tabs are shown on tablet/desktop - all content is visible in a scrollable layout.
@@ -52,6 +54,9 @@ fun TabletLaunchDetailContent(
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
+    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    isEventsLoading: Boolean = false,
+    eventsError: String? = null,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
@@ -115,6 +120,21 @@ fun TabletLaunchDetailContent(
                     modifier = Modifier.padding(top = 16.dp)
                 )
                 LaunchUpdatesSection(updates = launch.updates)
+            }
+
+            // Related Events Section
+            if (relatedEvents.isNotEmpty() || isEventsLoading || eventsError != null) {
+                Text(
+                    text = "Related Events",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                RelatedEventsCard(
+                    events = relatedEvents,
+                    isLoading = isEventsLoading,
+                    error = eventsError
+                )
             }
 
             // Related News Section

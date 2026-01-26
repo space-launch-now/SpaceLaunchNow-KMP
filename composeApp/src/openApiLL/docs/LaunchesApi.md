@@ -42,7 +42,7 @@ val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.t
 val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val launchDesignator : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated (COSPAR) international launch designators.
 val launcherConfigId : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val launcherConfigFamilyIds : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated launcher configuration family IDs.
+val launcherConfigFamilyIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated launcher configuration family IDs.
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val locationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated location IDs.
 val locationLaunchAttemptCount : kotlin.Int = 56 // kotlin.Int | 
@@ -156,7 +156,7 @@ try {
 | **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **launchDesignator** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated (COSPAR) international launch designators. | [optional] |
 | **launcherConfigId** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **launcherConfigFamilyIds** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated launcher configuration family IDs. | [optional] |
+| **launcherConfigFamilyIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated launcher configuration family IDs. | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **locationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated location IDs. | [optional] |
 | **locationLaunchAttemptCount** | **kotlin.Int**|  | [optional] |
@@ -297,7 +297,7 @@ val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.t
 val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val launchDesignator : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated (COSPAR) international launch designators.
 val launcherConfigId : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val launcherConfigFamilyIds : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated launcher configuration family IDs.
+val launcherConfigFamilyIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated launcher configuration family IDs.
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val locationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated location IDs.
 val locationLaunchAttemptCount : kotlin.Int = 56 // kotlin.Int | 
@@ -411,7 +411,7 @@ try {
 | **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **launchDesignator** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated (COSPAR) international launch designators. | [optional] |
 | **launcherConfigId** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **launcherConfigFamilyIds** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated launcher configuration family IDs. | [optional] |
+| **launcherConfigFamilyIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated launcher configuration family IDs. | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **locationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated location IDs. | [optional] |
 | **locationLaunchAttemptCount** | **kotlin.Int**|  | [optional] |
@@ -552,7 +552,7 @@ val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.t
 val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
 val launchDesignator : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated (COSPAR) international launch designators.
 val launcherConfigId : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
-val launcherConfigFamilyIds : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Comma-separated launcher configuration family IDs.
+val launcherConfigFamilyIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated launcher configuration family IDs.
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val locationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated location IDs.
 val locationLaunchAttemptCount : kotlin.Int = 56 // kotlin.Int | 
@@ -666,7 +666,7 @@ try {
 | **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
 | **launchDesignator** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated (COSPAR) international launch designators. | [optional] |
 | **launcherConfigId** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
-| **launcherConfigFamilyIds** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Comma-separated launcher configuration family IDs. | [optional] |
+| **launcherConfigFamilyIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated launcher configuration family IDs. | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **locationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated location IDs. | [optional] |
 | **locationLaunchAttemptCount** | **kotlin.Int**|  | [optional] |

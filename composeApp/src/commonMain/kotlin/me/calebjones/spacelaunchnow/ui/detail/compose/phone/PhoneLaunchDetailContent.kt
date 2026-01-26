@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
@@ -73,6 +74,9 @@ fun PhoneLaunchDetailContent(
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
+    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    isEventsLoading: Boolean = false,
+    eventsError: String? = null,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
@@ -156,6 +160,9 @@ fun PhoneLaunchDetailContent(
                     relatedNews = relatedNews,
                     isNewsLoading = isNewsLoading,
                     newsError = newsError,
+                    relatedEvents = relatedEvents,
+                    isEventsLoading = isEventsLoading,
+                    eventsError = eventsError,
                     onSetPlayerVisible = onSetPlayerVisible,
                     onNavigateToFullscreen = onNavigateToFullscreen,
                     onVideoSelected = onVideoSelected,

@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
@@ -17,6 +18,7 @@ import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.FlightClubCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchUpdatesSection
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.QuickStatsGrid
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedEventsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.TimelineCard
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
@@ -29,6 +31,7 @@ import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
  * - Timeline (if available)
  * - Flight Club link (if available)
  * - Launch updates (if available)
+ * - Related events (if available)
  * - Related news articles (if available)
  *
  * Note: Video player is now displayed above the tabs in PhoneLaunchDetailContent.
@@ -42,6 +45,9 @@ fun OverviewTabContent(
     relatedNews: List<Article> = emptyList(),
     isNewsLoading: Boolean = false,
     newsError: String? = null,
+    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    isEventsLoading: Boolean = false,
+    eventsError: String? = null,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
@@ -81,6 +87,22 @@ fun OverviewTabContent(
             )
             Spacer(Modifier.height(16.dp))
             LaunchUpdatesSection(updates = launch.updates)
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // Related Events Section
+        if (relatedEvents.isNotEmpty() || isEventsLoading || eventsError != null) {
+            Text(
+                text = "Related Events",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(16.dp))
+            RelatedEventsCard(
+                events = relatedEvents,
+                isLoading = isEventsLoading,
+                error = eventsError
+            )
             Spacer(Modifier.height(16.dp))
         }
 

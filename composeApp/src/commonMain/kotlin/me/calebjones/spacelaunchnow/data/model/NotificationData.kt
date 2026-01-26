@@ -181,6 +181,7 @@ object NotificationFilter {
         } else {
             true // No agency filter, so don't block based on agency
         }
+        log.d("Agency match: $agencyMatch")
 
         // 8. Check location filter (only if filter is active)
         // Special cases:
@@ -206,6 +207,7 @@ object NotificationFilter {
         } else {
             true // No location filter, so don't block based on location
         }
+        log.d("Location match: $locationMatch")
 
         // 9. Apply strict vs flexible matching logic
         val shouldShow = if (state.useStrictMatching) {

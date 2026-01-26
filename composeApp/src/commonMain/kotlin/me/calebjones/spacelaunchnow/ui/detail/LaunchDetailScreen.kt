@@ -50,6 +50,11 @@ fun LaunchDetailScreen(
     val isNewsLoading by viewModel.isNewsLoading.collectAsState()
     val newsError by viewModel.newsError.collectAsState()
 
+    // Related events state
+    val relatedEvents by viewModel.relatedEvents.collectAsState()
+    val isEventsLoading by viewModel.isEventsLoading.collectAsState()
+    val eventsError by viewModel.eventsError.collectAsState()
+
     // Determine current launch data
     val currentLaunch = cachedLaunchDetailed ?: launchDetails
 
@@ -61,6 +66,7 @@ fun LaunchDetailScreen(
             isRefreshing = true
             viewModel.refreshLaunchDetails(launchId)
             viewModel.fetchRelatedNews(launchId)
+            viewModel.fetchRelatedEvents(launchId)
         }
     )
 
@@ -83,6 +89,9 @@ fun LaunchDetailScreen(
 
         // Fetch related news for this launch
         viewModel.fetchRelatedNews(launchId)
+
+        // Fetch related events for this launch
+        viewModel.fetchRelatedEvents(launchId)
     }
 
     // 🎯 INTERSTITIAL AD: Show every 4th detail view visit
@@ -113,6 +122,9 @@ fun LaunchDetailScreen(
                     relatedNews = relatedNews,
                     isNewsLoading = isNewsLoading,
                     newsError = newsError,
+                    relatedEvents = relatedEvents,
+                    isEventsLoading = isEventsLoading,
+                    eventsError = eventsError,
                     onSelectVideo = viewModel::selectVideo,
                     onSetPlayerVisible = viewModel::setPlayerVisible,
                     onNavigateBack = onNavigateBack,
