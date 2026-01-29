@@ -1,6 +1,3 @@
-### Features
+### Bug Fixes
 
-* add related events to launch detail view
-* implement V5 Notification System for background notification handling
-* **iOS:** implement Google Maps integration for ISS tracking
-* update interstitial ad logic and move SmartBannerAd in phone lauinch detail
+* fix app rating tracking logic

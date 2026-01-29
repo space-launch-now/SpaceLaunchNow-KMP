@@ -1,3 +1,12 @@
+## [5.8.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.0...v5.8.1) (2026-01-29)
+
+
+### Bug Fixes
+
+* fix app rating tracking logic ([9fc62b9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9fc62b95972a84b56bc66f26ba1c3af2105cbc6b))
+
+
+
 # [5.8.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.5...v5.8.0) (2026-01-29)
 
 
@@ -34,15 +43,6 @@
 ### Bug Fixes
 
 * **logging:** decrease datadog logging ([1c36455](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1c3645588b0396c7e238ea887da2dcbed49817a1))
-
-
-
-## [5.7.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.1...v5.7.2) (2026-01-07)
-
-
-### Bug Fixes
-
-* update video player button to open in app and remove video filtering ([0ae0536](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0ae053611cd78ca1cd24b968e9d768193aaac2e1))
 
 
 
