@@ -258,7 +258,7 @@ class EventsRepositoryImpl(
             val response = eventsApi.getEventsByLaunchId(
                 launchId = launchId,
                 limit = limit,
-                ordering = "date"
+                ordering = "-date"
             )
 
             val body = response.body()
