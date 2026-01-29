@@ -35,7 +35,6 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         // CRITICAL: Delegate to WorkManager immediately to avoid execution timeout
         // FCM onMessageReceived has ~10 second window, but image loading can take longer
         // WorkManager guarantees execution even if app is killed
-
         val workData = Data.Builder()
 
         // Add all FCM data payload

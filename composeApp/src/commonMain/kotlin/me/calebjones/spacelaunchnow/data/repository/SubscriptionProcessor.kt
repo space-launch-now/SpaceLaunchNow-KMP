@@ -6,9 +6,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
+import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.logger
 
@@ -38,7 +40,7 @@ class SubscriptionProcessor(
     }
 
     private suspend fun updateFCMSubscriptions(state: NotificationState) {
-        log.d { "=== SubscriptionProcessor: Starting FCM update (v4 simple topics) ===" }
+        log.d { "=== SubscriptionProcessor: Starting FCM update (v5 topics only) ===" }
 
         try {
             // Master switch: if notifications disabled, unsubscribe from all
@@ -109,25 +111,24 @@ class SubscriptionProcessor(
     @Suppress("UNUSED_PARAMETER")
     private suspend fun calculateRequiredTopics(state: NotificationState): Set<String> {
         /**
-         * v4 Notification System:
-         * - Subscribe to ONLY the version topic (k_prod_v4 or k_debug_v4)
-         * - Server sends ALL notifications to these topics with full data payload
-         * - Client filters notifications based on user preferences (agency, location, timing, etc.)
-         *
-         * This eliminates the complex topic subscription logic and moves filtering to the client
+         * v5 Notification System:
+         * - Subscribe ONLY to V5 platform-specific topic (prod_v5_android/prod_v5_ios)
+         * - V5 provides extended filtering with lsp_id, location_id, program_ids, etc.
+         * - Automatically unsubscribes from old V4 topics (k_prod_v4, k_debug_v4)
+         * - All filtering is done client-side with extended IDs
          */
         val topics = mutableSetOf<String>()
 
-        // Only subscribe to version topic - all filtering is done client-side
-        val versionTopic = getVersionTopic()
-        topics.add(versionTopic)
-
-        log.d { "📡 v4 Simple Topics: Subscribing only to '$versionTopic' (client-side filtering enabled)" }
+        // V5 topic - platform-specific with extended filtering
+        val v5Topic = getV5VersionTopic()
+        topics.add(v5Topic)
+        log.d { "📡 v5 Topic: '$v5Topic' (client-side filtering with extended IDs)" }
+        log.d { "🔄 Migrating: Old v4 topics (k_prod_v4, k_debug_v4) will be unsubscribed automatically" }
 
         return topics
     }
 
-    private suspend fun getVersionTopic(): String {
+    private suspend fun getV4VersionTopic(): String {
         return if (BuildConfig.IS_DEBUG && debugPreferences != null) {
             try {
                 val debugSettings = debugPreferences.getDebugSettings()
@@ -137,6 +138,31 @@ class SubscriptionProcessor(
             }
         } else {
             "k_prod_v4"
+        }
+    }
+
+    private suspend fun getV5VersionTopic(): String {
+        val isDebug = if (BuildConfig.IS_DEBUG && debugPreferences != null) {
+            try {
+                val debugSettings = debugPreferences.getDebugSettings()
+                debugSettings.useDebugTopics
+            } catch (e: Exception) {
+                false
+            }
+        } else {
+            false
+        }
+
+        val platform = getPlatform()
+        return getV5Topic(platform.type, isDebug)
+    }
+
+    private fun getV5Topic(platformType: PlatformType, isDebug: Boolean): String {
+        val prefix = if (isDebug) "debug" else "prod"
+        return when (platformType) {
+            PlatformType.ANDROID -> "${prefix}_v5_android"
+            PlatformType.IOS -> "${prefix}_v5_ios"
+            PlatformType.DESKTOP -> "${prefix}_v5_desktop" // Placeholder, desktop doesn't use notifications
         }
     }
 }

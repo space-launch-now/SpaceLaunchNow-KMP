@@ -18,11 +18,10 @@ import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
  */
 class NotificationFilterTest {
 
-    companion object {
-        init {
-            // Initialize SpaceLogger before any test data is created
-            TestSpaceLoggerInit.ensureInitialized()
-        }
+    @BeforeTest
+    fun setup() {
+        // Initialize SpaceLogger before any test runs
+        TestSpaceLoggerInit.ensureInitialized()
     }
 
     // Helper to create topic settings with specific topics enabled
@@ -39,8 +38,8 @@ class NotificationFilterTest {
         )
     }
 
-    // Test Data
-    private val spacexLaunchFromKSC = NotificationData(
+    // Test Data - using lazy initialization to avoid logger access before @BeforeTest
+    private val spacexLaunchFromKSC by lazy { NotificationData(
         notificationType = "netstampChanged",
         launchId = "test-launch-1",
         launchUuid = "uuid-1",
@@ -52,9 +51,9 @@ class NotificationFilterTest {
         webcastLive = null,
         agencyId = "121", // SpaceX
         locationId = "27"  // Kennedy Space Center
-    )
+    ) }
 
-    private val nasaLaunchFromVandenberg = NotificationData(
+    private val nasaLaunchFromVandenberg by lazy { NotificationData(
         notificationType = "twentyFourHour",
         launchId = "test-launch-2",
         launchUuid = "uuid-2",
@@ -66,9 +65,9 @@ class NotificationFilterTest {
         webcastLive = null,
         agencyId = "44",  // NASA
         locationId = "11"  // Vandenberg
-    )
+    ) }
 
-    private val blueOriginLaunchFromTexas = NotificationData(
+    private val blueOriginLaunchFromTexas by lazy { NotificationData(
         notificationType = "tenMinutes",
         launchId = "test-launch-3",
         launchUuid = "uuid-3",
@@ -80,9 +79,9 @@ class NotificationFilterTest {
         webcastLive = null,
         agencyId = "141", // Blue Origin
         locationId = "16"  // Starbase, Texas
-    )
+    ) }
 
-    private val spacexLaunchFromOtherLocation = NotificationData(
+    private val spacexLaunchFromOtherLocation by lazy { NotificationData(
         notificationType = "netstampChanged",
         launchId = "test-launch-4",
         launchUuid = "uuid-4",
@@ -94,9 +93,9 @@ class NotificationFilterTest {
         webcastLive = null,
         agencyId = "121", // SpaceX
         locationId = "0"   // Other (unknown location)
-    )
+    ) }
 
-    private val spacexLaunchFromCape = NotificationData(
+    private val spacexLaunchFromCape by lazy { NotificationData(
         notificationType = "twentyFourHour",
         launchId = "test-launch-cape",
         launchUuid = "uuid-cape",
@@ -108,9 +107,9 @@ class NotificationFilterTest {
         webcastLive = null,
         agencyId = "121", // SpaceX
         locationId = "12"  // Cape Canaveral Space Force Station
-    )
+    ) }
 
-    private val rocketLabLaunchFromMahia = NotificationData(
+    private val rocketLabLaunchFromMahia by lazy { NotificationData(
         notificationType = "oneHour",
         launchId = "test-launch-5",
         launchUuid = "uuid-5",
@@ -122,7 +121,7 @@ class NotificationFilterTest {
         webcastLive = null,
         agencyId = "147", // Rocket Lab
         locationId = "15"  // Mahia, New Zealand
-    )
+    ) }
 
     // ========== Follow All Launches Tests ==========
 
@@ -207,6 +206,99 @@ class NotificationFilterTest {
 
         // Should NOT show: SpaceX from KSC (location matches, but agency doesn't)
         assertFalse(NotificationFilter.shouldShowNotification(spacexLaunchFromKSC, state))
+    }
+
+    @Test
+    fun testStrictMatching_spacexFromFloridaOnly_blocksCaliforniaLaunches() {
+        // User's exact scenario: SpaceX + Florida + strict matching
+        // Should block California launches even though SpaceX matches
+        val state = NotificationState(
+            followAllLaunches = false,
+            subscribedAgencies = setOf("121"), // SpaceX only
+            subscribedLocations = setOf("27"), // Florida only (includes Cape Canaveral via additionalIds)
+            useStrictMatching = true,
+            topicSettings = topicSettings("twentyFourHour")
+        )
+
+        // Should ALLOW: SpaceX from Florida (both agency AND location match)
+        val spacexFromFlorida = NotificationData(
+            notificationType = "twentyFourHour",
+            launchId = "test-florida-1",
+            launchUuid = "uuid-florida-1",
+            launchName = "Falcon 9 | Starlink",
+            launchImage = null,
+            launchNet = "2026-01-22T12:00:00Z",
+            launchLocation = "Kennedy Space Center, FL, USA",
+            webcast = "true",
+            webcastLive = null,
+            agencyId = "121",  // SpaceX
+            locationId = "27"   // Florida (KSC)
+        )
+        assertTrue(NotificationFilter.shouldShowNotification(spacexFromFlorida, state))
+
+        // Should ALLOW: SpaceX from Cape Canaveral (location 12 is in Florida's additionalIds)
+        val spacexFromCape = NotificationData(
+            notificationType = "twentyFourHour",
+            launchId = "test-cape-1",
+            launchUuid = "uuid-cape-1",
+            launchName = "Falcon 9 | GPS III",
+            launchImage = null,
+            launchNet = "2026-01-22T14:00:00Z",
+            launchLocation = "Cape Canaveral SFS, FL, USA",
+            webcast = "true",
+            webcastLive = null,
+            agencyId = "121",  // SpaceX
+            locationId = "12"   // Cape Canaveral (in Florida's additionalIds)
+        )
+        assertTrue(NotificationFilter.shouldShowNotification(spacexFromCape, state))
+
+        // Should BLOCK: SpaceX from California (agency matches, but location doesn't)
+        val spacexFromCalifornia = NotificationData(
+            notificationType = "twentyFourHour",
+            launchId = "test-california-1",
+            launchUuid = "uuid-california-1",
+            launchName = "Falcon 9 | NROL-123",
+            launchImage = null,
+            launchNet = "2026-01-22T16:00:00Z",
+            launchLocation = "Vandenberg SFB, CA, USA",
+            webcast = "true",
+            webcastLive = null,
+            agencyId = "121",  // SpaceX
+            locationId = "11"   // California (Vandenberg)
+        )
+        assertFalse(NotificationFilter.shouldShowNotification(spacexFromCalifornia, state))
+
+        // Should BLOCK: SpaceX from Texas (agency matches, but location doesn't)
+        val spacexFromTexas = NotificationData(
+            notificationType = "twentyFourHour",
+            launchId = "test-texas-1",
+            launchUuid = "uuid-texas-1",
+            launchName = "Starship | Flight Test",
+            launchImage = null,
+            launchNet = "2026-01-22T18:00:00Z",
+            launchLocation = "Starbase, TX, USA",
+            webcast = "true",
+            webcastLive = null,
+            agencyId = "121",  // SpaceX
+            locationId = "143"  // Texas
+        )
+        assertFalse(NotificationFilter.shouldShowNotification(spacexFromTexas, state))
+
+        // Should BLOCK: NASA from Florida (location matches, but agency doesn't)
+        val nasaFromFlorida = NotificationData(
+            notificationType = "twentyFourHour",
+            launchId = "test-nasa-1",
+            launchUuid = "uuid-nasa-1",
+            launchName = "SLS | Artemis III",
+            launchImage = null,
+            launchNet = "2026-01-22T20:00:00Z",
+            launchLocation = "Kennedy Space Center, FL, USA",
+            webcast = "true",
+            webcastLive = null,
+            agencyId = "44",   // NASA (not SpaceX)
+            locationId = "27"  // Florida
+        )
+        assertFalse(NotificationFilter.shouldShowNotification(nasaFromFlorida, state))
     }
 
     // ========== Flexible Matching Tests (OR logic) ==========

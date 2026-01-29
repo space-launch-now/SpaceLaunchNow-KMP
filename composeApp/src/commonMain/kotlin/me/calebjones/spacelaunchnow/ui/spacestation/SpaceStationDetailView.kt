@@ -363,8 +363,7 @@ private fun SpaceStationDetailContent(
                 Dialog(
                     onDismissRequest = { isMapFullscreen = false },
                     properties = DialogProperties(
-                        usePlatformDefaultWidth = false,
-                        decorFitsSystemWindows = false
+                        usePlatformDefaultWidth = false
                     )
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {

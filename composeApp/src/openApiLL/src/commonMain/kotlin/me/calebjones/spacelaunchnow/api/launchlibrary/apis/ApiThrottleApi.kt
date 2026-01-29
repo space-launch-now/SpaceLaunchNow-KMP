@@ -43,12 +43,12 @@ open class ApiThrottleApi : ApiClient {
     ): super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
-     * API endpoint that allows API Throttle information to be viewed.  GET: Returns a range of information about your API access
-     * @return kotlin.collections.List<APIThrottle>
+     * Get API throttle status
+     * Returns throttle information for the current user
+     * @return APIThrottle
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun apiThrottleList(): HttpResponse<kotlin.collections.List<APIThrottle>> {
+    open suspend fun apiThrottleStatus(): HttpResponse<APIThrottle> {
 
         val localVariableAuthNames = listOf<String>("basicAuth", "tokenAuth", "cookieAuth")
 
@@ -60,7 +60,7 @@ open class ApiThrottleApi : ApiClient {
 
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
-            "/api/ll/2.4.0/api-throttle/",
+            "/api/ll/2.4.0/api-throttle/status/",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = true,
@@ -70,17 +70,8 @@ open class ApiThrottleApi : ApiClient {
             localVariableConfig,
             localVariableBody,
             localVariableAuthNames
-        ).wrap<ApiThrottleListResponse>().map { value }
+        ).wrap()
     }
 
-    @Serializable(ApiThrottleListResponse.Companion::class)
-    private class ApiThrottleListResponse(val value: List<APIThrottle>) {
-        companion object : KSerializer<ApiThrottleListResponse> {
-            private val serializer: KSerializer<List<APIThrottle>> = serializer<List<APIThrottle>>()
-            override val descriptor = serializer.descriptor
-            override fun serialize(encoder: Encoder, value: ApiThrottleListResponse) = serializer.serialize(encoder, value.value)
-            override fun deserialize(decoder: Decoder) = ApiThrottleListResponse(serializer.deserialize(decoder))
-        }
-    }
 
 }

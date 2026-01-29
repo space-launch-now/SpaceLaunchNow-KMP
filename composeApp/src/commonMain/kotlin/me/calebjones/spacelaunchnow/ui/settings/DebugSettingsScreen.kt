@@ -438,7 +438,7 @@ fun DebugSettingsScreen(
             // Topics Section
             item {
                 Text(
-                    text = "Notification Topics (v4)",
+                    text = "Notification Topics (v5)",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
@@ -466,9 +466,9 @@ fun DebugSettingsScreen(
                                 )
                                 Text(
                                     text = if (debugSettings.useDebugTopics) {
-                                        "Using k_debug_v4 topic for testing"
+                                        "Using debug_v5_android topic for testing"
                                     } else {
-                                        "Using k_prod_v4 topic for production"
+                                        "Using prod_v5_android topic for production"
                                     },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -482,7 +482,7 @@ fun DebugSettingsScreen(
                         }
 
                         Text(
-                            text = "💡 v4 uses simple topics: k_debug_v4 (test) or k_prod_v4 (production)\n📱 All filtering is now done on the device (client-side)",
+                            text = "💡 v5 uses platform-specific topics\n📱 Android: prod_v5_android / debug_v5_android\n🍎 iOS: prod_v5_ios / debug_v5_ios\n✨ All filtering is done on the device (client-side)",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -1749,14 +1749,14 @@ fun DebugSettingsScreen(
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(
-                            text = "FCM Topics (v4 Simple Subscription)",
+                            text = "FCM Topics (v5 Platform-Specific)",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
 
                         Text(
-                            text = "v4 only subscribes to version topic. All filtering is client-side.",
+                            text = "v5 subscribes to platform-specific topics. All filtering is client-side with extended IDs.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

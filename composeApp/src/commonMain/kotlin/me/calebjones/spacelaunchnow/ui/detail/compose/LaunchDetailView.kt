@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.isLargeScreen
@@ -50,6 +51,9 @@ val snackDetailBoundsTransform = BoundsTransform { _, _ ->
  * @param relatedNews List of related news articles
  * @param isNewsLoading Whether news is currently loading
  * @param newsError Error message if news loading failed
+ * @param relatedEvents List of related events
+ * @param isEventsLoading Whether events are currently loading
+ * @param eventsError Error message if events loading failed
  * @param onSelectVideo Callback when a video is selected
  * @param onSetPlayerVisible Callback to show/hide the video player
  * @param onNavigateBack Callback when the back button is pressed
@@ -68,12 +72,16 @@ fun LaunchDetailView(
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
+    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    isEventsLoading: Boolean = false,
+    eventsError: String? = null,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
-    onNavigateToSettings: (() -> Unit)? = null
+    onNavigateToSettings: (() -> Unit)? = null,
+    onEventClick: ((Int) -> Unit)? = null
 ) {
     val isLargeScreen = isLargeScreen()
 
@@ -86,12 +94,16 @@ fun LaunchDetailView(
             relatedNews = relatedNews,
             isNewsLoading = isNewsLoading,
             newsError = newsError,
+            relatedEvents = relatedEvents,
+            isEventsLoading = isEventsLoading,
+            eventsError = eventsError,
             onSelectVideo = onSelectVideo,
             onSetPlayerVisible = onSetPlayerVisible,
             onNavigateBack = onNavigateBack,
             onNavigateToFullscreen = onNavigateToFullscreen,
             onVideoSelected = onVideoSelected,
-            onNavigateToSettings = onNavigateToSettings
+            onNavigateToSettings = onNavigateToSettings,
+            onEventClick = onEventClick
         )
     } else {
         // PHONE: Non-scrollable scaffold with tabbed layout (tabs handle their own scrolling)
@@ -101,12 +113,16 @@ fun LaunchDetailView(
             relatedNews = relatedNews,
             isNewsLoading = isNewsLoading,
             newsError = newsError,
+            relatedEvents = relatedEvents,
+            isEventsLoading = isEventsLoading,
+            eventsError = eventsError,
             onSelectVideo = onSelectVideo,
             onSetPlayerVisible = onSetPlayerVisible,
             onNavigateBack = onNavigateBack,
             onNavigateToFullscreen = onNavigateToFullscreen,
             onVideoSelected = onVideoSelected,
-            onNavigateToSettings = onNavigateToSettings
+            onNavigateToSettings = onNavigateToSettings,
+            onEventClick = onEventClick
         )
     }
 }
@@ -121,12 +137,16 @@ private fun TabletLaunchDetailView(
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
+    relatedEvents: List<EventEndpointNormal>,
+    isEventsLoading: Boolean,
+    eventsError: String?,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
-    onNavigateToSettings: (() -> Unit)? = null
+    onNavigateToSettings: (() -> Unit)? = null,
+    onEventClick: ((Int) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = launch.name ?: "Unknown Launch",
@@ -161,11 +181,15 @@ private fun TabletLaunchDetailView(
                 relatedNews = relatedNews,
                 isNewsLoading = isNewsLoading,
                 newsError = newsError,
+                relatedEvents = relatedEvents,
+                isEventsLoading = isEventsLoading,
+                eventsError = eventsError,
                 onSelectVideo = onSelectVideo,
                 onSetPlayerVisible = onSetPlayerVisible,
                 onNavigateToFullscreen = onNavigateToFullscreen,
                 onVideoSelected = onVideoSelected,
                 onNavigateToSettings = onNavigateToSettings,
+                onEventClick = onEventClick,
                 openUrl = openUrl
             )
 
@@ -185,12 +209,16 @@ private fun PhoneLaunchDetailView(
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
+    relatedEvents: List<EventEndpointNormal>,
+    isEventsLoading: Boolean,
+    eventsError: String?,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
-    onNavigateToSettings: (() -> Unit)? = null
+    onNavigateToSettings: (() -> Unit)? = null,
+    onEventClick: ((Int) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = launch.name ?: "Unknown Launch",
@@ -226,11 +254,15 @@ private fun PhoneLaunchDetailView(
                 relatedNews = relatedNews,
                 isNewsLoading = isNewsLoading,
                 newsError = newsError,
+                relatedEvents = relatedEvents,
+                isEventsLoading = isEventsLoading,
+                eventsError = eventsError,
                 onSelectVideo = onSelectVideo,
                 onSetPlayerVisible = onSetPlayerVisible,
                 onNavigateToFullscreen = onNavigateToFullscreen,
                 onVideoSelected = onVideoSelected,
                 onNavigateToSettings = onNavigateToSettings,
+                onEventClick = onEventClick,
                 openUrl = openUrl
             )
 

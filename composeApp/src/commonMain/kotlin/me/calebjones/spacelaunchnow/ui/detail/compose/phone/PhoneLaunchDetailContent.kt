@@ -40,9 +40,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailTab
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.CombinedLaunchOverviewCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
@@ -71,11 +74,15 @@ fun PhoneLaunchDetailContent(
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
+    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    isEventsLoading: Boolean = false,
+    eventsError: String? = null,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
+    onEventClick: ((Int) -> Unit)? = null,
     openUrl: (String) -> Unit
 ) {
     val tabs = LaunchDetailTab.values()
@@ -121,6 +128,15 @@ fun PhoneLaunchDetailContent(
             }
         }
 
+        // Ad Banner above tabs
+        SmartBannerAd(
+            modifier = Modifier.fillMaxWidth(),
+            placementType = AdPlacementType.INTERSTITIAL,
+            showRemoveAdsButton = true,
+            onRemoveAdsClick = onNavigateToSettings
+        )
+        Spacer(Modifier.height(16.dp))
+
         // Tab Row for tab selection
         PrimaryTabRow(
             selectedTabIndex = selectedTabIndex
@@ -145,10 +161,14 @@ fun PhoneLaunchDetailContent(
                     relatedNews = relatedNews,
                     isNewsLoading = isNewsLoading,
                     newsError = newsError,
+                    relatedEvents = relatedEvents,
+                    isEventsLoading = isEventsLoading,
+                    eventsError = eventsError,
                     onSetPlayerVisible = onSetPlayerVisible,
                     onNavigateToFullscreen = onNavigateToFullscreen,
                     onVideoSelected = onVideoSelected,
-                    onNavigateToSettings = onNavigateToSettings
+                    onNavigateToSettings = onNavigateToSettings,
+                    onEventClick = onEventClick
                 )
             }
 

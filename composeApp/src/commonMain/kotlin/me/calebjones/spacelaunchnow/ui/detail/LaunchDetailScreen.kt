@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailErrorView
@@ -50,6 +51,11 @@ fun LaunchDetailScreen(
     val isNewsLoading by viewModel.isNewsLoading.collectAsState()
     val newsError by viewModel.newsError.collectAsState()
 
+    // Related events state
+    val relatedEvents by viewModel.relatedEvents.collectAsState()
+    val isEventsLoading by viewModel.isEventsLoading.collectAsState()
+    val eventsError by viewModel.eventsError.collectAsState()
+
     // Determine current launch data
     val currentLaunch = cachedLaunchDetailed ?: launchDetails
 
@@ -61,6 +67,7 @@ fun LaunchDetailScreen(
             isRefreshing = true
             viewModel.refreshLaunchDetails(launchId)
             viewModel.fetchRelatedNews(launchId)
+            viewModel.fetchRelatedEvents(launchId)
         }
     )
 
@@ -83,6 +90,9 @@ fun LaunchDetailScreen(
 
         // Fetch related news for this launch
         viewModel.fetchRelatedNews(launchId)
+
+        // Fetch related events for this launch
+        viewModel.fetchRelatedEvents(launchId)
     }
 
     // 🎯 INTERSTITIAL AD: Show every 4th detail view visit
@@ -113,6 +123,9 @@ fun LaunchDetailScreen(
                     relatedNews = relatedNews,
                     isNewsLoading = isNewsLoading,
                     newsError = newsError,
+                    relatedEvents = relatedEvents,
+                    isEventsLoading = isEventsLoading,
+                    eventsError = eventsError,
                     onSelectVideo = viewModel::selectVideo,
                     onSetPlayerVisible = viewModel::setPlayerVisible,
                     onNavigateBack = onNavigateBack,
@@ -130,6 +143,9 @@ fun LaunchDetailScreen(
                         navController?.navigate(
                             me.calebjones.spacelaunchnow.navigation.SupportUs
                         )
+                    },
+                    onEventClick = { eventId ->
+                        navController?.navigate(EventDetail(eventId = eventId))
                     }
                 )
             }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
@@ -14,13 +15,15 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
+import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 
 class LaunchViewModel(
     private val repository: LaunchRepository,
     private val launchCache: LaunchCache,
-    private val articlesRepository: ArticlesRepository
+    private val articlesRepository: ArticlesRepository,
+    private val eventsRepository: EventsRepository
 ) : ViewModel() {
 
     private val _upcomingLaunches = MutableStateFlow<PaginatedLaunchBasicList?>(null)
@@ -54,6 +57,16 @@ class LaunchViewModel(
 
     private val _newsError = MutableStateFlow<String?>(null)
     val newsError: StateFlow<String?> = _newsError
+
+    // Related Events State
+    private val _relatedEvents = MutableStateFlow<List<EventEndpointNormal>>(emptyList())
+    val relatedEvents: StateFlow<List<EventEndpointNormal>> = _relatedEvents
+
+    private val _isEventsLoading = MutableStateFlow(false)
+    val isEventsLoading: StateFlow<Boolean> = _isEventsLoading
+
+    private val _eventsError = MutableStateFlow<String?>(null)
+    val eventsError: StateFlow<String?> = _eventsError
 
     fun fetchUpcomingLaunchesNormal(limit: Int) {
         viewModelScope.launch {
@@ -231,5 +244,41 @@ class LaunchViewModel(
         _relatedNews.value = emptyList()
         _newsError.value = null
         _isNewsLoading.value = false
+    }
+
+    // Related Events Methods
+
+    /**
+     * Fetch related events for a launch
+     */
+    fun fetchRelatedEvents(launchId: String, limit: Int = 20) {
+        viewModelScope.launch {
+            _isEventsLoading.value = true
+            _eventsError.value = null
+
+            val result = eventsRepository.getEventsByLaunchId(
+                launchId = launchId,
+                limit = limit
+            )
+
+            result.onSuccess { paginatedList ->
+                print("Related events size: ${paginatedList.results.size}")
+                _relatedEvents.value = paginatedList.results
+            }.onFailure { exception ->
+                print("Error fetching related events: ${exception.message}")
+                _eventsError.value = exception.message
+            }
+
+            _isEventsLoading.value = false
+        }
+    }
+
+    /**
+     * Clear related events state
+     */
+    fun clearRelatedEvents() {
+        _relatedEvents.value = emptyList()
+        _eventsError.value = null
+        _isEventsLoading.value = false
     }
 }

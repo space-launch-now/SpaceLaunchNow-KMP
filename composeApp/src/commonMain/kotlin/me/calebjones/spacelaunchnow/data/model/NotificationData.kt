@@ -6,6 +6,8 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 /**
  * Notification data structure for v4 notifications
  * Server sends this data structure and client filters based on user preferences
+ * 
+ * For V5 notifications, use V5NotificationPayload instead.
  */
 @Serializable
 data class NotificationData(
@@ -25,7 +27,16 @@ data class NotificationData(
         private val log = logger()
         
         /**
-         * Parse notification data from FCM data payload
+         * Check if payload is V5 format (has lsp_id field)
+         * Use this to determine which parser to use.
+         */
+        fun isV5Payload(data: Map<String, String>): Boolean {
+            return V5NotificationPayload.isV5Payload(data)
+        }
+        
+        /**
+         * Parse notification data from FCM data payload (V4 format)
+         * For V5 payloads, use V5NotificationPayload.fromMap() instead.
          * Returns null if required fields are missing
          */
         fun fromMap(data: Map<String, String>): NotificationData? {
@@ -46,6 +57,18 @@ data class NotificationData(
             } catch (e: Exception) {
                 log.e(e) { "❌ Failed to parse notification data: ${e.message}" }
                 null
+            }
+        }
+        
+        /**
+         * Parse either V4 or V5 payload, returning a unified wrapper
+         * Useful for backward compatibility during V4→V5 migration
+         */
+        fun parseAny(data: Map<String, String>): ParsedNotification? {
+            return if (isV5Payload(data)) {
+                V5NotificationPayload.fromMap(data)?.let { ParsedNotification.V5(it) }
+            } else {
+                fromMap(data)?.let { ParsedNotification.V4(it) }
             }
         }
     }
@@ -181,6 +204,7 @@ object NotificationFilter {
         } else {
             true // No agency filter, so don't block based on agency
         }
+        log.d("Agency match: $agencyMatch")
 
         // 8. Check location filter (only if filter is active)
         // Special cases:
@@ -206,6 +230,7 @@ object NotificationFilter {
         } else {
             true // No location filter, so don't block based on location
         }
+        log.d("Location match: $locationMatch")
 
         // 9. Apply strict vs flexible matching logic
         val shouldShow = if (state.useStrictMatching) {
@@ -267,4 +292,56 @@ object NotificationFilter {
             }
         }
     }
+}
+
+/**
+ * Unified wrapper for parsed notification payloads
+ * Supports both V4 (NotificationData) and V5 (V5NotificationPayload) formats
+ */
+sealed class ParsedNotification {
+    /**
+     * V4 notification payload (legacy format)
+     */
+    data class V4(val data: NotificationData) : ParsedNotification() {
+        override val notificationType: String get() = data.notificationType
+        override val launchUuid: String get() = data.launchUuid
+        override val launchName: String get() = data.launchName
+        override val launchImage: String? get() = data.launchImage
+        override val launchNet: String get() = data.launchNet
+        override val hasWebcast: Boolean get() = data.hasWebcast()
+    }
+
+    /**
+     * V5 notification payload (new format with extended filtering)
+     */
+    data class V5(val payload: V5NotificationPayload) : ParsedNotification() {
+        override val notificationType: String get() = payload.notificationType
+        override val launchUuid: String get() = payload.launchUuid
+        override val launchName: String get() = payload.launchName
+        override val launchImage: String? get() = payload.launchImage
+        override val launchNet: String get() = payload.launchNet
+        override val hasWebcast: Boolean get() = payload.webcast
+    }
+
+    /** Notification type (e.g., "tenMinutes", "oneHour") */
+    abstract val notificationType: String
+    /** Launch UUID for deep linking */
+    abstract val launchUuid: String
+    /** Launch display name */
+    abstract val launchName: String
+    /** Launch image URL (optional) */
+    abstract val launchImage: String?
+    /** Launch NET (ISO 8601) */
+    abstract val launchNet: String
+    /** Whether launch has webcast */
+    abstract val hasWebcast: Boolean
+
+    /** Check if this is a V5 payload */
+    fun isV5(): Boolean = this is V5
+
+    /** Get V5 payload if this is a V5 notification, null otherwise */
+    fun asV5(): V5NotificationPayload? = (this as? V5)?.payload
+
+    /** Get V4 data if this is a V4 notification, null otherwise */
+    fun asV4(): NotificationData? = (this as? V4)?.data
 }
