@@ -85,61 +85,51 @@ class RoadmapViewModel : ViewModel() {
             items = listOf(
                 RoadmapItem(
                     id = "1",
-                    title = "Initial Android Launch",
-                    description = "MVP release of the all new Space Launch Now app with core features",
-                    status = RoadmapStatus.COMPLETED,
-                    quarter = "Nov. 2025",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.HIGH
-                ),
-                RoadmapItem(
-                    id = "2",
-                    title = "Home and Notification Filtering",
-                    description = "Customizable home screen and notification filtering options",
-                    status = RoadmapStatus.COMPLETED,
-                    quarter = "November 25th 2025",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.HIGH
-                ),
-                RoadmapItem(
-                    id = "3",
-                    title = "Starship Screen",
-                    description = "Implement dedicated Starship vehicle page with launch history and stats",
-                    status = RoadmapStatus.IN_TESTING,
-                    quarter = "End of 2025",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.MEDIUM
-                ),
-                RoadmapItem(
-                    id = "4",
                     title = "Schedule page Sorting",
                     description = "Customizable schedule page with advanced sorting options",
-                    status = RoadmapStatus.IN_TESTING,
+                    status = RoadmapStatus.COMPLETED,
                     quarter = "Early December 2025",
                     category = RoadmapCategory.FEATURE,
                     priority = RoadmapPriority.HIGH
                 ),
                 RoadmapItem(
-                    id = "5",
-                    title = "Initial iOS Launch",
-                    description = "MVP release of the all new Space Launch Now app for iOS devices",
-                    status = RoadmapStatus.IN_PROGRESS,
-                    quarter = "End of 2025",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.HIGH
-                ),
-
-                RoadmapItem(
-                    id = "6",
-                    title = "Astronauts Profiles",
-                    description = "Profiles for astronauts with mission history and biographies",
-                    status = RoadmapStatus.BACKLOG,
-                    quarter = "Early 2026",
+                    id = "2",
+                    title = "Starship | Rockets | Agencies | ISS Tracking",
+                    description = "New pages with additional content",
+                    status = RoadmapStatus.IN_TESTING,
+                    quarter = "February 2026",
                     category = RoadmapCategory.FEATURE,
                     priority = RoadmapPriority.MEDIUM
                 ),
                 RoadmapItem(
-                    id = "7",
+                    id = "3",
+                    title = "Notification Filter Issues",
+                    description = "Users receiving notifications for locations they did not select",
+                    status = RoadmapStatus.IN_PROGRESS,
+                    quarter = "February 2026",
+                    category = RoadmapCategory.BUG_FIX,
+                    priority = RoadmapPriority.HIGH
+                ),
+                RoadmapItem(
+                    id = "4",
+                    title = "Initial iOS Launch",
+                    description = "MVP release of the all new Space Launch Now app for iOS devices",
+                    status = RoadmapStatus.IN_PROGRESS,
+                    quarter = "Q1 2026",
+                    category = RoadmapCategory.FEATURE,
+                    priority = RoadmapPriority.HIGH
+                ),
+                RoadmapItem(
+                    id = "5",
+                    title = "Astronauts Profiles",
+                    description = "Profiles for astronauts with mission history and biographies",
+                    status = RoadmapStatus.BACKLOG,
+                    quarter = "Q1 2026",
+                    category = RoadmapCategory.FEATURE,
+                    priority = RoadmapPriority.MEDIUM
+                ),
+                RoadmapItem(
+                    id = "6",
                     title = "Launch Vehicles Page",
                     description = "Detailed pages for launch vehicles with specifications and images",
                     status = RoadmapStatus.BACKLOG,
@@ -148,16 +138,7 @@ class RoadmapViewModel : ViewModel() {
                     priority = RoadmapPriority.LOW
                 ),
                 RoadmapItem(
-                    id = "8",
-                    title = "Agencies Page",
-                    description = "Detailed pages for space agencies with mission profiles and launch history",
-                    status = RoadmapStatus.BACKLOG,
-                    quarter = "Early 2026",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.LOW
-                ),
-                RoadmapItem(
-                    id = "9",
+                    id = "7",
                     title = "Additional Widgets",
                     description = "More home screen widgets with customizable themes",
                     status = RoadmapStatus.BACKLOG,
@@ -166,7 +147,7 @@ class RoadmapViewModel : ViewModel() {
                     priority = RoadmapPriority.MEDIUM
                 )
             ),
-            lastUpdated = "December 2025",
+            lastUpdated = "February 2026",
             message = "This roadmap represents planned features and is subject to change based on user feedback and priorities."
         )
     }
