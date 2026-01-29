@@ -1,3 +1,12 @@
+## [5.8.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.1...v5.8.2) (2026-01-29)
+
+
+### Bug Fixes
+
+* change event ordering to descending by date ([787c8a1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/787c8a113514a8ad0b7b144242cb43184953f08f))
+
+
+
 ## [5.8.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.0...v5.8.1) (2026-01-29)
 
 
@@ -34,15 +43,6 @@
 ### Bug Fixes
 
 * **logging:** debug sample rate control ([4d369b9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4d369b949fdc3aa1f1c978d220f757fcd8afdcdf))
-
-
-
-## [5.7.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.2...v5.7.3) (2026-01-15)
-
-
-### Bug Fixes
-
-* **logging:** decrease datadog logging ([1c36455](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1c3645588b0396c7e238ea887da2dcbed49817a1))
 
 
 
