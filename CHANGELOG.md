@@ -1,3 +1,15 @@
+# [5.8.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.5...v5.8.0) (2026-01-29)
+
+
+### Features
+
+* add related events to launch detail view ([9dc95df](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9dc95df14d513e486de56c4d37a9cfceb2a87608))
+* implement V5 Notification System for background notification handling ([41068dc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/41068dc6faf38b22a46f948110c97faa30009073))
+* **iOS:** implement Google Maps integration for ISS tracking ([e9f2270](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9f22707a895daa670217717c46dbe162f5c3db3))
+* update interstitial ad logic and move SmartBannerAd in phone lauinch detail ([1321186](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/13211867464fea6d854342f172455bc78ffbf1fd))
+
+
+
 ## [5.7.5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.4...v5.7.5) (2026-01-22)
 
 
@@ -31,15 +43,6 @@
 ### Bug Fixes
 
 * update video player button to open in app and remove video filtering ([0ae0536](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0ae053611cd78ca1cd24b968e9d768193aaac2e1))
-
-
-
-## [5.7.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.0...v5.7.1) (2026-01-05)
-
-
-### Bug Fixes
-
-* remove unnecessary changesNotSentForReview flag from deployment summary ([ce82b44](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ce82b4463914d373ea7ddd14a00ac662313cb4de))
 
 
 
