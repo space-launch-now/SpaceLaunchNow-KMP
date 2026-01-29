@@ -264,7 +264,7 @@ fun SpaceLaunchNowApp(
                 log.i { "LaunchedEffect: shouldShowEnjoymentDialog=$shouldShowEnjoymentDialog, showDelayedDialog=$showDelayedDialog" }
                 if (shouldShowEnjoymentDialog && !showDelayedDialog) {
                     log.i { "⏱️ Rating dialog conditions met, delaying 5 seconds before showing..." }
-                    kotlinx.coroutines.delay(5_000) // 5 seconds - let user actually use the app
+                    kotlinx.coroutines.delay(2_000) // 2 seconds
                     showDelayedDialog = true
                     log.i { "✅ Delay complete, setting showDelayedDialog=true" }
                 } else if (!shouldShowEnjoymentDialog) {
