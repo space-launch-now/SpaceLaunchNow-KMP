@@ -316,7 +316,7 @@ fun SpaceLaunchNowApp(
             LaunchedEffect(shouldShowNativeReview) {
                 if (shouldShowNativeReview) {
                     val activity = contextFactory.getActivity()
-                    log.i { "Triggering native in-app review with activity: ${activity?.javaClass?.simpleName}" }
+                    log.i { "Triggering native in-app review with activity: $activity" }
                     appRatingViewModel.requestReview(activity)
                 }
             }

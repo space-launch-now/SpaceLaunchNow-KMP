@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.util.LatLng
+import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 
 /**
  * Desktop stub implementation of IssMapView
@@ -29,7 +30,7 @@ actual fun IssMapView(
         Text(
             text = "Map view not available on Desktop\n\n" +
                     currentPosition?.let {
-                        "Current Position:\nLat: ${String.format("%.2f", it.latitude)}°\nLon: ${String.format("%.2f", it.longitude)}°"
+                        "Current Position:\nLat: ${NumberFormatUtil.formatDecimal(it.latitude, 2)}°\nLon: ${NumberFormatUtil.formatDecimal(it.longitude, 2)}°"
                     } ?: "Loading position...",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
