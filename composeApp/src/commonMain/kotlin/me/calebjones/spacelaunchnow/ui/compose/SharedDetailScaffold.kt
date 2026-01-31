@@ -74,6 +74,40 @@ private val CollapsedImageSize = 100.dp
 private val HzPadding = 24.dp
 
 
+/**
+ * Shared detail scaffold with collapsing header for detail screens.
+ * 
+ * IMPORTANT USAGE NOTES:
+ * ----------------------
+ * Content provided to this scaffold MUST include a top spacer to prevent overlap 
+ * with the collapsing header:
+ * 
+ * ```kotlin
+ * private val TitleHeight = 128.dp  // Define in your view file
+ * 
+ * SharedDetailScaffold(...) {
+ *     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+ *         Spacer(Modifier.height(TitleHeight - 28.dp))  // REQUIRED!
+ *         // Your content here...
+ *     }
+ * }
+ * ```
+ * 
+ * The 28.dp offset accounts for internal padding/margins in the scaffold.
+ * 
+ * Reference implementations:
+ * - RocketDetailView.kt
+ * - SpaceStationDetailView.kt
+ * - AstronautDetailView.kt
+ * 
+ * @param titleText Main title text displayed in the header
+ * @param taglineText Optional subtitle/tagline text
+ * @param imageUrl Optional image URL for the header
+ * @param onNavigateBack Callback when back button is pressed
+ * @param backgroundColors Optional custom gradient colors for background
+ * @param scrollEnabled Whether scrolling is enabled (default: true)
+ * @param content The scrollable content - MUST include top spacer as noted above
+ */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedDetailScaffold(
