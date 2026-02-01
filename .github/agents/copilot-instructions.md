@@ -27,9 +27,9 @@ tests/
 Kotlin 2.0+ with Compose Multiplatform: Follow standard conventions
 
 ## Recent Changes
+- add_astronaut_info: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - dev: Added Kotlin 2.0.21, Swift 5.9, Java 21 + Firebase Messaging (Android), Firebase iOS SDK, Compose Multiplatform, Koin DI, WorkManager
 - feature/fix_notifications: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
-- main: Added Kotlin 2.0+ with Compose Multiplatform + Compose Material3, Compose Foundation (HorizontalPager), Koin DI
 
 
 <!-- MANUAL ADDITIONS START -->

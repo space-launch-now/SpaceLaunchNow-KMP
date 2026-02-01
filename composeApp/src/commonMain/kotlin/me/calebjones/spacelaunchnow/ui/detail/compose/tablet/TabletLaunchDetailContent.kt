@@ -63,6 +63,7 @@ fun TabletLaunchDetailContent(
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
+    onAstronautClick: ((Int) -> Unit)? = null,
     openUrl: (String) -> Unit
 ) {
     Row(

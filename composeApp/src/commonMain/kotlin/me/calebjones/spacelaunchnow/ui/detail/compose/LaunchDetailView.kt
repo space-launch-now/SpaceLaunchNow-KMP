@@ -81,7 +81,8 @@ fun LaunchDetailView(
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
-    onEventClick: ((Int) -> Unit)? = null
+    onEventClick: ((Int) -> Unit)? = null,
+    onAstronautClick: ((Int) -> Unit)? = null
 ) {
     val isLargeScreen = isLargeScreen()
 
@@ -103,7 +104,8 @@ fun LaunchDetailView(
             onNavigateToFullscreen = onNavigateToFullscreen,
             onVideoSelected = onVideoSelected,
             onNavigateToSettings = onNavigateToSettings,
-            onEventClick = onEventClick
+            onEventClick = onEventClick,
+            onAstronautClick = onAstronautClick
         )
     } else {
         // PHONE: Non-scrollable scaffold with tabbed layout (tabs handle their own scrolling)
@@ -122,7 +124,8 @@ fun LaunchDetailView(
             onNavigateToFullscreen = onNavigateToFullscreen,
             onVideoSelected = onVideoSelected,
             onNavigateToSettings = onNavigateToSettings,
-            onEventClick = onEventClick
+            onEventClick = onEventClick,
+            onAstronautClick = onAstronautClick
         )
     }
 }
@@ -146,7 +149,8 @@ private fun TabletLaunchDetailView(
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
-    onEventClick: ((Int) -> Unit)? = null
+    onEventClick: ((Int) -> Unit)? = null,
+    onAstronautClick: ((Int) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = launch.name ?: "Unknown Launch",
@@ -190,6 +194,7 @@ private fun TabletLaunchDetailView(
                 onVideoSelected = onVideoSelected,
                 onNavigateToSettings = onNavigateToSettings,
                 onEventClick = onEventClick,
+                onAstronautClick = onAstronautClick,
                 openUrl = openUrl
             )
 
@@ -218,7 +223,8 @@ private fun PhoneLaunchDetailView(
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
-    onEventClick: ((Int) -> Unit)? = null
+    onEventClick: ((Int) -> Unit)? = null,
+    onAstronautClick: ((Int) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = launch.name ?: "Unknown Launch",
@@ -263,6 +269,7 @@ private fun PhoneLaunchDetailView(
                 onVideoSelected = onVideoSelected,
                 onNavigateToSettings = onNavigateToSettings,
                 onEventClick = onEventClick,
+                onAstronautClick = onAstronautClick,
                 openUrl = openUrl
             )
 

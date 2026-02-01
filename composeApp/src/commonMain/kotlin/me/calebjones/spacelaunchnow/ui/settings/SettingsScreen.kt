@@ -274,6 +274,12 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             SettingsNavigationRow(
+                                title = "Astronauts",
+                                subtitle = "Browse astronauts, view their career stats and missions",
+                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Astronauts) }
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
                                 title = "ISS Tracking",
                                 subtitle = "Live tracking, orbit path, crew, and NASA live stream",
                                 onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SpaceStationDetail(4)) }

@@ -20,6 +20,8 @@ import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
+import me.calebjones.spacelaunchnow.navigation.AstronautDetail
+import me.calebjones.spacelaunchnow.navigation.Astronauts
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
@@ -43,6 +45,8 @@ import me.calebjones.spacelaunchnow.ui.ads.AdInitializer
 import me.calebjones.spacelaunchnow.ui.ads.WithPreloadedAds
 import me.calebjones.spacelaunchnow.ui.agencies.AgencyDetailScreen
 import me.calebjones.spacelaunchnow.ui.agencies.AgencyListScreen
+import me.calebjones.spacelaunchnow.ui.astronaut.AstronautDetailView
+import me.calebjones.spacelaunchnow.ui.astronaut.AstronautListScreen
 import me.calebjones.spacelaunchnow.ui.compose.BetaWarningDialog
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
@@ -451,6 +455,24 @@ fun SpaceLaunchNowApp(
                             val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
                             AgencyDetailScreen(
                                 agencyId = agencyDetail.agencyId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<Astronauts> {
+                            AstronautListScreen(
+                                onNavigateToAstronautDetail = { id ->
+                                    navController.navigate(AstronautDetail(id))
+                                },
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<AstronautDetail> { backStackEntry ->
+                            val astronautDetail = backStackEntry.toRoute<AstronautDetail>()
+                            AstronautDetailView(
+                                astronautId = astronautDetail.astronautId,
+                                onLaunchClick = { launchId ->
+                                    navController.navigate(LaunchDetail(launchId))
+                                },
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

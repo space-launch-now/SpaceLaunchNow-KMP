@@ -58,6 +58,12 @@ data object Agencies
 data class AgencyDetail(val agencyId: Int)
 
 @Serializable
+data object Astronauts
+
+@Serializable
+data class AstronautDetail(val astronautId: Int)
+
+@Serializable
 data class SpaceStationDetail(val stationId: Int)
 
 @Serializable

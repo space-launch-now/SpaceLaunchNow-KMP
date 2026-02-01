@@ -225,6 +225,74 @@ object DateTimeUtil {
             "Q?"
         }
     }
+    
+    /**
+     * Parses an ISO 8601 duration string to a human-readable format
+     * Example: "P8DT14H12M30S" -> "8d 14h 12m"
+     * Example: "PT2H30M" -> "2h 30m"
+     * 
+     * @param duration ISO 8601 duration string (e.g., "P1Y2M10DT2H30M")
+     * @return Human-readable duration string
+     */
+    fun parseIsoDurationToHumanReadable(duration: String?): String {
+        if (duration.isNullOrBlank()) return "0m"
+        
+        return try {
+            val parts = mutableListOf<String>()
+            var remaining = duration.removePrefix("P")
+            
+            // Extract years
+            if (remaining.contains("Y")) {
+                val years = remaining.substringBefore("Y").toLongOrNull()
+                if (years != null && years > 0) parts.add("${years}y")
+                remaining = remaining.substringAfter("Y")
+            }
+            
+            // Extract months
+            if (remaining.contains("M") && !remaining.startsWith("T")) {
+                val months = remaining.substringBefore("M").toLongOrNull()
+                if (months != null && months > 0) parts.add("${months}mo")
+                remaining = remaining.substringAfter("M")
+            }
+            
+            // Extract days
+            if (remaining.contains("D")) {
+                val days = remaining.substringBefore("D").toLongOrNull()
+                if (days != null && days > 0) parts.add("${days}d")
+                remaining = remaining.substringAfter("D")
+            }
+            
+            // Extract time components (after T)
+            if (remaining.startsWith("T")) {
+                remaining = remaining.removePrefix("T")
+                
+                // Extract hours
+                if (remaining.contains("H")) {
+                    val hours = remaining.substringBefore("H").toLongOrNull()
+                    if (hours != null && hours > 0) parts.add("${hours}h")
+                    remaining = remaining.substringAfter("H")
+                }
+                
+                // Extract minutes
+                if (remaining.contains("M")) {
+                    val minutes = remaining.substringBefore("M").toLongOrNull()
+                    if (minutes != null && minutes > 0) parts.add("${minutes}m")
+                    remaining = remaining.substringAfter("M")
+                }
+                
+                // Extract seconds (optional, usually omitted for human readability)
+                if (remaining.contains("S")) {
+                    val seconds = remaining.substringBefore("S").toLongOrNull()
+                    if (seconds != null && seconds > 0) parts.add("${seconds}s")
+                }
+            }
+            
+            // Return formatted string or default
+            if (parts.isEmpty()) "0m" else parts.take(3).joinToString(" ")
+        } catch (e: Exception) {
+            "Unknown"
+        }
+    }
 }
 
 // Top-level expect declarations for multiplatform date/time formatting

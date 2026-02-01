@@ -15,6 +15,8 @@ import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
+import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -65,6 +67,8 @@ import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautDetailViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautListViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
@@ -159,6 +163,9 @@ val appModule = module {
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
+    singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
+    viewModelOf(::AstronautListViewModel)
+    viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), astronautId) }
 
     // Space Station tracking
     singleOf(::IssTrackingRepositoryImpl) {
