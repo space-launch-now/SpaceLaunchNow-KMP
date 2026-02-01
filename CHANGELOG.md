@@ -1,3 +1,17 @@
+# [5.9.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.2...v5.9.0) (2026-02-01)
+
+
+### Bug Fixes
+
+* astronaut detail view with agency abbreviation and improved stats display ([4327aa1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4327aa1cd99ccf8fe4a20d28f9e77bf2cd3af0f3))
+
+
+### Features
+
+* Add astronaut list and detail views with links in launch detailed ([45a6803](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/45a6803d2ecdf79ef2454ea5adc0b9364e73e68a))
+
+
+
 ## [5.8.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.1...v5.8.2) (2026-01-29)
 
 
@@ -34,15 +48,6 @@
 ### Bug Fixes
 
 * add tabs to launch detaial, refactor several other issues ([e98b01e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e98b01eefa6967ce41993f6b98bccdb95948a302))
-
-
-
-## [5.7.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.3...v5.7.4) (2026-01-15)
-
-
-### Bug Fixes
-
-* **logging:** debug sample rate control ([4d369b9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4d369b949fdc3aa1f1c978d220f757fcd8afdcdf))
 
 
 

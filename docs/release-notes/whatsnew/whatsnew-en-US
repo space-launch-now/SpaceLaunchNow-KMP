@@ -1,3 +1,7 @@
 ### Bug Fixes
 
-* change event ordering to descending by date
+* astronaut detail view with agency abbreviation and improved stats display
+
+### Features
+
+* Add astronaut list and detail views with links in launch detailed
