@@ -54,7 +54,7 @@ fun AstronautInfoCard(
                 text = "Biography",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Text(

@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautFlightHistoryCard
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautInfoCard
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautLinksCard
-import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautPersonalInfoCard
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautStatsCard
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautDetailViewModel
@@ -80,7 +79,7 @@ fun AstronautDetailView(
             
             SharedDetailScaffold(
                 titleText = astronaut.name ?: "Astronaut",
-                taglineText = astronaut.agency?.name,
+                taglineText = astronaut.agency?.abbrev,
                 imageUrl = astronaut.image?.imageUrl,
                 onNavigateBack = onNavigateBack
             ) {
@@ -94,10 +93,7 @@ fun AstronautDetailView(
                     // All SharedDetailScaffold implementations must include this spacer at the top
                     Spacer(Modifier.height(TitleHeight - 28.dp))
                     
-                    // Personal Information Card (Status, Age, Nationality, Death Date)
-                    AstronautPersonalInfoCard(astronaut = astronaut)
-                    
-                    // Career Statistics Card
+                    // Career Statistics Card (includes status, age, nationality, and career stats)
                     AstronautStatsCard(astronaut = astronaut)
                     
                     // Biography Card
@@ -115,6 +111,8 @@ fun AstronautDetailView(
                             onLaunchClick = onLaunchClick
                         )
                     }
+
+                    //TODO Add Agency Card
                     
                     // Bottom padding
                     Box(modifier = Modifier.padding(bottom = 200.dp))
@@ -145,11 +143,6 @@ private fun LoadingView(onNavigateBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 CircularProgressIndicator()
-                Text(
-                    text = "Loading astronaut details...",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }

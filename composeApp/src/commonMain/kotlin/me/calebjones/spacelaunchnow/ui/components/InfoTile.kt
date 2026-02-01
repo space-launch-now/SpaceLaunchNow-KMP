@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,7 +40,7 @@ data class InfoTileData(
  * @param label The label text describing the data
  * @param value The value text to display (optional if customComposable is provided)
  * @param modifier Modifier for the tile
- * @param color Optional color for the icon and surface background tint
+ * @param color Optional color for the surface background (icon tint will be automatically contrasted)
  * @param customComposable Optional custom composable to display instead of value text
  */
 @Composable
@@ -51,10 +52,18 @@ fun InfoTile(
     color: Color? = null,
     customComposable: (@Composable () -> Unit)? = null
 ) {
+    val backgroundColor = color ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f)
+    val iconTint = if (color != null) {
+        // If a custom color is provided, use contrasting color for icon
+        if (color.luminance() > 0.5f) Color.Black else Color.White
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
+    
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
-        color = color?.copy(alpha = 0.15f) ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f)
+        color = backgroundColor
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -67,7 +76,7 @@ fun InfoTile(
                 Icon(
                     icon,
                     contentDescription = null,
-                    tint = color ?: MaterialTheme.colorScheme.primary,
+                    tint = iconTint,
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
@@ -90,7 +99,3 @@ fun InfoTile(
         }
     }
 }
-
-// Preview removed - use platform-specific previews if needed
-// Android: Create InfoTilePreview.android.kt with @Preview annotation
-// Desktop: Use desktop preview features
