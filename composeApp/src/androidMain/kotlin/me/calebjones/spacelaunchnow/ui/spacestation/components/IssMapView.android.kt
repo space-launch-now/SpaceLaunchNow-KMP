@@ -130,15 +130,30 @@ actual fun IssMapView(
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
             googleCurrentPosition ?: GoogleLatLng(0.0, 0.0),
-            if (googleCurrentPosition != null) 2f else 1f
+            if (googleCurrentPosition != null) 3f else 1f
         )
     }
 
-    // Update camera position only on first load, allowing user to freely zoom/pan after
+    // Update camera position whenever ISS position changes to keep it centered
     LaunchedEffect(googleCurrentPosition) {
-        if (!cameraInitialized && googleCurrentPosition != null) {
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(googleCurrentPosition, 2f)
-            cameraInitialized = true
+        if (googleCurrentPosition != null) {
+            if (!cameraInitialized) {
+                // First load: set camera with animation
+                cameraPositionState.animate(
+                    update = com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom(
+                        googleCurrentPosition,
+                        3f
+                    ),
+                    durationMs = 1000
+                )
+                cameraInitialized = true
+            } else {
+                // Subsequent updates: smoothly move camera to new position
+                cameraPositionState.animate(
+                    update = com.google.android.gms.maps.CameraUpdateFactory.newLatLng(googleCurrentPosition),
+                    durationMs = 500
+                )
+            }
         }
     }
 

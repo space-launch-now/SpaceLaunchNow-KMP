@@ -165,7 +165,7 @@ private fun SpaceStationDetailContent(
             ) {
                 Column {
                     // Map section
-                    Box(modifier = Modifier.fillMaxWidth().height(500.dp)) {
+                    Box(modifier = Modifier.fillMaxWidth().height(205.dp)) {
                         IssMapView(
                             currentPosition = issPosition,
                             orbitPath = orbitPath,
