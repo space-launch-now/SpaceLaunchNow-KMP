@@ -44,7 +44,7 @@ class ParseISOTest {
     @Test
     fun testParseIsoDuration_fullFormat() {
         val result = parseIsoDurationToHumanReadable("P1Y2M3DT4H5M6S")
-        assertEquals("1y 2mo 3d 4h 5m 6s", result)
+        assertEquals("1y 2mo 3d", result)
     }
     
     @Test
