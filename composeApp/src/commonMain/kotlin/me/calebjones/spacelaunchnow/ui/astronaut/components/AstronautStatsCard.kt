@@ -31,7 +31,7 @@ import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
-import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -147,7 +147,7 @@ fun AstronautStatsCard(
                     icon = Icons.Default.Timer,
                     label = "Time in Space",
                     value = astronaut.timeInSpace?.let { 
-                        DateTimeUtil.parseIsoDurationToHumanReadable(it)
+                        parseIsoDurationToHumanReadable(it)
                     } ?: "N/A",
                     modifier = Modifier.weight(1f),
                     color = color
@@ -173,7 +173,7 @@ fun AstronautStatsCard(
                     icon = Icons.Default.Timer,
                     label = "EVA Time",
                     value = astronaut.evaTime?.let {
-                        DateTimeUtil.parseIsoDurationToHumanReadable(it)
+                        parseIsoDurationToHumanReadable(it)
                     } ?: "N/A",
                     modifier = Modifier.weight(1f),
                     color = color

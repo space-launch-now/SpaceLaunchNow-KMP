@@ -25,5 +25,5 @@ fun parseIsoDurationToHumanReadable(isoDuration: String): String {
     if (minutes > 0) parts.add("${minutes}m")
     if (seconds > 0) parts.add("${seconds}s")
 
-    return if (parts.isEmpty()) "0" else parts.joinToString(" ")
+    return if (parts.isEmpty()) "0" else parts.take(3).joinToString(" ")
 }

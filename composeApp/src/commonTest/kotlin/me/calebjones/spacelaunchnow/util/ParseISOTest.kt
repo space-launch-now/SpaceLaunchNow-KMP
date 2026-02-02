@@ -1,10 +1,16 @@
 package me.calebjones.spacelaunchnow.util
 
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ParseISOTest {
     
+    @BeforeTest
+    fun setup() {
+        TestSpaceLoggerInit.ensureInitialized()
+    }
+
     @Test
     fun testParseIsoDuration_hoursMinutesSeconds() {
         val result = parseIsoDurationToHumanReadable("PT2H30M15S")
@@ -101,5 +107,19 @@ class ParseISOTest {
         // Test a spacecraft mission that lasts 59 days, 12 hours, 59 minutes (like ISS mission)
         val result = parseIsoDurationToHumanReadable("P59DT12H59M")
         assertEquals("59d 12h 59m", result)
+    }
+
+    @Test
+    fun testParseIsoDuration_daysHoursMinutesSeconds() {
+        // Test the specific case from the user: 5 days, 20 hours, 50 minutes, 29 seconds
+        val result = parseIsoDurationToHumanReadable("P5DT20H50M29S")
+        assertEquals("5d 20h 50m", result)
+    }
+
+    @Test
+    fun testParseIsoDuration_nineDaysWithTime() {
+        // Test another case: 9 days, 8 hours, 43 minutes, 58 seconds
+        val result = parseIsoDurationToHumanReadable("P9DT8H43M58S")
+        assertEquals("9d 8h 43m", result)
     }
 }
