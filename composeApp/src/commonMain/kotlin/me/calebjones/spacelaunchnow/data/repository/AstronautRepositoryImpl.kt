@@ -27,7 +27,10 @@ class AstronautRepositoryImpl(
         search: String?,
         statusIds: List<Int>?,
         agencyIds: List<Int>?,
-        ordering: String?
+        ordering: String?,
+        hasFlown: Boolean?,
+        inSpace: Boolean?,
+        isHuman: Boolean?
     ): Result<PaginatedAstronautEndpointNormalList> {
         return try {
             log.d { "getAstronauts - limit: $limit, offset: $offset, search: $search" }
@@ -38,7 +41,10 @@ class AstronautRepositoryImpl(
                 search = search,
                 statusIds = statusIds?.map { it.toDouble() },
                 agencyIds = agencyIds?.map { it.toDouble() },
-                ordering = ordering
+                ordering = ordering,
+                hasFlown = hasFlown,
+                inSpace = inSpace,
+                isHuman = isHuman
             )
             
             val astronauts = response.body()

@@ -22,6 +22,9 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautE
  * @param statusIds List of astronaut status IDs to filter by (e.g., active, retired)
  * @param agencyIds List of agency IDs to filter astronauts by their associated agencies
  * @param ordering Field to sort by (e.g., "name", "-name" for descending)
+ * @param hasFlown Filter by whether astronaut has flown to space (true/false/null for all)
+ * @param inSpace Filter by whether astronaut is currently in space (true/false/null for all)
+ * @param isHuman Filter by whether entry is for a human (true) or non-human (false)
  *
  * @return HttpResponse containing PaginatedAstronautEndpointNormalList with astronaut data
  *
@@ -30,6 +33,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautE
  * val response = astronautsApi.getAstronautList(
  *     limit = 20,
  *     statusIds = listOf(1), // Active astronauts
+ *     hasFlown = true, // Only those who have flown
  *     ordering = "name"
  * )
  * val astronauts = response.body()
@@ -41,7 +45,10 @@ suspend fun AstronautsApi.getAstronautList(
     search: String? = null,
     statusIds: List<Double>? = null,
     agencyIds: List<Double>? = null,
-    ordering: String? = null
+    ordering: String? = null,
+    hasFlown: Boolean? = null,
+    inSpace: Boolean? = null,
+    isHuman: Boolean? = null
 ): HttpResponse<PaginatedAstronautEndpointNormalList> = astronautsList(
     age = null,
     ageGt = null,
@@ -75,9 +82,9 @@ suspend fun AstronautsApi.getAstronautList(
     flightsCountGte = null,
     flightsCountLt = null,
     flightsCountLte = null,
-    hasFlown = null,
-    inSpace = null,
-    isHuman = null,
+    hasFlown = hasFlown,
+    inSpace = inSpace,
+    isHuman = isHuman,
     landingsCount = null,
     landingsCountGt = null,
     landingsCountGte = null,
