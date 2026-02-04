@@ -388,6 +388,17 @@ class ScheduleViewModel(
         applyFilters(ScheduleFilterState())
     }
 
+    /**
+     * Apply a filter for a specific agency by ID.
+     * Used when navigating from Agency Detail screen.
+     */
+    fun filterByAgency(agencyId: Int) {
+        val newFilterState = _uiState.value.filterState.copy(
+            selectedAgencyIds = setOf(agencyId)
+        )
+        applyFilters(newFilterState)
+    }
+
     fun reloadFilterOptions() {
         viewModelScope.launch {
             log.d { "Force reloading filter options from API" }

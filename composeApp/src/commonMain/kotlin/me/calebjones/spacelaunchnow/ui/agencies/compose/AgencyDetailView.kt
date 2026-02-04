@@ -71,12 +71,13 @@ private val TitleHeight = 128.dp
 @Composable
 fun AgencyDetailView(
     agency: AgencyEndpointDetailed,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToSchedule: ((Int) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = agency.name,
         taglineText = agency.type?.name,
-        imageUrl = agency.logo?.imageUrl,
+        imageUrl = agency.socialLogo?.imageUrl,
         onNavigateBack = onNavigateBack,
         backgroundColors = listOf(
             MaterialTheme.colorScheme.tertiary,
@@ -84,12 +85,15 @@ fun AgencyDetailView(
             MaterialTheme.colorScheme.surfaceVariant
         ),
     ) {
-        AgencyDetailContentInBody(agency)
+        AgencyDetailContentInBody(agency, onNavigateToSchedule)
     }
 }
 
 @Composable
-private fun AgencyDetailContentInBody(agency: AgencyEndpointDetailed) {
+private fun AgencyDetailContentInBody(
+    agency: AgencyEndpointDetailed,
+    onNavigateToSchedule: ((Int) -> Unit)? = null
+) {
     val uriHandler = LocalUriHandler.current
     val openUrl: (String) -> Unit = { url ->
         try {
@@ -101,10 +105,37 @@ private fun AgencyDetailContentInBody(agency: AgencyEndpointDetailed) {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight - 28.dp))
+        Spacer(Modifier.height(TitleHeight))
 
         // Agency Overview Card
         AgencyOverviewCard(agency, openUrl)
+
+        Spacer(Modifier.height(16.dp))
+
+        // View Launches Button
+        if (onNavigateToSchedule != null && (agency.totalLaunchCount ?: 0) > 0) {
+            Button(
+                onClick = { onNavigateToSchedule(agency.id) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            ) {
+                Icon(
+                    imageVector = CustomIcons.RocketLaunch,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    text = "View ${agency.totalLaunchCount} Launches in Schedule",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+        }
 
         Spacer(Modifier.height(16.dp))
 

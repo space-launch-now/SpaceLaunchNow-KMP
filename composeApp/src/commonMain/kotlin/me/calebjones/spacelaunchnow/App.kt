@@ -376,7 +376,13 @@ fun SpaceLaunchNowApp(
                             val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
                             AgencyDetailScreen(
                                 agencyId = agencyDetail.agencyId,
-                                onNavigateBack = { navController.popBackStack() }
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToSchedule = { agencyId ->
+                                    // Apply agency filter BEFORE navigation
+                                    val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
+                                    scheduleViewModel.filterByAgency(agencyId)
+                                    navController.navigate(Schedule)
+                                }
                             )
                         }
                         composableWithCompositionLocal<SpaceStationDetail> { backStackEntry ->
@@ -455,7 +461,13 @@ fun SpaceLaunchNowApp(
                             val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
                             AgencyDetailScreen(
                                 agencyId = agencyDetail.agencyId,
-                                onNavigateBack = { navController.popBackStack() }
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToSchedule = { agencyId ->
+                                    // Apply agency filter BEFORE navigation
+                                    val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
+                                    scheduleViewModel.filterByAgency(agencyId)
+                                    navController.navigate(Schedule)
+                                }
                             )
                         }
                         composableWithCompositionLocal<Astronauts> {
