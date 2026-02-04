@@ -13,30 +13,40 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautListViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautSortOrder
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -46,6 +56,9 @@ import org.koin.compose.viewmodel.koinViewModel
  * - Paginated list of astronauts
  * - Infinite scroll loading
  * - Pull-to-refresh
+ * - Search by name
+ * - Sort by name, flights count, or first flight date
+ * - Filter by: has flown to space, currently in space, human/non-human
  * - Error and empty states
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,6 +71,30 @@ fun AstronautListScreen(
     val uiState by viewModel.uiState.collectAsState()
     
     val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    
+    // Filter sheet state
+    var showFilterSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    
+    // Calculate active filter count for badge
+    val activeFilterCount = remember(
+        uiState.searchQuery,
+        uiState.selectedSortOrder,
+        uiState.selectedStatusIds,
+        uiState.hasFlownFilter,
+        uiState.inSpaceFilter,
+        uiState.isHumanFilter
+    ) {
+        var count = 0
+        if (uiState.searchQuery.isNotBlank()) count++
+        if (uiState.selectedSortOrder != AstronautSortOrder.NAME_ASC) count++
+        if (uiState.selectedStatusIds.isNotEmpty()) count++
+        if (uiState.hasFlownFilter != null) count++
+        if (uiState.inSpaceFilter != null) count++
+        if (uiState.isHumanFilter != null) count++
+        count
+    }
     
     // Trigger load more when near bottom
     val shouldLoadMore by remember {
@@ -92,6 +129,25 @@ fun AstronautListScreen(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = "Back"
                         )
+                    }
+                },
+                actions = {
+                    // Filter button with badge
+                    IconButton(onClick = { showFilterSheet = true }) {
+                        BadgedBox(
+                            badge = {
+                                if (activeFilterCount > 0) {
+                                    Badge {
+                                        Text(activeFilterCount.toString())
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.FilterList,
+                                contentDescription = "Filter & Sort"
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -158,6 +214,54 @@ fun AstronautListScreen(
                     }
                 }
             }
+        }
+    }
+    
+    // Filter bottom sheet
+    if (showFilterSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showFilterSheet = false },
+            sheetState = sheetState
+        ) {
+            AstronautFilterSheet(
+                searchQuery = uiState.searchQuery,
+                selectedSortOrder = uiState.selectedSortOrder,
+                selectedStatusIds = uiState.selectedStatusIds,
+                statusOptions = uiState.statusOptions,
+                hasFlownFilter = uiState.hasFlownFilter,
+                inSpaceFilter = uiState.inSpaceFilter,
+                isHumanFilter = uiState.isHumanFilter,
+                onSearchQueryChange = { query ->
+                    viewModel.updateSearchQuery(query)
+                },
+                onSortOrderChange = { sortOrder ->
+                    viewModel.updateSortOrder(sortOrder)
+                },
+                onStatusSelectionChange = { statusIds ->
+                    viewModel.updateStatusFilter(statusIds)
+                },
+                onHasFlownChange = { hasFlown ->
+                    viewModel.updateHasFlownFilter(hasFlown)
+                },
+                onInSpaceChange = { inSpace ->
+                    viewModel.updateInSpaceFilter(inSpace)
+                },
+                onIsHumanChange = { isHuman ->
+                    viewModel.updateIsHumanFilter(isHuman)
+                },
+                onClearAll = {
+                    viewModel.clearAllFilters()
+                },
+                onReloadOptions = {
+                    viewModel.reloadFilterOptions()
+                },
+                onClose = {
+                    scope.launch {
+                        sheetState.hide()
+                        showFilterSheet = false
+                    }
+                }
+            )
         }
     }
 }

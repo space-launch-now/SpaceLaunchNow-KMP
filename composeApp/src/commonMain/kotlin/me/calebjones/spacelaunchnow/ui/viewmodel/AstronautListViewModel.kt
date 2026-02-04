@@ -14,11 +14,12 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 /**
  * ViewModel for displaying a paginated list of astronauts.
  *
- * Manages loading, pagination, error states, and search functionality
- * for the astronaut list screen.
+ * Manages loading, pagination, error states, search functionality,
+ * and filter options for the astronaut list screen.
  */
 class AstronautListViewModel(
-    private val astronautRepository: AstronautRepository
+    private val astronautRepository: AstronautRepository,
+    private val filterRepository: me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository
 ) : ViewModel() {
 
     private val log = logger()
@@ -27,6 +28,7 @@ class AstronautListViewModel(
     val uiState: StateFlow<AstronautListUiState> = _uiState.asStateFlow()
 
     init {
+        loadFilterOptions()
         loadAstronauts()
     }
 
@@ -35,13 +37,20 @@ class AstronautListViewModel(
      */
     fun loadAstronauts() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null, astronauts = emptyList(), currentPage = 0) }
             
             try {
+                val currentState = _uiState.value
                 val result = astronautRepository.getAstronauts(
                     limit = PAGE_SIZE,
                     offset = 0,
-                    ordering = "name"
+                    ordering = currentState.selectedSortOrder.apiValue,
+                    search = currentState.searchQuery.ifBlank { null },
+                    statusIds = currentState.selectedStatusIds.ifEmpty { null },
+                    agencyIds = currentState.selectedAgencyIds.ifEmpty { null },
+                    hasFlown = currentState.hasFlownFilter,
+                    inSpace = currentState.inSpaceFilter,
+                    isHuman = currentState.isHumanFilter
                 )
                 
                 result.fold(
@@ -100,7 +109,13 @@ class AstronautListViewModel(
                 val result = astronautRepository.getAstronauts(
                     limit = PAGE_SIZE,
                     offset = offset,
-                    ordering = "name"
+                    ordering = currentState.selectedSortOrder.apiValue,
+                    search = currentState.searchQuery.ifBlank { null },
+                    statusIds = currentState.selectedStatusIds.ifEmpty { null },
+                    agencyIds = currentState.selectedAgencyIds.ifEmpty { null },
+                    hasFlown = currentState.hasFlownFilter,
+                    inSpace = currentState.inSpaceFilter,
+                    isHuman = currentState.isHumanFilter
                 )
                 
                 result.fold(
@@ -141,8 +156,19 @@ class AstronautListViewModel(
      * Refresh the astronaut list (pull-to-refresh).
      */
     fun refresh() {
+        val currentState = _uiState.value
         _uiState.update {
-            AstronautListUiState()
+            AstronautListUiState(
+                searchQuery = currentState.searchQuery,
+                selectedSortOrder = currentState.selectedSortOrder,
+                selectedStatusIds = currentState.selectedStatusIds,
+                selectedAgencyIds = currentState.selectedAgencyIds,
+                hasFlownFilter = currentState.hasFlownFilter,
+                inSpaceFilter = currentState.inSpaceFilter,
+                isHumanFilter = currentState.isHumanFilter,
+                statusOptions = currentState.statusOptions,
+                isLoadingFilterOptions = currentState.isLoadingFilterOptions
+            )
         }
         loadAstronauts()
     }
@@ -152,6 +178,132 @@ class AstronautListViewModel(
      */
     fun clearError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    /**
+     * Update the search query and reload the list.
+     */
+    fun updateSearchQuery(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+        refresh()
+    }
+
+    /**
+     * Update the sort order and reload the list.
+     */
+    fun updateSortOrder(sortOrder: AstronautSortOrder) {
+        _uiState.update { it.copy(selectedSortOrder = sortOrder) }
+        refresh()
+    }
+
+    /**
+     * Update the status filter and reload the list.
+     */
+    fun updateStatusFilter(statusIds: List<Int>) {
+        _uiState.update { it.copy(selectedStatusIds = statusIds) }
+        refresh()
+    }
+
+    /**
+     * Update the agency filter and reload the list.
+     */
+    fun updateAgencyFilter(agencyIds: List<Int>) {
+        _uiState.update { it.copy(selectedAgencyIds = agencyIds) }
+        refresh()
+    }
+
+    /**
+     * Update the hasFlown filter and reload the list.
+     */
+    fun updateHasFlownFilter(hasFlown: Boolean?) {
+        _uiState.update { it.copy(hasFlownFilter = hasFlown) }
+        refresh()
+    }
+
+    /**
+     * Update the inSpace filter and reload the list.
+     */
+    fun updateInSpaceFilter(inSpace: Boolean?) {
+        _uiState.update { it.copy(inSpaceFilter = inSpace) }
+        refresh()
+    }
+
+    /**
+     * Update the isHuman filter and reload the list.
+     */
+    fun updateIsHumanFilter(isHuman: Boolean?) {
+        _uiState.update { it.copy(isHumanFilter = isHuman) }
+        refresh()
+    }
+
+    /**
+     * Clear all filters and search.
+     */
+    fun clearAllFilters() {
+        _uiState.update {
+            it.copy(
+                searchQuery = "",
+                selectedStatusIds = emptyList(),
+                selectedAgencyIds = emptyList(),
+                selectedSortOrder = AstronautSortOrder.NAME_ASC,
+                hasFlownFilter = null,
+                inSpaceFilter = null,
+                isHumanFilter = null
+            )
+        }
+        refresh()
+    }
+
+    /**
+     * Load filter options (status list) from the repository.
+     * Uses cache if available.
+     */
+    private fun loadFilterOptions() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingFilterOptions = true) }
+            
+            try {
+                val statuses = filterRepository.getStatuses().getOrNull() ?: emptyList()
+                
+                _uiState.update {
+                    it.copy(
+                        statusOptions = statuses,
+                        isLoadingFilterOptions = false
+                    )
+                }
+                
+                log.i { "Filter options loaded - Statuses: ${statuses.size}" }
+            } catch (e: Exception) {
+                log.e(e) { "Failed to load filter options" }
+                _uiState.update { it.copy(isLoadingFilterOptions = false) }
+            }
+        }
+    }
+
+    /**
+     * Force reload filter options from the API (bypasses cache).
+     */
+    fun reloadFilterOptions() {
+        viewModelScope.launch {
+            log.d { "Force reloading filter options from API" }
+            _uiState.update { it.copy(isLoadingFilterOptions = true) }
+            
+            try {
+                val statuses = filterRepository.getStatuses(forceRefresh = true).getOrNull() ?: emptyList()
+                
+                _uiState.update {
+                    it.copy(
+                        statusOptions = statuses,
+                        isLoadingFilterOptions = false
+                    )
+                }
+                
+                log.i { "Filter options reloaded - Statuses: ${statuses.size}" }
+            } catch (e: Exception) {
+                log.e(e) { "Failed to reload filter options" }
+                _uiState.update { it.copy(isLoadingFilterOptions = false) }
+            }
+        }
     }
 
     companion object {
@@ -169,5 +321,26 @@ data class AstronautListUiState(
     val error: String? = null,
     val currentPage: Int = 0,
     val hasMore: Boolean = true,
-    val totalCount: Int = 0
+    val totalCount: Int = 0,
+    val searchQuery: String = "",
+    val selectedSortOrder: AstronautSortOrder = AstronautSortOrder.NAME_ASC,
+    val selectedStatusIds: List<Int> = emptyList(),
+    val selectedAgencyIds: List<Int> = emptyList(),
+    val hasFlownFilter: Boolean? = null,
+    val inSpaceFilter: Boolean? = null,
+    val isHumanFilter: Boolean? = null,
+    val statusOptions: List<me.calebjones.spacelaunchnow.data.model.FilterOption> = emptyList(),
+    val isLoadingFilterOptions: Boolean = false
 )
+
+/**
+ * Sort order options for astronaut list.
+ */
+enum class AstronautSortOrder(val apiValue: String, val displayName: String) {
+    NAME_ASC("name", "Name (A-Z)"),
+    NAME_DESC("-name", "Name (Z-A)"),
+    FLIGHTS_ASC("flights_count", "Flights (Low to High)"),
+    FLIGHTS_DESC("-flights_count", "Flights (High to Low)"),
+    FIRST_FLIGHT_ASC("first_flight", "First Flight (Oldest)"),
+    FIRST_FLIGHT_DESC("-first_flight", "First Flight (Newest)")
+}
