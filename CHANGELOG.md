@@ -1,3 +1,14 @@
+## [5.9.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.9.0...v5.9.1) (2026-02-02)
+
+
+### Bug Fixes
+
+* iss views ([de287e9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/de287e9bd1f208f5109d28fa6807a2079b02d572))
+* replace DateTimeUtil with parseIsoDurationToHumanReadable and update related tests ([b71bd32](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b71bd32b48b42f94a8ac94c0783e78088bf0c11a))
+* update expected result for full format ISO duration test ([793cff1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/793cff18bbc72db1d51ad688702c6a3584b4ddff))
+
+
+
 # [5.9.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.2...v5.9.0) (2026-02-01)
 
 
@@ -39,15 +50,6 @@
 * implement V5 Notification System for background notification handling ([41068dc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/41068dc6faf38b22a46f948110c97faa30009073))
 * **iOS:** implement Google Maps integration for ISS tracking ([e9f2270](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9f22707a895daa670217717c46dbe162f5c3db3))
 * update interstitial ad logic and move SmartBannerAd in phone lauinch detail ([1321186](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/13211867464fea6d854342f172455bc78ffbf1fd))
-
-
-
-## [5.7.5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.7.4...v5.7.5) (2026-01-22)
-
-
-### Bug Fixes
-
-* add tabs to launch detaial, refactor several other issues ([e98b01e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e98b01eefa6967ce41993f6b98bccdb95948a302))
 
 
 

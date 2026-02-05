@@ -1,7 +1,5 @@
 ### Bug Fixes
 
-* astronaut detail view with agency abbreviation and improved stats display
-
-### Features
-
-* Add astronaut list and detail views with links in launch detailed
+* iss views
+* replace DateTimeUtil with parseIsoDurationToHumanReadable and update related tests
+* update expected result for full format ISO duration test
