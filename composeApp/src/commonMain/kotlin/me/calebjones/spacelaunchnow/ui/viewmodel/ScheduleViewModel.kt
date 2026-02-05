@@ -68,6 +68,8 @@ class ScheduleViewModel(
 
     private val cacheTtlMillis = 900_000L // 15 minute TTL
     private var queryVersion = 0
+    private var loadJobsUpcoming: kotlinx.coroutines.Job? = null
+    private var loadJobsPrevious: kotlinx.coroutines.Job? = null
 
     init {
         // Load saved filter state FIRST, then load data
@@ -175,7 +177,24 @@ class ScheduleViewModel(
     }
 
     private fun loadTab(tab: ScheduleTab, reset: Boolean) {
-        viewModelScope.launch {
+        // Cancel any existing load for this tab
+        when (tab) {
+            ScheduleTab.Upcoming -> {
+                loadJobsUpcoming?.cancel()
+                loadJobsUpcoming = viewModelScope.launch {
+                    executeLoadTab(tab, reset)
+                }
+            }
+            ScheduleTab.Previous -> {
+                loadJobsPrevious?.cancel()
+                loadJobsPrevious = viewModelScope.launch {
+                    executeLoadTab(tab, reset)
+                }
+            }
+        }
+    }
+
+    private suspend fun executeLoadTab(tab: ScheduleTab, reset: Boolean) {
             log.d { "Loading tab: $tab, reset: $reset" }
             val requestVersion = queryVersion
             val tabState = getTabState(tab)
@@ -268,7 +287,7 @@ class ScheduleViewModel(
                 // Ignore if query changed during request
                 if (requestVersion != queryVersion) {
                     log.d { "Query version changed, ignoring results" }
-                    return@launch
+                    return
                 }
 
                 val newItems = if (reset) {
@@ -294,6 +313,11 @@ class ScheduleViewModel(
                 log.i { "loadTab completed successfully for $tab" }
 
             } catch (t: Throwable) {
+                // Check if this was a cancellation - if so, don't log as error
+                if (t is kotlinx.coroutines.CancellationException) {
+                    log.d { "loadTab cancelled for $tab (expected during filter changes)" }
+                    throw t // Re-throw to properly handle cancellation
+                }
                 log.e(t) { "loadTab failed for $tab" }
                 updateTabState(
                     tab,
@@ -304,7 +328,6 @@ class ScheduleViewModel(
                     )
                 )
             }
-        }
     }
 
     private fun restoreOrReload(tab: ScheduleTab) {
@@ -391,12 +414,38 @@ class ScheduleViewModel(
     /**
      * Apply a filter for a specific agency by ID.
      * Used when navigating from Agency Detail screen.
+     * Returns a suspend function to ensure filter is fully applied before navigation.
      */
-    fun filterByAgency(agencyId: Int) {
-        val newFilterState = _uiState.value.filterState.copy(
+    suspend fun filterByAgencyAndWait(agencyId: Int) {
+        log.d { "filterByAgencyAndWait called with agencyId: $agencyId" }
+        
+        // Cancel any in-flight loads immediately
+        loadJobsUpcoming?.cancel()
+        loadJobsPrevious?.cancel()
+        loadJobsUpcoming = null
+        loadJobsPrevious = null
+        
+        val newFilterState = ScheduleFilterState(
             selectedAgencyIds = setOf(agencyId)
         )
-        applyFilters(newFilterState)
+        
+        // Update UI state immediately and clear both tabs
+        _uiState.value = _uiState.value.copy(
+            filterState = newFilterState,
+            upcomingTab = TabState(),  // Clear upcoming
+            previousTab = TabState()   // Clear previous
+        )
+        
+        // Invalidate cache immediately
+        invalidateCache()
+        
+        // Save to preferences (this will trigger the observer in init)
+        appPreferences.updateScheduleFilterState(newFilterState)
+        
+        // Wait for the observer to trigger and start loading
+        kotlinx.coroutines.delay(150)
+        
+        log.d { "Filter applied and ready for navigation" }
     }
 
     fun reloadFilterOptions() {

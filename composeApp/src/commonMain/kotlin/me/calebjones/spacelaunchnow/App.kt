@@ -9,11 +9,13 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
@@ -374,14 +376,17 @@ fun SpaceLaunchNowApp(
                         }
                         composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
                             val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                            val scope = rememberCoroutineScope()
                             AgencyDetailScreen(
                                 agencyId = agencyDetail.agencyId,
                                 onNavigateBack = { navController.popBackStack() },
                                 onNavigateToSchedule = { agencyId ->
-                                    // Apply agency filter BEFORE navigation
-                                    val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
-                                    scheduleViewModel.filterByAgency(agencyId)
-                                    navController.navigate(Schedule)
+                                    scope.launch {
+                                        // Apply agency filter and wait for it to complete
+                                        val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
+                                        scheduleViewModel.filterByAgencyAndWait(agencyId)
+                                        navController.navigate(Schedule)
+                                    }
                                 }
                             )
                         }
@@ -459,14 +464,17 @@ fun SpaceLaunchNowApp(
                         }
                         composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
                             val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                            val scope = rememberCoroutineScope()
                             AgencyDetailScreen(
                                 agencyId = agencyDetail.agencyId,
                                 onNavigateBack = { navController.popBackStack() },
                                 onNavigateToSchedule = { agencyId ->
-                                    // Apply agency filter BEFORE navigation
-                                    val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
-                                    scheduleViewModel.filterByAgency(agencyId)
-                                    navController.navigate(Schedule)
+                                    scope.launch {
+                                        // Apply agency filter and wait for it to complete
+                                        val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
+                                        scheduleViewModel.filterByAgencyAndWait(agencyId)
+                                        navController.navigate(Schedule)
+                                    }
                                 }
                             )
                         }
