@@ -199,3 +199,101 @@ suspend fun LauncherConfigurationsApi.getRocketList(
 suspend fun LauncherConfigurationsApi.getRocketDetails(
     id: Int
 ): HttpResponse<LauncherConfigDetailed> = launcherConfigurationsRetrieve(id = id)
+
+/**
+ * Get launcher configurations (rockets) with comprehensive filtering.
+ * 
+ * This extension function wraps the verbose generated API method (70+ parameters) 
+ * with a clean interface using the RocketFilters domain model.
+ * 
+ * @param filters RocketFilters domain model containing all query parameters
+ * @return HttpResponse containing PaginatedLauncherConfigNormalList
+ * @throws IllegalArgumentException if filters validation fails
+ */
+suspend fun LauncherConfigurationsApi.getRocketListFiltered(
+    filters: me.calebjones.spacelaunchnow.data.model.RocketFilters
+): HttpResponse<PaginatedLauncherConfigNormalList> {
+    // Validate filters before making API call
+    filters.validate()
+    
+    // Note: The Launch Library API doesn't support filtering by manufacturer IDs directly
+    // Manufacturer filtering would need to be done client-side after fetching results
+    
+    return launcherConfigurationsList(
+        // Core filter parameters
+        search = filters.searchQuery?.takeIf { it.isNotEmpty() },
+        active = filters.activeOnly,
+        ordering = filters.sortField.apiParam,
+        
+        // Pagination
+        limit = filters.limit,
+        offset = filters.offset,
+        
+        // All other 70+ parameters set to null
+        reusable = null,
+        attemptedLandings = null,
+        attemptedLandingsGt = null,
+        attemptedLandingsGte = null,
+        attemptedLandingsLt = null,
+        attemptedLandingsLte = null,
+        consecutiveSuccessfulLandings = null,
+        consecutiveSuccessfulLandingsGt = null,
+        consecutiveSuccessfulLandingsGte = null,
+        consecutiveSuccessfulLandingsLt = null,
+        consecutiveSuccessfulLandingsLte = null,
+        consecutiveSuccessfulLaunches = null,
+        consecutiveSuccessfulLaunchesGt = null,
+        consecutiveSuccessfulLaunchesGte = null,
+        consecutiveSuccessfulLaunchesLt = null,
+        consecutiveSuccessfulLaunchesLte = null,
+        failedLandings = null,
+        failedLandingsGt = null,
+        failedLandingsGte = null,
+        failedLandingsLt = null,
+        failedLandingsLte = null,
+        failedLaunches = null,
+        failedLaunchesGt = null,
+        failedLaunchesGte = null,
+        failedLaunchesLt = null,
+        failedLaunchesLte = null,
+        families = null,
+        familiesContains = null,
+        fullName = null,
+        fullNameContains = null,
+        isPlaceholder = null,
+        maidenFlight = null,
+        maidenFlightDay = null,
+        maidenFlightGt = null,
+        maidenFlightGte = null,
+        maidenFlightLt = null,
+        maidenFlightLte = null,
+        maidenFlightMonth = null,
+        maidenFlightYear = null,
+        manufacturerName = null,
+        manufacturerNameContains = null,
+        name = null,
+        nameContains = null,
+        pendingLaunches = null,
+        pendingLaunchesGt = null,
+        pendingLaunchesGte = null,
+        pendingLaunchesLt = null,
+        pendingLaunchesLte = null,
+        program = null,
+        programContains = null,
+        successfulLandings = null,
+        successfulLandingsGt = null,
+        successfulLandingsGte = null,
+        successfulLandingsLt = null,
+        successfulLandingsLte = null,
+        successfulLaunches = null,
+        successfulLaunchesGt = null,
+        successfulLaunchesGte = null,
+        successfulLaunchesLt = null,
+        successfulLaunchesLte = null,
+        totalLaunchCount = null,
+        totalLaunchCountGt = null,
+        totalLaunchCountGte = null,
+        totalLaunchCountLt = null,
+        totalLaunchCountLte = null
+    )
+}

@@ -4,9 +4,11 @@ import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getRocketDetails
 import me.calebjones.spacelaunchnow.api.extensions.getRocketList
+import me.calebjones.spacelaunchnow.api.extensions.getRocketListFiltered
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherConfigNormalList
+import me.calebjones.spacelaunchnow.data.model.RocketFilters
 
 class RocketRepositoryImpl(
     private val launcherConfigurationsApi: LauncherConfigurationsApi
@@ -53,6 +55,22 @@ class RocketRepositoryImpl(
         } catch (e: ResponseException) {
             Result.failure(e)
         } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun getRocketsFiltered(filters: RocketFilters): Result<PaginatedLauncherConfigNormalList> {
+        return try {
+            val response = launcherConfigurationsApi.getRocketListFiltered(filters)
+            Result.success(response.body())
+        } catch (e: ResponseException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: IllegalArgumentException) {
+            // Validation errors from filters.validate()
             Result.failure(e)
         } catch (e: Exception) {
             Result.failure(e)
