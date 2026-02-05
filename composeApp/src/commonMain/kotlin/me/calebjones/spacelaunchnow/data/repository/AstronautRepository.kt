@@ -20,6 +20,9 @@ interface AstronautRepository {
      * @param statusIds Optional list of status IDs to filter astronauts (e.g., active, retired)
      * @param agencyIds Optional list of agency IDs to filter astronauts by their agencies
      * @param ordering Optional field to sort results by (e.g., "name", "-name")
+     * @param hasFlown Optional filter by whether astronaut has flown to space
+     * @param inSpace Optional filter by whether astronaut is currently in space
+     * @param isHuman Optional filter by whether entry is for a human or non-human
      *
      * @return Result wrapping PaginatedAstronautEndpointNormalList on success,
      *         or an exception on failure (network error, API error, etc.)
@@ -30,7 +33,10 @@ interface AstronautRepository {
         search: String? = null,
         statusIds: List<Int>? = null,
         agencyIds: List<Int>? = null,
-        ordering: String? = null
+        ordering: String? = null,
+        hasFlown: Boolean? = null,
+        inSpace: Boolean? = null,
+        isHuman: Boolean? = null
     ): Result<PaginatedAstronautEndpointNormalList>
 
     /**

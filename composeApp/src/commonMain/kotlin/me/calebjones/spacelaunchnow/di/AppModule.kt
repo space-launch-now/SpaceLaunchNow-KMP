@@ -15,6 +15,8 @@ import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository
+import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
@@ -166,6 +168,7 @@ val appModule = module {
     viewModelOf(::AgencyListViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
+    singleOf(::AstronautFilterRepositoryImpl) { bind<AstronautFilterRepository>() }
     viewModelOf(::AstronautListViewModel)
     viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), astronautId) }
 
