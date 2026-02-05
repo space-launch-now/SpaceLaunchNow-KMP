@@ -64,6 +64,7 @@ import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapViewModel
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyListViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
@@ -162,6 +163,7 @@ val appModule = module {
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
+    viewModelOf(::AgencyListViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
     viewModelOf(::AstronautListViewModel)
