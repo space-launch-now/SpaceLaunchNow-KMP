@@ -116,7 +116,7 @@ fun AstronautListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (uiState.totalCount > 0) {
+                        text = if (activeFilterCount > 0) {
                             "Astronauts (${uiState.totalCount})"
                         } else {
                             "Astronauts"

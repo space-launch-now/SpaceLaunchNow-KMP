@@ -118,6 +118,8 @@ suspend fun LauncherConfigurationsApi.getRocketList(
     ordering: String? = null,
     active: Boolean? = null,
     reusable: Boolean? = null,
+    program: List<Int>? = null,
+    families: List<Int>? = null,
     manufacturerName: String? = null,
     manufacturerNameContains: String? = null
 ): HttpResponse<PaginatedLauncherConfigNormalList> = launcherConfigurationsList(
@@ -147,7 +149,7 @@ suspend fun LauncherConfigurationsApi.getRocketList(
     failedLaunchesGte = null,
     failedLaunchesLt = null,
     failedLaunchesLte = null,
-    families = null,
+    families = families,
     familiesContains = null,
     fullName = null,
     fullNameContains = null,
@@ -172,7 +174,7 @@ suspend fun LauncherConfigurationsApi.getRocketList(
     pendingLaunchesGte = null,
     pendingLaunchesLt = null,
     pendingLaunchesLte = null,
-    program = null,
+    program = program,
     programContains = null,
     reusable = reusable,
     search = search,
