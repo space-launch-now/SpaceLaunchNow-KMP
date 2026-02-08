@@ -370,7 +370,10 @@ class MockAstronautDetailRepository : AstronautRepository {
         search: String?,
         statusIds: List<Int>?,
         agencyIds: List<Int>?,
-        ordering: String?
+        ordering: String?,
+        hasFlown: Boolean?,
+        inSpace: Boolean?,
+        isHuman: Boolean?
     ): Result<PaginatedAstronautEndpointNormalList> {
         throw NotImplementedError("Not needed for detail view model tests")
     }
