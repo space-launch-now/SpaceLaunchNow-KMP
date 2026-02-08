@@ -18,14 +18,13 @@ fun RocketDetailScreen(
     onNavigateBack: () -> Unit
 ) {
     val viewModel = koinViewModel<RocketViewModel>()
+    val uiState by viewModel.uiState.collectAsState()
     val rocketDetails by viewModel.rocketDetails.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
 
     val log = SpaceLogger.getLogger("RocketDetailScreen")
 
     LaunchedEffect(rocketId) {
-        if (rocketDetails?.id != rocketId && !isLoading) {
+        if (rocketDetails?.id != rocketId) {
             viewModel.fetchRocketDetails(rocketId)
         }
     }
@@ -34,9 +33,9 @@ fun RocketDetailScreen(
     InterstitialAdHandler()
 
     when {
-        error != null -> {
+        uiState.error != null -> {
             RocketDetailErrorView(
-                errorMessage = error!!,
+                errorMessage = uiState.error!!,
                 onRetry = { viewModel.fetchRocketDetails(rocketId) },
                 onNavigateBack = onNavigateBack
             )

@@ -31,6 +31,8 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepository
+import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
@@ -178,6 +180,7 @@ val appModule = module {
     }
     viewModelOf(::SpaceStationViewModel)
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
+    singleOf(::RocketFilterRepositoryImpl) { bind<RocketFilterRepository>() }
     singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
     singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
     singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
