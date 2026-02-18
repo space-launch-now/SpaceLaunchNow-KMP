@@ -249,45 +249,6 @@ fun SettingsScreen(
                     }
                 }
                 // ABOUT
-                // EXPLORE
-                item {
-                    SectionHeaderText("Explore (WORK IN PROGRESS VIEWS)")
-                    Spacer(Modifier.height(2.dp))
-                    SettingsCardRow {
-                        Column(Modifier.fillMaxWidth()) {
-                            SettingsNavigationRow(
-                                title = "Starship",
-                                subtitle = "Track Starship development, launches, and events",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Starship) }
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            SettingsNavigationRow(
-                                title = "Rockets",
-                                subtitle = "Browse launcher configurations and details",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Rockets) }
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            SettingsNavigationRow(
-                                title = "Agencies",
-                                subtitle = "Explore space agencies and their missions",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Agencies) }
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            SettingsNavigationRow(
-                                title = "Astronauts",
-                                subtitle = "Browse astronauts, view their career stats and missions",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Astronauts) }
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            SettingsNavigationRow(
-                                title = "ISS Tracking",
-                                subtitle = "Live tracking, orbit path, crew, and NASA live stream",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SpaceStationDetail(4)) }
-                            )
-                        }
-                    }
-                }
-                // ABOUT
                 item {
                     SectionHeaderText("About")
                     Spacer(Modifier.height(2.dp))
