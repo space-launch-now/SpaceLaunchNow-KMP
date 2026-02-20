@@ -322,7 +322,11 @@ launchesApi.getLaunchMiniList(limit = 10, upcoming = true)
 
 ### Adding New Screens/Features
 
-For ANY UI work - make sure Previews are made for new componenets. Prefer common composables instead of creating new ones where ever possible. Additionally any datetime handling should use the DateTimeUtil class for consistency that support the UTC toggle. Always remember to keep accessibility in mind when creating new components.
+For ANY UI work - make sure **dual Previews** (light AND dark theme) are made for new components:
+- Light preview: `@Preview @Composable private fun ComponentNamePreview()` using `SpaceLaunchNowPreviewTheme()`
+- Dark preview: `@Preview @Composable private fun ComponentNameDarkPreview()` using `SpaceLaunchNowPreviewTheme(isDark = true)`
+
+Prefer common composables instead of creating new ones where ever possible. Additionally any datetime handling should use the DateTimeUtil class for consistency that support the UTC toggle. Always remember to keep accessibility in mind when creating new components.
 
 1. Add screen to `Screen.kt` sealed class
 2. Create ViewModel extending `ViewModel` with StateFlow properties
@@ -330,6 +334,7 @@ For ANY UI work - make sure Previews are made for new componenets. Prefer common
 4. Add repository if external data needed, register with `bind<Interface>()`
 5. Implement Composables in separate files as often as possible, keep files as short as possible
 6. Attempt to use components from `ui/components/` to match styles
+7. **Add dual previews** (light + dark) for all new Composables
 
 ### Platform-Specific Code
 

@@ -25,9 +25,12 @@ import androidx.navigation.toRoute
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
+import me.calebjones.spacelaunchnow.navigation.AstronautDetail
+import me.calebjones.spacelaunchnow.navigation.Astronauts
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
@@ -36,7 +39,9 @@ import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
+import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Settings
+import me.calebjones.spacelaunchnow.navigation.SpaceStationDetail
 import me.calebjones.spacelaunchnow.navigation.Starship
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
@@ -80,6 +85,10 @@ fun PhoneLayout(
         Agencies::class.qualifiedName -> false // Hide for Agencies list
         AgencyDetail::class.qualifiedName -> false // Hide for AgencyDetail
         FullscreenVideo::class.qualifiedName -> false // Hide for FullscreenVideo
+        AstronautDetail::class.qualifiedName -> false // Hide for AstronautDetail
+        Astronauts::class.qualifiedName -> false
+        SpaceStationDetail::class.qualifiedName -> false // Hide for SpaceStationDetail
+        Starship::class.qualifiedName -> false // Hide for Starship
         NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
         DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
         AboutLibraries::class.qualifiedName -> false // Hide for AboutLibrariesScreen
@@ -93,11 +102,10 @@ fun PhoneLayout(
             val currentRoute = navBackStackEntry?.destination?.route
 
             // If the route contains LaunchDetail, EventDetail, AgencyDetail, or FullscreenVideo, hide bottom bar
-            currentRoute?.contains("LaunchDetail") != true &&
-                    currentRoute?.contains("EventDetail") != true &&
-                    currentRoute?.contains("AgencyDetail") != true &&
+            currentRoute?.contains("Detail") != true &&
                     currentRoute?.contains("Rockets") != true &&
-                    currentRoute?.contains("Agencies") != true &&
+//                    currentRoute?.contains("Agencies") != true &&
+                    currentRoute?.contains("Astronauts") != true &&
                     currentRoute?.contains("FullscreenVideo") != true &&
                     currentRoute?.contains("NotificationSettings") != true &&
                     currentRoute?.contains("DebugSettings") != true
@@ -146,35 +154,38 @@ private fun PhoneContentWrapper(
         EventDetail::class.qualifiedName,
         RocketDetail::class.qualifiedName,
         AgencyDetail::class.qualifiedName,
+        Agencies::class.qualifiedName,
+        Rockets::class.qualifiedName,
+        Astronauts::class.qualifiedName,
+        Starship::class.qualifiedName,
+        AstronautDetail::class.qualifiedName,
+        SpaceStationDetail::class.qualifiedName,
         FullscreenVideo::class.qualifiedName,
         NotificationSettings::class.qualifiedName,
         DebugSettings::class.qualifiedName -> false
-        
-        // Default padding for main routes  
+
+        // Default padding for main routes
         Home::class.qualifiedName,
         Settings::class.qualifiedName,
-        Starship::class.qualifiedName -> true
-        
-        // Full padding for list routes
+        Explore::class.qualifiedName,
         Schedule::class.qualifiedName -> true
-        
+
+
         else -> {
             // For routes with arguments, check if it starts with certain patterns
             val currentRoute = navBackStackEntry?.destination?.route
-            currentRoute?.contains("LaunchDetail") != true &&
-                    currentRoute?.contains("EventDetail") != true &&
-                    currentRoute?.contains("AgencyDetail") != true &&
+            currentRoute?.contains("Detail") != true &&
                     currentRoute?.contains("FullscreenVideo") != true &&
                     currentRoute?.contains("NotificationSettings") != true &&
                     currentRoute?.contains("DebugSettings") != true
         }
     }
-    
+
     val needsAllPadding = when (navBackStackEntry?.destination?.route) {
         Schedule::class.qualifiedName -> true
         else -> false
     }
-    
+
     // Apply appropriate padding based on route
     Box(
         modifier = when {
