@@ -50,6 +50,7 @@ sealed class FilterResult {
         object Reasons {
             const val NOTIFICATIONS_DISABLED = "Notifications disabled globally"
             const val NOTIFICATION_TYPE_DISABLED = "Notification type disabled"
+            const val NO_AGENCIES_OR_LOCATIONS_SUBSCRIBED = "No agencies or locations subscribed"
             const val NO_LSPS_SUBSCRIBED = "No LSPs subscribed"
             const val NO_LOCATIONS_SUBSCRIBED = "No locations subscribed"
             const val NO_PROGRAMS_SUBSCRIBED = "No programs subscribed"

@@ -74,12 +74,11 @@ class NotificationWorker(
 
         log.d { "🔔 V5 Parsed: ${v5Payload.toDebugString()}" }
 
-        // Get user settings
-        val settings = notificationStateStorage.getState()
-        val v5Preferences = settings.v5Preferences
+        // Get user settings (full NotificationState, not just v5Preferences)
+        val state = notificationStateStorage.getState()
 
-        // Apply V5 client-side filtering
-        val filterResult = V5NotificationFilter.shouldShow(v5Payload, v5Preferences)
+        // Apply V5 client-side filtering (now uses NotificationState directly)
+        val filterResult = V5NotificationFilter.shouldShow(v5Payload, state)
 
         // Use server-provided title and body for V5
         val title = v5Payload.title
