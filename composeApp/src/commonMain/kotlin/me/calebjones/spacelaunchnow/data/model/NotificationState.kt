@@ -34,7 +34,7 @@ data class NotificationState(
     val lastError: String? = null
 ) {
     companion object {
-        private val log = logger()
+        private val log by lazy { logger() }
         
         /**
          * Get default agency IDs for all available agencies (using numeric IDs for v4 filtering)
