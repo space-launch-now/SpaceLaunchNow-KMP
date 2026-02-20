@@ -35,17 +35,17 @@ data class V5NotificationPayload(
     val webcast: Boolean,               // Has webcast
     val webcastLive: Boolean,           // Is webcast currently live
 
-    // V5 Filtering IDs (Extended)
-    val lspId: Int?,                    // Launch Service Provider ID
-    val locationId: Int?,               // Launch location ID
-    val programIds: List<Int>,          // Program IDs (parsed from comma-separated string)
-    val statusId: Int?,                 // Launch status ID (optional)
-    val orbitId: Int?,                  // Target orbit ID (optional)
-    val missionTypeId: Int?,            // Mission type ID (optional)
-    val launcherFamilyId: Int?          // Launcher family ID (optional)
+    // V5 Filtering IDs (Extended) - String-based to match server format
+    val lspId: String?,                 // Launch Service Provider ID (e.g., "121" for SpaceX)
+    val locationId: String?,            // Launch location ID (e.g., "12" for Cape Canaveral)
+    val programId: String?,             // Program ID (single value, e.g., "25" for Artemis)
+    val statusId: String?,              // Launch status ID (optional)
+    val orbitId: String?,               // Target orbit ID (optional)
+    val missionTypeId: String?,         // Mission type ID (optional)
+    val launcherFamilyId: String?       // Launcher family ID (optional)
 ) {
     companion object {
-        private val log = logger()
+        private val log by lazy { logger() }
 
         /**
          * Parse V5 payload from FCM data map
@@ -69,17 +69,14 @@ data class V5NotificationPayload(
                     launchLocation = data[NotificationTopicConfig.PayloadFields.LAUNCH_LOCATION] ?: "",
                     webcast = data[NotificationTopicConfig.PayloadFields.WEBCAST]?.lowercase() == "true",
                     webcastLive = data[NotificationTopicConfig.PayloadFields.WEBCAST_LIVE]?.lowercase() == "true",
-                    // V5 Extended Fields
-                    lspId = data[NotificationTopicConfig.PayloadFields.LSP_ID]?.toIntOrNull(),
-                    locationId = data[NotificationTopicConfig.PayloadFields.LOCATION_ID]?.toIntOrNull(),
-                    programIds = data[NotificationTopicConfig.PayloadFields.PROGRAM_IDS]
-                        ?.split(",")
-                        ?.mapNotNull { it.trim().toIntOrNull() }
-                        ?: emptyList(),
-                    statusId = data[NotificationTopicConfig.PayloadFields.STATUS_ID]?.toIntOrNull(),
-                    orbitId = data[NotificationTopicConfig.PayloadFields.ORBIT_ID]?.toIntOrNull(),
-                    missionTypeId = data[NotificationTopicConfig.PayloadFields.MISSION_TYPE_ID]?.toIntOrNull(),
-                    launcherFamilyId = data[NotificationTopicConfig.PayloadFields.LAUNCHER_FAMILY_ID]?.toIntOrNull()
+                    // V5 Extended Fields - Keep as Strings (match server format)
+                    lspId = data[NotificationTopicConfig.PayloadFields.LSP_ID],
+                    locationId = data[NotificationTopicConfig.PayloadFields.LOCATION_ID],
+                    programId = data[NotificationTopicConfig.PayloadFields.PROGRAM_IDS], // Single value, not list
+                    statusId = data[NotificationTopicConfig.PayloadFields.STATUS_ID],
+                    orbitId = data[NotificationTopicConfig.PayloadFields.ORBIT_ID],
+                    missionTypeId = data[NotificationTopicConfig.PayloadFields.MISSION_TYPE_ID],
+                    launcherFamilyId = data[NotificationTopicConfig.PayloadFields.LAUNCHER_FAMILY_ID]
                 )
             } catch (e: Exception) {
                 log.e(e) { "❌ Failed to parse V5 notification payload: ${e.message}" }
@@ -105,7 +102,7 @@ data class V5NotificationPayload(
      * Check if this notification has any filtering IDs
      */
     fun hasFilteringIds(): Boolean {
-        return lspId != null || locationId != null || programIds.isNotEmpty() ||
+        return lspId != null || locationId != null || programId != null ||
             statusId != null || orbitId != null || missionTypeId != null || launcherFamilyId != null
     }
 
@@ -119,7 +116,7 @@ data class V5NotificationPayload(
             append("launch=$launchName, ")
             append("lspId=$lspId, ")
             append("locationId=$locationId, ")
-            if (programIds.isNotEmpty()) append("programs=$programIds, ")
+            if (programId != null) append("program=$programId, ")
             if (statusId != null) append("status=$statusId, ")
             if (orbitId != null) append("orbit=$orbitId, ")
             if (missionTypeId != null) append("missionType=$missionTypeId, ")

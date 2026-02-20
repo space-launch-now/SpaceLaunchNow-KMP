@@ -1,34 +1,35 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.1.0 → 1.2.0
+Version Change: 1.2.0 → 1.3.0
 
-Added Principles:
-  - VII. Testing Standards (NEW)
-    - Establishes mandatory testing requirements for critical paths
-    - Defines integration test coverage for API clients
-    - Requires UI tests for critical user journeys
-    - Specifies test location conventions
+Modified Principles:
+  - III. Accessibility & User Experience (EXPANDED)
+    - Added requirement for dual previews (light + dark theme) for all UI components
+    - Establishes @Preview naming convention pattern
+    - Requires SpaceLaunchNowPreviewTheme wrapper with isDark parameter
+    - Ensures theme-aware UI development and visual verification
 
 Principles (Current):
   - I. Mobile-First Development (Android & iOS Equal Priority)
   - II. Pattern-Based Consistency
-  - III. Accessibility & User Experience
+  - III. Accessibility & User Experience (EXPANDED)
   - IV. CI/CD & Conventional Commits (NON-NEGOTIABLE)
   - V. Code Generation & API Management
   - VI. Multiplatform Architecture
-  - VII. Testing Standards (NEW)
+  - VII. Testing Standards
 
 Templates Status:
   ✅ plan-template.md - No updates required
   ✅ spec-template.md - No updates required
-  ✅ tasks-template.md - Test task sections align with new principle
+  ✅ tasks-template.md - Existing UI task sections already cover preview requirements
 
 Follow-up TODOs:
-  - None - new principle added
+  - None - principle expansion documented
 
 Ratification Date: 2026-01-21 (initial adoption)
-Amendment Reason: Added Testing Standards as new core principle
+Last Amendment: 2026-02-08
+Amendment Reason: Added dual preview pattern requirement for theme-aware UI development
 -->
 
 # SpaceLaunchNow KMP Constitution
@@ -57,12 +58,15 @@ Code MUST follow established project patterns without deviation unless explicitl
 
 All UI components MUST be accessible and user-friendly:
 
-- **Previews Required**: All new Composables MUST include `@Preview` annotations for visual verification
+- **Dual Previews Required**: All new Composables MUST include BOTH light and dark theme previews:
+  - Light preview: `@Preview @Composable private fun ComponentNamePreview()` using default `SpaceLaunchNowPreviewTheme()`
+  - Dark preview: `@Preview @Composable private fun ComponentNameDarkPreview()` using `SpaceLaunchNowPreviewTheme(isDark = true)`
+  - Naming convention: Base preview uses component name + "Preview", dark variant uses component name + "DarkPreview"
 - **Component Reuse**: MUST prefer existing components from `ui/components/` before creating new ones
 - **File Size**: Keep Composable files as short as possible by extracting reusable components
 - **Accessibility**: MUST implement proper content descriptions, semantic properties, and keyboard navigation
 
-**Rationale**: Accessible design expands user reach and ensures compliance with platform accessibility standards. Previews accelerate development and reduce UI regression bugs.
+**Rationale**: Accessible design expands user reach and ensures compliance with platform accessibility standards. Dual previews ensure UI components render correctly in both light and dark themes, catching theme-specific issues during development rather than in production. Preview consistency enables rapid visual verification across the entire component library.
 
 ### IV. CI/CD & Conventional Commits (NON-NEGOTIABLE)
 
@@ -155,4 +159,4 @@ This constitution supersedes all conflicting practices in the codebase. All pull
 
 **Runtime Guidance**: For day-to-day development guidance, reference `.github/copilot-instructions.md` which provides detailed implementation patterns and common gotchas aligned with these principles.
 
-**Version**: 1.2.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-01-21
+**Version**: 1.3.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-02-08

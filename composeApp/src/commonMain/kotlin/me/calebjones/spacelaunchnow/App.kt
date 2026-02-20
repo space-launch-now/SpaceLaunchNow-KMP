@@ -27,6 +27,7 @@ import me.calebjones.spacelaunchnow.navigation.Astronauts
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
@@ -52,6 +53,7 @@ import me.calebjones.spacelaunchnow.ui.astronaut.AstronautListScreen
 import me.calebjones.spacelaunchnow.ui.compose.BetaWarningDialog
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
+import me.calebjones.spacelaunchnow.ui.explore.ExploreScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
@@ -344,6 +346,9 @@ fun SpaceLaunchNowApp(
                             ScheduleScreen(
                                 onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
                             )
+                        }
+                        composableWithCompositionLocal<Explore> {
+                            ExploreScreen(navController = navController)
                         }
                         composableWithCompositionLocal<Settings> {
                             SettingsScreen(

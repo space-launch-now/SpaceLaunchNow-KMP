@@ -3,271 +3,156 @@ package me.calebjones.spacelaunchnow.data.model
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
- * V5 Notification Filter
+ * V5 Notification Filter (Simplified)
  *
- * Filter logic for V5 notifications with extended filtering capabilities.
- * Evaluates V5 notification payloads against user preferences to determine
- * whether notifications should be displayed.
+ * Simplified filter logic for V5 notifications that reuses NotificationState
+ * from V4. This eliminates the complex Int-based filtering system and dual
+ * state management, fixing the bug where users received all notifications.
  *
- * Filter Categories:
- * - LSP (Launch Service Provider)
- * - Location
- * - Program
- * - Orbit
- * - Mission Type
- * - Launcher Family
+ * Key Changes from Previous Implementation:
+ * - Uses NotificationState (String-based IDs) instead of V5FilterPreferences (Int-based)
+ * - Simple String membership checks: `"121" in state.subscribedAgencies`
+ * - No String→Int conversion overhead
+ * - Matches V4 filtering pattern (proven to work)
  *
  * Filter Logic:
- * - null preference = no filtering (follow all)
- * - empty set = block all
- * - non-empty set = filter to matching items
+ * - Master enable check: If notifications disabled, block all
+ * - Follow all bypass: If followAllLaunches enabled, allow all
+ * - Empty filters: If both agency and location filters empty, block all
+ * - Flexible mode (OR): Agency OR location must match
+ * - Strict mode (AND): Agency AND location must match
+ * - Webcast-only: Optionally filter to launches with webcasts
  *
- * Matching Modes:
- * - Strict (AND): ALL active filter categories must match
- * - Flexible (OR): ANY active filter category can match (default)
+ * Example:
+ * ```kotlin
+ * val payload = V5NotificationPayload.fromMap(fcmData)
+ * val state = notificationStateStorage.getState()
+ * val result = V5NotificationFilter.shouldShow(payload, state)
+ * if (result is FilterResult.Allowed) {
+ *     showNotification(payload)
+ * }
+ * ```
  */
 object V5NotificationFilter {
-    private val log = logger()
+    private val log by lazy { logger() }
 
     /**
-     * Determine if V5 notification should be shown based on user preferences
+     * Determine if V5 notification should be shown based on user state
      *
-     * @param payload The V5 notification payload
-     * @param preferences User filter preferences
-     * @return FilterResult indicating whether to show or block
+     * @param payload The V5 notification payload (with String IDs)
+     * @param state Current notification state (from NotificationState)
+     * @return FilterResult indicating whether to show or block, with reason
      */
     fun shouldShow(
         payload: V5NotificationPayload,
-        preferences: V5FilterPreferences
+        state: NotificationState
     ): FilterResult {
         log.d { "🔍 V5Filter: Evaluating ${payload.toDebugString()}" }
-        log.d { "🔍 V5Filter: Preferences ${preferences.toDebugString()}" }
+        log.d { "🔍 V5Filter: Subscriptions - agencies=${state.subscribedAgencies}, locations=${state.subscribedLocations}" }
 
-        // 1. Check master enable
-        if (!preferences.enableNotifications) {
+        // 1. Check if notifications are globally enabled
+        if (!state.enableNotifications) {
             log.d { "🔇 V5 BLOCKED: ${FilterResult.Companion.Reasons.NOTIFICATIONS_DISABLED}" }
             return FilterResult.blocked(FilterResult.Companion.Reasons.NOTIFICATIONS_DISABLED)
         }
 
-        // 2. Check notification type
-        if (payload.notificationType !in preferences.enabledNotificationTypes) {
-            val reason = "${FilterResult.Companion.Reasons.NOTIFICATION_TYPE_DISABLED}: '${payload.notificationType}'"
-            log.d { "🔇 V5 BLOCKED: $reason" }
-            return FilterResult.blocked(reason)
-        }
-
-        // 3. Check webcast-only filter
-        if (preferences.webcastOnly && !payload.webcast) {
+        // 2. Check webcast-only filter
+        val webcastOnly = state.isTopicEnabled(NotificationTopic.WEBCAST_ONLY)
+        if (webcastOnly && !payload.webcast) {
             log.d { "🔇 V5 BLOCKED: ${FilterResult.Companion.Reasons.WEBCAST_ONLY_NO_WEBCAST}" }
             return FilterResult.blocked(FilterResult.Companion.Reasons.WEBCAST_ONLY_NO_WEBCAST)
         }
 
-        // 4. Check filter categories
-        val filterResults = mutableListOf<CategoryFilterResult>()
+        // 3. Check notification type (timing) settings
+        // TODO: Implement notification type checking if needed
+        // For now, assume all notification types are enabled (V4 doesn't check this for V5 either)
 
-        // LSP filter
-        checkLspFilter(payload, preferences)?.let { filterResults.add(it) }
-
-        // Location filter
-        checkLocationFilter(payload, preferences)?.let { filterResults.add(it) }
-
-        // Program filter
-        checkProgramFilter(payload, preferences)?.let { filterResults.add(it) }
-
-        // Orbit filter
-        checkOrbitFilter(payload, preferences)?.let { filterResults.add(it) }
-
-        // Mission type filter
-        checkMissionTypeFilter(payload, preferences)?.let { filterResults.add(it) }
-
-        // Launcher family filter
-        checkLauncherFamilyFilter(payload, preferences)?.let { filterResults.add(it) }
-
-        // 5. If no filters are active, allow
-        if (filterResults.isEmpty()) {
-            log.d { "✅ V5 ALLOWED: No category filters active" }
+        // 4. Check if following all launches
+        // When followAllLaunches is enabled, show ALL notifications (skip agency/location filtering)
+        if (state.followAllLaunches) {
+            log.d { "✅ V5 ALLOWED: Following all launches (filters bypassed)" }
             return FilterResult.Allowed
         }
 
-        // 6. Check for immediate blocks (empty subscription sets)
-        val immediateBlock = filterResults.find { it.immediateBlock != null }
-        if (immediateBlock != null) {
-            log.d { "🔇 V5 BLOCKED: ${immediateBlock.immediateBlock}" }
-            return FilterResult.blocked(immediateBlock.immediateBlock!!)
+        // 5. Check if both filters are empty (block everything)
+        if (state.subscribedAgencies.isEmpty() && state.subscribedLocations.isEmpty()) {
+            log.d { "🔇 V5 BLOCKED: ${FilterResult.Companion.Reasons.NO_AGENCIES_OR_LOCATIONS_SUBSCRIBED}" }
+            return FilterResult.blocked(FilterResult.Companion.Reasons.NO_AGENCIES_OR_LOCATIONS_SUBSCRIBED)
         }
 
-        // 7. Apply filter logic (strict = AND, flexible = OR)
-        val matches = filterResults.map { it.matches }
-        val passed = if (preferences.useStrictMatching) {
-            // Strict mode: ALL must match
-            matches.all { it == true }
+        // 6. Determine which filters are active
+        val hasAgencyFilter = state.subscribedAgencies.isNotEmpty()
+        val hasLocationFilter = state.subscribedLocations.isNotEmpty()
+
+        log.v { "Agency filter active: $hasAgencyFilter, Location filter active: $hasLocationFilter" }
+
+        // 7. Check agency/LSP filter (V5 uses lspId instead of agencyId)
+        val agencyMatch = if (hasAgencyFilter) {
+            val matched = payload.lspId != null && state.subscribedAgencies.contains(payload.lspId)
+            log.d { "Agency/LSP match: $matched (payload=${payload.lspId}, subscribed=${state.subscribedAgencies.take(5)}...)" }
+            matched
         } else {
-            // Flexible mode: ANY can match (null counts as no preference, treat as pass)
-            matches.any { it == true } || matches.all { it == null }
+            true // No agency filter, so don't block based on agency
         }
 
-        return if (passed) {
-            log.d { "✅ V5 ALLOWED: Filter passed (strict=${preferences.useStrictMatching}, results=$filterResults)" }
+        // 8. Check location filter
+        val locationMatch = if (hasLocationFilter) {
+            // Direct match
+            val matched = if (payload.locationId != null && state.subscribedLocations.contains(payload.locationId)) {
+                true
+            }
+            // Wildcard match (locationId="0" means "Other" / any location)
+            else if (state.subscribedLocations.contains("0")) {
+                true
+            }
+            // Check if notification's location is in any subscribed location's additionalIds
+            // (for grouped locations like FLORIDA which includes multiple location IDs)
+            else {
+                val allLocations = NotificationLocation.getAll()
+                state.subscribedLocations.any { subscribedLocationId ->
+                    val location = allLocations.find { it.id.toString() == subscribedLocationId }
+                    location?.getAllIds()?.any { it.toString() == payload.locationId } ?: false
+                }
+            }
+            log.d { "Location match: $matched (payload=${payload.locationId}, subscribed=${state.subscribedLocations.take(5)}...)" }
+            matched
+        } else {
+            true // No location filter, so don't block based on location
+        }
+
+        // 9. Apply strict vs flexible matching logic
+        val shouldShow = if (state.useStrictMatching) {
+            // Strict mode: BOTH agency AND location must match
+            // If either filter is inactive (empty), we can't satisfy "BOTH" requirement
+            if (!hasAgencyFilter || !hasLocationFilter) {
+                log.d { "🔇 V5 BLOCKED: Strict matching requires BOTH agency AND location filters to be active" }
+                false
+            } else {
+                val result = agencyMatch && locationMatch
+                if (!result) {
+                    log.d { "🔇 V5 BLOCKED: Strict matching - agency: $agencyMatch, location: $locationMatch (need BOTH)" }
+                } else {
+                    log.d { "✅ V5 ALLOWED: Strict matching - agency: $agencyMatch, location: $locationMatch (both match)" }
+                }
+                result
+            }
+        } else {
+            // Flexible mode: EITHER agency OR location can match
+            val result = agencyMatch || locationMatch
+            if (!result) {
+                log.d { "🔇 V5 BLOCKED: Flexible matching - agency: $agencyMatch, location: $locationMatch (need at least ONE)" }
+            } else {
+                log.d { "✅ V5 ALLOWED: Flexible matching - agency: $agencyMatch, location: $locationMatch (at least one matches)" }
+            }
+            result
+        }
+
+        return if (shouldShow) {
             FilterResult.Allowed
         } else {
-            val reason = "${FilterResult.Companion.Reasons.FILTER_CRITERIA_NOT_MET} (strict=${preferences.useStrictMatching})"
-            log.d { "🔇 V5 BLOCKED: $reason" }
-            FilterResult.blocked(reason)
+            FilterResult.blocked("${FilterResult.Companion.Reasons.FILTER_CRITERIA_NOT_MET} (strict=${state.useStrictMatching})")
         }
     }
-
-    // MARK: - Category Filter Checks
-
-    /**
-     * Check LSP filter category
-     * @return null if no filter active, CategoryFilterResult otherwise
-     */
-    private fun checkLspFilter(
-        payload: V5NotificationPayload,
-        preferences: V5FilterPreferences
-    ): CategoryFilterResult? {
-        val subscribedIds = preferences.subscribedLspIds ?: return null
-
-        // Empty set = block all
-        if (subscribedIds.isEmpty()) {
-            return CategoryFilterResult(
-                category = "LSP",
-                matches = false,
-                immediateBlock = FilterResult.Companion.Reasons.NO_LSPS_SUBSCRIBED
-            )
-        }
-
-        // Check if payload LSP matches
-        val payloadLspId = payload.lspId
-        val matches = payloadLspId != null && payloadLspId in subscribedIds
-        log.v { "  LSP filter: payload=$payloadLspId, subscribed=$subscribedIds, matches=$matches" }
-
-        return CategoryFilterResult(category = "LSP", matches = matches)
-    }
-
-    /**
-     * Check location filter category
-     */
-    private fun checkLocationFilter(
-        payload: V5NotificationPayload,
-        preferences: V5FilterPreferences
-    ): CategoryFilterResult? {
-        val subscribedIds = preferences.subscribedLocationIds ?: return null
-
-        if (subscribedIds.isEmpty()) {
-            return CategoryFilterResult(
-                category = "Location",
-                matches = false,
-                immediateBlock = FilterResult.Companion.Reasons.NO_LOCATIONS_SUBSCRIBED
-            )
-        }
-
-        val payloadLocationId = payload.locationId
-        val matches = payloadLocationId != null && payloadLocationId in subscribedIds
-        log.v { "  Location filter: payload=$payloadLocationId, subscribed=$subscribedIds, matches=$matches" }
-
-        return CategoryFilterResult(category = "Location", matches = matches)
-    }
-
-    /**
-     * Check program filter category
-     * Programs use ANY match (if any program ID matches, it passes)
-     */
-    private fun checkProgramFilter(
-        payload: V5NotificationPayload,
-        preferences: V5FilterPreferences
-    ): CategoryFilterResult? {
-        val subscribedIds = preferences.subscribedProgramIds ?: return null
-
-        if (subscribedIds.isEmpty()) {
-            return CategoryFilterResult(
-                category = "Program",
-                matches = false,
-                immediateBlock = FilterResult.Companion.Reasons.NO_PROGRAMS_SUBSCRIBED
-            )
-        }
-
-        val payloadProgramIds = payload.programIds
-        val matches = payloadProgramIds.any { it in subscribedIds }
-        log.v { "  Program filter: payload=$payloadProgramIds, subscribed=$subscribedIds, matches=$matches" }
-
-        return CategoryFilterResult(category = "Program", matches = matches)
-    }
-
-    /**
-     * Check orbit filter category
-     */
-    private fun checkOrbitFilter(
-        payload: V5NotificationPayload,
-        preferences: V5FilterPreferences
-    ): CategoryFilterResult? {
-        val subscribedIds = preferences.subscribedOrbitIds ?: return null
-
-        if (subscribedIds.isEmpty()) {
-            return CategoryFilterResult(
-                category = "Orbit",
-                matches = false,
-                immediateBlock = FilterResult.Companion.Reasons.NO_ORBITS_SUBSCRIBED
-            )
-        }
-
-        val payloadOrbitId = payload.orbitId
-        // If payload has no orbit ID, treat as null match (not failed)
-        val matches = if (payloadOrbitId != null) payloadOrbitId in subscribedIds else null
-        log.v { "  Orbit filter: payload=$payloadOrbitId, subscribed=$subscribedIds, matches=$matches" }
-
-        return CategoryFilterResult(category = "Orbit", matches = matches)
-    }
-
-    /**
-     * Check mission type filter category
-     */
-    private fun checkMissionTypeFilter(
-        payload: V5NotificationPayload,
-        preferences: V5FilterPreferences
-    ): CategoryFilterResult? {
-        val subscribedIds = preferences.subscribedMissionTypeIds ?: return null
-
-        if (subscribedIds.isEmpty()) {
-            return CategoryFilterResult(
-                category = "MissionType",
-                matches = false,
-                immediateBlock = FilterResult.Companion.Reasons.NO_MISSION_TYPES_SUBSCRIBED
-            )
-        }
-
-        val payloadMissionTypeId = payload.missionTypeId
-        val matches = if (payloadMissionTypeId != null) payloadMissionTypeId in subscribedIds else null
-        log.v { "  MissionType filter: payload=$payloadMissionTypeId, subscribed=$subscribedIds, matches=$matches" }
-
-        return CategoryFilterResult(category = "MissionType", matches = matches)
-    }
-
-    /**
-     * Check launcher family filter category
-     */
-    private fun checkLauncherFamilyFilter(
-        payload: V5NotificationPayload,
-        preferences: V5FilterPreferences
-    ): CategoryFilterResult? {
-        val subscribedIds = preferences.subscribedLauncherFamilyIds ?: return null
-
-        if (subscribedIds.isEmpty()) {
-            return CategoryFilterResult(
-                category = "LauncherFamily",
-                matches = false,
-                immediateBlock = FilterResult.Companion.Reasons.NO_LAUNCHER_FAMILIES_SUBSCRIBED
-            )
-        }
-
-        val payloadLauncherFamilyId = payload.launcherFamilyId
-        val matches = if (payloadLauncherFamilyId != null) payloadLauncherFamilyId in subscribedIds else null
-        log.v { "  LauncherFamily filter: payload=$payloadLauncherFamilyId, subscribed=$subscribedIds, matches=$matches" }
-
-        return CategoryFilterResult(category = "LauncherFamily", matches = matches)
-    }
-
-    // MARK: - Convenience Methods
 
     /**
      * Convenience method for filtering from raw data map
@@ -275,13 +160,13 @@ object V5NotificationFilter {
      */
     fun shouldShowFromMap(
         dataMap: Map<String, String>,
-        preferences: V5FilterPreferences
+        state: NotificationState
     ): FilterResult {
         val payload = V5NotificationPayload.fromMap(dataMap) ?: run {
             log.w { "⚠️ Failed to parse V5 notification payload, blocking notification" }
             return FilterResult.blocked("Failed to parse V5 notification payload")
         }
-        return shouldShow(payload, preferences)
+        return shouldShow(payload, state)
     }
 
     /**
@@ -289,19 +174,8 @@ object V5NotificationFilter {
      */
     fun shouldShowNotification(
         payload: V5NotificationPayload,
-        preferences: V5FilterPreferences
+        state: NotificationState
     ): Boolean {
-        return shouldShow(payload, preferences).shouldShow()
+        return shouldShow(payload, state).shouldShow()
     }
-}
-
-/**
- * Internal helper class for tracking category filter results
- */
-private data class CategoryFilterResult(
-    val category: String,
-    val matches: Boolean?,           // true = matched, false = didn't match, null = payload missing this ID
-    val immediateBlock: String? = null  // If non-null, block immediately with this reason
-) {
-    override fun toString(): String = "$category:$matches"
 }
