@@ -22,6 +22,26 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 /**
+ * Mock implementation of AstronautFilterRepository for testing ViewModels.
+ */
+class MockAstronautFilterRepository : me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository {
+    private var statusesResponse: List<me.calebjones.spacelaunchnow.data.model.FilterOption> = emptyList()
+    var shouldReturnError = false
+
+    fun setStatusesResponse(response: List<me.calebjones.spacelaunchnow.data.model.FilterOption>) {
+        statusesResponse = response
+    }
+
+    override suspend fun getStatuses(forceRefresh: Boolean): Result<List<me.calebjones.spacelaunchnow.data.model.FilterOption>> {
+        return if (shouldReturnError) {
+            Result.failure(Exception("Test error"))
+        } else {
+            Result.success(statusesResponse)
+        }
+    }
+}
+
+/**
  * Mock implementation of AstronautRepository for testing ViewModels.
  */
 class MockAstronautListRepository : AstronautRepository {
@@ -39,7 +59,10 @@ class MockAstronautListRepository : AstronautRepository {
         search: String?,
         statusIds: List<Int>?,
         agencyIds: List<Int>?,
-        ordering: String?
+        ordering: String?,
+        hasFlown: Boolean?,
+        inSpace: Boolean?,
+        isHuman: Boolean?
     ): Result<PaginatedAstronautEndpointNormalList> {
         astronautsCallCount++
 
@@ -65,6 +88,7 @@ class MockAstronautListRepository : AstronautRepository {
 class AstronautListViewModelTest {
 
     private lateinit var mockRepository: MockAstronautListRepository
+    private lateinit var mockFilterRepository: MockAstronautFilterRepository
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
@@ -72,6 +96,7 @@ class AstronautListViewModelTest {
         TestSpaceLoggerInit.ensureInitialized()
         Dispatchers.setMain(testDispatcher)
         mockRepository = MockAstronautListRepository()
+        mockFilterRepository = MockAstronautFilterRepository()
     }
 
     @AfterTest
@@ -91,7 +116,7 @@ class AstronautListViewModelTest {
         )
         
         // When: ViewModel is created (loads automatically in init)
-        val viewModel = AstronautListViewModel(mockRepository)
+        val viewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
         advanceUntilIdle()
         
         // Then: Should have been attempted to load
@@ -118,7 +143,7 @@ class AstronautListViewModelTest {
                 results = mockAstronauts
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
 
         // When: Loading astronauts (called automatically in init)
         advanceUntilIdle()
@@ -137,7 +162,7 @@ class AstronautListViewModelTest {
         mockRepository.setAstronautsResponse(
             PaginatedAstronautEndpointNormalList(count = 0, next = null, previous = null, results = emptyList())
         )
-        val newViewModel = AstronautListViewModel(mockRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
 
         // When: Loading astronauts (called automatically in init)
         // Load completes
@@ -153,7 +178,7 @@ class AstronautListViewModelTest {
         mockRepository.setAstronautsResponse(
             PaginatedAstronautEndpointNormalList(count = 0, next = null, previous = null, results = emptyList())
         )
-        val newViewModel = AstronautListViewModel(mockRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
 
         // When: Loading astronauts (called automatically in init)
         advanceUntilIdle()
@@ -168,7 +193,7 @@ class AstronautListViewModelTest {
     fun `loadAstronauts should handle error`() = runTest {
         // Given: Repository returns failure
         mockRepository.shouldReturnError = true
-        val errorViewModel = AstronautListViewModel(mockRepository)
+        val errorViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
 
         // When: Loading astronauts (called automatically in init)
         advanceUntilIdle()
@@ -183,7 +208,7 @@ class AstronautListViewModelTest {
     fun `loadAstronauts should clear error on retry`() = runTest {
         // Given: Initial error state
         mockRepository.shouldReturnError = true
-        val errorViewModel = AstronautListViewModel(mockRepository)
+        val errorViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
         advanceUntilIdle()
         assertTrue(errorViewModel.uiState.value.error?.isNotEmpty() == true)
 
@@ -223,7 +248,7 @@ class AstronautListViewModelTest {
                 )
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
         advanceUntilIdle()
 
         // When: Loading more
@@ -258,7 +283,7 @@ class AstronautListViewModelTest {
                 results = listOf(createMockAstronaut(id = 1, name = "Test"))
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
         advanceUntilIdle()
 
         // When: Loading more
@@ -290,7 +315,7 @@ class AstronautListViewModelTest {
                 results = listOf(createMockAstronaut(id = 1, name = "Test"))
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
         advanceUntilIdle()
         val callCountAfterInit = mockRepository.astronautsCallCount
 
@@ -327,7 +352,7 @@ class AstronautListViewModelTest {
                 results = listOf(createMockAstronaut(id = 1, name = "Test"))
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
         advanceUntilIdle()
         assertTrue(newViewModel.uiState.value.hasMore)
 

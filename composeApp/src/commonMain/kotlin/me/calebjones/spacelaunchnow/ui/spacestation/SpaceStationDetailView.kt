@@ -117,7 +117,7 @@ private fun SpaceStationDetailContent(
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight - 28.dp))
+        Spacer(Modifier.height(TitleHeight))
 
         // ISS-specific: NASA live stream
         if (isIss && videoPlayerState.availableVideos.isNotEmpty()) {

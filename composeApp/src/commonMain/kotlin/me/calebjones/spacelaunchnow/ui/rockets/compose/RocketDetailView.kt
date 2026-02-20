@@ -47,7 +47,7 @@ private fun RocketDetailContent(rocket: LauncherConfigDetailed) {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight - 28.dp))
+        Spacer(Modifier.height(TitleHeight))
 
         // Basic Info Card
         RocketInfoCard(rocket)

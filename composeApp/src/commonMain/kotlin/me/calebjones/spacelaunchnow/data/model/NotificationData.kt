@@ -24,7 +24,7 @@ data class NotificationData(
     val locationId: String                // e.g., "143" for Texas
 ) {
     companion object {
-        private val log = logger()
+        private val log by lazy { logger() }
         
         /**
          * Check if payload is V5 format (has lsp_id field)
@@ -128,7 +128,7 @@ data class NotificationData(
  * ```
  */
 object NotificationFilter {
-    private val log = logger()
+    private val log by lazy { logger() }
 
     /**
      * Convenience method for filtering from raw data map

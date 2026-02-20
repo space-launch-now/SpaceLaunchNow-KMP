@@ -5,6 +5,13 @@ import kotlinx.serialization.Serializable
 /**
  * V5 Filter Preferences
  *
+ * @deprecated This class is no longer used by V5 notification filtering.
+ * V5 now reuses NotificationState (String-based IDs) instead of maintaining
+ * a separate Int-based filter system. This class is kept for backward
+ * compatibility only and will be removed in a future version.
+ *
+ * See V5NotificationFilter.kt for current implementation.
+ *
  * User preferences for V5 notification filtering.
  * These preferences are evaluated client-side to determine
  * whether a V5 notification should be displayed.
@@ -18,6 +25,12 @@ import kotlinx.serialization.Serializable
  * - Strict (AND): ALL active filters must match
  * - Flexible (OR): ANY active filter can match (default)
  */
+@Deprecated(
+    message = "V5 now uses NotificationState directly instead of V5FilterPreferences. " +
+        "This class is kept for backward compatibility only.",
+    replaceWith = ReplaceWith("NotificationState"),
+    level = DeprecationLevel.WARNING
+)
 @Serializable
 data class V5FilterPreferences(
     // Master enable/disable

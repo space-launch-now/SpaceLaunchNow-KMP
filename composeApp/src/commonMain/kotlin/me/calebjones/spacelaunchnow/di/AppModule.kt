@@ -15,6 +15,8 @@ import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository
+import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
@@ -29,6 +31,8 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepository
+import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
@@ -64,6 +68,7 @@ import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapViewModel
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyListViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppSettingsViewModel
@@ -162,8 +167,10 @@ val appModule = module {
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
+    viewModelOf(::AgencyListViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
+    singleOf(::AstronautFilterRepositoryImpl) { bind<AstronautFilterRepository>() }
     viewModelOf(::AstronautListViewModel)
     viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), astronautId) }
 
@@ -173,6 +180,7 @@ val appModule = module {
     }
     viewModelOf(::SpaceStationViewModel)
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
+    singleOf(::RocketFilterRepositoryImpl) { bind<RocketFilterRepository>() }
     singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
     singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
     singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
