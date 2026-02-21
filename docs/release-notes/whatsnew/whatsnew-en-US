@@ -1,5 +1,12 @@
 ### Bug Fixes
 
-* iss views
-* replace DateTimeUtil with parseIsoDurationToHumanReadable and update related tests
-* update expected result for full format ISO duration test
+* **notifications:** fix filters for v5 notifications
+* rocket list and view model for improved state management
+* rocket list and view model for improved state management
+* update ExploreScreen typography and layout adjustments
+
+### Features
+
+* add explore screen navigation
+* **astronauts:** implement comprehensive filtering and sorting for astronaut list
+* **astronauts:** implement comprehensive filtering and sorting for astronaut list...
