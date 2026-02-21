@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -22,11 +24,13 @@ class AgencyListViewModel(
 ) : ViewModel() {
 
     private val log = logger()
+    private val loadMutex = Mutex() // 🔒 Prevents concurrent initial loads
 
     private val _uiState = MutableStateFlow(AgencyListUiState())
     val uiState: StateFlow<AgencyListUiState> = _uiState.asStateFlow()
 
     init {
+        log.w { "🚨 AgencyListViewModel init block called - ViewModel instance: ${this.hashCode()}" }
         loadAgencies()
     }
 
@@ -34,11 +38,20 @@ class AgencyListViewModel(
      * Load the first page of agencies.
      */
     fun loadAgencies() {
+        log.i { "🔄 loadAgencies called from ViewModel ${this.hashCode()}" }
+        
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null, agencies = emptyList(), currentPage = 0) }
+            // 🔒 Use mutex to prevent concurrent loads
+            if (!loadMutex.tryLock()) {
+                log.w { "⚠️ Already loading agencies, skipping duplicate call" }
+                return@launch
+            }
             
             try {
+                _uiState.update { it.copy(isLoading = true, error = null, agencies = emptyList(), currentPage = 0) }
+                
                 val currentState = _uiState.value
+                log.d { "📡 Making API call to getAgencies..." }
                 val result = agencyRepository.getAgencies(
                     limit = PAGE_SIZE,
                     offset = 0,
@@ -80,6 +93,9 @@ class AgencyListViewModel(
                         error = "Unexpected error: ${e.message}"
                     )
                 }
+            } finally {
+                // 🔓 Always unlock the mutex
+                loadMutex.unlock()
             }
         }
     }
