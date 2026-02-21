@@ -1,3 +1,12 @@
+## [5.10.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.10.0...v5.10.1) (2026-02-21)
+
+
+### Bug Fixes
+
+* duplicate agencies loaded ([516cd21](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/516cd21fe55f362e7313e7418af211508add3769))
+
+
+
 # [5.10.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.9.1...v5.10.0) (2026-02-20)
 
 
@@ -52,15 +61,6 @@
 ### Bug Fixes
 
 * change event ordering to descending by date ([787c8a1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/787c8a113514a8ad0b7b144242cb43184953f08f))
-
-
-
-## [5.8.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.0...v5.8.1) (2026-01-29)
-
-
-### Bug Fixes
-
-* fix app rating tracking logic ([9fc62b9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9fc62b95972a84b56bc66f26ba1c3af2105cbc6b))
 
 
 
