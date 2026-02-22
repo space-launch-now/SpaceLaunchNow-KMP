@@ -1,15 +1,25 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,16 +29,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
+import me.calebjones.spacelaunchnow.ui.preview.PreviewData
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Instant
 
 /**
@@ -101,16 +116,24 @@ data class DetailedLaunchCardData(val launch: LaunchDetailed) : LaunchCardData {
 fun LaunchCardHeaderOverlay(
     launchData: LaunchCardData,
     showAgencyLogo: Boolean = true,
-    logoSize: androidx.compose.ui.unit.Dp = 56.dp,
+    logoSize: Dp = 56.dp,
     useRelativeTime: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(16.dp),
     modifier: Modifier = Modifier
 ) {
     val useUtc = LocalUseUtc.current
 
-    // Compute formatted values
-    val title by remember(launchData) {
-        mutableStateOf(launchData.getFormattedTitle())
+    // Split launch name into rocket config and mission name
+    val (rocketConfig, missionName) = remember(launchData) {
+        val title = launchData.getFormattedTitle()
+        // Split on " | " to separate rocket config from mission name
+        val parts = title.split(" | ", limit = 2)
+        if (parts.size == 2) {
+            Pair(parts[0], parts[1])
+        } else {
+            // If no separator, show entire name on first line
+            Pair(title, null)
+        }
     }
 
     val formattedDate by remember(launchData.net, useRelativeTime, useUtc) {
@@ -129,72 +152,129 @@ fun LaunchCardHeaderOverlay(
         modifier = modifier.padding(contentPadding),
         verticalAlignment = Alignment.Top,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        // Circular Agency Logo (if enabled and available) - always top-aligned
+        if (showAgencyLogo && launchData.agencyLogoUrl != null) {
+            SubcomposeAsyncImage(
+                model = launchData.agencyLogoUrl,
+                contentDescription = "Agency Logo",
+                modifier = Modifier
+                    .size(logoSize)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(logoSize / 2),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
+                error = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.RocketLaunch,
+                            contentDescription = "Agency placeholder",
+                            modifier = Modifier.size(logoSize / 2),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+        }
+
+        // Launch Information Column with drop shadows
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Circular Agency Logo (if enabled and available) with drop shadow effect
-            if (showAgencyLogo && launchData.agencyLogoUrl != null) {
-                AsyncImage(
-                    model = launchData.agencyLogoUrl,
-                    contentDescription = "Agency Logo",
-                    modifier = Modifier
-                        .size(logoSize)
-                        .clip(CircleShape)
-                        .border(
-                            2.dp,
-                            MaterialTheme.colorScheme.surfaceContainer,
-                            CircleShape
-                        ),
-                    contentScale = ContentScale.Crop
-                )
+            // Rocket Configuration (first line)
+            Text(
+                text = rocketConfig,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    shadow = androidx.compose.ui.graphics.Shadow(
+                        color = Color.Black.copy(alpha = 0.8f),
+                        offset = androidx.compose.ui.geometry.Offset(2f, 2f),
+                        blurRadius = 5f
+                    )
+                ),
+                color = Color.White
+            )
 
-                Spacer(modifier = Modifier.width(12.dp))
-            }
-
-            // Launch Information Column with drop shadows
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // Standardized Launch Title with drop shadow for overlay visibility
+            // Mission Name (second line, if available)
+            missionName?.let { mission ->
                 Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    text = mission,
+                    style = MaterialTheme.typography.titleMedium.copy(
                         shadow = androidx.compose.ui.graphics.Shadow(
-                            color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.8f),
+                            color = Color.Black.copy(alpha = 0.8f),
                             offset = androidx.compose.ui.geometry.Offset(2f, 2f),
                             blurRadius = 5f
                         )
                     ),
-                    color = androidx.compose.ui.graphics.Color.White
+                    color = Color.White.copy(alpha = 0.95f)
                 )
+            }
 
-                // Launch Location (if available) with drop shadow
-                launchData.locationName?.let { locationName ->
+            // Launch Location (if available) with icon and drop shadow
+            launchData.locationName?.let { locationName ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Launch Location",
+                        modifier = Modifier.size(16.dp),
+                        tint = Color.White.copy(alpha = 0.9f)
+                    )
                     Text(
                         text = locationName,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             shadow = androidx.compose.ui.graphics.Shadow(
-                                color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.8f),
+                                color = Color.Black.copy(alpha = 0.8f),
                                 offset = androidx.compose.ui.geometry.Offset(1f, 1f),
                                 blurRadius = 2f
                             )
                         ),
-                        color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.9f)
+                        color = Color.White.copy(alpha = 0.9f)
                     )
                 }
+            }
 
-                // Human Readable Date with drop shadow
+            // Human Readable Date with icon and drop shadow
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Schedule,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = Color.White.copy(alpha = 0.9f)
+                )
                 Text(
                     text = formattedDate,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         shadow = androidx.compose.ui.graphics.Shadow(
-                            color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.8f),
+                            color = Color.Black.copy(alpha = 0.8f),
                             offset = androidx.compose.ui.geometry.Offset(1f, 1f),
                             blurRadius = 2f
                         )
                     ),
-                    color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.9f)
+                    color = Color.White.copy(alpha = 0.9f)
                 )
             }
         }
@@ -207,3 +287,67 @@ fun LaunchCardHeaderOverlay(
 fun LaunchBasic.toLaunchCardData(): LaunchCardData = BasicLaunchCardData(this)
 fun LaunchNormal.toLaunchCardData(): LaunchCardData = NormalLaunchCardData(this)
 fun LaunchDetailed.toLaunchCardData(): LaunchCardData = DetailedLaunchCardData(this)
+
+// ========================================
+// Previews
+// ========================================
+
+// ========================================
+// Previews
+// ========================================
+
+@Preview
+@Composable
+private fun LaunchCardHeaderOverlayPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Box(modifier = Modifier.background(Color.DarkGray)) {
+            LaunchCardHeaderOverlay(
+                launchData = PreviewData.launchNormalSpaceX.toLaunchCardData(),
+                showAgencyLogo = true,
+                useRelativeTime = true
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun LaunchCardHeaderOverlayDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Box(modifier = Modifier.background(Color.DarkGray)) {
+            LaunchCardHeaderOverlay(
+                launchData = PreviewData.launchNormalSpaceX.toLaunchCardData(),
+                showAgencyLogo = true,
+                useRelativeTime = true
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun LaunchCardHeaderOverlayNoLogoPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Box(modifier = Modifier.background(Color.DarkGray)) {
+            LaunchCardHeaderOverlay(
+                launchData = PreviewData.launchBasicULA.toLaunchCardData(),
+                showAgencyLogo = false,
+                useRelativeTime = false
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun LaunchCardHeaderOverlayNoLogoDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Box(modifier = Modifier.background(Color.DarkGray)) {
+            LaunchCardHeaderOverlay(
+                launchData = PreviewData.launchBasicULA.toLaunchCardData(),
+                showAgencyLogo = false,
+                useRelativeTime = false
+            )
+        }
+    }
+}

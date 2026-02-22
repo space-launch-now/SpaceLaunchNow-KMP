@@ -40,20 +40,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.MissionType
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Orbit
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
@@ -63,8 +70,11 @@ import me.calebjones.spacelaunchnow.ui.compose.LaunchListShimmer
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
+import me.calebjones.spacelaunchnow.ui.preview.PreviewData
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Constants for layout dimensions
 private val CARD_WIDTH = 340.dp
@@ -160,7 +170,7 @@ fun LaunchListView(viewModel: LaunchCarouselViewModel, navController: NavControl
                     LaunchItemView(
                         launch = combinedLaunches[index],
                         navController = navController,
-                        modifier = Modifier.size(width = 340.dp, height = 240.dp)
+                        modifier = Modifier.size(width = 380.dp, height = 200.dp)
                     )
                 }
             }
@@ -198,7 +208,8 @@ fun LaunchItemView(
                 SubcomposeAsyncImage(
                     model = url,
                     contentDescription = "Launch Image",
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     loading = {
                         Box(
@@ -216,7 +227,14 @@ fun LaunchItemView(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                .background(
+                                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colorScheme.surfaceVariant,
+                                            MaterialTheme.colorScheme.surface
+                                        )
+                                    )
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -229,11 +247,18 @@ fun LaunchItemView(
                     }
                 )
             } ?: run {
-                // No image URL - show placeholder directly
+                // No image URL - show placeholder with gradient
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                        .background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.surfaceVariant,
+                                    MaterialTheme.colorScheme.surface
+                                )
+                            )
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -244,14 +269,6 @@ fun LaunchItemView(
                     )
                 }
             }
-
-            // Stronger semi-transparent overlay for better readability
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
-            )
-
             // Use the common LaunchCardHeader composable
             LaunchCardHeaderOverlay(
                 launchData = launch.toLaunchCardData(),
@@ -411,4 +428,55 @@ fun LaunchListErrorCard(
     }
 }
 
+// ========================================
+// Previews
+// ========================================
+
+@Preview
+@Composable
+private fun LaunchItemViewPreview() {
+    SpaceLaunchNowPreviewTheme {
+        LaunchItemView(
+            launch = PreviewData.launchNormalSpaceX,
+            navController = rememberNavController(),
+            modifier = Modifier.size(width = 380.dp, height = 200.dp)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LaunchItemViewDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        LaunchItemView(
+            launch = PreviewData.launchNormalSpaceX,
+            navController = rememberNavController(),
+            modifier = Modifier.size(width = 380.dp, height = 200.dp)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LaunchItemViewNoImagePreview() {
+    SpaceLaunchNowPreviewTheme {
+        LaunchItemView(
+            launch = PreviewData.launchNormalULA,
+            navController = rememberNavController(),
+            modifier = Modifier.size(width = 380.dp, height = 200.dp)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LaunchItemViewNoImageDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        LaunchItemView(
+            launch = PreviewData.launchNormalULA,
+            navController = rememberNavController(),
+            modifier = Modifier.size(width = 380.dp, height = 200.dp)
+        )
+    }
+}
 

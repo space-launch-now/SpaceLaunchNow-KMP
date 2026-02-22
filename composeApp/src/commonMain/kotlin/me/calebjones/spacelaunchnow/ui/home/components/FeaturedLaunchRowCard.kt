@@ -36,14 +36,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
+import me.calebjones.spacelaunchnow.ui.preview.PreviewData
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * A compact, wide card for displaying featured launches in a horizontal row.
@@ -142,50 +146,45 @@ fun FeaturedLaunchRowCard(
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Top section: Title
+                // Top section: Title (split into rocket config and mission)
                 Column {
-                    Text(
-                        text = launch.name ?: "Unknown Launch",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = 18.sp
-                    )
-                }
+                    val launchName = launch.name ?: "Unknown Launch"
+                    val parts = launchName.split(" | ", limit = 2)
 
-                // Middle section: Date/Time with day of week
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = launch.net?.let {
-                            DateTimeUtil.formatLaunchDateTime(it, useUtc)
-                        } ?: "TBD",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                    if (parts.size == 2) {
+                        // Rocket Configuration (first line)
+                        Text(
+                            text = parts[0],
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = 18.sp
+                        )
+                        // Mission Name (second line)
+                        Text(
+                            text = parts[1],
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f)
+                        )
+                    } else {
+                        // No separator, show entire name
+                        Text(
+                            text = launchName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = 18.sp
+                        )
+                    }
 
-                // Bottom section: Location + Pad and Status
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
-                ) {
                     // Location + Pad
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
                     ) {
                         Icon(
                             imageVector = Icons.Default.LocationOn,
@@ -205,8 +204,36 @@ fun FeaturedLaunchRowCard(
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    // Middle section: Date/Time with day of week
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = launch.net?.let {
+                                DateTimeUtil.formatLaunchDateTime(it, useUtc)
+                            } ?: "TBD",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
 
+                }
+
+                // Bottom section: Location + Pad and Status
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.Bottom
+                ) {
                     // Status chip
                     launch.status?.let { status ->
                         val statusColor = getLaunchStatusColor(status.id)
@@ -216,7 +243,7 @@ fun FeaturedLaunchRowCard(
                             contentColor = Color.White
                         ) {
                             Text(
-                                text = status.abbrev?.uppercase() ?: status.name.uppercase(),
+                                text = status.name.uppercase(),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Medium,
@@ -255,5 +282,53 @@ private fun formatLocationAndPad(launch: LaunchNormal): String {
         padName != null -> padName
         locationName != null -> locationName
         else -> "Unknown Location"
+    }
+}
+
+// ========================================
+// Previews
+// ========================================
+
+@Preview
+@Composable
+private fun FeaturedLaunchRowCardPreview() {
+    SpaceLaunchNowPreviewTheme {
+        FeaturedLaunchRowCard(
+            launch = PreviewData.launchNormalSpaceX,
+            navController = rememberNavController()
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeaturedLaunchRowCardDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        FeaturedLaunchRowCard(
+            launch = PreviewData.launchNormalSpaceX,
+            navController = rememberNavController()
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeaturedLaunchRowCardNoImagePreview() {
+    SpaceLaunchNowPreviewTheme {
+        FeaturedLaunchRowCard(
+            launch = PreviewData.launchNormalULA,
+            navController = rememberNavController()
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeaturedLaunchRowCardNoImageDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        FeaturedLaunchRowCard(
+            launch = PreviewData.launchNormalULA,
+            navController = rememberNavController()
+        )
     }
 }
