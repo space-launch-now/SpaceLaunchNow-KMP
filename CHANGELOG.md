@@ -1,3 +1,12 @@
+# [5.11.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.10.1...v5.11.0) (2026-02-22)
+
+
+### Features
+
+* improve home page views and layouts ([49a3a42](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/49a3a4213526e4873c04d7ba185ca6a2f67a2d39))
+
+
+
 ## [5.10.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.10.0...v5.10.1) (2026-02-21)
 
 
@@ -52,15 +61,6 @@
 ### Features
 
 * Add astronaut list and detail views with links in launch detailed ([45a6803](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/45a6803d2ecdf79ef2454ea5adc0b9364e73e68a))
-
-
-
-## [5.8.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.1...v5.8.2) (2026-01-29)
-
-
-### Bug Fixes
-
-* change event ordering to descending by date ([787c8a1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/787c8a113514a8ad0b7b144242cb43184953f08f))
 
 
 
