@@ -203,7 +203,8 @@ fun ResponsiveHomeContent(
                                         navController = navController,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(240.dp)
+                                            .height(380.dp)
+
                                     )
                                 } else {
                                     // Loading placeholder
@@ -279,8 +280,8 @@ fun ResponsiveHomeContent(
                                                             launch = launch,
                                                             navController = navController,
                                                             modifier = Modifier
-                                                                .width(320.dp)
-                                                                .height(240.dp)
+                                                                .width(380.dp)
+                                                                .height(200.dp)
                                                         )
                                                     }
                                                 }
@@ -332,8 +333,8 @@ fun ResponsiveHomeContent(
                                                     launch = launch,
                                                     navController = navController,
                                                     modifier = Modifier
-                                                        .width(320.dp)
-                                                        .height(240.dp)
+                                                        .width(380.dp)
+                                                        .height(200.dp)
                                                 )
                                             }
                                         }
@@ -596,8 +597,8 @@ fun ResponsiveHomeContent(
                                                 launch = launch,
                                                 navController = navController,
                                                 modifier = Modifier
-                                                    .width(300.dp)
-                                                    .height(220.dp)
+                                                    .width(380.dp)
+                                                    .height(200.dp)
                                             )
                                         }
                                     }
@@ -646,8 +647,8 @@ fun ResponsiveHomeContent(
                                         launch = launch,
                                         navController = navController,
                                         modifier = Modifier
-                                            .width(300.dp)
-                                            .height(220.dp)
+                                            .width(380.dp)
+                                            .height(200.dp)
                                     )
                                 }
                             }
