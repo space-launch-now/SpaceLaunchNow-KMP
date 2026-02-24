@@ -1,10 +1,14 @@
 package me.calebjones.spacelaunchnow.util
 
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.tan
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * Solar position calculator for day/night terminator overlay
@@ -62,16 +66,15 @@ object SolarCalculator {
      * @param timestampMs Unix timestamp in milliseconds (defaults to current time)
      * @return SolarPosition with sun and shadow coordinates
      */
-    fun calculateSunPosition(timestampMs: Long = System.currentTimeMillis()): SolarPosition {
+    fun calculateSunPosition(timestampMs: Long = Clock.System.now().toEpochMilliseconds()): SolarPosition {
         // Convert to date components in UTC
-        val date = java.util.Date(timestampMs)
-        val calendar = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))
-        calendar.time = date
-        
-        val hours = calendar.get(java.util.Calendar.HOUR_OF_DAY)
-        val minutes = calendar.get(java.util.Calendar.MINUTE)
-        val seconds = calendar.get(java.util.Calendar.SECOND)
-        val millis = calendar.get(java.util.Calendar.MILLISECOND)
+        val instant = Instant.fromEpochMilliseconds(timestampMs)
+        val dt = instant.toLocalDateTime(TimeZone.UTC)
+
+        val hours = dt.hour
+        val minutes = dt.minute
+        val seconds = dt.second
+        val millis = (timestampMs % 1000).toInt()
         
         val msPastMidnight = ((hours * 60 + minutes) * 60 + seconds) * 1000 + millis
         
@@ -171,7 +174,7 @@ object SolarCalculator {
      * @param timestampMs Unix timestamp in milliseconds (defaults to current time)
      * @return TwilightOverlay with all shadow circles
      */
-    fun getTwilightOverlay(timestampMs: Long = System.currentTimeMillis()): TwilightOverlay {
+    fun getTwilightOverlay(timestampMs: Long = Clock.System.now().toEpochMilliseconds()): TwilightOverlay {
         val position = calculateSunPosition(timestampMs)
         
         // Center on SHADOW position, with decreasing radius for darker zones

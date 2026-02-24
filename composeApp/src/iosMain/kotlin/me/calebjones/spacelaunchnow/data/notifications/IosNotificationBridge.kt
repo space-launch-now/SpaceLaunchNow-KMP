@@ -107,12 +107,13 @@ object IosNotificationBridge : KoinComponent {
             return it 
         }
         
-        // First call or cache cleared - need to fetch synchronously
+        // First call or cache cleared — fetch synchronously and sync NSE bridge
         log.d { "Fetching notification state synchronously" }
         return runBlocking {
             try {
                 val state = notificationStateStorage.getState()
                 cachedState = state
+                NSEPreferenceBridge.syncToUserDefaults(state)
                 state
             } catch (e: Exception) {
                 log.e { "Failed to get notification state: ${e.message}" }
@@ -126,12 +127,16 @@ object IosNotificationBridge : KoinComponent {
      * Refresh the cached notification state.
      * Call this when notification settings change to ensure the filter
      * uses the latest user preferences.
+     * Also syncs current state to NSE UserDefaults bridge so the NSE can filter
+     * independently when the app is killed.
      */
     fun refreshState() {
         log.d { "Refreshing notification state cache" }
         runBlocking {
             try {
-                cachedState = notificationStateStorage.getState()
+                val newState = notificationStateStorage.getState()
+                cachedState = newState
+                NSEPreferenceBridge.syncToUserDefaults(newState)
             } catch (e: Exception) {
                 log.e { "Failed to refresh notification state: ${e.message}" }
             }

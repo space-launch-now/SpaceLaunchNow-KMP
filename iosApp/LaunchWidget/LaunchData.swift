@@ -176,8 +176,8 @@ struct LaunchProvider: TimelineProvider {
                     isPlaceholder: false,
                     errorMessage: nil,
                     hasWidgetAccess: false,
-                    backgroundAlpha: Double(backgroundAlpha),
-                    cornerRadius: Double(cornerRadius)
+                    backgroundAlpha: Double(truncating: backgroundAlpha),
+                    cornerRadius: Double(truncating: cornerRadius)
                 )
             }
             
@@ -195,8 +195,8 @@ struct LaunchProvider: TimelineProvider {
                     isPlaceholder: false,
                     errorMessage: errorMsg,
                     hasWidgetAccess: true,
-                    backgroundAlpha: Double(backgroundAlpha),
-                    cornerRadius: Double(cornerRadius)
+                    backgroundAlpha: Double(truncating: backgroundAlpha),
+                    cornerRadius: Double(truncating: cornerRadius)
                 )
             }
             
@@ -204,8 +204,8 @@ struct LaunchProvider: TimelineProvider {
             return processPaginatedList(
                 paginatedList,
                 hasAccess: hasAccessBool,
-                backgroundAlpha: Double(backgroundAlpha),
-                cornerRadius: Double(cornerRadius)
+                backgroundAlpha: Double(truncating: backgroundAlpha),
+                cornerRadius: Double(truncating: cornerRadius)
             )
             
         } catch {
