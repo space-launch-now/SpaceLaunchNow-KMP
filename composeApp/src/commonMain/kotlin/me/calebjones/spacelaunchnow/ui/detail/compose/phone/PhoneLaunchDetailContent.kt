@@ -48,6 +48,7 @@ import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailTab
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.CombinedLaunchOverviewCard
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.CrewInformationCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.tabs.AgencyTabContent
 import me.calebjones.spacelaunchnow.ui.detail.compose.tabs.MissionTabContent
@@ -83,6 +84,7 @@ fun PhoneLaunchDetailContent(
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
+    onAstronautClick: ((Int) -> Unit)? = null,
     openUrl: (String) -> Unit
 ) {
     val tabs = LaunchDetailTab.values()
@@ -127,6 +129,13 @@ fun PhoneLaunchDetailContent(
                 Spacer(Modifier.height(16.dp))
             }
         }
+
+        // Crew Information Card (if crewed launch)
+        CrewInformationCard(
+            launch = launch,
+            onAstronautClick = onAstronautClick
+        )
+        Spacer(Modifier.height(16.dp))
 
         // Ad Banner above tabs
         SmartBannerAd(
@@ -189,7 +198,8 @@ fun PhoneLaunchDetailContent(
             LaunchDetailTab.Rocket -> {
                 RocketTabContent(
                     launch = launch,
-                    openUrl = openUrl
+                    openUrl = openUrl,
+                    onAstronautClick = onAstronautClick
                 )
             }
         }

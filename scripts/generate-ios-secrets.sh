@@ -18,6 +18,7 @@ fi
 
 # Read API_KEY from .env
 API_KEY=$(grep "^API_KEY=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+MAPS_API_KEY=$(grep "^MAPS_API_KEY=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 REVENUECAT_ANDROID_KEY=$(grep "^REVENUECAT_ANDROID_KEY=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 REVENUECAT_IOS_KEY=$(grep "^REVENUECAT_IOS_KEY=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 ANDROID_BANNER_AD_UNIT_ID=$(grep "^ANDROID_BANNER_AD_UNIT_ID=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
@@ -31,6 +32,10 @@ DEBUG=$(grep "^DEBUG=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 if [ -z "$API_KEY" ]; then
     echo "❌ Error: API_KEY not found in .env file"
     exit 1
+fi
+
+if [ -z "$MAPS_API_KEY" ]; then
+	echo "⚠️  Warning: MAPS_API_KEY not found in .env file"
 fi
 
 if [ -z "$REVENUECAT_ANDROID_KEY" ]; then
@@ -76,6 +81,8 @@ cat > "$SECRETS_PLIST" << EOF
 <dict>
 	<key>apiKey</key>
 	<string>$API_KEY</string>
+	<key>mapsApiKey</key>
+	<string>$MAPS_API_KEY</string>
 	<key>revenueCatAndroidKey</key>
 	<string>$REVENUECAT_ANDROID_KEY</string>
 	<key>revenueCatIosKey</key>
@@ -101,6 +108,7 @@ EOF
 echo "✅ Successfully created Secrets.plist with keys from .env"
 echo "📁 Location: $SECRETS_PLIST"
 echo "✅ API_KEY: $([ -n "$API_KEY" ] && echo "Set" || echo "Not set")"
+echo "✅ MAPS_API_KEY: $([ -n "$MAPS_API_KEY" ] && echo "Set" || echo "Not set")"
 echo "✅ REVENUECAT_ANDROID_KEY: $([ -n "$REVENUECAT_ANDROID_KEY" ] && echo "Set" || echo "Not set")"
 echo "✅ REVENUECAT_IOS_KEY: $([ -n "$REVENUECAT_IOS_KEY" ] && echo "Set" || echo "Not set")"
 echo "✅ ANDROID_BANNER_AD_UNIT_ID: $([ -n "$ANDROID_BANNER_AD_UNIT_ID" ] && echo "Set" || echo "Not set")"

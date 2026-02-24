@@ -9,20 +9,25 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
+import me.calebjones.spacelaunchnow.navigation.AstronautDetail
+import me.calebjones.spacelaunchnow.navigation.Astronauts
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
@@ -43,9 +48,12 @@ import me.calebjones.spacelaunchnow.ui.ads.AdInitializer
 import me.calebjones.spacelaunchnow.ui.ads.WithPreloadedAds
 import me.calebjones.spacelaunchnow.ui.agencies.AgencyDetailScreen
 import me.calebjones.spacelaunchnow.ui.agencies.AgencyListScreen
+import me.calebjones.spacelaunchnow.ui.astronaut.AstronautDetailView
+import me.calebjones.spacelaunchnow.ui.astronaut.AstronautListScreen
 import me.calebjones.spacelaunchnow.ui.compose.BetaWarningDialog
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
+import me.calebjones.spacelaunchnow.ui.explore.ExploreScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
@@ -264,7 +272,7 @@ fun SpaceLaunchNowApp(
                 log.i { "LaunchedEffect: shouldShowEnjoymentDialog=$shouldShowEnjoymentDialog, showDelayedDialog=$showDelayedDialog" }
                 if (shouldShowEnjoymentDialog && !showDelayedDialog) {
                     log.i { "⏱️ Rating dialog conditions met, delaying 5 seconds before showing..." }
-                    kotlinx.coroutines.delay(5_000) // 5 seconds - let user actually use the app
+                    kotlinx.coroutines.delay(2_000) // 2 seconds
                     showDelayedDialog = true
                     log.i { "✅ Delay complete, setting showDelayedDialog=true" }
                 } else if (!shouldShowEnjoymentDialog) {
@@ -338,6 +346,9 @@ fun SpaceLaunchNowApp(
                                 onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
                             )
                         }
+                        composableWithCompositionLocal<Explore> {
+                            ExploreScreen(navController = navController)
+                        }
                         composableWithCompositionLocal<Settings> {
                             SettingsScreen(
                                 navController = navController,
@@ -369,9 +380,18 @@ fun SpaceLaunchNowApp(
                         }
                         composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
                             val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                            val scope = rememberCoroutineScope()
                             AgencyDetailScreen(
                                 agencyId = agencyDetail.agencyId,
-                                onNavigateBack = { navController.popBackStack() }
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToSchedule = { agencyId ->
+                                    scope.launch {
+                                        // Apply agency filter and wait for it to complete
+                                        val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
+                                        scheduleViewModel.filterByAgencyAndWait(agencyId)
+                                        navController.navigate(Schedule)
+                                    }
+                                }
                             )
                         }
                         composableWithCompositionLocal<SpaceStationDetail> { backStackEntry ->
@@ -448,8 +468,35 @@ fun SpaceLaunchNowApp(
                         }
                         composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
                             val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                            val scope = rememberCoroutineScope()
                             AgencyDetailScreen(
                                 agencyId = agencyDetail.agencyId,
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToSchedule = { agencyId ->
+                                    scope.launch {
+                                        // Apply agency filter and wait for it to complete
+                                        val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
+                                        scheduleViewModel.filterByAgencyAndWait(agencyId)
+                                        navController.navigate(Schedule)
+                                    }
+                                }
+                            )
+                        }
+                        composableWithCompositionLocal<Astronauts> {
+                            AstronautListScreen(
+                                onNavigateToAstronautDetail = { id ->
+                                    navController.navigate(AstronautDetail(id))
+                                },
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composableWithCompositionLocal<AstronautDetail> { backStackEntry ->
+                            val astronautDetail = backStackEntry.toRoute<AstronautDetail>()
+                            AstronautDetailView(
+                                astronautId = astronautDetail.astronautId,
+                                onLaunchClick = { launchId ->
+                                    navController.navigate(LaunchDetail(launchId))
+                                },
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

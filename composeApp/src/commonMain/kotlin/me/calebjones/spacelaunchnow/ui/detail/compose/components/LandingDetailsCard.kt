@@ -44,7 +44,7 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 
 @Composable
-fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
+        fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
     val stagesWithLanding = launcherStages.filter { it.landing != null }
 
     // Guard: if nothing to show, return early

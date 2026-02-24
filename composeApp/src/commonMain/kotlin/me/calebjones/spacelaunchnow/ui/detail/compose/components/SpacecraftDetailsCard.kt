@@ -60,11 +60,15 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 
 @Composable
-fun SpacecraftDetailsCard(spacecraftStages: List<SpacecraftFlightDetailedSerializerNoLaunch>) {
+fun SpacecraftDetailsCard(
+    spacecraftStages: List<SpacecraftFlightDetailedSerializerNoLaunch>
+) {
     if (spacecraftStages.isEmpty()) return
 
     spacecraftStages.forEach { spacecraftFlight ->
-        SpacecraftDetailCard(spacecraftFlight = spacecraftFlight)
+        SpacecraftDetailCard(
+            spacecraftFlight = spacecraftFlight
+        )
         if (spacecraftFlight != spacecraftStages.last()) {
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -72,7 +76,9 @@ fun SpacecraftDetailsCard(spacecraftStages: List<SpacecraftFlightDetailedSeriali
 }
 
 @Composable
-fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoLaunch) {
+fun SpacecraftDetailCard(
+    spacecraftFlight: SpacecraftFlightDetailedSerializerNoLaunch
+) {
     val spacecraft = spacecraftFlight.spacecraft
     val useUtc = LocalUseUtc.current
 
@@ -310,107 +316,6 @@ fun SpacecraftDetailCard(spacecraftFlight: SpacecraftFlightDetailedSerializerNoL
                 }
             }
 
-
-            // Crew information
-            if (spacecraftFlight.launchCrew.isNotEmpty() ||
-                spacecraftFlight.onboardCrew.isNotEmpty() ||
-                spacecraftFlight.landingCrew.isNotEmpty()
-            ) {
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-                Text(
-                    text = "Crew Information",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                if (spacecraftFlight.launchCrew.isNotEmpty()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "Launch Crew (${spacecraftFlight.launchCrew.size})",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            spacecraftFlight.launchCrew.forEach { crewMember ->
-                                AssistChip(
-                                    onClick = { },
-                                    label = { crewMember.astronaut.name?.let { Text(it) } },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Filled.Person,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(AssistChipDefaults.IconSize)
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                if (spacecraftFlight.onboardCrew.isNotEmpty()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "Onboard Crew (${spacecraftFlight.onboardCrew.size})",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            spacecraftFlight.onboardCrew.forEach { crewMember ->
-                                AssistChip(
-                                    onClick = { },
-                                    label = { crewMember.astronaut.name?.let { Text(it) } },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Filled.Person,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(AssistChipDefaults.IconSize)
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                if (spacecraftFlight.landingCrew.isNotEmpty()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "Landing Crew (${spacecraftFlight.landingCrew.size})",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            spacecraftFlight.landingCrew.forEach { crewMember ->
-                                AssistChip(
-                                    onClick = { },
-                                    label = { crewMember.astronaut.name?.let { Text(it) } },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Filled.Person,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(AssistChipDefaults.IconSize)
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
 
             // Docking events
             if (spacecraftFlight.dockingEvents.isNotEmpty()) {

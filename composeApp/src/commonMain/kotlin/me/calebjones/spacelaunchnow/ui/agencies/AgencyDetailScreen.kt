@@ -15,7 +15,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AgencyDetailScreen(
     agencyId: Int,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToSchedule: ((Int) -> Unit)? = null
 ) {
     val log = SpaceLogger.getLogger("AgencyDetailScreen")
     val viewModel = koinViewModel<AgencyViewModel>()
@@ -44,7 +45,8 @@ fun AgencyDetailScreen(
         agencyDetails != null -> {
             AgencyDetailView(
                 agency = agencyDetails!!,
-                onNavigateBack = onNavigateBack
+                onNavigateBack = onNavigateBack,
+                onNavigateToSchedule = onNavigateToSchedule
             )
         }
 

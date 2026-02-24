@@ -63,3 +63,27 @@ fun SpaceLaunchNowTheme(
         content = content,
     )
 }
+
+/**
+ * Preview-safe version of SpaceLaunchNowTheme that doesn't require Koin.
+ * Use this in @Preview functions to avoid "KoinApplication has not been started" errors.
+ */
+@Composable
+fun SpaceLaunchNowPreviewTheme(
+    isDark: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    val dynamicThemeState = rememberDynamicMaterialThemeState(
+        isDark = isDark,
+        style = if (isDark) PaletteStyle.Vibrant else PaletteStyle.Fidelity,
+        contrastLevel = 0.3,
+        specVersion = ColorSpec.SpecVersion.SPEC_2025,
+        seedColor = Primary
+    )
+
+    DynamicMaterialTheme(
+        state = dynamicThemeState,
+        animate = true,
+        content = content,
+    )
+}

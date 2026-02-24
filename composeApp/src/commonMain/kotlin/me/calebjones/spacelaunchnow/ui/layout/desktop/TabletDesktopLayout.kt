@@ -102,7 +102,7 @@ fun TabletDesktopLayout(
         NotificationSettings::class.qualifiedName -> false // Hide for NotificationSettings
         DebugSettings::class.qualifiedName -> false // Hide for DebugSettings
         Roadmap::class.qualifiedName -> false // Hide for Roadmap
-        
+
         else -> {
             // For routes with arguments, check if it contains certain patterns
             val currentRoute = navBackStackEntry?.destination?.route

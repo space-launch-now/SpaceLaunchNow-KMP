@@ -263,14 +263,14 @@ class LaunchLocalDataSource(
         }
     }
     
-    // Starship history operations with 1-month TTL
+    // Starship history operations with 1-month TTL (uses separate cache table)
     suspend fun cacheStarshipHistory(launches: List<LaunchNormal>) {
         val now = System.now().toEpochMilliseconds()
         val oneMonthMs = 2592000000L // 30 days in milliseconds
         val expiresAt = now + oneMonthMs
         
         launches.forEach { launch ->
-            queries.insertOrReplaceNormal(
+            queries.insertOrReplaceStarshipHistory(
                 id = launch.id,
                 name = launch.name ?: "",
                 status_id = launch.status?.id?.toLong(),
@@ -296,7 +296,7 @@ class LaunchLocalDataSource(
     
     suspend fun getStarshipHistory(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
-        return queries.getPreviousNormal(now, now, limit.toLong())
+        return queries.getStarshipHistory(now, now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
                 try {
@@ -306,15 +306,11 @@ class LaunchLocalDataSource(
                     null
                 }
             }
-            .filter { launch ->
-                // Only return launches from Starship program (ID = 1)
-                launch.program?.any { it.id == 1 } == true
-            }
     }
     
     suspend fun getStarshipHistoryStale(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
-        return queries.getPreviousNormalStale(now, limit.toLong())
+        return queries.getStarshipHistoryStale(now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
                 try {
@@ -323,10 +319,6 @@ class LaunchLocalDataSource(
                     log.e(e) { "Error decoding stale Starship history from cache: ${e.message}" }
                     null
                 }
-            }
-            .filter { launch ->
-                // Only return launches from Starship program (ID = 1)
-                launch.program?.any { it.id == 1 } == true
             }
     }
     

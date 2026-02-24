@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,6 +46,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageLicense
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageVariant
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageVariantType
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,7 +134,7 @@ private fun AgencyList(
 }
 
 @Composable
-private fun AgencyListItem(
+fun AgencyListItem(
     agency: AgencyNormal,
     onClick: () -> Unit
 ) {
@@ -147,13 +157,22 @@ private fun AgencyListItem(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                agency.image?.let { logoUrl ->
-                    AsyncImage(
-                        model = logoUrl,
-                        contentDescription = "${agency.name} logo",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                val image = agency.socialLogo?.imageUrl ?: agency.logo?.imageUrl
+
+                image?.let { logoUrl ->
+                    Surface(
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    ) {
+                        AsyncImage(
+                            model = logoUrl,
+                            contentDescription = "Agency logo",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(CircleShape),
+                        )
+                    }
                 } ?: run {
                     Icon(
                         imageVector = Icons.Default.Business,
@@ -178,33 +197,37 @@ private fun AgencyListItem(
                     fontWeight = FontWeight.Bold
                 )
 
-                agency.abbrev?.let { abbrev ->
+                agency.type?.name?.let { type ->
                     Text(
-                        text = abbrev,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = type,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                // Push chips to bottom
+                if (agency.country.isNotEmpty()) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    agency.type?.name?.let { type ->
-                        Text(
-                            text = type,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.tertiary
-                        )
-                    }
+                // Country chips
+                if (agency.country.isNotEmpty()) {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        contentPadding = PaddingValues(vertical = 4.dp),
 
-                    if (agency.country.isNotEmpty()) {
-                        Text(
-                            text = agency.country.joinToString(", ") { it.name ?: "Unknown" },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                    ) {
+                        items(agency.country) { country ->
+                            AssistChip(
+                                onClick = { },
+                                label = {
+                                    Text(
+                                        text = country.name ?: "Unknown",
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -280,6 +303,119 @@ private fun EmptyContent() {
             text = "No agencies found",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AgencyListItemPreview() {
+    MaterialTheme {
+        val sampleAgency = AgencyNormal(
+            id = 1,
+            name = "SpaceX",
+            type = AgencyType(
+                id = 1,
+                name = "Commercial"
+            ),
+            country = listOf(
+                Country(
+                    id = 1,
+                    name = "USA",
+                    alpha2Code = "US",
+                    alpha3Code = "USA",
+                    nationalityName = "American",
+                    nationalityNameComposed = "American"
+                )
+            ),
+            abbrev = "SpX",
+            description = null,
+            administrator = null,
+            foundingYear = null,
+            launchers = null,
+            spacecraft = null,
+            parent = null,
+            image = null,
+            logo = null,
+            socialLogo = null,
+            responseMode = "Normal",
+            url = "",
+            featured = true
+        )
+        
+        AgencyListItem(
+            agency = sampleAgency,
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AgencyListItemMultiNationalPreview() {
+    MaterialTheme {
+        val sampleAgency = AgencyNormal(
+            id = 2,
+            name = "European Space Agency",
+            type = AgencyType(
+                id = 2,
+                name = "Multinational"
+            ),
+            country = listOf(
+                Country(
+                    id = 2,
+                    name = "France",
+                    alpha2Code = "FR",
+                    alpha3Code = "FRA"
+                ),
+                Country(
+                    id = 3,
+                    name = "Germany",
+                    alpha2Code = "DE",
+                    alpha3Code = "DEU",
+                ),
+                Country(
+                    id = 4,
+                    name = "Italy",
+                    alpha2Code = "IT",
+                    alpha3Code = "ITA",
+                )
+            ),
+            abbrev = "ESA",
+            description = null,
+            administrator = null,
+            foundingYear = null,
+            launchers = null,
+            spacecraft = null,
+            parent = null,
+            image = null,
+            logo = null,
+            socialLogo = Image(
+                id = 1,
+                name = "Image",
+                imageUrl = "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/china2520national2520space2520administration_nation_20190602114400.png",
+                thumbnailUrl = "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/china2520national2520space2520administration_nation_20190602114400.png",
+                credit = null,
+                license = ImageLicense(
+                    id = 1
+                ),
+                variants = listOf(ImageVariant(
+                    id = 1,
+                    type = ImageVariantType(
+                        id = 1
+                    ),
+                    imageUrl =  "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/china2520national2520space2520administration_nation_20190602114400.png",
+                )),
+                singleUse = null,
+            ),
+            responseMode = "Normal",
+            url = "",
+            featured = true
+        )
+        
+        AgencyListItem(
+            agency = sampleAgency,
+            onClick = {}
         )
     }
 }

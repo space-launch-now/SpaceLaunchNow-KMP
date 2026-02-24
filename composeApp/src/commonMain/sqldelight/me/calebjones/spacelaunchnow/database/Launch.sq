@@ -65,6 +65,29 @@ CREATE TABLE LaunchDetailedCache (
     expires_at INTEGER NOT NULL
 );
 
+-- Separate cache table for Starship history to prevent cache pollution
+CREATE TABLE StarshipHistoryCache (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    status_id INTEGER,
+    status_name TEXT,
+    net INTEGER, -- stored as epoch milliseconds
+    window_end INTEGER,
+    window_start INTEGER,
+    launch_service_provider_id INTEGER,
+    launch_service_provider_name TEXT,
+    rocket_configuration_id INTEGER,
+    rocket_configuration_name TEXT,
+    pad_name TEXT,
+    location_name TEXT,
+    image_url TEXT,
+    mission_name TEXT,
+    mission_description TEXT,
+    json_data TEXT NOT NULL, -- Full serialized LaunchNormal object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
 -- Indexes for common queries
 CREATE INDEX idx_launch_basic_net ON LaunchBasicCache(net);
 CREATE INDEX idx_launch_basic_status ON LaunchBasicCache(status_id);
@@ -73,6 +96,8 @@ CREATE INDEX idx_launch_normal_net ON LaunchNormalCache(net);
 CREATE INDEX idx_launch_normal_status ON LaunchNormalCache(status_id);
 CREATE INDEX idx_launch_normal_expires ON LaunchNormalCache(expires_at);
 CREATE INDEX idx_launch_detailed_expires ON LaunchDetailedCache(expires_at);
+CREATE INDEX idx_starship_history_net ON StarshipHistoryCache(net);
+CREATE INDEX idx_starship_history_expires ON StarshipHistoryCache(expires_at);
 
 -- Queries for LaunchBasic
 insertOrReplaceBasic:
@@ -182,3 +207,32 @@ DELETE FROM LaunchDetailedCache WHERE id = ?;
 
 clearAllDetailed:
 DELETE FROM LaunchDetailedCache;
+
+-- Queries for StarshipHistoryCache
+insertOrReplaceStarshipHistory:
+INSERT OR REPLACE INTO StarshipHistoryCache (
+    id, name, status_id, status_name, net, window_end, window_start,
+    launch_service_provider_id, launch_service_provider_name,
+    rocket_configuration_id, rocket_configuration_name,
+    pad_name, location_name, image_url, mission_name, mission_description,
+    json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getStarshipHistory:
+SELECT * FROM StarshipHistoryCache
+WHERE net < ? AND expires_at > ?
+ORDER BY net DESC
+LIMIT ?;
+
+getStarshipHistoryStale:
+SELECT * FROM StarshipHistoryCache
+WHERE net < ?
+ORDER BY net DESC
+LIMIT ?;
+
+deleteExpiredStarshipHistory:
+DELETE FROM StarshipHistoryCache WHERE expires_at < ?;
+
+clearAllStarshipHistory:
+DELETE FROM StarshipHistoryCache;
+

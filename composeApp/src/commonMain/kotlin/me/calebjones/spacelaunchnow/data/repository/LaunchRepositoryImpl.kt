@@ -463,7 +463,9 @@ class LaunchRepositoryImpl(
                             timestamp = staleTimestamp ?: now
                         )
                     )
-                } else if (hasStaleData) {
+                }
+
+                if (hasStaleData) {
                     // Apply user preference filters to stale cached data
                     val filteredStale =
                         filterLaunchesByPreferences(staleCached!!, agencyIds, locationIds)

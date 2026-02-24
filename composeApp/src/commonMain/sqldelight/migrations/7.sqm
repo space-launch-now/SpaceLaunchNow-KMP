@@ -1,0 +1,31 @@
+-- Migration from version 7 to version 8
+-- Adds StarshipHistoryCache table to separate Starship-specific cache from general launch cache
+-- This prevents cache pollution where Starship-only launches contaminate the general previous launches cache
+
+-- Create separate cache table for Starship history
+CREATE TABLE StarshipHistoryCache (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    status_id INTEGER,
+    status_name TEXT,
+    net INTEGER, -- stored as epoch milliseconds
+    window_end INTEGER,
+    window_start INTEGER,
+    launch_service_provider_id INTEGER,
+    launch_service_provider_name TEXT,
+    rocket_configuration_id INTEGER,
+    rocket_configuration_name TEXT,
+    pad_name TEXT,
+    location_name TEXT,
+    image_url TEXT,
+    mission_name TEXT,
+    mission_description TEXT,
+    json_data TEXT NOT NULL, -- Full serialized LaunchNormal object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Create indexes for efficient queries
+CREATE INDEX idx_starship_history_net ON StarshipHistoryCache(net);
+CREATE INDEX idx_starship_history_expires ON StarshipHistoryCache(expires_at);
+

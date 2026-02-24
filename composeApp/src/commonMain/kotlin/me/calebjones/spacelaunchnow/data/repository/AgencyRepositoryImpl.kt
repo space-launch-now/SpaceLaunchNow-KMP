@@ -10,12 +10,24 @@ class AgencyRepositoryImpl(
     private val agenciesApi: AgenciesApi
 ) : AgencyRepository {
 
-    override suspend fun getAgencies(limit: Int, offset: Int): Result<PaginatedAgencyNormalList> {
+    override suspend fun getAgencies(
+        limit: Int,
+        offset: Int,
+        ordering: String?,
+        search: String?,
+        featured: Boolean?,
+        typeId: Int?,
+        countryCode: List<String>?
+    ): Result<PaginatedAgencyNormalList> {
         return try {
             val response = agenciesApi.getAgencyList(
                 limit = limit,
                 offset = offset,
-                ordering = "-total_launch_count" // Order by total launch count descending
+                ordering = ordering,
+                search = search,
+                featured = featured,
+                typeId = typeId,
+                countryCode = countryCode
             )
             Result.success(response.body())
         } catch (e: ResponseException) {

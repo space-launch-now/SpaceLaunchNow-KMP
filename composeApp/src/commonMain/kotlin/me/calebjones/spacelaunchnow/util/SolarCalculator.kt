@@ -7,8 +7,10 @@ import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.tan
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
-import kotlin.time.Instant
 
 /**
  * Solar position calculator for day/night terminator overlay
@@ -69,12 +71,12 @@ object SolarCalculator {
     fun calculateSunPosition(timestampMs: Long = Clock.System.now().toEpochMilliseconds()): SolarPosition {
         // Convert to date components in UTC
         val instant = Instant.fromEpochMilliseconds(timestampMs)
-        val dt = instant.toLocalDateTime(TimeZone.UTC)
-
-        val hours = dt.hour
-        val minutes = dt.minute
-        val seconds = dt.second
-        val millis = (timestampMs % 1000).toInt()
+        val dateTime = instant.toLocalDateTime(TimeZone.UTC)
+        
+        val hours = dateTime.hour
+        val minutes = dateTime.minute
+        val seconds = dateTime.second
+        val millis = dateTime.nanosecond / 1_000_000  // Convert nanoseconds to milliseconds
         
         val msPastMidnight = ((hours * 60 + minutes) * 60 + seconds) * 1000 + millis
         

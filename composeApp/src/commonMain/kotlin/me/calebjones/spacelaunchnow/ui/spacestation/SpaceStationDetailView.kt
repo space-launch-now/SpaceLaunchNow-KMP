@@ -117,7 +117,7 @@ private fun SpaceStationDetailContent(
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight - 28.dp))
+        Spacer(Modifier.height(TitleHeight))
 
         // ISS-specific: NASA live stream
         if (isIss && videoPlayerState.availableVideos.isNotEmpty()) {
@@ -165,7 +165,7 @@ private fun SpaceStationDetailContent(
             ) {
                 Column {
                     // Map section
-                    Box(modifier = Modifier.fillMaxWidth().height(500.dp)) {
+                    Box(modifier = Modifier.fillMaxWidth().height(250.dp)) {
                         IssMapView(
                             currentPosition = issPosition,
                             orbitPath = orbitPath,
