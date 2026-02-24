@@ -51,7 +51,8 @@ data class NotificationData(
                     launchLocation = data["launch_location"] ?: return null,
                     webcast = data["webcast"] ?: "false",
                     webcastLive = data["webcast_live"],
-                    agencyId = data["agency_id"] ?: return null,
+                    // V5 payloads use "lsp_id" instead of "agency_id" — accept either key.
+                    agencyId = data["agency_id"] ?: data["lsp_id"] ?: return null,
                     locationId = data["location_id"] ?: return null
                 )
             } catch (e: Exception) {
