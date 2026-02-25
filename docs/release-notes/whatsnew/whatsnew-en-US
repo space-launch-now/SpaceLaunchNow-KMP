@@ -1,4 +1,3 @@
 ### Features
 
-* add Explore screen to TabletDesktopLayout and update theme preference handling in MainViewController
-* **iOS:** update widget background handling and improve layout for Launch List and Next Up widgets
+* update Package.resolved and add location usage description in Info.plist
