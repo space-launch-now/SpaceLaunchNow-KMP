@@ -1,3 +1,12 @@
+# [5.13.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.12.0...v5.13.0) (2026-02-25)
+
+
+### Features
+
+* add debug flag and TOTP secret handling to AppSecrets and update iOS Secrets.plist generation ([4b3b53f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4b3b53f83d3bf625780d35b085b565ec0e3bdf57))
+
+
+
 # [5.12.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.11.0...v5.12.0) (2026-02-25)
 
 
@@ -47,17 +56,6 @@
 * enhance rocket view with filtering, sorting, and search capabilities ([a188c0b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a188c0b98160a0c796f7b4a90c92d330ac61bb03))
 * enhance rocket view with filtering, sorting, and search capabilities ([76f329e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/76f329ea9318f6511054bff8edea136410ae074e))
 * implement asynchronous agency filtering ([de2c074](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/de2c074a70392bd0b5bbab26d211af3d4a19397d))
-
-
-
-## [5.9.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.9.0...v5.9.1) (2026-02-02)
-
-
-### Bug Fixes
-
-* iss views ([de287e9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/de287e9bd1f208f5109d28fa6807a2079b02d572))
-* replace DateTimeUtil with parseIsoDurationToHumanReadable and update related tests ([b71bd32](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b71bd32b48b42f94a8ac94c0783e78088bf0c11a))
-* update expected result for full format ISO duration test ([793cff1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/793cff18bbc72db1d51ad688702c6a3584b4ddff))
 
 
 
