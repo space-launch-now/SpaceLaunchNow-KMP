@@ -379,7 +379,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
               let launchName = data["launch_name"],
               let launchNet = data["launch_net"],
               let launchLocation = data["launch_location"],
-              let agencyId = data["agency_id"],
+              let agencyId = data["agency_id"] ?? data["lsp_id"], // V5 payloads use lsp_id instead of agency_id
               let locationId = data["location_id"] else {
             print("❌ [Parse] Missing required notification fields")
             print("❌ [Parse] Available fields: \(data.keys.sorted())")
@@ -598,7 +598,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("📩 [iOS SWIFT] Notification Data:")
         print("   - Type: \(dataMap["notification_type"] ?? "unknown")")
         print("   - Launch: \(dataMap["launch_name"] ?? "unknown")")
-        print("   - Agency ID: \(dataMap["agency_id"] ?? "unknown")")
+        print("   - Agency ID: \(dataMap["agency_id"] ?? dataMap["lsp_id"] ?? "unknown")")
         print("   - Location ID: \(dataMap["location_id"] ?? "unknown")")
         print("   - Webcast: \(dataMap["webcast"] ?? "false")")
         print("   - Webcast Live: \(dataMap["webcast_live"] ?? "false")")

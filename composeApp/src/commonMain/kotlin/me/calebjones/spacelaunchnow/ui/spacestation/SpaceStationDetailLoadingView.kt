@@ -3,13 +3,14 @@ package me.calebjones.spacelaunchnow.ui.spacestation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,32 +21,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
+import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
+
+private val TitleHeight = 128.dp
 
 /**
- * Loading view for space station details
+ * Loading view for space station details with shimmer placeholders.
+ * Uses SharedDetailScaffold pattern with collapsed header to match other detail screens.
  */
 @Composable
 fun SpaceStationDetailLoadingView(onNavigateBack: () -> Unit) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column {
-            // Top bar with back button
-            IconButton(
-                onClick = onNavigateBack,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Navigate back"
-                )
-            }
+    SharedDetailScaffold(
+        titleText = "Loading...",
+        taglineText = null,
+        imageUrl = null,
+        onNavigateBack = onNavigateBack,
+        backgroundColors = listOf(
+            MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+        ),
+        scrollEnabled = false
+    ) {
+        // Shimmer content matching SpaceStationDetailView layout
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Spacer(Modifier.height(TitleHeight))
+            // NASA live stream placeholder
+            PlainShimmerCard(height = 200)
 
-            // Loading indicator
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+            // Active expedition card
+            PlainShimmerCard(height = 180)
+
+            // ISS Map with position info
+            PlainShimmerCard(height = 400)
+
+            // Station specs card
+            PlainShimmerCard(height = 160)
         }
     }
 }
