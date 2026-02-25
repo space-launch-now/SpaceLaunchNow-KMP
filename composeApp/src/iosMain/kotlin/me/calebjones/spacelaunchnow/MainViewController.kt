@@ -91,12 +91,14 @@ fun MainViewController() = ComposeUIViewController {
     val navigationDestination by navigationDestinationState
     val notificationLaunchId by notificationLaunchIdState
 
-    // Collect useUtc preference for reactive updates
+    // Collect useUtc and theme preferences for reactive updates
     val appPreferences = getKoin().get<AppPreferences>()
     val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
+    val themeOption by appPreferences.themeFlow.collectAsState(initial = me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.System)
 
     SpaceLaunchNowApp(
         contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(),
+        themeOption = themeOption,
         useUtc = useUtc,
         navigationDestination = navigationDestination,
         onNavigationDestinationConsumed = {
