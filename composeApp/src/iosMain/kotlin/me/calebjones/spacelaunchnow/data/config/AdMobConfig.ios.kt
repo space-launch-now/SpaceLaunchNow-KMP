@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.data.config
 
 import me.calebjones.spacelaunchnow.util.AppSecrets
+import me.calebjones.spacelaunchnow.util.BuildConfig
 
 /**
  * iOS implementation of AdMob configuration
@@ -30,7 +31,8 @@ actual object AdMobConfig {
 
     actual val platform: String = "iOS"
 
-    // For iOS, we'll use a simple debug check
-    // You can enhance this based on your build configuration
-    actual val isDebug: Boolean = true // TODO: Set based on your iOS build configuration
+    // iOS debug mode is read from Secrets.plist at app initialization
+    // Unlike Android (automatic via build type), iOS requires explicit DEBUG configuration
+    actual val isDebug: Boolean
+        get() = BuildConfig.IS_DEBUG
 }
