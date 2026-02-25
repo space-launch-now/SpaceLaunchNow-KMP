@@ -1,3 +1,14 @@
+# [5.12.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.11.0...v5.12.0) (2026-02-25)
+
+
+### Features
+
+* add shimmer loading states for space station details and docking locations ([9069bfc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9069bfcbe804fdf053388934b722d90bec2cbb01))
+* implement notification filter fix for iOS ([0b7d9d1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0b7d9d183a4de1097cd2b17a88dc72204383189f))
+* **iOS:** update notification parsing to support V5 payloads ([cfb1281](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cfb12812f02ae9fa58f7427fc41550be1daffbec))
+
+
+
 # [5.11.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.10.1...v5.11.0) (2026-02-22)
 
 
@@ -47,20 +58,6 @@
 * iss views ([de287e9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/de287e9bd1f208f5109d28fa6807a2079b02d572))
 * replace DateTimeUtil with parseIsoDurationToHumanReadable and update related tests ([b71bd32](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b71bd32b48b42f94a8ac94c0783e78088bf0c11a))
 * update expected result for full format ISO duration test ([793cff1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/793cff18bbc72db1d51ad688702c6a3584b4ddff))
-
-
-
-# [5.9.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.8.2...v5.9.0) (2026-02-01)
-
-
-### Bug Fixes
-
-* astronaut detail view with agency abbreviation and improved stats display ([4327aa1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4327aa1cd99ccf8fe4a20d28f9e77bf2cd3af0f3))
-
-
-### Features
-
-* Add astronaut list and detail views with links in launch detailed ([45a6803](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/45a6803d2ecdf79ef2454ea5adc0b9364e73e68a))
 
 
 

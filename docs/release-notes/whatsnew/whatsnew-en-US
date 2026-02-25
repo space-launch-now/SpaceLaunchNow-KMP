@@ -1,3 +1,5 @@
 ### Features
 
-* improve home page views and layouts
+* add shimmer loading states for space station details and docking locations
+* implement notification filter fix for iOS
+* **iOS:** update notification parsing to support V5 payloads
