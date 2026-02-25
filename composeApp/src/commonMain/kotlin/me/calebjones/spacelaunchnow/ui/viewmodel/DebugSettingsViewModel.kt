@@ -127,8 +127,8 @@ class DebugSettingsViewModel(
             try {
                 _isLoading.value = true
                 debugPreferences.setUseDebugTopics(useDebug)
-                val topicType = if (useDebug) "debug_v3" else "prod_v3"
-                _statusMessage.value = "Switched to $topicType topics"
+                val topicType = if (useDebug) "debug_v5" else "prod_v5"
+                _statusMessage.value = "Switched to $topicType topics (platform-specific)"
             } catch (e: Exception) {
                 _statusMessage.value = "Failed to update topics: ${e.message}"
             } finally {

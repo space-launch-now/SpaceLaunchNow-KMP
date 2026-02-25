@@ -679,4 +679,118 @@ object NotificationDisplayHelper {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
+
+    /**
+     * Display a V5 notification using V5NotificationPayload
+     * 
+     * V5 notifications use server-provided title and body directly,
+     * unlike V4 which constructs the body from notification data.
+     *
+     * @param context Android context
+     * @param payload V5 notification payload with all data
+     * @param title Server-provided title (may include emoji prefixes)
+     * @param body Server-provided body text
+     */
+    fun showV5Notification(
+        context: Context,
+        payload: me.calebjones.spacelaunchnow.data.model.V5NotificationPayload,
+        title: String,
+        body: String
+    ) {
+        log.d("📱 [V5 Notification] Starting V5 notification display...")
+        log.d("📱 [V5 Notification] Title: $title")
+        log.d("📱 [V5 Notification] Body: $body")
+        log.d("📱 [V5 Notification] Launch: ${payload.launchName}")
+
+        // Ensure channels exist
+        createNotificationChannels(context)
+
+        // Determine which channel to use
+        val channelId = getChannelId(payload.notificationType)
+        log.d("📱 [V5 Notification] Channel: $channelId")
+
+        // Add 🔴 emoji to title if webcast is live (like old app)
+        val displayTitle = if (payload.webcastLive) {
+            "🔴 $title"
+        } else {
+            title
+        }
+
+        // Create intent with launch data for deep linking
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("launch_id", payload.launchUuid) // Use UUID for API 2.4.0
+            putExtra("launch_uuid", payload.launchUuid)
+            putExtra("launch_name", payload.launchName)
+            putExtra("launch_net", payload.launchNet)
+            putExtra("launch_location", payload.launchLocation)
+            putExtra("webcast", payload.webcast.toString())
+            putExtra("lsp_id", payload.lspId?.toString() ?: "")
+            putExtra("location_id", payload.locationId?.toString() ?: "")
+            putExtra("notification_type", payload.notificationType)
+            putExtra("is_v5", true)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            payload.launchUuid.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Build base notification
+        val notificationBuilder = NotificationCompat.Builder(context, channelId)
+            .setContentTitle(displayTitle)
+            .setContentText(body)
+            .setSmallIcon(R.drawable.ic_rocket_notification)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setOnlyAlertOnce(true)
+
+        // Load and display image if available
+        log.d("📱 [V5 Notification] Image URL: ${payload.launchImage}")
+
+        var imageBitmap = loadImageFromUrlSync(context, payload.launchImage)
+        log.d("📱 [V5 Notification] Image bitmap result: $imageBitmap")
+
+        // Add LIVE badge if webcast is live
+        if (imageBitmap != null && payload.webcastLive) {
+            log.d("📱 [V5 Notification] 🔴 Adding LIVE badge")
+            imageBitmap = drawLiveBadge(imageBitmap)
+        }
+
+        if (imageBitmap != null) {
+            log.d("📱 [V5 Notification] ✅ Setting large icon and BigPictureStyle")
+            notificationBuilder
+                .setLargeIcon(imageBitmap)
+                .setStyle(
+                    NotificationCompat.BigPictureStyle()
+                        .bigPicture(imageBitmap)
+                        .bigLargeIcon(null as Bitmap?)
+                )
+        } else {
+            log.d("📱 [V5 Notification] Using BigTextStyle (no image)")
+            notificationBuilder.setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(body)
+            )
+        }
+
+        val notification = notificationBuilder.build()
+        log.i("📱 [V5 Notification] Notification built successfully")
+
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Use launchUuid as the notification tag (collapse key)
+        log.i("📱 [V5 Notification] Showing notification - Tag: ${payload.launchUuid}, ID: ${payload.launchUuid.hashCode()}")
+
+        notificationManager.notify(
+            payload.launchUuid,
+            payload.launchUuid.hashCode(),
+            notification
+        )
+        log.i("📱 [V5 Notification] ✅ V5 Notification shown successfully!")
+    }
 }

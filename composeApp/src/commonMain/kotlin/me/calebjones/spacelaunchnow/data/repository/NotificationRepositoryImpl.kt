@@ -5,7 +5,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
@@ -150,17 +149,15 @@ class NotificationRepositoryImpl(
             log.v { "Subscribed agencies: ${newState.subscribedAgencies}" }
             log.v { "Subscribed locations: ${newState.subscribedLocations}" }
 
-            // 2. Persist to storage (background)
-            repositoryScope.launch {
-                try {
-                    storage.saveState(newState)
-                    log.d { "Notification state persisted to storage" }
-                } catch (e: Exception) {
-                    log.e(e) { "Failed to persist notification state" }
-                }
+            // 2. Persist to storage (synchronous to prevent race condition with notification evaluation)
+            try {
+                storage.saveState(newState)
+                log.d { "Notification state persisted to storage" }
+            } catch (e: Exception) {
+                log.e(e) { "Failed to persist notification state" }
             }
 
-            // 3. Trigger background FCM subscription updates (debounced)
+            // 4. Trigger background FCM subscription updates (debounced)
             log.d { "Triggering SubscriptionProcessor update..." }
             subscriptionProcessor.requestUpdate(newState)
 

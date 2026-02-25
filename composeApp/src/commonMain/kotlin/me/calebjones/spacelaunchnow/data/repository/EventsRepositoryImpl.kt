@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.data.repository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getEventList
+import me.calebjones.spacelaunchnow.api.extensions.getEventsByLaunchId
 import me.calebjones.spacelaunchnow.api.extensions.getUpcomingEvents
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
@@ -243,6 +244,33 @@ class EventsRepositoryImpl(
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "Failed to get event details" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getEventsByLaunchId(
+        launchId: String,
+        limit: Int
+    ): Result<PaginatedEventEndpointNormalList> {
+        return try {
+            log.d { "getEventsByLaunchId called - launchId: $launchId, limit: $limit" }
+
+            val response = eventsApi.getEventsByLaunchId(
+                launchId = launchId,
+                limit = limit,
+                ordering = "-date"
+            )
+
+            val body = response.body()
+            log.i { "Successfully fetched ${body.results.size} events for launch $launchId (status: ${response.status})" }
+
+            Result.success(body)
+
+        } catch (e: ResponseException) {
+            log.e(e) { "API error while fetching events for launch $launchId (status: ${e.response.status})" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "Unexpected error while fetching events for launch $launchId" }
             Result.failure(e)
         }
     }

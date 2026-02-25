@@ -12,11 +12,11 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 
 <a id="eventsDetailedList"></a>
 # **eventsDetailedList**
-> PaginatedEventEndpointDetailedList eventsDetailedList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, id, lastUpdatedGte, lastUpdatedLte, limit, month, offset, ordering, previous, program, search, slug, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
+> PaginatedEventEndpointDetailedList eventsDetailedList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, expeditionIds, id, lastUpdatedGte, lastUpdatedLte, launchIds, limit, month, offset, ordering, previous, program, programIds, search, slug, spacestationIds, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
 
 
 
-#### Filters Parameters - &#x60;agency__ids&#x60;, &#x60;date__gt&#x60;, &#x60;date__gte&#x60;, &#x60;date__lt&#x60;, &#x60;date__lte&#x60;, &#x60;day&#x60;, &#x60;id&#x60;, &#x60;last_updated__gte&#x60;, &#x60;last_updated__lte&#x60;, &#x60;month&#x60;, &#x60;previous&#x60;, &#x60;program&#x60;, &#x60;slug&#x60;, &#x60;type&#x60;, &#x60;type__ids&#x60;, &#x60;upcoming&#x60;, &#x60;upcoming_with_recent&#x60;, &#x60;video_url&#x60;, &#x60;year&#x60;  Example - [/events/detailed/?type__ids&#x3D;2,8](./?type__ids&#x3D;2,8)  #### Search Fields searched - &#x60;name&#x60;  Example - [/events/detailed/?search&#x3D;Flyby](./?search&#x3D;Flyby)  #### Ordering Fields - &#x60;date&#x60;, &#x60;last_updated&#x60;  Example - [/events/detailed/?ordering&#x3D;-last_updated](./?ordering&#x3D;-last_updated)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/events/detailed/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/events/detailed/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Filters Parameters - &#x60;agency__ids&#x60;, &#x60;date__gt&#x60;, &#x60;date__gte&#x60;, &#x60;date__lt&#x60;, &#x60;date__lte&#x60;, &#x60;day&#x60;, &#x60;expedition__ids&#x60;, &#x60;id&#x60;, &#x60;last_updated__gte&#x60;, &#x60;last_updated__lte&#x60;, &#x60;launch__ids&#x60;, &#x60;month&#x60;, &#x60;previous&#x60;, &#x60;program&#x60;, &#x60;program__ids&#x60;, &#x60;slug&#x60;, &#x60;spacestation__ids&#x60;, &#x60;type&#x60;, &#x60;type__ids&#x60;, &#x60;upcoming&#x60;, &#x60;upcoming_with_recent&#x60;, &#x60;video_url&#x60;, &#x60;year&#x60;  Example - [/events/detailed/?type__ids&#x3D;2,8](./?type__ids&#x3D;2,8)  #### Search Fields searched - &#x60;name&#x60;  Example - [/events/detailed/?search&#x3D;Flyby](./?search&#x3D;Flyby)  #### Ordering Fields - &#x60;date&#x60;, &#x60;last_updated&#x60;  Example - [/events/detailed/?ordering&#x3D;-last_updated](./?ordering&#x3D;-last_updated)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/events/detailed/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/events/detailed/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -31,17 +31,21 @@ val dateGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Ins
 val dateLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than
 val dateLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than or equal to
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
+val expeditionIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated expedition IDs.
 val id : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
 val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
+val launchIds : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated launch IDs (UUIDs).
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val month : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
 val ordering : kotlin.String = ordering_example // kotlin.String | Which field to use when ordering the results.
 val previous : kotlin.Boolean = true // kotlin.Boolean | Filter for events that have already occurred (up to current time).
 val program : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | 
+val programIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated program IDs.
 val search : kotlin.String = search_example // kotlin.String | A search term.
 val slug : kotlin.String = slug_example // kotlin.String | 
+val spacestationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated space station IDs.
 val type : kotlin.Int = 56 // kotlin.Int | 
 val typeIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated event type IDs.
 val upcoming : kotlin.Boolean = true // kotlin.Boolean | Filter for events upcoming within the next period (up to current time).
@@ -49,7 +53,7 @@ val upcomingWithRecent : kotlin.Boolean = true // kotlin.Boolean | Filter for ev
 val videoUrl : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated video URLs.
 val year : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 try {
-    val result : PaginatedEventEndpointDetailedList = apiInstance.eventsDetailedList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, id, lastUpdatedGte, lastUpdatedLte, limit, month, offset, ordering, previous, program, search, slug, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
+    val result : PaginatedEventEndpointDetailedList = apiInstance.eventsDetailedList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, expeditionIds, id, lastUpdatedGte, lastUpdatedLte, launchIds, limit, month, offset, ordering, previous, program, programIds, search, slug, spacestationIds, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling EventsApi#eventsDetailedList")
@@ -67,17 +71,21 @@ try {
 | **dateLt** | **kotlin.time.Instant**| Date is less than | [optional] |
 | **dateLte** | **kotlin.time.Instant**| Date is less than or equal to | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
+| **expeditionIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated expedition IDs. | [optional] |
 | **id** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
 | **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
+| **launchIds** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated launch IDs (UUIDs). | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **month** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
 | **ordering** | **kotlin.String**| Which field to use when ordering the results. | [optional] |
 | **previous** | **kotlin.Boolean**| Filter for events that have already occurred (up to current time). | [optional] |
 | **program** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)|  | [optional] |
+| **programIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated program IDs. | [optional] |
 | **search** | **kotlin.String**| A search term. | [optional] |
 | **slug** | **kotlin.String**|  | [optional] |
+| **spacestationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated space station IDs. | [optional] |
 | **type** | **kotlin.Int**|  | [optional] |
 | **typeIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated event type IDs. | [optional] |
 | **upcoming** | **kotlin.Boolean**| Filter for events upcoming within the next period (up to current time). | [optional] |
@@ -111,11 +119,11 @@ Configure cookieAuth:
 
 <a id="eventsList"></a>
 # **eventsList**
-> PaginatedEventEndpointNormalList eventsList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, id, lastUpdatedGte, lastUpdatedLte, limit, month, offset, ordering, previous, program, search, slug, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
+> PaginatedEventEndpointNormalList eventsList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, expeditionIds, id, lastUpdatedGte, lastUpdatedLte, launchIds, limit, month, offset, ordering, previous, program, programIds, search, slug, spacestationIds, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
 
 
 
-#### Filters Parameters - &#x60;agency__ids&#x60;, &#x60;date__gt&#x60;, &#x60;date__gte&#x60;, &#x60;date__lt&#x60;, &#x60;date__lte&#x60;, &#x60;day&#x60;, &#x60;id&#x60;, &#x60;last_updated__gte&#x60;, &#x60;last_updated__lte&#x60;, &#x60;month&#x60;, &#x60;previous&#x60;, &#x60;program&#x60;, &#x60;slug&#x60;, &#x60;type&#x60;, &#x60;type__ids&#x60;, &#x60;upcoming&#x60;, &#x60;upcoming_with_recent&#x60;, &#x60;video_url&#x60;, &#x60;year&#x60;  Example - [/events/?type__ids&#x3D;2,8](./?type__ids&#x3D;2,8)  #### Search Fields searched - &#x60;name&#x60;  Example - [/events/?search&#x3D;Flyby](./?search&#x3D;Flyby)  #### Ordering Fields - &#x60;date&#x60;, &#x60;last_updated&#x60;  Example - [/events/?ordering&#x3D;-last_updated](./?ordering&#x3D;-last_updated)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/events/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/events/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Filters Parameters - &#x60;agency__ids&#x60;, &#x60;date__gt&#x60;, &#x60;date__gte&#x60;, &#x60;date__lt&#x60;, &#x60;date__lte&#x60;, &#x60;day&#x60;, &#x60;expedition__ids&#x60;, &#x60;id&#x60;, &#x60;last_updated__gte&#x60;, &#x60;last_updated__lte&#x60;, &#x60;launch__ids&#x60;, &#x60;month&#x60;, &#x60;previous&#x60;, &#x60;program&#x60;, &#x60;program__ids&#x60;, &#x60;slug&#x60;, &#x60;spacestation__ids&#x60;, &#x60;type&#x60;, &#x60;type__ids&#x60;, &#x60;upcoming&#x60;, &#x60;upcoming_with_recent&#x60;, &#x60;video_url&#x60;, &#x60;year&#x60;  Example - [/events/?type__ids&#x3D;2,8](./?type__ids&#x3D;2,8)  #### Search Fields searched - &#x60;name&#x60;  Example - [/events/?search&#x3D;Flyby](./?search&#x3D;Flyby)  #### Ordering Fields - &#x60;date&#x60;, &#x60;last_updated&#x60;  Example - [/events/?ordering&#x3D;-last_updated](./?ordering&#x3D;-last_updated)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/events/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/events/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -130,17 +138,21 @@ val dateGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Ins
 val dateLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than
 val dateLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than or equal to
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
+val expeditionIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated expedition IDs.
 val id : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
 val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
+val launchIds : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated launch IDs (UUIDs).
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val month : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
 val ordering : kotlin.String = ordering_example // kotlin.String | Which field to use when ordering the results.
 val previous : kotlin.Boolean = true // kotlin.Boolean | Filter for events that have already occurred (up to current time).
 val program : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | 
+val programIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated program IDs.
 val search : kotlin.String = search_example // kotlin.String | A search term.
 val slug : kotlin.String = slug_example // kotlin.String | 
+val spacestationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated space station IDs.
 val type : kotlin.Int = 56 // kotlin.Int | 
 val typeIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated event type IDs.
 val upcoming : kotlin.Boolean = true // kotlin.Boolean | Filter for events upcoming within the next period (up to current time).
@@ -148,7 +160,7 @@ val upcomingWithRecent : kotlin.Boolean = true // kotlin.Boolean | Filter for ev
 val videoUrl : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated video URLs.
 val year : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 try {
-    val result : PaginatedEventEndpointNormalList = apiInstance.eventsList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, id, lastUpdatedGte, lastUpdatedLte, limit, month, offset, ordering, previous, program, search, slug, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
+    val result : PaginatedEventEndpointNormalList = apiInstance.eventsList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, expeditionIds, id, lastUpdatedGte, lastUpdatedLte, launchIds, limit, month, offset, ordering, previous, program, programIds, search, slug, spacestationIds, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling EventsApi#eventsList")
@@ -166,17 +178,21 @@ try {
 | **dateLt** | **kotlin.time.Instant**| Date is less than | [optional] |
 | **dateLte** | **kotlin.time.Instant**| Date is less than or equal to | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
+| **expeditionIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated expedition IDs. | [optional] |
 | **id** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
 | **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
+| **launchIds** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated launch IDs (UUIDs). | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **month** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
 | **ordering** | **kotlin.String**| Which field to use when ordering the results. | [optional] |
 | **previous** | **kotlin.Boolean**| Filter for events that have already occurred (up to current time). | [optional] |
 | **program** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)|  | [optional] |
+| **programIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated program IDs. | [optional] |
 | **search** | **kotlin.String**| A search term. | [optional] |
 | **slug** | **kotlin.String**|  | [optional] |
+| **spacestationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated space station IDs. | [optional] |
 | **type** | **kotlin.Int**|  | [optional] |
 | **typeIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated event type IDs. | [optional] |
 | **upcoming** | **kotlin.Boolean**| Filter for events upcoming within the next period (up to current time). | [optional] |
@@ -210,11 +226,11 @@ Configure cookieAuth:
 
 <a id="eventsMiniList"></a>
 # **eventsMiniList**
-> PaginatedEventEndpointListList eventsMiniList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, id, lastUpdatedGte, lastUpdatedLte, limit, month, offset, ordering, previous, program, search, slug, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
+> PaginatedEventEndpointListList eventsMiniList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, expeditionIds, id, lastUpdatedGte, lastUpdatedLte, launchIds, limit, month, offset, ordering, previous, program, programIds, search, slug, spacestationIds, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
 
 
 
-#### Filters Parameters - &#x60;agency__ids&#x60;, &#x60;date__gt&#x60;, &#x60;date__gte&#x60;, &#x60;date__lt&#x60;, &#x60;date__lte&#x60;, &#x60;day&#x60;, &#x60;id&#x60;, &#x60;last_updated__gte&#x60;, &#x60;last_updated__lte&#x60;, &#x60;month&#x60;, &#x60;previous&#x60;, &#x60;program&#x60;, &#x60;slug&#x60;, &#x60;type&#x60;, &#x60;type__ids&#x60;, &#x60;upcoming&#x60;, &#x60;upcoming_with_recent&#x60;, &#x60;video_url&#x60;, &#x60;year&#x60;  Example - [/events/mini/?type__ids&#x3D;2,8](./?type__ids&#x3D;2,8)  #### Search Fields searched - &#x60;name&#x60;  Example - [/events/mini/?search&#x3D;Flyby](./?search&#x3D;Flyby)  #### Ordering Fields - &#x60;date&#x60;, &#x60;last_updated&#x60;  Example - [/events/mini/?ordering&#x3D;-last_updated](./?ordering&#x3D;-last_updated)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/events/mini/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/events/mini/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Filters Parameters - &#x60;agency__ids&#x60;, &#x60;date__gt&#x60;, &#x60;date__gte&#x60;, &#x60;date__lt&#x60;, &#x60;date__lte&#x60;, &#x60;day&#x60;, &#x60;expedition__ids&#x60;, &#x60;id&#x60;, &#x60;last_updated__gte&#x60;, &#x60;last_updated__lte&#x60;, &#x60;launch__ids&#x60;, &#x60;month&#x60;, &#x60;previous&#x60;, &#x60;program&#x60;, &#x60;program__ids&#x60;, &#x60;slug&#x60;, &#x60;spacestation__ids&#x60;, &#x60;type&#x60;, &#x60;type__ids&#x60;, &#x60;upcoming&#x60;, &#x60;upcoming_with_recent&#x60;, &#x60;video_url&#x60;, &#x60;year&#x60;  Example - [/events/mini/?type__ids&#x3D;2,8](./?type__ids&#x3D;2,8)  #### Search Fields searched - &#x60;name&#x60;  Example - [/events/mini/?search&#x3D;Flyby](./?search&#x3D;Flyby)  #### Ordering Fields - &#x60;date&#x60;, &#x60;last_updated&#x60;  Example - [/events/mini/?ordering&#x3D;-last_updated](./?ordering&#x3D;-last_updated)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/events/mini/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/events/mini/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -229,17 +245,21 @@ val dateGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Ins
 val dateLt : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than
 val dateLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date is less than or equal to
 val day : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
+val expeditionIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated expedition IDs.
 val id : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Multiple values may be separated by commas.
 val lastUpdatedGte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is greater than or equal to
 val lastUpdatedLte : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Last Update is less than or equal to
+val launchIds : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated launch IDs (UUIDs).
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
 val month : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
 val ordering : kotlin.String = ordering_example // kotlin.String | Which field to use when ordering the results.
 val previous : kotlin.Boolean = true // kotlin.Boolean | Filter for events that have already occurred (up to current time).
 val program : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | 
+val programIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated program IDs.
 val search : kotlin.String = search_example // kotlin.String | A search term.
 val slug : kotlin.String = slug_example // kotlin.String | 
+val spacestationIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated space station IDs.
 val type : kotlin.Int = 56 // kotlin.Int | 
 val typeIds : kotlin.collections.List<kotlin.Int> =  // kotlin.collections.List<kotlin.Int> | Comma-separated event type IDs.
 val upcoming : kotlin.Boolean = true // kotlin.Boolean | Filter for events upcoming within the next period (up to current time).
@@ -247,7 +267,7 @@ val upcomingWithRecent : kotlin.Boolean = true // kotlin.Boolean | Filter for ev
 val videoUrl : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated video URLs.
 val year : kotlin.collections.List<kotlin.Double> =  // kotlin.collections.List<kotlin.Double> | Multiple values may be separated by commas.
 try {
-    val result : PaginatedEventEndpointListList = apiInstance.eventsMiniList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, id, lastUpdatedGte, lastUpdatedLte, limit, month, offset, ordering, previous, program, search, slug, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
+    val result : PaginatedEventEndpointListList = apiInstance.eventsMiniList(agencyIds, dateGt, dateGte, dateLt, dateLte, day, expeditionIds, id, lastUpdatedGte, lastUpdatedLte, launchIds, limit, month, offset, ordering, previous, program, programIds, search, slug, spacestationIds, type, typeIds, upcoming, upcomingWithRecent, videoUrl, year)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling EventsApi#eventsMiniList")
@@ -265,17 +285,21 @@ try {
 | **dateLt** | **kotlin.time.Instant**| Date is less than | [optional] |
 | **dateLte** | **kotlin.time.Instant**| Date is less than or equal to | [optional] |
 | **day** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
+| **expeditionIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated expedition IDs. | [optional] |
 | **id** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Multiple values may be separated by commas. | [optional] |
 | **lastUpdatedGte** | **kotlin.time.Instant**| Last Update is greater than or equal to | [optional] |
 | **lastUpdatedLte** | **kotlin.time.Instant**| Last Update is less than or equal to | [optional] |
+| **launchIds** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated launch IDs (UUIDs). | [optional] |
 | **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
 | **month** | [**kotlin.collections.List&lt;kotlin.Double&gt;**](kotlin.Double.md)| Multiple values may be separated by commas. | [optional] |
 | **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
 | **ordering** | **kotlin.String**| Which field to use when ordering the results. | [optional] |
 | **previous** | **kotlin.Boolean**| Filter for events that have already occurred (up to current time). | [optional] |
 | **program** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)|  | [optional] |
+| **programIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated program IDs. | [optional] |
 | **search** | **kotlin.String**| A search term. | [optional] |
 | **slug** | **kotlin.String**|  | [optional] |
+| **spacestationIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated space station IDs. | [optional] |
 | **type** | **kotlin.Int**|  | [optional] |
 | **typeIds** | [**kotlin.collections.List&lt;kotlin.Int&gt;**](kotlin.Int.md)| Comma-separated event type IDs. | [optional] |
 | **upcoming** | **kotlin.Boolean**| Filter for events upcoming within the next period (up to current time). | [optional] |
@@ -313,7 +337,7 @@ Configure cookieAuth:
 
 
 
-#### Filters Parameters - &#x60;agency__ids&#x60;, &#x60;date__gt&#x60;, &#x60;date__gte&#x60;, &#x60;date__lt&#x60;, &#x60;date__lte&#x60;, &#x60;day&#x60;, &#x60;id&#x60;, &#x60;last_updated__gte&#x60;, &#x60;last_updated__lte&#x60;, &#x60;month&#x60;, &#x60;previous&#x60;, &#x60;program&#x60;, &#x60;slug&#x60;, &#x60;type&#x60;, &#x60;type__ids&#x60;, &#x60;upcoming&#x60;, &#x60;upcoming_with_recent&#x60;, &#x60;video_url&#x60;, &#x60;year&#x60;  Example - [/events/?type__ids&#x3D;2,8](./?type__ids&#x3D;2,8)  #### Search Fields searched - &#x60;name&#x60;  Example - [/events/?search&#x3D;Flyby](./?search&#x3D;Flyby)  #### Ordering Fields - &#x60;date&#x60;, &#x60;last_updated&#x60;  Example - [/events/?ordering&#x3D;-last_updated](./?ordering&#x3D;-last_updated)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/events/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/events/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Filters Parameters - &#x60;agency__ids&#x60;, &#x60;date__gt&#x60;, &#x60;date__gte&#x60;, &#x60;date__lt&#x60;, &#x60;date__lte&#x60;, &#x60;day&#x60;, &#x60;expedition__ids&#x60;, &#x60;id&#x60;, &#x60;last_updated__gte&#x60;, &#x60;last_updated__lte&#x60;, &#x60;launch__ids&#x60;, &#x60;month&#x60;, &#x60;previous&#x60;, &#x60;program&#x60;, &#x60;program__ids&#x60;, &#x60;slug&#x60;, &#x60;spacestation__ids&#x60;, &#x60;type&#x60;, &#x60;type__ids&#x60;, &#x60;upcoming&#x60;, &#x60;upcoming_with_recent&#x60;, &#x60;video_url&#x60;, &#x60;year&#x60;  Example - [/events/?type__ids&#x3D;2,8](./?type__ids&#x3D;2,8)  #### Search Fields searched - &#x60;name&#x60;  Example - [/events/?search&#x3D;Flyby](./?search&#x3D;Flyby)  #### Ordering Fields - &#x60;date&#x60;, &#x60;last_updated&#x60;  Example - [/events/?ordering&#x3D;-last_updated](./?ordering&#x3D;-last_updated)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/events/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/events/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin

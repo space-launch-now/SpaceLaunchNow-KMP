@@ -45,4 +45,12 @@ interface EventsRepository {
      * Get detailed information for a single event by ID
      */
     suspend fun getEventDetails(eventId: Int): Result<EventEndpointDetailed>
+
+    /**
+     * Get events related to a specific launch by launch ID (UUID)
+     */
+    suspend fun getEventsByLaunchId(
+        launchId: String,
+        limit: Int = 10
+    ): Result<PaginatedEventEndpointNormalList>
 }

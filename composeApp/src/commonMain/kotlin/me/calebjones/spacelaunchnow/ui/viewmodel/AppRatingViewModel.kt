@@ -117,7 +117,7 @@ class AppRatingViewModel(
                 (Clock.System.now().toEpochMilliseconds() - lastPromptDate) / MILLIS_PER_DAY
             val gaveFeedback = appPreferences.hasUserGivenFeedback()
             val requiredCooldown = if (gaveFeedback) FEEDBACK_COOLDOWN_DAYS else COOLDOWN_DAYS
-            
+
             if (daysSinceLastPrompt < requiredCooldown) {
                 log.d { "Cooldown active: $daysSinceLastPrompt/$requiredCooldown days (feedback user: $gaveFeedback)" }
                 return
@@ -127,6 +127,12 @@ class AppRatingViewModel(
         // All conditions met - show enjoyment dialog first
         log.i { "✅ App rating conditions met! Showing enjoyment dialog" }
         _shouldShowEnjoymentDialog.value = true
+
+        // Record that we showed the dialog to start cooldown
+        appPreferences.updateLastRatingPromptDate(
+            Clock.System.now().toEpochMilliseconds()
+        )
+        appPreferences.incrementRatingDialogShownCount()
     }
 
     /**
@@ -196,7 +202,7 @@ class AppRatingViewModel(
     /**
      * Requests the native in-app review.
      * Call this when ready to show the rating prompt.
-     * 
+     *
      * @param activity The activity context (required for Android, ignored on other platforms)
      */
     fun requestReview(activity: Any? = null) {
@@ -207,13 +213,7 @@ class AppRatingViewModel(
                 val success = appRatingManager.requestReview(activity)
 
                 if (success) {
-                    // Update tracking
-                    appPreferences.updateLastRatingPromptDate(
-                        Clock.System.now().toEpochMilliseconds()
-                    )
-                    appPreferences.incrementRatingDialogShownCount()
-                    val totalShown = appPreferences.getRatingDialogShownCount()
-                    log.i { "✅ Native review prompt shown successfully (total times: $totalShown)" }
+                    log.i { "✅ Native review prompt shown successfully" }
                 } else {
                     log.w { "❌ Native review prompt request failed (platform may have rejected)" }
                 }

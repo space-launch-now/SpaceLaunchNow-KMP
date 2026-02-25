@@ -62,3 +62,9 @@ internal fun getStringResource(filename: String, fileType: String, valueKey: Str
     val dict = NSDictionary.dictionaryWithContentsOfFile(path) ?: return null
     return dict.get(valueKey) as? String
 }
+
+internal fun getIntResource(filename: String, fileType: String, valueKey: String): Int? {
+    val path = NSBundle.mainBundle.pathForResource(filename, fileType) ?: return null
+    val dict = NSDictionary.dictionaryWithContentsOfFile(path) ?: return null
+    return (dict.get(valueKey) as? Number)?.toInt()
+}

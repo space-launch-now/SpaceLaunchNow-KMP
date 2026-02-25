@@ -6,12 +6,14 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Utility object for formatting dates and times in a locale-appropriate way using platform-specific formatters
  */
 object DateTimeUtil {
-    
+    private val log by lazy { logger() }
+
     /**
      * Formats an Instant to a human-readable local date and time string using platform-specific locale formatting
      * Android: Uses DateTimeFormatter with locale
@@ -225,6 +227,7 @@ object DateTimeUtil {
             "Q?"
         }
     }
+
 }
 
 // Top-level expect declarations for multiplatform date/time formatting

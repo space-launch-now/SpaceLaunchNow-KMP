@@ -80,7 +80,7 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 | *AgenciesApi* | [**agenciesList**](docs/AgenciesApi.md#agencieslist) | **GET** /api/ll/2.4.0/agencies/ |  |
 | *AgenciesApi* | [**agenciesMiniList**](docs/AgenciesApi.md#agenciesminilist) | **GET** /api/ll/2.4.0/agencies/mini/ |  |
 | *AgenciesApi* | [**agenciesRetrieve**](docs/AgenciesApi.md#agenciesretrieve) | **GET** /api/ll/2.4.0/agencies/{id}/ |  |
-| *ApiThrottleApi* | [**apiThrottleList**](docs/ApiThrottleApi.md#apithrottlelist) | **GET** /api/ll/2.4.0/api-throttle/ |  |
+| *ApiThrottleApi* | [**apiThrottleStatus**](docs/ApiThrottleApi.md#apithrottlestatus) | **GET** /api/ll/2.4.0/api-throttle/status/ | Get API throttle status |
 | *AstronautsApi* | [**astronautsDetailedList**](docs/AstronautsApi.md#astronautsdetailedlist) | **GET** /api/ll/2.4.0/astronauts/detailed/ |  |
 | *AstronautsApi* | [**astronautsList**](docs/AstronautsApi.md#astronautslist) | **GET** /api/ll/2.4.0/astronauts/ |  |
 | *AstronautsApi* | [**astronautsMiniList**](docs/AstronautsApi.md#astronautsminilist) | **GET** /api/ll/2.4.0/astronauts/mini/ |  |

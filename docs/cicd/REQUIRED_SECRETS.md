@@ -20,6 +20,27 @@ Configure these secrets in GitHub repository **Settings → Secrets and variable
 - Create an API key in your dashboard
 - Copy the key and add to GitHub secrets
 
+### Debug Menu TOTP Secret
+
+| Secret Name | Type | Description |
+|------------|------|-------------|
+| `TOTP_SECRET_BASE32` | string | Base32-encoded secret for debug menu TOTP authentication |
+
+**Where to get:**
+1. Generate a secure random Base32 secret:
+   ```bash
+   # On Linux/Mac
+   head -c 20 /dev/urandom | base32
+   ```
+2. Or use an online generator: https://stefansundin.github.io/2fa-qr/
+3. Copy the Base32 secret and add to GitHub secrets
+
+**Important Notes:**
+- ✅ Used for time-based one-time password (TOTP) authentication in debug menu
+- ✅ Keep this secret secure - it grants access to debug features
+- ✅ Use different secrets for development/staging/production
+- ⚠️ This is optional for local development (has a default fallback) but **required for CI/CD**
+
 ### RevenueCat API Keys (⚠️ NEW - Required for Premium Features)
 
 | Secret Name | Type | Description |
@@ -245,6 +266,7 @@ Use this checklist to verify all secrets are configured:
 
 ### Essential (Required for All Builds)
 - [ ] `API_KEY` - Space Devs Launch Library
+- [ ] `TOTP_SECRET_BASE32` - Debug menu TOTP authentication
 - [ ] `REVENUECAT_ANDROID_KEY` - Android premium features ⚠️ NEW
 - [ ] `REVENUECAT_IOS_KEY` - iOS premium features ⚠️ NEW
 

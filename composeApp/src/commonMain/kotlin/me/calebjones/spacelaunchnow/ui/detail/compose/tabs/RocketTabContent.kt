@@ -28,7 +28,8 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.SpacecraftDetai
 @Composable
 fun RocketTabContent(
     launch: LaunchDetailed,
-    openUrl: (String) -> Unit
+    openUrl: (String) -> Unit,
+    onAstronautClick: ((Int) -> Unit)? = null
 ) {
     val hasRocket = launch.rocket?.configuration != null
     val hasSpacecraft = !launch.rocket?.spacecraftStage.isNullOrEmpty()
@@ -84,7 +85,9 @@ fun RocketTabContent(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(16.dp))
-                SpacecraftDetailsCard(spacecraftStages = spacecraftStages)
+                SpacecraftDetailsCard(
+                    spacecraftStages = spacecraftStages
+                )
                 Spacer(Modifier.height(16.dp))
             }
         }

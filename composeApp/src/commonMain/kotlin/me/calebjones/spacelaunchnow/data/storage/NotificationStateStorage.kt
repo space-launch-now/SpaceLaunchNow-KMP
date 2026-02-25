@@ -100,6 +100,9 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
             
             preferences[SUBSCRIBED_TOPICS] = state.subscribedTopics
         }
+        // Sync to App Group UserDefaults so the NSE can read filter prefs when app is killed.
+        // iOS: writes to shared UserDefaults. Android/Desktop: no-op via expect/actual.
+        syncNotificationStateToNSE(state)
     }
 
     suspend fun getState(): NotificationState {

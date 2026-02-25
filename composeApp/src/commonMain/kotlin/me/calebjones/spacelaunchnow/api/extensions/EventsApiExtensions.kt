@@ -91,3 +91,40 @@ suspend fun EventsApi.getStarshipEvents(
     ordering = "date"
 )
 
+/**
+ * Get events related to a specific launch by launch ID (UUID)
+ */
+suspend fun EventsApi.getEventsByLaunchId(
+    launchId: String,
+    limit: Int? = null,
+    ordering: String? = "date"
+) = this.eventsList(
+    agencyIds = null,
+    dateGt = null,
+    dateGte = null,
+    dateLt = null,
+    dateLte = null,
+    day = null,
+    expeditionIds = null,
+    id = null,
+    lastUpdatedGte = null,
+    lastUpdatedLte = null,
+    launchIds = listOf(launchId),
+    limit = limit,
+    month = null,
+    offset = null,
+    ordering = ordering,
+    previous = null,
+    program = null,
+    programIds = null,
+    search = null,
+    slug = null,
+    spacestationIds = null,
+    type = null,
+    typeIds = null,
+    upcoming = null,
+    upcomingWithRecent = null,
+    videoUrl = null,
+    year = null
+)
+

@@ -4,16 +4,16 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**apiThrottleList**](ApiThrottleApi.md#apiThrottleList) | **GET** /api/ll/2.4.0/api-throttle/ |  |
+| [**apiThrottleStatus**](ApiThrottleApi.md#apiThrottleStatus) | **GET** /api/ll/2.4.0/api-throttle/status/ | Get API throttle status |
 
 
-<a id="apiThrottleList"></a>
-# **apiThrottleList**
-> kotlin.collections.List&lt;APIThrottle&gt; apiThrottleList()
+<a id="apiThrottleStatus"></a>
+# **apiThrottleStatus**
+> APIThrottle apiThrottleStatus()
 
+Get API throttle status
 
-
-API endpoint that allows API Throttle information to be viewed.  GET: Returns a range of information about your API access
+Returns throttle information for the current user
 
 ### Example
 ```kotlin
@@ -23,13 +23,13 @@ API endpoint that allows API Throttle information to be viewed.  GET: Returns a 
 
 val apiInstance = ApiThrottleApi()
 try {
-    val result : kotlin.collections.List<APIThrottle> = apiInstance.apiThrottleList()
+    val result : APIThrottle = apiInstance.apiThrottleStatus()
     println(result)
 } catch (e: ClientException) {
-    println("4xx response calling ApiThrottleApi#apiThrottleList")
+    println("4xx response calling ApiThrottleApi#apiThrottleStatus")
     e.printStackTrace()
 } catch (e: ServerException) {
-    println("5xx response calling ApiThrottleApi#apiThrottleList")
+    println("5xx response calling ApiThrottleApi#apiThrottleStatus")
     e.printStackTrace()
 }
 ```
@@ -39,7 +39,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**kotlin.collections.List&lt;APIThrottle&gt;**](APIThrottle.md)
+[**APIThrottle**](APIThrottle.md)
 
 ### Authorization
 
