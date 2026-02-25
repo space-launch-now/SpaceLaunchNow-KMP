@@ -31,6 +31,7 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.SpaceShuttle
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.DockingLocationSerializerForSpacestation
+import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 
 /**
@@ -40,8 +41,14 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
 @Composable
 fun DockingLocationsCard(
     dockingLocations: List<DockingLocationSerializerForSpacestation>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ) {
+    if (isLoading) {
+        PlainShimmerCard(height = 140, modifier = modifier)
+        return
+    }
+    
     // Only show occupied docking locations
     val occupiedLocations = dockingLocations.filter { it.currentlyDocked != null }
 
