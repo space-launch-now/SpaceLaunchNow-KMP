@@ -1,3 +1,13 @@
+# [5.15.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.14.0...v5.15.0) (2026-02-25)
+
+
+### Features
+
+* add Explore screen to TabletDesktopLayout and update theme preference handling in MainViewController ([0d2c3a4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0d2c3a4e4853afe6981e251463f1049c3274dc6c))
+* **iOS:** update widget background handling and improve layout for Launch List and Next Up widgets ([94605ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/94605ff8bc24bbccc4096fec00ae0422a2fedfa5))
+
+
+
 # [5.14.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.13.0...v5.14.0) (2026-02-25)
 
 
@@ -33,15 +43,6 @@
 ### Features
 
 * improve home page views and layouts ([49a3a42](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/49a3a4213526e4873c04d7ba185ca6a2f67a2d39))
-
-
-
-## [5.10.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.10.0...v5.10.1) (2026-02-21)
-
-
-### Bug Fixes
-
-* duplicate agencies loaded ([516cd21](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/516cd21fe55f362e7313e7418af211508add3769))
 
 
 
