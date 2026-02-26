@@ -71,21 +71,15 @@ class KoinHelper : KoinComponent {
     
     /**
      * Check if the user has access to the ADVANCED_WIDGETS premium feature
-     * This is used by iOS widgets to gate content behind subscription
-     * 
-     * TEMPORARY: Returns true to allow widget development
-     * TODO: Re-enable RevenueCat check once framework linking is fixed
+     * This is used by iOS as a general subscription check (widget access gating
+     * uses shared UserDefaults via WidgetAccessSharer instead)
      */
     suspend fun hasWidgetAccess(): Boolean {
-        return true // Temporarily bypass RevenueCat to avoid linking issues in widget extension
-        
-        /* Original implementation - re-enable after adding RevenueCat frameworks to widget target
         return try {
             subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
         } catch (e: Exception) {
             false // Default to locked if check fails
         }
-        */
     }
     
     /**
