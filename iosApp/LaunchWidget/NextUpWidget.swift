@@ -9,8 +9,6 @@ struct NextUpWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: LaunchProvider()) { entry in
             NextUpWidgetView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
-                .widgetBackground(backgroundView: Color.clear)
         }
         .configurationDisplayName("Next Launch")
         .description("Shows the next upcoming space launch")
@@ -25,10 +23,7 @@ struct NextUpWidgetView: View {
     
     var body: some View {
         ZStack {
-            // Custom background with user-configured transparency that respects light/dark mode
-            Color(colorScheme == .dark ? UIColor.secondarySystemBackground : UIColor.systemBackground)
-                .opacity(entry.backgroundAlpha)
-            
+
             // Content
             if entry.isPlaceholder {
                 placeholderView
@@ -40,7 +35,10 @@ struct NextUpWidgetView: View {
                 emptyView
             }
         }
-        .cornerRadius(entry.cornerRadius)
+        .containerBackground(for: .widget) {
+            Color(colorScheme == .dark ? UIColor.secondarySystemBackground : UIColor.systemBackground)
+                .opacity(entry.backgroundAlpha)
+        }
     }
     
     // MARK: - Launch View

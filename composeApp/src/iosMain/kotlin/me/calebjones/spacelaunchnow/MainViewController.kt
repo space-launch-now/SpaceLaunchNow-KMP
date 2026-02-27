@@ -7,6 +7,10 @@ import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import co.touchlab.kermit.Severity
+import me.calebjones.spacelaunchnow.analytics.initializeDatadog
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -56,6 +60,35 @@ fun MainViewController() = ComposeUIViewController {
             log.w(e) { "Failed to configure SpaceLogger preferences observer" }
         }
 
+        // Initialize Datadog analytics (matching Android pattern)
+        try {
+            val loggingPrefs =
+                getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
+            val debugPrefs =
+                getKoin().get<me.calebjones.spacelaunchnow.data.storage.DebugPreferences>()
+
+            val consoleSeverity = runBlocking {
+                loggingPrefs.getConsoleSeverity().first()
+            }
+            val sampleRate = runBlocking {
+                debugPrefs.debugSettingsFlow.first().datadogSampleRate
+            }
+
+            if (consoleSeverity <= Severity.Debug || me.calebjones.spacelaunchnow.util.BuildConfig.IS_DEBUG) {
+                log.d { "Initializing Datadog (diagnostic logging enabled) with ${sampleRate.toInt()}% sample rate..." }
+                initializeDatadog(
+                    context = null,
+                    sampleRate = sampleRate,
+                    debugPreferences = debugPrefs
+                )
+                log.d { "✅ Datadog initialized successfully" }
+            } else {
+                log.i { "⏭️ Datadog initialization skipped (diagnostic logging disabled)" }
+            }
+        } catch (e: Exception) {
+            log.e(e) { "❌ Failed to initialize Datadog" }
+        }
+
         // Initialize Billing and Subscription system on background thread
         CoroutineScope(Dispatchers.Default).launch {
             try {
@@ -91,12 +124,14 @@ fun MainViewController() = ComposeUIViewController {
     val navigationDestination by navigationDestinationState
     val notificationLaunchId by notificationLaunchIdState
 
-    // Collect useUtc preference for reactive updates
+    // Collect useUtc and theme preferences for reactive updates
     val appPreferences = getKoin().get<AppPreferences>()
     val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
+    val themeOption by appPreferences.themeFlow.collectAsState(initial = me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.System)
 
     SpaceLaunchNowApp(
         contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(),
+        themeOption = themeOption,
         useUtc = useUtc,
         navigationDestination = navigationDestination,
         onNavigationDestinationConsumed = {

@@ -8,11 +8,18 @@ PROJECT_ROOT="$SCRIPT_DIR/.."
 ENV_FILE="$PROJECT_ROOT/.env"
 SECRETS_PLIST="$PROJECT_ROOT/iosApp/iosApp/Secrets.plist"
 TEMPLATE_FILE="$PROJECT_ROOT/iosApp/iosApp/Secrets.plist.template"
+VERSION_PROPS="$PROJECT_ROOT/version.properties"
 
 # Check if .env file exists
 if [ ! -f "$ENV_FILE" ]; then
     echo "❌ Error: .env file not found at $ENV_FILE"
     echo "Please create a .env file with your API_KEY"
+    exit 1
+fi
+
+# Check if version.properties exists
+if [ ! -f "$VERSION_PROPS" ]; then
+    echo "❌ Error: version.properties not found at $VERSION_PROPS"
     exit 1
 fi
 
@@ -28,6 +35,21 @@ IOS_INTERSTITIAL_AD_UNIT_ID=$(grep "^IOS_INTERSTITIAL_AD_UNIT_ID=" "$ENV_FILE" |
 ANDROID_REWARDED_AD_UNIT_ID=$(grep "^ANDROID_REWARDED_AD_UNIT_ID=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 IOS_REWARDED_AD_UNIT_ID=$(grep "^IOS_REWARDED_AD_UNIT_ID=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 DEBUG=$(grep "^DEBUG=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+TOTP_SECRET=$(grep "^TOTP_SECRET=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+DATADOG_ENABLED=$(grep "^DATADOG_ENABLED=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+DATADOG_CLIENT_TOKEN=$(grep "^DATADOG_CLIENT_TOKEN=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+DATADOG_APPLICATION_ID=$(grep "^DATADOG_APPLICATION_ID=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+DATADOG_ENVIRONMENT=$(grep "^DATADOG_ENVIRONMENT=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+
+# Read version info from version.properties
+VERSION_MAJOR=$(grep "^versionMajor=" "$VERSION_PROPS" | cut -d '=' -f2)
+VERSION_MINOR=$(grep "^versionMinor=" "$VERSION_PROPS" | cut -d '=' -f2)
+VERSION_PATCH=$(grep "^versionPatch=" "$VERSION_PROPS" | cut -d '=' -f2)
+VERSION_BUILD_NUMBER=$(grep "^versionBuildNumber=" "$VERSION_PROPS" | cut -d '=' -f2)
+
+# Compute version name and code (matching build.gradle.kts logic)
+VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${VERSION_BUILD_NUMBER}"
+VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + VERSION_BUILD_NUMBER))
 
 if [ -z "$API_KEY" ]; then
     echo "❌ Error: API_KEY not found in .env file"
@@ -70,7 +92,13 @@ if [ -z "$IOS_REWARDED_AD_UNIT_ID" ]; then
 fi
 
 if [ -z "$DEBUG" ]; then
-    echo "⚠️  Warning: DEBUG not found in .env file"
+    echo "⚠️  Warning: DEBUG not found in .env file (defaulting to false for production safety)"
+    DEBUG="false"
+fi
+
+if [ -z "$TOTP_SECRET" ]; then
+    echo "⚠️  Warning: TOTP_SECRET not found in .env file (using default)"
+    TOTP_SECRET="JBSWY3DPEHPK3PXP"
 fi
 
 # Create Secrets.plist
@@ -101,6 +129,20 @@ cat > "$SECRETS_PLIST" << EOF
 	<string>$IOS_REWARDED_AD_UNIT_ID</string>
     <key>debug</key>
 	<string>$DEBUG</string>
+	<key>totpSecret</key>
+	<string>$TOTP_SECRET</string>
+	<key>datadogEnabled</key>
+	<string>${DATADOG_ENABLED:-false}</string>
+	<key>dataDogClientToken</key>
+	<string>$DATADOG_CLIENT_TOKEN</string>
+	<key>dataDogApplicationId</key>
+	<string>$DATADOG_APPLICATION_ID</string>
+	<key>dataDogEnv</key>
+	<string>${DATADOG_ENVIRONMENT:-production}</string>
+	<key>versionName</key>
+	<string>$VERSION_NAME</string>
+	<key>versionCode</key>
+	<integer>$VERSION_CODE</integer>
 </dict>
 </plist>
 EOF
@@ -118,3 +160,9 @@ echo "✅ IOS_INTERSTITIAL_AD_UNIT_ID: $([ -n "$IOS_INTERSTITIAL_AD_UNIT_ID" ] &
 echo "✅ ANDROID_REWARDED_AD_UNIT_ID: $([ -n "$ANDROID_REWARDED_AD_UNIT_ID" ] && echo "Set" || echo "Not set")"
 echo "✅ IOS_REWARDED_AD_UNIT_ID: $([ -n "$IOS_REWARDED_AD_UNIT_ID" ] && echo "Set" || echo "Not set")"
 echo "✅ DEBUG: $([ -n "$DEBUG" ] && echo "Set" || echo "Not set")"
+echo "✅ TOTP_SECRET: $([ -n "$TOTP_SECRET" ] && echo "Set" || echo "Using default")"
+echo "✅ DATADOG_ENABLED: $([ -n "$DATADOG_ENABLED" ] && echo "$DATADOG_ENABLED" || echo "Not set (default: false)")"
+echo "✅ DATADOG_CLIENT_TOKEN: $([ -n "$DATADOG_CLIENT_TOKEN" ] && echo "Set" || echo "Not set")"
+echo "✅ DATADOG_APPLICATION_ID: $([ -n "$DATADOG_APPLICATION_ID" ] && echo "Set" || echo "Not set")"
+echo "✅ DATADOG_ENVIRONMENT: $([ -n "$DATADOG_ENVIRONMENT" ] && echo "$DATADOG_ENVIRONMENT" || echo "Not set (default: production)")"
+echo "✅ VERSION: $VERSION_NAME (code: $VERSION_CODE)"

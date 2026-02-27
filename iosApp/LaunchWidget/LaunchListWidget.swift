@@ -2,19 +2,6 @@ import WidgetKit
 import SwiftUI
 import UIKit
 
-// Helper extension to apply custom background with opacity (shared with NextUpWidget)
-extension View {
-    func widgetBackground(backgroundView: some View) -> some View {
-        if #available(iOSApplicationExtension 17.0, *) {
-            return containerBackground(for: .widget) {
-                backgroundView
-            }
-        } else {
-            return background(backgroundView)
-        }
-    }
-}
-
 // MARK: - Launch List Widget
 struct LaunchListWidget: Widget {
     let kind: String = "LaunchListWidget"
@@ -22,11 +9,9 @@ struct LaunchListWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: LaunchProvider()) { entry in
             LaunchListWidgetView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
-                .widgetBackground(backgroundView: Color.clear)
         }
         .configurationDisplayName("Launch List")
-        .description("Shows upcoming space launches")
+        .description("Premium · Shows upcoming space launches")
         .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
     }
 }
@@ -38,11 +23,7 @@ struct LaunchListWidgetView: View {
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        ZStack {
-            // Custom background with user-configured transparency that respects light/dark mode
-            Color(colorScheme == .dark ? UIColor.secondarySystemBackground : UIColor.systemBackground)
-                .opacity(entry.backgroundAlpha)
-            
+        ZStack(alignment: .top) {
             // Content
             if entry.isPlaceholder {
                 placeholderView
@@ -56,9 +37,13 @@ struct LaunchListWidgetView: View {
                 emptyView
             }
         }
-        .cornerRadius(entry.cornerRadius)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .containerBackground(for: .widget) {
+            Color(colorScheme == .dark ? UIColor.secondarySystemBackground : UIColor.systemBackground)
+                .opacity(entry.backgroundAlpha)
+        }
     }
-    
+
     // MARK: - Launch List View
     private var launchListView: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -74,16 +59,46 @@ struct LaunchListWidgetView: View {
             }
             .padding(.horizontal)
             .padding(.top)
-            
-            // Launch list
-            VStack(spacing: 12) {
-                ForEach(Array(entry.launches.prefix(maxLaunches).enumerated()), id: \.element.id) { index, launch in
-                    LaunchRow(launch: launch, showDivider: index < entry.launches.count - 1)
+
+            if family == .systemExtraLarge {
+                // Two-column grid for extra-large widget
+                let launches = Array(entry.launches.prefix(maxLaunches))
+                let half = (launches.count + 1) / 2
+                let left = Array(launches.prefix(half))
+                let right = Array(launches.dropFirst(half))
+
+                HStack(alignment: .top, spacing: 0) {
+                    VStack(spacing: 12) {
+                        ForEach(Array(left.enumerated()), id: \.element.id) { index, launch in
+                            LaunchRow(launch: launch, showDivider: index < left.count - 1)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal)
+
+                    Divider()
+
+                    VStack(spacing: 12) {
+                        ForEach(Array(right.enumerated()), id: \.element.id) { index, launch in
+                            LaunchRow(launch: launch, showDivider: index < right.count - 1)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal)
                 }
+                .padding(.bottom)
+            } else {
+                // Single-column list for medium/large
+                VStack(spacing: 12) {
+                    ForEach(Array(entry.launches.prefix(maxLaunches).enumerated()), id: \.element.id) { index, launch in
+                        LaunchRow(launch: launch, showDivider: index < entry.launches.count - 1)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
             }
-            .padding(.horizontal)
-            .padding(.bottom)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
     
     // MARK: - Max launches based on widget size
@@ -123,6 +138,7 @@ struct LaunchListWidgetView: View {
             
             Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
     
     // MARK: - Empty View
@@ -215,29 +231,29 @@ struct LaunchRow: View {
     let showDivider: Bool
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 2) {
                     // Launch name
                     Text(launch.name)
-                        .font(.subheadline)
+                        .font(.caption)
                         .fontWeight(.semibold)
-                        .lineLimit(2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
                     
-                    // Agency and location
+                    // Agency and location on one line
                     HStack(spacing: 4) {
                         Image(systemName: "building.2")
-                            .font(.caption2)
+                            .font(.system(size: 9))
                         Text(launch.agency)
-                            .font(.caption)
-                    }
-                    .foregroundStyle(.secondary)
-                    
-                    HStack(spacing: 4) {
+                            .font(.system(size: 10))
+                        Text("·")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.tertiary)
                         Image(systemName: "location")
-                            .font(.caption2)
+                            .font(.system(size: 9))
                         Text(launch.location)
-                            .font(.caption)
+                            .font(.system(size: 10))
                             .lineLimit(1)
                     }
                     .foregroundStyle(.secondary)
@@ -245,20 +261,18 @@ struct LaunchRow: View {
                 
                 Spacer()
                 
-                // Countdown
-                VStack(alignment: .trailing, spacing: 2) {
+                // Countdown + status
+                VStack(alignment: .trailing, spacing: 1) {
                     Text(launch.timeUntilLaunch)
-                        .font(.caption)
-                        .fontWeight(.bold)
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(.orange)
                     
-                    // Status indicator
-                    HStack(spacing: 4) {
+                    HStack(spacing: 3) {
                         Circle()
                             .fill(statusColor(for: launch.status))
-                            .frame(width: 6, height: 6)
+                            .frame(width: 5, height: 5)
                         Text(launch.status)
-                            .font(.caption2)
+                            .font(.system(size: 9))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -266,6 +280,7 @@ struct LaunchRow: View {
             
             if showDivider {
                 Divider()
+                    .padding(.top, 1)
             }
         }
     }

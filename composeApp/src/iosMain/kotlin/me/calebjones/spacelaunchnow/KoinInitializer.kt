@@ -9,6 +9,8 @@ import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
+import me.calebjones.spacelaunchnow.util.initializeBuildConfig
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -20,14 +22,19 @@ import kotlinx.coroutines.flow.first
 private var koinInstance: Koin? = null
 
 /**
- * Initialize Koin for iOS
- * This should be called before the UI is created to ensure all dependencies are available
+ * Initialize Koin for iOS (also used by widget extensions).
+ * SpaceLogger must be initialized before Koin because KoinHelper's constructor
+ * calls logger(), which requires SpaceLogger to be ready.
  */
 fun initKoin() {
     if (koinInstance == null) {
+        // SpaceLogger must be initialized before any Kotlin code that calls logger()
+        initializeBuildConfig()
+        SpaceLogger.initialize()
+
         val app = startKoin(koinConfig)
         koinInstance = app.koin
-        
+
         // Note: IosPushMessagingBridge now uses KoinComponent with by inject()
         // so it automatically gets NotificationHistoryStorage when Koin starts
     }
@@ -64,21 +71,15 @@ class KoinHelper : KoinComponent {
     
     /**
      * Check if the user has access to the ADVANCED_WIDGETS premium feature
-     * This is used by iOS widgets to gate content behind subscription
-     * 
-     * TEMPORARY: Returns true to allow widget development
-     * TODO: Re-enable RevenueCat check once framework linking is fixed
+     * This is used by iOS as a general subscription check (widget access gating
+     * uses shared UserDefaults via WidgetAccessSharer instead)
      */
     suspend fun hasWidgetAccess(): Boolean {
-        return true // Temporarily bypass RevenueCat to avoid linking issues in widget extension
-        
-        /* Original implementation - re-enable after adding RevenueCat frameworks to widget target
         return try {
             subscriptionRepository.hasFeature(PremiumFeature.ADVANCED_WIDGETS)
         } catch (e: Exception) {
             false // Default to locked if check fails
         }
-        */
     }
     
     /**

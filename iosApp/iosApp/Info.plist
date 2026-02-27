@@ -243,6 +243,8 @@
 			<string>3qcr597p9d.skadnetwork</string>
 		</dict>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Space Launch Now uses your location to show launches near you and relevant launch site information.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -252,7 +254,6 @@
 	<array>
 		<string>remote-notification</string>
 		<string>fetch</string>
-		<string>processing</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict/>

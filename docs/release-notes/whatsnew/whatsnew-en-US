@@ -1,12 +1,3 @@
-### Bug Fixes
-
-* **notifications:** fix filters for v5 notifications
-* rocket list and view model for improved state management
-* rocket list and view model for improved state management
-* update ExploreScreen typography and layout adjustments
-
 ### Features
 
-* add explore screen navigation
-* **astronauts:** implement comprehensive filtering and sorting for astronaut list
-* **astronauts:** implement comprehensive filtering and sorting for astronaut list...
+* update Package.resolved and add location usage description in Info.plist

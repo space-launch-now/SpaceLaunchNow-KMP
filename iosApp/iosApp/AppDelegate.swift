@@ -4,6 +4,14 @@ import FirebaseMessaging
 import UserNotifications
 import ComposeApp
 import GoogleMaps
+import WidgetKit
+
+// MARK: - WidgetKit Bridge Implementation
+class SwiftWidgetTimelineReloader: WidgetTimelineReloader {
+    func reloadAllTimelines() {
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+}
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     
@@ -41,6 +49,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("2️⃣.5 Initializing Share Helper...")
         _ = ShareHelper.shared
         print("✅ Share Helper initialized\n")
+        
+        // Register WidgetKit reload bridge so Kotlin can request timeline reloads
+        // when subscription state changes (premium purchase, restore, simulation mode)
+        print("2️⃣.6 Registering WidgetKit reload bridge...")
+        WidgetKitBridge.shared.reloader = SwiftWidgetTimelineReloader()
+        print("✅ WidgetKit reload bridge registered\n")
         
         // Set delegates
         print("3️⃣ Setting notification delegates...")

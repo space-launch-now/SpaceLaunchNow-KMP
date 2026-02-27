@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
@@ -46,6 +47,7 @@ import me.calebjones.spacelaunchnow.navigation.AgencyDetail
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
 import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
@@ -54,6 +56,7 @@ import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.Schedule
+import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
@@ -119,10 +122,10 @@ fun TabletDesktopLayout(
     SpaceLaunchNowTheme(themeOption = themeOption) {
         SharedTransitionLayout {
             CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-                val screens = listOf(Home, Schedule, Settings)
-                val items = listOf("Home", "Schedule", "Settings")
+                val screens = listOf(Home, Schedule, Explore, Settings)
+                val items = listOf("Home", "Schedule", "Explore", "Settings")
                 val selectedIcons =
-                    listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Settings)
+                    listOf(Icons.Filled.Home, Icons.AutoMirrored.Filled.List, Icons.Filled.Explore, Icons.Filled.Settings)
 
                 val windowSizeInfo = currentWindowAdaptiveInfo()
                 val windowSize = windowSizeInfo.windowSizeClass
