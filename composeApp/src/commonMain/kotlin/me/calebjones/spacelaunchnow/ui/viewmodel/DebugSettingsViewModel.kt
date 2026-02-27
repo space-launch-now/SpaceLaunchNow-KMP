@@ -66,6 +66,9 @@ class DebugSettingsViewModel(
     private val _notificationStats = MutableStateFlow<NotificationStats?>(null)
     val notificationStats: StateFlow<NotificationStats?> = _notificationStats.asStateFlow()
 
+    private val _selectedTab = MutableStateFlow(me.calebjones.spacelaunchnow.ui.settings.DebugTab.System)
+    val selectedTab: StateFlow<me.calebjones.spacelaunchnow.ui.settings.DebugTab> = _selectedTab.asStateFlow()
+
     val isDebugMode: Boolean = BuildConfig.IS_DEBUG
 
     init {
@@ -205,6 +208,10 @@ class DebugSettingsViewModel(
     fun clearStatusMessage() {
         _statusMessage.value = null
         _detailedMessage.value = null
+    }
+
+    fun selectTab(tab: me.calebjones.spacelaunchnow.ui.settings.DebugTab) {
+        _selectedTab.value = tab
     }
 
     fun resetNotificationPermissionFlag() {
