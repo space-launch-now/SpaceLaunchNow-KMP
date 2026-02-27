@@ -1,3 +1,10 @@
+### Bug Fixes
+
+* update iOS version in Info.plist and adjust Secrets.plist path in script
+
 ### Features
 
-* update Package.resolved and add location usage description in Info.plist
+* add tabs to debug screen
+* enhance ExploreScreen and ExploreCard for better tablet support
+* integrate Datadog analytics initialization and update iOS secrets generation script
+* **iOS:** implement widget access synchronization and update handling
