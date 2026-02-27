@@ -46,7 +46,7 @@ class IosBillingManager : BillingManager {
                 return Result.failure(IllegalStateException("RevenueCat iOS API key not configured"))
             }
             
-            log.d { "🔑 Using API key: ${apiKey.take(15)}..." }
+            log.d { "🔑 Using API key: ${apiKey.take(5)}..." }
             
             Purchases.configure(apiKey = apiKey) {
                 this.appUserId = appUserId
