@@ -37,18 +37,26 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  *
  * @param section The explore section to display
  * @param onClick Callback when the card is clicked
+ * @param isLargeScreen Whether to use larger sizing for tablet/desktop screens
  * @param modifier Optional modifier for customization
  */
 @Composable
 fun ExploreCard(
     section: ExploreSection,
     onClick: () -> Unit,
+    isLargeScreen: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val cardHeight = if (isLargeScreen) 260.dp else 250.dp
+    val iconSurfaceSize = if (isLargeScreen) 140.dp else 120.dp
+    val iconPadding = if (isLargeScreen) 18.dp else 12.dp
+    val cardPadding = if (isLargeScreen) 24.dp else 16.dp
+    val titleStyle = if (isLargeScreen) MaterialTheme.typography.titleLarge else MaterialTheme.typography.titleMedium
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(cardHeight)
             .semantics {
                 contentDescription = section.contentDescription
             }
@@ -67,7 +75,7 @@ fun ExploreCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(16.dp),
+                .padding(cardPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
@@ -75,13 +83,13 @@ fun ExploreCard(
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(iconSurfaceSize)
             ) {
                 Icon(
                     imageVector = section.icon,
                     contentDescription = null, // Decorative, card has contentDescription
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.padding(iconPadding)
                 )
             }
 
@@ -92,7 +100,7 @@ fun ExploreCard(
                 // Title
                 Text(
                     text = section.title,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = titleStyle,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface
@@ -143,6 +151,44 @@ private fun ExploreCardDarkPreview() {
                 contentDescription = "Navigate to Rockets"
             ),
             onClick = {}
+        )
+    }
+}
+
+@Preview(widthDp = 400)
+@Composable
+private fun ExploreCardLargeScreenPreview() {
+    SpaceLaunchNowPreviewTheme {
+        ExploreCard(
+            section = ExploreSection(
+                id = "rockets",
+                title = "Rockets",
+                description = "Browse launcher configurations and technical specifications",
+                icon = Icons.Filled.Rocket,
+                route = Rockets,
+                contentDescription = "Navigate to Rockets"
+            ),
+            onClick = {},
+            isLargeScreen = true
+        )
+    }
+}
+
+@Preview(widthDp = 400)
+@Composable
+private fun ExploreCardLargeScreenDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        ExploreCard(
+            section = ExploreSection(
+                id = "rockets",
+                title = "Rockets",
+                description = "Browse launcher configurations and technical specifications",
+                icon = Icons.Filled.Rocket,
+                route = Rockets,
+                contentDescription = "Navigate to Rockets"
+            ),
+            onClick = {},
+            isLargeScreen = true
         )
     }
 }

@@ -3,12 +3,11 @@ package me.calebjones.spacelaunchnow.analytics
 import com.datadog.kmp.rum.configuration.RumConfiguration
 
 /**
- * iOS stub implementation for Datadog.
- * Datadog is not currently set up for iOS, so this provides no-op implementations.
+ * iOS platform-specific RUM configuration.
+ * Note: trackUiKitViews and trackUiKitActions are not available in KMP SDK.
+ * Platform-specific view tracking should be configured differently if needed.
  */
 internal actual fun rumPlatformSetup(rumConfigurationBuilder: RumConfiguration.Builder) {
-    // iOS-specific RUM configuration
-    // Note: trackUiKitViews and trackUiKitActions are not available in KMP SDK
-    // Platform-specific view tracking should be configured differently if needed
-    // This function is never called since initializeDatadog returns early when disabled
+    // iOS-specific RUM configuration not yet implemented
+    // UIKit view/action tracking should be added when needed
 }

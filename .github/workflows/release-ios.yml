@@ -68,7 +68,6 @@ jobs:
         run: |
           chmod +x scripts/generate-ios-secrets.sh
           ./scripts/generate-ios-secrets.sh
-          cp iosApp/iosApp/Secrets.plist iosApp/Secrets.plist
 
       - name: Decode GoogleService-Info.plist
         env:
