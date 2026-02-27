@@ -68,10 +68,11 @@ fun ExploreScreen(
             )
         }
     ) { innerPadding ->
+        val gridSpacing = if (isTablet) 16.dp else 12.dp
         LazyVerticalGrid(
             columns = if (isTablet) {
                 // Adaptive columns on tablet/desktop (2-3 columns depending on width)
-                GridCells.Adaptive(200.dp)
+                GridCells.Adaptive(250.dp)
             } else {
                 // Fixed 2 columns on phone
                 GridCells.Fixed(2)
@@ -79,9 +80,9 @@ fun ExploreScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(horizontal = if (isTablet) 24.dp else 16.dp, vertical = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(gridSpacing),
+            verticalArrangement = Arrangement.spacedBy(gridSpacing)
         ) {
             val sections = ExploreSections.sections
             val sectionCount = sections.size
@@ -101,6 +102,7 @@ fun ExploreScreen(
             ) { _, section ->
                 ExploreCard(
                     section = section,
+                    isLargeScreen = isTablet,
                     onClick = {
                         navController.navigate(section.route)
                     }
