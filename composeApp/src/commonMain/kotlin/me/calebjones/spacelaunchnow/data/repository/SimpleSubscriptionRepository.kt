@@ -19,6 +19,7 @@ import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
+import me.calebjones.spacelaunchnow.widgets.WidgetAccessSharer
 
 /**
  * Simple, reliable subscription repository
@@ -55,6 +56,9 @@ class SimpleSubscriptionRepository(
 
                     // Wait for DataStore write to complete before triggering widget update
                     widgetPreferences.updateWidgetAccessGranted(hasWidgetAccess)
+
+                    // Sync widget access to shared UserDefaults for iOS widget extension
+                    WidgetAccessSharer.syncWidgetAccess(hasWidgetAccess)
 
                     // Trigger widget updates after DataStore write is confirmed complete
                     updateWidgetsAfterAccessChange(if (hasWidgetAccess) "access granted" else "access revoked")
@@ -264,6 +268,9 @@ class SimpleSubscriptionRepository(
 
                 // Wait for DataStore write to complete before triggering widget update
                 widgetPreferences.updateWidgetAccessGranted(hasWidgetAccess)
+
+                // Sync widget access to shared UserDefaults for iOS widget extension
+                WidgetAccessSharer.syncWidgetAccess(hasWidgetAccess)
                 log.i { "✅ Updated widget preferences cache" }
 
                 // Trigger widget update after DataStore write is confirmed complete
@@ -353,6 +360,8 @@ class SimpleSubscriptionRepository(
 
         // Update widgets if this affects widget features
         if (feature == PremiumFeature.ADVANCED_WIDGETS || feature == PremiumFeature.WIDGETS_CUSTOMIZATION) {
+            // Sync to shared UserDefaults so iOS widget picks up temporary access on next refresh
+            WidgetAccessSharer.syncWidgetAccess(true)
             updateWidgetsAfterAccessChange("temporary access granted for ${feature.name}")
         }
     }

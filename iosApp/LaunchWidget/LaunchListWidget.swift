@@ -11,7 +11,7 @@ struct LaunchListWidget: Widget {
             LaunchListWidgetView(entry: entry)
         }
         .configurationDisplayName("Launch List")
-        .description("Shows upcoming space launches")
+        .description("Premium · Shows upcoming space launches")
         .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
     }
 }

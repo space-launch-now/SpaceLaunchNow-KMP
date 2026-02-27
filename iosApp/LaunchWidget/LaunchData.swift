@@ -161,10 +161,10 @@ struct LaunchProvider: TimelineProvider {
             let cornerRadius = try await helper.getWidgetCornerRadius()
             print("🚀 Widget: Got preferences - alpha: \(backgroundAlpha), cornerRadius: \(cornerRadius)")
             
-            // Check if user has widget access (premium entitlement)
+            // Check if user has widget access via shared UserDefaults (App Group)
             print("🚀 Widget: Checking widget access...")
-            let hasAccess = try await helper.hasWidgetAccess()
-            let hasAccessBool = hasAccess.boolValue // Convert KotlinBoolean to Bool
+            let defaults = UserDefaults(suiteName: "group.me.calebjones.spacelaunchnow")
+            let hasAccessBool = defaults?.bool(forKey: "widget_has_access") ?? false
             print("🚀 Widget: Widget access: \(hasAccessBool)")
             
             // If no access, return locked entry

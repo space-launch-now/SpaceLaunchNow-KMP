@@ -6,7 +6,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 ENV_FILE="$PROJECT_ROOT/.env"
-SECRETS_PLIST="$PROJECT_ROOT/iosApp/iosApp/Secrets.plist"
+SECRETS_PLIST="$PROJECT_ROOT/iosApp/Secrets.plist"
 TEMPLATE_FILE="$PROJECT_ROOT/iosApp/iosApp/Secrets.plist.template"
 VERSION_PROPS="$PROJECT_ROOT/version.properties"
 
@@ -36,6 +36,10 @@ ANDROID_REWARDED_AD_UNIT_ID=$(grep "^ANDROID_REWARDED_AD_UNIT_ID=" "$ENV_FILE" |
 IOS_REWARDED_AD_UNIT_ID=$(grep "^IOS_REWARDED_AD_UNIT_ID=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 DEBUG=$(grep "^DEBUG=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 TOTP_SECRET=$(grep "^TOTP_SECRET=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+DATADOG_ENABLED=$(grep "^DATADOG_ENABLED=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+DATADOG_CLIENT_TOKEN=$(grep "^DATADOG_CLIENT_TOKEN=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+DATADOG_APPLICATION_ID=$(grep "^DATADOG_APPLICATION_ID=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+DATADOG_ENVIRONMENT=$(grep "^DATADOG_ENVIRONMENT=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 
 # Read version info from version.properties
 VERSION_MAJOR=$(grep "^versionMajor=" "$VERSION_PROPS" | cut -d '=' -f2)
@@ -127,6 +131,14 @@ cat > "$SECRETS_PLIST" << EOF
 	<string>$DEBUG</string>
 	<key>totpSecret</key>
 	<string>$TOTP_SECRET</string>
+	<key>datadogEnabled</key>
+	<string>${DATADOG_ENABLED:-false}</string>
+	<key>dataDogClientToken</key>
+	<string>$DATADOG_CLIENT_TOKEN</string>
+	<key>dataDogApplicationId</key>
+	<string>$DATADOG_APPLICATION_ID</string>
+	<key>dataDogEnv</key>
+	<string>${DATADOG_ENVIRONMENT:-production}</string>
 	<key>versionName</key>
 	<string>$VERSION_NAME</string>
 	<key>versionCode</key>
@@ -149,4 +161,8 @@ echo "✅ ANDROID_REWARDED_AD_UNIT_ID: $([ -n "$ANDROID_REWARDED_AD_UNIT_ID" ] &
 echo "✅ IOS_REWARDED_AD_UNIT_ID: $([ -n "$IOS_REWARDED_AD_UNIT_ID" ] && echo "Set" || echo "Not set")"
 echo "✅ DEBUG: $([ -n "$DEBUG" ] && echo "Set" || echo "Not set")"
 echo "✅ TOTP_SECRET: $([ -n "$TOTP_SECRET" ] && echo "Set" || echo "Using default")"
+echo "✅ DATADOG_ENABLED: $([ -n "$DATADOG_ENABLED" ] && echo "$DATADOG_ENABLED" || echo "Not set (default: false)")"
+echo "✅ DATADOG_CLIENT_TOKEN: $([ -n "$DATADOG_CLIENT_TOKEN" ] && echo "Set" || echo "Not set")"
+echo "✅ DATADOG_APPLICATION_ID: $([ -n "$DATADOG_APPLICATION_ID" ] && echo "Set" || echo "Not set")"
+echo "✅ DATADOG_ENVIRONMENT: $([ -n "$DATADOG_ENVIRONMENT" ] && echo "$DATADOG_ENVIRONMENT" || echo "Not set (default: production)")"
 echo "✅ VERSION: $VERSION_NAME (code: $VERSION_CODE)"

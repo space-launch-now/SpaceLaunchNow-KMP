@@ -68,7 +68,6 @@ jobs:
         run: |
           chmod +x scripts/generate-ios-secrets.sh
           ./scripts/generate-ios-secrets.sh
-          cp iosApp/iosApp/Secrets.plist iosApp/Secrets.plist
 
       - name: Decode GoogleService-Info.plist
         env:
@@ -145,6 +144,14 @@ jobs:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" iosApp/iosApp/Info.plist
           
           echo "✅ Updated iOS version to $MARKETING_VERSION (Build $BUILD_NUMBER)"
+
+      - name: Commit updated iOS version files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add iosApp/iosApp/Info.plist iosApp/Secrets.plist
+          git diff --staged --quiet || git commit -m "chore(ios): update Info.plist to ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.build_number }}) [skip ci]"
+          git push
 
       # ==================== BUILD ====================
       - name: Build iOS archive with automatic code signing

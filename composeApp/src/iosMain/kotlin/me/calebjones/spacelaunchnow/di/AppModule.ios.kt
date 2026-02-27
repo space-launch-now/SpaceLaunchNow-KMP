@@ -9,6 +9,7 @@ import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.rating.AppRatingManager
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.createPlatformSharingService
+import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
 import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -29,6 +30,9 @@ val iosModule = module {
 
     // App rating manager
     single { AppRatingManager() }
+
+    // Widget timeline reloader — triggers WidgetCenter.shared.reloadAllTimelines() via Swift bridge
+    single { PlatformWidgetUpdater(context = null) }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {

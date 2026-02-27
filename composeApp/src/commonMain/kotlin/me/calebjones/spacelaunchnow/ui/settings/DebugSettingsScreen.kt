@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,9 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -35,13 +37,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,27 +55,34 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.data.model.NotificationAgency
-import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
+import me.calebjones.spacelaunchnow.data.storage.DebugSettings
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
-import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
-import kotlin.time.Clock.System
 
-@OptIn(ExperimentalMaterial3Api::class)
+enum class DebugTab {
+    System,
+    Notifications,
+    Billing
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DebugSettingsScreen(
     onNavigateBack: () -> Unit = {},
@@ -102,10 +111,54 @@ fun DebugSettingsScreen(
     val detailedMessage by debugViewModel.detailedMessage.collectAsStateWithLifecycle()
     val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val subscriptionState by subscriptionRepo.state.collectAsState()
+    val selectedTab by debugViewModel.selectedTab.collectAsStateWithLifecycle()
 
     // Cache settings
     val debugShortCacheTtl by appPreferences.debugShortCacheTtlFlow.collectAsState(initial = false)
     val scope = rememberCoroutineScope()
+
+    // Tab pager state
+    val pagerState = rememberPagerState(
+        initialPage = when (selectedTab) {
+            DebugTab.System -> 0
+            DebugTab.Notifications -> 1
+            DebugTab.Billing -> 2
+        },
+        pageCount = { 3 }
+    )
+
+    // Sync tab selection when user swipes pages
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+        if (!pagerState.isScrollInProgress) {
+            val newTab = when (pagerState.currentPage) {
+                0 -> DebugTab.System
+                1 -> DebugTab.Notifications
+                2 -> DebugTab.Billing
+                else -> DebugTab.System
+            }
+            if (newTab != selectedTab) {
+                debugViewModel.selectTab(newTab)
+            }
+        }
+    }
+
+    // When user taps the tab, animate pager to page
+    fun onTabSelected(tab: DebugTab) {
+        val target = when (tab) {
+            DebugTab.System -> 0
+            DebugTab.Notifications -> 1
+            DebugTab.Billing -> 2
+        }
+        if (pagerState.currentPage != target) {
+            debugViewModel.selectTab(tab)
+            scope.launch {
+                pagerState.animateScrollToPage(
+                    target,
+                    animationSpec = tween(durationMillis = 550)
+                )
+            }
+        }
+    }
 
     val snackbarHostState = remember { SnackbarHostState() }
     var showDetailedDialog by remember { mutableStateOf(false) }
@@ -180,93 +233,157 @@ fun DebugSettingsScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item {
-                Text(
-                    text = "⚠️ These settings are for development and testing only!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 16.dp)
+            // Tab Row
+            val selectedTabIndex = when (selectedTab) {
+                DebugTab.System -> 0
+                DebugTab.Notifications -> 1
+                DebugTab.Billing -> 2
+            }
+            
+            PrimaryTabRow(selectedTabIndex = selectedTabIndex) {
+                Tab(
+                    selected = selectedTab == DebugTab.System,
+                    onClick = { onTabSelected(DebugTab.System) },
+                    text = { Text("System") }
+                )
+                Tab(
+                    selected = selectedTab == DebugTab.Notifications,
+                    onClick = { onTabSelected(DebugTab.Notifications) },
+                    text = { Text("Notifications") }
+                )
+                Tab(
+                    selected = selectedTab == DebugTab.Billing,
+                    onClick = { onTabSelected(DebugTab.Billing) },
+                    text = { Text("Billing") }
                 )
             }
 
-            // Logging Configuration Section
-            item {
+            // Horizontal Pager for tab content
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> SystemTabContent(
+                        debugViewModel = debugViewModel,
+                        debugSettings = debugSettings,
+                        isLoading = isLoading,
+                        customUrlText = customUrlText,
+                        onCustomUrlTextChange = { customUrlText = it }
+                    )
+                    1 -> NotificationsTabContent(
+                        debugViewModel = debugViewModel,
+                        debugSettings = debugSettings,
+                        isLoading = isLoading
+                    )
+                    2 -> BillingTabContent(
+                        debugViewModel = debugViewModel,
+                        debugSettings = debugSettings,
+                        isLoading = isLoading
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SystemTabContent(
+    debugViewModel: DebugSettingsViewModel,
+    debugSettings: DebugSettings,
+    isLoading: Boolean,
+    customUrlText: String,
+    onCustomUrlTextChange: (String) -> Unit
+) {
+    val loggingPreferences = koinInject<LoggingPreferences>()
+    val appPreferences = koinInject<me.calebjones.spacelaunchnow.data.storage.AppPreferences>()
+    val debugShortCacheTtl by appPreferences.debugShortCacheTtlFlow.collectAsState(initial = false)
+    val scope = rememberCoroutineScope()
+    
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Warning text
+        item {
+            Text(
+                text = "⚠️ System Configuration - Changes may require app restart",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        
+        // Section 1: Logging Configuration
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Logging Configuration",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
-                val loggingPreferences: LoggingPreferences = koinInject()
                 DebugLoggingSettings(
                     loggingPreferences = loggingPreferences
                 )
             }
-
-            // Datadog Sample Rate Section
-            item {
+        }
+        
+        // Section 2: Datadog Sample Rate
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Datadog Sample Rate",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
                 DatadogSampleRateControl(
                     currentRate = debugSettings.datadogSampleRate,
-                    onRateChange = { debugViewModel.setDatadogSampleRate(it) }
+                    onRateChange = { rate ->
+                        debugViewModel.setDatadogSampleRate(rate)
+                    }
                 )
             }
-
-            // Test Logging Section
-            item {
+        }
+        
+        // Section 3: Test Logging
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Test Logging",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
                 TestLoggingButtons()
             }
-
-            // API URL Section
-            item {
+        }
+        
+        // Section 4: API Configuration
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "API Configuration",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // Use Custom API URL Toggle
+                        // Custom URL Toggle
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -275,10 +392,11 @@ fun DebugSettingsScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = "Use Custom API URL",
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = "Override the default API base URL",
+                                    text = "Override the default API endpoint",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -289,34 +407,45 @@ fun DebugSettingsScreen(
                                 enabled = !isLoading
                             )
                         }
-
+                        
+                        // Custom URL Text Field
                         if (debugSettings.useCustomApiUrl) {
-                            // Custom URL Input
+                            HorizontalDivider()
+                            
                             OutlinedTextField(
                                 value = customUrlText,
-                                onValueChange = { customUrlText = it },
+                                onValueChange = onCustomUrlTextChange,
                                 label = { Text("Custom API Base URL") },
-                                placeholder = { Text("https://example.com/api") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                                placeholder = { Text("https://api.example.com") },
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = !isLoading,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                                singleLine = true,
                                 trailingIcon = {
                                     if (customUrlText != debugSettings.customApiBaseUrl) {
-                                        TextButton(
-                                            onClick = { debugViewModel.setCustomApiUrl(customUrlText) }
+                                        IconButton(
+                                            onClick = { 
+                                                debugViewModel.setCustomApiUrl(customUrlText)
+                                            }
                                         ) {
-                                            Text("Save")
+                                            Icon(
+                                                Icons.Default.Refresh,
+                                                contentDescription = "Apply URL"
+                                            )
                                         }
                                     }
                                 }
                             )
-
-                            // Quick URL buttons
+                            
+                            // Quick preset buttons
+                            HorizontalDivider()
+                            
                             Text(
-                                text = "Quick Options:",
-                                style = MaterialTheme.typography.labelMedium
+                                text = "Quick Switch:",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
                             )
-
+                            
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -343,35 +472,38 @@ fun DebugSettingsScreen(
                                     Text("Local", fontSize = 12.sp)
                                 }
                             }
+                            
+                            // Current URL Display
+                            Text(
+                                text = "Current: ${debugSettings.customApiBaseUrl}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
                         }
-
-                        // Current URL display
-                        Text(
-                            text = "Current URL: ${if (debugSettings.useCustomApiUrl) debugSettings.customApiBaseUrl else DebugPreferences.PROD_API_URL}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                     }
                 }
             }
-
-            // Cache Configuration Section
-            item {
+        }
+        
+        // Section 5: Cache Configuration
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Cache Configuration",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Row(
@@ -381,21 +513,14 @@ fun DebugSettingsScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Short Cache TTL (2 min)",
-                                    style = MaterialTheme.typography.bodyLarge
+                                    text = "Use Short Cache TTL",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = if (debugShortCacheTtl) {
-                                        "⚠️ Cache expires in 2 minutes instead of 1 hour"
-                                    } else {
-                                        "Normal cache duration: 1 hour for all data types"
-                                    },
+                                    text = "Cache expires in 30 seconds instead of normal duration",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = if (debugShortCacheTtl) {
-                                        MaterialTheme.colorScheme.error
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    }
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Switch(
@@ -407,51 +532,132 @@ fun DebugSettingsScreen(
                                 }
                             )
                         }
-
+                        
                         if (debugShortCacheTtl) {
                             HorizontalDivider()
-
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Text(
-                                    text = "Debug Cache Durations:",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Text(
-                                    text = "• All data types: 2 minutes",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "• Check logs for cache age info",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            Text(
+                                text = "⚠️ Short cache TTL is enabled. Data will refresh more frequently, which is useful for testing but may increase API usage.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
                         }
                     }
                 }
             }
-
-            // Topics Section
-            item {
+        }
+        
+        // Section 6: Info Section
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Notification Topics (v5)",
+                    text = "Information",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "💡 Debug Menu Tips",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "• Most settings require app restart to take effect\n" +
+                                   "• Custom API URLs must be valid HTTPS endpoints\n" +
+                                   "• Short cache TTL increases API calls - use sparingly\n" +
+                                   "• Datadog sample rate controls logging costs\n" +
+                                   "• Test logging buttons verify your configuration",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NotificationsTabContent(
+    debugViewModel: DebugSettingsViewModel,
+    debugSettings: DebugSettings,
+    isLoading: Boolean
+) {
+    val scope = rememberCoroutineScope()
+    val notificationRepository = koinInject<me.calebjones.spacelaunchnow.data.repository.NotificationRepository>()
+    val fcmToken by debugViewModel.fcmToken.collectAsState()
+    val notificationHistory by debugViewModel.notificationHistory.collectAsState()
+    val notificationStats by debugViewModel.notificationStats.collectAsState()
+    val clipboardManager = LocalClipboardManager.current
+    val platform = me.calebjones.spacelaunchnow.getPlatform()
+    
+    // Test notification form state
+    var selectedAgency by remember { mutableStateOf(me.calebjones.spacelaunchnow.data.model.NotificationAgency.SPACEX) }
+    var selectedLocation by remember { mutableStateOf(me.calebjones.spacelaunchnow.data.model.NotificationLocation.FLORIDA) }
+    var selectedType by remember { mutableStateOf("twentyFourHour") }
+    var agencyDropdownExpanded by remember { mutableStateOf(false) }
+    var locationDropdownExpanded by remember { mutableStateOf(false) }
+    var typeDropdownExpanded by remember { mutableStateOf(false) }
+    
+    val availableAgencies = me.calebjones.spacelaunchnow.data.model.NotificationAgency.getAll()
+    val availableLocations = me.calebjones.spacelaunchnow.data.model.NotificationLocation.getAll()
+    val availableTypes = listOf(
+        "twentyFourHour" to "24 Hour Notice",
+        "oneHour" to "1 Hour Notice",
+        "tenMinutes" to "10 Minute Notice",
+        "oneMinute" to "1 Minute Notice",
+        "netstampChanged" to "Schedule Changed",
+        "inFlight" to "In Flight",
+        "success" to "Launch Success",
+        "failure" to "Launch Failure",
+        "webcastLive" to "Webcast Live"
+    )
+    
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Warning text
+        item {
+            Text(
+                text = "⚠️ Notification Debug Tools - For development and testing only",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        
+        // Section 1: Notification Topics (v5)
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Notification Topics (V5)",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Row(
@@ -462,13 +668,14 @@ fun DebugSettingsScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = "Use Debug Topics",
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
                                     text = if (debugSettings.useDebugTopics) {
-                                        "Using debug_v5_android topic for testing"
+                                        "Subscribed to: debug_v5_${platform.name.lowercase()}"
                                     } else {
-                                        "Using prod_v5_android topic for production"
+                                        "Subscribed to: prod_v5_${platform.name.lowercase()}"
                                     },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -476,1439 +683,1134 @@ fun DebugSettingsScreen(
                             }
                             Switch(
                                 checked = debugSettings.useDebugTopics,
-                                onCheckedChange = { debugViewModel.setUseDebugTopics(it) },
+                                onCheckedChange = { enabled ->
+                                    debugViewModel.setUseDebugTopics(enabled)
+                                },
                                 enabled = !isLoading
                             )
                         }
-
+                        
+                        HorizontalDivider()
+                        
                         Text(
-                            text = "💡 v5 uses platform-specific topics\n📱 Android: prod_v5_android / debug_v5_android\n🍎 iOS: prod_v5_ios / debug_v5_ios\n✨ All filtering is done on the device (client-side)",
+                            text = "💡 Debug topics receive test notifications only. Production topics receive real launch notifications.",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 }
             }
-
-            // FCM Token Section
-            item {
+        }
+        
+        // Section 2: FCM Token
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "FCM Token",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
-                val fcmToken by debugViewModel.fcmToken.collectAsStateWithLifecycle()
-                val clipboardManager = LocalClipboardManager.current
-
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "📱 Device FCM Token",
+                            text = "Firebase Cloud Messaging Token",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold
                         )
-
-                        Text(
-                            text = "Use this token to send test notifications from Firebase Console",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        // Token display
+                        
                         if (fcmToken != null) {
-                            OutlinedTextField(
-                                value = fcmToken ?: "",
-                                onValueChange = {},
-                                readOnly = true,
+                            Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                textStyle = MaterialTheme.typography.bodySmall.copy(
-                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                    fontSize = 11.sp
-                                ),
-                                maxLines = 3
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Text(
+                                    text = fcmToken ?: "No token",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(12.dp),
+                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                                )
+                            }
+                        }
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        debugViewModel.fetchFcmToken()
+                                    }
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text(if (fcmToken == null) "Get Token" else "Refresh")
+                            }
+                            
+                            if (fcmToken != null) {
+                                OutlinedButton(
+                                    onClick = {
+                                        fcmToken?.let { token ->
+                                            clipboardManager.setText(AnnotatedString(token))
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Copy")
+                                }
+                            }
+                        }
+                        
+                        HorizontalDivider()
+                        
+                        Text(
+                            text = "💡 Use this token to send test notifications from Firebase Console",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                }
+            }
+        }
+        
+        // Section 3: Notification Permissions (Android)
+        if (platform.name == "Android") {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Notification Permissions",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Android 13+ Permissions",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold
                             )
-
+                            
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Button(
                                     onClick = {
-                                        fcmToken?.let {
-                                            clipboardManager.setText(AnnotatedString(it))
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar("Token copied to clipboard")
-                                            }
+                                        scope.launch {
+                                            notificationRepository.requestNotificationPermission()
                                         }
                                     },
-                                    modifier = Modifier.weight(1f),
-                                    enabled = fcmToken != null && !fcmToken!!.startsWith("Error") && !fcmToken!!.startsWith("Exception")
+                                    enabled = !isLoading,
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("Copy Token")
+                                    Text("Request Permission")
                                 }
-
+                                
                                 OutlinedButton(
-                                    onClick = { debugViewModel.fetchFcmToken() },
-                                    modifier = Modifier.weight(1f),
-                                    enabled = !isLoading
+                                    onClick = {
+                                        debugViewModel.resetNotificationPermissionFlag()
+                                    },
+                                    enabled = !isLoading,
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("Refresh")
+                                    Text("Reset Flag")
                                 }
                             }
-                        } else {
-                            Button(
-                                onClick = { debugViewModel.fetchFcmToken() },
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = !isLoading
-                            ) {
-                                if (isLoading) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(16.dp),
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-                                Text("Get FCM Token")
-                            }
+                            
+                            HorizontalDivider()
+                            
+                            Text(
+                                text = "💡 Reset flag will prompt permission dialog again on next app launch",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
                         }
                     }
                 }
             }
-
-            // Notification Permissions Section
-            item {
+        }
+        
+        // Section 4: Test Notifications (v4)
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Notification Permissions (Android)",
+                    text = "Test Notifications",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "🔐 Permission Testing",
+                            text = "Send Test Notification",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold
                         )
-
-                        Button(
-                            onClick = { settingsViewModel.requestNotificationPermission() },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading
-                        ) {
-                            Text("Request Notification Permission")
-                        }
-
-                        OutlinedButton(
-                            onClick = {
-                                debugViewModel.resetNotificationPermissionFlag()
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading
-                        ) {
-                            Text("Reset 'Asked Permission' Flag")
-                        }
-
+                        
                         Text(
-                            text = "💡 First button triggers permission request. Second button resets the flag so permission will be requested on next app launch (like fresh install).",
+                            text = "Configure and send a test notification that goes through the same filtering as real FCM notifications",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    }
-                }
-            }
-
-            // Test Notification Section
-            item {
-                Text(
-                    text = "Test Notifications (v4)",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "🧪 Notification Testing",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        // Define available options
-                        val agencies = NotificationAgency.getAll()
-
-                        val locations = NotificationLocation.getAll()
-
-
-                        val notificationTypes = listOf(
-                            "netstampChanged" to "Launch Time Changed",
-                            "twentyFourHour" to "24 Hours Before",
-                            "oneHour" to "1 Hour Before",
-                            "tenMinutes" to "10 Minutes Before",
-                            "oneMinute" to "1 Minute Before",
-                            "inFlight" to "In-Flight Update",
-                            "success" to "Launch Success"
-                        )
-
-                        // Form state
-                        var selectedAgency by remember { mutableStateOf(agencies[0]) }
-                        var selectedLocation by remember { mutableStateOf(locations[0]) }
-                        var webcast by remember { mutableStateOf("true") }
-                        var selectedNotificationType by remember { mutableStateOf(notificationTypes[2].first) } // oneHour default
-                        var launchImage by remember { mutableStateOf("https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/starship_on_the_image_20250111100520.jpg") }
-
-                        // Dropdown states
-                        var agencyExpanded by remember { mutableStateOf(false) }
-                        var locationExpanded by remember { mutableStateOf(false) }
-                        var notificationTypeExpanded by remember { mutableStateOf(false) }
-
-                        // Agency Picker
+                        
+                        HorizontalDivider()
+                        
+                        // Agency Dropdown
                         ExposedDropdownMenuBox(
-                            expanded = agencyExpanded,
-                            onExpandedChange = { agencyExpanded = !agencyExpanded }
+                            expanded = agencyDropdownExpanded,
+                            onExpandedChange = { agencyDropdownExpanded = it }
                         ) {
                             OutlinedTextField(
-                                value = "${selectedAgency.name} (${selectedAgency.id})",
+                                value = selectedAgency.name,
                                 onValueChange = {},
                                 readOnly = true,
                                 label = { Text("Agency") },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = agencyExpanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor(),
-                                enabled = !isLoading,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = agencyDropdownExpanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-
                             ExposedDropdownMenu(
-                                expanded = agencyExpanded,
-                                onDismissRequest = { agencyExpanded = false }
+                                expanded = agencyDropdownExpanded,
+                                onDismissRequest = { agencyDropdownExpanded = false }
                             ) {
-                                agencies.forEach { agency ->
+                                availableAgencies.forEach { agency ->
                                     DropdownMenuItem(
-                                        text = { Text("${agency.name} (ID: ${agency.id})") },
+                                        text = { Text(agency.name) },
                                         onClick = {
                                             selectedAgency = agency
-                                            agencyExpanded = false
+                                            agencyDropdownExpanded = false
                                         }
                                     )
                                 }
                             }
                         }
-
-                        // Location Picker
+                        
+                        // Location Dropdown
                         ExposedDropdownMenuBox(
-                            expanded = locationExpanded,
-                            onExpandedChange = { locationExpanded = !locationExpanded }
+                            expanded = locationDropdownExpanded,
+                            onExpandedChange = { locationDropdownExpanded = it }
                         ) {
                             OutlinedTextField(
-                                value = "${selectedLocation.name} (${selectedLocation.id})",
+                                value = selectedLocation.name,
                                 onValueChange = {},
                                 readOnly = true,
                                 label = { Text("Location") },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor(),
-                                enabled = !isLoading,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationDropdownExpanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-
                             ExposedDropdownMenu(
-                                expanded = locationExpanded,
-                                onDismissRequest = { locationExpanded = false }
+                                expanded = locationDropdownExpanded,
+                                onDismissRequest = { locationDropdownExpanded = false }
                             ) {
-                                locations.forEach { location ->
+                                availableLocations.forEach { location ->
                                     DropdownMenuItem(
-                                        text = { Text("${location.name} (ID: ${location.id})") },
+                                        text = { Text(location.name) },
                                         onClick = {
                                             selectedLocation = location
-                                            locationExpanded = false
+                                            locationDropdownExpanded = false
                                         }
                                     )
                                 }
                             }
                         }
-
-                        // Webcast toggle
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("Webcast Available")
-                            Switch(
-                                checked = webcast == "true",
-                                onCheckedChange = { webcast = if (it) "true" else "false" },
-                                enabled = !isLoading
-                            )
-                        }
-
-                        // Notification Type Picker
+                        
+                        // Notification Type Dropdown
                         ExposedDropdownMenuBox(
-                            expanded = notificationTypeExpanded,
-                            onExpandedChange = {
-                                notificationTypeExpanded = !notificationTypeExpanded
-                            }
+                            expanded = typeDropdownExpanded,
+                            onExpandedChange = { typeDropdownExpanded = it }
                         ) {
                             OutlinedTextField(
-                                value = notificationTypes.find { it.first == selectedNotificationType }?.second
-                                    ?: selectedNotificationType,
+                                value = availableTypes.find { it.first == selectedType }?.second ?: selectedType,
                                 onValueChange = {},
                                 readOnly = true,
                                 label = { Text("Notification Type") },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = notificationTypeExpanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor(),
-                                enabled = !isLoading,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeDropdownExpanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-
                             ExposedDropdownMenu(
-                                expanded = notificationTypeExpanded,
-                                onDismissRequest = { notificationTypeExpanded = false }
+                                expanded = typeDropdownExpanded,
+                                onDismissRequest = { typeDropdownExpanded = false }
                             ) {
-                                notificationTypes.forEach { (typeId, typeName) ->
+                                availableTypes.forEach { (typeId, displayName) ->
                                     DropdownMenuItem(
-                                        text = { Text(typeName) },
+                                        text = { Text(displayName) },
                                         onClick = {
-                                            selectedNotificationType = typeId
-                                            notificationTypeExpanded = false
+                                            selectedType = typeId
+                                            typeDropdownExpanded = false
                                         }
                                     )
                                 }
                             }
                         }
-
-                        // Launch Image URL Field
-                        OutlinedTextField(
-                            value = launchImage,
-                            onValueChange = { launchImage = it },
-                            label = { Text("Launch Image URL") },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading,
-                            singleLine = false,
-                            maxLines = 3
-                        )
-
+                        
                         Button(
                             onClick = {
                                 debugViewModel.triggerTestNotification(
                                     agencyId = selectedAgency.id.toString(),
                                     locationId = selectedLocation.id.toString(),
-                                    webcast = webcast,
-                                    notificationType = selectedNotificationType,
-                                    launchImage = launchImage
+                                    webcast = "true",
+                                    notificationType = selectedType,
+                                    launchImage = "https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/launch_images/falcon2520925_image_20230808174814.jpeg"
                                 )
                             },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading
+                            enabled = !isLoading,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             if (isLoading) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp,
                                     color = MaterialTheme.colorScheme.onPrimary
                                 )
-                                Spacer(Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
                             }
                             Text("Send Test Notification")
                         }
-
+                        
+                        HorizontalDivider()
+                        
                         Text(
-                            text = "💡 Select from available agencies, locations, and notification types to test v4 client-side filtering. Test notifications go through the same filtering logic as real FCM notifications.",
+                            text = "💡 Test notifications go through the same client-side filtering as real FCM notifications. Check your notification settings if blocked.",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.tertiary
                         )
-
                     }
                 }
             }
-
-            // Notification History Section
-            item {
+        }
+        
+        // Section 5: Notification History
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Notification History",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            item {
-                val notificationHistory by debugViewModel.notificationHistory.collectAsStateWithLifecycle()
-                val notificationStats by debugViewModel.notificationStats.collectAsStateWithLifecycle()
-
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "📝 Received Notifications (Last 100)",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Text(
-                            text = "View all notifications received by this device, including filtered ones",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        // Stats display
-                        notificationStats?.let { stats ->
-                            HorizontalDivider()
-                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text(
-                                    text = "Statistics:",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Text(
-                                    text = "• Total Received: ${stats.totalReceived}",
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                                Text(
-                                    text = "• Displayed: ${stats.totalDisplayed} ✅",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = "• Filtered: ${stats.totalFiltered} 🔇",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
-
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Button(
-                                onClick = { debugViewModel.loadNotificationHistory() },
-                                modifier = Modifier.weight(1f),
+                            Text(
+                                text = "Last 100 Notifications",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            
+                            IconButton(
+                                onClick = {
+                                    debugViewModel.loadNotificationHistory()
+                                },
                                 enabled = !isLoading
                             ) {
-                                if (isLoading) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(16.dp),
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-                                Text("Load History")
-                            }
-
-                            OutlinedButton(
-                                onClick = { debugViewModel.clearNotificationHistory() },
-                                modifier = Modifier.weight(1f),
-                                enabled = !isLoading && notificationHistory.isNotEmpty()
-                            ) {
-                                Text("Clear")
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Refresh history"
+                                )
                             }
                         }
-
+                        
+                        // Statistics
+                        notificationStats?.let { stats ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(
+                                        text = "📊 Statistics",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = "Total Received:",
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                        Text(
+                                            text = "${stats.totalReceived}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                    
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = "Displayed:",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            text = "${stats.totalDisplayed}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = "Filtered:",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                        Text(
+                                            text = "${stats.totalFiltered}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        
                         // History list
                         if (notificationHistory.isNotEmpty()) {
                             HorizontalDivider()
+                            
                             Text(
                                 text = "Recent Notifications:",
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
-
-                            // Show latest 5 notifications
-                            notificationHistory.take(5).forEach { item ->
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = if (item.wasFiltered) {
-                                            MaterialTheme.colorScheme.errorContainer
-                                        } else {
-                                            MaterialTheme.colorScheme.primaryContainer
-                                        }
-                                    )
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(12.dp),
-                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                            
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                notificationHistory.take(10).forEach { item ->
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = if (item.wasShown) {
+                                                MaterialTheme.colorScheme.primaryContainer
+                                            } else {
+                                                MaterialTheme.colorScheme.errorContainer
+                                            }
+                                        )
                                     ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(12.dp),
+                                            verticalArrangement = Arrangement.spacedBy(4.dp)
                                         ) {
-                                            Text(
-                                                text = item.launchName ?: "Unknown Launch",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
                                                 Text(
-                                                    text = if (item.wasShown) "👁️" else "🚫",
-                                                    style = MaterialTheme.typography.bodyMedium
+                                                    text = item.notificationType,
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    fontWeight = FontWeight.Bold
                                                 )
                                                 Text(
-                                                    text = if (item.wasFiltered) "🔇" else "✅",
-                                                    style = MaterialTheme.typography.bodyMedium
+                                                    text = if (item.wasShown) "✅ Shown" else "🔇 Filtered",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    fontSize = 10.sp
                                                 )
                                             }
-                                        }
-                                        Text(
-                                            text = "Type: ${item.notificationType}",
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
-                                        Text(
-                                            text = "Received: ${item.receivedAt}",
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
-                                        Text(
-                                            text = "Filtered: ${if (item.wasFiltered) "Yes" else "No"} | Shown: ${if (item.wasShown) "Yes" else "No"}",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = if (item.wasShown) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                                        )
-                                        if (item.wasFiltered) {
-                                            Text(
-                                                text = "Reason: ${item.filterReason ?: "Unknown"}",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.error
-                                            )
-                                        }
-                                        
-                                        // Show raw JSON data
-                                        if (item.rawData.isNotEmpty()) {
-                                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                                            Text(
-                                                text = "📦 Raw FCM Data:",
-                                                style = MaterialTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.SemiBold
-                                            )
-                                            Card(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surface
+                                            
+                                            item.launchName?.let { name ->
+                                                Text(
+                                                    text = name,
+                                                    style = MaterialTheme.typography.bodySmall
                                                 )
-                                            ) {
-                                                Column(
-                                                    modifier = Modifier.padding(8.dp),
-                                                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                                                ) {
-                                                    item.rawData.forEach { (key, value) ->
-                                                        Text(
-                                                            text = "$key: $value",
-                                                            style = MaterialTheme.typography.bodySmall,
-                                                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                                                        )
-                                                    }
-                                                }
+                                            }
+                                            
+                                            if (!item.wasShown && item.filterReason != null) {
+                                                Text(
+                                                    text = "Reason: ${item.filterReason}",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    fontSize = 10.sp,
+                                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                                )
                                             }
                                         }
                                     }
                                 }
                             }
-
-                            if (notificationHistory.size > 5) {
-                                Text(
-                                    text = "... and ${notificationHistory.size - 5} more (total: ${notificationHistory.size})",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
                         } else {
                             Text(
-                                text = "No notifications received yet. Send a test notification or wait for a real FCM notification.",
+                                text = "No notification history available. Click refresh to load.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+                        
+                        if (notificationHistory.isNotEmpty()) {
+                            OutlinedButton(
+                                onClick = {
+                                    debugViewModel.clearNotificationHistory()
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Clear History")
+                            }
+                        }
+                        
+                        HorizontalDivider()
+                        
+                        Text(
+                            text = "💡 History shows the last 100 notifications received, including filtered ones",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BillingTabContent(
+    debugViewModel: DebugSettingsViewModel,
+    debugSettings: DebugSettings,
+    isLoading: Boolean
+) {
+    val log = SpaceLogger.getLogger("BillingTabContent")
+    val subscriptionRepo = koinInject<SubscriptionRepository>()
+    val subscriptionState by subscriptionRepo.state.collectAsState()
+    val scope = rememberCoroutineScope()
+    
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Warning text
+        item {
+            Text(
+                text = "⚠️ Billing & RevenueCat - Debug Tools",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        
+        // Section 1: Subscription Simulation
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "💳 Subscription Simulation",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Text(
+                        text = "Test different subscription states without actual purchases",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    HorizontalDivider()
+                    
+                    // Current State Display
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = "Current State",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Subscription Type:",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    text = subscriptionState.subscriptionType.name,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Is Subscribed:",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    text = if (subscriptionState.isSubscribed) "✅ Yes" else "❌ No",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            
+                            // Check if in debug mode
+                            val simpleRepo = subscriptionRepo as? SimpleSubscriptionRepository
+                            var isDebugMode by remember { mutableStateOf(false) }
+                            
+                            LaunchedEffect(subscriptionState) {
+                                isDebugMode = simpleRepo?.isInDebugMode() ?: false
+                            }
+                            
+                            if (isDebugMode) {
+                                Text(
+                                    text = "🧪 Debug Mode Active",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                    
+                    HorizontalDivider()
+                    
+                    // Simulation Buttons
+                    Text(
+                        text = "Simulate Subscription States:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    
+                    // FREE State
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                try {
+                                    log.d { "Setting debug subscription to FREE" }
+                                    (subscriptionRepo as? SimpleSubscriptionRepository)?.setDebugSubscription(
+                                        subscriptionType = SubscriptionType.FREE,
+                                        productId = "",
+                                        entitlements = emptySet()
+                                    )
+                                } catch (e: Exception) {
+                                    log.e(e) { "Failed to set FREE subscription: ${e.message}" }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                text = "🆓 FREE User",
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "No premium features",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
-                }
-            }
-
-            // Info Section
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    
+                    // PREMIUM State
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                try {
+                                    log.d { "Setting debug subscription to PREMIUM" }
+                                    (subscriptionRepo as? SimpleSubscriptionRepository)?.setDebugSubscription(
+                                        subscriptionType = SubscriptionType.PREMIUM,
+                                        productId = "debug_monthly",
+                                        entitlements = setOf("premium")
+                                    )
+                                } catch (e: Exception) {
+                                    log.e(e) { "Failed to set PREMIUM subscription: ${e.message}" }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
                     ) {
-                        Text(
-                            text = "ℹ️ Information",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "• API URL changes require app restart to take full effect\n" +
-                                    "• Topic changes are applied immediately\n" +
-                                    "• These settings are stored locally and persist between app launches",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            // Subscription Simulation Section
-            item {
-                Text(
-                    text = "Subscription Simulation",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "🎭 Subscription Simulation",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        val coroutineScope = rememberCoroutineScope()
-
-                        // Cast to SimpleSubscriptionRepository to access debug methods
-                        val simpleRepo = subscriptionRepo as? SimpleSubscriptionRepository
-                        var isSimulationActive by remember { mutableStateOf(false) }
-
-                        // Debug logging
-                        LaunchedEffect(Unit) {
-                            log.d { "🎭 SubscriptionRepository type: ${subscriptionRepo::class.simpleName}, SimpleSubscriptionRepository cast: ${if (simpleRepo != null) "✅ Success" else "❌ Failed"}" }
-                        }
-
-                        // Check if we're in debug mode
-                        LaunchedEffect(subscriptionState) {
-                            simpleRepo?.let {
-                                isSimulationActive = it.isInDebugMode()
-                                log.d { "🎭 Debug Mode Check: isSimulationActive = $isSimulationActive" }
-                            }
-                        }
-
-                        // Show error if repository can't be cast
-                        if (simpleRepo == null) {
-                            Surface(
-                                color = MaterialTheme.colorScheme.errorContainer,
-                                shape = MaterialTheme.shapes.small
-                            ) {
-                                Column(modifier = Modifier.padding(12.dp)) {
-                                    Text(
-                                        text = "⚠️ Subscription Simulation Not Available",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                    Text(
-                                        text = "Repository type: ${subscriptionRepo::class.simpleName}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onErrorContainer
-                                    )
-                                    Text(
-                                        text = "Expected: SimpleSubscriptionRepository",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onErrorContainer
-                                    )
-                                }
-                            }
-                        } else {
-
-                            // Current state display
-                            Surface(
-                                color = if (subscriptionState.isSubscribed) {
-                                    MaterialTheme.colorScheme.primaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.surfaceVariant
-                                },
-                                shape = MaterialTheme.shapes.small
-                            ) {
-                                Column(modifier = Modifier.padding(12.dp)) {
-                                    Text(
-                                        text = "📊 Current State:",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = if (subscriptionState.isSubscribed) {
-                                            "${subscriptionState.subscriptionType.name} (${subscriptionState.productId ?: "Unknown"})"
-                                        } else {
-                                            "FREE"
-                                        },
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
-
-                                    // Show features
-                                    if (subscriptionState.features.isNotEmpty()) {
-                                        Text(
-                                            text = "Features: ${subscriptionState.features.joinToString { it.name }}",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-
-                                    // Show simulation status
-                                    Text(
-                                        text = if (isSimulationActive) "⚠️ SIMULATION ACTIVE" else "✅ Real Billing Data",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = if (isSimulationActive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-
-                            HorizontalDivider()
-
-                            // Simulation Toggle
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Simulation Mode:",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.weight(1f)
-                                )
-
-                                if (isSimulationActive) {
-                                    OutlinedButton(
-                                        onClick = {
-                                            coroutineScope.launch {
-                                                simpleRepo?.clearDebugState()
-                                                isSimulationActive = false
-                                            }
-                                        }
-                                    ) {
-                                        Text("🔄 Use Real Data")
-                                    }
-                                } else {
-                                    Button(
-                                        onClick = {
-                                            // Enable simulation with premium state as default
-                                            coroutineScope.launch {
-                                                simpleRepo?.setDebugSubscription(
-                                                    subscriptionType = SubscriptionType.PREMIUM,
-                                                    productId = "debug_premium",
-                                                    entitlements = setOf("premium")
-                                                )
-                                                isSimulationActive = true
-                                            }
-                                        }
-                                    ) {
-                                        Text("🎭 Enable Simulation")
-                                    }
-                                }
-                            }
-
-                            // Simulation Controls (only show when simulation is active)
-                            if (isSimulationActive && simpleRepo != null) {
-                                HorizontalDivider()
-
-                                Text(
-                                    text = "Subscription Types:",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-
-                                // Free State
-                                OutlinedButton(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            simpleRepo.setDebugSubscription(SubscriptionType.FREE)
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text("🆓 FREE")
-                                }
-
-                                // Premium State
-                                Button(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            simpleRepo.setDebugSubscription(
-                                                subscriptionType = SubscriptionType.PREMIUM,
-                                                productId = "debug_premium",
-                                                entitlements = setOf("premium")
-                                            )
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary
-                                    )
-                                ) {
-                                    Text("⭐ PREMIUM")
-                                }
-
-                                // Lifetime State
-                                Button(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            simpleRepo.setDebugSubscription(
-                                                subscriptionType = SubscriptionType.LIFETIME,
-                                                productId = "debug_lifetime",
-                                                entitlements = setOf("premium")
-                                            )
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiary,
-                                        contentColor = MaterialTheme.colorScheme.onTertiary
-                                    )
-                                ) {
-                                    Text("✨ LIFETIME")
-                                }
-
-                                // Legacy State
-                                Button(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            simpleRepo.setDebugSubscription(
-                                                subscriptionType = SubscriptionType.LEGACY,
-                                                productId = "debug_legacy",
-                                                entitlements = setOf("legacy")
-                                            )
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiary
-                                    )
-                                ) {
-                                    Text("🏛️ LEGACY")
-                                }
-
-                                HorizontalDivider()
-
-                                // Force refresh widget access
-                                Button(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            val hasAccess =
-                                                subscriptionRepo.forceRefreshWidgetAccess()
-                                            log.i { "Widget access refreshed: $hasAccess" }
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                ) {
-                                    Text("🔧 Refresh Widget Access")
-                                }
-                            }
-
-                            // Close the else block for simpleRepo != null
-                        }
-
-                        // Restore Purchases Button (always available)
-                        HorizontalDivider()
-
-                        var isRestoring by remember { mutableStateOf(false) }
-
-                        Button(
-                            onClick = {
-                                coroutineScope.launch {
-                                    isRestoring = true
-                                    try {
-                                        val result = subscriptionRepo.restorePurchases()
-                                        if (result.isSuccess) {
-                                            log.i { "✅ Restore successful: ${result.getOrNull()}" }
-                                        } else {
-                                            log.w { "❌ Restore failed: ${result.exceptionOrNull()?.message}" }
-                                        }
-                                    } catch (e: Exception) {
-                                        log.e(e) { "❌ Restore error: ${e.message}" }
-                                    } finally {
-                                        isRestoring = false
-                                    }
-                                }
-                            },
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = !isRestoring,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondary
-                            )
+                            horizontalAlignment = Alignment.Start
                         ) {
-                            if (isRestoring) {
-                                Text("🔄 Restoring...")
-                            } else {
-                                Text("🔄 Restore Purchases (Real)")
-                            }
-                        }
-
-                        // Info text
-                        Text(
-                            text = if (isSimulationActive) {
-                                "💡 Simulation mode overrides real billing data. Widget access will update automatically when you change subscription states. Use 'Use Real Data' to return to actual billing status."
-                            } else {
-                                "💡 Use 'Restore Purchases' to sync with your actual subscription status. Enable simulation to test different subscription states."
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        // Restore Purchases Button
-                        Button(
-                            onClick = {
-                                coroutineScope.launch {
-                                    isRestoring = true
-                                    try {
-                                        val result = subscriptionRepo.restorePurchases()
-                                        if (result.isSuccess) {
-                                            log.i { "✅ Restore successful: ${result.getOrNull()}" }
-                                        } else {
-                                            log.w { "❌ Restore failed: ${result.exceptionOrNull()?.message}" }
-                                        }
-                                    } catch (e: Exception) {
-                                        log.e(e) { "❌ Restore error: ${e.message}" }
-                                    } finally {
-                                        isRestoring = false
-                                    }
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isRestoring,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondary
-                            )
-                        ) {
-                            if (isRestoring) {
-                                Text("🔄 Restoring...")
-                            } else {
-                                Text("🔄 Restore Purchases")
-                            }
-                        }
-
-                        Text(
-                            text = "💡 Use 'Restore Purchases' to sync with RevenueCat and get your real subscription status.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        // Get billing client
-                        val billingClient =
-                            koinInject<me.calebjones.spacelaunchnow.data.billing.BillingClient>()
-
-                        // Current simulated state display
-                        Surface(
-                            color = if (subscriptionState.isSubscribed) {
-                                MaterialTheme.colorScheme.primaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.surfaceVariant
-                            },
-                            shape = MaterialTheme.shapes.small
-                        ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Text(
-                                    text = "🎭 Simulated State:",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = if (subscriptionState.isSubscribed)
-                                        "${subscriptionState.subscriptionType.name} (${subscriptionState.productId})"
-                                    else "FREE",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-
-                        // Actual owned products from billing client
-                        var isQuerying by remember { mutableStateOf(false) }
-                        var ownedProducts by remember {
-                            mutableStateOf<List<me.calebjones.spacelaunchnow.data.model.PlatformPurchase>?>(
-                                null
-                            )
-                        }
-                        var queryError by remember { mutableStateOf<String?>(null) }
-
-                        LaunchedEffect(Unit) {
-                            // Auto-query on first load
-                            isQuerying = true
-                            queryError = null
-                            billingClient.queryPurchases().fold(
-                                onSuccess = { purchases ->
-                                    ownedProducts = purchases
-                                    isQuerying = false
-                                },
-                                onFailure = { error ->
-                                    queryError = error.message ?: "Unknown error"
-                                    isQuerying = false
-                                }
-                            )
-                        }
-
-                        Surface(
-                            color = MaterialTheme.colorScheme.secondaryContainer,
-                            shape = MaterialTheme.shapes.small
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "🛒 Real Owned Products:",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-
-                                    if (!isQuerying) {
-                                        IconButton(
-                                            onClick = {
-                                                coroutineScope.launch {
-                                                    isQuerying = true
-                                                    queryError = null
-                                                    billingClient.queryPurchases().fold(
-                                                        onSuccess = { purchases ->
-                                                            ownedProducts = purchases
-                                                            isQuerying = false
-                                                        },
-                                                        onFailure = { error ->
-                                                            queryError =
-                                                                error.message ?: "Unknown error"
-                                                            isQuerying = false
-                                                        }
-                                                    )
-                                                }
-                                            },
-                                            modifier = Modifier.size(32.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Refresh,
-                                                contentDescription = "Refresh",
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                when {
-                                    isQuerying -> {
-                                        Text(
-                                            text = "⏳ Querying...",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
-                                                alpha = 0.7f
-                                            )
-                                        )
-                                    }
-
-                                    queryError != null -> {
-                                        Text(
-                                            text = "❌ Error: $queryError",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.error
-                                        )
-                                    }
-
-                                    ownedProducts?.isEmpty() == true -> {
-                                        Text(
-                                            text = "No products owned",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
-                                                alpha = 0.7f
-                                            )
-                                        )
-                                    }
-
-                                    ownedProducts != null -> {
-                                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                            ownedProducts!!.forEach { purchase ->
-                                                val subscriptionType =
-                                                    me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.getSubscriptionType(
-                                                        purchase.productId
-                                                    )
-
-                                                Row(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Column(modifier = Modifier.weight(1f)) {
-                                                        Text(
-                                                            text = purchase.productId,
-                                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                                                            ),
-                                                            fontWeight = FontWeight.Bold,
-                                                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                                                        )
-                                                        Text(
-                                                            text = subscriptionType.name,
-                                                            style = MaterialTheme.typography.labelSmall,
-                                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
-                                                                alpha = 0.7f
-                                                            )
-                                                        )
-                                                    }
-
-                                                    val isExpired =
-                                                        purchase.expiryTime?.let { expiry ->
-                                                            System.now()
-                                                                .toEpochMilliseconds() > expiry
-                                                        } ?: false
-
-                                                    Surface(
-                                                        color = if (isExpired)
-                                                            MaterialTheme.colorScheme.error
-                                                        else
-                                                            MaterialTheme.colorScheme.tertiary,
-                                                        shape = MaterialTheme.shapes.extraSmall
-                                                    ) {
-                                                        Text(
-                                                            text = if (isExpired) "EXPIRED" else "ACTIVE",
-                                                            modifier = Modifier.padding(
-                                                                horizontal = 6.dp,
-                                                                vertical = 2.dp
-                                                            ),
-                                                            style = MaterialTheme.typography.labelSmall,
-                                                            fontSize = 10.sp,
-                                                            color = if (isExpired)
-                                                                MaterialTheme.colorScheme.onError
-                                                            else
-                                                                MaterialTheme.colorScheme.onTertiary
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        // Custom SKU Input Section
-                        HorizontalDivider()
-
-                        var customSku by remember { mutableStateOf("") }
-                        var customProductType by remember { mutableStateOf("inapp") }
-                        var customBasePlan by remember { mutableStateOf("") }
-                        var isPurchasing by remember { mutableStateOf(false) }
-
-                        Text(
-                            text = "Custom SKU Purchase (Direct Android Billing):",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-
-                        Text(
-                            text = "⚠️ This uses the native Android Billing Library directly (bypasses RevenueCat)!",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        OutlinedTextField(
-                            value = customSku,
-                            onValueChange = { customSku = it },
-                            label = { Text("Product ID / SKU") },
-                            placeholder = { Text("e.g., spacelaunchnow_pro, 2020_super_fan") },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading && !isPurchasing,
-                            singleLine = true,
-                            supportingText = {
-                                Text(
-                                    "Required: Product ID from Google Play Console",
-                                    fontSize = 11.sp
-                                )
-                            }
-                        )
-
-                        // Product Type Selector
-                        var productTypeExpanded by remember { mutableStateOf(false) }
-                        val productTypes =
-                            listOf("inapp" to "In-App Product (one-time)", "subs" to "Subscription")
-
-                        ExposedDropdownMenuBox(
-                            expanded = productTypeExpanded,
-                            onExpandedChange = { productTypeExpanded = !productTypeExpanded }
-                        ) {
-                            OutlinedTextField(
-                                value = productTypes.find { it.first == customProductType }?.second
-                                    ?: customProductType,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("Product Type") },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = productTypeExpanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor(),
-                                enabled = !isLoading && !isPurchasing,
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = productTypeExpanded,
-                                onDismissRequest = { productTypeExpanded = false }
-                            ) {
-                                productTypes.forEach { (type, display) ->
-                                    DropdownMenuItem(
-                                        text = { Text(display) },
-                                        onClick = {
-                                            customProductType = type
-                                            productTypeExpanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        if (customProductType == "subs") {
-                            OutlinedTextField(
-                                value = customBasePlan,
-                                onValueChange = { customBasePlan = it },
-                                label = { Text("Base Plan ID (for subscriptions)") },
-                                placeholder = { Text("e.g., base-plan, yearly") },
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = !isLoading && !isPurchasing,
-                                singleLine = true,
-                                supportingText = {
-                                    Text(
-                                        "Optional: Leave empty to use default plan",
-                                        fontSize = 11.sp
-                                    )
-                                }
-                            )
-                        }
-
-                        HorizontalDivider()
-
-                        Text(
-                            text = "💡 This queries Google Play Billing Library directly.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 10.sp
-                        )
-
-                    }
-                }
-            }
-
-            // Subscribed Topics Card (for debug)
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(
-                            text = "FCM Topics (v5 Platform-Specific)",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-
-                        Text(
-                            text = "v5 subscribes to platform-specific topics. All filtering is client-side with extended IDs.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        if (uiState.notificationSettings.subscribedTopics.isEmpty()) {
                             Text(
-                                text = "⏳ Not yet subscribed (initializing...)",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
+                                text = "⭐ PREMIUM Subscriber",
+                                fontWeight = FontWeight.Bold
                             )
-                        } else {
-                            Column(modifier = Modifier.padding(top = 8.dp)) {
-                                uiState.notificationSettings.subscribedTopics.sorted()
-                                    .forEach { topic ->
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(
-                                                text = "✅",
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
-                                            Text(
-                                                text = topic,
-                                                style = MaterialTheme.typography.bodyMedium.copy(
-                                                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                                    fontWeight = FontWeight.Bold
-                                                ),
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
-                                    }
-                            }
+                            Text(
+                                text = "All premium features enabled",
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
+                    
+                    // LIFETIME State
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                try {
+                                    log.d { "Setting debug subscription to LIFETIME" }
+                                    (subscriptionRepo as? SimpleSubscriptionRepository)?.setDebugSubscription(
+                                        subscriptionType = SubscriptionType.LIFETIME,
+                                        productId = "debug_lifetime",
+                                        entitlements = setOf("premium", "lifetime")
+                                    )
+                                } catch (e: Exception) {
+                                    log.e(e) { "Failed to set LIFETIME subscription: ${e.message}" }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                text = "💎 LIFETIME Owner",
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "One-time purchase, all features forever",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                    
+                    // LEGACY State
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                try {
+                                    log.d { "Setting debug subscription to LEGACY" }
+                                    (subscriptionRepo as? SimpleSubscriptionRepository)?.setDebugSubscription(
+                                        subscriptionType = SubscriptionType.LEGACY,
+                                        productId = "2018_founder",
+                                        entitlements = setOf("legacy")
+                                    )
+                                } catch (e: Exception) {
+                                    log.e(e) { "Failed to set LEGACY subscription: ${e.message}" }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                text = "🏅 LEGACY Supporter",
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "2018 Founder - Basic premium features",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                    
+                    HorizontalDivider()
+                    
+                    // Clear Debug State
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                try {
+                                    log.d { "Clearing debug state" }
+                                    (subscriptionRepo as? SimpleSubscriptionRepository)?.clearDebugState()
+                                } catch (e: Exception) {
+                                    log.e(e) { "Failed to clear debug state: ${e.message}" }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text("🔄 Clear Debug State & Return to Real Subscription")
+                    }
+                    
+                    Text(
+                        text = "Note: Clearing debug state will restore your actual subscription status from RevenueCat/BillingManager",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                    )
                 }
             }
-
-            // RevenueCat Integration Testing Section
-            item {
-                Text(
-                    text = "RevenueCat Integration Testing",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 16.dp)
+        }
+        
+        // Section 2: RevenueCat Integration Testing
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
-            }
-
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    Text(
+                        text = "🔌 RevenueCat Integration Testing",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Text(
+                        text = "Test BillingManager integration (platform-agnostic)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    HorizontalDivider()
+                    
+                    // Test Buttons
+                    Button(
+                        onClick = { debugViewModel.checkBillingInitialization() },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading
                     ) {
-                        Text(
-                            text = "🧪 RevenueCat SDK Testing",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Text(
-                            text = "Test RevenueCat integration before deploying to production. These buttons will query the SDK and display results in snackbars.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        // Check Initialization
-                        Button(
-                            onClick = { debugViewModel.checkBillingInitialization() },
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("✅ Check Initialization Status")
+                            Text("🔍 Check Initialization")
                         }
-
-                        // Query Products
-                        Button(
-                            onClick = { debugViewModel.queryBillingProducts() },
+                    }
+                    
+                    Button(
+                        onClick = { debugViewModel.queryBillingProducts() },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading
+                    ) {
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("📦 Query Products/Offerings")
+                            Text("📦 Query Products")
                         }
-
-                        // Check Entitlements
-                        Button(
-                            onClick = { debugViewModel.checkBillingEntitlements() },
+                    }
+                    
+                    Button(
+                        onClick = { debugViewModel.checkBillingEntitlements() },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading
+                    ) {
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("🔐 Check Customer Entitlements")
+                            Text("🔐 Check Entitlements")
                         }
-
-                        // Test Restore
-                        OutlinedButton(
-                            onClick = { debugViewModel.testBillingRestore() },
+                    }
+                    
+                    Button(
+                        onClick = { debugViewModel.testBillingRestore() },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading
+                    ) {
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text("🔄 Test Restore Purchases")
                         }
-
-                        // View Offering Details
-                        OutlinedButton(
-                            onClick = { debugViewModel.viewBillingProductDetails() },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading
-                        ) {
-                            Text("🎁 View Offering Details")
-                        }
-
-                        HorizontalDivider()
-
-                        Text(
-                            text = "💡 Tips:",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Text(
-                            text = "• Run 'Check Initialization' first to verify SDK is configured\n" +
-                                    "• 'Query Products' shows available packages and their prices\n" +
-                                    "• 'Check Entitlements' shows what the user has access to\n" +
-                                    "• 'Test Restore' simulates restoring purchases from stores\n" +
-                                    "• Results will show in long snackbar messages at the bottom",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        Text(
-                            text = "⚠️ Note: RevenueCat must be initialized in MainApplication for these tests to work.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error,
-                            fontWeight = FontWeight.Medium
-                        )
                     }
-                }
-            }
-
-            if (isLoading) {
-                item {
-                    Box(
+                    
+                    HorizontalDivider()
+                    
+                    // Tips Section
+                    Card(
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        )
                     ) {
-                        CircularProgressIndicator()
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "💡 Tips",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            
+                            Text(
+                                text = "• Check Initialization - Verify BillingManager is initialized and connected",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            
+                            Text(
+                                text = "• Query Products - Fetch available subscription products from store",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            
+                            Text(
+                                text = "• Check Entitlements - View current user entitlements and access level",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            
+                            Text(
+                                text = "• Test Restore - Restore previous purchases and verify they're recognized",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                    
+                    // Warning about RevenueCat initialization
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "⚠️",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = "BillingManager must be initialized via Application/App startup for these tests to work",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+// Preview Composables
+
+@Preview
+@Composable
+private fun SystemTabPreview() {
+    SpaceLaunchNowPreviewTheme {
+        SystemTabContent(
+            debugViewModel = DebugSettingsViewModel(),
+            debugSettings = DebugSettings(
+                useCustomApiUrl = false,
+                customApiBaseUrl = "https://ll.thespacedevs.com/2.4.0/",
+                useDebugTopics = false
+            ),
+            isLoading = false,
+            customUrlText = "https://ll.thespacedevs.com/2.4.0/",
+            onCustomUrlTextChange = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SystemTabDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        SystemTabContent(
+            debugViewModel = DebugSettingsViewModel(),
+            debugSettings = DebugSettings(
+                useCustomApiUrl = false,
+                customApiBaseUrl = "https://ll.thespacedevs.com/2.4.0/",
+                useDebugTopics = false
+            ),
+            isLoading = false,
+            customUrlText = "https://ll.thespacedevs.com/2.4.0/",
+            onCustomUrlTextChange = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun NotificationsTabPreview() {
+    SpaceLaunchNowPreviewTheme {
+        NotificationsTabContent(
+            debugViewModel = DebugSettingsViewModel(),
+            debugSettings = DebugSettings(
+                useCustomApiUrl = false,
+                customApiBaseUrl = "https://ll.thespacedevs.com/2.4.0/",
+                useDebugTopics = false
+            ),
+            isLoading = false
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun NotificationsTabDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        NotificationsTabContent(
+            debugViewModel = DebugSettingsViewModel(),
+            debugSettings = DebugSettings(
+                useCustomApiUrl = false,
+                customApiBaseUrl = "https://ll.thespacedevs.com/2.4.0/",
+                useDebugTopics = false
+            ),
+            isLoading = false
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun BillingTabPreview() {
+    SpaceLaunchNowPreviewTheme {
+        BillingTabContent(
+            debugViewModel = DebugSettingsViewModel(),
+            debugSettings = DebugSettings(
+                useCustomApiUrl = false,
+                customApiBaseUrl = "https://ll.thespacedevs.com/2.4.0/",
+                useDebugTopics = false
+            ),
+            isLoading = false
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun BillingTabDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        BillingTabContent(
+            debugViewModel = DebugSettingsViewModel(),
+            debugSettings = DebugSettings(
+                useCustomApiUrl = false,
+                customApiBaseUrl = "https://ll.thespacedevs.com/2.4.0/",
+                useDebugTopics = false
+            ),
+            isLoading = false
+        )
     }
 }
