@@ -1,3 +1,13 @@
+# [5.18.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.17.1...v5.18.0) (2026-02-28)
+
+
+### Features
+
+* add Lock Screen widgets for upcoming launches [skip ci] ([07091b6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/07091b67c57e703dcbeaf90f2319a350d2b0bb37))
+* add Lock Screen widgets for upcoming launches [skip ci] ([e9beb50](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9beb5053ca580f4372f69b21ae6106d1682c6b0))
+
+
+
 ## [5.17.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.17.0...v5.17.1) (2026-02-27)
 
 
@@ -40,15 +50,6 @@
 
 * add Explore screen to TabletDesktopLayout and update theme preference handling in MainViewController ([0d2c3a4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0d2c3a4e4853afe6981e251463f1049c3274dc6c))
 * **iOS:** update widget background handling and improve layout for Launch List and Next Up widgets ([94605ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/94605ff8bc24bbccc4096fec00ae0422a2fedfa5))
-
-
-
-# [5.14.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.13.0...v5.14.0) (2026-02-25)
-
-
-### Features
-
-* add TOTP secret handling and debug flag to CI workflows; update REQUIRED_SECRETS documentation ([2df7a5a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2df7a5a4437e23609ea6119e82befcf9266e24bc))
 
 
 
