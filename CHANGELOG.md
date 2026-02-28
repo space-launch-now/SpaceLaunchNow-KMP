@@ -1,3 +1,12 @@
+## [5.17.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.17.0...v5.17.1) (2026-02-27)
+
+
+### Bug Fixes
+
+* update GitHub Actions workflow to include fetch-depth and token for checkout step [skip ci] ([83fa517](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/83fa517937f269eb2a2cd13a52d846143e5c4ad8))
+
+
+
 # [5.17.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.16.0...v5.17.0) (2026-02-27)
 
 
@@ -40,15 +49,6 @@
 ### Features
 
 * add TOTP secret handling and debug flag to CI workflows; update REQUIRED_SECRETS documentation ([2df7a5a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2df7a5a4437e23609ea6119e82befcf9266e24bc))
-
-
-
-# [5.13.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.12.0...v5.13.0) (2026-02-25)
-
-
-### Features
-
-* add debug flag and TOTP secret handling to AppSecrets and update iOS Secrets.plist generation ([4b3b53f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4b3b53f83d3bf625780d35b085b565ec0e3bdf57))
 
 
 
