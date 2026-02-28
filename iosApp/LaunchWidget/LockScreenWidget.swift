@@ -1,5 +1,5 @@
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 // MARK: - Lock Screen Widget
 struct LockScreenWidget: Widget {
@@ -149,7 +149,9 @@ struct AccessoryInlineView: View {
         if entry.isPlaceholder {
             Text("Loading...")
         } else if let launch = entry.launches.first {
-            let shortName = launch.name.components(separatedBy: "|").first?.trimmingCharacters(in: .whitespaces) ?? launch.name
+            let shortName =
+                launch.name.components(separatedBy: "|").first?.trimmingCharacters(in: .whitespaces)
+                ?? launch.name
             ViewThatFits {
                 Text("\(shortName) in \(hoursUntilLaunch(launch: launch))")
                 Text("\(shortName) \(hoursUntilLaunch(launch: launch))")

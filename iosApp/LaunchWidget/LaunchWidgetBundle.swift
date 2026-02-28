@@ -6,8 +6,8 @@
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 @main
 struct LaunchWidgetBundle: WidgetBundle {
