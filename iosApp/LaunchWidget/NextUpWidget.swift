@@ -23,7 +23,6 @@ struct NextUpWidgetView: View {
     
     var body: some View {
         ZStack {
-
             // Content
             if entry.isPlaceholder {
                 placeholderView
@@ -37,7 +36,6 @@ struct NextUpWidgetView: View {
         }
         .containerBackground(for: .widget) {
             Color(colorScheme == .dark ? UIColor.secondarySystemBackground : UIColor.systemBackground)
-                .opacity(entry.backgroundAlpha)
         }
     }
     
@@ -63,7 +61,7 @@ struct NextUpWidgetView: View {
                     Spacer()
                     
                     // Launch name (very compact)
-                    Text(launch.name)
+                    Text(launch.formattedName)
                         .font(.footnote)
                         .fontWeight(.medium)
                         .lineLimit(3)
@@ -82,78 +80,146 @@ struct NextUpWidgetView: View {
                     Spacer(minLength: 0)
                 }
                 .padding(8)
+            } else if isLargeWidget(for: geometry.size) {
+                // LARGE WIDGET: Vertical layout with hero image
+                VStack(alignment: .leading, spacing: 0) {
+                    // Hero image across top
+                    if let uiImage = launch.image {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(height: geometry.size.height * 0.4)
+                            .clipped()
+                    }
+                    
+                    // Content below image
+                    VStack(alignment: .leading, spacing: 8) {
+                        // Header row
+                        HStack {
+                            Text("NEXT LAUNCH")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Text(launch.status.uppercased())
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(statusColor(for: launch.status))
+                                .clipShape(Capsule())
+                        }
+                        
+                        // Launch name
+                        Text(launch.formattedName)
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
+                        
+                        // Countdown
+                        Text(launch.timeUntilLaunch)
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.orange)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                        
+                        Spacer(minLength: 0)
+                        
+                        // Agency & Location
+                        HStack(spacing: 0) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "building.2")
+                                        .font(.caption)
+                                    Text(launch.displayAgency)
+                                        .font(.caption)
+                                }
+                                HStack(spacing: 4) {
+                                    Image(systemName: "location")
+                                        .font(.caption)
+                                    Text(launch.location)
+                                        .font(.caption)
+                                        .lineLimit(1)
+                                }
+                            }
+                            .foregroundStyle(.secondary)
+                            Spacer()
+                        }
+                    }
+                    .padding(16)
+                }
             } else {
-                // MEDIUM/LARGE WIDGET: Full design
-                VStack(alignment: .leading, spacing: adaptiveSpacing(for: geometry.size)) {
-                    // Header
-                    HStack {
+                // MEDIUM WIDGET
+                HStack(spacing: 10) {
+                    // Launch image (left side, square)
+                    if let uiImage = launch.image {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(
+                                width: adaptiveImageHeight(for: geometry.size),
+                                height: adaptiveImageHeight(for: geometry.size)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    
+                    // Content (right side)
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Section label
                         Text("NEXT LAUNCH")
                             .font(adaptiveHeaderFont(for: geometry.size))
                             .fontWeight(.bold)
                             .foregroundStyle(.secondary)
-                        Spacer()
-                        // Status with orange color
-                        Text(launch.status)
-                            .font(adaptiveHeaderFont(for: geometry.size))
-                            .fontWeight(.medium)
-                            .foregroundStyle(.orange)
-                    }
-                    
-                    // Launch name
-                    Text(launch.name)
-                        .font(adaptiveTitleFont(for: geometry.size))
-                        .lineLimit(adaptiveTitleLines(for: geometry.size))
-                        .minimumScaleFactor(0.7)
-                    
-                    // Countdown section with better visual hierarchy
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(isLaunchInPast(launch: launch) ? "Launched" : "In")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .fontWeight(.medium)
+                            .padding(.bottom, 6)
                         
+                        // Launch name
+                        Text(launch.formattedName)
+                            .font(adaptiveTitleFont(for: geometry.size))
+                            .fontWeight(.semibold)
+                            .lineLimit(3)
+                            .minimumScaleFactor(0.7)
+                            .padding(.bottom, 8)
+                        
+                        // Status pill
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text(launch.status.uppercased())
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(statusColor(for: launch.status))
+                                .clipShape(Capsule())
+                        }
+                        .padding(.bottom, 4)
+                        
+                        // Countdown
                         Text(launch.timeUntilLaunch)
                             .font(adaptiveCountdownFont(for: geometry.size))
                             .fontWeight(.bold)
                             .foregroundStyle(.primary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.8)
-                    }
-                    
-                    // Details (adaptive based on space)
-                    if shouldShowDetails(for: geometry.size) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            // Agency
-                            HStack {
-                                Image(systemName: "building.2")
-                                    .font(adaptiveDetailFont(for: geometry.size))
-                                Text(launch.agency)
-                                    .font(adaptiveDetailFont(for: geometry.size))
-                            }
-                            .foregroundStyle(.secondary)
-                            
-                            // Location
-                            HStack {
-                                Image(systemName: "location")
-                                    .font(adaptiveDetailFont(for: geometry.size))
-                                Text(launch.location)
-                                    .font(adaptiveDetailFont(for: geometry.size))
-                                    .lineLimit(1)
-                            }
-                            .foregroundStyle(.secondary)
-                        }
-                    } else {
-                        // Compact view - show only agency
-                        HStack {
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                        
+                        Spacer(minLength: 8)
+                        
+                        // Agency & Location
+                        HStack(spacing: 4) {
                             Image(systemName: "building.2")
                                 .font(adaptiveDetailFont(for: geometry.size))
-                            Text(launch.agency)
+                            Text(launch.displayAgency)
                                 .font(adaptiveDetailFont(for: geometry.size))
+                            Text("·")
+                                .font(adaptiveDetailFont(for: geometry.size))
+                            Image(systemName: "location")
+                                .font(adaptiveDetailFont(for: geometry.size))
+                            Text(launch.location)
+                                .font(adaptiveDetailFont(for: geometry.size))
+                                .lineLimit(1)
                         }
                         .foregroundStyle(.secondary)
                     }
-                    
-                    Spacer(minLength: 0)
                 }
                 .padding(adaptivePadding(for: geometry.size))
             }
@@ -312,6 +378,10 @@ struct NextUpWidgetView: View {
         size.width < 180 && size.height < 180 // Small (systemSmall) widget detection
     }
     
+    private func isLargeWidget(for size: CGSize) -> Bool {
+        size.height > 280
+    }
+    
     private func isLaunchInPast(launch: LaunchData) -> Bool {
         launch.launchTime.timeIntervalSinceNow < 0
     }
@@ -336,14 +406,9 @@ struct NextUpWidgetView: View {
     }
     
     private func adaptiveImageHeight(for size: CGSize) -> CGFloat {
-        if size.height < 200 { return 50 }
-        else if size.height < 300 { return 60 }
-        else { return 80 }
-    }
-    
-    private func adaptiveCornerRadius(for size: CGSize) -> CGFloat {
-        if size.width < 200 { return 6 }
-        else { return 8 }
+        if size.height < 200 { return 65 }
+        else if size.height < 300 { return 80 }
+        else { return 100 }
     }
     
     private func adaptiveTitleLines(for size: CGSize) -> Int {
@@ -405,12 +470,53 @@ struct NextUpWidgetView: View {
             return "rocket"
         }
     }
+    
+    private func statusColor(for status: String) -> Color {
+        switch status.lowercased() {
+        case "go", "success":
+            return .green
+        case "tbc", "tbd":
+            return .orange
+        case "hold", "failure":
+            return .red
+        default:
+            return .gray
+        }
+    }
 }
 
 // MARK: - Preview
 @available(iOS 17.0, *)
-#Preview("NextUpWidget", as: .systemSmall) {
+#Preview("Small", as: .systemSmall) {
     NextUpWidget()
 } timeline: {
     LaunchEntry.placeholder
+}
+
+@available(iOS 17.0, *)
+#Preview("Medium", as: .systemMedium) {
+    NextUpWidget()
+} timeline: {
+    LaunchEntry.placeholder
+    LaunchEntry(
+        date: Date(),
+        launches: [LaunchData.placeholder],
+        isPlaceholder: false,
+        errorMessage: nil,
+        hasWidgetAccess: true
+    )
+}
+
+@available(iOS 17.0, *)
+#Preview("Large", as: .systemLarge) {
+    NextUpWidget()
+} timeline: {
+    LaunchEntry.placeholder
+    LaunchEntry(
+        date: Date(),
+        launches: [LaunchData.placeholder],
+        isPlaceholder: false,
+        errorMessage: nil,
+        hasWidgetAccess: true
+    )
 }

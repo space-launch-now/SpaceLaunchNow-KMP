@@ -40,7 +40,6 @@ struct LaunchListWidgetView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .containerBackground(for: .widget) {
             Color(colorScheme == .dark ? UIColor.secondarySystemBackground : UIColor.systemBackground)
-                .opacity(entry.backgroundAlpha)
         }
     }
 
@@ -107,9 +106,9 @@ struct LaunchListWidgetView: View {
         case .systemMedium:
             return 2
         case .systemLarge:
-            return 4
+            return 5
         case .systemExtraLarge:
-            return 8
+            return 10
         default:
             return 2
         }
@@ -232,24 +231,44 @@ struct LaunchRow: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            HStack(alignment: .center) {
+            HStack(alignment: .center, spacing: 8) {
+                // Thumbnail image
+                if let uiImage = launch.image {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 32, height: 32)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                } else {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.secondary.opacity(0.15))
+                        .frame(width: 32, height: 32)
+                        .overlay(
+                            Image(systemName: "rocket")
+                                .font(.system(size: 14))
+                                .foregroundStyle(.secondary)
+                        )
+                }
+                
                 VStack(alignment: .leading, spacing: 2) {
                     // Launch name
-                    Text(launch.name)
+                    Text(launch.formattedName)
                         .font(.caption)
                         .fontWeight(.semibold)
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
                     
-                    // Agency and location on one line
+                    // Agency
                     HStack(spacing: 4) {
                         Image(systemName: "building.2")
                             .font(.system(size: 9))
-                        Text(launch.agency)
+                        Text(launch.displayAgency)
                             .font(.system(size: 10))
-                        Text("·")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.tertiary)
+                    }
+                    .foregroundStyle(.secondary)
+                    
+                    // Location
+                    HStack(spacing: 4) {
                         Image(systemName: "location")
                             .font(.system(size: 9))
                         Text(launch.location)
@@ -312,6 +331,7 @@ struct LaunchRow: View {
                 id: "2",
                 name: "Atlas V 551 | USSF-51",
                 agency: "United Launch Alliance",
+                agencyAbbrev: "ULA",
                 location: "Cape Canaveral, FL",
                 launchTime: Date().addingTimeInterval(7200),
                 status: "Go",
@@ -320,8 +340,6 @@ struct LaunchRow: View {
         ],
         isPlaceholder: false,
         errorMessage: nil,
-        hasWidgetAccess: true,
-        backgroundAlpha: 0.75,
-        cornerRadius: 16.0
+        hasWidgetAccess: true
     )
 }

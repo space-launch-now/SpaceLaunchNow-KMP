@@ -1,6 +1,7 @@
 import Foundation
 import WidgetKit
 import SwiftUI
+import UIKit
 import ComposeApp
 
 // MARK: - Launch Data Models
@@ -10,8 +11,6 @@ struct LaunchEntry: TimelineEntry {
     let isPlaceholder: Bool
     let errorMessage: String?
     let hasWidgetAccess: Bool  // Premium entitlement check
-    let backgroundAlpha: Double  // Widget background transparency (0.0 to 1.0)
-    let cornerRadius: Double  // Widget corner radius in dp
     
     static var placeholder: LaunchEntry {
         LaunchEntry(
@@ -19,9 +18,7 @@ struct LaunchEntry: TimelineEntry {
             launches: [LaunchData.placeholder],
             isPlaceholder: true,
             errorMessage: nil,
-            hasWidgetAccess: true,  // Show placeholder as if they have access
-            backgroundAlpha: 0.75,
-            cornerRadius: 16.0
+            hasWidgetAccess: true  // Show placeholder as if they have access
         )
     }
 }
@@ -30,11 +27,23 @@ struct LaunchData: Identifiable {
     let id: String
     let name: String
     let agency: String
+    let agencyAbbrev: String?
     let location: String
     let launchTime: Date
     let status: String
     let imageUrl: String?
+    var image: UIImage?
     
+    var displayAgency: String {
+        if agency.count > 15, let abbrev = agencyAbbrev, !abbrev.isEmpty {
+            return abbrev
+        }
+        return agency
+    }    
+    /// Splits "Provider | Vehicle" into two lines
+    var formattedName: String {
+        name
+    }    
     var timeUntilLaunch: String {
         let interval = launchTime.timeIntervalSinceNow
         
@@ -97,10 +106,12 @@ struct LaunchData: Identifiable {
             id: "1",
             name: "Falcon 9 Block 5 | Starlink Group",
             agency: "SpaceX",
+            agencyAbbrev: nil,
             location: "Kennedy Space Center, FL",
             launchTime: Date().addingTimeInterval(3600),
             status: "Go",
-            imageUrl: nil
+            imageUrl: nil,
+            image: nil
         )
     }
 }
@@ -155,12 +166,6 @@ struct LaunchProvider: TimelineProvider {
             let helper = KoinHelper.Companion().instance()
             print("🚀 Widget: Got helper")
             
-            // Fetch widget preferences
-            print("🚀 Widget: Fetching widget preferences...")
-            let backgroundAlpha = try await helper.getWidgetBackgroundAlpha()
-            let cornerRadius = try await helper.getWidgetCornerRadius()
-            print("🚀 Widget: Got preferences - alpha: \(backgroundAlpha), cornerRadius: \(cornerRadius)")
-            
             // Check if user has widget access via shared UserDefaults (App Group)
             print("🚀 Widget: Checking widget access...")
             let defaults = UserDefaults(suiteName: "group.me.calebjones.spacelaunchnow")
@@ -175,9 +180,7 @@ struct LaunchProvider: TimelineProvider {
                     launches: [],
                     isPlaceholder: false,
                     errorMessage: nil,
-                    hasWidgetAccess: false,
-                    backgroundAlpha: Double(truncating: backgroundAlpha),
-                    cornerRadius: Double(truncating: cornerRadius)
+                    hasWidgetAccess: false
                 )
             }
             
@@ -194,19 +197,32 @@ struct LaunchProvider: TimelineProvider {
                     launches: [],
                     isPlaceholder: false,
                     errorMessage: errorMsg,
-                    hasWidgetAccess: true,
-                    backgroundAlpha: Double(truncating: backgroundAlpha),
-                    cornerRadius: Double(truncating: cornerRadius)
+                    hasWidgetAccess: true
                 )
             }
             
             print("🚀 Widget: Successfully got PaginatedLaunchNormalList with \(paginatedList.results.count) launches")
-            return processPaginatedList(
+            var entry = processPaginatedList(
                 paginatedList,
-                hasAccess: hasAccessBool,
-                backgroundAlpha: Double(truncating: backgroundAlpha),
-                cornerRadius: Double(truncating: cornerRadius)
+                hasAccess: hasAccessBool
             )
+            
+            // Download images for launches
+            var updatedLaunches = entry.launches
+            for i in updatedLaunches.indices {
+                if let urlString = updatedLaunches[i].imageUrl {
+                    updatedLaunches[i].image = await Self.downloadImage(from: urlString, maxSize: 200)
+                }
+            }
+            entry = LaunchEntry(
+                date: entry.date,
+                launches: updatedLaunches,
+                isPlaceholder: entry.isPlaceholder,
+                errorMessage: entry.errorMessage,
+                hasWidgetAccess: entry.hasWidgetAccess
+            )
+            
+            return entry
             
         } catch {
             let errorMsg = "Error: \(error.localizedDescription)"
@@ -216,19 +232,72 @@ struct LaunchProvider: TimelineProvider {
                 launches: [],
                 isPlaceholder: false,
                 errorMessage: errorMsg,
-                hasWidgetAccess: false,
-                backgroundAlpha: 0.75,
-                cornerRadius: 16.0
+                hasWidgetAccess: false
             )
+        }
+    }
+    
+    // MARK: - Image Download & Cache
+    
+    private static var imageCacheDir: URL {
+        let container = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.me.calebjones.spacelaunchnow"
+        ) ?? FileManager.default.temporaryDirectory
+        let cacheDir = container.appendingPathComponent("widget_image_cache")
+        try? FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
+        return cacheDir
+    }
+    
+    private static func cacheFile(for urlString: String) -> URL {
+        let hash = urlString.data(using: .utf8)!.base64EncodedString()
+            .replacingOccurrences(of: "/", with: "_")
+            .prefix(64)
+        return imageCacheDir.appendingPathComponent(String(hash) + ".jpg")
+    }
+    
+    private static func downloadImage(from urlString: String, maxSize: CGFloat) async -> UIImage? {
+        let cacheFile = cacheFile(for: urlString)
+        
+        // Check cache (valid for 1 hour)
+        if let attrs = try? FileManager.default.attributesOfItem(atPath: cacheFile.path),
+           let modified = attrs[.modificationDate] as? Date,
+           Date().timeIntervalSince(modified) < 3600,
+           let cached = UIImage(contentsOfFile: cacheFile.path) {
+            print("🖼️ Widget: Using cached image for \(urlString)")
+            return cached
+        }
+        
+        guard let url = URL(string: urlString) else { return nil }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let original = UIImage(data: data) else { return nil }
+            
+            // Downscale to save memory
+            let scale = min(maxSize / original.size.width, maxSize / original.size.height, 1.0)
+            let newSize = CGSize(width: original.size.width * scale, height: original.size.height * scale)
+            let renderer = UIGraphicsImageRenderer(size: newSize)
+            let resized = renderer.image { _ in
+                original.draw(in: CGRect(origin: .zero, size: newSize))
+            }
+            
+            // Cache to disk
+            if let jpegData = resized.jpegData(compressionQuality: 0.7) {
+                try? jpegData.write(to: cacheFile)
+            }
+            
+            print("🖼️ Widget: Downloaded & cached image for \(urlString)")
+            return resized
+        } catch {
+            print("🖼️ Widget: Failed to download image: \(error.localizedDescription)")
+            return nil
         }
     }
     
     // Helper to process the paginated list
     private func processPaginatedList(
         _ paginatedList: PaginatedLaunchNormalList,
-        hasAccess: Bool,
-        backgroundAlpha: Double,
-        cornerRadius: Double
+        hasAccess: Bool
     ) -> LaunchEntry {
         let results = paginatedList.results
         print("🚀 Widget: Got \(results.count) launches")
@@ -257,10 +326,12 @@ struct LaunchProvider: TimelineProvider {
                 id: launch.id,
                 name: name,
                 agency: launch.launchServiceProvider.name,
+                agencyAbbrev: launch.launchServiceProvider.abbrev,
                 location: launch.pad?.location?.name ?? "Unknown Location",
                 launchTime: launchDate,
                 status: launch.status?.name ?? "Unknown",
-                imageUrl: finalImageUrl
+                imageUrl: finalImageUrl,
+                image: nil
             )
         }
         
@@ -272,9 +343,7 @@ struct LaunchProvider: TimelineProvider {
                 launches: [],
                 isPlaceholder: false,
                 errorMessage: "API returned \(results.count) items but 0 were valid",
-                hasWidgetAccess: hasAccess,
-                backgroundAlpha: backgroundAlpha,
-                cornerRadius: cornerRadius
+                hasWidgetAccess: hasAccess
             )
         }
         
@@ -283,9 +352,7 @@ struct LaunchProvider: TimelineProvider {
             launches: launches,
             isPlaceholder: false,
             errorMessage: nil,
-            hasWidgetAccess: hasAccess,
-            backgroundAlpha: backgroundAlpha,
-            cornerRadius: cornerRadius
+            hasWidgetAccess: hasAccess
         )
     }
 }

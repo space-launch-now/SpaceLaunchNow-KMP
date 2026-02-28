@@ -14,5 +14,6 @@ struct LaunchWidgetBundle: WidgetBundle {
     var body: some Widget {
         NextUpWidget()
         LaunchListWidget()
+        LockScreenWidget()
     }
 }
