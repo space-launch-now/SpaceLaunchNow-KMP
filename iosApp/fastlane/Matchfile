@@ -1,7 +1,7 @@
 git_url(ENV["MATCH_GIT_URL"])
 storage_mode("git")
 type("appstore")
-readonly(false) # TODO: revert to true after match-init workflow succeeds
+readonly(true)
 
 app_identifier([
   "me.spacelaunchnow.spacelaunchnow",
