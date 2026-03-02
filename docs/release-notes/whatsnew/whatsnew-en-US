@@ -1,4 +1,3 @@
-### Features
+### Bug Fixes
 
-* add Lock Screen widgets for upcoming launches [skip ci]
-* add Lock Screen widgets for upcoming launches [skip ci]
+* force refresh upcoming launches in fetchUpcomingLaunchesOrNull [skip ci]

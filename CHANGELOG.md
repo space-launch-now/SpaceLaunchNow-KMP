@@ -1,3 +1,12 @@
+## [5.18.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.18.0...v5.18.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* force refresh upcoming launches in fetchUpcomingLaunchesOrNull [skip ci] ([0e5c6ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0e5c6ac147aaf270b8c9a0fcf2597c3384d45f7e))
+
+
+
 # [5.18.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.17.1...v5.18.0) (2026-02-28)
 
 
@@ -40,16 +49,6 @@
 ### Features
 
 * update Package.resolved and add location usage description in Info.plist ([1937f59](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1937f597bd84a6da71cf51808c55a243c094d6d5))
-
-
-
-# [5.15.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.14.0...v5.15.0) (2026-02-25)
-
-
-### Features
-
-* add Explore screen to TabletDesktopLayout and update theme preference handling in MainViewController ([0d2c3a4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0d2c3a4e4853afe6981e251463f1049c3274dc6c))
-* **iOS:** update widget background handling and improve layout for Launch List and Next Up widgets ([94605ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/94605ff8bc24bbccc4096fec00ae0422a2fedfa5))
 
 
 
