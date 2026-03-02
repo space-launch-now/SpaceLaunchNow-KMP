@@ -62,7 +62,7 @@ class KoinHelper : KoinComponent {
      * Returns the PaginatedLaunchNormalList directly or null if failed
      */
     suspend fun fetchUpcomingLaunchesOrNull(limit: Int): PaginatedLaunchNormalList? {
-        val result = launchRepository.getUpcomingLaunchesNormal(limit)
+        val result = launchRepository.getUpcomingLaunchesNormal(limit, forceRefresh = true)
         return result.getOrNull()?.data
     }
     
