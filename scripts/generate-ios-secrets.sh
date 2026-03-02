@@ -97,8 +97,8 @@ if [ -z "$DEBUG" ]; then
 fi
 
 if [ -z "$TOTP_SECRET" ]; then
-    echo "⚠️  Warning: TOTP_SECRET not found in .env file (using default)"
-    TOTP_SECRET="JBSWY3DPEHPK3PXP"
+    echo "⚠️  Warning: TOTP_SECRET not found in .env file (TOTP auth will be disabled)"
+    TOTP_SECRET=""
 fi
 
 # Create Secrets.plist

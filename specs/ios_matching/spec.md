@@ -101,8 +101,9 @@ app_identifier([
   "me.spacelaunchnow.spacelaunchnow.LaunchWidget"
 ])
 
-team_id(ENV["APPLE_TEAM_ID"] || "4T4QRN2U5X")
+team_id(ENV["APPLE_TEAM_ID"])
 ```
+
 
 **Create `iosApp/fastlane/Fastfile`:**
 
@@ -239,7 +240,7 @@ cd iosApp
 # Set environment variables
 export MATCH_GIT_URL="git@github.com:space-launch-now/ios-certificates.git"
 export MATCH_PASSWORD="your-strong-password"
-export APPLE_TEAM_ID="4T4QRN2U5X"
+export APPLE_TEAM_ID="<YOUR_APPLE_TEAM_ID>"
 
 # Clean up App Store Connect first
 # (Manually revoke orphaned certificates in App Store Connect portal)

@@ -1,16 +1,39 @@
-This is a Kotlin Multiplatform application for Space Launch Now based off Launch Library data from The Space Devs.
+SpaceLaunchNow-KMP is a Kotlin Multiplatform (Compose Multiplatform) app that displays space launch information using Launch Library data from The Space Devs.
 
-**TL;DR:** Use `feat:` for features, `fix:` for bugs. Merges to master auto-deploy! 🎉
+Targets:
+- Android
+- Desktop (JVM)
+- iOS
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+## Getting started
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+Prerequisites:
+- JDK 21 (JetBrains JDK recommended)
+- Android Studio / IntelliJ IDEA
+- Xcode 15+ (for iOS builds)
 
+1. Create your local env file:
+  - `cp .env.example .env`
+2. (Optional) Generate the API client:
+  - `./gradlew openApiGenerate`
+3. Build / run:
+  - Desktop: `./gradlew desktopRun`
+  - Desktop compile: `./gradlew compileKotlinDesktop`
+  - Tests: `./gradlew test`
+  - Android debug install: `./gradlew installDebug`
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## Repository structure
+
+- `composeApp/`: shared Kotlin + Compose Multiplatform code
+- `iosApp/`: native iOS entry point + Xcode project
+- `docs/`: architecture, CI/CD, and integration documentation
+
+## Feedback and contributions
+
+- Use GitHub Issues for bugs and feature requests
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines
+- For security issues, see [SECURITY.md](SECURITY.md) (please don’t open public issues)
+
+## License
+
+GPL-3.0. See [LICENSE](LICENSE).

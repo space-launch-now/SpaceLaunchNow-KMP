@@ -16,7 +16,7 @@ actual object AppSecrets {
 
     // Debug Menu TOTP Secret
     actual val totpSecret: String
-        get() = getStringResource("Secrets", "plist", "totpSecret") ?: "JBSWY3DPEHPK3PXP"
+        get() = getStringResource("Secrets", "plist", "totpSecret") ?: ""
 
     // AdMob ad unit IDs
     actual val androidBannerAdUnitId: String
