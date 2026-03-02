@@ -327,7 +327,7 @@ android {
         val revenueCatIosKey = envProps.getProperty("REVENUECAT_IOS_KEY") ?: ""
 
         // Debug Menu TOTP Secret
-        val totpSecret = envProps.getProperty("TOTP_SECRET") ?: "JBSWY3DPEHPK3PXP"
+        val totpSecret = envProps.getProperty("TOTP_SECRET") ?: ""
 
         // AdMob ad unit IDs
         val androidBannerAdUnitId = envProps.getProperty("ANDROID_BANNER_AD_UNIT_ID") ?: ""

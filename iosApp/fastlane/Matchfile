@@ -9,4 +9,4 @@ app_identifier([
   "me.spacelaunchnow.spacelaunchnow.LaunchWidget"
 ])
 
-team_id(ENV["APPLE_TEAM_ID"] || "4T4QRN2U5X")
+team_id(ENV["APPLE_TEAM_ID"])

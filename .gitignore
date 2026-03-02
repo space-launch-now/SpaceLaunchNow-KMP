@@ -27,3 +27,31 @@ iosApp/iosApp/GoogleService-Info.plist
 **google-services.json
 keystore.properties
 .vscode/
+
+# Signing & certificates
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+release.keystore
+
+# CI/CD artifacts that should never be committed
+service-account.json
+secrets-backup.txt
+secrets-inventory.txt
+
+# Environment files
+.env.*
+!.env.example
+
+# Build outputs & caches
+*.log
+*.tmp
+Thumbs.db
+
+# Node tooling (OpenAPI generator CLI)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

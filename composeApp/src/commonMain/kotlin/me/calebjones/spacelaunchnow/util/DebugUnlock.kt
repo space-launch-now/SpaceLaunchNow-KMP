@@ -27,10 +27,10 @@ object DebugUnlock {
     // Load from environment variable for security - DO NOT hardcode in production!
     // Add to your .env file: TOTP_SECRET=YOUR_BASE32_SECRET
     // Generate a new secret: https://stefansundin.github.io/2fa-qr/
-    // Fallback for development/testing only
+    // When no secret is configured, TOTP verification is disabled
     private val TOTP_SECRET_BASE32 = EnvironmentManager.getEnv(
         "TOTP_SECRET_BASE32",
-        "JBSWY3DPEHPK3PXP" // Default for development only - CHANGE THIS!
+        "" // Empty default disables TOTP - configure via .env or environment variable
     )
 
     // TOTP settings (standard RFC 6238 defaults)

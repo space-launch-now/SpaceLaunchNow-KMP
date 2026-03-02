@@ -269,7 +269,7 @@ For detailed TOTP configuration, code generation, and troubleshooting:
 📖 **See [DEBUG_MENU_TOTP_SETUP.md](DEBUG_MENU_TOTP_SETUP.md)** for the complete TOTP guide.
 
 Quick TOTP reference:
-- **Default Secret**: `JBSWY3DPEHPK3PXP` (change this!)
+- **Secret**: Configure via `.env` file (`TOTP_SECRET=<YOUR_TOTP_SECRET>`). Debug menu TOTP is disabled when no secret is set.
 - **Code Length**: 6 digits
 - **Time Period**: 30 seconds
 - **Tolerance**: ±1 time step (±30 seconds)

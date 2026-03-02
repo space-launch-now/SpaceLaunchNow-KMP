@@ -71,7 +71,7 @@ platform :ios do
       output_name: "SpaceLaunchNow.ipa",
       export_options: {
         signingStyle: "manual",
-        teamID: ENV["APPLE_TEAM_ID"] || "4T4QRN2U5X",
+        teamID: ENV["APPLE_TEAM_ID"],
         uploadBitcode: false,
         uploadSymbols: true,
         compileBitcode: false,
