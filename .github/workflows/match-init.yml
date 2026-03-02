@@ -45,6 +45,6 @@ jobs:
           APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
         run: |
           cd iosApp
-          bundle exec fastlane sync_certificates
+          bundle exec fastlane init_certificates
           echo "✅ Match initialized — certificates and profiles stored in certificates repo"
-          echo "👉 Next: revert Matchfile readonly to true, then delete this workflow"
+          echo "👉 Next: delete this workflow"
