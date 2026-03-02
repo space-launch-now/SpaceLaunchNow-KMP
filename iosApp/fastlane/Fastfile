@@ -1,0 +1,55 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Sync code signing certificates and provisioning profiles via Match"
+  lane :sync_certificates do
+    setup_ci if ENV["CI"]
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APPLE_API_KEY_ID"],
+      issuer_id: ENV["APPLE_API_ISSUER_ID"],
+      key_content: ENV["APPLE_API_KEY_CONTENT"],
+      is_key_content_base64: true
+    )
+
+    match(
+      type: "appstore",
+      app_identifier: [
+        "me.spacelaunchnow.spacelaunchnow",
+        "me.spacelaunchnow.spacelaunchnow.NotificationServiceExtension",
+        "me.spacelaunchnow.spacelaunchnow.LaunchWidget"
+      ],
+      readonly: is_ci,
+      api_key: api_key
+    )
+  end
+
+  desc "Build a signed Release archive and export IPA for App Store"
+  lane :build_release do
+    sync_certificates
+
+    build_app(
+      project: "iosApp.xcodeproj",
+      scheme: "iosApp",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: ENV["RUNNER_TEMP"] || "./build",
+      output_name: "SpaceLaunchNow.ipa",
+      export_options: {
+        signingStyle: "manual",
+        teamID: ENV["APPLE_TEAM_ID"] || "4T4QRN2U5X",
+        uploadBitcode: false,
+        uploadSymbols: true,
+        compileBitcode: false,
+        provisioningProfiles: {
+          "me.spacelaunchnow.spacelaunchnow" =>
+            "match AppStore me.spacelaunchnow.spacelaunchnow",
+          "me.spacelaunchnow.spacelaunchnow.NotificationServiceExtension" =>
+            "match AppStore me.spacelaunchnow.spacelaunchnow.NotificationServiceExtension",
+          "me.spacelaunchnow.spacelaunchnow.LaunchWidget" =>
+            "match AppStore me.spacelaunchnow.spacelaunchnow.LaunchWidget"
+        }
+      }
+    )
+  end
+end
