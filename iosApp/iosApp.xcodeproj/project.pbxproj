@@ -122,6 +122,7 @@
 				LaunchData.swift,
 				LaunchListWidget.swift,
 				LaunchWidgetBundle.swift,
+				LockScreenWidget.swift,
 				NextUpWidget.swift,
 			);
 			target = 3C2F71402E936FBD0026D5CD /* LaunchWidgetExtension */;

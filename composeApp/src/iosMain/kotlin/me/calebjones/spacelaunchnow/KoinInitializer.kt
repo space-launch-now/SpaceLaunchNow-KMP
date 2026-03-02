@@ -5,7 +5,6 @@ import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.notifications.IosPushMessagingBridge
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.util.logging.logger
-import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
@@ -16,7 +15,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.mp.KoinPlatform.getKoin
-import kotlinx.coroutines.flow.first
 
 // Global holder for Koin instance
 private var koinInstance: Koin? = null
@@ -49,7 +47,6 @@ class KoinHelper : KoinComponent {
     
     val launchRepository: LaunchRepository by inject()
     val subscriptionRepository: SubscriptionRepository by inject()
-    val widgetPreferences: WidgetPreferences by inject()
 
     /**
      * Fetch upcoming launches and unwrap the Result type
@@ -65,7 +62,7 @@ class KoinHelper : KoinComponent {
      * Returns the PaginatedLaunchNormalList directly or null if failed
      */
     suspend fun fetchUpcomingLaunchesOrNull(limit: Int): PaginatedLaunchNormalList? {
-        val result = launchRepository.getUpcomingLaunchesNormal(limit)
+        val result = launchRepository.getUpcomingLaunchesNormal(limit, forceRefresh = true)
         return result.getOrNull()?.data
     }
     
@@ -82,32 +79,6 @@ class KoinHelper : KoinComponent {
         }
     }
     
-    /**
-     * Get widget background alpha (0.0 to 1.0)
-     * Used by iOS widgets to set background transparency
-     */
-    suspend fun getWidgetBackgroundAlpha(): Float {
-        return try {
-            widgetPreferences.widgetBackgroundAlphaFlow.first().toFloat()
-        } catch (e: Exception) {
-            log.e(e) { "Failed to get widget background alpha" }
-            0.75f // Default value
-        }
-    }
-    
-    /**
-     * Get widget corner radius in dp (0 to 40)
-     * Used by iOS widgets to set corner radius
-     */
-    suspend fun getWidgetCornerRadius(): Float {
-        return try {
-            widgetPreferences.widgetCornerRadiusFlow.first().toFloat()
-        } catch (e: Exception) {
-            log.e(e) { "Failed to get widget corner radius" }
-            16f // Default value
-        }
-    }
-
     companion object {
         fun instance(): KoinHelper = KoinHelper()
     }

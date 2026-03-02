@@ -295,123 +295,126 @@ fun ThemeCustomizationScreen(
                 }
             }
 
-            // Widget Background Transparency
-            item {
-                val widgetBackgroundAlpha by viewModel.widgetBackgroundAlpha.collectAsStateWithLifecycle()
-                SettingsCardRow {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                "Background Transparency",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = if (hasWidgetCustomization) {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                                },
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                "${(widgetBackgroundAlpha * 100).toInt()}%",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if (hasWidgetCustomization) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                },
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Text(
-                            "0% = Fully transparent, 100% = Fully opaque",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (hasWidgetCustomization) {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            }
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Slider(
-                            value = widgetBackgroundAlpha,
-                            onValueChange = {
-                                if (hasWidgetCustomization) viewModel.updateWidgetBackgroundAlpha(
-                                    it
+            // Widget Background Transparency (Android only - iOS WidgetKit controls background)
+            if (getPlatform().type.isAndroid) {
+                item {
+                    val widgetBackgroundAlpha by viewModel.widgetBackgroundAlpha.collectAsStateWithLifecycle()
+                    SettingsCardRow {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Background Transparency",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = if (hasWidgetCustomization) {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    },
+                                    fontWeight = FontWeight.Bold
                                 )
-                            },
-                            valueRange = 0f..1f,
-                            enabled = hasWidgetCustomization,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-
-            // Widget Corner Radius
-            item {
-                val widgetCornerRadius by viewModel.widgetCornerRadius.collectAsStateWithLifecycle()
-                SettingsCardRow {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                                Text(
+                                    "${(widgetBackgroundAlpha * 100).toInt()}%",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (hasWidgetCustomization) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                    },
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             Text(
-                                "Corner Radius",
-                                style = MaterialTheme.typography.titleMedium,
+                                "0% = Fully transparent, 100% = Fully opaque",
+                                style = MaterialTheme.typography.bodySmall,
                                 color = if (hasWidgetCustomization) {
                                     MaterialTheme.colorScheme.onSurfaceVariant
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                                },
-                                fontWeight = FontWeight.Bold
+                                }
                             )
-                            Text(
-                                "${widgetCornerRadius}dp",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if (hasWidgetCustomization) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            Spacer(Modifier.height(8.dp))
+                            Slider(
+                                value = widgetBackgroundAlpha,
+                                onValueChange = {
+                                    if (hasWidgetCustomization) viewModel.updateWidgetBackgroundAlpha(
+                                        it
+                                    )
                                 },
-                                fontWeight = FontWeight.Bold
+                                valueRange = 0f..1f,
+                                enabled = hasWidgetCustomization,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
-                        Text(
-                            "Rounded corners for widget background (0-40dp, increments of 4dp)",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (hasWidgetCustomization) {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    }
+                }
+
+                // Widget Corner Radius
+                item {
+                    val widgetCornerRadius by viewModel.widgetCornerRadius.collectAsStateWithLifecycle()
+                    SettingsCardRow {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Corner Radius",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = if (hasWidgetCustomization) {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    },
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    "${widgetCornerRadius}dp",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (hasWidgetCustomization) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                    },
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Slider(
-                            value = widgetCornerRadius.toFloat(),
-                            onValueChange = {
-                                if (hasWidgetCustomization) {
-                                    // Round to nearest multiple of 4
-                                    val roundedValue = ((it / 4f).toInt() * 4).coerceIn(0, 40)
-                                    viewModel.updateWidgetCornerRadius(roundedValue)
+                            Text(
+                                "Rounded corners for widget background (0-40dp, increments of 4dp)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (hasWidgetCustomization) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                 }
-                            },
-                            valueRange = 0f..40f,
-                            steps = 9, // 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 = 11 positions, so 9 steps between them
-                            enabled = hasWidgetCustomization,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Slider(
+                                value = widgetCornerRadius.toFloat(),
+                                onValueChange = {
+                                    if (hasWidgetCustomization) {
+                                        // Round to nearest multiple of 4
+                                        val roundedValue = ((it / 4f).toInt() * 4).coerceIn(0, 40)
+                                        viewModel.updateWidgetCornerRadius(roundedValue)
+                                    }
+                                },
+                                valueRange = 0f..40f,
+                                steps = 9, // 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 = 11 positions, so 9 steps between them
+                                enabled = hasWidgetCustomization,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }
 
-            // Apply to Widgets Button (Show for all, but disable for non-premium)
-            item {
+            // Apply to Widgets Button (Android only - iOS WidgetKit controls appearance)
+            if (getPlatform().type.isAndroid) {
+                item {
                 Spacer(Modifier.height(8.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -498,6 +501,7 @@ fun ThemeCustomizationScreen(
                     }
                 }
             }
+            } // end isAndroid gate for widget customization controls
 
             // Reset Button (Show for all, but disable for non-premium)
             item {

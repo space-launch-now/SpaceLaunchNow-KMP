@@ -3,9 +3,12 @@ package me.calebjones.spacelaunchnow.ui.settings
 import androidx.compose.runtime.Composable
 
 /**
- * iOS implementation of widget update side effect (no-op).
+ * iOS implementation of widget update side effect.
+ * No-op on iOS — widget transparency and corner radius controls are Android-only.
+ * iOS WidgetKit manages widget appearance at the system level.
  */
 @Composable
 actual fun WidgetUpdateSideEffect() {
-    // No widgets on iOS
+    // Widget customization controls are Android-only.
+    // iOS widgets use default WidgetKit backgrounds.
 }

@@ -6,13 +6,14 @@
 //  Copyright © 2025 orgName. All rights reserved.
 //
 
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 @main
 struct LaunchWidgetBundle: WidgetBundle {
     var body: some Widget {
         NextUpWidget()
         LaunchListWidget()
+        LockScreenWidget()
     }
 }
