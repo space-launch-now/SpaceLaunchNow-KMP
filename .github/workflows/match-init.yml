@@ -16,10 +16,17 @@ jobs:
       - name: Setup SSH for Match certificates repo
         run: |
           mkdir -p ~/.ssh
-          printf '%s' "${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > ~/.ssh/match_key
+          echo "${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > ~/.ssh/match_key
           chmod 600 ~/.ssh/match_key
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-          printf 'Host github.com\n  IdentityFile ~/.ssh/match_key\n  IdentitiesOnly yes\n' >> ~/.ssh/config
+          cat >> ~/.ssh/config << 'EOF'
+          Host github.com
+            IdentityFile ~/.ssh/match_key
+            IdentitiesOnly yes
+          EOF
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/match_key
+          ssh -T git@github.com 2>&1 || true
           echo "✅ SSH configured for Match certificates repo"
 
       - name: Install Fastlane
