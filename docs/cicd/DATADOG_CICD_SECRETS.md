@@ -17,12 +17,12 @@ To enable Datadog logging in CI/CD builds, you need to add the following secrets
 - **Description**: Enables/disables Datadog logging globally
 
 #### DATADOG_CLIENT_TOKEN  
-- **Value**: `pub7e5097e45d3872872dfacdd53701a43d`
+- **Value**: `<YOUR_DATADOG_CLIENT_TOKEN>`
 - **Description**: Your Datadog client token for authentication
 - **Where to find**: Datadog Dashboard → Organization Settings → Client Tokens
 
 #### DATADOG_APPLICATION_ID
-- **Value**: `349dbfe5-ec31-40e4-aae6-307b1097be9d`  
+- **Value**: `<YOUR_DATADOG_APP_ID>`  
 - **Description**: Your Datadog RUM application ID
 - **Where to find**: Datadog Dashboard → RUM Applications → Your App → Application Details
 
@@ -87,8 +87,8 @@ For local development, your `.env` file should already have:
 
 ```properties
 DATADOG_ENABLED=true
-DATADOG_CLIENT_TOKEN=pub7e5097e45d3872872dfacdd53701a43d
-DATADOG_APPLICATION_ID=349dbfe5-ec31-40e4-aae6-307b1097be9d
+DATADOG_CLIENT_TOKEN=<YOUR_DATADOG_CLIENT_TOKEN>
+DATADOG_APPLICATION_ID=<YOUR_DATADOG_APP_ID>
 DATADOG_ENVIRONMENT=development
 ```
 

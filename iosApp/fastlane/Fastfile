@@ -1,16 +1,19 @@
 default_platform(:ios)
 
+# Shared App Store Connect API key, consumed by match, upload_to_testflight, etc.
+def api_key
+  app_store_connect_api_key(
+    key_id: ENV["APPLE_API_KEY_ID"],
+    issuer_id: ENV["APPLE_API_ISSUER_ID"],
+    key_content: ENV["APPLE_API_KEY_CONTENT"],
+    is_key_content_base64: true
+  )
+end
+
 platform :ios do
   desc "Sync code signing certificates and provisioning profiles via Match"
   lane :sync_certificates do
     setup_ci if ENV["CI"]
-
-    api_key = app_store_connect_api_key(
-      key_id: ENV["APPLE_API_KEY_ID"],
-      issuer_id: ENV["APPLE_API_ISSUER_ID"],
-      key_content: ENV["APPLE_API_KEY_CONTENT"],
-      is_key_content_base64: true
-    )
 
     match(
       type: "appstore",
@@ -24,8 +27,39 @@ platform :ios do
     )
   end
 
+  desc "Initialize Match for the first time (generates and uploads certs — run once)"
+  lane :init_certificates do
+    setup_ci if ENV["CI"]
+
+    match(
+      type: "appstore",
+      app_identifier: [
+        "me.spacelaunchnow.spacelaunchnow",
+        "me.spacelaunchnow.spacelaunchnow.NotificationServiceExtension",
+        "me.spacelaunchnow.spacelaunchnow.LaunchWidget"
+      ],
+      readonly: false,
+      api_key: api_key
+    )
+  end
+
   desc "Build a signed Release archive and export IPA for App Store"
   lane :build_release do
+    version_name = ENV["VERSION_NAME"] or UI.user_error!("VERSION_NAME env var not set")
+    build_num    = ENV["BUILD_NUMBER"] or UI.user_error!("BUILD_NUMBER env var not set")
+
+    # Bump version in Info.plist (replaces PlistBuddy in CI workflow)
+    set_info_plist_value(
+      path: "iosApp/Info.plist",
+      key: "CFBundleShortVersionString",
+      value: version_name
+    )
+    set_info_plist_value(
+      path: "iosApp/Info.plist",
+      key: "CFBundleVersion",
+      value: build_num
+    )
+
     sync_certificates
 
     build_app(
@@ -37,7 +71,7 @@ platform :ios do
       output_name: "SpaceLaunchNow.ipa",
       export_options: {
         signingStyle: "manual",
-        teamID: ENV["APPLE_TEAM_ID"] || "4T4QRN2U5X",
+        teamID: ENV["APPLE_TEAM_ID"],
         uploadBitcode: false,
         uploadSymbols: true,
         compileBitcode: false,
@@ -50,6 +84,20 @@ platform :ios do
             "match AppStore me.spacelaunchnow.spacelaunchnow.LaunchWidget"
         }
       }
+    )
+
+    # Verify signing identity, bundle ID, entitlements and profile expiry
+    verify_build(
+      ipa_path: File.join(ENV["RUNNER_TEMP"] || "./build", "SpaceLaunchNow.ipa")
+    )
+  end
+
+  desc "Upload IPA to TestFlight via App Store Connect API (replaces deprecated altool)"
+  lane :upload_testflight do
+    upload_to_testflight(
+      ipa: File.join(ENV["RUNNER_TEMP"] || "./build", "SpaceLaunchNow.ipa"),
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
     )
   end
 end
