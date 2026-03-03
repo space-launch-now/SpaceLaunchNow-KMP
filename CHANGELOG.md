@@ -1,3 +1,13 @@
+## [5.18.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.18.1...v5.18.2) (2026-03-03)
+
+
+### Bug Fixes
+
+* **ios:** add SKAdNetwork identifiers and update Info.plist for conversion tracking ([6facf5f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6facf5f5b739c23c7a935cbcc12c04fc77429b9e))
+* **ios:** implement SHA-256 hashing for widget image cache keys to resolve cache collisions ([d62f7de](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d62f7de8a41cb87b46f16afe74b33faa3c6311aa))
+
+
+
 ## [5.18.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.18.0...v5.18.1) (2026-03-02)
 
 
@@ -40,15 +50,6 @@
 * enhance ExploreScreen and ExploreCard for better tablet support ([e8f2d00](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e8f2d00603c3f6b2ad0557e9f7d3a1a6719e2a02))
 * integrate Datadog analytics initialization and update iOS secrets generation script ([ae649a5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ae649a5924aca71523f9ed1f34237020002f0f7e))
 * **iOS:** implement widget access synchronization and update handling ([033a586](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/033a5864c5f6531cb3c95016929890759ea7c4a6))
-
-
-
-# [5.16.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.15.0...v5.16.0) (2026-02-25)
-
-
-### Features
-
-* update Package.resolved and add location usage description in Info.plist ([1937f59](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1937f597bd84a6da71cf51808c55a243c094d6d5))
 
 
 

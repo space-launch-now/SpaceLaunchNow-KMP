@@ -1,3 +1,4 @@
 ### Bug Fixes
 
-* force refresh upcoming launches in fetchUpcomingLaunchesOrNull [skip ci]
+* **ios:** add SKAdNetwork identifiers and update Info.plist for conversion tracking
+* **ios:** implement SHA-256 hashing for widget image cache keys to resolve cache collisions
