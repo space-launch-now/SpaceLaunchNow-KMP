@@ -1,4 +1,5 @@
 import ComposeApp
+import CryptoKit
 import Foundation
 import SwiftUI
 import UIKit
@@ -252,11 +253,11 @@ struct LaunchProvider: TimelineProvider {
         return cacheDir
     }
 
-    private static func cacheFile(for urlString: String) -> URL {
-        let hash = urlString.data(using: .utf8)!.base64EncodedString()
-            .replacingOccurrences(of: "/", with: "_")
-            .prefix(64)
-        return imageCacheDir.appendingPathComponent(String(hash) + ".jpg")
+    static func cacheFile(for urlString: String) -> URL {
+        let data = Data(urlString.utf8)
+        let hash = SHA256.hash(data: data)
+        let hashString = hash.compactMap { String(format: "%02x", $0) }.joined()
+        return imageCacheDir.appendingPathComponent(hashString + ".jpg")
     }
 
     private static func downloadImage(from urlString: String, maxSize: CGFloat) async -> UIImage? {
