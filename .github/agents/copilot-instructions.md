@@ -10,8 +10,11 @@ Auto-generated from all feature plans. Last updated: 2026-01-21
 - DataStore (Android), UserDefaults + App Groups (iOS), SQLite (notification history) (dev)
 - Kotlin 2.1.0 (Kotlin Multiplatform) + Kotlinx Serialization, Firebase Cloud Messaging, Koin DI (fix_notif_filters)
 - DataStore (key-value persistence for NotificationState) (fix_notif_filters)
-- Swift (iOS app), Kotlin Multiplatform (shared code) — no code changes needed + Google Mobile Ads SDK >=12.12.0 (via SPM), Google UMP >=3.0.0 (via SPM) (002-enable-skadnetwork)
-
+- Swift 5.9+ (iOS widget extension)
+ + `CryptoKit` (Apple system framework, iOS 13+), `WidgetKit`, `SwiftUI`
+ (003-fix-widget-image-mismatch)
+- Disk-based image cache in app group container (`group.me.calebjones.spacelaunchnow/widget_image_cache/`)
+ (003-fix-widget-image-mismatch)
 - Kotlin 2.0+ with Compose Multiplatform + Compose Material3, Compose Foundation (HorizontalPager), Koin DI (main)
 
 ## Project Structure
@@ -28,12 +31,3 @@ tests/
 ## Code Style
 
 Kotlin 2.0+ with Compose Multiplatform: Follow standard conventions
-
-## Recent Changes
-- 002-enable-skadnetwork: Added Swift (iOS app), Kotlin Multiplatform (shared code) — no code changes needed + Google Mobile Ads SDK >=12.12.0 (via SPM), Google UMP >=3.0.0 (via SPM)
-- add_explore_section: Added Kotlin 1.9.x with Compose Multiplatform 1.6+ + Compose Multiplatform, Kotlin Serialization, Jetpack Navigation Compose, Koin DI, Material Design 3
-- fix_notif_filters: Added Kotlin 2.1.0 (Kotlin Multiplatform) + Kotlinx Serialization, Firebase Cloud Messaging, Koin DI
-
-
-<!-- MANUAL ADDITIONS START -->
-<!-- MANUAL ADDITIONS END -->

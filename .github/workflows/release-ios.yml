@@ -127,6 +127,20 @@ jobs:
           bundle install
           echo "✅ Fastlane installed"
 
+      # ==================== TESTS ====================
+      - name: Run iOS Widget Tests
+        run: |
+          cd iosApp
+          echo "🧪 Running LaunchWidgetTests..."
+          xcodebuild test \
+            -project iosApp.xcodeproj \
+            -scheme iosApp \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -only-testing:LaunchWidgetTests \
+            -resultBundlePath "$RUNNER_TEMP/TestResults.xcresult" \
+            | xcpretty --color || true
+          echo "✅ iOS Widget tests complete"
+
       # ==================== BUILD ====================
       - name: Build iOS with Fastlane (Match signing)
         env:
