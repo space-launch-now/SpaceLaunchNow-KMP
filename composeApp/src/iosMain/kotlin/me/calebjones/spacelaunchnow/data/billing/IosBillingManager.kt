@@ -12,10 +12,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import com.revenuecat.purchases.kmp.models.DiscountPaymentMode
+import com.revenuecat.purchases.kmp.models.PeriodType
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.util.AppSecrets
+import me.calebjones.spacelaunchnow.util.toDisplayString
 import kotlin.coroutines.resume
 
 /**
@@ -85,6 +88,11 @@ class IosBillingManager : BillingManager {
             val offerings = purchases.awaitOfferings()
             
             val products = offerings.current?.availablePackages?.map { pkg ->
+                // Extract free trial / intro offer from introductory discount (iOS/App Store)
+                val introDiscount = pkg.storeProduct.introductoryDiscount
+                val isFreeTrial = introDiscount?.paymentMode == DiscountPaymentMode.FREE_TRIAL
+                val hasIntro = introDiscount != null && !isFreeTrial
+
                 ProductInfo(
                     productId = pkg.storeProduct.id,
                     basePlanId = pkg.identifier,
@@ -92,7 +100,14 @@ class IosBillingManager : BillingManager {
                     description = "${pkg.packageType} - ${pkg.storeProduct.period?.unit?.name ?: "One-time"}",
                     formattedPrice = pkg.storeProduct.price.formatted,
                     priceAmountMicros = pkg.storeProduct.price.amountMicros.toLong(),
-                    currencyCode = pkg.storeProduct.price.currencyCode
+                    currencyCode = pkg.storeProduct.price.currencyCode,
+                    hasFreeTrial = isFreeTrial,
+                    freeTrialPeriodDisplay = if (isFreeTrial) introDiscount?.subscriptionPeriod?.toDisplayString() else null,
+                    freeTrialPeriodValue = if (isFreeTrial) introDiscount?.subscriptionPeriod?.value else null,
+                    freeTrialPeriodUnit = if (isFreeTrial) introDiscount?.subscriptionPeriod?.unit?.name else null,
+                    hasIntroOffer = hasIntro,
+                    introOfferPrice = if (hasIntro) introDiscount?.price?.formatted else null,
+                    introOfferPeriodDisplay = if (hasIntro) introDiscount?.subscriptionPeriod?.toDisplayString() else null
                 )
             } ?: emptyList()
             
@@ -189,8 +204,15 @@ class IosBillingManager : BillingManager {
         
         val subscriptionType = determineSubscriptionType(activeEntitlements, productIds)
         val features = determineFeatures(subscriptionType)
-        
-        log.d { "📊 Purchase state: Type=$subscriptionType, Entitlements=$activeEntitlements, Products=$productIds, Features=${features.size}" }
+
+        // Detect if any active entitlement is in a trial period
+        val trialEntitlement = customerInfo.entitlements.active.values.firstOrNull {
+            it.periodType == PeriodType.TRIAL
+        }
+        val isInTrial = trialEntitlement != null
+        val trialExpires = trialEntitlement?.expirationDateMillis
+
+        log.d { "📊 Purchase state: Type=$subscriptionType, Entitlements=$activeEntitlements, Products=$productIds, Features=${features.size}, inTrial=$isInTrial" }
         
         _purchaseState.value = PurchaseState(
             isSubscribed = subscriptionType != SubscriptionType.FREE,
@@ -199,7 +221,9 @@ class IosBillingManager : BillingManager {
             activeProductIds = productIds,
             features = features,
             lastRefreshed = kotlin.time.Clock.System.now().toEpochMilliseconds(),
-            userId = customerInfo.originalAppUserId
+            userId = customerInfo.originalAppUserId,
+            isInTrialPeriod = isInTrial,
+            trialExpiresAt = trialExpires
         )
     }
     

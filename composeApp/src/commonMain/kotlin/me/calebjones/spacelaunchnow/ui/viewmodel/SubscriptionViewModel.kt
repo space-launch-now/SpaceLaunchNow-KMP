@@ -15,7 +15,7 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * ViewModel for subscription management
- * 
+ *
  * Phase 7: Updated to use platform-agnostic BillingManager instead of RevenueCatManager
  */
 class SubscriptionViewModel(
@@ -31,7 +31,7 @@ class SubscriptionViewModel(
     // UI-specific state
     private val _uiState = MutableStateFlow(SubscriptionUiState())
     val uiState: StateFlow<SubscriptionUiState> = _uiState.asStateFlow()
-    
+
     // Available products - platform-agnostic list
     private val _availableProducts = MutableStateFlow<List<ProductInfo>>(emptyList())
     val availableProducts: StateFlow<List<ProductInfo>> = _availableProducts.asStateFlow()
@@ -46,7 +46,7 @@ class SubscriptionViewModel(
             loadPricing()
         }
     }
-    
+
     /**
      * Load available products from BillingManager
      */
@@ -56,6 +56,20 @@ class SubscriptionViewModel(
                 onSuccess = { products ->
                     _availableProducts.value = products
                     log.i { "Loaded ${products.size} products from BillingManager" }
+
+                    // Compute trial offer state from loaded products
+                    val yearlyProduct = products.find {
+                        it.basePlanId?.contains("annual", ignoreCase = true) == true ||
+                                it.basePlanId?.contains("yearly", ignoreCase = true) == true
+                    }
+                    val hasAnyTrial = products.any { it.hasFreeTrial }
+                    _uiState.value = _uiState.value.copy(
+                        hasAnyTrialOffer = hasAnyTrial,
+                        trialPeriodDisplay = yearlyProduct?.freeTrialPeriodDisplay,
+                        trialPostPrice = if (yearlyProduct?.hasFreeTrial == true) {
+                            "${yearlyProduct.formattedPrice}/year"
+                        } else null
+                    )
                 },
                 onFailure = { error ->
                     log.e(error) { "Failed to load products" }
@@ -159,43 +173,48 @@ class SubscriptionViewModel(
             )
         }
     }
-    
+
     /**
      * Purchase a product (convenience method using ProductInfo)
-     * 
+     *
      * @param product The ProductInfo to purchase
      */
     fun purchaseProduct(product: ProductInfo) {
         purchaseProduct(product.productId, product.basePlanId)
     }
-    
+
     /**
      * Legacy method - Purchase a subscription
      *
      * @param productId The product ID to purchase
      * @param basePlanId The base plan (e.g., "base-plan" for monthly, "yearly" for yearly)
      */
-    @Deprecated("Use purchaseProduct() instead", ReplaceWith("purchaseProduct(productId, basePlanId)"))
+    @Deprecated(
+        "Use purchaseProduct() instead",
+        ReplaceWith("purchaseProduct(productId, basePlanId)")
+    )
     fun purchaseSubscription(productId: String, basePlanId: String? = null) {
         purchaseProduct(productId, basePlanId)
     }
-    
+
     /**
      * Helper method to find products by type
      */
     fun getProductByType(type: ProductType): ProductInfo? {
         return when (type) {
-            ProductType.MONTHLY -> _availableProducts.value.find { 
-                it.basePlanId?.contains("monthly", ignoreCase = true) == true 
+            ProductType.MONTHLY -> _availableProducts.value.find {
+                it.basePlanId?.contains("monthly", ignoreCase = true) == true
             }
-            ProductType.ANNUAL -> _availableProducts.value.find { 
+
+            ProductType.ANNUAL -> _availableProducts.value.find {
                 it.basePlanId?.contains("annual", ignoreCase = true) == true ||
-                it.basePlanId?.contains("yearly", ignoreCase = true) == true
+                        it.basePlanId?.contains("yearly", ignoreCase = true) == true
             }
-            ProductType.LIFETIME -> _availableProducts.value.find { 
+
+            ProductType.LIFETIME -> _availableProducts.value.find {
                 it.basePlanId?.contains("lifetime", ignoreCase = true) == true ||
-                it.productId.contains("lifetime", ignoreCase = true) ||
-                it.productId.contains("pro", ignoreCase = true)
+                        it.productId.contains("lifetime", ignoreCase = true) ||
+                        it.productId.contains("pro", ignoreCase = true)
             }
         }
     }
@@ -230,7 +249,7 @@ class SubscriptionViewModel(
 
     /**
      * Check if user has access to a feature
-     * 
+     *
      * Uses RevenueCat entitlements as authoritative source with cached state fallback.
      *
      * @param feature The feature to check
@@ -268,7 +287,10 @@ data class SubscriptionUiState(
     val errorMessage: String? = null,
     val monthlyPricing: me.calebjones.spacelaunchnow.data.model.ProductPricing? = null,
     val yearlyPricing: me.calebjones.spacelaunchnow.data.model.ProductPricing? = null,
-    val lifetimePricing: me.calebjones.spacelaunchnow.data.model.ProductPricing? = null
+    val lifetimePricing: me.calebjones.spacelaunchnow.data.model.ProductPricing? = null,
+    val hasAnyTrialOffer: Boolean = false,
+    val trialPeriodDisplay: String? = null,
+    val trialPostPrice: String? = null
 ) {
     /**
      * Get formatted monthly price or fallback
@@ -294,7 +316,7 @@ data class SubscriptionUiState(
 
         if (monthly != null && yearly != null) {
             val savings = yearly.calculateSavingsPercent(monthly)
-            return if (savings > 0) "Save $savings%!" else ""
+            return if (savings > 0) "Save $savings% via yearly plan!" else ""
         }
 
         return "Save 58%!"  // Fallback

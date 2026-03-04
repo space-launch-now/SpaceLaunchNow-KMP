@@ -7,6 +7,7 @@ import com.revenuecat.purchases.kmp.configure
 import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.models.CustomerInfo
+import com.revenuecat.purchases.kmp.models.PeriodType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +19,7 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.util.toDisplayString
 import kotlin.coroutines.resume
 
 /**
@@ -115,6 +117,18 @@ class AndroidBillingManager(
             val offerings = purchases.awaitOfferings()
 
             val products = offerings.current?.availablePackages?.map { pkg ->
+                // Extract free trial info from subscription options (Android/Google Play)
+                val freeTrialOption = pkg.storeProduct.subscriptionOptions?.freeTrial
+                val freeTrialPhase = freeTrialOption?.pricingPhases?.firstOrNull {
+                    it.price.amountMicros == 0L
+                }
+
+                // Extract intro offer info (non-free intro pricing)
+                val introOption = pkg.storeProduct.subscriptionOptions?.introOffer
+                val introPhase = introOption?.pricingPhases?.firstOrNull {
+                    it.price.amountMicros > 0L
+                }
+
                 ProductInfo(
                     productId = pkg.storeProduct.id,
                     basePlanId = pkg.identifier,
@@ -122,7 +136,14 @@ class AndroidBillingManager(
                     description = "${pkg.packageType} - ${pkg.storeProduct.period?.unit?.name ?: "One-time"}",
                     formattedPrice = pkg.storeProduct.price.formatted,
                     priceAmountMicros = pkg.storeProduct.price.amountMicros.toLong(),
-                    currencyCode = pkg.storeProduct.price.currencyCode
+                    currencyCode = pkg.storeProduct.price.currencyCode,
+                    hasFreeTrial = freeTrialPhase != null,
+                    freeTrialPeriodDisplay = freeTrialPhase?.billingPeriod?.toDisplayString(),
+                    freeTrialPeriodValue = freeTrialPhase?.billingPeriod?.value,
+                    freeTrialPeriodUnit = freeTrialPhase?.billingPeriod?.unit?.name,
+                    hasIntroOffer = introPhase != null,
+                    introOfferPrice = introPhase?.price?.formatted,
+                    introOfferPeriodDisplay = introPhase?.billingPeriod?.toDisplayString()
                 )
             } ?: emptyList()
 
@@ -249,7 +270,14 @@ class AndroidBillingManager(
         val subscriptionType = determineSubscriptionType(activeEntitlements, productIds)
         val features = determineFeatures(subscriptionType)
 
-        log.i { "Purchase state updated - type: $subscriptionType, entitlements: $activeEntitlements, products: $productIds, features: ${features.size}" }
+        // Detect if any active entitlement is in a trial period
+        val trialEntitlement = customerInfo.entitlements.active.values.firstOrNull {
+            it.periodType == PeriodType.TRIAL
+        }
+        val isInTrial = trialEntitlement != null
+        val trialExpires = trialEntitlement?.expirationDateMillis
+
+        log.i { "Purchase state updated - type: $subscriptionType, entitlements: $activeEntitlements, products: $productIds, features: ${features.size}, inTrial: $isInTrial" }
 
         _purchaseState.value = PurchaseState(
             isSubscribed = subscriptionType != SubscriptionType.FREE,
@@ -258,7 +286,9 @@ class AndroidBillingManager(
             activeProductIds = productIds,
             features = features,
             lastRefreshed = System.currentTimeMillis(),
-            userId = customerInfo.originalAppUserId
+            userId = customerInfo.originalAppUserId,
+            isInTrialPeriod = isInTrial,
+            trialExpiresAt = trialExpires
         )
 
         // Update Datadog RUM with user subscription info
