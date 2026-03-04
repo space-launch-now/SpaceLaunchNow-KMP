@@ -17,6 +17,7 @@ import com.revenuecat.purchases.kmp.models.PeriodType
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.data.config.RevenueCatConfig
 import me.calebjones.spacelaunchnow.util.AppSecrets
 import me.calebjones.spacelaunchnow.util.toDisplayString
 import kotlin.coroutines.resume
@@ -37,11 +38,18 @@ class IosBillingManager : BillingManager {
         get() = Purchases.sharedInstance
     
     override suspend fun initialize(appUserId: String?): Result<Unit> {
+        // Guard against double initialization — each init triggers syncPurchases()
+        // which hits StoreKit and can show the Apple ID sign-in dialog
+        if (_isInitialized.value) {
+            log.d { "IosBillingManager already initialized, skipping" }
+            return Result.success(Unit)
+        }
+
         return try {
             log.i { "🚀 Initializing IosBillingManager..." }
             
             // Configure RevenueCat with iOS API key
-            Purchases.logLevel = LogLevel.DEBUG
+            Purchases.logLevel = if (RevenueCatConfig.isDebug) LogLevel.DEBUG else LogLevel.WARN
             
             val apiKey = AppSecrets.revenueCatIosKey
             if (apiKey.isEmpty()) {
