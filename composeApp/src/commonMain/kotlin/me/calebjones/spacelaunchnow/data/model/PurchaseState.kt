@@ -14,7 +14,9 @@ data class PurchaseState(
     val activeProductIds: Set<String> = emptySet(),
     val features: Set<PremiumFeature> = emptySet(),
     val lastRefreshed: Long = 0L,
-    val userId: String? = null
+    val userId: String? = null,
+    val isInTrialPeriod: Boolean = false,
+    val trialExpiresAt: Long? = null
 ) {
     /**
      * Convert to SubscriptionState for UI/caching
@@ -26,7 +28,9 @@ data class PurchaseState(
             productId = activeProductIds.firstOrNull(),
             lastVerified = lastRefreshed,
             features = features,
-            needsVerification = false
+            needsVerification = false,
+            isInTrialPeriod = isInTrialPeriod,
+            trialExpiresAt = trialExpiresAt
         )
     }
 }
