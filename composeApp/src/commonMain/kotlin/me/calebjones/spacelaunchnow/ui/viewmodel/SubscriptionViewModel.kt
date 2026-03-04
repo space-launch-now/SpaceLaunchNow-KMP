@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
+import me.calebjones.spacelaunchnow.data.model.ProductPricing
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -42,13 +43,11 @@ class SubscriptionViewModel(
             repository.initialize()
             // Load available products from BillingManager
             loadAvailableProducts()
-            // Load legacy pricing information (backward compatibility)
-            loadPricing()
         }
     }
 
     /**
-     * Load available products from BillingManager
+     * Load available products from BillingManager and derive pricing
      */
     private fun loadAvailableProducts() {
         viewModelScope.launch {
@@ -57,19 +56,40 @@ class SubscriptionViewModel(
                     _availableProducts.value = products
                     log.i { "Loaded ${products.size} products from BillingManager" }
 
-                    // Compute trial offer state from loaded products
+                    // Find products by RevenueCat package identifier
+                    val monthlyProduct = products.find {
+                        it.basePlanId?.contains("monthly", ignoreCase = true) == true
+                    }
                     val yearlyProduct = products.find {
                         it.basePlanId?.contains("annual", ignoreCase = true) == true ||
                                 it.basePlanId?.contains("yearly", ignoreCase = true) == true
                     }
+                    val lifetimeProduct = products.find {
+                        it.basePlanId?.contains("lifetime", ignoreCase = true) == true ||
+                                it.productId.contains("lifetime", ignoreCase = true) ||
+                                it.productId.contains("pro", ignoreCase = true)
+                    }
+
+                    // Derive pricing from loaded products
+                    val monthlyPricing = monthlyProduct?.toProductPricing(billingPeriod = "P1M")
+                    val yearlyPricing = yearlyProduct?.toProductPricing(billingPeriod = "P1Y")
+                    val lifetimePricing = lifetimeProduct?.toProductPricing(billingPeriod = "LIFETIME")
+
+                    // Compute trial offer state
                     val hasAnyTrial = products.any { it.hasFreeTrial }
+
                     _uiState.value = _uiState.value.copy(
+                        monthlyPricing = monthlyPricing,
+                        yearlyPricing = yearlyPricing,
+                        lifetimePricing = lifetimePricing,
                         hasAnyTrialOffer = hasAnyTrial,
                         trialPeriodDisplay = yearlyProduct?.freeTrialPeriodDisplay,
                         trialPostPrice = if (yearlyProduct?.hasFreeTrial == true) {
                             "${yearlyProduct.formattedPrice}/year"
                         } else null
                     )
+
+                    log.i { "Pricing derived - monthly: ${monthlyPricing?.formattedPrice}, yearly: ${yearlyPricing?.formattedPrice}, lifetime: ${lifetimePricing?.formattedPrice}" }
                 },
                 onFailure = { error ->
                     log.e(error) { "Failed to load products" }
@@ -79,47 +99,22 @@ class SubscriptionViewModel(
     }
 
     /**
-     * Load product pricing from platform
+     * Convert a ProductInfo to ProductPricing
      */
-    private fun loadPricing() {
-        viewModelScope.launch {
-            // Load subscription pricing
-            repository.getProductPricing(me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.PRODUCT_ID)
-                .fold(
-                    onSuccess = { pricingList ->
-                        val monthlyPricing = pricingList.find {
-                            it.basePlanId == me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.BASE_PLAN_MONTHLY
-                        }
-                        val yearlyPricing = pricingList.find {
-                            it.basePlanId == me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.BASE_PLAN_YEARLY
-                        }
-
-                        _uiState.value = _uiState.value.copy(
-                            monthlyPricing = monthlyPricing,
-                            yearlyPricing = yearlyPricing
-                        )
-                    },
-                    onFailure = { error ->
-                        log.e(error) { "Failed to load subscription pricing" }
-                    }
-                )
-
-            // Load lifetime (Pro) pricing
-            repository.getProductPricing(me.calebjones.spacelaunchnow.data.billing.SubscriptionProducts.PRO_LIFETIME)
-                .fold(
-                    onSuccess = { pricingList ->
-                        val lifetimePricing = pricingList.firstOrNull()
-
-                        _uiState.value = _uiState.value.copy(
-                            lifetimePricing = lifetimePricing
-                        )
-                    },
-                    onFailure = { error ->
-                        log.e(error) { "Failed to load lifetime pricing" }
-                    }
-                )
-        }
+    private fun ProductInfo.toProductPricing(billingPeriod: String): ProductPricing {
+        return ProductPricing(
+            productId = productId,
+            basePlanId = basePlanId ?: "",
+            formattedPrice = formattedPrice,
+            priceAmountMicros = priceAmountMicros,
+            priceCurrencyCode = currencyCode,
+            billingPeriod = billingPeriod,
+            title = title,
+            description = description
+        )
     }
+
+
 
     /**
      * Verify subscription status with platform
