@@ -319,6 +319,6 @@ data class SubscriptionUiState(
             return if (savings > 0) "Save $savings% via yearly plan!" else ""
         }
 
-        return "Save 58%!"  // Fallback
+        return ""
     }
 }
