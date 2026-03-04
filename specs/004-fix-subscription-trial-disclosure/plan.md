@@ -1,25 +1,23 @@
-# Implementation Plan: Fix Subscription Free Trial Disclosure
+# Implementation Plan: Platform-Specific Welcome Dialog
 
 **Branch**: `004-fix-subscription-trial-disclosure` | **Date**: 2026-03-03 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `/specs/004-fix-subscription-trial-disclosure/spec.md`
-
-**Status**: CRITICAL — Google Play policy violation requiring immediate resolution
+**Input**: User request to make the welcome dialog platform-aware and improve its copy
 
 ## Summary
 
-Google Play flagged SpaceLaunchNow for violating the Subscriptions policy: the yearly plan ($9.99/year) has a 3-day free trial configured in Google Play/RevenueCat, but the app's subscription UI does not disclose trial terms (duration, post-trial cost, cancellation). Fix involves extracting trial data from RevenueCat's `StoreProduct.subscriptionOptions` (Android) / `StoreProduct.introductoryDiscount` (iOS), adding trial fields to `ProductInfo`, and updating `PricingCard` + `FinePrint` composables with required disclosures.
+The `BetaWarningDialog` (welcome/intro dialog shown on first launch) contains hardcoded text referencing "Google" on all platforms, including iOS and Desktop. This plan covers making the welcome dialog text platform-aware using the existing `PlatformType` pattern, improving the copy to be more user-friendly, and bringing the component up to project standards (dual previews, `SpaceLaunchNowPreviewTheme`).
 
 ## Technical Context
 
-**Language/Version**: Kotlin 2.x (KMP), Java 21 (JetBrains JDK)  
-**Primary Dependencies**: RevenueCat purchases-kmp v1.9.0+14.3.0, Jetpack Compose Multiplatform, Koin DI  
-**Storage**: N/A (no persistence changes — trial data is fetched live from RevenueCat)  
-**Testing**: JUnit (commonTest/jvmTest), Compose Preview testing  
-**Target Platform**: Android (primary, CRITICAL), iOS, Desktop (secondary)  
-**Project Type**: Mobile (KMP multiplatform)  
-**Performance Goals**: N/A (no perf-sensitive changes)  
-**Constraints**: Must comply with Google Play Subscriptions policy (https://support.google.com/googleplay/android-developer/answer/9900533/)  
-**Scale/Scope**: 5 files modified, 1 file created. Scoped to subscription screen only.
+**Language/Version**: Kotlin 2.x (KMP), Compose Multiplatform  
+**Primary Dependencies**: Jetpack Compose, Koin DI, DataStore Preferences  
+**Storage**: DataStore Preferences (`beta_warning_shown` flag via `AppPreferences`)  
+**Testing**: Compose Preview verification (light + dark), manual platform testing  
+**Target Platform**: Android, iOS, Desktop (KMP)  
+**Project Type**: mobile (Kotlin Multiplatform)  
+**Performance Goals**: N/A (static dialog, no performance concerns)  
+**Constraints**: Must use existing `PlatformType` pattern, no hardcoded platform text  
+**Scale/Scope**: Single file change (`BetaWarningDialog.kt`), ~1 composable affected
 
 ## Constitution Check
 
@@ -27,15 +25,15 @@ Google Play flagged SpaceLaunchNow for violating the Subscriptions policy: the y
 
 | Principle | Status | Notes |
 |-----------|--------|-------|
-| I. Mobile-First (Android & iOS Equal) | ✅ PASS | Android extraction via `subscriptionOptions`, iOS via `introductoryDiscount`. Both platforms handled. |
-| II. Pattern-Based Consistency | ✅ PASS | Uses existing `ProductInfo` model + `BillingManager` pattern. No new patterns introduced. |
-| III. Accessibility & UX | ✅ PASS | Dual previews required for modified `PricingCard`/`FinePrint`. Trial info provides better UX. |
-| IV. CI/CD & Conventional Commits | ✅ PASS | Commit: `fix(billing): add free trial disclosure to subscription UI` |
-| V. Code Generation & API Management | ✅ PASS | No generated code changes. |
-| VI. Multiplatform Architecture | ✅ PASS | Common model (`ProductInfo`), platform-specific extraction (`AndroidBillingManager`/`IosBillingManager`). |
-| VII. Testing Standards | ✅ PASS | Unit tests for `PeriodFormatUtil`, integration tests for trial data extraction. |
+| I. Mobile-First (Android & iOS Equal) | PASS | Change makes dialog platform-aware for both Android and iOS |
+| II. Pattern-Based Consistency | PASS | Uses existing `when (platformType)` pattern from SupportUsScreen |
+| III. Accessibility & UX | FIX NEEDED | Current dialog is missing dark preview; plan includes adding it |
+| IV. CI/CD & Conventional Commits | PASS | No CI/CD impact |
+| V. Code Generation & API Management | N/A | No generated code involved |
+| VI. Multiplatform Architecture | PASS | Common code with `PlatformType` discrimination |
+| VII. Testing Standards | PASS | Dual previews will be added for visual verification |
 
-**Post-Phase 1 Re-check**: All gates still pass. No violations or complexity escalation.
+**Gate Result**: PASS (with fix for Principle III included in scope)
 
 ## Project Structure
 
@@ -44,41 +42,33 @@ Google Play flagged SpaceLaunchNow for violating the Subscriptions policy: the y
 ```text
 specs/004-fix-subscription-trial-disclosure/
 ├── plan.md              # This file
-├── spec.md              # Feature specification
-├── research.md          # Phase 0: RevenueCat SDK API research
-├── data-model.md        # Phase 1: ProductInfo model changes
-├── quickstart.md        # Phase 1: Implementation quickstart
-├── contracts/           # Phase 1: Internal component contracts
-│   └── internal-contracts.md
-└── tasks.md             # Phase 2 output (NOT created by /speckit.plan)
+├── research.md          # Phase 0 output
+├── data-model.md        # Phase 1 output
+├── quickstart.md        # Phase 1 output
+├── contracts/           # N/A (UI-only change)
+└── tasks.md             # Phase 2 output (separate command)
 ```
 
-### Source Code (modified files)
+### Source Code (repository root)
 
 ```text
 composeApp/src/
 ├── commonMain/kotlin/me/calebjones/spacelaunchnow/
-│   ├── data/
-│   │   └── model/
-│   │       ├── ProductInfo.kt              # MODIFY: Add trial fields
-│   │       └── SubscriptionState.kt        # MODIFY: Add isInTrialPeriod
-│   ├── ui/
-│   │   ├── subscription/
-│   │   │   └── SupportUsScreen.kt          # MODIFY: PricingCard + FinePrint trial disclosure
-│   │   └── viewmodel/
-│   │       └── SubscriptionViewModel.kt    # MODIFY: Pass trial info to UI
-│   └── util/
-│       └── PeriodFormatUtil.kt             # CREATE: Period display formatting
-├── androidMain/kotlin/me/calebjones/spacelaunchnow/
-│   └── data/billing/
-│       └── AndroidBillingManager.kt        # MODIFY: Extract trial from subscriptionOptions
-└── iosMain/kotlin/me/calebjones/spacelaunchnow/
-    └── data/billing/
-        └── IosBillingManager.kt            # MODIFY: Extract trial from introductoryDiscount
+│   ├── Platform.kt                           # PlatformType enum (ANDROID, IOS, DESKTOP)
+│   ├── ui/compose/
+│   │   └── BetaWarningDialog.kt              # PRIMARY: Welcome dialog to modify
+│   └── data/storage/
+│       └── AppPreferences.kt                 # betaWarningShownFlow preference
+├── androidMain/kotlin/.../
+│   └── AndroidPlatform.kt                    # actual fun getPlatform() → ANDROID
+├── iosMain/kotlin/.../
+│   └── IOSPlatform.kt                        # actual fun getPlatform() → IOS
+└── desktopMain/kotlin/.../
+    └── DesktopPlatform.kt                    # actual fun getPlatform() → DESKTOP
 ```
 
-**Structure Decision**: Kotlin Multiplatform mobile project. Common business logic + UI in `commonMain`, platform-specific billing extraction in `androidMain`/`iosMain`. No new modules or structural changes needed.
+**Structure Decision**: Single-file UI change in commonMain using existing platform detection infrastructure. No new files needed.
 
 ## Complexity Tracking
 
-> No constitution violations. No complexity justification needed.
+> No violations to justify — all changes align with existing patterns.

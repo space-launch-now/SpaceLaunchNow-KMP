@@ -1,177 +1,53 @@
-# Data Model: Fix Subscription Free Trial Disclosure
+# Data Model: Platform-Specific Welcome Dialog
 
-**Date**: 2026-03-03  
-**Branch**: `004-fix-subscription-trial-disclosure`
+**Date**: 2026-03-03 | **Plan**: [plan.md](plan.md)
 
-## Entity Changes
+## Entities
 
-### 1. ProductInfo (Modified)
+### No New Data Entities Required
 
-**File**: `composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/data/model/ProductInfo.kt`
+This feature modifies UI text only. No new data models, database schemas, or API contracts are needed.
 
-**Current fields**: `productId`, `basePlanId`, `title`, `description`, `formattedPrice`, `priceAmountMicros`, `currencyCode`
+## Existing Entities Used
 
-**New fields**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `hasFreeTrial` | `Boolean` | Whether this product has a free trial offer |
-| `freeTrialPeriodDisplay` | `String?` | Human-readable trial duration (e.g., "3-day") |
-| `freeTrialPeriodValue` | `Int?` | Numeric trial duration value (e.g., 3) |
-| `freeTrialPeriodUnit` | `String?` | Trial duration unit (e.g., "DAY", "WEEK", "MONTH") |
-| `hasIntroOffer` | `Boolean` | Whether this product has an introductory pricing offer |
-| `introOfferPrice` | `String?` | Formatted introductory price (e.g., "$0.99") |
-| `introOfferPeriodDisplay` | `String?` | Human-readable intro offer period |
-
-**Updated data class**:
-```kotlin
-data class ProductInfo(
-    val productId: String,
-    val basePlanId: String?,
-    val title: String,
-    val description: String,
-    val formattedPrice: String,
-    val priceAmountMicros: Long,
-    val currencyCode: String,
-    // Trial/intro offer fields
-    val hasFreeTrial: Boolean = false,
-    val freeTrialPeriodDisplay: String? = null,
-    val freeTrialPeriodValue: Int? = null,
-    val freeTrialPeriodUnit: String? = null,
-    val hasIntroOffer: Boolean = false,
-    val introOfferPrice: String? = null,
-    val introOfferPeriodDisplay: String? = null
-)
-```
-
-**Validation rules**:
-- `hasFreeTrial == true` requires non-null `freeTrialPeriodDisplay`
-- `hasIntroOffer == true` requires non-null `introOfferPrice`
-- `freeTrialPeriodDisplay` format: "{value}-{unit}" (e.g., "3-day", "1-week")
-
-### 2. SubscriptionUiState (Modified)
-
-**File**: `composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/viewmodel/SubscriptionViewModel.kt`
-
-**New field**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `hasAnyTrialOffer` | `Boolean` | Computed: whether any visible product has a trial |
-
-**Derivation**: Computed from `availableProducts` — `true` if any product has `hasFreeTrial == true`.
-
-### 3. SubscriptionState (Modified — minor)
-
-**File**: `composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/data/model/SubscriptionState.kt`
-
-**New fields**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `isInTrialPeriod` | `Boolean` | Whether user's current entitlement is a trial |
-| `trialExpiresAt` | `Long?` | Trial expiration timestamp (millis since epoch), null if not in trial |
-
-**Source**: Derived from `EntitlementInfo.periodType == PeriodType.TRIAL` and `EntitlementInfo.expirationDateMillis`.
-
-## Entity Relationships
-
-```
-┌─────────────────────┐
-│     Offerings       │
-│  (RevenueCat SDK)   │
-└──────┬──────────────┘
-       │ contains
-       ▼
-┌─────────────────────┐
-│     Package         │
-│  (RevenueCat SDK)   │
-│ - storeProduct      │
-└──────┬──────────────┘
-       │ maps to
-       ▼
-┌─────────────────────────────────┐
-│         ProductInfo             │
-│       (app data model)          │
-│ - productId                     │
-│ - formattedPrice                │
-│ - hasFreeTrial ← NEW            │
-│ - freeTrialPeriodDisplay ← NEW  │
-│ - hasIntroOffer ← NEW           │
-│ - introOfferPrice ← NEW         │
-└──────┬──────────────────────────┘
-       │ displayed by
-       ▼
-┌─────────────────────┐     ┌──────────────────┐
-│   PricingCard       │     │    FinePrint      │
-│ - trial badge       │     │ - trial terms     │
-│ - trial CTA button  │     │ - cancellation    │
-│ - post-trial price  │     │   instructions    │
-└─────────────────────┘     └──────────────────┘
-```
-
-## Platform-Specific Extraction Logic
-
-### Android (AndroidBillingManager.getAvailableProducts)
+### PlatformType (existing, no changes)
 
 ```kotlin
-// In the StoreProduct → ProductInfo mapping:
-val freeTrialOption = pkg.storeProduct.subscriptionOptions?.freeTrial
-val freePhase = freeTrialOption?.pricingPhases?.firstOrNull { 
-    it.price.amountMicros == 0L 
+// Location: composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/Platform.kt
+enum class PlatformType {
+    ANDROID,
+    IOS,
+    DESKTOP;
+
+    val isAndroid: Boolean get() = this == ANDROID
+    val isIOS: Boolean get() = this == IOS
+    val isDesktop: Boolean get() = this == DESKTOP
+    val isMobile: Boolean get() = this == ANDROID || this == IOS
 }
-
-ProductInfo(
-    // ... existing fields ...
-    hasFreeTrial = freePhase != null,
-    freeTrialPeriodDisplay = freePhase?.billingPeriod?.toDisplayString(),
-    freeTrialPeriodValue = freePhase?.billingPeriod?.value,
-    freeTrialPeriodUnit = freePhase?.billingPeriod?.unit?.name
-)
 ```
 
-### iOS (IosBillingManager.getAvailableProducts)
+### AppPreferences (existing, no changes)
 
 ```kotlin
-// In the StoreProduct → ProductInfo mapping:
-val introDiscount = pkg.storeProduct.introductoryDiscount
-val isFreeTrial = introDiscount?.paymentMode == DiscountPaymentMode.FREE_TRIAL
-
-ProductInfo(
-    // ... existing fields ...
-    hasFreeTrial = isFreeTrial,
-    freeTrialPeriodDisplay = if (isFreeTrial) introDiscount?.subscriptionPeriod?.toDisplayString() else null,
-    freeTrialPeriodValue = if (isFreeTrial) introDiscount?.subscriptionPeriod?.value else null,
-    freeTrialPeriodUnit = if (isFreeTrial) introDiscount?.subscriptionPeriod?.unit?.name else null,
-    hasIntroOffer = introDiscount != null && !isFreeTrial,
-    introOfferPrice = if (!isFreeTrial) introDiscount?.price?.formatted else null,
-    introOfferPeriodDisplay = if (!isFreeTrial) introDiscount?.subscriptionPeriod?.toDisplayString() else null
-)
+// Location: composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/data/storage/AppPreferences.kt
+// Key: "beta_warning_shown" (Boolean, default false)
+// Flow: betaWarningShownFlow
+// Setter: setBetaWarningShown(shown: Boolean)
 ```
 
-## New Utility
+## Platform-Specific Text Mapping
 
-### Period.toDisplayString() Extension
+| Text Element | Android | iOS | Desktop |
+|-------------|---------|-----|---------|
+| Store reference | "Google Play" | "the App Store" | _(omitted)_ |
+| Platform guidelines | "guidelines from Google" | "guidelines from Apple" | "evolving platform requirements" |
+| Description context | Mentions Google restrictions | Mentions Apple restrictions | Generic platform language |
 
-**File**: `composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/util/PeriodFormatUtil.kt`
+## State Transitions
 
-```kotlin
-import com.revenuecat.purchases.kmp.models.Period
-import com.revenuecat.purchases.kmp.models.PeriodUnit
-
-fun Period.toDisplayString(): String = when (unit) {
-    PeriodUnit.DAY -> if (value == 1) "1-day" else "$value-day"
-    PeriodUnit.WEEK -> if (value == 1) "1-week" else "$value-week"
-    PeriodUnit.MONTH -> if (value == 1) "1-month" else "$value-month"
-    PeriodUnit.YEAR -> if (value == 1) "1-year" else "$value-year"
-    PeriodUnit.UNKNOWN -> "$value"
-}
-
-fun Period.toReadableString(): String = when (unit) {
-    PeriodUnit.DAY -> if (value == 1) "1 day" else "$value days"
-    PeriodUnit.WEEK -> if (value == 1) "1 week" else "$value weeks"
-    PeriodUnit.MONTH -> if (value == 1) "1 month" else "$value months"
-    PeriodUnit.YEAR -> if (value == 1) "1 year" else "$value years"
-    PeriodUnit.UNKNOWN -> "$value"
-}
+```
+Dialog State Machine (unchanged):
+  [App Launch] → check betaWarningShown
+    ├─ true  → [No Dialog]
+    └─ false → [Show Dialog] → user clicks "I Understand" → setBetaWarningShown(true) → [Dismiss]
 ```

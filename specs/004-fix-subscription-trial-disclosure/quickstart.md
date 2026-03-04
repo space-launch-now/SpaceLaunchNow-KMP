@@ -1,59 +1,89 @@
-# Quickstart: Fix Subscription Free Trial Disclosure
+# Quickstart: Platform-Specific Welcome Dialog
 
-**Branch**: `004-fix-subscription-trial-disclosure`  
-**Priority**: CRITICAL — Google Play policy violation
+**Date**: 2026-03-03 | **Plan**: [plan.md](plan.md)
 
-## Problem
-Google Play flagged the app for violating the Subscriptions policy: the yearly plan has a 3-day free trial configured in Play Console/RevenueCat, but the app UI doesn't disclose trial terms.
+## What This Changes
 
-## Solution Overview
+The first-run welcome dialog (`BetaWarningDialog`) currently shows Android/Google-specific text on all platforms. This change:
 
-5 files modified, 1 file created:
+1. **Makes text platform-aware** — Android mentions Google, iOS mentions Apple, Desktop uses generic language
+2. **Improves the copy** — Warmer, more forward-looking tone instead of technical/apologetic
+3. **Adds dark preview** — Brings the component up to project standards per Constitution Principle III
 
-### Layer 1: Data Model
-1. **Modify `ProductInfo.kt`** — Add trial fields (`hasFreeTrial`, `freeTrialPeriodDisplay`, etc.)
+## File to Modify
 
-### Layer 2: Platform Billing (extract trial data)
-2. **Modify `AndroidBillingManager.kt`** — Extract trial from `StoreProduct.subscriptionOptions.freeTrial`
-3. **Modify `IosBillingManager.kt`** — Extract trial from `StoreProduct.introductoryDiscount`
+**Single file**: `composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/BetaWarningDialog.kt`
 
-### Layer 3: Utility
-4. **Create `PeriodFormatUtil.kt`** — `Period.toDisplayString()` extension for human-readable trial periods
+## Implementation Steps
 
-### Layer 4: UI (display trial info)
-5. **Modify `SupportUsScreen.kt`** — Update `PricingCard` and `FinePrint` composables with trial disclosure
-6. **Modify `SubscriptionViewModel.kt`** — Pass trial info through to UI
+### Step 1: Add Platform Import
 
-## Key Files
+Add `import me.calebjones.spacelaunchnow.getPlatform` to the imports section.
 
-| File | Change |
-|------|--------|
-| `data/model/ProductInfo.kt` | Add 7 new fields with backward-compatible defaults |
-| `data/billing/AndroidBillingManager.kt` | Read `subscriptionOptions.freeTrial` in `getAvailableProducts()` |
-| `data/billing/IosBillingManager.kt` | Read `introductoryDiscount` in `getAvailableProducts()` |
-| `util/PeriodFormatUtil.kt` | New file — `Period.toDisplayString()` and `Period.toReadableString()` |
-| `ui/subscription/SupportUsScreen.kt` | Add trial badge/text to `PricingCard`, trial terms to `FinePrint` |
-| `ui/viewmodel/SubscriptionViewModel.kt` | Compute `hasAnyTrialOffer` for FinePrint |
+### Step 2: Get Platform Type in Composable
 
-## Build & Test
-
-```bash
-# Standard build
-./gradlew compileKotlinDesktop
-
-# Run on Android device
-./gradlew installDebug
-
-# Run tests
-./gradlew test
+Inside the `BetaWarningDialog` composable, add:
+```kotlin
+val platformType = getPlatform().type
 ```
 
-## Verification Checklist
+### Step 3: Make Description Text Platform-Specific
 
-- [ ] Open subscription screen → yearly card shows "3-day free trial"
-- [ ] Button says "Start Free Trial" (not "Subscribe Now")
-- [ ] Fine print includes trial-specific cancellation language
-- [ ] Monthly card still shows "Subscribe Now" (no trial on monthly)
-- [ ] Lifetime card unchanged
-- [ ] Both light and dark preview render correctly
-- [ ] Submit updated build to Google Play for policy re-review
+Replace the hardcoded `description` list with a `when (platformType)` expression:
+
+```kotlin
+val description = buildList {
+    add(when (platformType) {
+        PlatformType.ANDROID -> "The original app has been completely rebuilt to meet modern guidelines from Google and deliver a better experience."
+        PlatformType.IOS -> "This app has been built from the ground up for iOS, bringing you the best space launch tracking experience on Apple devices."
+        PlatformType.DESKTOP -> "This desktop version brings space launch tracking to your computer with a native experience."
+    })
+    add("")
+    add("Features are actively being developed and released frequently. Check the Roadmap in Settings to see what's coming next.")
+    add("")
+    add("Thank you to everyone who has supported this project!")
+}
+```
+
+### Step 4: Fix Preview (Dual Light + Dark)
+
+Replace the single `MaterialTheme` preview with dual `SpaceLaunchNowPreviewTheme` previews:
+
+```kotlin
+@Preview
+@Composable
+private fun BetaWarningDialogPreview() {
+    val mockPreferences = AppPreferences(/* mock DataStore */)
+    SpaceLaunchNowPreviewTheme {
+        BetaWarningDialog(appPreferences = mockPreferences)
+    }
+}
+
+@Preview
+@Composable
+private fun BetaWarningDialogDarkPreview() {
+    val mockPreferences = AppPreferences(/* mock DataStore */)
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        BetaWarningDialog(appPreferences = mockPreferences)
+    }
+}
+```
+
+## Verification
+
+1. Run Android emulator — dialog should mention "Google"
+2. Run iOS simulator — dialog should mention "Apple" / "iOS"
+3. Run Desktop — dialog should use generic language
+4. Verify both light and dark previews render correctly
+5. Verify existing users who already dismissed the dialog are NOT shown it again (preference key unchanged)
+
+## Commit Message
+
+```
+fix(ui): make welcome dialog text platform-specific
+
+The BetaWarningDialog showed Android/Google-specific text on all
+platforms. Updated to use PlatformType for platform-appropriate
+messaging and improved copy tone. Added dark preview per
+project conventions.
+```
