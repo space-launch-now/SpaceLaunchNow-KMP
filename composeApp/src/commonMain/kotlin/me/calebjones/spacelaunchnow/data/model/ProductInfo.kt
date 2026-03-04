@@ -11,5 +11,13 @@ data class ProductInfo(
     val description: String,
     val formattedPrice: String,
     val priceAmountMicros: Long,
-    val currencyCode: String
+    val currencyCode: String,
+    // Trial/intro offer fields — all have defaults for backward compatibility
+    val hasFreeTrial: Boolean = false,
+    val freeTrialPeriodDisplay: String? = null,
+    val freeTrialPeriodValue: Int? = null,
+    val freeTrialPeriodUnit: String? = null,
+    val hasIntroOffer: Boolean = false,
+    val introOfferPrice: String? = null,
+    val introOfferPeriodDisplay: String? = null
 )

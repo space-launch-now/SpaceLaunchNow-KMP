@@ -11,10 +11,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import co.touchlab.kermit.Severity
 import me.calebjones.spacelaunchnow.analytics.initializeDatadog
-import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -90,31 +88,16 @@ fun MainViewController() = ComposeUIViewController {
         }
 
         // Initialize Billing and Subscription system on background thread
+        // NOTE: repository.initialize() handles billingClient.initialize() and syncer.startSyncing()
+        // internally — no need to call them separately here.
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 log.i { "iOS: 🚀 Starting billing and subscription initialization..." }
 
-                // Step 1: Initialize BillingManager (RevenueCat)
-                val billingManager = getKoin().get<BillingManager>()
-                billingManager.initialize(appUserId = null)
-                log.i { "iOS: ✅ BillingManager initialized successfully" }
-
-                // Step 2: Initialize and start SubscriptionSyncer
-                // This listens to billing state changes and persists to LocalSubscriptionStorage
-                val syncer = getKoin().get<SubscriptionSyncer>()
-                syncer.startSyncing()
-                log.i { "iOS: ✅ SubscriptionSyncer started successfully" }
-
-                // Step 3: Initialize SubscriptionRepository (loads cached state)
                 val repository = getKoin().get<SubscriptionRepository>()
                 repository.initialize()
-                log.i { "iOS: ✅ SubscriptionRepository initialized successfully" }
 
-                // Step 4: Force initial sync to ensure purchase state is persisted
-                syncer.syncNow()
-                log.i { "iOS: ✅ Initial subscription sync complete" }
-
-                log.i { "iOS: 🎉 All billing and subscription systems initialized" }
+                log.i { "iOS: 🎉 Billing and subscription systems initialized" }
             } catch (e: Exception) {
                 log.e(e) { "iOS: ❌ Failed to initialize billing/subscription system" }
             }

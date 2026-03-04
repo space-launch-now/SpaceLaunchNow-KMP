@@ -76,7 +76,9 @@ import me.calebjones.spacelaunchnow.ui.components.AppIconBox
 import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.viewmodel.ProductType
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
@@ -390,7 +392,9 @@ fun SupportUsScreen(
                                 viewModel.purchaseProduct(annualProduct)
                             }
                         },
-                        enabled = annualProduct != null
+                        enabled = annualProduct != null,
+                        hasFreeTrial = annualProduct?.hasFreeTrial ?: false,
+                        freeTrialPeriodDisplay = annualProduct?.freeTrialPeriodDisplay
                     )
                     // Don't show fallback UI - just hide until loaded
                 }
@@ -497,7 +501,11 @@ fun SupportUsScreen(
             // Fine Print
             item {
                 Spacer(Modifier.height(24.dp))
-                FinePrint()
+                FinePrint(
+                    hasTrialOffer = uiState.hasAnyTrialOffer,
+                    trialPeriodDisplay = uiState.trialPeriodDisplay,
+                    postTrialPrice = uiState.trialPostPrice
+                )
                 Spacer(Modifier.height(32.dp))
             }
         }
@@ -631,7 +639,10 @@ private fun PricingCard(
     isRecommended: Boolean = false,
     isProcessing: Boolean = false,
     onSubscribe: () -> Unit,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    hasFreeTrial: Boolean = false,
+    freeTrialPeriodDisplay: String? = null,
+    subscribeButtonText: String = if (hasFreeTrial) "Start Free Trial" else "Subscribe Now"
 ) {
     Card(
         modifier = Modifier
@@ -712,6 +723,27 @@ private fun PricingCard(
                 )
             }
 
+            // Free Trial Badge
+            if (hasFreeTrial && freeTrialPeriodDisplay != null) {
+                Surface(
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    Text(
+                        text = "$freeTrialPeriodDisplay free trial",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                }
+                Text(
+                    text = "then $price$period after trial",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isRecommended) MaterialTheme.colorScheme.onPrimaryFixedVariant else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             // Features Quick List
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 PerkCheckmark("Premium Themes")
@@ -736,7 +768,7 @@ private fun PricingCard(
                 }
             ) {
                 Text(
-                    text = "Subscribe Now",
+                    text = subscribeButtonText,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -1024,7 +1056,11 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
 }
 
 @Composable
-private fun FinePrint() {
+private fun FinePrint(
+    hasTrialOffer: Boolean = false,
+    trialPeriodDisplay: String? = null,
+    postTrialPrice: String? = null
+) {
     val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
     val platformType = getPlatform().type
     
@@ -1059,6 +1095,19 @@ private fun FinePrint() {
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
         )
+
+        // Trial-specific disclosure (Google Play policy requirement)
+        if (hasTrialOffer && trialPeriodDisplay != null && postTrialPrice != null) {
+            Text(
+                text = "Free trial will automatically convert to a paid subscription " +
+                        "at $postTrialPrice unless canceled before the trial ends. " +
+                        "You won't be charged if you cancel during the $trialPeriodDisplay trial period.",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+            )
+        }
 
         Text(
             text = "Any purchase above unlocks all premium features. " +
@@ -1379,6 +1428,19 @@ private fun CurrentPlanCard(
 
                 Text(
                     text = when {
+                        subscriptionState.isInTrialPeriod -> {
+                            val daysLeft = subscriptionState.trialExpiresAt?.let { expires ->
+                                @OptIn(kotlin.time.ExperimentalTime::class)
+                                val msRemaining = expires - kotlin.time.Clock.System.now().toEpochMilliseconds()
+                                val days = (msRemaining / (1000 * 60 * 60 * 24)).coerceAtLeast(0)
+                                days
+                            }
+                            if (daysLeft != null && daysLeft > 0) {
+                                "Free Trial – $daysLeft day${if (daysLeft == 1L) "" else "s"} remaining"
+                            } else {
+                                "Free Trial"
+                            }
+                        }
                         subscriptionState.isSubscribed -> "${subscriptionState.subscriptionType.name.replaceFirstChar { it.uppercase() }} Member"
                         else -> "Free User"
                     },
@@ -1633,5 +1695,145 @@ private fun getPackagesToShow(
             showMonthly = false,    // No downgrades
             showPerks = false
         )
+    }
+}
+
+// ==================== Previews ====================
+
+@Preview
+@Composable
+private fun PricingCardTrialPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface {
+            PricingCard(
+                title = "Yearly",
+                price = "$9.99",
+                period = "/year",
+                savings = "Save 58%!",
+                isRecommended = true,
+                isProcessing = false,
+                onSubscribe = {},
+                enabled = true,
+                hasFreeTrial = true,
+                freeTrialPeriodDisplay = "3-day"
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PricingCardTrialDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Surface {
+            PricingCard(
+                title = "Yearly",
+                price = "$9.99",
+                period = "/year",
+                savings = "Save 58%!",
+                isRecommended = true,
+                isProcessing = false,
+                onSubscribe = {},
+                enabled = true,
+                hasFreeTrial = true,
+                freeTrialPeriodDisplay = "3-day"
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PricingCardNoTrialPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface {
+            PricingCard(
+                title = "Monthly",
+                price = "$2.99",
+                period = "/month",
+                isRecommended = false,
+                isProcessing = false,
+                onSubscribe = {},
+                enabled = true
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun FinePrintTrialPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface {
+            FinePrint(
+                hasTrialOffer = true,
+                trialPeriodDisplay = "3-day",
+                postTrialPrice = "$9.99/year"
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun FinePrintTrialDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Surface {
+            FinePrint(
+                hasTrialOffer = true,
+                trialPeriodDisplay = "3-day",
+                postTrialPrice = "$9.99/year"
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun FinePrintNoTrialPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface {
+            FinePrint()
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CurrentPlanCardTrialPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface {
+            CurrentPlanCard(
+                subscriptionState = SubscriptionState(
+                    isSubscribed = true,
+                    subscriptionType = me.calebjones.spacelaunchnow.data.model.SubscriptionType.PREMIUM,
+                    isInTrialPeriod = true,
+                    trialExpiresAt = null
+                ),
+                onVerifySubscription = {},
+                onRestorePurchases = {},
+                isProcessing = false
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CurrentPlanCardTrialDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Surface {
+            CurrentPlanCard(
+                subscriptionState = SubscriptionState(
+                    isSubscribed = true,
+                    subscriptionType = me.calebjones.spacelaunchnow.data.model.SubscriptionType.PREMIUM,
+                    isInTrialPeriod = true,
+                    trialExpiresAt = null
+                ),
+                onVerifySubscription = {},
+                onRestorePurchases = {},
+                isProcessing = false
+            )
+        }
     }
 }

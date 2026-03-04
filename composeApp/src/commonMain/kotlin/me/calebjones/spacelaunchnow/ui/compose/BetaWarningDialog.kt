@@ -28,8 +28,11 @@ import androidx.datastore.preferences.core.emptyPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
@@ -54,15 +57,21 @@ fun BetaWarningDialog(
     }
 
     if (showDialog) {
+        val platformType = getPlatform().type
+
+        val platformContext = when (platformType) {
+            PlatformType.ANDROID -> "Space Launch Now has been rebuilt from the ground up to meet modern guidelines from Google and deliver a faster, more reliable experience."
+            PlatformType.IOS -> "Space Launch Now has been rebuilt from the ground up for iOS, bringing you the best space launch tracking experience on Apple devices."
+            PlatformType.DESKTOP -> "Space Launch Now is now available on desktop, giving you a native space launch tracking experience right on your computer."
+        }
+
         val description = listOf(
-            "The original app's codebase is 10 years old, there were technical issues that made it impossible to support with new guidelines and restrictions from Google.",
+            platformContext,
             "",
-            "I am actively re-implementing all features from the original app while adding new ones. Updates are released frequently as features are completed.",
+            "New features are being added regularly. Check the Roadmap in Settings to see what's coming next.",
             "",
-            "Please check the Roadmap section in Settings to see planned features and progress.",
-            "",
-            "Thank you to everyone who has supported this project for the last ten years!"
-        ) 
+            "Thank you to everyone who has supported this project over the years!"
+        )
 
         AlertDialog(
             onDismissRequest = {
@@ -74,7 +83,7 @@ fun BetaWarningDialog(
             },
             title = {
                 Text(
-                    text = "Space Launch Now",
+                    text = "Welcome to Space Launch Now",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -88,7 +97,7 @@ fun BetaWarningDialog(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Thank you for using the all new Space Launch Now!",
+                        text = "A completely reimagined app for space fans.",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Start
@@ -97,7 +106,7 @@ fun BetaWarningDialog(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "This app is actively being developed with frequent updates. You may occasionally experience issues as features are added.",
+                        text = "This app is actively being developed with frequent updates. You may occasionally see rough edges as new features roll out.",
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Start,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -136,17 +145,29 @@ fun BetaWarningDialog(
 @Preview
 @Composable
 private fun BetaWarningDialogPreview() {
-    // Mock DataStore that returns false for beta warning shown (so dialog displays)
     val mockDataStore = object : DataStore<Preferences> {
         override val data: Flow<Preferences> = flowOf(emptyPreferences())
         override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences): Preferences {
             return emptyPreferences()
         }
     }
-
     val mockPreferences = AppPreferences(mockDataStore)
+    SpaceLaunchNowPreviewTheme {
+        BetaWarningDialog(appPreferences = mockPreferences)
+    }
+}
 
-    MaterialTheme {
+@Preview
+@Composable
+private fun BetaWarningDialogDarkPreview() {
+    val mockDataStore = object : DataStore<Preferences> {
+        override val data: Flow<Preferences> = flowOf(emptyPreferences())
+        override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences): Preferences {
+            return emptyPreferences()
+        }
+    }
+    val mockPreferences = AppPreferences(mockDataStore)
+    SpaceLaunchNowPreviewTheme(isDark = true) {
         BetaWarningDialog(appPreferences = mockPreferences)
     }
 }

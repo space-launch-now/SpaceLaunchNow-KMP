@@ -35,6 +35,10 @@ data class SubscriptionState(
     // Features
     val features: Set<PremiumFeature> = emptySet(),
 
+    // Trial status
+    val isInTrialPeriod: Boolean = false,
+    val trialExpiresAt: Long? = null, // Epoch milliseconds, null if not in trial
+
     // UI state
     val isLoading: Boolean = false,
     val isCached: Boolean = false
