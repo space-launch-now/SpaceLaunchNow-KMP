@@ -92,19 +92,24 @@ class LaunchRepositoryImpl(
             if (!forceRefresh) {
                 val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(4)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                    log.i { "Cache hit - Returning ${cachedLaunches.size} fresh cached featured launches" }
-                    return Result.success(
-                        DataResult(
-                            data = PaginatedLaunchNormalList(
-                                count = cachedLaunches.size,
-                                next = null,
-                                previous = null,
-                                results = cachedLaunches
-                            ),
-                            source = DataSource.CACHE,
-                            timestamp = staleTimestamp ?: now
+                    // Apply user filter preferences to fresh cache (prevents returning unfiltered data on cold start)
+                    val filteredCache = filterLaunchesByPreferences(cachedLaunches, agencyIds, locationIds)
+                    if (filteredCache.isNotEmpty()) {
+                        log.i { "Cache hit - Returning ${filteredCache.size}/${cachedLaunches.size} filtered fresh cached featured launches" }
+                        return Result.success(
+                            DataResult(
+                                data = PaginatedLaunchNormalList(
+                                    count = filteredCache.size,
+                                    next = null,
+                                    previous = null,
+                                    results = filteredCache
+                                ),
+                                source = DataSource.CACHE,
+                                timestamp = staleTimestamp ?: now
+                            )
                         )
-                    )
+                    }
+                    log.d { "Fresh cache filtered to zero results (had ${cachedLaunches.size}), falling through to stale/API" }
                 } else if (hasStaleData) {
                     // Filter stale cache by user preferences
                     val filteredStale =
@@ -258,19 +263,24 @@ class LaunchRepositoryImpl(
             if (!forceRefresh) {
                 val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(limit)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                    log.i { "✅ CACHE HIT: Returning ${cachedLaunches.size} fresh cached launches" }
-                    return Result.success(
-                        DataResult(
-                            data = PaginatedLaunchNormalList(
-                                count = cachedLaunches.size,
-                                next = null,
-                                previous = null,
-                                results = cachedLaunches
-                            ),
-                            source = DataSource.CACHE,
-                            timestamp = staleTimestamp ?: now
+                    // Apply user filter preferences to fresh cache (prevents returning unfiltered data on cold start)
+                    val filteredCache = filterLaunchesByPreferences(cachedLaunches, agencyIds, locationIds)
+                    if (filteredCache.isNotEmpty()) {
+                        log.i { "✅ CACHE HIT: Returning ${filteredCache.size}/${cachedLaunches.size} filtered fresh cached launches" }
+                        return Result.success(
+                            DataResult(
+                                data = PaginatedLaunchNormalList(
+                                    count = filteredCache.size,
+                                    next = null,
+                                    previous = null,
+                                    results = filteredCache
+                                ),
+                                source = DataSource.CACHE,
+                                timestamp = staleTimestamp ?: now
+                            )
                         )
-                    )
+                    }
+                    log.d { "Fresh cache filtered to zero results (had ${cachedLaunches.size}), falling through to stale/API" }
                 } else if (hasStaleData) {
                     // Filter stale cache by user preferences (agency and location)
                     val filteredStale =
@@ -450,19 +460,24 @@ class LaunchRepositoryImpl(
             if (!forceRefresh) {
                 val cachedLaunches = localDataSource?.getPreviousNormalLaunches(limit)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
-                    log.i { "✅ CACHE HIT: Returning ${cachedLaunches.size} fresh cached previous launches" }
-                    return Result.success(
-                        DataResult(
-                            data = PaginatedLaunchNormalList(
-                                count = cachedLaunches.size,
-                                next = null,
-                                previous = null,
-                                results = cachedLaunches
-                            ),
-                            source = DataSource.CACHE,
-                            timestamp = staleTimestamp ?: now
+                    // Apply user filter preferences to fresh cache (prevents returning unfiltered data on cold start)
+                    val filteredCache = filterLaunchesByPreferences(cachedLaunches, agencyIds, locationIds)
+                    if (filteredCache.isNotEmpty()) {
+                        log.i { "✅ CACHE HIT: Returning ${filteredCache.size}/${cachedLaunches.size} filtered fresh cached previous launches" }
+                        return Result.success(
+                            DataResult(
+                                data = PaginatedLaunchNormalList(
+                                    count = filteredCache.size,
+                                    next = null,
+                                    previous = null,
+                                    results = filteredCache
+                                ),
+                                source = DataSource.CACHE,
+                                timestamp = staleTimestamp ?: now
+                            )
                         )
-                    )
+                    }
+                    log.d { "Fresh cache filtered to zero results (had ${cachedLaunches.size}), falling through to stale/API" }
                 }
 
                 if (hasStaleData) {
