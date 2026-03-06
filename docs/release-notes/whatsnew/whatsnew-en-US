@@ -1,4 +1,10 @@
 ### Bug Fixes
 
-* **ios:** add SKAdNetwork identifiers and update Info.plist for conversion tracking
-* **ios:** implement SHA-256 hashing for widget image cache keys to resolve cache collisions
+* **billing:** improve billing initialization logic
+* **subscription:** derive pricing from available products and remove legacy pricing logic
+* **ui:** remove template fallback savings message
+* **ui:** update welcome dialog to be platform-specific
+
+### Features
+
+* **billing:** implement free trial disclosure in subscription UI

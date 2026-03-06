@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
@@ -19,6 +20,7 @@ import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
+import me.calebjones.spacelaunchnow.widgets.WidgetAccessCache
 import me.calebjones.spacelaunchnow.widgets.WidgetAccessSharer
 
 /**
@@ -57,8 +59,16 @@ class SimpleSubscriptionRepository(
                     // Wait for DataStore write to complete before triggering widget update
                     widgetPreferences.updateWidgetAccessGranted(hasWidgetAccess)
 
-                    // Sync widget access to shared UserDefaults for iOS widget extension
-                    WidgetAccessSharer.syncWidgetAccess(hasWidgetAccess)
+                    // Build enhanced cache and sync to shared UserDefaults for iOS widget extension.
+                    // wasEverPremium is sticky — persist true if the stored value is already true.
+                    val cache = WidgetAccessCache(
+                        hasAccess = hasWidgetAccess,
+                        subscriptionExpiryMs = local.subscriptionExpiryMs,
+                        lastVerifiedMs = local.lastSynced,
+                        wasEverPremium = local.wasEverPremium || hasWidgetAccess,
+                        subscriptionType = local.subscriptionType
+                    )
+                    WidgetAccessSharer.syncWidgetAccessCache(cache)
 
                     // Trigger widget updates after DataStore write is confirmed complete
                     updateWidgetsAfterAccessChange(if (hasWidgetAccess) "access granted" else "access revoked")
@@ -269,8 +279,16 @@ class SimpleSubscriptionRepository(
                 // Wait for DataStore write to complete before triggering widget update
                 widgetPreferences.updateWidgetAccessGranted(hasWidgetAccess)
 
-                // Sync widget access to shared UserDefaults for iOS widget extension
-                WidgetAccessSharer.syncWidgetAccess(hasWidgetAccess)
+                // Sync enhanced cache to shared UserDefaults for iOS widget extension
+                val localData2 = localStorage.get()
+                val cache = WidgetAccessCache(
+                    hasAccess = hasWidgetAccess,
+                    subscriptionExpiryMs = localData2.subscriptionExpiryMs,
+                    lastVerifiedMs = localData2.lastSynced,
+                    wasEverPremium = localData2.wasEverPremium || hasWidgetAccess,
+                    subscriptionType = localData2.subscriptionType
+                )
+                WidgetAccessSharer.syncWidgetAccessCache(cache)
                 log.i { "✅ Updated widget preferences cache" }
 
                 // Trigger widget update after DataStore write is confirmed complete
@@ -361,7 +379,15 @@ class SimpleSubscriptionRepository(
         // Update widgets if this affects widget features
         if (feature == PremiumFeature.ADVANCED_WIDGETS || feature == PremiumFeature.WIDGETS_CUSTOMIZATION) {
             // Sync to shared UserDefaults so iOS widget picks up temporary access on next refresh
-            WidgetAccessSharer.syncWidgetAccess(true)
+            val localData = localStorage.get()
+            val cache = WidgetAccessCache(
+                hasAccess = true,
+                subscriptionExpiryMs = localData.subscriptionExpiryMs,
+                lastVerifiedMs = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                wasEverPremium = localData.wasEverPremium,
+                subscriptionType = localData.subscriptionType
+            )
+            WidgetAccessSharer.syncWidgetAccessCache(cache)
             updateWidgetsAfterAccessChange("temporary access granted for ${feature.name}")
         }
     }
