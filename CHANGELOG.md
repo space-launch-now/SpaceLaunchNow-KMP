@@ -1,3 +1,19 @@
+# [5.20.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.19.0...v5.20.0) (2026-03-06)
+
+
+### Bug Fixes
+
+* **data:** apply user filters to fresh cache and widget data ([b2dbca9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b2dbca9337c6ae32ecda958048dd49fccb8345fb))
+* **widget:** update access state handling in LaunchProvider and improve Lock Screen widget background ([1cca171](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1cca171e1a5a11dae2c74ed31fafbc42ed7807d6))
+
+
+### Features
+
+* **admob:** implement compliance audit and remediation plan ([f5f2616](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f5f2616b0ac35cbd8c5b04fe8c7d98abab161c5a))
+* **widgets:** implement robust subscription persistence for iOS widget ([0bcb1e4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0bcb1e463a6ca5fd17d6fad20e08bfb47cc8c789))
+
+
+
 # [5.19.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.18.2...v5.19.0) (2026-03-04)
 
 
@@ -41,15 +57,6 @@
 
 * add Lock Screen widgets for upcoming launches [skip ci] ([07091b6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/07091b67c57e703dcbeaf90f2319a350d2b0bb37))
 * add Lock Screen widgets for upcoming launches [skip ci] ([e9beb50](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9beb5053ca580f4372f69b21ae6106d1682c6b0))
-
-
-
-## [5.17.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.17.0...v5.17.1) (2026-02-27)
-
-
-### Bug Fixes
-
-* update GitHub Actions workflow to include fetch-depth and token for checkout step [skip ci] ([83fa517](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/83fa517937f269eb2a2cd13a52d846143e5c4ad8))
 
 
 

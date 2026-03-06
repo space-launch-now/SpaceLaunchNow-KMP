@@ -1,10 +1,9 @@
 ### Bug Fixes
 
-* **billing:** improve billing initialization logic
-* **subscription:** derive pricing from available products and remove legacy pricing logic
-* **ui:** remove template fallback savings message
-* **ui:** update welcome dialog to be platform-specific
+* **data:** apply user filters to fresh cache and widget data
+* **widget:** update access state handling in LaunchProvider and improve Lock Screen widget background
 
 ### Features
 
-* **billing:** implement free trial disclosure in subscription UI
+* **admob:** implement compliance audit and remediation plan
+* **widgets:** implement robust subscription persistence for iOS widget
