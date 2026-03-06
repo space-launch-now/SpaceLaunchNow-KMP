@@ -1,3 +1,20 @@
+# [5.19.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.18.2...v5.19.0) (2026-03-04)
+
+
+### Bug Fixes
+
+* **billing:** improve billing initialization logic ([2b8b62c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2b8b62c51f27fef9d8cab52ef3ea46ffa65a231f))
+* **subscription:** derive pricing from available products and remove legacy pricing logic ([387e97a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/387e97a4c1c2e3a12a5b9a7b21a52ed766d9942d))
+* **ui:** remove template fallback savings message ([4c794a1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4c794a19be3ad8443a51937d926175e5d9215f52))
+* **ui:** update welcome dialog to be platform-specific ([dbb2fe3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dbb2fe32f7f21e99ca24650267327255fb3bcc89))
+
+
+### Features
+
+* **billing:** implement free trial disclosure in subscription UI ([de7d9d8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/de7d9d8dedbc36389481c96923c1392c62a67214))
+
+
+
 ## [5.18.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.18.1...v5.18.2) (2026-03-03)
 
 
@@ -33,23 +50,6 @@
 ### Bug Fixes
 
 * update GitHub Actions workflow to include fetch-depth and token for checkout step [skip ci] ([83fa517](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/83fa517937f269eb2a2cd13a52d846143e5c4ad8))
-
-
-
-# [5.17.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.16.0...v5.17.0) (2026-02-27)
-
-
-### Bug Fixes
-
-* update iOS version in Info.plist and adjust Secrets.plist path in script ([f9240d8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f9240d8b9b786d315d653fc68919674674f70926))
-
-
-### Features
-
-* add tabs to debug screen ([ccc8646](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ccc8646335d85ab69f09905086032d26f1c5814f))
-* enhance ExploreScreen and ExploreCard for better tablet support ([e8f2d00](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e8f2d00603c3f6b2ad0557e9f7d3a1a6719e2a02))
-* integrate Datadog analytics initialization and update iOS secrets generation script ([ae649a5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ae649a5924aca71523f9ed1f34237020002f0f7e))
-* **iOS:** implement widget access synchronization and update handling ([033a586](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/033a5864c5f6531cb3c95016929890759ea7c4a6))
 
 
 
