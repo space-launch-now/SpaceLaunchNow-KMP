@@ -170,7 +170,9 @@ struct LaunchProvider: TimelineProvider {
             // Check if user has widget access using fail-safe cache
             print("🚀 Widget: Checking widget access...")
             let accessState = WidgetAccessState.readFromCache()
-            print("🚀 Widget: Widget access: \(accessState.shouldShowUnlocked) (hasAccess=\(accessState.hasAccess), wasEverPremium=\(accessState.wasEverPremium), expiry=\(String(describing: accessState.subscriptionExpiry)))")
+            print(
+                "🚀 Widget: Widget access: \(accessState.shouldShowUnlocked) (hasAccess=\(accessState.hasAccess), wasEverPremium=\(accessState.wasEverPremium), expiry=\(String(describing: accessState.subscriptionExpiry)))"
+            )
 
             // If no access, return locked entry
             if !accessState.shouldShowUnlocked {
@@ -206,7 +208,7 @@ struct LaunchProvider: TimelineProvider {
             )
             var entry = processPaginatedList(
                 paginatedList,
-                hasAccess: hasAccessBool
+                hasAccess: accessState.shouldShowUnlocked
             )
 
             // Download images for launches
