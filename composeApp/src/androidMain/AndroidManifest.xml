@@ -50,10 +50,10 @@
                 android:resource="@xml/next_up_widget_info" />
         </receiver>
         
-        <!-- AdMob App ID (Test ID for development) -->
+        <!-- AdMob App ID (set via ADMOB_APP_ID in .env; debug builds use Google's test App ID) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="${ADMOB_APP_ID}" />
 
         <!-- Google Maps API Key -->
         <meta-data

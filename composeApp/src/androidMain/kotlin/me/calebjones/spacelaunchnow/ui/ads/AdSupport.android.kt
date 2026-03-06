@@ -35,23 +35,35 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 @OptIn(DependsOnGoogleUserMessagingPlatform::class, ExperimentalBasicAds::class)
 @Composable
 actual fun AdConsentPopup(
-    onFailure: ((Throwable) -> Unit)?
+    onFailure: ((Throwable) -> Unit)?,
+    onConsentResolved: (() -> Unit)?
 ) {
     val contextFactory = LocalContextFactory.current
     val activity = contextFactory?.getActivity() as? Activity
-    
+
     // Only show consent popup if we have a valid Activity
     if (activity == null) {
+        // Resolve immediately so the app isn't blocked from loading ads
+        LaunchedEffect(Unit) { onConsentResolved?.invoke() }
         return
     }
-    
+
     val consent by rememberConsent(activity = activity)
-    
+
+    // CR-2: Call onConsentResolved when UMP signals ads can be requested
+    LaunchedEffect(consent.canRequestAds) {
+        if (consent.canRequestAds) {
+            onConsentResolved?.invoke()
+        }
+    }
+
     // Show consent popup
     ConsentPopup(
         consent = consent,
         onFailure = { throwable ->
             onFailure?.invoke(throwable)
+            // Also resolve on failure to avoid blocking ad loading indefinitely
+            onConsentResolved?.invoke()
         }
     )
 }
@@ -64,12 +76,13 @@ actual fun AdConsentPopup(
 @Composable
 actual fun WithPreloadedAds(
     context: Any?,
+    shouldPreloadAds: Boolean,
     content: @Composable () -> Unit
 ) {
     // Cast context to Activity - it should be an Activity on Android
     val activity = context as? Activity
-    
-    if (activity == null) {
+
+    if (activity == null || !shouldPreloadAds) {
         // Still provide the content but without ads
         content()
         return

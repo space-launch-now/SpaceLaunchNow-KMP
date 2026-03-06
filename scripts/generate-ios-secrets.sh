@@ -40,6 +40,7 @@ DATADOG_ENABLED=$(grep "^DATADOG_ENABLED=" "$ENV_FILE" | cut -d '=' -f2- | tr -d
 DATADOG_CLIENT_TOKEN=$(grep "^DATADOG_CLIENT_TOKEN=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 DATADOG_APPLICATION_ID=$(grep "^DATADOG_APPLICATION_ID=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 DATADOG_ENVIRONMENT=$(grep "^DATADOG_ENVIRONMENT=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+IOS_ADMOB_APP_ID=$(grep "^IOS_ADMOB_APP_ID=" "$ENV_FILE" | cut -d '=' -f2- | tr -d '"' | tr -d "'")
 
 # Read version info from version.properties
 VERSION_MAJOR=$(grep "^versionMajor=" "$VERSION_PROPS" | cut -d '=' -f2)
@@ -89,6 +90,10 @@ fi
 
 if [ -z "$IOS_REWARDED_AD_UNIT_ID" ]; then
     echo "⚠️  Warning: IOS_REWARDED_AD_UNIT_ID not found in .env file"
+fi
+
+if [ -z "$IOS_ADMOB_APP_ID" ]; then
+    echo "⚠️  Warning: IOS_ADMOB_APP_ID not found in .env file (Info.plist GADApplicationIdentifier will not be updated)"
 fi
 
 if [ -z "$DEBUG" ]; then
@@ -149,6 +154,17 @@ EOF
 
 echo "✅ Successfully created Secrets.plist with keys from .env"
 echo "📁 Location: $SECRETS_PLIST"
+
+# Patch GADApplicationIdentifier in Info.plist when IOS_ADMOB_APP_ID is set
+INFO_PLIST="$PROJECT_ROOT/iosApp/iosApp/Info.plist"
+if [ -n "$IOS_ADMOB_APP_ID" ]; then
+    if [ -f "$INFO_PLIST" ]; then
+        /usr/libexec/PlistBuddy -c "Set :GADApplicationIdentifier $IOS_ADMOB_APP_ID" "$INFO_PLIST"
+        echo "✅ Updated GADApplicationIdentifier in Info.plist"
+    else
+        echo "⚠️  Warning: Info.plist not found at $INFO_PLIST, skipping GADApplicationIdentifier update"
+    fi
+fi
 echo "✅ API_KEY: $([ -n "$API_KEY" ] && echo "Set" || echo "Not set")"
 echo "✅ MAPS_API_KEY: $([ -n "$MAPS_API_KEY" ] && echo "Set" || echo "Not set")"
 echo "✅ REVENUECAT_ANDROID_KEY: $([ -n "$REVENUECAT_ANDROID_KEY" ] && echo "Set" || echo "Not set")"
@@ -159,6 +175,7 @@ echo "✅ ANDROID_INTERSTITIAL_AD_UNIT_ID: $([ -n "$ANDROID_INTERSTITIAL_AD_UNIT
 echo "✅ IOS_INTERSTITIAL_AD_UNIT_ID: $([ -n "$IOS_INTERSTITIAL_AD_UNIT_ID" ] && echo "Set" || echo "Not set")"
 echo "✅ ANDROID_REWARDED_AD_UNIT_ID: $([ -n "$ANDROID_REWARDED_AD_UNIT_ID" ] && echo "Set" || echo "Not set")"
 echo "✅ IOS_REWARDED_AD_UNIT_ID: $([ -n "$IOS_REWARDED_AD_UNIT_ID" ] && echo "Set" || echo "Not set")"
+echo "✅ IOS_ADMOB_APP_ID: $([ -n "$IOS_ADMOB_APP_ID" ] && echo "Set" || echo "Not set (Info.plist unchanged)")"
 echo "✅ DEBUG: $([ -n "$DEBUG" ] && echo "Set" || echo "Not set")"
 echo "✅ TOTP_SECRET: $([ -n "$TOTP_SECRET" ] && echo "Set" || echo "Using default")"
 echo "✅ DATADOG_ENABLED: $([ -n "$DATADOG_ENABLED" ] && echo "$DATADOG_ENABLED" || echo "Not set (default: false)")"
