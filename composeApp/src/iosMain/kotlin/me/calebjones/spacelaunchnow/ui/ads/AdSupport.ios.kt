@@ -39,7 +39,8 @@ private val log by lazy { SpaceLogger.getLogger("AdSupport") }
 @OptIn(DependsOnGoogleUserMessagingPlatform::class, ExperimentalBasicAds::class)
 @Composable
 actual fun AdConsentPopup(
-    onFailure: ((Throwable) -> Unit)?
+    onFailure: ((Throwable) -> Unit)?,
+    onConsentResolved: (() -> Unit)?
 ) {
     val contextFactory = LocalContextFactory.current
     var viewController by remember { mutableStateOf<Any?>(null) }
@@ -57,6 +58,8 @@ actual fun AdConsentPopup(
         }
         if (viewController == null) {
             log.w { "⚠️ AdConsentPopup: ViewController is null after retries, consent popup will not be shown" }
+            // Resolve to avoid blocking ad loading indefinitely
+            onConsentResolved?.invoke()
         }
     }
 
@@ -64,11 +67,20 @@ actual fun AdConsentPopup(
 
     val consent by rememberConsent(activity = vc)
 
+    // CR-2: Call onConsentResolved when UMP signals ads can be requested
+    LaunchedEffect(consent.canRequestAds) {
+        if (consent.canRequestAds) {
+            onConsentResolved?.invoke()
+        }
+    }
+
     ConsentPopup(
         consent = consent,
         onFailure = { throwable ->
             log.e(throwable) { "❌ Consent popup failure" }
             onFailure?.invoke(throwable)
+            // Also resolve on failure to avoid blocking ad loading indefinitely
+            onConsentResolved?.invoke()
         }
     )
 }
@@ -81,8 +93,14 @@ actual fun AdConsentPopup(
 @Composable
 actual fun WithPreloadedAds(
     context: Any?,
+    shouldPreloadAds: Boolean,
     content: @Composable () -> Unit
 ) {
+    if (!shouldPreloadAds) {
+        content()
+        return
+    }
+
     // 🚀 PERFORMANCE OPTIMIZATION: Only preload the 3 most commonly used banner sizes
     // This reduces memory usage and loading time by 66% compared to loading 9 sizes
     // Other sizes will load on-demand when needed

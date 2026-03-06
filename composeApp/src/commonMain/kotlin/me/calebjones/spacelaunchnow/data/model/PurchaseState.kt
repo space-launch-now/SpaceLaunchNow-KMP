@@ -16,7 +16,8 @@ data class PurchaseState(
     val lastRefreshed: Long = 0L,
     val userId: String? = null,
     val isInTrialPeriod: Boolean = false,
-    val trialExpiresAt: Long? = null
+    val trialExpiresAt: Long? = null,
+    val subscriptionExpiryMs: Long? = null // Unix ms when subscription expires; null for lifetime
 ) {
     /**
      * Convert to SubscriptionState for UI/caching

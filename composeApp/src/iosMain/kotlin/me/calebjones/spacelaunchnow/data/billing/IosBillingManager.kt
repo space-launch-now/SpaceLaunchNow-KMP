@@ -220,7 +220,13 @@ class IosBillingManager : BillingManager {
         val isInTrial = trialEntitlement != null
         val trialExpires = trialEntitlement?.expirationDateMillis
 
-        log.d { "📊 Purchase state: Type=$subscriptionType, Entitlements=$activeEntitlements, Products=$productIds, Features=${features.size}, inTrial=$isInTrial" }
+        // Subscription expiry: use the latest expiry from all active entitlements.
+        // Lifetime subscriptions return null for expirationDateMillis, which is correct.
+        val subscriptionExpiryMs = customerInfo.entitlements.active.values
+            .mapNotNull { it.expirationDateMillis }
+            .maxOrNull()
+
+        log.d { "📊 Purchase state: Type=$subscriptionType, Entitlements=$activeEntitlements, Products=$productIds, Features=${features.size}, inTrial=$isInTrial, expiry=$subscriptionExpiryMs" }
         
         _purchaseState.value = PurchaseState(
             isSubscribed = subscriptionType != SubscriptionType.FREE,
@@ -231,7 +237,8 @@ class IosBillingManager : BillingManager {
             lastRefreshed = kotlin.time.Clock.System.now().toEpochMilliseconds(),
             userId = customerInfo.originalAppUserId,
             isInTrialPeriod = isInTrial,
-            trialExpiresAt = trialExpires
+            trialExpiresAt = trialExpires,
+            subscriptionExpiryMs = subscriptionExpiryMs
         )
     }
     

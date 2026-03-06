@@ -8,6 +8,7 @@ struct LockScreenWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: LaunchProvider()) { entry in
             LockScreenWidgetEntryView(entry: entry)
+                .containerBackground(.clear, for: .widget)
         }
         .configurationDisplayName("Lock Screen Launch")
         .description("Premium · Shows next launch on your Lock Screen")

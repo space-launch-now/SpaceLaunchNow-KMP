@@ -201,6 +201,7 @@ jobs:
           DATADOG_APPLICATION_ID=${{ secrets.DATADOG_APPLICATION_ID }}
           DATADOG_ENVIRONMENT=${{ secrets.DATADOG_ENVIRONMENT }}
           MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          ADMOB_APP_ID=${{ secrets.ADMOB_APP_ID }}
           TOTP_SECRET=${{ secrets.TOTP_SECRET_BASE32 }}
           DEBUG=false
           EOF
@@ -339,6 +340,7 @@ jobs:
           DATADOG_APPLICATION_ID=${{ secrets.DATADOG_APPLICATION_ID }}
           DATADOG_ENVIRONMENT=${{ secrets.DATADOG_ENVIRONMENT }}
           MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          ADMOB_APP_ID=${{ secrets.ADMOB_APP_ID }}
           TOTP_SECRET=${{ secrets.TOTP_SECRET_BASE32 }}
           DEBUG=false
           EOF

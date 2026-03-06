@@ -1,16 +1,19 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 
 /**
  * Desktop implementation of AdConsentPopup (no-op).
- * Desktop doesn't support ads or consent popups.
+ * Desktop doesn't support ads or consent popups; resolve consent immediately.
  */
 @Composable
 actual fun AdConsentPopup(
-    onFailure: ((Throwable) -> Unit)?
+    onFailure: ((Throwable) -> Unit)?,
+    onConsentResolved: (() -> Unit)?
 ) {
-    // No-op: Desktop doesn't show consent popups
+    // Desktop doesn't need consent; resolve immediately so ads aren't blocked on other platforms
+    LaunchedEffect(Unit) { onConsentResolved?.invoke() }
 }
 
 /**
@@ -20,6 +23,7 @@ actual fun AdConsentPopup(
 @Composable
 actual fun WithPreloadedAds(
     context: Any?,
+    shouldPreloadAds: Boolean,
     content: @Composable () -> Unit
 ) {
     // No-op wrapper: Just render content without preloading ads

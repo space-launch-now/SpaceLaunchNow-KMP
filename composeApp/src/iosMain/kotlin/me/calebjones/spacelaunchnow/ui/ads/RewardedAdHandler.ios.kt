@@ -116,8 +116,12 @@ actual fun RewardedAdHandler(
         RewardedAd(
             loadedAd = rewardedAd,
             onRewardEarned = {
-                log.d { "🎉 RewardedAd: User earned reward!" }
-                onRewardEarned?.invoke(1, "reward") // Default reward values
+                // Guard against duplicate reward grants (CR-7 fix)
+                if (!rewardGranted) {
+                    log.d { "🎉 RewardedAd: User earned reward! (ad callback)" }
+                    rewardGranted = true
+                    onRewardEarned?.invoke(1, "reward")
+                }
             }
         )
     }

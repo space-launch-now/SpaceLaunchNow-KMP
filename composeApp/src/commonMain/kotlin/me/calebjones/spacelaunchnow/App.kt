@@ -195,10 +195,15 @@ fun SpaceLaunchNowApp(
                     emptyList()
                 }
 
-                val adInitSuccess = AdInitializer.initialize(context = contextFactory.getActivity())
+                // CR-3: Ad SDK must initialize on Main thread per Google AdMob threading contract
+                val adInitSuccess = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    AdInitializer.initialize(context = contextFactory.getActivity())
+                }
 
                 if (adInitSuccess) {
-                    AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                        AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
+                    }
                 }
 
                 try {
@@ -256,8 +261,14 @@ fun SpaceLaunchNowApp(
 
             // Show consent popup (platform-specific implementation)
             // Must be inside CompositionLocalProvider to access LocalContextFactory
+            // CR-2: Track consent resolution to gate ad preloading
+            var isConsentResolved by remember { mutableStateOf(false) }
             AdConsentPopup(
-                onFailure = { log.w(it) { "Consent popup failure" } }
+                onFailure = { throwable ->
+                    log.w(throwable) { "Consent popup failure" }
+                    isConsentResolved = true
+                },
+                onConsentResolved = { isConsentResolved = true }
             )
 
             // App rating integration - shows enjoyment dialog first, then native review or feedback
@@ -328,9 +339,10 @@ fun SpaceLaunchNowApp(
                 }
             }
 
-            // Wrap content with preloaded ads (platform-specific: Android/iOS preloads, Desktop no-op)
+            // CR-2: Gate ad preloading on consent resolution; content renders immediately either way
             WithPreloadedAds(
-                context = contextFactory.getActivity()
+                context = contextFactory.getActivity(),
+                shouldPreloadAds = isConsentResolved
             ) {
                 // Hoisted NavHost - preserved across layout switches to maintain navigation state
                 val navHostContent: @Composable () -> Unit = {

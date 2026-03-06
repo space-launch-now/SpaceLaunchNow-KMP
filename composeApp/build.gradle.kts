@@ -347,6 +347,9 @@ android {
         // Google Maps API Key
         val mapsApiKey = envProps.getProperty("MAPS_API_KEY") ?: ""
 
+        // AdMob App ID (production ID set in .env; debug builds use Google's test App ID)
+        val admobAppId = envProps.getProperty("ADMOB_APP_ID") ?: ""
+
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         buildConfigField("String", "REVENUECAT_ANDROID_KEY", "\"$revenueCatAndroidKey\"")
         buildConfigField("String", "REVENUECAT_IOS_KEY", "\"$revenueCatIosKey\"")
@@ -383,6 +386,7 @@ android {
         versionName = computeVersionName()
         manifestPlaceholders["appName"] = "Space Launch Now"
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
     }
 
     // Bundle configuration for 16KB optimization
@@ -420,6 +424,8 @@ android {
             versionNameSuffix = "-DEBUG"
             buildConfigField("boolean", "IS_DEBUG", "true")
             manifestPlaceholders["appName"] = "@string/app_name_debug"
+            // Debug builds use Google's standard test App ID
+            manifestPlaceholders["ADMOB_APP_ID"] = "ca-app-pub-3940256099942544~3347511713"
         }
     }
     compileOptions {

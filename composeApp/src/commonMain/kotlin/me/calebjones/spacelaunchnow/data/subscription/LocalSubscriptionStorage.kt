@@ -23,7 +23,9 @@ data class LocalSubscriptionData(
     val productIds: Set<String> = emptySet(),   // Product IDs user owns
     val lastSynced: Long = 0L,                  // Last time we synced with RevenueCat
     val needsSync: Boolean = true,              // Whether we need to sync with RevenueCat
-    val isDebugMode: Boolean = false            // Whether we're in debug/simulation mode (blocks sync)
+    val isDebugMode: Boolean = false,           // Whether we're in debug/simulation mode (blocks sync)
+    val subscriptionExpiryMs: Long? = null,     // Unix ms when subscription expires; null for lifetime
+    val wasEverPremium: Boolean = false         // Sticky flag: true once user has ever been premium
 ) {
     /**
      * Check if user has a specific feature based on subscription type

@@ -39,8 +39,8 @@ actual object AdInitializer {
             BasicAds.configuration = RequestConfiguration(
                 maxAdContentRating = RequestConfiguration.MAX_AD_CONTENT_RATING_PG,
                 publisherPrivacyPersonalizationState = RequestConfiguration.PublisherPrivacyPersonalizationState.ENABLED,
-                tagForChildDirectedTreatment = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED,
-                tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED,
+                tagForChildDirectedTreatment = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE,
+                tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE,
                 testDeviceIds = testDeviceIds
             )
             log.d("Configuration applied (Debug: $isDebug, Test devices: ${testDeviceIds.size})")

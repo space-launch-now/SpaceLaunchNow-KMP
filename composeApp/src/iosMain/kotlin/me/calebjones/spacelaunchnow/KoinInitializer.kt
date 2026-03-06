@@ -1,12 +1,15 @@
 package me.calebjones.spacelaunchnow
 
+import kotlinx.coroutines.flow.first
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.notifications.IosPushMessagingBridge
-import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
-import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
+import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -59,10 +62,23 @@ class KoinHelper : KoinComponent {
 
     /**
      * Fetch upcoming launches and unwrap the Result type
-     * Returns the PaginatedLaunchNormalList directly or null if failed
+     * Returns the PaginatedLaunchNormalList directly or null if failed.
+     * Applies user filter preferences (agency/location) from NotificationState.
      */
     suspend fun fetchUpcomingLaunchesOrNull(limit: Int): PaginatedLaunchNormalList? {
-        val result = launchRepository.getUpcomingLaunchesNormal(limit, forceRefresh = true)
+        val notificationStateStorage = getKoin().get<NotificationStateStorage>()
+        val launchFilterService = getKoin().get<LaunchFilterService>()
+
+        val state = notificationStateStorage.stateFlow.first()
+        val agencyIds = launchFilterService.getAgencyIds(state)
+        val locationIds = launchFilterService.getLocationIds(state)
+
+        val result = launchRepository.getUpcomingLaunchesNormal(
+            limit,
+            forceRefresh = true,
+            agencyIds = agencyIds,
+            locationIds = locationIds
+        )
         return result.getOrNull()?.data
     }
     

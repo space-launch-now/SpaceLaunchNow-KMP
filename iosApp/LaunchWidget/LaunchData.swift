@@ -167,14 +167,15 @@ struct LaunchProvider: TimelineProvider {
             let helper = KoinHelper.Companion().instance()
             print("🚀 Widget: Got helper")
 
-            // Check if user has widget access via shared UserDefaults (App Group)
+            // Check if user has widget access using fail-safe cache
             print("🚀 Widget: Checking widget access...")
-            let defaults = UserDefaults(suiteName: "group.me.calebjones.spacelaunchnow")
-            let hasAccessBool = defaults?.bool(forKey: "widget_has_access") ?? false
-            print("🚀 Widget: Widget access: \(hasAccessBool)")
+            let accessState = WidgetAccessState.readFromCache()
+            print(
+                "🚀 Widget: Widget access: \(accessState.shouldShowUnlocked) (hasAccess=\(accessState.hasAccess), wasEverPremium=\(accessState.wasEverPremium), expiry=\(String(describing: accessState.subscriptionExpiry)))"
+            )
 
             // If no access, return locked entry
-            if !hasAccessBool {
+            if !accessState.shouldShowUnlocked {
                 print("🚀 Widget: User does not have widget access - showing paywall")
                 return LaunchEntry(
                     date: Date(),
@@ -207,7 +208,7 @@ struct LaunchProvider: TimelineProvider {
             )
             var entry = processPaginatedList(
                 paginatedList,
-                hasAccess: hasAccessBool
+                hasAccess: accessState.shouldShowUnlocked
             )
 
             // Download images for launches

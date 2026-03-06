@@ -33,5 +33,6 @@ tests/
 Kotlin 2.0+ with Compose Multiplatform: Follow standard conventions
 
 ## Recent Changes
+- 005-fix-stale-filtered-data: Added Kotlin 2.1.x (KMP), Swift 5.x (iOS widgets) + Compose Multiplatform, Ktor, Koin, Glance (Android widgets), WidgetKit (iOS)
 - 004-fix-subscription-trial-disclosure: Added Kotlin 2.x (KMP), Compose Multiplatform + Jetpack Compose, Koin DI, DataStore Preferences
 - 004-fix-subscription-trial-disclosure: Added Kotlin 2.x (KMP), Java 21 (JetBrains JDK) + RevenueCat purchases-kmp v1.9.0+14.3.0, Jetpack Compose Multiplatform, Koin DI
