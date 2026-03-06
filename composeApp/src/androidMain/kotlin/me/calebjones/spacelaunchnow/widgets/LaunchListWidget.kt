@@ -42,12 +42,15 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -118,7 +121,18 @@ class LaunchListWidget : GlanceAppWidget() {
         return withContext(Dispatchers.IO) {
             try {
                 val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
-                val result = launchRepository.getUpcomingLaunchesNormal(limit = 10)
+                val notificationStateStorage: NotificationStateStorage by koinInject(NotificationStateStorage::class.java)
+                val launchFilterService: LaunchFilterService by koinInject(LaunchFilterService::class.java)
+
+                val state = notificationStateStorage.stateFlow.first()
+                val agencyIds = launchFilterService.getAgencyIds(state)
+                val locationIds = launchFilterService.getLocationIds(state)
+
+                val result = launchRepository.getUpcomingLaunchesNormal(
+                    limit = 10,
+                    agencyIds = agencyIds,
+                    locationIds = locationIds
+                )
                 result.getOrNull()?.data?.results ?: emptyList()
             } catch (e: Exception) {
                 log.e(e) { "Failed to fetch launches" }
