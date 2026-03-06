@@ -24,9 +24,9 @@ private val log by lazy { SpaceLogger.getLogger("InterstitialAdHandler") }
 /**
  * iOS implementation of InterstitialAdHandler using BasicAds library.
  * 
- * Interstitial ad handler that shows ads every 4th detail view visit.
+ * Interstitial ad handler that shows ads every 10th detail view visit.
  * - Checks if the user has ad-free premium
- * - Tracks visit count and shows ads every 4th visit
+ * - Tracks visit count and shows ads every 10th visit
  * - Respects minimum time intervals between ads (5 minutes)
  */
 @OptIn(DependsOnGoogleMobileAds::class)

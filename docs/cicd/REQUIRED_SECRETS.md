@@ -64,7 +64,30 @@ Configure these secrets in GitHub repository **Settings → Secrets and variable
 
 ---
 
-## 📺 AdMob Ad Unit IDs (⚠️ NEW - Required for Ad Revenue)
+## 📺 AdMob (⚠️ NEW - Required for Ad Revenue)
+
+### AdMob App IDs
+
+| Secret Name | Platform | Type | Description |
+|------------|----------|------|-------------|
+| `ADMOB_APP_ID` | Android | string | AdMob Android Application ID (injected via `build.gradle.kts` manifest placeholder) |
+| `IOS_ADMOB_APP_ID` | iOS | string | AdMob iOS Application ID (injected into `Info.plist` `GADApplicationIdentifier` via `generate-ios-secrets.sh`) |
+
+**Where to get:**
+1. Go to https://admob.google.com/
+2. Select your app (**Android** for `ADMOB_APP_ID`, **iOS** for `IOS_ADMOB_APP_ID`)
+3. Navigate to **App settings**
+4. Copy the **App ID** (format: `ca-app-pub-XXXXXXXXXXXXXXXXXX~XXXXXXXXXX`)
+
+> ⚠️ **The Android and iOS App IDs are different** — one per platform in the AdMob console.
+
+**Important Notes:**
+- ✅ `ADMOB_APP_ID` is used by Android CI (`pr-validation.yml`, `release-main.yml`) — not needed for iOS builds
+- ✅ `IOS_ADMOB_APP_ID` is used by iOS CI (`release-ios.yml`) via `generate-ios-secrets.sh` + PlistBuddy
+- ✅ Android debug builds automatically use Google's test App ID (`ca-app-pub-3940256099942544~3347511713`) via `build.gradle.kts`
+- ⚠️ Using the test App ID in production blocks all real ad revenue
+
+### AdMob Ad Unit IDs
 
 | Secret Name | Type | Description |
 |------------|------|-------------|

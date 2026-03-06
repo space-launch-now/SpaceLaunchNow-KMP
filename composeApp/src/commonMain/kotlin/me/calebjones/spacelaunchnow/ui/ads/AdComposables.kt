@@ -99,7 +99,8 @@ expect fun RewardedAdHandler(
  */
 @Composable
 expect fun AdConsentPopup(
-    onFailure: ((Throwable) -> Unit)? = null
+    onFailure: ((Throwable) -> Unit)? = null,
+    onConsentResolved: (() -> Unit)? = null
 )
 
 /**
@@ -118,5 +119,6 @@ expect fun AdConsentPopup(
 @Composable
 expect fun WithPreloadedAds(
     context: Any?,
+    shouldPreloadAds: Boolean = true,
     content: @Composable () -> Unit
 )
