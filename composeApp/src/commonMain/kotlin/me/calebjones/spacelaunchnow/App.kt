@@ -278,13 +278,15 @@ fun SpaceLaunchNowApp(
                 }
             }
 
-            // Onboarding gate — null while DataStore initializes; NavHost deferred until known
-            val onboardingCompleted by appPreferences.onboardingCompletedFlow.collectAsState(initial = null)
+            // Onboarding paywall gate — uses a versioned key so ALL existing users (including
+            // those who already completed onboarding in a prior build) see the paywall once.
+            // null = DataStore still initializing; defer NavHost until resolved.
+            val onboardingPaywallShown by appPreferences.onboardingPaywallV1ShownFlow.collectAsState(initial = null)
             val subscriptionViewModel: SubscriptionViewModel = koinInject()
             val subscriptionState by subscriptionViewModel.subscriptionState.collectAsState()
             val startRoute: Any? = when {
-                onboardingCompleted == null -> null
-                onboardingCompleted == true -> Home
+                onboardingPaywallShown == null -> null
+                onboardingPaywallShown == true -> Home
                 else -> Onboarding
             }
 
