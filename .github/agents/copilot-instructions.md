@@ -16,6 +16,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-21
 - Disk-based image cache in app group container (`group.me.calebjones.spacelaunchnow/widget_image_cache/`)
  (003-fix-widget-image-mismatch)
 - Kotlin 2.0+ with Compose Multiplatform + Compose Material3, Compose Foundation (HorizontalPager), Koin DI (main)
+- Kotlin 2.1.0 (KMP), Java 21 + Compose Multiplatform, RevenueCat SDK (via `SubscriptionViewModel`), Koin DI, DataStore Preferences (006-onboarding-paywall)
+- DataStore Preferences (`AppPreferences`) — new `ONBOARDING_PAYWALL_SHOWN` boolean key (006-onboarding-paywall)
 
 ## Project Structure
 
@@ -33,6 +35,6 @@ tests/
 Kotlin 2.0+ with Compose Multiplatform: Follow standard conventions
 
 ## Recent Changes
+- 006-onboarding-paywall: Added Kotlin 2.1.0 (KMP), Java 21 + Compose Multiplatform, RevenueCat SDK (via `SubscriptionViewModel`), Koin DI, DataStore Preferences
 - 005-fix-stale-filtered-data: Added Kotlin 2.1.x (KMP), Swift 5.x (iOS widgets) + Compose Multiplatform, Ktor, Koin, Glance (Android widgets), WidgetKit (iOS)
 - 004-fix-subscription-trial-disclosure: Added Kotlin 2.x (KMP), Compose Multiplatform + Jetpack Compose, Koin DI, DataStore Preferences
-- 004-fix-subscription-trial-disclosure: Added Kotlin 2.x (KMP), Java 21 (JetBrains JDK) + RevenueCat purchases-kmp v1.9.0+14.3.0, Jetpack Compose Multiplatform, Koin DI
