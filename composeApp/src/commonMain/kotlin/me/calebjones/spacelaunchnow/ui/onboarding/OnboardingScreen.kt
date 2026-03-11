@@ -194,7 +194,7 @@ fun OnboardingContent(
                 .padding(horizontal = 20.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // ── Hero section ──────────────────────────────────────────────
             Card(
