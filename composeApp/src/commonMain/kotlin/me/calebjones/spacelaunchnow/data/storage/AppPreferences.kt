@@ -39,6 +39,10 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // Onboarding completed flag (replaces BETA_WARNING_SHOWN for new installs)
         private val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
 
+        // Versioned paywall-onboarding gate — new key ensures ALL existing users see the
+        // onboarding paywall at least once after this version ships.
+        private val ONBOARDING_PAYWALL_V1_SHOWN = booleanPreferencesKey("onboarding_paywall_v1_shown")
+
         // Schedule filter state
         private val SCHEDULE_FILTER_STATE = stringPreferencesKey("schedule_filter_state")
 
@@ -159,6 +163,17 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     suspend fun setOnboardingCompleted(completed: Boolean) {
         dataStore.edit { preferences ->
             preferences[ONBOARDING_COMPLETED] = completed
+        }
+    }
+
+    // Versioned paywall onboarding gate methods
+    val onboardingPaywallV1ShownFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[ONBOARDING_PAYWALL_V1_SHOWN] ?: false
+    }
+
+    suspend fun setOnboardingPaywallV1Shown(shown: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[ONBOARDING_PAYWALL_V1_SHOWN] = shown
         }
     }
 

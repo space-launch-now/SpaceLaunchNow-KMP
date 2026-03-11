@@ -127,6 +127,7 @@ fun OnboardingScreen(
         if (uiState.successMessage != null) {
             coroutineScope.launch {
                 appPreferences.setOnboardingCompleted(true)
+                appPreferences.setOnboardingPaywallV1Shown(true)
             }
             onComplete()
         }
@@ -147,6 +148,7 @@ fun OnboardingScreen(
         onDismiss = {
             coroutineScope.launch {
                 appPreferences.setOnboardingCompleted(true)
+                appPreferences.setOnboardingPaywallV1Shown(true)
                 onComplete()
             }
         }
