@@ -919,6 +919,29 @@ class LaunchRepositoryImpl(
         }
     }
 
+    override suspend fun getNextNormalLaunch(
+        limit: Int
+    ): Result<PaginatedLaunchNormalList> {
+        return try {
+            val response = launchesApi.getLaunchList(
+                limit = limit,
+                upcoming = true,
+                ordering = "net"
+            )
+            val body = response.body()
+            Result.success(body)
+        } catch (e: ResponseException) {
+            log.e(e) { "ResponseException in getNextNormalLaunch: ${e.message}" }
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "IOException in getNextNormalLaunch: ${e.message}" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "Exception in getNextNormalLaunch: ${e::class.simpleName}: ${e.message}" }
+            Result.failure(e)
+        }
+    }
+
     // Additional utility methods using the clean extension functions
 
     suspend fun searchLaunches(

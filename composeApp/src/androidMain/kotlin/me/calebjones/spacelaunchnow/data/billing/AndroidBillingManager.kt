@@ -8,6 +8,7 @@ import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.models.CustomerInfo
 import com.revenuecat.purchases.kmp.models.PeriodType
+import com.revenuecat.purchases.kmp.models.freePhase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,10 +16,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import me.calebjones.spacelaunchnow.BuildConfig
 import me.calebjones.spacelaunchnow.analytics.DatadogRUM
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
-import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.toDisplayString
 import kotlin.coroutines.resume
 
@@ -117,26 +118,41 @@ class AndroidBillingManager(
             val offerings = purchases.awaitOfferings()
 
             val products = offerings.current?.availablePackages?.map { pkg ->
-                // Extract free trial info from subscription options (Android/Google Play)
-                val freeTrialOption = pkg.storeProduct.subscriptionOptions?.freeTrial
-                val freeTrialPhase = freeTrialOption?.pricingPhases?.firstOrNull {
+                val product = pkg.storeProduct
+
+                // Strategy 1: explicit freeTrial subscription option (Google Play base plan offer)
+                val freeTrialOption = product.subscriptionOptions?.freeTrial
+                val freeTrialPhaseFromOption = freeTrialOption?.pricingPhases?.firstOrNull {
                     it.price.amountMicros == 0L
                 }
 
+                // Strategy 2: scan defaultOption pricing phases for a $0 phase
+                val freeTrialPhaseFromDefault = product.defaultOption?.pricingPhases
+                    ?.firstOrNull { it.price.amountMicros == 0L }
+
+                val freeTrialPhase = freeTrialPhaseFromOption ?: freeTrialPhaseFromDefault
+
                 // Extract intro offer info (non-free intro pricing)
-                val introOption = pkg.storeProduct.subscriptionOptions?.introOffer
+                val introOption = product.subscriptionOptions?.introOffer
                 val introPhase = introOption?.pricingPhases?.firstOrNull {
                     it.price.amountMicros > 0L
                 }
 
+                log.d {
+                    "Product ${product.id} (${pkg.identifier}): " +
+                            "freeTrial=${freeTrialPhase != null}, " +
+                            "trialPeriod=${freeTrialPhase?.billingPeriod?.toDisplayString()}, " +
+                            "subscriptionOptions=${product.subscriptionOptions != null}"
+                }
+
                 ProductInfo(
-                    productId = pkg.storeProduct.id,
+                    productId = product.id,
                     basePlanId = pkg.identifier,
-                    title = pkg.storeProduct.title,
-                    description = "${pkg.packageType} - ${pkg.storeProduct.period?.unit?.name ?: "One-time"}",
-                    formattedPrice = pkg.storeProduct.price.formatted,
-                    priceAmountMicros = pkg.storeProduct.price.amountMicros.toLong(),
-                    currencyCode = pkg.storeProduct.price.currencyCode,
+                    title = product.title,
+                    description = "${pkg.packageType} - ${product.period?.unit?.name ?: "One-time"}",
+                    formattedPrice = product.price.formatted,
+                    priceAmountMicros = product.price.amountMicros.toLong(),
+                    currencyCode = product.price.currencyCode,
                     hasFreeTrial = freeTrialPhase != null,
                     freeTrialPeriodDisplay = freeTrialPhase?.billingPeriod?.toDisplayString(),
                     freeTrialPeriodValue = freeTrialPhase?.billingPeriod?.value,
@@ -147,7 +163,7 @@ class AndroidBillingManager(
                 )
             } ?: emptyList()
 
-            log.i { "Found ${products.size} available products" }
+            log.i { "Found ${products.size} available products: ${products.map { "${it.basePlanId}(trial=${it.hasFreeTrial})" }}" }
             Result.success(products)
         } catch (e: Exception) {
             log.e(e) { "Failed to get available products" }
@@ -253,18 +269,16 @@ class AndroidBillingManager(
 
         val activeEntitlements = customerInfo.entitlements.active.keys
 
-        // Collect all product IDs from various sources
+        // Collect product IDs from entitlements and active subscriptions only.
+        // nonSubscriptionTransactions (one-time IAPs) are intentionally excluded —
+        // they do not represent an active subscription and must not affect subscription type.
         val productIds = buildSet {
             // From entitlements
             customerInfo.entitlements.active.values.forEach {
                 it.productIdentifier?.let { productId -> add(productId) }
             }
-            // From active subscriptions
+            // From active subscriptions only
             addAll(customerInfo.activeSubscriptions)
-            // From non-subscription purchases
-            customerInfo.nonSubscriptionTransactions.forEach {
-                add(it.productIdentifier)
-            }
         }
 
         val subscriptionType = determineSubscriptionType(activeEntitlements, productIds)
@@ -311,7 +325,11 @@ class AndroidBillingManager(
         entitlements: Set<String>,
         productIds: Set<String>
     ): SubscriptionType {
-        log.d { "Determining subscription type - entitlements: ${entitlements.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }}, products: ${productIds.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }}" }
+        log.d {
+            "Determining subscription type - entitlements: ${
+                entitlements.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }
+            }, products: ${productIds.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }}"
+        }
 
         // Check entitlements first (most reliable)
         val result = when {
@@ -367,12 +385,6 @@ class AndroidBillingManager(
                 }
                 log.v { "Match: Found premium product ID '$matchedProduct' → PREMIUM" }
                 SubscriptionType.PREMIUM
-            }
-
-            // Check for any active subscription or purchase (legacy)
-            productIds.isNotEmpty() -> {
-                log.w { "Fallback: Unknown product IDs present → LEGACY - Products: ${productIds.joinToString(", ")}" }
-                SubscriptionType.LEGACY
             }
 
             else -> {

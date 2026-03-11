@@ -35,6 +35,7 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.Onboarding
 import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
@@ -96,6 +97,7 @@ fun PhoneLayout(
         ThemeCustomization::class.qualifiedName -> false // Hide for ThemeCustomization
         CalendarSync::class.qualifiedName -> false // Hide for CalendarSync
         Roadmap::class.qualifiedName -> false // Hide for Roadmap
+        Onboarding::class.qualifiedName -> false // Hide for full-screen Onboarding paywall
 
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern

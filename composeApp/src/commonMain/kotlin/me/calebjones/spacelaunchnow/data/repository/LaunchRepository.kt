@@ -57,5 +57,6 @@ interface LaunchRepository {
     ): Result<DataResult<PaginatedLaunchNormalList>>
 
     suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList>
+    suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedLaunchNormalList>
 }
  

@@ -207,6 +207,22 @@ fun SettingsScreen(
                     }
                 }
 
+                // SUPPORT & MEMBERSHIP
+                item {
+                    SectionHeaderText("Premium")
+                    Spacer(Modifier.height(2.dp))
+                    SettingsCardRow {
+                        Column(Modifier.fillMaxWidth()) {
+                            SettingsNavigationRow(
+                                title = "Go Premium \u2728",
+                                subtitle = "Ad-free, widgets, themes & more",
+                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs) },
+                                icon = Icons.Filled.Star
+                            )
+                        }
+                    }
+                }
+
                 // DIAGNOSTIC LOGGING
                 item {
                     val loggingPreferences: LoggingPreferences = koinInject()
@@ -233,21 +249,7 @@ fun SettingsScreen(
                         }
                     }
                 }
-                // SUPPORT & MEMBERSHIP
-                item {
-                    SectionHeaderText("Support & Membership")
-                    Spacer(Modifier.height(2.dp))
-                    SettingsCardRow {
-                        Column(Modifier.fillMaxWidth()) {
-                            SettingsNavigationRow(
-                                title = "Support Me ✨",
-                                subtitle = "Premium features, golden card, and support development",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs) },
-                                icon = Icons.Filled.Star
-                            )
-                        }
-                    }
-                }
+
                 // ABOUT
                 item {
                     SectionHeaderText("About")

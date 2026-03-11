@@ -212,34 +212,19 @@ fun SupportUsScreen(
                             SubscriptionType.LEGACY -> "Continue Your Support"
                             SubscriptionType.PREMIUM -> "Upgrade to Lifetime"
                             SubscriptionType.LIFETIME -> ""
-                            else -> "Become a Member"
+                            else -> ""
                         }
                         subscriptionState.subscriptionType.isLegacy
                         Spacer(Modifier.height(24.dp))
-                        Text(
-                            text = headerText,
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 24.dp)
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = if (!subscriptionState.isSubscribed)
-                                "Unlock premium features and support development"
-                            else
-                                "Unlock all premium features including widgets and more!",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 24.dp)
-                        )
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            text = "✨ All plans unlock all features",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 24.dp)
-                        )
+                        if (headerText.isNotEmpty()) {
+                            Text(
+                                text = headerText,
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
+                            Spacer(Modifier.height(8.dp))
+                        }
                     }
 
                     // Premium Widget Perk
@@ -252,32 +237,6 @@ fun SupportUsScreen(
                             gradient = listOf(
                                 MaterialTheme.colorScheme.primary,
                                 MaterialTheme.colorScheme.tertiary
-                            )
-                        )
-                    }
-
-                    item {
-                        Spacer(Modifier.height(24.dp))
-                        PremiumPerkCard(
-                            icon = Icons.Default.DashboardCustomize,
-                            title = "Widget Customization",
-                            description = "Customize widgets with customizable themes and layouts",
-                            gradient = listOf(
-                                MaterialTheme.colorScheme.primaryFixed,
-                                MaterialTheme.colorScheme.tertiaryFixed
-                            )
-                        )
-                    }
-
-                    item {
-                        Spacer(Modifier.height(24.dp))
-                        PremiumPerkCard(
-                            icon = Icons.Default.EditCalendar,
-                            title = "Calendar Sync",
-                            description = "Access to Calendar Sync link for Launch and Event calendar sync",
-                            gradient = listOf(
-                                MaterialTheme.colorScheme.secondary,
-                                MaterialTheme.colorScheme.inversePrimary
                             )
                         )
                     }
@@ -338,53 +297,14 @@ fun SupportUsScreen(
                 }
             }
 
-            // Pro Lifetime (Golden Premium Option) - Show if available in packagesToShow
-            if (packagesToShow.showLifetime) {
-                item {
-                    ProLifetimeCard(
-                        price = lifetimeProduct?.formattedPrice ?: "$-.--",
-                        isProcessing = uiState.isProcessing,
-                        onPurchase = {
-                            if (lifetimeProduct != null) {
-                                viewModel.purchaseProduct(lifetimeProduct)
-                            }
-                        },
-                        enabled = lifetimeProduct != null
-                    )
-
-                    // Show divider only if lifetime was shown AND there are subscription plans to show
-                    if (packagesToShow.showAnnual && packagesToShow.showMonthly) {
-                        Spacer(Modifier.height(20.dp))
-
-                        // "Or subscribe" divider
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            HorizontalDivider(modifier = Modifier.weight(1f))
-                            Text(
-                                text = "  Or subscribe  ",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            HorizontalDivider(modifier = Modifier.weight(1f))
-                        }
-                        Spacer(Modifier.height(16.dp))
-                    }
-                    // Don't show fallback UI or divider - just hide until loaded
-                }
-            }
-
-            // Yearly Plan (Recommended) - Show if available in packagesToShow
+            // Annual Plan (Recommended — anchored first) - Show if available in packagesToShow
             if (packagesToShow.showAnnual) {
                 item {
                     PricingCard(
                         title = "Yearly",
                         price = annualProduct?.formattedPrice ?: "$-.--",
                         period = "/year",
-                        savings = uiState.getSavingsPercent(),
+                        savings = uiState.getAnnualMonthlyEquivalent(),
                         isRecommended = true,
                         isProcessing = uiState.isProcessing,
                         onSubscribe = {
@@ -396,7 +316,6 @@ fun SupportUsScreen(
                         hasFreeTrial = annualProduct?.hasFreeTrial ?: false,
                         freeTrialPeriodDisplay = annualProduct?.freeTrialPeriodDisplay
                     )
-                    // Don't show fallback UI - just hide until loaded
                 }
             }
 
@@ -418,7 +337,42 @@ fun SupportUsScreen(
                         },
                         enabled = monthlyProduct != null
                     )
-                    // Don't show fallback UI - just hide until loaded
+                }
+            }
+
+            // Pro Lifetime — shown last, for power users who want to commit
+            if (packagesToShow.showLifetime) {
+                item {
+                    // "Or go lifetime" divider
+                    if (packagesToShow.showAnnual || packagesToShow.showMonthly) {
+                        Spacer(Modifier.height(20.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            HorizontalDivider(modifier = Modifier.weight(1f))
+                            Text(
+                                text = "  Or go lifetime  ",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            HorizontalDivider(modifier = Modifier.weight(1f))
+                        }
+                        Spacer(Modifier.height(16.dp))
+                    }
+
+                    ProLifetimeCard(
+                        price = lifetimeProduct?.formattedPrice ?: "$-.--",
+                        isProcessing = uiState.isProcessing,
+                        onPurchase = {
+                            if (lifetimeProduct != null) {
+                                viewModel.purchaseProduct(lifetimeProduct)
+                            }
+                        },
+                        enabled = lifetimeProduct != null
+                    )
                 }
             }
 
@@ -644,10 +598,23 @@ private fun PricingCard(
     freeTrialPeriodDisplay: String? = null,
     subscribeButtonText: String = if (hasFreeTrial) "Start Free Trial" else "Subscribe Now"
 ) {
+    val glowPrimary = MaterialTheme.colorScheme.primary
+    val glowTertiary = MaterialTheme.colorScheme.tertiary
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .then(
+                if (isRecommended) Modifier.platformShadowGlow(
+                    gradientColors = listOf(
+                        glowPrimary.copy(alpha = 0.5f),
+                        glowTertiary.copy(alpha = 0.4f)
+                    ),
+                    borderRadius = 14.dp,
+                    blurRadius = 12.dp,
+                    spread = 6.dp
+                ) else Modifier
+            ),
         colors = if (isRecommended) {
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -742,16 +709,6 @@ private fun PricingCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = if (isRecommended) MaterialTheme.colorScheme.onPrimaryFixedVariant else MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-
-            // Features Quick List
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PerkCheckmark("Premium Themes")
-                PerkCheckmark("Premium Widget")
-                PerkCheckmark("Widget Customization")
-                PerkCheckmark("Calendar Sync")
-                PerkCheckmark("No Ads")
-                PerkCheckmark("Support Development")
             }
 
             // Subscribe Button
