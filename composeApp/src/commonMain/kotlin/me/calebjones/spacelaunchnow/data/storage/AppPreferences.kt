@@ -36,6 +36,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // Beta warning dialog shown flag
         private val BETA_WARNING_SHOWN = booleanPreferencesKey("beta_warning_shown")
 
+        // Onboarding completed flag (replaces BETA_WARNING_SHOWN for new installs)
+        private val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+
         // Schedule filter state
         private val SCHEDULE_FILTER_STATE = stringPreferencesKey("schedule_filter_state")
 
@@ -146,6 +149,17 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
     suspend fun isBetaWarningShown(): Boolean {
         return dataStore.data.map { it[BETA_WARNING_SHOWN] }.first() ?: false
+    }
+
+    // Onboarding completed methods
+    val onboardingCompletedFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[ONBOARDING_COMPLETED] ?: false
+    }
+
+    suspend fun setOnboardingCompleted(completed: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[ONBOARDING_COMPLETED] = completed
+        }
     }
 
     // Schedule filter state methods

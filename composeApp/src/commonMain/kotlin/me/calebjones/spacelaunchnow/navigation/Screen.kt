@@ -50,6 +50,9 @@ data class LaunchDetail(val launchId: String)
 data class EventDetail(val eventId: Int)
 
 @Serializable
+data object Onboarding
+
+@Serializable
 data object Rockets
 
 @Serializable

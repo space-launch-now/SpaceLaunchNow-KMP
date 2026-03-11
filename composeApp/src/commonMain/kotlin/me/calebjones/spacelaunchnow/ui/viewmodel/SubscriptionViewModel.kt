@@ -93,6 +93,17 @@ class SubscriptionViewModel(
                 },
                 onFailure = { error ->
                     log.e(error) { "Failed to load products" }
+                    val isBillingUnavailable = error.message?.let { msg ->
+                        msg.contains("StoreProblemError", ignoreCase = true) ||
+                        msg.contains("Billing is not available", ignoreCase = true) ||
+                        msg.contains("not allowed to make the purchase", ignoreCase = true) ||
+                        msg.contains("PurchaseNotAllowedError", ignoreCase = true) ||
+                        msg.contains("not supported", ignoreCase = true)
+                    } == true
+                    if (isBillingUnavailable) {
+                        log.w { "Billing not available on this device — hiding paywall CTA" }
+                        _uiState.value = _uiState.value.copy(billingUnavailable = true)
+                    }
                 }
             )
         }
@@ -280,6 +291,7 @@ data class SubscriptionUiState(
     val isProcessing: Boolean = false,
     val successMessage: String? = null,
     val errorMessage: String? = null,
+    val billingUnavailable: Boolean = false,
     val monthlyPricing: me.calebjones.spacelaunchnow.data.model.ProductPricing? = null,
     val yearlyPricing: me.calebjones.spacelaunchnow.data.model.ProductPricing? = null,
     val lifetimePricing: me.calebjones.spacelaunchnow.data.model.ProductPricing? = null,
@@ -315,5 +327,20 @@ data class SubscriptionUiState(
         }
 
         return ""
+    }
+
+    /**
+     * Self-contained monthly equivalent for annual plan (e.g. "Just $1.08/mo").
+     * More compelling than a vague percentage—shows the actual per-month cost.
+     */
+    fun getAnnualMonthlyEquivalent(): String? {
+        val yearly = yearlyPricing ?: return null
+        if (yearly.priceAmountMicros <= 0) return null
+        val monthlyMicros = yearly.priceAmountMicros / 12
+        val rawCents = (monthlyMicros % 1_000_000 + 5_000) / 10_000
+        val dollars = monthlyMicros / 1_000_000 + rawCents / 100
+        val cents = rawCents % 100
+        val prefix = yearly.formattedPrice.takeWhile { !it.isDigit() }
+        return "Just $prefix$dollars.${cents.toString().padStart(2, '0')}/mo"
     }
 }

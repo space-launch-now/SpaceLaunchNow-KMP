@@ -35,16 +35,19 @@ fun AppIconBox(
     boxSize: Dp = 112.dp,
     iconSize: Dp = 90.dp
 ) {
+    val outerSize = boxSize + 13.dp
+    val middleSize = boxSize + 9.dp
+
     Box(
-        modifier = Modifier
-            .size(125.dp)
+        modifier = modifier
+            .size(outerSize)
             .shadow(elevation = 8.dp, shape = CircleShape, clip = false),
         contentAlignment = Alignment.Center
     ) {
         // Outer colorful sweep gradient border effect
         Box(
             modifier = Modifier
-                .size(125.dp)
+                .size(outerSize)
                 .clip(CircleShape)
                 .background(
                     Brush.sweepGradient(
@@ -56,18 +59,17 @@ fun AppIconBox(
                         )
                     )
                 )
-                .then(Modifier)
         ) {}
         // Middle thin border
         Box(
             modifier = Modifier
-                .size(121.dp)
+                .size(middleSize)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primaryContainer)
         ) {}
         // Inner circle with app icon
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .size(boxSize)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primary),

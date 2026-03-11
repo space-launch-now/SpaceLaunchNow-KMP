@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -11,14 +12,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
+import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
+import me.calebjones.spacelaunchnow.data.repository.EventsRepository
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
@@ -32,6 +42,7 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
+import me.calebjones.spacelaunchnow.navigation.Onboarding
 import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
@@ -50,7 +61,6 @@ import me.calebjones.spacelaunchnow.ui.agencies.AgencyDetailScreen
 import me.calebjones.spacelaunchnow.ui.agencies.AgencyListScreen
 import me.calebjones.spacelaunchnow.ui.astronaut.AstronautDetailView
 import me.calebjones.spacelaunchnow.ui.astronaut.AstronautListScreen
-import me.calebjones.spacelaunchnow.ui.compose.BetaWarningDialog
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.explore.ExploreScreen
@@ -58,6 +68,7 @@ import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
+import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingScreen
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
@@ -71,6 +82,7 @@ import me.calebjones.spacelaunchnow.ui.starship.StarshipScreen
 import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -196,9 +208,10 @@ fun SpaceLaunchNowApp(
                 }
 
                 // CR-3: Ad SDK must initialize on Main thread per Google AdMob threading contract
-                val adInitSuccess = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                    AdInitializer.initialize(context = contextFactory.getActivity())
-                }
+                val adInitSuccess =
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                        AdInitializer.initialize(context = contextFactory.getActivity())
+                    }
 
                 if (adInitSuccess) {
                     kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
@@ -257,7 +270,68 @@ fun SpaceLaunchNowApp(
             LocalUseUtc provides useUtc,
             LocalContextFactory provides contextFactory
         ) {
-            BetaWarningDialog()
+            // Migrate existing users: if they've seen BetaWarningDialog, mark onboarding complete
+            val appPreferences: AppPreferences = koinInject()
+            LaunchedEffect(Unit) {
+                if (appPreferences.isBetaWarningShown()) {
+                    appPreferences.setOnboardingCompleted(true)
+                }
+            }
+
+            // Onboarding gate — null while DataStore initializes; NavHost deferred until known
+            val onboardingCompleted by appPreferences.onboardingCompletedFlow.collectAsState(initial = null)
+            val subscriptionViewModel: SubscriptionViewModel = koinInject()
+            val subscriptionState by subscriptionViewModel.subscriptionState.collectAsState()
+            val startRoute: Any? = when {
+                onboardingCompleted == null -> null
+                onboardingCompleted == true -> Home
+                else -> Onboarding
+            }
+
+            // Preload home screen data in the background while onboarding is shown.
+            // Repositories are singletons — warming them here means Home's ViewModels
+            // get instant cache hits the moment navigation completes.
+            if (startRoute == Onboarding) {
+                val launchRepository: LaunchRepository = koinInject()
+                val updatesRepository: UpdatesRepository = koinInject()
+                val articlesRepository: ArticlesRepository = koinInject()
+                val eventsRepository: EventsRepository = koinInject()
+                val notificationStateStorage: NotificationStateStorage = koinInject()
+                val launchFilterService: LaunchFilterService = koinInject()
+                LaunchedEffect(Unit) {
+                    try {
+                        val filters = notificationStateStorage.stateFlow.first()
+                        val filterParams = launchFilterService.getFilterParams(filters)
+                        kotlinx.coroutines.coroutineScope {
+                            launch(kotlinx.coroutines.Dispatchers.IO) {
+                                launchRepository.getFeaturedLaunch(
+                                    agencyIds = filterParams.agencyIds,
+                                    locationIds = filterParams.locationIds
+                                )
+                            }
+                            launch(kotlinx.coroutines.Dispatchers.IO) {
+                                launchRepository.getUpcomingLaunchesNormal(
+                                    limit = 8,
+                                    agencyIds = filterParams.agencyIds,
+                                    locationIds = filterParams.locationIds
+                                )
+                            }
+                            launch(kotlinx.coroutines.Dispatchers.IO) {
+                                launchRepository.getPreviousLaunchesNormal(
+                                    limit = 8,
+                                    agencyIds = filterParams.agencyIds,
+                                    locationIds = filterParams.locationIds
+                                )
+                            }
+                            launch(kotlinx.coroutines.Dispatchers.IO) { updatesRepository.getLatestUpdates() }
+                            launch(kotlinx.coroutines.Dispatchers.IO) { articlesRepository.getArticles() }
+                            launch(kotlinx.coroutines.Dispatchers.IO) { eventsRepository.getUpcomingEvents() }
+                        }
+                    } catch (e: Exception) {
+                        log.d { "Home data prefetch suppressed: ${e.message}" }
+                    }
+                }
+            }
 
             // Show consent popup (platform-specific implementation)
             // Must be inside CompositionLocalProvider to access LocalContextFactory
@@ -344,201 +418,221 @@ fun SpaceLaunchNowApp(
                 context = contextFactory.getActivity(),
                 shouldPreloadAds = isConsentResolved
             ) {
-                // Hoisted NavHost - preserved across layout switches to maintain navigation state
-                val navHostContent: @Composable () -> Unit = {
-                    NavHost(
-                        navController = navController,
-                        startDestination = Home,
-                    ) {
-                        composableWithCompositionLocal<Home> {
-                            HomeScreen(navController = navController)
-                        }
-                        composableWithCompositionLocal<Schedule> {
-                            ScheduleScreen(
-                                onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
-                            )
-                        }
-                        composableWithCompositionLocal<Explore> {
-                            ExploreScreen(navController = navController)
-                        }
-                        composableWithCompositionLocal<Settings> {
-                            SettingsScreen(
-                                navController = navController,
-                                onOpenNotificationSettings = {
-                                    navController.navigate(NotificationSettings)
-                                },
-                                onOpenDebugSettings = {
-                                    navController.navigate(DebugSettings)
-                                },
-                                onOpenAboutLibraries = {
-                                    navController.navigate(AboutLibraries)
-                                }
-                            )
-                        }
-                        composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
-                            val launchDetail = backStackEntry.toRoute<LaunchDetail>()
-                            LaunchDetailScreen(
-                                launchId = launchDetail.launchId,
-                                onNavigateBack = { navController.popBackStack() },
-                                navController = navController
-                            )
-                        }
-                        composableWithCompositionLocal<EventDetail> { backStackEntry ->
-                            val eventDetail = backStackEntry.toRoute<EventDetail>()
-                            EventDetailScreen(
-                                eventId = eventDetail.eventId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
-                            val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
-                            val scope = rememberCoroutineScope()
-                            AgencyDetailScreen(
-                                agencyId = agencyDetail.agencyId,
-                                onNavigateBack = { navController.popBackStack() },
-                                onNavigateToSchedule = { agencyId ->
-                                    scope.launch {
-                                        // Apply agency filter and wait for it to complete
-                                        val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
-                                        scheduleViewModel.filterByAgencyAndWait(agencyId)
-                                        navController.navigate(Schedule)
+                if (startRoute == null) {
+                    // DataStore still loading — blank surface prevents flash to Home screen
+                    androidx.compose.material3.Surface(
+                        modifier = Modifier.fillMaxSize()
+                    ) {}
+                } else {
+                    // Hoisted NavHost - preserved across layout switches to maintain navigation state
+                    val navHostContent: @Composable () -> Unit = {
+                        NavHost(
+                            navController = navController,
+                            startDestination = startRoute,
+                        ) {
+                            composableWithCompositionLocal<Onboarding> {
+                                OnboardingScreen(
+                                    onComplete = {
+                                        navController.navigate(Home) {
+                                            popUpTo<Onboarding> { inclusive = true }
+                                        }
                                     }
-                                }
-                            )
-                        }
-                        composableWithCompositionLocal<SpaceStationDetail> { backStackEntry ->
-                            val stationDetail = backStackEntry.toRoute<SpaceStationDetail>()
-                            me.calebjones.spacelaunchnow.ui.spacestation.SpaceStationDetailScreen(
-                                stationId = stationDetail.stationId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
-                            val fullscreenVideo = backStackEntry.toRoute<FullscreenVideo>()
-                            FullscreenVideoScreen(
-                                videoUrl = fullscreenVideo.videoUrl,
-                                launchName = fullscreenVideo.launchName,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<NotificationSettings> {
-                            NotificationSettingsScreen(
-                                navController = navController,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<DebugSettings> {
-                            DebugSettingsScreen(
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<AboutLibraries> {
-                            AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
-                        }
-                        composableWithCompositionLocal<SupportUs> {
-                            SupportUsScreen(
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<ThemeCustomization> {
-                            ThemeCustomizationScreen(
-                                navController = navController
-                            )
-                        }
-                        composableWithCompositionLocal<CalendarSync> {
-                            CalendarSyncScreen(
-                                navController = navController
-                            )
-                        }
-                        composableWithCompositionLocal<Roadmap> {
-                            RoadmapScreen(
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<Rockets> {
-                            RocketListScreen(
-                                onNavigateToRocketDetail = { id ->
-                                    navController.navigate(RocketDetail(id))
-                                },
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<RocketDetail> { backStackEntry ->
-                            val rocketDetail = backStackEntry.toRoute<RocketDetail>()
-                            RocketDetailScreen(
-                                rocketId = rocketDetail.rocketId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<Agencies> {
-                            AgencyListScreen(
-                                onNavigateToAgencyDetail = { id ->
-                                    navController.navigate(AgencyDetail(id))
-                                },
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
-                            val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
-                            val scope = rememberCoroutineScope()
-                            AgencyDetailScreen(
-                                agencyId = agencyDetail.agencyId,
-                                onNavigateBack = { navController.popBackStack() },
-                                onNavigateToSchedule = { agencyId ->
-                                    scope.launch {
-                                        // Apply agency filter and wait for it to complete
-                                        val scheduleViewModel = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
-                                        scheduleViewModel.filterByAgencyAndWait(agencyId)
-                                        navController.navigate(Schedule)
+                                )
+                            }
+                            composableWithCompositionLocal<Home> {
+                                HomeScreen(navController = navController)
+                            }
+                            composableWithCompositionLocal<Schedule> {
+                                ScheduleScreen(
+                                    onLaunchClick = { id -> navController.navigate(LaunchDetail(id)) }
+                                )
+                            }
+                            composableWithCompositionLocal<Explore> {
+                                ExploreScreen(navController = navController)
+                            }
+                            composableWithCompositionLocal<Settings> {
+                                SettingsScreen(
+                                    navController = navController,
+                                    onOpenNotificationSettings = {
+                                        navController.navigate(NotificationSettings)
+                                    },
+                                    onOpenDebugSettings = {
+                                        navController.navigate(DebugSettings)
+                                    },
+                                    onOpenAboutLibraries = {
+                                        navController.navigate(AboutLibraries)
                                     }
-                                }
-                            )
-                        }
-                        composableWithCompositionLocal<Astronauts> {
-                            AstronautListScreen(
-                                onNavigateToAstronautDetail = { id ->
-                                    navController.navigate(AstronautDetail(id))
-                                },
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<AstronautDetail> { backStackEntry ->
-                            val astronautDetail = backStackEntry.toRoute<AstronautDetail>()
-                            AstronautDetailView(
-                                astronautId = astronautDetail.astronautId,
-                                onLaunchClick = { launchId ->
-                                    navController.navigate(LaunchDetail(launchId))
-                                },
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<SpaceStationDetail> { backStackEntry ->
-                            val stationDetail = backStackEntry.toRoute<SpaceStationDetail>()
-                            me.calebjones.spacelaunchnow.ui.spacestation.SpaceStationDetailScreen(
-                                stationId = stationDetail.stationId,
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-                        composableWithCompositionLocal<Starship> {
-                            StarshipScreen(navController = navController)
+                                )
+                            }
+                            composableWithCompositionLocal<LaunchDetail> { backStackEntry ->
+                                val launchDetail = backStackEntry.toRoute<LaunchDetail>()
+                                LaunchDetailScreen(
+                                    launchId = launchDetail.launchId,
+                                    onNavigateBack = { navController.popBackStack() },
+                                    navController = navController
+                                )
+                            }
+                            composableWithCompositionLocal<EventDetail> { backStackEntry ->
+                                val eventDetail = backStackEntry.toRoute<EventDetail>()
+                                EventDetailScreen(
+                                    eventId = eventDetail.eventId,
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
+                                val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                                val scope = rememberCoroutineScope()
+                                AgencyDetailScreen(
+                                    agencyId = agencyDetail.agencyId,
+                                    onNavigateBack = { navController.popBackStack() },
+                                    onNavigateToSchedule = { agencyId ->
+                                        scope.launch {
+                                            // Apply agency filter and wait for it to complete
+                                            val scheduleViewModel =
+                                                org.koin.mp.KoinPlatform.getKoin()
+                                                    .get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
+                                            scheduleViewModel.filterByAgencyAndWait(agencyId)
+                                            navController.navigate(Schedule)
+                                        }
+                                    }
+                                )
+                            }
+                            composableWithCompositionLocal<SpaceStationDetail> { backStackEntry ->
+                                val stationDetail = backStackEntry.toRoute<SpaceStationDetail>()
+                                me.calebjones.spacelaunchnow.ui.spacestation.SpaceStationDetailScreen(
+                                    stationId = stationDetail.stationId,
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
+                                val fullscreenVideo = backStackEntry.toRoute<FullscreenVideo>()
+                                FullscreenVideoScreen(
+                                    videoUrl = fullscreenVideo.videoUrl,
+                                    launchName = fullscreenVideo.launchName,
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<NotificationSettings> {
+                                NotificationSettingsScreen(
+                                    navController = navController,
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<DebugSettings> {
+                                DebugSettingsScreen(
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<AboutLibraries> {
+                                AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
+                            }
+                            composableWithCompositionLocal<SupportUs> {
+                                SupportUsScreen(
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<ThemeCustomization> {
+                                ThemeCustomizationScreen(
+                                    navController = navController
+                                )
+                            }
+                            composableWithCompositionLocal<CalendarSync> {
+                                CalendarSyncScreen(
+                                    navController = navController
+                                )
+                            }
+                            composableWithCompositionLocal<Roadmap> {
+                                RoadmapScreen(
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<Rockets> {
+                                RocketListScreen(
+                                    onNavigateToRocketDetail = { id ->
+                                        navController.navigate(RocketDetail(id))
+                                    },
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<RocketDetail> { backStackEntry ->
+                                val rocketDetail = backStackEntry.toRoute<RocketDetail>()
+                                RocketDetailScreen(
+                                    rocketId = rocketDetail.rocketId,
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<Agencies> {
+                                AgencyListScreen(
+                                    onNavigateToAgencyDetail = { id ->
+                                        navController.navigate(AgencyDetail(id))
+                                    },
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
+                                val agencyDetail = backStackEntry.toRoute<AgencyDetail>()
+                                val scope = rememberCoroutineScope()
+                                AgencyDetailScreen(
+                                    agencyId = agencyDetail.agencyId,
+                                    onNavigateBack = { navController.popBackStack() },
+                                    onNavigateToSchedule = { agencyId ->
+                                        scope.launch {
+                                            // Apply agency filter and wait for it to complete
+                                            val scheduleViewModel =
+                                                org.koin.mp.KoinPlatform.getKoin()
+                                                    .get<me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel>()
+                                            scheduleViewModel.filterByAgencyAndWait(agencyId)
+                                            navController.navigate(Schedule)
+                                        }
+                                    }
+                                )
+                            }
+                            composableWithCompositionLocal<Astronauts> {
+                                AstronautListScreen(
+                                    onNavigateToAstronautDetail = { id ->
+                                        navController.navigate(AstronautDetail(id))
+                                    },
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<AstronautDetail> { backStackEntry ->
+                                val astronautDetail = backStackEntry.toRoute<AstronautDetail>()
+                                AstronautDetailView(
+                                    astronautId = astronautDetail.astronautId,
+                                    onLaunchClick = { launchId ->
+                                        navController.navigate(LaunchDetail(launchId))
+                                    },
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<SpaceStationDetail> { backStackEntry ->
+                                val stationDetail = backStackEntry.toRoute<SpaceStationDetail>()
+                                me.calebjones.spacelaunchnow.ui.spacestation.SpaceStationDetailScreen(
+                                    stationId = stationDetail.stationId,
+                                    onNavigateBack = { navController.popBackStack() }
+                                )
+                            }
+                            composableWithCompositionLocal<Starship> {
+                                StarshipScreen(navController = navController)
+                            }
                         }
                     }
-                }
 
-                // Dynamic layout switching while preserving navigation state
-                if (currentIsTabletSize) {
-                    TabletDesktopLayout(
-                        navController = navController,
-                        themeOption = themeOption,
-                        content = navHostContent
-                    )
-                } else {
-                    PhoneLayout(
-                        navController = navController,
-                        themeOption = themeOption,
-                        content = navHostContent
-                    )
-                }
+                    // Dynamic layout switching while preserving navigation state
+                    if (currentIsTabletSize) {
+                        TabletDesktopLayout(
+                            navController = navController,
+                            themeOption = themeOption,
+                            content = navHostContent
+                        )
+                    } else {
+                        PhoneLayout(
+                            navController = navController,
+                            themeOption = themeOption,
+                            content = navHostContent
+                        )
+                    }
+                } // end else — onboarding state resolved
             }
         }
     }
