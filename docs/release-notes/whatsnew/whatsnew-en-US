@@ -1,4 +1,3 @@
-### Features
+### Bug Fixes
 
-* **agent:** add business analysis agent skill
-* **ui:** implement onboarding screen
+* **onboarding:** onboarding pref key

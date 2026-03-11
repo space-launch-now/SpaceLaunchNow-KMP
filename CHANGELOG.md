@@ -1,3 +1,12 @@
+## [5.21.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.21.0...v5.21.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* **onboarding:** onboarding pref key ([fb9435b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fb9435b73c949ee662a2fcb57faaff5c840f93c9))
+
+
+
 # [5.21.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.20.0...v5.21.0) (2026-03-11)
 
 
@@ -48,15 +57,6 @@
 
 * **ios:** add SKAdNetwork identifiers and update Info.plist for conversion tracking ([6facf5f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6facf5f5b739c23c7a935cbcc12c04fc77429b9e))
 * **ios:** implement SHA-256 hashing for widget image cache keys to resolve cache collisions ([d62f7de](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d62f7de8a41cb87b46f16afe74b33faa3c6311aa))
-
-
-
-## [5.18.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.18.0...v5.18.1) (2026-03-02)
-
-
-### Bug Fixes
-
-* force refresh upcoming launches in fetchUpcomingLaunchesOrNull [skip ci] ([0e5c6ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0e5c6ac147aaf270b8c9a0fcf2597c3384d45f7e))
 
 
 
