@@ -1,9 +1,4 @@
-### Bug Fixes
-
-* **data:** apply user filters to fresh cache and widget data
-* **widget:** update access state handling in LaunchProvider and improve Lock Screen widget background
-
 ### Features
 
-* **admob:** implement compliance audit and remediation plan
-* **widgets:** implement robust subscription persistence for iOS widget
+* **agent:** add business analysis agent skill
+* **ui:** implement onboarding screen

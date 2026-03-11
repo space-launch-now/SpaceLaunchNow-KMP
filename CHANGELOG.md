@@ -1,3 +1,13 @@
+# [5.21.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.20.0...v5.21.0) (2026-03-11)
+
+
+### Features
+
+* **agent:** add business analysis agent skill ([a7d1ce4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a7d1ce42727365b068823ed3a07ea0383dd6df9b))
+* **ui:** implement onboarding screen ([517e963](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/517e963127cdb7ee5b469bebf3aefdf6cf0e6166))
+
+
+
 # [5.20.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.19.0...v5.20.0) (2026-03-06)
 
 
@@ -47,16 +57,6 @@
 ### Bug Fixes
 
 * force refresh upcoming launches in fetchUpcomingLaunchesOrNull [skip ci] ([0e5c6ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0e5c6ac147aaf270b8c9a0fcf2597c3384d45f7e))
-
-
-
-# [5.18.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.17.1...v5.18.0) (2026-02-28)
-
-
-### Features
-
-* add Lock Screen widgets for upcoming launches [skip ci] ([07091b6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/07091b67c57e703dcbeaf90f2319a350d2b0bb37))
-* add Lock Screen widgets for upcoming launches [skip ci] ([e9beb50](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9beb5053ca580f4372f69b21ae6106d1682c6b0))
 
 
 
