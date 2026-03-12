@@ -25,7 +25,7 @@ data class SettingsUiState(
     val availableLocations: List<NotificationLocation> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val theme: ThemeOption = ThemeOption.System,
+    val theme: ThemeOption = ThemeOption.Dark,
     val useUtc: Boolean = false,
     val notificationsEnabled: Boolean = true,
     val hideTbdLaunches: Boolean = false,
@@ -47,7 +47,7 @@ class AppSettingsViewModel(
     val themeFlow = appPreferences.themeFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = ThemeOption.System
+        initialValue = ThemeOption.Dark
     )
 
     val useUtcFlow = appPreferences.useUtcFlow.stateIn(

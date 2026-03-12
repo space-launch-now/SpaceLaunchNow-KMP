@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
@@ -54,8 +55,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
@@ -64,6 +70,8 @@ import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.getPlatform
+import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
@@ -181,6 +189,12 @@ fun OnboardingContent(
             Color(0xFF2A1060),
         )
     )
+    val uriHandler = LocalUriHandler.current
+    val termsUrl = if (getPlatform().type == PlatformType.IOS) {
+        "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+    } else {
+        "https://spacelaunchnow.app/app/tos"
+    }
 
     Box(
         modifier = Modifier
@@ -489,14 +503,43 @@ fun OnboardingContent(
             Spacer(modifier = Modifier.height(4.dp))
 
             // ── Legal footer ──────────────────────────────────────────────
-            Text(
-                text = "By subscribing you agree to our Terms of Service and Privacy Policy. Subscriptions auto-renew unless cancelled.",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.25f),
-                textAlign = TextAlign.Center,
+            val legalText = buildAnnotatedString {
+                withStyle(SpanStyle(color = Color.White.copy(alpha = 0.25f))) {
+                    append("By subscribing you agree to our ")
+                }
+                pushStringAnnotation(tag = "URL", annotation = termsUrl)
+                withStyle(SpanStyle(
+                    color = Color.White.copy(alpha = 0.55f),
+                    textDecoration = TextDecoration.Underline
+                )) {
+                    append("Terms of Service")
+                }
+                pop()
+                withStyle(SpanStyle(color = Color.White.copy(alpha = 0.25f))) {
+                    append(" and ")
+                }
+                pushStringAnnotation(tag = "URL", annotation = "https://spacelaunchnow.app/app/privacy")
+                withStyle(SpanStyle(
+                    color = Color.White.copy(alpha = 0.55f),
+                    textDecoration = TextDecoration.Underline
+                )) {
+                    append("Privacy Policy")
+                }
+                pop()
+                withStyle(SpanStyle(color = Color.White.copy(alpha = 0.25f))) {
+                    append(". Subscriptions auto-renew unless cancelled.")
+                }
+            }
+            ClickableText(
+                text = legalText,
+                style = MaterialTheme.typography.labelSmall.copy(textAlign = TextAlign.Center),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 8.dp),
+                onClick = { offset ->
+                    legalText.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                        .firstOrNull()?.let { uriHandler.openUri(it.item) }
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
