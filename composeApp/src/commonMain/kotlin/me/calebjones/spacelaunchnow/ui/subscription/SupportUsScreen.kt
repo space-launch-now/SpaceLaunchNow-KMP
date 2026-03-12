@@ -63,8 +63,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
@@ -1074,7 +1079,35 @@ private fun FinePrint(
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         )
-        
+
+        val termsUrl = if (platformType == PlatformType.IOS) {
+            "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+        } else {
+            "https://spacelaunchnow.app/app/tos"
+        }
+        val linkColor = MaterialTheme.colorScheme.primary
+        val legalLinksText = buildAnnotatedString {
+            pushStringAnnotation(tag = "URL", annotation = termsUrl)
+            withStyle(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)) {
+                append("Terms of Service")
+            }
+            pop()
+            append("  ·  ")
+            pushStringAnnotation(tag = "URL", annotation = "https://spacelaunchnow.app/app/privacy")
+            withStyle(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)) {
+                append("Privacy Policy")
+            }
+            pop()
+        }
+        ClickableText(
+            text = legalLinksText,
+            style = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
+            onClick = { offset ->
+                legalLinksText.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                    .firstOrNull()?.let { uriHandler.openUri(it.item) }
+            }
+        )
+
         // Manage Subscriptions Button (platform-specific)
         if (platformType.isMobile) {
             Spacer(Modifier.height(8.dp))
