@@ -305,29 +305,29 @@ fun SpaceLaunchNowApp(
                         val filters = notificationStateStorage.stateFlow.first()
                         val filterParams = launchFilterService.getFilterParams(filters)
                         kotlinx.coroutines.coroutineScope {
-                            launch(kotlinx.coroutines.Dispatchers.IO) {
+                            launch(kotlinx.coroutines.Dispatchers.Default) {
                                 launchRepository.getFeaturedLaunch(
                                     agencyIds = filterParams.agencyIds,
                                     locationIds = filterParams.locationIds
                                 )
                             }
-                            launch(kotlinx.coroutines.Dispatchers.IO) {
+                            launch(kotlinx.coroutines.Dispatchers.Default) {
                                 launchRepository.getUpcomingLaunchesNormal(
                                     limit = 8,
                                     agencyIds = filterParams.agencyIds,
                                     locationIds = filterParams.locationIds
                                 )
                             }
-                            launch(kotlinx.coroutines.Dispatchers.IO) {
+                            launch(kotlinx.coroutines.Dispatchers.Default) {
                                 launchRepository.getPreviousLaunchesNormal(
                                     limit = 8,
                                     agencyIds = filterParams.agencyIds,
                                     locationIds = filterParams.locationIds
                                 )
                             }
-                            launch(kotlinx.coroutines.Dispatchers.IO) { updatesRepository.getLatestUpdates() }
-                            launch(kotlinx.coroutines.Dispatchers.IO) { articlesRepository.getArticles() }
-                            launch(kotlinx.coroutines.Dispatchers.IO) { eventsRepository.getUpcomingEvents() }
+                            launch(kotlinx.coroutines.Dispatchers.Default) { updatesRepository.getLatestUpdates() }
+                            launch(kotlinx.coroutines.Dispatchers.Default) { articlesRepository.getArticles() }
+                            launch(kotlinx.coroutines.Dispatchers.Default) { eventsRepository.getUpcomingEvents() }
                         }
                     } catch (e: Exception) {
                         log.d { "Home data prefetch suppressed: ${e.message}" }

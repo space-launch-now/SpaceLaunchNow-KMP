@@ -164,12 +164,12 @@ class HomeViewModel(
 
                 // PRIORITY 3: Everything else - run on IO dispatcher (lower priority for background work)
                 // These don't block the UI and can use lower priority IO threads
-                launch(kotlinx.coroutines.Dispatchers.IO) { loadUpdates() }
-                launch(kotlinx.coroutines.Dispatchers.IO) { loadArticles() }
-                launch(kotlinx.coroutines.Dispatchers.IO) { loadEvents() }
-                launch(kotlinx.coroutines.Dispatchers.IO) { loadNext24Hours() }
-                launch(kotlinx.coroutines.Dispatchers.IO) { loadNextWeek() }
-                launch(kotlinx.coroutines.Dispatchers.IO) { loadNextMonth() }
+                launch(kotlinx.coroutines.Dispatchers.Default) { loadUpdates() }
+                launch(kotlinx.coroutines.Dispatchers.Default) { loadArticles() }
+                launch(kotlinx.coroutines.Dispatchers.Default) { loadEvents() }
+                launch(kotlinx.coroutines.Dispatchers.Default) { loadNext24Hours() }
+                launch(kotlinx.coroutines.Dispatchers.Default) { loadNextWeek() }
+                launch(kotlinx.coroutines.Dispatchers.Default) { loadNextMonth() }
 
             } catch (exception: Exception) {
                 log.e(exception) { "Error loading home screen data" }
