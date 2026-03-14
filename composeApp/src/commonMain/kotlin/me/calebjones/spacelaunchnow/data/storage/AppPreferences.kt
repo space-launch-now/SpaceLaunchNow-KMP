@@ -55,8 +55,8 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     val themeFlow: Flow<ThemeOption> = dataStore.data.map { preferences ->
-        val themeString = preferences[THEME_OPTION] ?: ThemeOption.System.name
-        ThemeOption.entries.firstOrNull { it.name == themeString } ?: ThemeOption.System
+        val themeString = preferences[THEME_OPTION] ?: ThemeOption.Dark.name
+        ThemeOption.entries.firstOrNull { it.name == themeString } ?: ThemeOption.Dark
     }
 
     val useUtcFlow: Flow<Boolean> = dataStore.data.map { preferences ->
@@ -98,8 +98,8 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     suspend fun getTheme(): ThemeOption {
-        val themeString = dataStore.data.map { it[THEME_OPTION] }.first() ?: ThemeOption.System.name
-        return ThemeOption.entries.firstOrNull { it.name == themeString } ?: ThemeOption.System
+        val themeString = dataStore.data.map { it[THEME_OPTION] }.first() ?: ThemeOption.Dark.name
+        return ThemeOption.entries.firstOrNull { it.name == themeString } ?: ThemeOption.Dark
     }
 
     suspend fun getUseUtc(): Boolean {

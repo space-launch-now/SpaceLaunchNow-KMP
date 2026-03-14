@@ -1,9 +1,5 @@
 package me.calebjones.spacelaunchnow.ui.onboarding
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,10 +31,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -65,6 +61,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
+import me.calebjones.spacelaunchnow.ui.components.FinePrint
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
@@ -181,7 +178,6 @@ fun OnboardingContent(
             Color(0xFF2A1060),
         )
     )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -375,7 +371,8 @@ fun OnboardingContent(
                     if (monthlyProduct != null) {
                         Spacer(modifier = Modifier.height(8.dp))
                         val monthlyMicros = monthlyProduct.priceAmountMicros
-                        val perMonth = if (monthlyMicros > 0) monthlyProduct.formattedPrice else null
+                        val perMonth =
+                            if (monthlyMicros > 0) monthlyProduct.formattedPrice else null
                         OutlinedButton(
                             onClick = { onSubscribe(monthlyProduct) },
                             enabled = !isProcessing,
@@ -434,25 +431,8 @@ fun OnboardingContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // ── Error message ─────────────────────────────────────────────
-            AnimatedVisibility(
-                visible = errorMessage != null,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut()
-            ) {
-                if (errorMessage != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = errorMessage,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
 
             // ── Continue to App (subscribed users only) ──────────────────
             if (isSubscribed) {
@@ -474,29 +454,12 @@ fun OnboardingContent(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // ── Restore Purchases ─────────────────────────────────────────
-            TextButton(
-                onClick = onRestorePurchases,
-                enabled = !isProcessing
-            ) {
-                Text(
-                    text = "Already a member? Restore Purchases",
-                    color = Color.White.copy(alpha = 0.4f),
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // ── Legal footer ──────────────────────────────────────────────
-            Text(
-                text = "By subscribing you agree to our Terms of Service and Privacy Policy. Subscriptions auto-renew unless cancelled.",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.25f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+            FinePrint(
+                dimColor = Color.White.copy(alpha = 0.25f),
+                linkColor = Color.White.copy(alpha = 0.55f)
             )
 
             Spacer(modifier = Modifier.height(16.dp))

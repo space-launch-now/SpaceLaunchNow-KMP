@@ -99,10 +99,10 @@ fun SettingsScreen(
 
     val uriHandler = LocalUriHandler.current
     val onPrivacyPolicy = {
-        uriHandler.openUri("https://spacelaunchnow.app/site/privacy")
+        uriHandler.openUri("https://spacelaunchnow.app/app/privacy")
     }
     val onTerms = {
-        uriHandler.openUri("https://spacelaunchnow.app/site/tos")
+        uriHandler.openUri("https://spacelaunchnow.app/app/tos")
     }
     val onAbout: () -> Unit = {
         onOpenAboutLibraries()
