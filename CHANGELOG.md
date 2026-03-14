@@ -1,3 +1,12 @@
+## [5.21.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.21.2...v5.21.3) (2026-03-12)
+
+
+### Bug Fixes
+
+* change coroutine dispatcher from IO to Default for background tasks ([51c259e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/51c259e382b9d78a7014e1d1ed5f844ced0817b0))
+
+
+
 ## [5.21.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.21.1...v5.21.2) (2026-03-11)
 
 
@@ -39,23 +48,6 @@
 
 * **admob:** implement compliance audit and remediation plan ([f5f2616](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f5f2616b0ac35cbd8c5b04fe8c7d98abab161c5a))
 * **widgets:** implement robust subscription persistence for iOS widget ([0bcb1e4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0bcb1e463a6ca5fd17d6fad20e08bfb47cc8c789))
-
-
-
-# [5.19.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.18.2...v5.19.0) (2026-03-04)
-
-
-### Bug Fixes
-
-* **billing:** improve billing initialization logic ([2b8b62c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2b8b62c51f27fef9d8cab52ef3ea46ffa65a231f))
-* **subscription:** derive pricing from available products and remove legacy pricing logic ([387e97a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/387e97a4c1c2e3a12a5b9a7b21a52ed766d9942d))
-* **ui:** remove template fallback savings message ([4c794a1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4c794a19be3ad8443a51937d926175e5d9215f52))
-* **ui:** update welcome dialog to be platform-specific ([dbb2fe3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dbb2fe32f7f21e99ca24650267327255fb3bcc89))
-
-
-### Features
-
-* **billing:** implement free trial disclosure in subscription UI ([de7d9d8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/de7d9d8dedbc36389481c96923c1392c62a67214))
 
 
 
