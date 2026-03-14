@@ -25,13 +25,10 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.DashboardCustomize
-import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FormatPaint
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Stars
@@ -63,25 +60,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.getPlatform
-import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
+import me.calebjones.spacelaunchnow.ui.components.FinePrint
 import me.calebjones.spacelaunchnow.ui.platformShadowGlow
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.ProductType
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
-import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
@@ -612,12 +604,12 @@ private fun PricingCard(
             .then(
                 if (isRecommended) Modifier.platformShadowGlow(
                     gradientColors = listOf(
-                        glowPrimary.copy(alpha = 0.5f),
-                        glowTertiary.copy(alpha = 0.4f)
+                        glowPrimary.copy(alpha = 0.1f),
+                        glowTertiary.copy(alpha = 0.3f)
                     ),
-                    borderRadius = 14.dp,
+                    borderRadius = 7.dp,
                     blurRadius = 12.dp,
-                    spread = 6.dp
+                    spread = 3.dp
                 ) else Modifier
             ),
         colors = if (isRecommended) {
@@ -1017,128 +1009,6 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
     }
 }
 
-@Composable
-private fun FinePrint(
-    hasTrialOffer: Boolean = false,
-    trialPeriodDisplay: String? = null,
-    postTrialPrice: String? = null
-) {
-    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
-    val platformType = getPlatform().type
-    
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Icon(
-            Icons.Default.Lock,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-        )
-
-        Text(
-            text = "Secure Billing",
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Text(
-            text = "Purchases are processed securely through ${when (platformType) {
-                PlatformType.ANDROID -> "Google Play"
-                PlatformType.IOS -> "the App Store"
-                else -> "your platform's store"
-            }}.",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-        )
-
-        // Trial-specific disclosure (Google Play policy requirement)
-        if (hasTrialOffer && trialPeriodDisplay != null && postTrialPrice != null) {
-            Text(
-                text = "Free trial will automatically convert to a paid subscription " +
-                        "at $postTrialPrice unless canceled before the trial ends. " +
-                        "You won't be charged if you cancel during the $trialPeriodDisplay trial period.",
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-            )
-        }
-
-        Text(
-            text = "Any purchase above unlocks all premium features. " +
-                    "Subscriptions auto-renew until canceled. " +
-                    "You can manage or cancel your subscription at any time by following the link below.",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-        )
-
-        val termsUrl = if (platformType == PlatformType.IOS) {
-            "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
-        } else {
-            "https://spacelaunchnow.app/app/tos"
-        }
-        val linkColor = MaterialTheme.colorScheme.primary
-        val legalLinksText = buildAnnotatedString {
-            pushStringAnnotation(tag = "URL", annotation = termsUrl)
-            withStyle(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)) {
-                append("Terms of Service")
-            }
-            pop()
-            append("  ·  ")
-            pushStringAnnotation(tag = "URL", annotation = "https://spacelaunchnow.app/app/privacy")
-            withStyle(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)) {
-                append("Privacy Policy")
-            }
-            pop()
-        }
-        ClickableText(
-            text = legalLinksText,
-            style = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
-            onClick = { offset ->
-                legalLinksText.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                    .firstOrNull()?.let { uriHandler.openUri(it.item) }
-            }
-        )
-
-        // Manage Subscriptions Button (platform-specific)
-        if (platformType.isMobile) {
-            Spacer(Modifier.height(8.dp))
-            TextButton(
-                onClick = {
-                    val url = when (platformType) {
-                        PlatformType.ANDROID -> "https://play.google.com/store/account/subscriptions"
-                        PlatformType.IOS -> "https://apps.apple.com/account/subscriptions"
-                        else -> null
-                    }
-                    url?.let { uriHandler.openUri(it) }
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.OpenInNew,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(Modifier.size(4.dp))
-                Text(
-                    text = when (platformType) {
-                        PlatformType.ANDROID -> "Manage Subscriptions on Google Play"
-                        PlatformType.IOS -> "Manage Subscriptions in App Store"
-                        else -> "Manage Subscriptions"
-                    },
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun GoogleFormLinkCard() {
@@ -1221,22 +1091,22 @@ private fun ProLifetimeCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .platformShadowGlow(
-                gradientColors = listOf(
-                    Color(0xFFFFD700).copy(alpha = 0.6f), // Gold
-                    Color(0xFFFFA500).copy(alpha = 0.5f), // Orange
-                    Color(0xFFFF9800).copy(alpha = 0.7f)  // Yellow
-                ),
-                borderRadius = 10.dp,
-                blurRadius = 12.dp,
-                offsetX = 0.dp,
-                offsetY = 0.dp,
-                spread = 8.dp,
-                enableBreathingEffect = true,
-                breathingEffectIntensity = 4.dp,
-                breathingDurationMillis = 3000
-            ),
+            .padding(horizontal = 24.dp),
+//            .platformShadowGlow(
+//                gradientColors = listOf(
+//                    Color(0xFFFFD700).copy(alpha = 0.6f), // Gold
+//                    Color(0xFFFFA500).copy(alpha = 0.5f), // Orange
+//                    Color(0xFFFF9800).copy(alpha = 0.7f)  // Yellow
+//                ),
+//                borderRadius = 10.dp,
+//                blurRadius = 12.dp,
+//                offsetX = 0.dp,
+//                offsetY = 0.dp,
+//                spread = 8.dp,
+//                enableBreathingEffect = true,
+//                breathingEffectIntensity = 4.dp,
+//                breathingDurationMillis = 3000
+//            ),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = surfaceColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -1421,7 +1291,8 @@ private fun CurrentPlanCard(
                         subscriptionState.isInTrialPeriod -> {
                             val daysLeft = subscriptionState.trialExpiresAt?.let { expires ->
                                 @OptIn(kotlin.time.ExperimentalTime::class)
-                                val msRemaining = expires - kotlin.time.Clock.System.now().toEpochMilliseconds()
+                                val msRemaining =
+                                    expires - kotlin.time.Clock.System.now().toEpochMilliseconds()
                                 val days = (msRemaining / (1000 * 60 * 60 * 24)).coerceAtLeast(0)
                                 days
                             }
@@ -1431,6 +1302,7 @@ private fun CurrentPlanCard(
                                 "Free Trial"
                             }
                         }
+
                         subscriptionState.isSubscribed -> "${subscriptionState.subscriptionType.name.replaceFirstChar { it.uppercase() }} Member"
                         else -> "Free User"
                     },

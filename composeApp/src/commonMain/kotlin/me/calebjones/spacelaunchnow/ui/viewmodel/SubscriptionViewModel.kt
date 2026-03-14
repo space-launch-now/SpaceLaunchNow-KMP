@@ -92,18 +92,22 @@ class SubscriptionViewModel(
                     log.i { "Pricing derived - monthly: ${monthlyPricing?.formattedPrice}, yearly: ${yearlyPricing?.formattedPrice}, lifetime: ${lifetimePricing?.formattedPrice}" }
                 },
                 onFailure = { error ->
-                    log.e(error) { "Failed to load products" }
-                    val isBillingUnavailable = error.message?.let { msg ->
+                    log.e(error) { "Failed to get available products: ${error.message}" }
+                    // Any failure to load products means purchases can't proceed — treat all
+                    // errors as billing unavailable so the UI exits the endless shimmer state.
+                    // Specific known-unavailable messages are silently hidden; unexpected errors
+                    // (e.g. configuration issues) are surfaced so the user isn't left stuck.
+                    val isKnownUnavailable = error.message?.let { msg ->
                         msg.contains("StoreProblemError", ignoreCase = true) ||
                         msg.contains("Billing is not available", ignoreCase = true) ||
                         msg.contains("not allowed to make the purchase", ignoreCase = true) ||
                         msg.contains("PurchaseNotAllowedError", ignoreCase = true) ||
                         msg.contains("not supported", ignoreCase = true)
                     } == true
-                    if (isBillingUnavailable) {
-                        log.w { "Billing not available on this device — hiding paywall CTA" }
-                        _uiState.value = _uiState.value.copy(billingUnavailable = true)
-                    }
+                    _uiState.value = _uiState.value.copy(
+                        billingUnavailable = true,
+                        errorMessage = if (isKnownUnavailable) null else error.message
+                    )
                 }
             )
         }

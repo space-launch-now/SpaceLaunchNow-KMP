@@ -1,9 +1,5 @@
 package me.calebjones.spacelaunchnow.ui.onboarding
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
@@ -36,10 +31,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -55,13 +50,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
@@ -70,9 +60,8 @@ import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.getPlatform
-import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
+import me.calebjones.spacelaunchnow.ui.components.FinePrint
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
@@ -189,13 +178,6 @@ fun OnboardingContent(
             Color(0xFF2A1060),
         )
     )
-    val uriHandler = LocalUriHandler.current
-    val termsUrl = if (getPlatform().type == PlatformType.IOS) {
-        "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
-    } else {
-        "https://spacelaunchnow.app/app/tos"
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -389,7 +371,8 @@ fun OnboardingContent(
                     if (monthlyProduct != null) {
                         Spacer(modifier = Modifier.height(8.dp))
                         val monthlyMicros = monthlyProduct.priceAmountMicros
-                        val perMonth = if (monthlyMicros > 0) monthlyProduct.formattedPrice else null
+                        val perMonth =
+                            if (monthlyMicros > 0) monthlyProduct.formattedPrice else null
                         OutlinedButton(
                             onClick = { onSubscribe(monthlyProduct) },
                             enabled = !isProcessing,
@@ -448,25 +431,8 @@ fun OnboardingContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // ── Error message ─────────────────────────────────────────────
-            AnimatedVisibility(
-                visible = errorMessage != null,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut()
-            ) {
-                if (errorMessage != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = errorMessage,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
 
             // ── Continue to App (subscribed users only) ──────────────────
             if (isSubscribed) {
@@ -488,58 +454,12 @@ fun OnboardingContent(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // ── Restore Purchases ─────────────────────────────────────────
-            TextButton(
-                onClick = onRestorePurchases,
-                enabled = !isProcessing
-            ) {
-                Text(
-                    text = "Already a member? Restore Purchases",
-                    color = Color.White.copy(alpha = 0.4f),
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // ── Legal footer ──────────────────────────────────────────────
-            val legalText = buildAnnotatedString {
-                withStyle(SpanStyle(color = Color.White.copy(alpha = 0.25f))) {
-                    append("By subscribing you agree to our ")
-                }
-                pushStringAnnotation(tag = "URL", annotation = termsUrl)
-                withStyle(SpanStyle(
-                    color = Color.White.copy(alpha = 0.55f),
-                    textDecoration = TextDecoration.Underline
-                )) {
-                    append("Terms of Service")
-                }
-                pop()
-                withStyle(SpanStyle(color = Color.White.copy(alpha = 0.25f))) {
-                    append(" and ")
-                }
-                pushStringAnnotation(tag = "URL", annotation = "https://spacelaunchnow.app/app/privacy")
-                withStyle(SpanStyle(
-                    color = Color.White.copy(alpha = 0.55f),
-                    textDecoration = TextDecoration.Underline
-                )) {
-                    append("Privacy Policy")
-                }
-                pop()
-                withStyle(SpanStyle(color = Color.White.copy(alpha = 0.25f))) {
-                    append(". Subscriptions auto-renew unless cancelled.")
-                }
-            }
-            ClickableText(
-                text = legalText,
-                style = MaterialTheme.typography.labelSmall.copy(textAlign = TextAlign.Center),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                onClick = { offset ->
-                    legalText.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                        .firstOrNull()?.let { uriHandler.openUri(it.item) }
-                }
+            FinePrint(
+                dimColor = Color.White.copy(alpha = 0.25f),
+                linkColor = Color.White.copy(alpha = 0.55f)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
