@@ -4,15 +4,14 @@ import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import app.lexilabs.basic.ads.AdSize
+import app.lexilabs.basic.ads.Consent
+import app.lexilabs.basic.ads.ConsentDebugSettings
+import app.lexilabs.basic.ads.ConsentRequestParameters
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.DependsOnGoogleUserMessagingPlatform
-import app.lexilabs.basic.ads.ExperimentalBasicAds
-import app.lexilabs.basic.ads.composable.ConsentPopup
 import app.lexilabs.basic.ads.composable.rememberBannerAd
-import app.lexilabs.basic.ads.composable.rememberConsent
 import app.lexilabs.basic.ads.composable.rememberInterstitialAd
 import app.lexilabs.basic.ads.composable.rememberRewardedAd
 import me.calebjones.spacelaunchnow.LocalPreloadedBannerAd
@@ -27,45 +26,89 @@ import me.calebjones.spacelaunchnow.LocalPreloadedFluidAd
 import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
 import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
-import me.calebjones.spacelaunchnow.util.logging.logger
+import co.touchlab.kermit.Logger
+import com.google.android.ump.ConsentInformation
+import com.google.android.ump.UserMessagingPlatform
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+
 
 /**
  * Android implementation of AdConsentPopup using Google UMP.
+ *
+ * NOTE: The consent form will only appear if a GDPR message has been configured
+ * in the AdMob console (Privacy & messaging) for the app's AdMob App ID.
  */
-@OptIn(DependsOnGoogleUserMessagingPlatform::class, ExperimentalBasicAds::class)
+@OptIn(DependsOnGoogleUserMessagingPlatform::class, DependsOnGoogleMobileAds::class)
 @Composable
 actual fun AdConsentPopup(
     onFailure: ((Throwable) -> Unit)?,
     onConsentResolved: (() -> Unit)?
 ) {
+    val log = Logger.withTag("AdConsentPopup")
     val contextFactory = LocalContextFactory.current
     val activity = contextFactory?.getActivity() as? Activity
 
     // Only show consent popup if we have a valid Activity
     if (activity == null) {
-        // Resolve immediately so the app isn't blocked from loading ads
+        log.w { "Activity is null, resolving consent immediately" }
         LaunchedEffect(Unit) { onConsentResolved?.invoke() }
         return
     }
 
-    val consent by rememberConsent(activity = activity)
+    // Debug: uncomment to simulate EEA geography for consent testing.
+    // Get your device hash from logcat: "Use new ConsentDebugSettings.Builder().addTestDeviceHashedId(...)"
+    // val debugSettings = ConsentDebugSettings.builder(
+    //     debugGeography = ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA,
+    //     hashedId = "0BF9377651BCA3F62260F25FFC54F6A8",
+    //     forceTesting = true
+    // )
+    // val params = remember(debugSettings) {
+    //     ConsentRequestParameters.Builder()
+    //         .setConsentDebugSettings(debugSettings)
+    //         .build()
+    // }
 
-    // CR-2: Call onConsentResolved when UMP signals ads can be requested
-    LaunchedEffect(consent.canRequestAds) {
-        if (consent.canRequestAds) {
-            onConsentResolved?.invoke()
-        }
+    // Production: bare consent request params (no debug override)
+    val params = remember { ConsentRequestParameters.Builder().build() }
+
+    // Create consent object once per activity
+    val consent = remember(activity) { Consent(activity) }
+
+    // Single LaunchedEffect — fires ONE requestConsentInfoUpdate with debug settings.
+    // We avoid ConsentPopup because it fires a SECOND request WITHOUT debug settings,
+    // which overwrites gdprApplies back to 0.
+    LaunchedEffect(consent, params) {
+        consent.requestConsentInfoUpdate(
+            params = params,
+            onCompletion = {
+                if (consent.canRequestAds) {
+                    log.d { "Consent already granted — ads can be requested" }
+                    onConsentResolved?.invoke()
+                } else {
+                    consent.loadAndShowConsentForm(
+                        onLoaded = { log.d { "Consent form loaded" } },
+                        onShown = {
+                            log.d { "Consent form shown" }
+                            if (consent.canRequestAds) {
+                                onConsentResolved?.invoke()
+                            }
+                        },
+                        onError = { throwable ->
+                            log.w(throwable) { "Consent form unavailable: ${throwable.message}" }
+                            onFailure?.invoke(throwable)
+                            onConsentResolved?.invoke()
+                        }
+                    )
+                }
+            },
+            onError = { exception ->
+                log.w(exception) { "Consent info update failed: ${exception.message}" }
+                onFailure?.invoke(exception)
+                onConsentResolved?.invoke()
+            }
+        )
     }
-
-    // Show consent popup
-    ConsentPopup(
-        consent = consent,
-        onFailure = { throwable ->
-            onFailure?.invoke(throwable)
-            // Also resolve on failure to avoid blocking ad loading indefinitely
-            onConsentResolved?.invoke()
-        }
-    )
 }
 
 /**
@@ -79,68 +122,52 @@ actual fun WithPreloadedAds(
     shouldPreloadAds: Boolean,
     content: @Composable () -> Unit
 ) {
-    // Cast context to Activity - it should be an Activity on Android
-    val activity = context as? Activity
-
-    if (activity == null || !shouldPreloadAds) {
-        // Still provide the content but without ads
+    if (!shouldPreloadAds) {
         content()
         return
     }
-    
-    // 🚀 PERFORMANCE OPTIMIZATION: Only preload the 3 most commonly used banner sizes
-    // This reduces memory usage and loading time by 66% compared to loading 9 sizes
-    // Other sizes will load on-demand when needed
-    
-    // Primary banner ad (most common - used in content areas)
+
+    // Primary banner ad (most common — used in content areas)
     val preloadedBannerAd by rememberBannerAd(
-        activity = activity,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER
     )
-    
+
     // Large banner for detail pages and featured content
     val preloadedLargeBannerAd by rememberBannerAd(
-        activity = activity,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.LARGE_BANNER
     )
-    
+
     // Medium rectangle for inline list ads
     val preloadedMediumRectangleAd by rememberBannerAd(
-        activity = activity,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.MEDIUM_RECTANGLE
     )
-    
-    // 🔧 FIX: Create DEDICATED navigation banner ad (doesn't share with content ads)
-    // This prevents conflicts when navigating between screens with inline ads
+
+    // Dedicated navigation banner ad (doesn't share with content ads)
     val preloadedNavigationBannerAd by rememberBannerAd(
-        activity = activity,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER
     )
-    
-    // Navigation fallbacks still reuse existing ads for efficiency
+
+    // Navigation fallbacks reuse existing ads for efficiency
     val preloadedNavigationLargeBannerAd = preloadedLargeBannerAd
-    val preloadedNavigationLeaderboardAd = preloadedLargeBannerAd // Fallback to large banner
-    
-    // Tablet-specific ads also reuse the preloaded ads (lazy load on demand if needed)
-    val preloadedLeaderboardAd = preloadedLargeBannerAd // Fallback to large banner
-    val preloadedFullBannerAd = preloadedLargeBannerAd  // Fallback to large banner
-    val preloadedFluidAd = preloadedBannerAd            // Fallback to standard banner
-    
+    val preloadedNavigationLeaderboardAd = preloadedLargeBannerAd
+
+    // Tablet-specific ads reuse preloaded ads (lazy load on demand if needed)
+    val preloadedLeaderboardAd = preloadedLargeBannerAd
+    val preloadedFullBannerAd = preloadedLargeBannerAd
+    val preloadedFluidAd = preloadedBannerAd
+
     // Preload interstitial and rewarded ads
     val preloadedInterstitialAd by rememberInterstitialAd(
-        activity = activity,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.INTERSTITIAL)
     )
     val preloadedRewardedAd by rememberRewardedAd(
-        activity = activity,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.REWARDED)
     )
-    
-    // Provide all preloaded ads via CompositionLocal
+
     CompositionLocalProvider(
         LocalPreloadedBannerAd provides preloadedBannerAd,
         LocalPreloadedLargeBannerAd provides preloadedLargeBannerAd,
@@ -156,4 +183,51 @@ actual fun WithPreloadedAds(
     ) {
         content()
     }
+}
+
+/**
+ * Android implementation — shows the UMP privacy options form so the user
+ * can revoke or change their ad consent choices.
+ *
+ * See https://developers.google.com/admob/android/privacy#privacy_options
+ */
+actual fun showPrivacyOptionsForm(
+    activity: Any?,
+    onDismiss: () -> Unit,
+    onFailure: (Throwable) -> Unit
+) {
+    val log = Logger.withTag("PrivacyOptions")
+    val act = activity as? Activity
+    if (act == null) {
+        log.w { "Activity is null, cannot show privacy options form" }
+        onFailure(IllegalStateException("Activity is null"))
+        return
+    }
+
+    UserMessagingPlatform.showPrivacyOptionsForm(act) { formError ->
+        if (formError != null) {
+            log.w { "Privacy options form error: ${formError.message}" }
+            onFailure(Exception(formError.message))
+        }
+        onDismiss()
+    }
+}
+
+/**
+ * Android implementation — checks whether the UMP privacy options entry
+ * point should be visible (true for EEA users who have a consent form).
+ */
+@Composable
+actual fun rememberPrivacyOptionsRequired(): Boolean {
+    val contextFactory = LocalContextFactory.current
+    val activity = contextFactory?.getActivity() as? Activity ?: return false
+
+    val required = remember {
+        val consentInfo = UserMessagingPlatform.getConsentInformation(activity)
+        mutableStateOf(
+            consentInfo.privacyOptionsRequirementStatus ==
+                    ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
+        )
+    }
+    return required.value
 }

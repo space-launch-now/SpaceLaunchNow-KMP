@@ -170,3 +170,26 @@ actual fun WithPreloadedAds(
         content()
     }
 }
+
+/**
+ * iOS implementation — shows the UMP privacy options form.
+ * TODO: Implement using UMP iOS SDK when needed.
+ */
+actual fun showPrivacyOptionsForm(
+    activity: Any?,
+    onDismiss: () -> Unit,
+    onFailure: (Throwable) -> Unit
+) {
+    log.w { "showPrivacyOptionsForm not yet implemented on iOS" }
+    onDismiss()
+}
+
+/**
+ * iOS implementation — privacy options requirement check.
+ * TODO: Implement using UMP iOS SDK when needed.
+ */
+@Composable
+actual fun rememberPrivacyOptionsRequired(): Boolean {
+    // TODO: Check UMP consent info on iOS
+    return false
+}

@@ -219,7 +219,8 @@ class LocalSubscriptionStorage {
                 entitlements = entitlements,
                 productIds = productIds,
                 lastSynced = System.now().toEpochMilliseconds(),
-                needsSync = false // Don't sync when in debug mode
+                needsSync = false, // Don't sync when in debug mode
+                isDebugMode = true // Protect debug state from being overwritten by SubscriptionSyncer
             )
         )
     }

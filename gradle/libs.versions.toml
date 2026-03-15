@@ -28,7 +28,7 @@ ddSdkKotlinMultiplatformRum = "1.4.0"
 insetsx = "0.1.0-alpha10"
 junit = "4.13.2"
 kermit = "2.0.4"
-kotlin = "2.2.20"
+kotlin = "2.3.0"
 kotlin-test = "2.1.21"
 koin = "4.1.1"
 kotlinxCoroutinesTest = "1.8.0"
@@ -79,9 +79,9 @@ kstore = "1.0.0"
 sqldelight = "2.1.0"
 
 # Basic Ads (Google AdMob for KMP)
-basic-ads = "0.2.7"
-google-play-services-ads = "23.6.0"
-android-ump = "3.1.0"
+basic-ads = "1.1.0"
+google-play-services-ads = "24.9.0"
+android-ump = "4.0.0"
 
 # Datadog RUM & Logs for KMP
 datadog-sdk-android = "2.20.0"

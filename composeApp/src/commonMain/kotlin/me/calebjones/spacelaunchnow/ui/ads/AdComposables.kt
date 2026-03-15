@@ -32,7 +32,7 @@ enum class AdPlacementType {
  * @param showRemoveAdsButton Whether to show "Remove Ads" button (Android/iOS only)
  * @param showCard Whether to wrap ad in Material card (Android/iOS only)
  * @param onRemoveAdsClick Callback when "Remove Ads" button is clicked
- * @param onSizeChanged Callback when ad size changes (widthDp, heightPx)
+ * @param onSizeChanged Callback when ad size changes (widthDp, heightPx: Int)
  */
 @Composable
 expect fun SmartBannerAd(
@@ -122,3 +122,34 @@ expect fun WithPreloadedAds(
     shouldPreloadAds: Boolean = true,
     content: @Composable () -> Unit
 )
+
+/**
+ * Shows the privacy options form so the user can change their ad consent choices.
+ *
+ * On Android/iOS:
+ * - Uses Google UMP to show the privacy options form
+ * - Only available when privacy options are required (EEA users)
+ *
+ * On Desktop:
+ * - No-op
+ *
+ * @param onDismiss Called when the form is dismissed (success or failure)
+ * @param onFailure Called if showing the form fails
+ */
+expect fun showPrivacyOptionsForm(
+    activity: Any?,
+    onDismiss: () -> Unit = {},
+    onFailure: (Throwable) -> Unit = {}
+)
+
+/**
+ * Returns whether the privacy options entry point should be shown.
+ *
+ * On Android/iOS:
+ * - Returns true if UMP indicates privacy options are required
+ *
+ * On Desktop:
+ * - Always returns false
+ */
+@Composable
+expect fun rememberPrivacyOptionsRequired(): Boolean
