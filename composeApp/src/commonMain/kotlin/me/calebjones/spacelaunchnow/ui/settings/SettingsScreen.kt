@@ -276,6 +276,23 @@ fun SettingsScreen(
                             onClick = onAbout
                         )
                     }
+                    // Ad privacy / consent revocation
+                    val privacyOptionsRequired = me.calebjones.spacelaunchnow.ui.ads.rememberPrivacyOptionsRequired()
+                    if (privacyOptionsRequired) {
+                        Spacer(Modifier.height(4.dp))
+                        SettingsCardRow {
+                            val contextFactory = me.calebjones.spacelaunchnow.LocalContextFactory.current
+                            SettingsNavigationRow(
+                                title = "Ad privacy settings",
+                                onClick = {
+                                    me.calebjones.spacelaunchnow.ui.ads.showPrivacyOptionsForm(
+                                        activity = contextFactory?.getActivity()
+                                    )
+                                }
+                            )
+                        }
+                    }
+
                     Spacer(Modifier.height(4.dp))
                     SettingsCardRow {
                         SettingsNavigationRow(

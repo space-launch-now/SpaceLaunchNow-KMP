@@ -80,6 +80,7 @@ import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationScreen
 import me.calebjones.spacelaunchnow.ui.starship.StarshipScreen
 import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
@@ -265,7 +266,7 @@ fun SpaceLaunchNowApp(
     // Provide the useUtc setting and contextFactory throughout the app
     // Ad-related CompositionLocals are provided by WithPreloadedAds wrapper
     // Wrap everything in theme so dialogs get proper theming
-    me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme(themeOption = themeOption) {
+    SpaceLaunchNowTheme(themeOption = themeOption) {
         CompositionLocalProvider(
             LocalUseUtc provides useUtc,
             LocalContextFactory provides contextFactory
@@ -339,6 +340,7 @@ fun SpaceLaunchNowApp(
             // Must be inside CompositionLocalProvider to access LocalContextFactory
             // CR-2: Track consent resolution to gate ad preloading
             var isConsentResolved by remember { mutableStateOf(false) }
+
             AdConsentPopup(
                 onFailure = { throwable ->
                     log.w(throwable) { "Consent popup failure" }

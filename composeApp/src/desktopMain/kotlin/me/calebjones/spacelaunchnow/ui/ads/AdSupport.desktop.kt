@@ -29,3 +29,20 @@ actual fun WithPreloadedAds(
     // No-op wrapper: Just render content without preloading ads
     content()
 }
+
+/**
+ * Desktop implementation — no-op, desktop has no ad consent.
+ */
+actual fun showPrivacyOptionsForm(
+    activity: Any?,
+    onDismiss: () -> Unit,
+    onFailure: (Throwable) -> Unit
+) {
+    onDismiss()
+}
+
+/**
+ * Desktop implementation — privacy options are never required.
+ */
+@Composable
+actual fun rememberPrivacyOptionsRequired(): Boolean = false
