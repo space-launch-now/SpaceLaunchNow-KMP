@@ -27,9 +27,6 @@ import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
 import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
 import co.touchlab.kermit.Logger
-import com.google.android.ump.ConsentInformation
-import com.google.android.ump.UserMessagingPlatform
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 
 
@@ -186,48 +183,42 @@ actual fun WithPreloadedAds(
 }
 
 /**
- * Android implementation — shows the UMP privacy options form so the user
- * can revoke or change their ad consent choices.
- *
- * See https://developers.google.com/admob/android/privacy#privacy_options
+ * Android implementation — shows the UMP privacy options form via BasicAds
+ * so the user can revoke or change their ad consent choices.
  */
+@OptIn(DependsOnGoogleUserMessagingPlatform::class)
 actual fun showPrivacyOptionsForm(
     activity: Any?,
     onDismiss: () -> Unit,
     onFailure: (Throwable) -> Unit
 ) {
     val log = Logger.withTag("PrivacyOptions")
-    val act = activity as? Activity
-    if (act == null) {
+    if (activity == null) {
         log.w { "Activity is null, cannot show privacy options form" }
         onFailure(IllegalStateException("Activity is null"))
         return
     }
 
-    UserMessagingPlatform.showPrivacyOptionsForm(act) { formError ->
-        if (formError != null) {
-            log.w { "Privacy options form error: ${formError.message}" }
-            onFailure(Exception(formError.message))
+    val consent = Consent(activity)
+    consent.showPrivacyOptionsForm(
+        onDismissed = { onDismiss() },
+        onError = { exception ->
+            log.w { "Privacy options form error: ${exception.message}" }
+            onFailure(exception)
         }
-        onDismiss()
-    }
+    )
 }
 
 /**
  * Android implementation — checks whether the UMP privacy options entry
- * point should be visible (true for EEA users who have a consent form).
+ * point should be visible via BasicAds.
  */
+@OptIn(DependsOnGoogleUserMessagingPlatform::class)
 @Composable
 actual fun rememberPrivacyOptionsRequired(): Boolean {
     val contextFactory = LocalContextFactory.current
-    val activity = contextFactory?.getActivity() as? Activity ?: return false
+    val activity = contextFactory?.getActivity() ?: return false
 
-    val required = remember {
-        val consentInfo = UserMessagingPlatform.getConsentInformation(activity)
-        mutableStateOf(
-            consentInfo.privacyOptionsRequirementStatus ==
-                    ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
-        )
-    }
-    return required.value
+    val consent = remember(activity) { Consent(activity) }
+    return consent.isPrivacyOptionsRequired()
 }
