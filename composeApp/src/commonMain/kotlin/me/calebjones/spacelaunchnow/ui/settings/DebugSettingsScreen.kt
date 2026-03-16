@@ -86,6 +86,7 @@ enum class DebugTab {
 @Composable
 fun DebugSettingsScreen(
     onNavigateBack: () -> Unit = {},
+    onNavigateToLiveOnboarding: () -> Unit = {},
     debugViewModel: DebugSettingsViewModel = koinInject(),
     settingsViewModel: SettingsViewModel = koinInject()
 ) {
@@ -274,7 +275,8 @@ fun DebugSettingsScreen(
                         debugSettings = debugSettings,
                         isLoading = isLoading,
                         customUrlText = customUrlText,
-                        onCustomUrlTextChange = { customUrlText = it }
+                        onCustomUrlTextChange = { customUrlText = it },
+                        onNavigateToLiveOnboarding = onNavigateToLiveOnboarding
                     )
                     1 -> NotificationsTabContent(
                         debugViewModel = debugViewModel,
@@ -298,7 +300,8 @@ private fun SystemTabContent(
     debugSettings: DebugSettings,
     isLoading: Boolean,
     customUrlText: String,
-    onCustomUrlTextChange: (String) -> Unit
+    onCustomUrlTextChange: (String) -> Unit,
+    onNavigateToLiveOnboarding: () -> Unit = {}
 ) {
     val loggingPreferences = koinInject<LoggingPreferences>()
     val appPreferences = koinInject<me.calebjones.spacelaunchnow.data.storage.AppPreferences>()
@@ -320,6 +323,42 @@ private fun SystemTabContent(
             )
         }
         
+        // Section: Screen Previews
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Screen Previews",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Launch screens directly for testing",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Button(
+                            onClick = onNavigateToLiveOnboarding,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Open Live Onboarding")
+                        }
+                    }
+                }
+            }
+        }
+
         // Section 1: Logging Configuration
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -41,6 +41,7 @@ import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Onboarding
 import me.calebjones.spacelaunchnow.navigation.Roadmap
@@ -68,7 +69,8 @@ import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
-import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingScreen
+import me.calebjones.spacelaunchnow.ui.onboarding.LiveOnboardingScreen
+import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPaywallScreen
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
@@ -282,11 +284,13 @@ fun SpaceLaunchNowApp(
             // Onboarding paywall gate — uses a versioned key so ALL existing users (including
             // those who already completed onboarding in a prior build) see the paywall once.
             // null = DataStore still initializing; defer NavHost until resolved.
+            val liveOnboardingCompleted by appPreferences.liveOnboardingCompletedFlow.collectAsState(initial = null)
             val onboardingPaywallShown by appPreferences.onboardingPaywallV1ShownFlow.collectAsState(initial = null)
             val subscriptionViewModel: SubscriptionViewModel = koinInject()
             val subscriptionState by subscriptionViewModel.subscriptionState.collectAsState()
             val startRoute: Any? = when {
-                onboardingPaywallShown == null -> null
+                liveOnboardingCompleted == null || onboardingPaywallShown == null -> null
+                liveOnboardingCompleted == false -> LiveOnboarding
                 onboardingPaywallShown == true -> Home
                 else -> Onboarding
             }
@@ -294,7 +298,7 @@ fun SpaceLaunchNowApp(
             // Preload home screen data in the background while onboarding is shown.
             // Repositories are singletons — warming them here means Home's ViewModels
             // get instant cache hits the moment navigation completes.
-            if (startRoute == Onboarding) {
+            if (startRoute == Onboarding || startRoute == LiveOnboarding) {
                 val launchRepository: LaunchRepository = koinInject()
                 val updatesRepository: UpdatesRepository = koinInject()
                 val articlesRepository: ArticlesRepository = koinInject()
@@ -434,8 +438,17 @@ fun SpaceLaunchNowApp(
                             navController = navController,
                             startDestination = startRoute,
                         ) {
+                            composableWithCompositionLocal<LiveOnboarding> {
+                                LiveOnboardingScreen(
+                                    onComplete = {
+                                        navController.navigate(Onboarding) {
+                                            popUpTo<LiveOnboarding> { inclusive = true }
+                                        }
+                                    }
+                                )
+                            }
                             composableWithCompositionLocal<Onboarding> {
-                                OnboardingScreen(
+                                OnboardingPaywallScreen(
                                     onComplete = {
                                         navController.navigate(Home) {
                                             popUpTo<Onboarding> { inclusive = true }
@@ -524,7 +537,8 @@ fun SpaceLaunchNowApp(
                             }
                             composableWithCompositionLocal<DebugSettings> {
                                 DebugSettingsScreen(
-                                    onNavigateBack = { navController.popBackStack() }
+                                    onNavigateBack = { navController.popBackStack() },
+                                    onNavigateToLiveOnboarding = { navController.navigate(LiveOnboarding) }
                                 )
                             }
                             composableWithCompositionLocal<AboutLibraries> {

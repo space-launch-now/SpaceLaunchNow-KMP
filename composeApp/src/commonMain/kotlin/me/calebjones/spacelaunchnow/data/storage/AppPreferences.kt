@@ -43,6 +43,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // onboarding paywall at least once after this version ships.
         private val ONBOARDING_PAYWALL_V1_SHOWN = booleanPreferencesKey("onboarding_paywall_v1_shown")
 
+        // Live onboarding (feature preview carousel) completed flag
+        private val LIVE_ONBOARDING_COMPLETED = booleanPreferencesKey("live_onboarding_completed")
+
         // Schedule filter state
         private val SCHEDULE_FILTER_STATE = stringPreferencesKey("schedule_filter_state")
 
@@ -174,6 +177,17 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     suspend fun setOnboardingPaywallV1Shown(shown: Boolean) {
         dataStore.edit { preferences ->
             preferences[ONBOARDING_PAYWALL_V1_SHOWN] = shown
+        }
+    }
+
+    // Live onboarding completed methods
+    val liveOnboardingCompletedFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[LIVE_ONBOARDING_COMPLETED] ?: false
+    }
+
+    suspend fun setLiveOnboardingCompleted(completed: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[LIVE_ONBOARDING_COMPLETED] = completed
         }
     }
 

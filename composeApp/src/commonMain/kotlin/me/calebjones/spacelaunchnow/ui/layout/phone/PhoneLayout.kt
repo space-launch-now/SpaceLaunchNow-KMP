@@ -34,6 +34,7 @@ import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Onboarding
 import me.calebjones.spacelaunchnow.navigation.Roadmap
@@ -78,7 +79,9 @@ fun PhoneLayout(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     // Determine if the bottom bar should be shown
+    // Default to hidden when route is null (initial composition) to prevent flash
     val showBottomBar = when (navBackStackEntry?.destination?.route) {
+        null -> false // Hide until navigation is resolved to prevent flash
         LaunchDetail::class.qualifiedName -> false // Hide for LaunchDetail
         EventDetail::class.qualifiedName -> false // Hide for EventDetail
         RocketDetail::class.qualifiedName -> false // Hide for RocketDetail
@@ -98,6 +101,7 @@ fun PhoneLayout(
         CalendarSync::class.qualifiedName -> false // Hide for CalendarSync
         Roadmap::class.qualifiedName -> false // Hide for Roadmap
         Onboarding::class.qualifiedName -> false // Hide for full-screen Onboarding paywall
+        LiveOnboarding::class.qualifiedName -> false // Hide for LiveOnboarding
 
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern

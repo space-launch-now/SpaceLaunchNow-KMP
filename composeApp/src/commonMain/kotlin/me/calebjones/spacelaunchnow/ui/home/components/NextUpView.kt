@@ -101,9 +101,13 @@ fun NextLaunchView(navController: NavController) {
 
 
 @Composable
-fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
-    val sharingService = koinInject<LaunchSharingService>()
+fun NextLaunchItemView(
+    launch: LaunchNormal,
+    navController: NavController,
+    onShare: (() -> Unit)? = null
+) {
     val coroutineScope = rememberCoroutineScope()
+    val sharingService = koinInject<LaunchSharingService>()
 
     // Main content column
     Column(
@@ -277,8 +281,12 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                     // Share button
                     Button(
                         onClick = {
-                            coroutineScope.launch {
-                                sharingService.shareUrl(launch.launchUrl)
+                            if (onShare != null) {
+                                onShare()
+                            } else {
+                                coroutineScope.launch {
+                                    sharingService.shareUrl(launch.launchUrl)
+                                }
                             }
                         },
                         modifier = Modifier.weight(1f),

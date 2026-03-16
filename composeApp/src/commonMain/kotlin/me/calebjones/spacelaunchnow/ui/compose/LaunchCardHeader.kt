@@ -1,5 +1,11 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,8 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
@@ -104,6 +109,35 @@ data class DetailedLaunchCardData(val launch: LaunchDetailed) : LaunchCardData {
     override fun getFormattedTitle(): String = launch.name ?: "Unknown Launch"
 }
 
+@Composable
+private fun AgencyLogoShimmer(logoSize: Dp) {
+    val baseColor = MaterialTheme.colorScheme.surfaceVariant
+    val highlightColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f)
+    val shimmerColors = listOf(baseColor, highlightColor, baseColor)
+    val transition = rememberInfiniteTransition(label = "logo_shimmer")
+    val translateAnim by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 400f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "logo_shimmer_translate"
+    )
+    Box(
+        modifier = Modifier
+            .size(logoSize)
+            .clip(CircleShape)
+            .background(
+                brush = Brush.linearGradient(
+                    colors = shimmerColors,
+                    start = Offset(translateAnim - 200f, translateAnim - 200f),
+                    end = Offset(translateAnim, translateAnim)
+                )
+            )
+    )
+}
+
 /**
  *
  * @param launchData The launch data wrapped in LaunchCardData interface
@@ -161,20 +195,7 @@ fun LaunchCardHeaderOverlay(
                     .size(logoSize)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                loading = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(logoSize / 2),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
+                loading = { AgencyLogoShimmer(logoSize = logoSize) },
                 error = {
                     Box(
                         modifier = Modifier
@@ -292,9 +313,25 @@ fun LaunchDetailed.toLaunchCardData(): LaunchCardData = DetailedLaunchCardData(t
 // Previews
 // ========================================
 
-// ========================================
-// Previews
-// ========================================
+@Preview
+@Composable
+private fun AgencyLogoLoadingShimmerPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Box(modifier = Modifier.background(Color.DarkGray).padding(16.dp)) {
+            AgencyLogoShimmer(logoSize = 56.dp)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AgencyLogoLoadingShimmerDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Box(modifier = Modifier.background(Color.DarkGray).padding(16.dp)) {
+            AgencyLogoShimmer(logoSize = 56.dp)
+        }
+    }
+}
 
 @Preview
 @Composable

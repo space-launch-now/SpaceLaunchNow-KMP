@@ -16,6 +16,7 @@ interface LaunchRepository {
         netGt: Instant?,
         netLt: Instant?
     ): Result<PaginatedLaunchBasicList>
+    suspend fun getPreviousLaunchesList(limit: Int): Result<PaginatedLaunchBasicList>
 
     suspend fun getFeaturedLaunch(
         forceRefresh: Boolean = false,

@@ -142,10 +142,10 @@ fun ArticlesView() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticleItem(article: Article) {
+fun ArticleItem(article: Article, onClick: (() -> Unit)? = null) {
     val uriHandler = LocalUriHandler.current
     Card(
-        onClick = { uriHandler.openUri(article.url) },
+        onClick = { (onClick ?: { uriHandler.openUri(article.url) }).invoke() },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),
