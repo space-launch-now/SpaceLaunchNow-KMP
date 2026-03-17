@@ -109,7 +109,7 @@ private fun ExplorePreviewContent(
                         )
                     }
                     items(rockets) { rocket ->
-                        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                        Box(modis d                                fier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
                             RocketListItem(
                                 rocket = rocket,
                                 onClick = {}

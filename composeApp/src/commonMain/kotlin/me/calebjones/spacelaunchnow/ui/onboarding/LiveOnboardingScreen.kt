@@ -226,7 +226,7 @@ private fun LiveOnboardingScreenPreviewContent() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, end = 16.dp),
+                    .padding(top = 12.dp, end = 12.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 TextButton(onClick = {}) {
