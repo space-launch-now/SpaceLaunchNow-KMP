@@ -44,6 +44,7 @@ class AppRatingViewModel(
         private const val INITIAL_DELAY_DAYS = 7L
         private const val COOLDOWN_DAYS = 90L
         private const val FEEDBACK_COOLDOWN_DAYS = 30L // Shorter cooldown if they gave feedback
+        private const val MAX_PROMPTS = 3L // Stop asking after this many prompts
         private const val MILLIS_PER_DAY = 86400000L
     }
 
@@ -77,10 +78,10 @@ class AppRatingViewModel(
                 "=== APP RATING STATE ===" +
                         "\n  Launch Count: $newCount (min: $MIN_LAUNCHES)" +
                         "\n  User Has Rated: $hasRated" +
-                        "\n  Times Shown: $shownCount" +
+                        "\n  Times Shown: $shownCount (max: $MAX_PROMPTS)" +
                         "\n  Last Prompt: ${if (lastPromptDate != null) "$daysSinceLastPrompt days ago" else "never"}" +
                         "\n  Cooldown: $COOLDOWN_DAYS days" +
-                        "\n  Will Show: ${newCount >= MIN_LAUNCHES && !hasRated && (daysSinceLastPrompt == null || daysSinceLastPrompt >= COOLDOWN_DAYS)}" +
+                        "\n  Will Show: ${newCount >= MIN_LAUNCHES && !hasRated && shownCount < MAX_PROMPTS && (daysSinceLastPrompt == null || daysSinceLastPrompt >= COOLDOWN_DAYS)}" +
                         "\n========================"
             }
 
@@ -96,6 +97,13 @@ class AppRatingViewModel(
         // Don't show if user already rated
         if (appPreferences.hasUserRated()) {
             log.d { "User has already rated, not showing prompt" }
+            return
+        }
+
+        // Don't show if we've already asked too many times
+        val shownCount = appPreferences.getRatingDialogShownCount()
+        if (shownCount >= MAX_PROMPTS) {
+            log.d { "Max prompts reached: $shownCount/$MAX_PROMPTS, not showing" }
             return
         }
 

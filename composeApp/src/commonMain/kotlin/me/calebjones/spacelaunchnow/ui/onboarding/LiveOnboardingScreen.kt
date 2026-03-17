@@ -84,7 +84,9 @@ fun LiveOnboardingScreen(
     val agencies by onboardingViewModel.agencies.collectAsState()
 
     val isLastPage = pagerState.currentPage == PAGE_COUNT - 1
+    val isFirstPage = pagerState.currentPage == 0
 
+    // Data is pre-cached by PreloadViewModel; these calls load from cache into ViewModel StateFlows
     LaunchedEffect(Unit) {
         nextUpViewModel.fetchNextLaunch()
         onboardingViewModel.fetchScheduleData()
@@ -115,12 +117,18 @@ fun LiveOnboardingScreen(
                     .padding(top = 16.dp, end = 16.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                TextButton(onClick = { completeOnboarding() }) {
-                    Text(
-                        text = "Skip",
-                        color = Color.White.copy(alpha = 0.7f),
-                        style = MaterialTheme.typography.labelLarge
-                    )
+                if (!isLastPage && !isFirstPage) {
+                    TextButton(onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(PAGE_COUNT - 1)
+                        }
+                    }) {
+                        Text(
+                            text = "Skip",
+                            color = Color.White.copy(alpha = 0.7f),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                 }
             }
 
@@ -156,7 +164,9 @@ fun LiveOnboardingScreen(
                         agencies = agencies
                     )
                     5 -> NotificationPermissionPage(
-                        onPermissionResult = { /* Result handled; user taps Get Started below */ },
+                        onPermissionResult = { granted ->
+                            if (granted) completeOnboarding()
+                        },
                         onSkip = { completeOnboarding() },
                         modifier = Modifier.fillMaxSize()
                     )

@@ -37,6 +37,7 @@ import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Onboarding
+import me.calebjones.spacelaunchnow.navigation.Preload
 import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
@@ -102,6 +103,7 @@ fun PhoneLayout(
         Roadmap::class.qualifiedName -> false // Hide for Roadmap
         Onboarding::class.qualifiedName -> false // Hide for full-screen Onboarding paywall
         LiveOnboarding::class.qualifiedName -> false // Hide for LiveOnboarding
+        Preload::class.qualifiedName -> false // Hide for Preload
 
         else -> {
             // For routes with arguments, check if it starts with LaunchDetail pattern

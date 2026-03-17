@@ -22,7 +22,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.extensions.launchUrl
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
@@ -143,20 +143,26 @@ fun NextLaunchItemView(
                 ) {
                     // Background Image covering only the image area with proper error, placeholder, and loading states
                     launch.image?.imageUrl?.let { url ->
-                        SubcomposeAsyncImage(
+                        // NOTE: Image loading placeholders should use blurred/shimmer backgrounds,
+                    // not circular progress indicators. Circular loaders are jarring for image content.
+                    SubcomposeAsyncImage(
                             model = url,
                             contentDescription = "Launch Image",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
                             loading = {
                                 Box(
-                                    modifier = Modifier.fillMaxSize(),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .shimmer()
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(48.dp),
-                                        strokeWidth = 4.dp,
-                                        color = MaterialTheme.colorScheme.primary
+                                    Icon(
+                                        imageVector = CustomIcons.RocketLaunch,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(96.dp),
+                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                     )
                                 }
                             },

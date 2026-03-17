@@ -11,3 +11,8 @@ actual suspend fun hasPlatformNotificationPermission(): Boolean {
     // For now, return true as iOS handles permissions differently
     return true
 }
+
+actual fun openPlatformNotificationSettings(): Boolean {
+    // TODO: Implement iOS open settings
+    return false
+}
