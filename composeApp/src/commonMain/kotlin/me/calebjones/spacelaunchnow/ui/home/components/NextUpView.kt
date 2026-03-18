@@ -26,11 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,12 +37,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
-import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.extensions.launchUrl
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
@@ -56,24 +50,19 @@ import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
-import me.calebjones.spacelaunchnow.ui.viewmodel.FeaturedLaunchViewModel
-import me.calebjones.spacelaunchnow.util.LaunchSharingService
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 
 @Composable
-fun NextLaunchView(navController: NavController) {
-    val featuredLaunchViewModel = koinViewModel<FeaturedLaunchViewModel>()
-    val state by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
-
-    // NOTE: We don't need to call loadFeaturedLaunch here because HomeScreen already calls it
-    // in its LaunchedEffect(Unit). The ViewModel is shared, so data flows automatically.
-    
+fun NextLaunchView(
+    state: ViewState<LaunchNormal?>,
+    navController: NavController,
+    onShare: (LaunchNormal) -> Unit = {},
+) {
     Column {
         when {
             // STATE 1: Show data if it exists (ALWAYS, even while loading or with error)
             state.data != null -> {
-                NextLaunchItemView(state.data!!, navController)
+                NextLaunchItemView(state.data!!, navController, onShare = { onShare(state.data!!) })
             }
 
             // STATE 2: Error with no data
@@ -104,10 +93,8 @@ fun NextLaunchView(navController: NavController) {
 fun NextLaunchItemView(
     launch: LaunchNormal,
     navController: NavController,
-    onShare: (() -> Unit)? = null
+    onShare: () -> Unit = {},
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val sharingService = koinInject<LaunchSharingService>()
 
     // Main content column
     Column(
@@ -286,15 +273,7 @@ fun NextLaunchItemView(
 
                     // Share button
                     Button(
-                        onClick = {
-                            if (onShare != null) {
-                                onShare()
-                            } else {
-                                coroutineScope.launch {
-                                    sharingService.shareUrl(launch.launchUrl)
-                                }
-                            }
-                        },
+                        onClick = onShare,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer
