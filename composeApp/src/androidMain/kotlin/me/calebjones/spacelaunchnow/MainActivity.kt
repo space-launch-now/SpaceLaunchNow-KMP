@@ -62,29 +62,10 @@ class MainActivity : ComponentActivity() {
 
         // Fresh install logic is now handled in App.kt during app startup
 
-        // Ask for notification permission only on first launch (Android 13+) and if not already granted
-        log.d { "Notification permission check - SDK: ${Build.VERSION.SDK_INT}, isAndroid13+: ${Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU}, hasPermission: ${notificationPermissionHandler.hasNotificationPermission()}, hasAsked: ${hasAskedNotificationPermission(this)}" }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            !notificationPermissionHandler.hasNotificationPermission() &&
-            !hasAskedNotificationPermission(this)
-        ) {
-            log.i { "All conditions met - requesting notification permission" }
-            notificationPermissionHandler.requestNotificationPermission(this)
-            // Don't mark as asked yet - wait for the result
-        } else {
-            val reasons = mutableListOf<String>()
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                reasons.add("Android version is below 13")
-            }
-            if (notificationPermissionHandler.hasNotificationPermission()) {
-                reasons.add("Already has notification permission")
-            }
-            if (hasAskedNotificationPermission(this)) {
-                reasons.add("Already asked for permission before")
-            }
-            log.d { "Conditions not met for permission request - Reasons: ${reasons.joinToString(", ")}" }
-        }
+        // Notification permission is now handled by the LiveOnboarding flow (page 4).
+        // No auto-request here — the onboarding carousel's "Enable Notifications" button
+        // triggers the system permission dialog at the appropriate time.
+        log.d { "Notification permission check skipped - handled by LiveOnboarding flow" }
 
         // Check if launched from notification (with launch_id)
         val intentLaunchId = intent?.getStringExtra("launch_id")

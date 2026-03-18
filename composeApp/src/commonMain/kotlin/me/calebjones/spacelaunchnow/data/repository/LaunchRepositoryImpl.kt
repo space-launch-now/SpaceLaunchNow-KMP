@@ -409,6 +409,29 @@ class LaunchRepositoryImpl(
         }
     }
 
+    override suspend fun getPreviousLaunchesList(limit: Int): Result<PaginatedLaunchBasicList> {
+        return try {
+            log.d { "getPreviousLaunchesList - limit: $limit" }
+            val response = launchesApi.getLaunchMiniList(
+                limit = limit,
+                previous = true,
+                ordering = "-net"
+            )
+            val launches = response.body()
+            log.i { "✅ API SUCCESS: Fetched ${launches.results.size} previous launches (mini list)" }
+            Result.success(launches)
+        } catch (e: ResponseException) {
+            log.e(e) { "❌ API ERROR in getPreviousLaunchesList: ${e.message}" }
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "❌ NETWORK ERROR in getPreviousLaunchesList: ${e.message}" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "❌ UNEXPECTED ERROR in getPreviousLaunchesList: ${e::class.simpleName}: ${e.message}" }
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getUpcomingLaunchesList(
         limit: Int,
         netGt: Instant?,

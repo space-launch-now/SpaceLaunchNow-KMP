@@ -43,6 +43,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // onboarding paywall at least once after this version ships.
         private val ONBOARDING_PAYWALL_V1_SHOWN = booleanPreferencesKey("onboarding_paywall_v1_shown")
 
+        // Live onboarding (feature preview carousel) completed flag
+        private val LIVE_ONBOARDING_COMPLETED = booleanPreferencesKey("live_onboarding_completed")
+
         // Schedule filter state
         private val SCHEDULE_FILTER_STATE = stringPreferencesKey("schedule_filter_state")
 
@@ -55,8 +58,8 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     val themeFlow: Flow<ThemeOption> = dataStore.data.map { preferences ->
-        val themeString = preferences[THEME_OPTION] ?: ThemeOption.System.name
-        ThemeOption.entries.firstOrNull { it.name == themeString } ?: ThemeOption.System
+        val themeString = preferences[THEME_OPTION] ?: ThemeOption.Dark.name
+        ThemeOption.entries.firstOrNull { it.name == themeString } ?: ThemeOption.Dark
     }
 
     val useUtcFlow: Flow<Boolean> = dataStore.data.map { preferences ->
@@ -98,8 +101,8 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     suspend fun getTheme(): ThemeOption {
-        val themeString = dataStore.data.map { it[THEME_OPTION] }.first() ?: ThemeOption.System.name
-        return ThemeOption.entries.firstOrNull { it.name == themeString } ?: ThemeOption.System
+        val themeString = dataStore.data.map { it[THEME_OPTION] }.first() ?: ThemeOption.Dark.name
+        return ThemeOption.entries.firstOrNull { it.name == themeString } ?: ThemeOption.Dark
     }
 
     suspend fun getUseUtc(): Boolean {
@@ -174,6 +177,17 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     suspend fun setOnboardingPaywallV1Shown(shown: Boolean) {
         dataStore.edit { preferences ->
             preferences[ONBOARDING_PAYWALL_V1_SHOWN] = shown
+        }
+    }
+
+    // Live onboarding completed methods
+    val liveOnboardingCompletedFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[LIVE_ONBOARDING_COMPLETED] ?: false
+    }
+
+    suspend fun setLiveOnboardingCompleted(completed: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[LIVE_ONBOARDING_COMPLETED] = completed
         }
     }
 

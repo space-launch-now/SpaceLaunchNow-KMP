@@ -16,6 +16,7 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 
 expect suspend fun requestPlatformNotificationPermission(): Boolean
 expect suspend fun hasPlatformNotificationPermission(): Boolean
+expect fun openPlatformNotificationSettings(): Boolean
 
 class NotificationRepositoryImpl(
     private val pushMessaging: PushMessaging,

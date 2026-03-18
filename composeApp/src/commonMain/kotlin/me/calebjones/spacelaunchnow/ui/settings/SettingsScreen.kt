@@ -56,6 +56,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.repository.hasPlatformNotificationPermission
+import me.calebjones.spacelaunchnow.data.repository.openPlatformNotificationSettings
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
@@ -97,12 +99,34 @@ fun SettingsScreen(
     var showPassword by remember { mutableStateOf(false) }
     var useTotp by remember { mutableStateOf(false) } // Toggle between password and TOTP
 
+    var hasNotificationPermission by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        hasNotificationPermission = hasPlatformNotificationPermission()
+    }
+
+    // Re-check when returning from settings
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                coroutineScope.launch {
+                    hasNotificationPermission = hasPlatformNotificationPermission()
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     val uriHandler = LocalUriHandler.current
     val onPrivacyPolicy = {
-        uriHandler.openUri("https://spacelaunchnow.app/site/privacy")
+        uriHandler.openUri("https://spacelaunchnow.app/app/privacy")
     }
     val onTerms = {
-        uriHandler.openUri("https://spacelaunchnow.app/site/tos")
+        uriHandler.openUri("https://spacelaunchnow.app/app/tos")
     }
     val onAbout: () -> Unit = {
         onOpenAboutLibraries()
@@ -183,25 +207,52 @@ fun SettingsScreen(
                     Spacer(Modifier.height(2.dp))
                     SettingsCardRow {
                         Column(Modifier.fillMaxWidth()) {
-                            SettingsToggleRow(
-                                title = "Notifications Enabled",
-                                subtitle = "Allow notifications for news, launches and events",
-                                checked = uiState.notificationsEnabled,
-                                onCheckedChange = viewModel::updateNotificationsEnabled
-                            )
+                            if (!hasNotificationPermission) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = "Notifications Disabled",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                        Text(
+                                            text = "Permission required to send notifications",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.padding(top = 2.dp)
+                                        )
+                                    }
+                                    TextButton(
+                                        onClick = { openPlatformNotificationSettings() }
+                                    ) {
+                                        Text("Open Settings")
+                                    }
+                                }
+                            } else {
+                                SettingsToggleRow(
+                                    title = "Notifications Enabled",
+                                    subtitle = "Allow notifications for news, launches and events",
+                                    checked = uiState.notificationsEnabled,
+                                    onCheckedChange = viewModel::updateNotificationsEnabled
+                                )
+                            }
                             Spacer(modifier = Modifier.height(8.dp))
                             SettingsNavigationRow(
                                 title = "Launch Filters",
                                 subtitle = "Filter launches shown in app and notifications",
                                 onClick = onOpenNotificationSettings,
-                                enabled = uiState.notificationsEnabled
+                                enabled = hasNotificationPermission && uiState.notificationsEnabled
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             SettingsNavigationRow(
                                 title = "System Settings",
                                 subtitle = "Manage notification channels, sounds, and do-not-disturb",
                                 onClick = onOpenSystemNotificationSettings,
-                                enabled = uiState.notificationsEnabled
+                                enabled = hasNotificationPermission && uiState.notificationsEnabled
                             )
                         }
                     }
@@ -276,6 +327,23 @@ fun SettingsScreen(
                             onClick = onAbout
                         )
                     }
+                    // Ad privacy / consent revocation
+                    val privacyOptionsRequired = me.calebjones.spacelaunchnow.ui.ads.rememberPrivacyOptionsRequired()
+                    if (privacyOptionsRequired) {
+                        Spacer(Modifier.height(4.dp))
+                        SettingsCardRow {
+                            val contextFactory = me.calebjones.spacelaunchnow.LocalContextFactory.current
+                            SettingsNavigationRow(
+                                title = "Ad privacy settings",
+                                onClick = {
+                                    me.calebjones.spacelaunchnow.ui.ads.showPrivacyOptionsForm(
+                                        activity = contextFactory?.getActivity()
+                                    )
+                                }
+                            )
+                        }
+                    }
+
                     Spacer(Modifier.height(4.dp))
                     SettingsCardRow {
                         SettingsNavigationRow(

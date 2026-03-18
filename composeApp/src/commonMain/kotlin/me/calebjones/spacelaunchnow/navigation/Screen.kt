@@ -53,6 +53,12 @@ data class EventDetail(val eventId: Int)
 data object Onboarding
 
 @Serializable
+data object Preload
+
+@Serializable
+data object LiveOnboarding
+
+@Serializable
 data object Rockets
 
 @Serializable

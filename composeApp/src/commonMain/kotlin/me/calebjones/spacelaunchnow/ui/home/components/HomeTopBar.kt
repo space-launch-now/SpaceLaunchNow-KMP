@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 
@@ -25,8 +24,7 @@ fun HomeTopBar(navController: NavController) {
             Text(
                 text = "Space Launch Now",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                fontSize = 36.sp
+                fontWeight = FontWeight.Bold
             )
         },
         actions = {

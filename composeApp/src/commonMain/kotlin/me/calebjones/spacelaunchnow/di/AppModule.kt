@@ -84,6 +84,8 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.OnboardingViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.PreloadViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
@@ -143,6 +145,8 @@ val appModule = module {
     }
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
+    viewModelOf(::OnboardingViewModel)
+    viewModelOf(::PreloadViewModel)
 
     // App rating ViewModel - using standard viewModel DSL
     viewModel {

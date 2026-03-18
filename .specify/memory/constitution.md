@@ -1,35 +1,35 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.2.0 → 1.3.0
+Version Change: 1.3.0 → 1.4.0
 
 Modified Principles:
-  - III. Accessibility & User Experience (EXPANDED)
-    - Added requirement for dual previews (light + dark theme) for all UI components
-    - Establishes @Preview naming convention pattern
-    - Requires SpaceLaunchNowPreviewTheme wrapper with isDark parameter
-    - Ensures theme-aware UI development and visual verification
+  - VI. Multiplatform Architecture (EXPANDED)
+    - Added hard requirement: Android, iOS, and Desktop builds MUST all succeed
+    - Mobile-only dependencies MUST be scoped to androidMain/iosMain, never commonMain
+    - Desktop actuals MUST provide no-op stubs for mobile-only SDK features
+    - Breaking any platform build is not acceptable
 
 Principles (Current):
   - I. Mobile-First Development (Android & iOS Equal Priority)
   - II. Pattern-Based Consistency
-  - III. Accessibility & User Experience (EXPANDED)
+  - III. Accessibility & User Experience
   - IV. CI/CD & Conventional Commits (NON-NEGOTIABLE)
   - V. Code Generation & API Management
-  - VI. Multiplatform Architecture
+  - VI. Multiplatform Architecture (EXPANDED)
   - VII. Testing Standards
 
 Templates Status:
   ✅ plan-template.md - No updates required
   ✅ spec-template.md - No updates required
-  ✅ tasks-template.md - Existing UI task sections already cover preview requirements
+  ✅ tasks-template.md - No updates required
 
 Follow-up TODOs:
   - None - principle expansion documented
 
 Ratification Date: 2026-01-21 (initial adoption)
-Last Amendment: 2026-02-08
-Amendment Reason: Added dual preview pattern requirement for theme-aware UI development
+Last Amendment: 2026-03-16
+Amendment Reason: Added cross-platform build success requirement to Principle VI
 -->
 
 # SpaceLaunchNow KMP Constitution
@@ -95,12 +95,13 @@ Generated code MUST NOT be committed to version control. All API interactions MU
 
 Code organization MUST respect the Kotlin Multiplatform structure and expect/actual pattern:
 
+- **All Targets MUST Build**: Android, iOS, and Desktop builds MUST all succeed. Changes that break any platform build are NOT acceptable, even if that platform is not the primary focus. Mobile-only dependencies (e.g., Datadog KMP, RevenueCat, kermit-crashlytics) MUST be scoped to `androidMain`/`iosMain` source sets, never `commonMain`.
 - **Common First**: Business logic MUST reside in `commonMain` unless platform-specific requirements exist
-- **Platform-Specific**: Use `expect`/`actual` pattern for platform implementations (e.g., `nativeConfig()` for Koin setup)
+- **Platform-Specific**: Use `expect`/`actual` pattern for platform implementations (e.g., `nativeConfig()` for Koin setup). Desktop actuals MUST provide no-op stubs for mobile-only SDK features.
 - **Dependency Injection**: MUST use Koin with proper module structure (`AppModule.kt`, `NetworkModule.kt`, `ApiModule.kt`)
 - **No Magic Strings/IDs**: MUST use data classes and constants instead of hardcoded values
 
-**Rationale**: Proper multiplatform architecture maximizes code reuse across Android, Desktop, and iOS while maintaining platform-specific optimization paths.
+**Rationale**: Proper multiplatform architecture maximizes code reuse across Android, Desktop, and iOS while maintaining platform-specific optimization paths. All three platform builds succeeding is a hard requirement — a broken desktop build blocks desktop development and indicates incorrect dependency scoping.
 
 ### VII. Testing Standards
 
@@ -159,4 +160,4 @@ This constitution supersedes all conflicting practices in the codebase. All pull
 
 **Runtime Guidance**: For day-to-day development guidance, reference `.github/copilot-instructions.md` which provides detailed implementation patterns and common gotchas aligned with these principles.
 
-**Version**: 1.3.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-02-08
+**Version**: 1.4.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-03-16

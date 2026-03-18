@@ -149,6 +149,13 @@ kotlin {
                 implementation(libs.purchases.result)
                 implementation(libs.basicAds)
 
+                // Datadog KMP (Android only)
+                implementation(libs.dd.sdk.kotlin.multiplatform.rum)
+                implementation(libs.dd.sdk.kotlin.multiplatform.logs)
+
+                // Kermit Crashlytics (Android only)
+                implementation(libs.kermit.crashlytics)
+
                 // SQLDelight Android driver
                 implementation(libs.sqldelight.android.driver)
 
@@ -178,6 +185,13 @@ kotlin {
                 implementation(libs.purchases.result)
 
                 implementation(libs.basicAds)
+
+                // Datadog KMP (iOS only)
+                implementation(libs.dd.sdk.kotlin.multiplatform.rum)
+                implementation(libs.dd.sdk.kotlin.multiplatform.logs)
+
+                // Kermit Crashlytics (iOS only)
+                implementation(libs.kermit.crashlytics)
 
                 // SQLDelight iOS driver
                 implementation(libs.sqldelight.native.driver)
@@ -225,7 +239,6 @@ kotlin {
                 implementation(libs.compose.icons.weatherIcons)
                 implementation(libs.coil.compose)
                 implementation(libs.coil.compose.ktor)
-                implementation(libs.insetsx)
 
                 implementation(libs.dotenv)
 
@@ -248,23 +261,12 @@ kotlin {
                 // Cryptography library for secure hashing (also used for TOTP HMAC-SHA1)
                 implementation(libs.cryptography.core)
 
-                implementation(libs.dd.sdk.kotlin.multiplatform.rum)
-                implementation(libs.dd.sdk.kotlin.multiplatform.logs)
-
                 // Kermit for multiplatform logging
                 implementation(libs.kermit)
-                implementation(libs.kermit.crashlytics)
-
 
                 // SQLDelight common runtime and coroutines
                 implementation(libs.sqldelight.runtime)
                 implementation(libs.sqldelight.coroutines)
-
-                // TODO remove
-                implementation(libs.purchases.core)
-                implementation(libs.purchases.ui)
-                implementation(libs.purchases.either)
-                implementation(libs.purchases.result)
 
             }
         }

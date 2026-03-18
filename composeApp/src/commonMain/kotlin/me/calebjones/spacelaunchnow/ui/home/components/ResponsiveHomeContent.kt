@@ -3,10 +3,8 @@ package me.calebjones.spacelaunchnow.ui.home.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,153 +12,94 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import androidx.navigation.compose.rememberNavController
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.isLargeScreen
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.components.OfflineBanner
-import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
-import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
-import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.FeaturedLaunchViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
+import me.calebjones.spacelaunchnow.ui.preview.PreviewData
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
+import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
-@OptIn(ExperimentalTime::class)
 @Composable
 fun ResponsiveHomeContent(
     navController: NavController,
-    launchesViewModel: LaunchesViewModel,
-    featuredLaunchViewModel: FeaturedLaunchViewModel,
-    launchCarouselViewModel: LaunchCarouselViewModel,
-    feedViewModel: FeedViewModel,
-    eventsViewModel: EventsViewModel,
-    historyViewModel: HistoryViewModel,
-    statsViewModel: StatsViewModel,
+    additionalFeaturedLaunchesState: ViewState<List<LaunchNormal>>,
+    previousLaunchesState: ViewState<List<LaunchNormal>>,
+    historyState: ViewState<HistoryViewModel.HistoryData>,
+    featuredLaunchState: ViewState<LaunchNormal?>,
+    updatesState: ViewState<List<UpdateEndpoint>>,
+    articlesState: ViewState<List<Article>>,
+    eventsState: ViewState<List<EventEndpointNormal>>,
+    next24HoursCount: Int,
+    nextWeekCount: Int,
+    nextMonthCount: Int,
+    combinedLaunches: List<LaunchNormal>,
+    upcomingStartIndex: Int,
+    carouselError: String?,
+    isCarouselLoading: Boolean,
+    onCarouselRetry: () -> Unit,
+    isAnyViewLoading: Boolean,
+    hasAdFree: Boolean,
+    onShareLaunch: (LaunchNormal) -> Unit = {},
     modifier: Modifier = Modifier,
     isOffline: Boolean = false,
     oldestCacheTimestamp: Long? = null,
     onRetry: () -> Unit = {}
 ) {
-    val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
-
-    // Collect all ViewStates from domain-specific ViewModels
-    val featuredLaunchState by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
-    val additionalFeaturedLaunchesState by featuredLaunchViewModel.additionalFeaturedLaunches.collectAsStateWithLifecycle()
-    val upcomingLaunchesState by launchCarouselViewModel.upcomingLaunchesState.collectAsStateWithLifecycle()
-    val previousLaunchesState by launchCarouselViewModel.previousLaunchesState.collectAsStateWithLifecycle()
-    val updatesState by feedViewModel.updatesState.collectAsStateWithLifecycle()
-    val articlesState by feedViewModel.articlesState.collectAsStateWithLifecycle()
-    val eventsState by eventsViewModel.eventsState.collectAsStateWithLifecycle()
-    val historyState by historyViewModel.historyState.collectAsStateWithLifecycle()
-
-    // Check if ANY view is loading
-    val isAnyViewLoading = remember(
-        featuredLaunchState,
-        upcomingLaunchesState,
-        updatesState,
-        articlesState,
-        eventsState,
-        historyState
-    ) {
-        listOf(
-            featuredLaunchState,
-            upcomingLaunchesState,
-            updatesState,
-            articlesState,
-            eventsState,
-            historyState
-        ).any { it.isLoading }
-    }
-
-    // Collect accurate quick stats counts from StatsViewModel
-    val next24HoursCount by statsViewModel.next24HoursCount.collectAsStateWithLifecycle()
-    val nextWeekCount by statsViewModel.nextWeekCount.collectAsStateWithLifecycle()
-    val nextMonthCount by statsViewModel.nextMonthCount.collectAsStateWithLifecycle()
-
-    // Get current day and month for "This Day in History"
-    val currentDate = remember {
-        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    }
-    val currentDay = currentDate.dayOfMonth
-    val currentMonth = currentDate.monthNumber
-
-    // Load history launches on composition using NEW ViewState pattern
-    LaunchedEffect(currentDay, currentMonth) {
-        if (historyState.data.count == 0 && !historyState.isLoading && historyState.error == null) {
-            historyViewModel.loadHistoryLaunches(day = currentDay, month = currentMonth)
-        }
-    }
-
     val isTabletOrDesktop = isLargeScreen()
 
-    if (isTabletOrDesktop) {
-        // Tablet landscape layout - full width scrollable content
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-        ) {
-            item { HomeTopBar(navController = navController) }
+    LazyColumn(
+        modifier = if (isTabletOrDesktop) modifier.fillMaxSize() else modifier,
+    ) {
+        item(key = "top_bar") { HomeTopBar(navController = navController) }
 
-            // Single offline banner when any data is stale
-            if (isOffline) {
-                item {
-                    OfflineBanner(
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        dataSource = me.calebjones.spacelaunchnow.data.model.DataSource.STALE_CACHE,
-                        cacheTimestamp = oldestCacheTimestamp,
-                        onRetry = onRetry
-                    )
-                }
+        // Single offline banner when any data is stale
+        if (isOffline) {
+            item(key = "offline_banner") {
+                OfflineBanner(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    dataSource = DataSource.STALE_CACHE,
+                    cacheTimestamp = oldestCacheTimestamp,
+                    onRetry = onRetry
+                )
             }
+        }
 
-            // Show loading indicator when any view is loading
-            if (isAnyViewLoading) {
-                item {
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                    )
-                }
+        // Show loading indicator when any view is loading
+        if (isAnyViewLoading) {
+            item(key = "loading_indicator") {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                )
             }
+        }
 
-            // Hero cards row: Last Launch + Stats + Next Up (countdown)
+        if (isTabletOrDesktop) {
+            // Tablet: Hero cards row — Last Launch + This Day in History (left) + Next Up (right)
             item(key = "hero_cards_row") {
                 Row(
                     modifier = Modifier
@@ -169,393 +108,67 @@ fun ResponsiveHomeContent(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.Top
                 ) {
-                    // Left column: Last Launch + Quick Stats
-
                     Column(
                         modifier = Modifier.weight(0.4f),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        LastLaunchCard(
+                            previousLaunch = previousLaunchesState.data.firstOrNull(),
+                            navController = navController
+                        )
 
-                        // Last Launch - Always render
-                        Card {
-                            Column(modifier = Modifier.padding(8.dp)) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(bottom = 12.dp)
-                                ) {
-                                    Icon(
-                                        Icons.Default.CheckCircle,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        text = "Last Launch",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 20.sp
-                                    )
-                                }
-                                if (previousLaunchesState.data.isNotEmpty()) {
-                                    val previousLaunch = previousLaunchesState.data.first()
-                                    LaunchItemView(
-                                        launch = previousLaunch,
-                                        navController = navController,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(380.dp)
-
-                                    )
-                                } else {
-                                    // Loading placeholder
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(240.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            "Loading...",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
-                                                alpha = 0.6f
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        // This Day in History Card - Always render
-                        Card {
-                            Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(bottom = 12.dp, start = 8.dp)
-                                ) {
-                                    Icon(
-                                        Icons.Default.History,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        text = "This Day in History",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 20.sp
-                                    )
-                                }
-
-                                when {
-                                    // Error state - show error with retry OR data with error indicator
-                                    historyState.error != null -> {
-                                        if (historyState.data.launches.isNotEmpty()) {
-                                            // Show stale data with error indicator
-                                            Column {
-                                                // Error banner
-                                                Card(
-                                                    colors = CardDefaults.cardColors(
-                                                        containerColor = MaterialTheme.colorScheme.errorContainer
-                                                    ),
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .padding(horizontal = 4.dp, vertical = 4.dp)
-                                                ) {
-                                                    Text(
-                                                        text = "Showing cached data",
-                                                        style = MaterialTheme.typography.bodySmall,
-                                                        color = MaterialTheme.colorScheme.onErrorContainer,
-                                                        modifier = Modifier.padding(8.dp)
-                                                    )
-                                                }
-                                                // Show stale launches
-                                                LazyRow(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                                    contentPadding = PaddingValues(horizontal = 4.dp)
-                                                ) {
-                                                    items(historyState.data.launches) { launch ->
-                                                        LaunchItemView(
-                                                            launch = launch,
-                                                            navController = navController,
-                                                            modifier = Modifier
-                                                                .width(380.dp)
-                                                                .height(200.dp)
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            // No cached data, just show error
-                                            Card(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(horizontal = 4.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.errorContainer
-                                                )
-                                            ) {
-                                                Column(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .padding(16.dp),
-                                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                                ) {
-                                                    Text(
-                                                        text = "Failed to load history launches",
-                                                        fontWeight = FontWeight.Medium,
-                                                        color = MaterialTheme.colorScheme.onErrorContainer
-                                                    )
-                                                    Text(
-                                                        text = historyState.error!!,
-                                                        fontSize = 12.sp,
-                                                        color = MaterialTheme.colorScheme.onErrorContainer.copy(
-                                                            alpha = 0.8f
-                                                        ),
-                                                        textAlign = TextAlign.Center
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                    // Has data (no error)
-                                    historyState.data.launches.isNotEmpty() && historyState.error == null -> {
-                                        // Scrollable carousel of history launches
-                                        LazyRow(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                            contentPadding = PaddingValues(horizontal = 4.dp)
-                                        ) {
-                                            items(historyState.data.launches) { launch ->
-                                                LaunchItemView(
-                                                    launch = launch,
-                                                    navController = navController,
-                                                    modifier = Modifier
-                                                        .width(380.dp)
-                                                        .height(200.dp)
-                                                )
-                                            }
-                                        }
-                                    }
-                                    // Loading or empty state
-                                    else -> {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(200.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                if (historyState.isLoading) "Loading launches..."
-                                                else if (historyState.data.count > 0) "Loading..."
-                                                else "No launches on this day",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurface.copy(
-                                                    alpha = 0.6f
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        TabletHistoryCard(
+                            historyState = historyState,
+                            navController = navController
+                        )
                     }
 
-                    // Right: Next Up with countdown - larger to accommodate countdown
                     Box(modifier = Modifier.weight(0.6f)) {
-                        NextLaunchView(navController = navController)
-                    }
-                }
-            }
-            
-            // Featured Launches Row - shows next 3 upcoming launches
-            item(key = "tablet_featured_launches_row") {
-                FeaturedLaunchesRow(
-                    launchesState = additionalFeaturedLaunchesState,
-                    navController = navController
-                )
-            }
-            
-            item { Spacer(modifier = Modifier.height(12.dp)) }
-            item {                         // Quick Stats
-                Column(modifier = Modifier.padding(8.dp)) {
-                    Text(
-                        text = "Quick Stats",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-
-                    // Stats Grid (2x2)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        StatItem(
-                            icon = Icons.Default.Today,
-                            label = "Next 24 Hours",
-                            value = if (next24HoursCount > 0) next24HoursCount.toString() else "-",
-                            modifier = Modifier.weight(1f)
-                        )
-                        StatItem(
-                            icon = Icons.Default.DateRange,
-                            label = "Next 7 Days",
-                            value = if (nextWeekCount > 0) nextWeekCount.toString() else "-",
-                            modifier = Modifier.weight(1f)
-                        )
-                        StatItem(
-                            icon = Icons.Default.Schedule,
-                            label = "Next 30 Days",
-                            value = if (nextMonthCount > 0) nextMonthCount.toString() else "-",
-                            modifier = Modifier.weight(1f)
-                        )
-                        StatItem(
-                            icon = Icons.Default.History,
-                            label = "This Day in History",
-                            value = if (historyState.data.count > 0) historyState.data.count.toString() else "-",
-                            modifier = Modifier.weight(1f)
+                        NextLaunchView(
+                            state = featuredLaunchState,
+                            navController = navController,
+                            onShare = onShareLaunch
                         )
                     }
                 }
             }
-
-            // Large Ad between This Day in History and Launch Schedule (only for non-premium users)
-            if (!hasAdFree) {
-                item {
-                    SmartBannerAd(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        placementType = AdPlacementType.INTERSTITIAL, // Between content sections
-                        showRemoveAdsButton = true,
-                        onRemoveAdsClick = {
-                            // Navigate to settings - navController is available in this scope
-                            navController.navigate(SupportUs)
-                        }
-                    )
-                }
-            }
-
-            item {
-                SectionTitle(
-                    title = "Launch Schedule",
-                    hasAction = true,
-                    onActionClick = {
-                        navController.navigate(Schedule) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    })
-            }
-            // Bidirectional scrollable launch list
-            item {
-                LaunchListView(
-                    viewModel = launchCarouselViewModel,
-                    navController = navController
+        } else {
+            // Phone: Next launch hero
+            item(key = "next_launch_view") {
+                NextLaunchView(
+                    state = featuredLaunchState,
+                    navController = navController,
+                    onShare = onShareLaunch
                 )
             }
-            item { Spacer(modifier = Modifier.height(24.dp)) }
-            item { SectionTitle(title = "Latest Updates", hasAction = false) }
-            item { LatestUpdatesView(navController = navController) }
-            item { SectionTitle(title = "Latest News", hasAction = false) }
-            item { ArticlesView() }
-            item { SectionTitle(title = "Upcoming Events", hasAction = false) }
-            item { EventsView(navController = navController) }
-            item { Spacer(modifier = Modifier.height(64.dp)) }
         }
-    } else {
-        // Phone layout - use bidirectional carousel
-        LazyColumn(
-            modifier = modifier,
-        ) {
-            item { HomeTopBar(navController = navController) }
 
-            // Single offline banner when any data is stale
-            if (isOffline) {
-                item {
-                    OfflineBanner(
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        dataSource = me.calebjones.spacelaunchnow.data.model.DataSource.STALE_CACHE,
-                        cacheTimestamp = oldestCacheTimestamp,
-                        onRetry = onRetry
-                    )
-                }
-            }
+        // Featured Launches Row
+        item(key = "featured_launches_row") {
+            FeaturedLaunchesRow(
+                launchesState = additionalFeaturedLaunchesState,
+                navController = navController
+            )
+        }
 
-            // Show loading indicator when any view is loading
-            if (isAnyViewLoading) {
-                item {
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                    )
-                }
-            }
-
-            item(key = "next_launch_view") { NextLaunchView(navController = navController) }
-
-            // Featured Launches Row - shows next 3 upcoming launches
-            item(key = "featured_launches_row") {
-                FeaturedLaunchesRow(
-                    launchesState = additionalFeaturedLaunchesState,
-                    navController = navController
+        // Quick Stats
+        item(key = "quick_stats") {
+            QuickStatsSection(
+                next24HoursCount = next24HoursCount,
+                nextWeekCount = nextWeekCount,
+                nextMonthCount = nextMonthCount,
+                historyCount = historyState.data.count,
+                isTabletLayout = isTabletOrDesktop,
+                modifier = Modifier.padding(
+                    horizontal = if (isTabletOrDesktop) 8.dp else 16.dp,
+                    vertical = 8.dp
                 )
-            }
+            )
+        }
 
-            // Quick Stats
-            item {
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    Text(
-                        text = "Quick Stats",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Stats Grid (2x2)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        StatItem(
-                            icon = Icons.Default.Today,
-                            label = "Next 24 Hours",
-                            value = if (next24HoursCount > 0) next24HoursCount.toString() else "-",
-                            modifier = Modifier.weight(1f)
-                        )
-                        StatItem(
-                            icon = Icons.Default.DateRange,
-                            label = "Next 7 Days",
-                            value = if (nextWeekCount > 0) nextWeekCount.toString() else "-",
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        StatItem(
-                            icon = Icons.Default.Schedule,
-                            label = "Next 30 Days",
-                            value = if (nextMonthCount > 0) nextMonthCount.toString() else "-",
-                            modifier = Modifier.weight(1f)
-                        )
-                        StatItem(
-                            icon = Icons.Default.History,
-                            label = "This Day in History",
-                            value = if (historyState.data.count > 0) historyState.data.count.toString() else "-",
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
-
-            // This Day in History Card
-            item {
+        // This Day in History (phone only — tablet shows it in the hero row)
+        if (!isTabletOrDesktop) {
+            item(key = "history_section") {
                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Text(
                         text = "This Day in History",
@@ -563,209 +176,272 @@ fun ResponsiveHomeContent(
                         fontSize = 20.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-
-                    when {
-                        // Error state with or without cached data
-                        historyState.error != null -> {
-                            if (historyState.data.launches.isNotEmpty()) {
-                                // Show stale data with error indicator
-                                Column {
-                                    // Error banner
-                                    Card(
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.errorContainer
-                                        ),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(bottom = 4.dp)
-                                    ) {
-                                        Text(
-                                            text = "Showing cached data",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onErrorContainer,
-                                            modifier = Modifier.padding(8.dp)
-                                        )
-                                    }
-                                    // Show stale launches
-                                    LazyRow(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        contentPadding = PaddingValues(horizontal = 8.dp)
-                                    ) {
-                                        items(historyState.data.launches) { launch ->
-                                            LaunchItemView(
-                                                launch = launch,
-                                                navController = navController,
-                                                modifier = Modifier
-                                                    .width(380.dp)
-                                                    .height(200.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                            } else {
-                                // No cached data, just show error
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.errorContainer
-                                    )
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Text(
-                                            text = "Failed to load history launches",
-                                            fontWeight = FontWeight.Medium,
-                                            color = MaterialTheme.colorScheme.onErrorContainer
-                                        )
-                                        Text(
-                                            text = historyState.error!!,
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.onErrorContainer.copy(
-                                                alpha = 0.8f
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        // Has data (no error)
-                        historyState.data.launches.isNotEmpty() && historyState.error == null -> {
-                            LazyRow(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                contentPadding = PaddingValues(horizontal = 8.dp)
-                            ) {
-                                items(historyState.data.launches) { launch ->
-                                    LaunchItemView(
-                                        launch = launch,
-                                        navController = navController,
-                                        modifier = Modifier
-                                            .width(380.dp)
-                                            .height(200.dp)
-                                    )
-                                }
-                            }
-                        }
-                        // Loading or empty state
-                        else -> {
-                            PlainShimmerCard()
-                        }
-                    }
-                }
-            }
-
-            // Large Ad between This Day in History and Launch Schedule (only for non-premium users)
-            if (!hasAdFree) {
-                item {
-                    SmartBannerAd(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        placementType = AdPlacementType.INTERSTITIAL, // Between content sections
-                        showRemoveAdsButton = true,
-                        onRemoveAdsClick = {
-                            // Navigate to settings - navController is available in this scope
-                            navController.navigate(SupportUs)
-                        }
+                    ThisDayInHistorySection(
+                        historyState = historyState,
+                        navController = navController
                     )
                 }
             }
+        }
 
-            item {
-                SectionTitle(
-                    title = "Launch Schedule",
-                    hasAction = true,
-                    onActionClick = {
-                        navController.navigate(Schedule) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+        // Ad placement (non-premium users only)
+        if (!hasAdFree) {
+            item(key = "ad_banner") {
+                SmartBannerAd(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    placementType = AdPlacementType.INTERSTITIAL,
+                    showRemoveAdsButton = true,
+                    onRemoveAdsClick = { navController.navigate(SupportUs) }
+                )
+            }
+        }
+
+        item(key = "launch_schedule_title") {
+            SectionTitle(
+                title = "Launch Schedule",
+                hasAction = true,
+                onActionClick = {
+                    navController.navigate(Schedule) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                )
-            }
-            // Use new HomeQuickView for phone (bidirectional carousel)
-            item {
-                LaunchListView(
-                    viewModel = launchCarouselViewModel,
-                    navController = navController
-                )
-            }
-            item { SectionTitle(title = "Latest Updates", hasAction = false) }
-            item { LatestUpdatesView(navController = navController) }
-            item { SectionTitle(title = "Latest News", hasAction = false) }
-            item { ArticlesView() }
-            item { SectionTitle(title = "Upcoming Events", hasAction = false) }
-            item { EventsView(navController = navController) }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
+                }
+            )
+        }
+
+        item(key = "launch_list") {
+            LaunchListView(
+                combinedLaunches = combinedLaunches,
+                upcomingStartIndex = upcomingStartIndex,
+                carouselError = carouselError,
+                isCarouselLoading = isCarouselLoading,
+                onRetry = onCarouselRetry,
+                navController = navController
+            )
+        }
+
+        item(key = "updates_title") { SectionTitle(title = "Latest Updates", hasAction = false) }
+        item(key = "updates_view") { LatestUpdatesView(state = updatesState, navController = navController) }
+        item(key = "news_title") { SectionTitle(title = "Latest News", hasAction = false) }
+        item(key = "news_view") { ArticlesView(state = articlesState) }
+        item(key = "events_title") { SectionTitle(title = "Upcoming Events", hasAction = false) }
+        item(key = "events_view") { EventsView(state = eventsState, navController = navController) }
+        item(key = "bottom_spacer") {
+            Spacer(modifier = Modifier.height(if (isTabletOrDesktop) 64.dp else 32.dp))
         }
     }
 }
 
 /**
- * Individual stat item for the quick stats card - matches detail page StatCard style
+ * Tablet-specific "This Day in History" card with a header row,
+ * wrapping the shared [ThisDayInHistorySection].
  */
 @Composable
-private fun StatItem(
-    icon: ImageVector,
-    label: String,
-    value: String,
+private fun TabletHistoryCard(
+    historyState: ViewState<HistoryViewModel.HistoryData>,
+    navController: NavController,
     modifier: Modifier = Modifier,
-    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceVariant
 ) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = modifier
-    ) {
-        Row(
-            modifier = Modifier
-                .defaultMinSize(minHeight = 96.dp)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                modifier = Modifier.size(64.dp)
+    Card(modifier = modifier) {
+        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 12.dp, start = 8.dp)
             ) {
                 Icon(
-                    imageVector = icon,
-                    contentDescription = label,
+                    Icons.Default.History,
+                    contentDescription = "This Day in History",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.size(20.dp)
                 )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
+                Spacer(Modifier.width(8.dp))
                 Text(
-                    text = value,
-                    style = MaterialTheme.typography.titleLarge,
+                    text = "This Day in History",
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
-                )
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2
+                    fontSize = 20.sp
                 )
             }
+
+            ThisDayInHistorySection(
+                historyState = historyState,
+                navController = navController
+            )
         }
+    }
+}
+
+// ========================================
+// Previews
+// ========================================
+
+@Preview
+@Composable
+private fun ResponsiveHomeContentPreview() {
+    SpaceLaunchNowPreviewTheme {
+        val launches = listOf(
+            PreviewData.launchNormalSpaceX,
+            PreviewData.launchNormalULA,
+            PreviewData.launchNormalCrewMission
+        )
+        ResponsiveHomeContent(
+            navController = rememberNavController(),
+            additionalFeaturedLaunchesState = ViewState(data = launches),
+            previousLaunchesState = ViewState(data = launches),
+            historyState = ViewState(
+                data = HistoryViewModel.HistoryData(
+                    count = 5,
+                    launches = launches
+                )
+            ),
+            featuredLaunchState = ViewState(data = launches.first()),
+            updatesState = ViewState(data = emptyList()),
+            articlesState = ViewState(data = emptyList()),
+            eventsState = ViewState(data = emptyList()),
+            next24HoursCount = 2,
+            nextWeekCount = 8,
+            nextMonthCount = 24,
+            combinedLaunches = launches,
+            upcomingStartIndex = 1,
+            carouselError = null,
+            isCarouselLoading = false,
+            onCarouselRetry = {},
+            isAnyViewLoading = false,
+            hasAdFree = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ResponsiveHomeContentDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        val launches = listOf(
+            PreviewData.launchNormalSpaceX,
+            PreviewData.launchNormalULA,
+            PreviewData.launchNormalCrewMission
+        )
+        ResponsiveHomeContent(
+            navController = rememberNavController(),
+            additionalFeaturedLaunchesState = ViewState(data = launches),
+            previousLaunchesState = ViewState(data = launches),
+            historyState = ViewState(
+                data = HistoryViewModel.HistoryData(
+                    count = 5,
+                    launches = launches
+                )
+            ),
+            featuredLaunchState = ViewState(data = launches.first()),
+            updatesState = ViewState(data = emptyList()),
+            articlesState = ViewState(data = emptyList()),
+            eventsState = ViewState(data = emptyList()),
+            next24HoursCount = 2,
+            nextWeekCount = 8,
+            nextMonthCount = 24,
+            combinedLaunches = launches,
+            upcomingStartIndex = 1,
+            carouselError = null,
+            isCarouselLoading = false,
+            onCarouselRetry = {},
+            isAnyViewLoading = false,
+            hasAdFree = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ResponsiveHomeContentLoadingPreview() {
+    SpaceLaunchNowPreviewTheme {
+        ResponsiveHomeContent(
+            navController = rememberNavController(),
+            additionalFeaturedLaunchesState = ViewState(data = emptyList(), isLoading = true),
+            previousLaunchesState = ViewState(data = emptyList(), isLoading = true),
+            historyState = ViewState(
+                data = HistoryViewModel.HistoryData(count = 0, launches = emptyList()),
+                isLoading = true
+            ),
+            featuredLaunchState = ViewState(data = null, isLoading = true),
+            updatesState = ViewState(data = emptyList(), isLoading = true),
+            articlesState = ViewState(data = emptyList(), isLoading = true),
+            eventsState = ViewState(data = emptyList(), isLoading = true),
+            next24HoursCount = 0,
+            nextWeekCount = 0,
+            nextMonthCount = 0,
+            combinedLaunches = emptyList(),
+            upcomingStartIndex = 0,
+            carouselError = null,
+            isCarouselLoading = true,
+            onCarouselRetry = {},
+            isAnyViewLoading = true,
+            hasAdFree = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ResponsiveHomeContentOfflinePreview() {
+    SpaceLaunchNowPreviewTheme {
+        val launches = listOf(PreviewData.launchNormalSpaceX)
+        ResponsiveHomeContent(
+            navController = rememberNavController(),
+            additionalFeaturedLaunchesState = ViewState(
+                data = launches,
+                dataSource = DataSource.STALE_CACHE,
+                error = "Network unavailable"
+            ),
+            previousLaunchesState = ViewState(data = launches),
+            historyState = ViewState(
+                data = HistoryViewModel.HistoryData(count = 1, launches = launches)
+            ),
+            featuredLaunchState = ViewState(data = launches.first()),
+            updatesState = ViewState(data = emptyList()),
+            articlesState = ViewState(data = emptyList()),
+            eventsState = ViewState(data = emptyList()),
+            next24HoursCount = 1,
+            nextWeekCount = 3,
+            nextMonthCount = 10,
+            combinedLaunches = launches,
+            upcomingStartIndex = 0,
+            carouselError = null,
+            isCarouselLoading = false,
+            onCarouselRetry = {},
+            isAnyViewLoading = false,
+            hasAdFree = true,
+            isOffline = true,
+            oldestCacheTimestamp = 1710000000000L
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ResponsiveHomeContentErrorPreview() {
+    SpaceLaunchNowPreviewTheme {
+        ResponsiveHomeContent(
+            navController = rememberNavController(),
+            additionalFeaturedLaunchesState = ViewState(data = emptyList()),
+            previousLaunchesState = ViewState(data = emptyList()),
+            historyState = ViewState(
+                data = HistoryViewModel.HistoryData(count = 0, launches = emptyList())
+            ),
+            featuredLaunchState = ViewState(data = null),
+            updatesState = ViewState(data = emptyList()),
+            articlesState = ViewState(data = emptyList()),
+            eventsState = ViewState(data = emptyList()),
+            next24HoursCount = 0,
+            nextWeekCount = 0,
+            nextMonthCount = 0,
+            combinedLaunches = emptyList(),
+            upcomingStartIndex = 0,
+            carouselError = "Failed to connect to server",
+            isCarouselLoading = false,
+            onCarouselRetry = {},
+            isAnyViewLoading = false,
+            hasAdFree = true
+        )
     }
 }

@@ -9,10 +9,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import app.lexilabs.basic.ads.AdSize
+import app.lexilabs.basic.ads.Consent
 import kotlinx.coroutines.delay
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.DependsOnGoogleUserMessagingPlatform
-import app.lexilabs.basic.ads.ExperimentalBasicAds
 import app.lexilabs.basic.ads.composable.ConsentPopup
 import app.lexilabs.basic.ads.composable.rememberBannerAd
 import app.lexilabs.basic.ads.composable.rememberConsent
@@ -36,7 +36,7 @@ private val log by lazy { SpaceLogger.getLogger("AdSupport") }
 /**
  * iOS implementation of AdConsentPopup using Google UMP.
  */
-@OptIn(DependsOnGoogleUserMessagingPlatform::class, ExperimentalBasicAds::class)
+@OptIn(DependsOnGoogleUserMessagingPlatform::class)
 @Composable
 actual fun AdConsentPopup(
     onFailure: ((Throwable) -> Unit)?,
@@ -169,4 +169,36 @@ actual fun WithPreloadedAds(
     ) {
         content()
     }
+}
+
+/**
+ * iOS implementation — shows the UMP privacy options form via BasicAds.
+ */
+@OptIn(DependsOnGoogleUserMessagingPlatform::class)
+actual fun showPrivacyOptionsForm(
+    activity: Any?,
+    onDismiss: () -> Unit,
+    onFailure: (Throwable) -> Unit
+) {
+    val consent = Consent(activity)
+    consent.showPrivacyOptionsForm(
+        onDismissed = { onDismiss() },
+        onError = { exception ->
+            log.w(exception) { "Privacy options form error: ${exception.message}" }
+            onFailure(exception)
+        }
+    )
+}
+
+/**
+ * iOS implementation — checks whether the UMP privacy options entry
+ * point should be visible via BasicAds.
+ */
+@OptIn(DependsOnGoogleUserMessagingPlatform::class)
+@Composable
+actual fun rememberPrivacyOptionsRequired(): Boolean {
+    val contextFactory = LocalContextFactory.current
+    val vc = contextFactory?.getActivity()
+    val consent = remember(vc) { Consent(vc) }
+    return consent.isPrivacyOptionsRequired()
 }

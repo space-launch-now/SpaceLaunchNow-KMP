@@ -128,7 +128,7 @@ struct AccessoryRectangularView: View {
     private var emptyView: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 4) {
-                Image(systemName: "rocket")
+                Image(systemName: "paperplane.fill")
                     .font(.caption)
                 Text("No Launches")
                     .font(.caption)
@@ -158,7 +158,7 @@ struct AccessoryInlineView: View {
                 Text("\(shortName) \(hoursUntilLaunch(launch: launch))")
             }
         } else {
-            Label("No Launches", systemImage: "rocket")
+            Label("No Launches", systemImage: "paperplane.fill")
         }
     }
 
@@ -190,14 +190,14 @@ struct AccessoryCircularView: View {
         if entry.isPlaceholder {
             ZStack {
                 AccessoryWidgetBackground()
-                Image(systemName: "rocket")
+                Image(systemName: "paperplane.fill")
                     .font(.title3)
             }
         } else if let launch = entry.launches.first {
             ZStack {
                 AccessoryWidgetBackground()
                 VStack(spacing: 1) {
-                    Image(systemName: "rocket")
+                    Image(systemName: "paperplane.fill")
                         .font(.caption2)
                         .widgetAccentable()
                     Text(compactCircularCountdown(launch: launch))
@@ -210,7 +210,7 @@ struct AccessoryCircularView: View {
         } else {
             ZStack {
                 AccessoryWidgetBackground()
-                Image(systemName: "rocket")
+                Image(systemName: "paperplane.fill")
                     .font(.title3)
                     .foregroundStyle(.secondary)
             }

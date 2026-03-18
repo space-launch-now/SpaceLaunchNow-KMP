@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Desktop implementation of BillingManager - No billing support

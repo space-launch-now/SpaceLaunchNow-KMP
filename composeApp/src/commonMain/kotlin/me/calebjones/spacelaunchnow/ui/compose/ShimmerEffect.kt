@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,25 +41,7 @@ fun NextUpShimmerBox() {
             .padding(horizontal = 16.dp)
     ) {
 
-
-        // Countdown card shimmer
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(500.dp)
-                .clip(RoundedCornerShape(24.dp)),
-            shape = MaterialTheme.shapes.medium,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-        }
+        PlainShimmerCard(height = 400)
     }
 }
 
@@ -177,13 +158,13 @@ fun StarshipOverviewShimmer() {
     ) {
         // Program info card shimmer
         PlainShimmerCard(height = 180)
-        
+
         // Livestream/video placeholder shimmer
         PlainShimmerCard(height = 200)
-        
+
         // Next launch card shimmer
         PlainShimmerCard(height = 160)
-        
+
         // Updates section shimmer (horizontal scroll)
         UpdatesShimmer(cardCount = 3)
     }
@@ -206,11 +187,11 @@ fun StarshipEventsShimmer() {
         repeat(4) {
             PlainShimmerCard(height = 100)
         }
-        
+
         // Updates section
         PlainShimmerCard(height = 24, width = 100) // Section header
         UpdatesShimmer(cardCount = 3)
-        
+
         // News section  
         PlainShimmerCard(height = 24, width = 80) // Section header
         LaunchListShimmer(cardCount = 2)
@@ -288,7 +269,7 @@ fun IssMapShimmer(modifier: Modifier = Modifier) {
         Column(modifier = Modifier.shimmer()) {
             // Map section shimmer
             PlainShimmerCard(height = 250, modifier = Modifier.fillMaxWidth())
-            
+
             // Position info section shimmer
             Column(modifier = Modifier.padding(16.dp)) {
                 // Title
@@ -299,9 +280,9 @@ fun IssMapShimmer(modifier: Modifier = Modifier) {
                         .clip(RoundedCornerShape(4.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 )
-                
+
                 androidx.compose.foundation.layout.Spacer(Modifier.height(12.dp))
-                
+
                 // Lat/Long row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -324,7 +305,7 @@ fun IssMapShimmer(modifier: Modifier = Modifier) {
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                         )
                     }
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier
@@ -343,9 +324,9 @@ fun IssMapShimmer(modifier: Modifier = Modifier) {
                         )
                     }
                 }
-                
+
                 androidx.compose.foundation.layout.Spacer(Modifier.height(16.dp))
-                
+
                 // Altitude/Velocity row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -368,7 +349,7 @@ fun IssMapShimmer(modifier: Modifier = Modifier) {
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                         )
                     }
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier
@@ -419,7 +400,7 @@ fun ExpeditionInfoShimmer(modifier: Modifier = Modifier) {
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 )
             }
-            
+
             // Expedition name
             Box(
                 modifier = Modifier
@@ -428,9 +409,9 @@ fun ExpeditionInfoShimmer(modifier: Modifier = Modifier) {
                     .clip(RoundedCornerShape(4.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             )
-            
+
             androidx.compose.foundation.layout.Spacer(Modifier.height(12.dp))
-            
+
             // Date range row
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.weight(1f)) {
@@ -450,9 +431,9 @@ fun ExpeditionInfoShimmer(modifier: Modifier = Modifier) {
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     )
                 }
-                
+
                 androidx.compose.foundation.layout.Spacer(Modifier.width(16.dp))
-                
+
                 Column(modifier = Modifier.weight(1f)) {
                     Box(
                         modifier = Modifier
@@ -490,9 +471,9 @@ fun StationSpecsShimmer(modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
-        
+
         androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
-        
+
         Card(
             modifier = modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -520,7 +501,7 @@ fun StationSpecsShimmer(modifier: Modifier = Modifier) {
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                         )
                     }
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier
@@ -539,9 +520,9 @@ fun StationSpecsShimmer(modifier: Modifier = Modifier) {
                         )
                     }
                 }
-                
+
                 androidx.compose.foundation.layout.Spacer(Modifier.height(12.dp))
-                
+
                 // Dimensions row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -564,7 +545,7 @@ fun StationSpecsShimmer(modifier: Modifier = Modifier) {
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                         )
                     }
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier
@@ -603,9 +584,9 @@ fun OwnerAgenciesShimmer(modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
-        
+
         androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
-        
+
         // Agency items
         repeat(2) {
             Card(
@@ -625,9 +606,9 @@ fun OwnerAgenciesShimmer(modifier: Modifier = Modifier) {
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     )
-                    
+
                     androidx.compose.foundation.layout.Spacer(Modifier.width(12.dp))
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier
@@ -667,9 +648,9 @@ fun DockingLocationsShimmer(modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
-        
+
         androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
-        
+
         // Docked vehicle items
         repeat(2) {
             Card(
@@ -689,9 +670,9 @@ fun DockingLocationsShimmer(modifier: Modifier = Modifier) {
                             .clip(RoundedCornerShape(8.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     )
-                    
+
                     androidx.compose.foundation.layout.Spacer(Modifier.width(12.dp))
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier
@@ -731,9 +712,9 @@ fun StationReportsShimmer(modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
-        
+
         androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
-        
+
         Card(
             modifier = modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -752,9 +733,9 @@ fun StationReportsShimmer(modifier: Modifier = Modifier) {
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                         )
-                        
+
                         androidx.compose.foundation.layout.Spacer(Modifier.width(12.dp))
-                        
+
                         Column(modifier = Modifier.weight(1f)) {
                             Box(
                                 modifier = Modifier

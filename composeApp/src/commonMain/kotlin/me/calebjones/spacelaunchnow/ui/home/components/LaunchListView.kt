@@ -39,7 +39,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -72,7 +71,6 @@ import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
-import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -82,16 +80,20 @@ private val CARD_HEIGHT = 240.dp
 private val CARD_SPACING = 16.dp
 
 @Composable
-fun LaunchListView(viewModel: LaunchCarouselViewModel, navController: NavController) {
+fun LaunchListView(
+    combinedLaunches: List<LaunchNormal>,
+    upcomingStartIndex: Int,
+    carouselError: String?,
+    isCarouselLoading: Boolean,
+    onRetry: () -> Unit,
+    navController: NavController,
+) {
     BoxWithConstraints {
         val screenWidth = maxWidth
         val density = LocalDensity.current
 
-        // Use derived states from ViewModel (automatically computed from ViewStates)
-        val combinedLaunches by viewModel.combinedLaunches.collectAsStateWithLifecycle()
-        val upcomingStartIndex by viewModel.upcomingStartIndex.collectAsStateWithLifecycle()
-        val error by viewModel.carouselError.collectAsStateWithLifecycle()
-        val isLoading by viewModel.isCarouselLoading.collectAsStateWithLifecycle()
+        val error = carouselError
+        val isLoading = isCarouselLoading
 
         val scrollState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
@@ -125,7 +127,7 @@ fun LaunchListView(viewModel: LaunchCarouselViewModel, navController: NavControl
         if (error != null) {
             LaunchListErrorCard(
                 error = error!!,
-                onRetry = { viewModel.loadLaunches(upcomingLimit = 10, forceRefresh = true) }
+                onRetry = onRetry
             )
         } else if (combinedLaunches.isNotEmpty()) {
             LazyRow(

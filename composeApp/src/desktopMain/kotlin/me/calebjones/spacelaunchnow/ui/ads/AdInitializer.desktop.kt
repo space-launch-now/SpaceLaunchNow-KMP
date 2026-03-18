@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Desktop implementation of AdInitializer (no-op)

@@ -247,7 +247,7 @@ struct LaunchRow: View {
                         .fill(Color.secondary.opacity(0.15))
                         .frame(width: 32, height: 32)
                         .overlay(
-                            Image(systemName: "rocket")
+                            Image(systemName: "paperplane.fill")
                                 .font(.system(size: 14))
                                 .foregroundStyle(.secondary)
                         )
