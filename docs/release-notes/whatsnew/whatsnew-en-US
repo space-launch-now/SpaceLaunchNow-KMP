@@ -1,3 +1,11 @@
 ### Bug Fixes
 
-* change coroutine dispatcher from IO to Default for background tasks
+* **ads:** implement consent management and privacy options
+* **ads:** update privacy options form implementation
+* combine legal into single composable
+* onboarding restructure and add new pages
+* **onboarding:** improve scroll handling and notification permission flow
+* restructure dependencies to fix desktop build issues
+* small adjustments
+* update privacy policy and terms of service
+* update theme preference to Dark and add legal notes...
