@@ -66,8 +66,11 @@ class IosBillingManager : BillingManager {
             _isInitialized.value = true
             log.i { "✅ IosBillingManager initialized successfully" }
             
-            // Initial sync
-            syncPurchases()
+            // NOTE: syncPurchases() is NOT called here on purpose.
+            // Calling it at launch triggers a StoreKit transaction sync which
+            // shows the App Store / Apple ID sign-in dialog immediately.
+            // Syncing is deferred to when the user interacts with billing
+            // (e.g. paywall, restore, or settings).
             refreshPurchaseState()
             
             Result.success(Unit)

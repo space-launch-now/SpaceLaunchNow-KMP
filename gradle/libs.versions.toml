@@ -25,7 +25,6 @@ compose-hot-reload = "1.0.0"
 coreSplashscreen = "1.2.0"
 ddSdkKotlinMultiplatformLogs = "1.4.0"
 ddSdkKotlinMultiplatformRum = "1.4.0"
-insetsx = "0.1.0-alpha10"
 junit = "4.13.2"
 kermit = "2.1.0"
 kotlin = "2.3.20"
@@ -85,7 +84,7 @@ android-ump = "4.0.0"
 
 # Datadog RUM & Logs for KMP
 datadog-sdk-android = "2.20.0"
-datadog-sdk-ios = "2.26.0"
+datadog-sdk-ios = "3.5.0"
 
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -107,7 +106,6 @@ coil-compose-jvm = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 compose-shimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.ref = "compose-shimmer" }
 
-insetsx = { module = "com.moriatsushi.insetsx:insetsx", version.ref = "insetsx" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-test" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
