@@ -3,9 +3,9 @@ package me.calebjones.spacelaunchnow.ui.ads
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
-private val log by lazy { logger() }
+private val log by lazy { SpaceLogger.getLogger("SmartBannerAd") }
 
 /**
  * Desktop implementation of SmartBannerAd (no-op).

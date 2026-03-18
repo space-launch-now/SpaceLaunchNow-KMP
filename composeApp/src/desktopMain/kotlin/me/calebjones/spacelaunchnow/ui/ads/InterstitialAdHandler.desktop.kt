@@ -1,9 +1,9 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
 import androidx.compose.runtime.Composable
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 
-private val log by lazy { logger() }
+private val log by lazy { SpaceLogger.getLogger("InterstitialAdHandler") }
 
 /**
  * Desktop implementation of InterstitialAdHandler (no-op).

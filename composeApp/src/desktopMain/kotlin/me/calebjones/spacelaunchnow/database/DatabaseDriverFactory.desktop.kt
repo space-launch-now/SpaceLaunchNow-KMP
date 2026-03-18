@@ -9,11 +9,17 @@ actual class DatabaseDriverFactory {
         val databasePath = File(System.getProperty("user.home"), ".spacelaunchnow")
         databasePath.mkdirs()
         val databaseFile = File(databasePath, "spacelaunchnow.db")
-        
+        val dbExists = databaseFile.exists()
+
         return JdbcSqliteDriver(
             url = "jdbc:sqlite:${databaseFile.absolutePath}",
         ).also { driver ->
-            SpaceLaunchDatabase.Schema.create(driver)
+            if (!dbExists) {
+                SpaceLaunchDatabase.Schema.create(driver)
+            } else {
+                val currentVersion = SpaceLaunchDatabase.Schema.version
+                // Migrate if needed in the future
+            }
         }
     }
 }
