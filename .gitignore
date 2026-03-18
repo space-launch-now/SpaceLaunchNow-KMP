@@ -57,3 +57,4 @@ yarn.lock
 pnpm-lock.yaml
 
 specs/business/
+composeApp/app_settings.preferences_pb

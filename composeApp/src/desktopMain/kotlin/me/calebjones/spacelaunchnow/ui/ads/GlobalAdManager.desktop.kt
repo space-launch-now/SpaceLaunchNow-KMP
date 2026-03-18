@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
-import me.calebjones.spacelaunchnow.logger
+import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.data.config.AdMobConfig
 import me.calebjones.spacelaunchnow.util.BuildConfig

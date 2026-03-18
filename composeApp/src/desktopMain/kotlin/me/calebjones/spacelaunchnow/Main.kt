@@ -3,8 +3,11 @@ package me.calebjones.spacelaunchnow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
@@ -29,9 +32,13 @@ fun main() {
     }
 
     application {
+        val windowState = rememberWindowState(
+            size = DpSize(1280.dp, 900.dp)
+        )
         Window(
             title = "Space Launch Now",
-            onCloseRequest = ::exitApplication
+            onCloseRequest = ::exitApplication,
+            state = windowState
         ) {
             DesktopApp()
         }
@@ -45,7 +52,7 @@ private fun DesktopApp() {
     val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
 
     SpaceLaunchNowApp(
-        contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(null),
+        contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(),
         themeOption = themeOption,
         useUtc = useUtc
     )
