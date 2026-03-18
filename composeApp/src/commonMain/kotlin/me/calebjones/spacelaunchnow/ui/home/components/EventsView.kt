@@ -24,8 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
@@ -50,21 +47,14 @@ import me.calebjones.spacelaunchnow.ui.SharedElementType
 import me.calebjones.spacelaunchnow.ui.detail.compose.snackDetailBoundsTransform
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
-import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun EventsView(navController: NavController) {
-    val eventsViewModel = koinViewModel<EventsViewModel>()
-    val state by eventsViewModel.eventsState.collectAsStateWithLifecycle()
-
-    // Load events if not already loaded and no error
-    LaunchedEffect(Unit) {
-        if (state.data.isEmpty() && !state.isLoading && state.error == null) {
-            eventsViewModel.loadEvents(10)
-        }
-    }
+fun EventsView(
+    state: ViewState<List<EventEndpointNormal>>,
+    navController: NavController,
+) {
     Column {
         when {
             // STATE 4: Error State - show error with retry OR data with error indicator

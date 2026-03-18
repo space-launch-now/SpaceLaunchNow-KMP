@@ -17,18 +17,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
-import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
-import me.calebjones.spacelaunchnow.data.repository.EventsRepository
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
-import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.navigation.AboutLibraries
 import me.calebjones.spacelaunchnow.navigation.Agencies
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
@@ -41,8 +34,10 @@ import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Onboarding
+import me.calebjones.spacelaunchnow.navigation.Preload
 import me.calebjones.spacelaunchnow.navigation.Roadmap
 import me.calebjones.spacelaunchnow.navigation.RocketDetail
 import me.calebjones.spacelaunchnow.navigation.Rockets
@@ -68,7 +63,9 @@ import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
-import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingScreen
+import me.calebjones.spacelaunchnow.ui.onboarding.LiveOnboardingScreen
+import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPaywallScreen
+import me.calebjones.spacelaunchnow.ui.preload.PreloadScreen
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
@@ -279,61 +276,16 @@ fun SpaceLaunchNowApp(
                 }
             }
 
-            // Onboarding paywall gate — uses a versioned key so ALL existing users (including
-            // those who already completed onboarding in a prior build) see the paywall once.
+            // Onboarding / preload gate — PreloadScreen determines the next destination
+            // internally based on liveOnboardingCompleted and onboardingPaywallShown.
             // null = DataStore still initializing; defer NavHost until resolved.
+            val liveOnboardingCompleted by appPreferences.liveOnboardingCompletedFlow.collectAsState(initial = null)
             val onboardingPaywallShown by appPreferences.onboardingPaywallV1ShownFlow.collectAsState(initial = null)
             val subscriptionViewModel: SubscriptionViewModel = koinInject()
             val subscriptionState by subscriptionViewModel.subscriptionState.collectAsState()
             val startRoute: Any? = when {
-                onboardingPaywallShown == null -> null
-                onboardingPaywallShown == true -> Home
-                else -> Onboarding
-            }
-
-            // Preload home screen data in the background while onboarding is shown.
-            // Repositories are singletons — warming them here means Home's ViewModels
-            // get instant cache hits the moment navigation completes.
-            if (startRoute == Onboarding) {
-                val launchRepository: LaunchRepository = koinInject()
-                val updatesRepository: UpdatesRepository = koinInject()
-                val articlesRepository: ArticlesRepository = koinInject()
-                val eventsRepository: EventsRepository = koinInject()
-                val notificationStateStorage: NotificationStateStorage = koinInject()
-                val launchFilterService: LaunchFilterService = koinInject()
-                LaunchedEffect(Unit) {
-                    try {
-                        val filters = notificationStateStorage.stateFlow.first()
-                        val filterParams = launchFilterService.getFilterParams(filters)
-                        kotlinx.coroutines.coroutineScope {
-                            launch(kotlinx.coroutines.Dispatchers.Default) {
-                                launchRepository.getFeaturedLaunch(
-                                    agencyIds = filterParams.agencyIds,
-                                    locationIds = filterParams.locationIds
-                                )
-                            }
-                            launch(kotlinx.coroutines.Dispatchers.Default) {
-                                launchRepository.getUpcomingLaunchesNormal(
-                                    limit = 8,
-                                    agencyIds = filterParams.agencyIds,
-                                    locationIds = filterParams.locationIds
-                                )
-                            }
-                            launch(kotlinx.coroutines.Dispatchers.Default) {
-                                launchRepository.getPreviousLaunchesNormal(
-                                    limit = 8,
-                                    agencyIds = filterParams.agencyIds,
-                                    locationIds = filterParams.locationIds
-                                )
-                            }
-                            launch(kotlinx.coroutines.Dispatchers.Default) { updatesRepository.getLatestUpdates() }
-                            launch(kotlinx.coroutines.Dispatchers.Default) { articlesRepository.getArticles() }
-                            launch(kotlinx.coroutines.Dispatchers.Default) { eventsRepository.getUpcomingEvents() }
-                        }
-                    } catch (e: Exception) {
-                        log.d { "Home data prefetch suppressed: ${e.message}" }
-                    }
-                }
+                liveOnboardingCompleted == null || onboardingPaywallShown == null -> null
+                else -> Preload
             }
 
             // Show consent popup (platform-specific implementation)
@@ -434,8 +386,26 @@ fun SpaceLaunchNowApp(
                             navController = navController,
                             startDestination = startRoute,
                         ) {
+                            composableWithCompositionLocal<Preload> {
+                                PreloadScreen(
+                                    onPreloadComplete = { nextDestination ->
+                                        navController.navigate(nextDestination) {
+                                            popUpTo<Preload> { inclusive = true }
+                                        }
+                                    }
+                                )
+                            }
+                            composableWithCompositionLocal<LiveOnboarding> {
+                                LiveOnboardingScreen(
+                                    onComplete = {
+                                        navController.navigate(Onboarding) {
+                                            popUpTo<LiveOnboarding> { inclusive = true }
+                                        }
+                                    }
+                                )
+                            }
                             composableWithCompositionLocal<Onboarding> {
-                                OnboardingScreen(
+                                OnboardingPaywallScreen(
                                     onComplete = {
                                         navController.navigate(Home) {
                                             popUpTo<Onboarding> { inclusive = true }
@@ -524,7 +494,8 @@ fun SpaceLaunchNowApp(
                             }
                             composableWithCompositionLocal<DebugSettings> {
                                 DebugSettingsScreen(
-                                    onNavigateBack = { navController.popBackStack() }
+                                    onNavigateBack = { navController.popBackStack() },
+                                    onNavigateToLiveOnboarding = { navController.navigate(LiveOnboarding) }
                                 )
                             }
                             composableWithCompositionLocal<AboutLibraries> {

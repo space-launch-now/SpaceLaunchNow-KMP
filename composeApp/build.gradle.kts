@@ -239,7 +239,6 @@ kotlin {
                 implementation(libs.compose.icons.weatherIcons)
                 implementation(libs.coil.compose)
                 implementation(libs.coil.compose.ktor)
-                implementation(libs.insetsx)
 
                 implementation(libs.dotenv)
 

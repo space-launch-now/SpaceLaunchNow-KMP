@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -32,7 +34,19 @@ fun HorizontalScrollableList() {
 @Composable
 fun UpcomingHorizontalScrollableList(navController: androidx.navigation.NavController) {
     val launchCarouselViewModel = koinViewModel<LaunchCarouselViewModel>()
-    LaunchListView(viewModel = launchCarouselViewModel, navController = navController)
+    val combinedLaunches by launchCarouselViewModel.combinedLaunches.collectAsStateWithLifecycle()
+    val upcomingStartIndex by launchCarouselViewModel.upcomingStartIndex.collectAsStateWithLifecycle()
+    val carouselError by launchCarouselViewModel.carouselError.collectAsStateWithLifecycle()
+    val isCarouselLoading by launchCarouselViewModel.isCarouselLoading.collectAsStateWithLifecycle()
+
+    LaunchListView(
+        combinedLaunches = combinedLaunches,
+        upcomingStartIndex = upcomingStartIndex,
+        carouselError = carouselError,
+        isCarouselLoading = isCarouselLoading,
+        onRetry = { launchCarouselViewModel.loadLaunches(upcomingLimit = 10, forceRefresh = true) },
+        navController = navController
+    )
 }
 
 @Composable

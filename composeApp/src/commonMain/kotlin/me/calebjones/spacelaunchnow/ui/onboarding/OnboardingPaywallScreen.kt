@@ -7,18 +7,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Notifications
@@ -31,7 +36,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -76,11 +80,19 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 // ---------------------------------------------------------------------------
+// Space theme colours
+// ---------------------------------------------------------------------------
+
+private val SpaceDeepNavy = Color(0xFF0A0E2A)
+private val SpaceMidnightPurple = Color(0xFF1A1040)
+private val SpaceDeepPurple = Color(0xFF2A1060)
+
+// ---------------------------------------------------------------------------
 // Stateful entry point
 // ---------------------------------------------------------------------------
 
 @Composable
-fun OnboardingScreen(
+fun OnboardingPaywallScreen(
     viewModel: SubscriptionViewModel = koinInject(),
     nextUpViewModel: NextUpViewModel = koinViewModel(),
     appPreferences: AppPreferences = koinInject(),
@@ -173,9 +185,9 @@ fun OnboardingContent(
 ) {
     val spaceGradient = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF0A0E2A),
-            Color(0xFF1A1040),
-            Color(0xFF2A1060),
+            SpaceDeepNavy,
+            SpaceMidnightPurple,
+            SpaceDeepPurple,
         )
     )
     Box(
@@ -186,132 +198,88 @@ fun OnboardingContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Hero section ──────────────────────────────────────────────
+            // ── App icon + headline ───────────────────────────────────────
+            AppIconBox(boxSize = 72.dp, iconSize = 56.dp)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = if (isSubscribed) "Welcome Back!" else "Try Premium Free",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = if (isSubscribed) {
+                    "You're a Premium member. Thanks for supporting!"
+                } else {
+                    "Get the most out of Space Launch Now with a free trial... cancel anytime."
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // ── Premium features ──────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.08f)
-                )
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AppIconBox(boxSize = 56.dp, iconSize = 44.dp)
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = if (isSubscribed) "Welcome Back!" else "Welcome to Space Launch Now",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Spacer(modifier = Modifier.height(3.dp))
-                        Text(
-                            text = if (isSubscribed) {
-                                "You're a Premium member. Thanks for supporting!"
-                            } else {
-                                "Track every launch, mission, and crew... go ad-free with Premium."
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.65f)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // ── Next launch teaser ────────────────────────────────────────
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    containerColor = Color.Transparent
+                ),
                 border = androidx.compose.foundation.BorderStroke(
                     width = 1.dp,
                     color = Color.White.copy(alpha = 0.15f)
                 )
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "NEXT UPCOMING LAUNCH",
+                        text = "PREMIUM FEATURES INCLUDE",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.5f),
+                        color = Color.White.copy(alpha = 0.45f),
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 1.5.sp,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp)
+                            .padding(bottom = 12.dp)
                     )
-                    if (nextLaunch != null) {
-                        OnboardingNextLaunchCard(launch = nextLaunch)
-                    } else {
-                        PlainShimmerCard(height = 200, modifier = Modifier.fillMaxWidth())
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        HorizontalDivider(
-                            modifier = Modifier.weight(1f),
-                            color = Color.White.copy(alpha = 0.15f)
-                        )
-                        Text(
-                            text = "  Explore the App  ",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White.copy(alpha = 0.4f),
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        HorizontalDivider(
-                            modifier = Modifier.weight(1f),
-                            color = Color.White.copy(alpha = 0.15f)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    OnboardingTrackingFeatureRow()
-                }
-            }
-            Spacer(modifier = Modifier.height(20.dp))
 
-            // ── Premium features (condensed single card) ──────────────────
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.08f)
-                )
-            ) {
-                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
-                    Text(
-                        text = "Unlock Premium Features",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Color.White.copy(alpha = 0.4f),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    OnboardingPerkRow(
+                    OnboardingPerkCard(
                         icon = Icons.Default.Block,
-                        label = "Ad-free experience"
+                        title = "Ad-Free Experience",
+                        subtitle = "Browse launches and news without interruptions."
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    OnboardingPerkRow(
+                    OnboardingPerkCard(
                         icon = Icons.Default.Widgets,
-                        label = "Additional Premium widgets"
+                        title = "Premium Widgets",
+                        subtitle = "Premium customizable home screen widgets for upcoming launches."
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    OnboardingPerkRow(
+                    OnboardingPerkCard(
                         icon = Icons.Default.FormatPaint,
-                        label = "Exclusive themes & customization"
+                        title = "Themes & App Icons",
+                        subtitle = "Personalize your app with exclusive themes."
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OnboardingPerkCard(
+                        icon = Icons.Default.CalendarMonth,
+                        title = "Calendar Sync",
+                        subtitle = "Add launches directly to your calendar so you never miss one."
                     )
                 }
             }
@@ -323,56 +291,72 @@ fun OnboardingContent(
                 if (annualProduct != null) {
                     val trialLabel = annualProduct.freeTrialPeriodDisplay
                     val ctaLabel =
-                        if (trialLabel != null) "Start $trialLabel Free Trial" else "Start Free Trial"
+                        if (trialLabel != null) "Start Your $trialLabel Free Trial" else "Start Free Trial"
                     val disclosureText =
                         "Then ${annualProduct.formattedPrice}/year. Cancel anytime."
 
-                    Button(
-                        onClick = { onSubscribe(annualProduct) },
-                        enabled = !isProcessing,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        if (isProcessing) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = Color.White,
-                                strokeWidth = 2.dp
+                    Box(contentAlignment = Alignment.TopEnd) {
+                        Button(
+                            onClick = { onSubscribe(annualProduct) },
+                            enabled = !isProcessing,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
                             )
-                        } else {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-
+                        ) {
+                            if (isProcessing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = ctaLabel,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = disclosureText,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White.copy(alpha = 0.5f),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                        if (savingsPercent != null) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 12.dp)
+                                    .offset(y = (-8).dp)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.tertiary)
+                                    .padding(horizontal = 8.dp, vertical = 3.dp)
                             ) {
                                 Text(
-                                    text = ctaLabel,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = disclosureText,
+                                    text = "Save $savingsPercent",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = Color.White.copy(alpha = 0.5f),
-                                    textAlign = TextAlign.Center
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onTertiary,
+                                    fontSize = 10.sp
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    // ── Monthly fallback pill (secondary, non-competing) ──
+                    // ── Monthly fallback ───────────────────────────────────
                     if (monthlyProduct != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        val monthlyMicros = monthlyProduct.priceAmountMicros
+                        Spacer(modifier = Modifier.height(12.dp))
                         val perMonth =
-                            if (monthlyMicros > 0) monthlyProduct.formattedPrice else null
+                            if (monthlyProduct.priceAmountMicros > 0) monthlyProduct.formattedPrice else null
                         OutlinedButton(
                             onClick = { onSubscribe(monthlyProduct) },
                             enabled = !isProcessing,
@@ -387,28 +371,28 @@ fun OnboardingContent(
                         ) {
                             Text(
                                 text = buildString {
-                                    append("Or try Monthly")
+                                    append("Or go Monthly")
                                     if (perMonth != null) append(" · $perMonth/mo")
                                 },
                                 style = MaterialTheme.typography.labelMedium
                             )
                         }
-                    } else {
-                        Spacer(modifier = Modifier.height(2.dp))
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     TextButton(
                         onClick = onDismiss,
                         enabled = !isProcessing
                     ) {
                         Text(
-                            text = "Continue for Free",
+                            text = "Continue for free",
                             color = Color.White.copy(alpha = 0.35f),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
+
                 } else if (billingUnavailable) {
-                    // Billing unavailable (emulator, unsupported device, etc.) — skip CTA
                     Text(
                         text = "Purchases not available on this device.",
                         style = MaterialTheme.typography.labelSmall,
@@ -425,14 +409,10 @@ fun OnboardingContent(
                         )
                     }
                 } else {
-                    // Still loading products
-                    PlainShimmerCard(height = 52, modifier = Modifier.fillMaxWidth())
+                    PlainShimmerCard(height = 56, modifier = Modifier.fillMaxWidth())
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
 
             // ── Continue to App (subscribed users only) ──────────────────
             if (isSubscribed) {
@@ -454,7 +434,19 @@ fun OnboardingContent(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            // ── Error message ─────────────────────────────────────────────
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(64.dp))
 
             // ── Legal footer ──────────────────────────────────────────────
             FinePrint(
@@ -647,7 +639,7 @@ private fun OnboardingPricingCard(
 }
 
 @Composable
-private fun OnboardingNextLaunchCard(launch: LaunchNormal) {
+internal fun OnboardingNextLaunchCard(launch: LaunchNormal) {
     val launchCardData = remember(launch) { launch.toLaunchCardData() }
     val imageUrl = launch.image?.imageUrl ?: launch.image?.thumbnailUrl
 
@@ -670,15 +662,16 @@ private fun OnboardingNextLaunchCard(launch: LaunchNormal) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(32.dp),
-                                strokeWidth = 3.dp,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(
+                                            SpaceDeepNavy,
+                                            SpaceMidnightPurple,
+                                            SpaceDeepPurple,
+                                        )
+                                    )
+                                )
+                        )
                     },
                     error = {
                         Box(
@@ -738,7 +731,7 @@ private fun OnboardingNextLaunchCard(launch: LaunchNormal) {
 }
 
 @Composable
-private fun OnboardingTrackingFeatureRow() {
+internal fun OnboardingTrackingFeatureRow() {
     val features = listOf(
         Pair(Icons.Default.Timer, "Countdown"),
         Pair(Icons.Default.Map, "Map View"),

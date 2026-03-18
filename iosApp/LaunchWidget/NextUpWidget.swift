@@ -235,7 +235,7 @@ struct NextUpWidgetView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Compact header with status
                     HStack {
-                        Image(systemName: "rocket")
+                        Image(systemName: "paperplane.fill")
                             .font(.caption)
                             .foregroundStyle(.orange)
                         Text("Go")
@@ -360,7 +360,7 @@ struct NextUpWidgetView: View {
     // MARK: - Empty View
     private var emptyView: some View {
         VStack(spacing: 8) {
-            Image(systemName: "rocket")
+            Image(systemName: "paperplane.fill")
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
 
@@ -474,7 +474,7 @@ struct NextUpWidgetView: View {
         } else if lowercaseAgency.contains("esa") || lowercaseAgency.contains("arianespace") {
             return "globe.europe.africa"
         } else {
-            return "rocket"
+            return "paperplane.fill"
         }
     }
 

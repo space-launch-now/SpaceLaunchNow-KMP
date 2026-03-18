@@ -22,16 +22,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,11 +37,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
-import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.extensions.launchUrl
+import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
@@ -56,24 +50,19 @@ import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
 import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
-import me.calebjones.spacelaunchnow.ui.viewmodel.FeaturedLaunchViewModel
-import me.calebjones.spacelaunchnow.util.LaunchSharingService
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 
 @Composable
-fun NextLaunchView(navController: NavController) {
-    val featuredLaunchViewModel = koinViewModel<FeaturedLaunchViewModel>()
-    val state by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
-
-    // NOTE: We don't need to call loadFeaturedLaunch here because HomeScreen already calls it
-    // in its LaunchedEffect(Unit). The ViewModel is shared, so data flows automatically.
-    
+fun NextLaunchView(
+    state: ViewState<LaunchNormal?>,
+    navController: NavController,
+    onShare: (LaunchNormal) -> Unit = {},
+) {
     Column {
         when {
             // STATE 1: Show data if it exists (ALWAYS, even while loading or with error)
             state.data != null -> {
-                NextLaunchItemView(state.data!!, navController)
+                NextLaunchItemView(state.data!!, navController, onShare = { onShare(state.data!!) })
             }
 
             // STATE 2: Error with no data
@@ -101,9 +90,11 @@ fun NextLaunchView(navController: NavController) {
 
 
 @Composable
-fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
-    val sharingService = koinInject<LaunchSharingService>()
-    val coroutineScope = rememberCoroutineScope()
+fun NextLaunchItemView(
+    launch: LaunchNormal,
+    navController: NavController,
+    onShare: () -> Unit = {},
+) {
 
     // Main content column
     Column(
@@ -139,20 +130,26 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
                 ) {
                     // Background Image covering only the image area with proper error, placeholder, and loading states
                     launch.image?.imageUrl?.let { url ->
-                        SubcomposeAsyncImage(
+                        // NOTE: Image loading placeholders should use blurred/shimmer backgrounds,
+                    // not circular progress indicators. Circular loaders are jarring for image content.
+                    SubcomposeAsyncImage(
                             model = url,
                             contentDescription = "Launch Image",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
                             loading = {
                                 Box(
-                                    modifier = Modifier.fillMaxSize(),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .shimmer()
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(48.dp),
-                                        strokeWidth = 4.dp,
-                                        color = MaterialTheme.colorScheme.primary
+                                    Icon(
+                                        imageVector = CustomIcons.RocketLaunch,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(96.dp),
+                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                     )
                                 }
                             },
@@ -276,11 +273,7 @@ fun NextLaunchItemView(launch: LaunchNormal, navController: NavController) {
 
                     // Share button
                     Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                sharingService.shareUrl(launch.launchUrl)
-                            }
-                        },
+                        onClick = onShare,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer
