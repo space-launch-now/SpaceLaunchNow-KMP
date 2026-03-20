@@ -209,7 +209,7 @@ private fun ScheduleContent(
     }
 
     Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
-        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        Column(modifier = Modifier.fillMaxSize()) {
             // Title bar with expandable search
             Box(
                 modifier = Modifier

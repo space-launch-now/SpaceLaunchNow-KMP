@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
@@ -20,6 +21,7 @@ import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 @Composable
 fun HomeTopBar(navController: NavController) {
     TopAppBar(
+        windowInsets = WindowInsets(0, 0, 0, 0),
         title = {
             Text(
                 text = "Space Launch Now",

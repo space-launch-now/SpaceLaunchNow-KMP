@@ -52,9 +52,11 @@ fun WelcomePage(
     modifier: Modifier = Modifier,
     nextLaunch: LaunchNormal? = null
 ) {
-    val isMediumOrLarger = rememberAdaptiveLayoutState().isMediumOrLarger
+    // Use wide (side-by-side) layout only when width is EXPANDED (≥840dp).
+    // MEDIUM (600-840dp, e.g. tablet portrait) is too narrow for side-by-side.
+    val useWideLayout = rememberAdaptiveLayoutState().isExpanded
 
-    if (isMediumOrLarger) {
+    if (useWideLayout) {
         WelcomePageWide(modifier = modifier, nextLaunch = nextLaunch)
     } else {
         WelcomePageCompact(modifier = modifier, nextLaunch = nextLaunch)

@@ -1,6 +1,5 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -11,8 +10,9 @@ import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.ui.components.PlatformBackHandler
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 
 /**
@@ -50,7 +50,7 @@ fun <T : Any> ListDetailWrapper(
         }
     }
 
-    BackHandler(navigator.canNavigateBack()) {
+    PlatformBackHandler(enabled = navigator.canNavigateBack()) {
         scope.launch { navigator.navigateBack() }
     }
 

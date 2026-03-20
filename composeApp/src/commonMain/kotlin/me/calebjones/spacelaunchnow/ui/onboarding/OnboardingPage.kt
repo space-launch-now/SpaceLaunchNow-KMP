@@ -86,9 +86,11 @@ fun OnboardingPage(
     allowInteraction: Boolean = false,
     deviceFrameContent: @Composable () -> Unit
 ) {
-    val isMediumOrLarger = rememberAdaptiveLayoutState().isMediumOrLarger
+    // Use wide (side-by-side) layout only when width is EXPANDED (≥840dp).
+    // MEDIUM (600-840dp, e.g. tablet portrait) is too narrow for side-by-side.
+    val useWideLayout = rememberAdaptiveLayoutState().isExpanded
 
-    if (isMediumOrLarger) {
+    if (useWideLayout) {
         OnboardingPageWide(
             title = title,
             subtitle = subtitle,
