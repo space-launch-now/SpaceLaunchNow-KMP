@@ -37,6 +37,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -366,10 +367,11 @@ fun OnboardingContent(
                             modifier = Modifier.fillMaxWidth(),
                             border = androidx.compose.foundation.BorderStroke(
                                 width = 1.dp,
-                                color = Color.White.copy(alpha = 0.25f)
+                                color = Color.White.copy(alpha = 0.4f)
                             ),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Color.White.copy(alpha = 0.6f)
+                                containerColor = Color.White.copy(alpha = 0.08f),
+                                contentColor = Color.White.copy(alpha = 0.85f)
                             )
                         ) {
                             Text(
@@ -382,16 +384,30 @@ fun OnboardingContent(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    TextButton(
+                    HorizontalDivider(
+                        color = Color.White.copy(alpha = 0.15f),
+                        thickness = 1.dp
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedButton(
                         onClick = onDismiss,
-                        enabled = !isProcessing
+                        enabled = !isProcessing,
+                        modifier = Modifier.fillMaxWidth(),
+                        border = androidx.compose.foundation.BorderStroke(
+                            width = 1.dp,
+                            color = Color.White.copy(alpha = 0.18f)
+                        ),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.White.copy(alpha = 0.7f)
+                        )
                     ) {
                         Text(
                             text = "Continue for free",
-                            color = Color.White.copy(alpha = 0.35f),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
 
@@ -402,11 +418,20 @@ fun OnboardingContent(
                         color = Color.White.copy(alpha = 0.45f),
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    TextButton(onClick = onDismiss) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.fillMaxWidth(),
+                        border = androidx.compose.foundation.BorderStroke(
+                            width = 1.dp,
+                            color = Color.White.copy(alpha = 0.25f)
+                        ),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.White.copy(alpha = 0.8f)
+                        )
+                    ) {
                         Text(
-                            text = "Continue for Free",
-                            color = Color.White.copy(alpha = 0.75f),
+                            text = "Continue for free",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold
                         )
