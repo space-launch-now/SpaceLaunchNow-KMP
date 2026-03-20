@@ -1,3 +1,14 @@
+## [5.22.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.1...v5.22.2) (2026-03-20)
+
+
+### Bug Fixes
+
+* optimize Gradle JVM arguments for iOS CI/CD on macOS xlarge runners [skip ci] ([5ef3f3a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5ef3f3a45651f82f293e75c2f5a93d82e6ff1425))
+* update macOS runner to xlarge for iOS build and deployment [skip-ci] ([df548ba](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/df548ba534098af8ede16e217338b9b58a059131))
+* update paywall button styling ([f4733ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f4733ffc519a7f04a443f405e4dd027ff18b2add))
+
+
+
 ## [5.22.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.0...v5.22.1) (2026-03-20)
 
 
@@ -46,15 +57,6 @@
 ### Bug Fixes
 
 * **onboarding:** increase spacer height in onboarding content ([0195b52](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0195b524897936b6a551767770a6e38bdc81192d))
-
-
-
-## [5.21.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.21.0...v5.21.1) (2026-03-11)
-
-
-### Bug Fixes
-
-* **onboarding:** onboarding pref key ([fb9435b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fb9435b73c949ee662a2fcb57faaff5c840f93c9))
 
 
 

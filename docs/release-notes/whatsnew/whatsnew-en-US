@@ -1,4 +1,5 @@
 ### Bug Fixes
 
-* enhance layout handling and theme change support across multiple screens
-* implement responsive navigation
+* optimize Gradle JVM arguments for iOS CI/CD on macOS xlarge runners [skip ci]
+* update macOS runner to xlarge for iOS build and deployment [skip-ci]
+* update paywall button styling
