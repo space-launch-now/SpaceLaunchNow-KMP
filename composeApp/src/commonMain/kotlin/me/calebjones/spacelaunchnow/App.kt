@@ -60,8 +60,7 @@ import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.explore.ExploreScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
-import me.calebjones.spacelaunchnow.ui.layout.desktop.TabletDesktopLayout
-import me.calebjones.spacelaunchnow.ui.layout.phone.PhoneLayout
+import me.calebjones.spacelaunchnow.ui.layout.AdaptiveAppScaffold
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
 import me.calebjones.spacelaunchnow.ui.onboarding.LiveOnboardingScreen
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPaywallScreen
@@ -100,6 +99,13 @@ val LocalUseUtc = compositionLocalOf { false }
 val LocalContextFactory =
     compositionLocalOf<ContextFactory?> { null }
 
+@Deprecated(
+    message = "Use rememberAdaptiveLayoutState() from ui.layout instead",
+    replaceWith = ReplaceWith(
+        "rememberAdaptiveLayoutState()",
+        "me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState"
+    )
+)
 @Composable
 fun isTabletOrDesktop(): Boolean {
     // Desktop platform always uses tablet layout
@@ -140,12 +146,7 @@ fun SpaceLaunchNowApp(
 
     val navController = rememberNavController()
 
-    // Determine current window size for layout decisions - now dynamic
-    val currentIsTabletSize = isTabletOrDesktop()
-
-    log.v { "Dynamic layout detection: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}" }
-
-    log.v { "SpaceLaunchNowApp recomposing - NavController: ${navController.hashCode()}, using dynamic layout: ${if (currentIsTabletSize) "Tablet/Desktop" else "Phone"}" }
+    log.v { "SpaceLaunchNowApp recomposing - NavController: ${navController.hashCode()}" }
 
 
     // Handle notification-based navigation
@@ -593,20 +594,12 @@ fun SpaceLaunchNowApp(
                         }
                     }
 
-                    // Dynamic layout switching while preserving navigation state
-                    if (currentIsTabletSize) {
-                        TabletDesktopLayout(
-                            navController = navController,
-                            themeOption = themeOption,
-                            content = navHostContent
-                        )
-                    } else {
-                        PhoneLayout(
-                            navController = navController,
-                            themeOption = themeOption,
-                            content = navHostContent
-                        )
-                    }
+                    // Adaptive scaffold — auto-selects NavigationBar/Rail/Drawer by window size
+                    AdaptiveAppScaffold(
+                        navController = navController,
+                        themeOption = themeOption,
+                        content = navHostContent
+                    )
                 } // end else — onboarding state resolved
             }
         }

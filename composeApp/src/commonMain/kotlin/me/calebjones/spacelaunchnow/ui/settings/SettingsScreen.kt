@@ -156,7 +156,7 @@ fun SettingsScreen(
                         text = "Settings",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 36.sp,
+                        fontSize = 32.sp,
                     )
                 }
             )

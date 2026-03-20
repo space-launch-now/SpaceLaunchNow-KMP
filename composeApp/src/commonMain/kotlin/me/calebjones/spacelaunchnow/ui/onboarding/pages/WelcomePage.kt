@@ -4,12 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingNextLaunchCard
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingTrackingFeatureRow
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
@@ -50,6 +52,52 @@ fun WelcomePage(
     modifier: Modifier = Modifier,
     nextLaunch: LaunchNormal? = null
 ) {
+    val isMediumOrLarger = rememberAdaptiveLayoutState().isMediumOrLarger
+
+    if (isMediumOrLarger) {
+        WelcomePageWide(modifier = modifier, nextLaunch = nextLaunch)
+    } else {
+        WelcomePageCompact(modifier = modifier, nextLaunch = nextLaunch)
+    }
+}
+
+@Composable
+private fun WelcomePageWide(
+    modifier: Modifier = Modifier,
+    nextLaunch: LaunchNormal? = null
+) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .background(spaceGradient)
+            .padding(horizontal = 32.dp, vertical = 24.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Left: Welcome card
+        Box(
+            modifier = Modifier
+                .weight(1f),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            WelcomeCardContent()
+        }
+
+        // Right: Next launch + explore
+        Box(
+            modifier = Modifier
+                .weight(1f)
+        ) {
+            NextLaunchContent(nextLaunch = nextLaunch)
+        }
+    }
+}
+
+@Composable
+private fun WelcomePageCompact(
+    modifier: Modifier = Modifier,
+    nextLaunch: LaunchNormal? = null
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -60,115 +108,131 @@ fun WelcomePage(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Icon overlaps the top of the card — Box layout prevents shadow clipping
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
             contentAlignment = Alignment.TopCenter
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 60.dp), // leave room for the icon to overlap
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 72.dp, bottom = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Welcome to",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = "Space Launch Now",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "Your guide to every rocket launch,\nright from your pocket.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            // Icon rendered on top, shadow renders freely
-            AppIconBox(
-                modifier = Modifier.size(120.dp)
-            )
+            WelcomeCardContent()
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Next Upcoming Launch card wrapped in outlined card
+        NextLaunchContent(
+            nextLaunch = nextLaunch,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+    }
+}
+
+@Composable
+private fun WelcomeCardContent(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.TopCenter
+    ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .padding(top = 60.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f))
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
+            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
         ) {
-            Column(modifier = Modifier.padding(12.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 72.dp, bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    text = "NEXT UPCOMING LAUNCH",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White.copy(alpha = 0.5f),
-                    fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 1.5.sp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
+                    text = "Welcome to",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center
                 )
-                if (nextLaunch != null) {
-                    OnboardingNextLaunchCard(launch = nextLaunch)
-                } else {
-                    PlainShimmerCard(height = 200, modifier = Modifier.fillMaxWidth())
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        color = Color.White.copy(alpha = 0.15f)
-                    )
-                    Text(
-                        text = "  Explore the App  ",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.4f),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        color = Color.White.copy(alpha = 0.15f)
-                    )
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                OnboardingTrackingFeatureRow()
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Space Launch Now",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Your guide to every rocket launch,\nright from your pocket.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                    textAlign = TextAlign.Center
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        AppIconBox(
+            modifier = Modifier.size(120.dp)
+        )
+    }
+}
+
+@Composable
+private fun NextLaunchContent(
+    modifier: Modifier = Modifier,
+    nextLaunch: LaunchNormal? = null
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f))
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = "NEXT UPCOMING LAUNCH",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White.copy(alpha = 0.5f),
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 1.5.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+            if (nextLaunch != null) {
+                OnboardingNextLaunchCard(launch = nextLaunch)
+            } else {
+                PlainShimmerCard(height = 200, modifier = Modifier.fillMaxWidth())
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = Color.White.copy(alpha = 0.15f)
+                )
+                Text(
+                    text = "  Explore the App  ",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.4f),
+                    fontWeight = FontWeight.SemiBold
+                )
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = Color.White.copy(alpha = 0.15f)
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            OnboardingTrackingFeatureRow()
+        }
     }
 }
 

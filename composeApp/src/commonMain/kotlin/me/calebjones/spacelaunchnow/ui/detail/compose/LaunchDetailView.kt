@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
-import me.calebjones.spacelaunchnow.isLargeScreen
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.detail.compose.phone.PhoneLaunchDetailContent
 import me.calebjones.spacelaunchnow.ui.detail.compose.tablet.TabletLaunchDetailContent
@@ -77,14 +77,15 @@ fun LaunchDetailView(
     eventsError: String? = null,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
-    onNavigateBack: () -> Unit,
+    onNavigateBack: (() -> Unit)? = null,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
-    onAstronautClick: ((Int) -> Unit)? = null
+    onAstronautClick: ((Int) -> Unit)? = null,
+    forcePhoneLayout: Boolean = false
 ) {
-    val isLargeScreen = isLargeScreen()
+    val isLargeScreen = rememberAdaptiveLayoutState().isExpanded && !forcePhoneLayout
 
     // Completely separate architecture for phone vs tablet
     if (isLargeScreen) {
@@ -125,7 +126,8 @@ fun LaunchDetailView(
             onVideoSelected = onVideoSelected,
             onNavigateToSettings = onNavigateToSettings,
             onEventClick = onEventClick,
-            onAstronautClick = onAstronautClick
+            onAstronautClick = onAstronautClick,
+            forcePhoneLayout = forcePhoneLayout
         )
     }
 }
@@ -145,7 +147,7 @@ private fun TabletLaunchDetailView(
     eventsError: String?,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
-    onNavigateBack: () -> Unit,
+    onNavigateBack: (() -> Unit)? = null,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
@@ -219,12 +221,13 @@ private fun PhoneLaunchDetailView(
     eventsError: String?,
     onSelectVideo: (Int) -> Unit,
     onSetPlayerVisible: (Boolean) -> Unit,
-    onNavigateBack: () -> Unit,
+    onNavigateBack: (() -> Unit)? = null,
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
-    onAstronautClick: ((Int) -> Unit)? = null
+    onAstronautClick: ((Int) -> Unit)? = null,
+    forcePhoneLayout: Boolean = false
 ) {
     SharedDetailScaffold(
         titleText = launch.name ?: "Unknown Launch",
@@ -232,6 +235,7 @@ private fun PhoneLaunchDetailView(
         imageUrl = launch.image?.imageUrl,
         onNavigateBack = onNavigateBack,
         scrollEnabled = true, // Parent scrolling enabled for header collapse
+        forcePhoneLayout = forcePhoneLayout,
         backgroundColors = listOf(
             getLaunchStatusColor(launch.status?.id),
             MaterialTheme.colorScheme.primaryContainer,

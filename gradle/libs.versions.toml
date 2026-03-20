@@ -21,6 +21,7 @@ compose-plugin = "1.10.2"
 compose = "2.2.21"
 compose-material3 = "1.5.0-alpha15"
 compose-material3-adaptive = "1.2.0"
+compose-material3-navigation-suite = "1.10.0-alpha05"
 compose-hot-reload = "1.0.0"
 coreSplashscreen = "1.2.0"
 ddSdkKotlinMultiplatformLogs = "1.4.0"
@@ -147,6 +148,9 @@ ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref =
 
 compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "compose-material3" }
 compose-material3-adaptive = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive", version.ref = "compose-material3-adaptive" }
+compose-material3-adaptive-layout = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive-layout", version.ref = "compose-material3-adaptive" }
+compose-material3-adaptive-navigation = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "compose-material3-adaptive" }
+compose-material3-navigation-suite = { group = "org.jetbrains.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "compose-material3-navigation-suite" }
 androidx-palette = { group = "androidx.palette", name = "palette", version.ref = "androidx-palette" }
 
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }

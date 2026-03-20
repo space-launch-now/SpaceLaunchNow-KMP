@@ -60,29 +60,31 @@ private val TitleHeight = 120.dp
 fun LaunchDetailErrorView(
     errorMessage: String,
     onRetry: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: (() -> Unit)? = null
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         // Back button
-        IconButton(
-            onClick = onNavigateBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .statusBarsPadding()
-                .padding(16.dp)
-                .size(36.dp)
-                .background(
-                    color = Color(0xff121212).copy(alpha = 0.32f),
-                    shape = CircleShape,
-                ),
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = "Back",
-            )
+        if (onNavigateBack != null) {
+            IconButton(
+                onClick = onNavigateBack,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .statusBarsPadding()
+                    .padding(16.dp)
+                    .size(36.dp)
+                    .background(
+                        color = Color(0xff121212).copy(alpha = 0.32f),
+                        shape = CircleShape,
+                    ),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                    contentDescription = "Back",
+                )
+            }
         }
 
         // Error content
@@ -100,7 +102,7 @@ fun LaunchDetailErrorView(
  * Shows skeleton loading cards that mimic the structure of launch detail content.
  */
 @Composable
-fun LaunchDetailLoadingView(onNavigateBack: () -> Unit) {
+fun LaunchDetailLoadingView(onNavigateBack: (() -> Unit)? = null) {
     // Use SharedDetailScaffold to match the responsive behavior of the actual detail view
     SharedDetailScaffold(
         titleText = "",

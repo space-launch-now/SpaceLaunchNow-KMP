@@ -129,6 +129,15 @@ class LaunchViewModel(
     }
 
     /**
+     * Clear launch details so the UI shows a loading state while new data is fetched.
+     */
+    fun clearLaunchDetails() {
+        _launchDetails.value = null
+        _error.value = null
+        _isLoading.value = true
+    }
+
+    /**
      * Get cached launch normal data if available. This can be used by the UI
      * to show basic information while detailed data is being fetched.
      */

@@ -24,8 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import me.calebjones.spacelaunchnow.isTabletOrDesktop
 import me.calebjones.spacelaunchnow.ui.explore.components.ExploreCard
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 
 /**
  * Explore screen displaying a grid of discovery sections.
@@ -47,7 +47,7 @@ fun ExploreScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val isTablet = isTabletOrDesktop()
+    val isTablet = rememberAdaptiveLayoutState().isExpanded
     
     Scaffold(
         modifier = modifier,
@@ -58,7 +58,7 @@ fun ExploreScreen(
                         text = "Explore",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 36.sp,
+                        fontSize = 32.sp,
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

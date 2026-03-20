@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.onboarding.pages
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.repository.hasPlatformNotificationPermission
 import me.calebjones.spacelaunchnow.data.repository.openPlatformNotificationSettings
@@ -81,10 +84,7 @@ fun NotificationPermissionPage(
                 scope.launch {
                     val granted = hasPlatformNotificationPermission()
                     hasPermission = granted
-                    // If user enabled in settings, auto-advance
-                    if (granted) {
-                        onPermissionResult(true)
-                    }
+                    // LaunchedEffect(hasPermission) handles the delayed auto-advance
                 }
             }
         }
@@ -97,14 +97,21 @@ fun NotificationPermissionPage(
     // Auto-advance if permission already granted on initial check
     LaunchedEffect(hasPermission) {
         if (hasPermission == true) {
+            delay(3000L)
             onPermissionResult(true)
         }
     }
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .background(spaceGradient)
+            .background(spaceGradient),
+        contentAlignment = Alignment.Center
+    ) {
+    Column(
+        modifier = Modifier
+            .widthIn(max = 480.dp)
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -225,6 +232,7 @@ fun NotificationPermissionPage(
         }
 
         Spacer(modifier = Modifier.height(48.dp))
+    }
     }
 }
 

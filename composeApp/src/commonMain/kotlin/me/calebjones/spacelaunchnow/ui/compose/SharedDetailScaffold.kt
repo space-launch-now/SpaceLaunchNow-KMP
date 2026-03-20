@@ -54,8 +54,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil3.compose.SubcomposeAsyncImage
-import me.calebjones.spacelaunchnow.isLargeScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import kotlin.math.max
 import kotlin.math.min
@@ -114,13 +114,14 @@ fun SharedDetailScaffold(
     titleText: String,
     taglineText: String?,
     imageUrl: String?,
-    onNavigateBack: () -> Unit,
+    onNavigateBack: (() -> Unit)? = null,
     backgroundColors: List<Color>? = null,
     scrollEnabled: Boolean = true,
+    forcePhoneLayout: Boolean = false,
     content: @Composable () -> Unit,
 ) {
 
-    val isLargeScreen = isLargeScreen()
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger && !forcePhoneLayout
 
     // For tablets, always start collapsed and don't allow expansion
     val forceNoCollapse = isLargeScreen
@@ -145,17 +146,22 @@ fun SharedDetailScaffold(
             titleText,
             taglineText,
             scroll,
-            forceNoCollapse = forceNoCollapse
+            forceNoCollapse = forceNoCollapse,
+            showBackButton = onNavigateBack != null,
+            forcePhoneLayout = forcePhoneLayout
         )
-        SharedDetailImage(imageUrl, scroll, forceNoCollapse = forceNoCollapse)
-        SharedDetailUp(onNavigateBack)
+        SharedDetailImage(imageUrl, scroll, forceNoCollapse = forceNoCollapse, forcePhoneLayout = forcePhoneLayout)
+        if (onNavigateBack != null) {
+            SharedDetailUp(onNavigateBack, forcePhoneLayout = forcePhoneLayout)
+        }
     }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun SharedDetailBackground(colors: List<Color>, forceNoCollapse: Boolean = false) {
-    val isLargeScreen = isLargeScreen()
+    // forceNoCollapse == true means large screen (tablet/desktop)
+    val isLargeScreen = forceNoCollapse
 
     val infiniteTransition = rememberInfiniteTransition(label = "background")
     val targetOffset = with(LocalDensity.current) { 5000.dp.toPx() }
@@ -202,7 +208,8 @@ private fun SharedDetailBody(
 ) {
     val sharedTransitionScope = LocalSharedTransitionScope.current
         ?: throw IllegalStateException("No scope found")
-    val isLargeScreen = isLargeScreen()
+    // forceNoCollapse == true means large screen (tablet/desktop)
+    val isLargeScreen = forceNoCollapse
 
     with(sharedTransitionScope) {
         Column {
@@ -244,8 +251,10 @@ private fun SharedDetailTitle(
     tagline: String?,
     scroll: ScrollState,
     forceNoCollapse: Boolean = false,
+    showBackButton: Boolean = true,
+    forcePhoneLayout: Boolean = false,
 ) {
-    val isLargeScreen = isLargeScreen()
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger && !forcePhoneLayout
 
     val maxOffset = with(LocalDensity.current) { MaxTitleOffset.toPx() }
     val minOffset = with(LocalDensity.current) { MinTitleOffset.toPx() }
@@ -263,7 +272,7 @@ private fun SharedDetailTitle(
 
     // Calculate horizontal padding needed to avoid overlap with collapsed image and back button
     val horizontalPaddingPx = with(LocalDensity.current) { HzPadding.toPx() }
-    val leftPaddingPx = if (forceNoCollapse && isLargeScreen) {
+    val leftPaddingPx = if (forceNoCollapse && isLargeScreen && showBackButton) {
         horizontalPaddingPx + with(LocalDensity.current) { 48.dp.toPx() } // Space for back button
     } else {
         horizontalPaddingPx
@@ -328,6 +337,7 @@ private fun SharedDetailImage(
     imageUrl: String?,
     scroll: ScrollState,
     forceNoCollapse: Boolean = false,
+    forcePhoneLayout: Boolean = false,
 ) {
 
     val collapseRange = with(LocalDensity.current) { (MaxTitleOffset - MinTitleOffset).toPx() }
@@ -336,6 +346,7 @@ private fun SharedDetailImage(
 
     CollapsingImageLayout(
         collapseFractionProvider = collapseFractionProvider,
+        forcePhoneLayout = forcePhoneLayout,
         modifier = Modifier
             .statusBarsPadding()
             .padding(horizontal = HzPadding)
@@ -381,10 +392,10 @@ private fun SharedDetailImage(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedDetailUp(upPress: () -> Unit) {
+private fun SharedDetailUp(upPress: () -> Unit, forcePhoneLayout: Boolean = false) {
     val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
         ?: throw IllegalArgumentException("No Scope found")
-    val isLargeScreen = isLargeScreen()
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger && !forcePhoneLayout
 
     with(animatedVisibilityScope) {
         IconButton(
@@ -429,10 +440,11 @@ private fun SharedDetailUp(upPress: () -> Unit) {
 @Composable
 private fun CollapsingImageLayout(
     collapseFractionProvider: () -> Float,
+    forcePhoneLayout: Boolean = false,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val isLargeScreen = isLargeScreen()
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger && !forcePhoneLayout
 
     Layout(
         modifier = modifier,

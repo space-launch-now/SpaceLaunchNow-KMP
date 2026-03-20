@@ -201,6 +201,9 @@ kotlin {
 
                 // Adaptive layouts for responsive UI
                 implementation(libs.compose.material3.adaptive)
+                implementation(libs.compose.material3.adaptive.layout)
+                implementation(libs.compose.material3.adaptive.navigation)
+                implementation(libs.compose.material3.navigation.suite)
 
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
