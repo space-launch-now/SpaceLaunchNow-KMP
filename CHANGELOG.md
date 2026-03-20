@@ -1,3 +1,13 @@
+## [5.22.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.0...v5.22.1) (2026-03-20)
+
+
+### Bug Fixes
+
+* enhance layout handling and theme change support across multiple screens ([408562a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/408562ae2cf4948c8a823d8c1ef5b66cdd2ea66c))
+* implement responsive navigation ([4a26a81](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4a26a81d653c2d67209fb15052247f73f364612e))
+
+
+
 # [5.22.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.21.3...v5.22.0) (2026-03-18)
 
 
@@ -45,16 +55,6 @@
 ### Bug Fixes
 
 * **onboarding:** onboarding pref key ([fb9435b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fb9435b73c949ee662a2fcb57faaff5c840f93c9))
-
-
-
-# [5.21.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.20.0...v5.21.0) (2026-03-11)
-
-
-### Features
-
-* **agent:** add business analysis agent skill ([a7d1ce4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a7d1ce42727365b068823ed3a07ea0383dd6df9b))
-* **ui:** implement onboarding screen ([517e963](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/517e963127cdb7ee5b469bebf3aefdf6cf0e6166))
 
 
 
