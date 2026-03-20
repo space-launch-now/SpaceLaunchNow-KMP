@@ -85,6 +85,13 @@ import org.jetbrains.compose.resources.painterResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 
+@Deprecated(
+    message = "Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer",
+    replaceWith = ReplaceWith(
+        "AdaptiveAppScaffold(navController, themeOption, content)",
+        "me.calebjones.spacelaunchnow.ui.layout.AdaptiveAppScaffold"
+    )
+)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun TabletDesktopLayout(

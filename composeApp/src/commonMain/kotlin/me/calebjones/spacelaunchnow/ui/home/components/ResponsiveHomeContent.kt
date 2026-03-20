@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.home.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,12 +33,12 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.model.DataSource
-import me.calebjones.spacelaunchnow.isLargeScreen
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.components.OfflineBanner
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel
@@ -70,10 +71,14 @@ fun ResponsiveHomeContent(
     oldestCacheTimestamp: Long? = null,
     onRetry: () -> Unit = {}
 ) {
-    val isTabletOrDesktop = isLargeScreen()
+    val layoutState = rememberAdaptiveLayoutState()
+    val isTabletOrDesktop = layoutState.isExpanded
+
+    BoxWithConstraints(modifier = if (isTabletOrDesktop) modifier.fillMaxSize() else modifier) {
+    val useWideHeroLayout = isTabletOrDesktop && maxWidth >= 1000.dp
 
     LazyColumn(
-        modifier = if (isTabletOrDesktop) modifier.fillMaxSize() else modifier,
+        modifier = Modifier.fillMaxSize(),
     ) {
         item(key = "top_bar") { HomeTopBar(navController = navController) }
 
@@ -99,37 +104,56 @@ fun ResponsiveHomeContent(
         }
 
         if (isTabletOrDesktop) {
-            // Tablet: Hero cards row — Last Launch + This Day in History (left) + Next Up (right)
-            item(key = "hero_cards_row") {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column(
-                        modifier = Modifier.weight(0.4f),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+            // Desktop/Tablet: Hero cards row
+            if (useWideHeroLayout) {
+                // Wide layout: Last Launch + History (left) + Next Up (right)
+                item(key = "hero_cards_row") {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.Top
                     ) {
-                        LastLaunchCard(
-                            previousLaunch = previousLaunchesState.data.firstOrNull(),
-                            navController = navController
-                        )
+                        Column(
+                            modifier = Modifier.weight(0.4f),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            LastLaunchCard(
+                                previousLaunch = previousLaunchesState.data.firstOrNull(),
+                                navController = navController
+                            )
 
-                        TabletHistoryCard(
-                            historyState = historyState,
-                            navController = navController
-                        )
-                    }
+                            TabletHistoryCard(
+                                historyState = historyState,
+                                navController = navController
+                            )
+                        }
 
-                    Box(modifier = Modifier.weight(0.6f)) {
-                        NextLaunchView(
-                            state = featuredLaunchState,
-                            navController = navController,
-                            onShare = onShareLaunch
-                        )
+                        Box(modifier = Modifier.weight(0.6f)) {
+                            NextLaunchView(
+                                state = featuredLaunchState,
+                                navController = navController,
+                                onShare = onShareLaunch
+                            )
+                        }
                     }
+                }
+            } else {
+                // Medium expanded (e.g. foldable): Single column, full width
+                item(key = "next_launch_view") {
+                    NextLaunchView(
+                        state = featuredLaunchState,
+                        navController = navController,
+                        onShare = onShareLaunch
+                    )
+                }
+                item(key = "last_launch_card") {
+                    LastLaunchCard(
+                        previousLaunch = previousLaunchesState.data.firstOrNull(),
+                        navController = navController,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
                 }
             }
         } else {
@@ -166,8 +190,8 @@ fun ResponsiveHomeContent(
             )
         }
 
-        // This Day in History (phone only — tablet shows it in the hero row)
-        if (!isTabletOrDesktop) {
+        // This Day in History (shown separately when not using wide hero layout)
+        if (!useWideHeroLayout) {
             item(key = "history_section") {
                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Text(
@@ -191,7 +215,7 @@ fun ResponsiveHomeContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 12.dp),
-                    placementType = AdPlacementType.INTERSTITIAL,
+                    placementType = AdPlacementType.FEED,
                     showRemoveAdsButton = true,
                     onRemoveAdsClick = { navController.navigate(SupportUs) }
                 )
@@ -224,7 +248,12 @@ fun ResponsiveHomeContent(
         }
 
         item(key = "updates_title") { SectionTitle(title = "Latest Updates", hasAction = false) }
-        item(key = "updates_view") { LatestUpdatesView(state = updatesState, navController = navController) }
+        item(key = "updates_view") {
+            LatestUpdatesView(
+                state = updatesState,
+                navController = navController
+            )
+        }
         item(key = "news_title") { SectionTitle(title = "Latest News", hasAction = false) }
         item(key = "news_view") { ArticlesView(state = articlesState) }
         item(key = "events_title") { SectionTitle(title = "Upcoming Events", hasAction = false) }
@@ -233,6 +262,7 @@ fun ResponsiveHomeContent(
             Spacer(modifier = Modifier.height(if (isTabletOrDesktop) 64.dp else 32.dp))
         }
     }
+    } // BoxWithConstraints
 }
 
 /**

@@ -66,6 +66,9 @@ class ScheduleViewModel(
     private val _uiState = MutableStateFlow(ScheduleUiState())
     val uiState: StateFlow<ScheduleUiState> = _uiState.asStateFlow()
 
+    /** Tracks the currently selected launch ID for list-detail restoration. */
+    var selectedLaunchId: String? = null
+
     private val cacheTtlMillis = 900_000L // 15 minute TTL
     private var queryVersion = 0
     private var loadJobsUpcoming: kotlinx.coroutines.Job? = null

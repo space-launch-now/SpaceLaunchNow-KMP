@@ -154,7 +154,7 @@ fun PhoneLaunchDetailContent(
                 Tab(
                     selected = selectedTabIndex == index,
                     onClick = { selectedTabIndex = index },
-                    text = { Text(tab.displayName) }
+                    text = { Text(tab.displayName, maxLines = 1, overflow = TextOverflow.Ellipsis) }
                 )
             }
         }

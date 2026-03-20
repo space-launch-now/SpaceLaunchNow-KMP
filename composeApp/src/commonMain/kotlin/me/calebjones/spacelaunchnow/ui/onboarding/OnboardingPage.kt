@@ -1,8 +1,10 @@
 package me.calebjones.spacelaunchnow.ui.onboarding
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -26,6 +29,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -80,6 +84,142 @@ fun OnboardingPage(
     deviceFrameStyle: DeviceFrameStyle = detectDeviceFrameStyle(),
     contentScale: Float = 0.85f,
     allowInteraction: Boolean = false,
+    deviceFrameContent: @Composable () -> Unit
+) {
+    // Use wide (side-by-side) layout only when width is EXPANDED (≥840dp).
+    // MEDIUM (600-840dp, e.g. tablet portrait) is too narrow for side-by-side.
+    val useWideLayout = rememberAdaptiveLayoutState().isExpanded
+
+    if (useWideLayout) {
+        OnboardingPageWide(
+            title = title,
+            subtitle = subtitle,
+            modifier = modifier,
+            icon = icon,
+            deviceFrameStyle = deviceFrameStyle,
+            contentScale = contentScale,
+            allowInteraction = allowInteraction,
+            deviceFrameContent = deviceFrameContent
+        )
+    } else {
+        OnboardingPageCompact(
+            title = title,
+            subtitle = subtitle,
+            modifier = modifier,
+            icon = icon,
+            deviceFrameStyle = deviceFrameStyle,
+            contentScale = contentScale,
+            allowInteraction = allowInteraction,
+            deviceFrameContent = deviceFrameContent
+        )
+    }
+}
+
+@Composable
+private fun OnboardingPageWide(
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    deviceFrameStyle: DeviceFrameStyle,
+    contentScale: Float,
+    allowInteraction: Boolean,
+    deviceFrameContent: @Composable () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .background(spaceGradient)
+            .padding(horizontal = 32.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        // Left: Device frame
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(vertical = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            DeviceFrame(
+                style = deviceFrameStyle,
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .fillMaxHeight(0.9f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer(scaleX = contentScale, scaleY = contentScale)
+                        .then(
+                            if (!allowInteraction) {
+                                Modifier.pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        while (true) {
+                                            awaitPointerEvent()
+                                        }
+                                    }
+                                }
+                            } else Modifier
+                        )
+                ) {
+                    deviceFrameContent()
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.width(24.dp))
+
+        // Right: Text content
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun OnboardingPageCompact(
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    deviceFrameStyle: DeviceFrameStyle,
+    contentScale: Float,
+    allowInteraction: Boolean,
     deviceFrameContent: @Composable () -> Unit
 ) {
     Column(

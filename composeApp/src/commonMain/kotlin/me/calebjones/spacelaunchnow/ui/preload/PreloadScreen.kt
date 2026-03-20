@@ -87,13 +87,13 @@ private fun PreloadScreenContent(
     state: PreloadState,
     modifier: Modifier = Modifier
 ) {
-    var messageIndex by remember { mutableIntStateOf(0) }
+    var messageIndex by remember { mutableIntStateOf((loadingMessages.indices).random()) }
     val currentMessage = loadingMessages[messageIndex]
 
     LaunchedEffect(Unit) {
         while (true) {
             delay(5000)
-            messageIndex = (messageIndex + 1) % loadingMessages.size
+            messageIndex = (loadingMessages.indices - messageIndex).random()
         }
     }
 

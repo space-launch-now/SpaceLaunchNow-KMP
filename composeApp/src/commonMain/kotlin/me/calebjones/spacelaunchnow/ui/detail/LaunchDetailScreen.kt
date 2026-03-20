@@ -2,10 +2,18 @@ package me.calebjones.spacelaunchnow.ui.detail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -15,11 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.navigation.AstronautDetail
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
-import me.calebjones.spacelaunchnow.navigation.AstronautDetail
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailErrorView
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailLoadingView
@@ -33,8 +42,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun LaunchDetailScreen(
     launchId: String,
-    onNavigateBack: () -> Unit,
-    navController: NavHostController? = null
+    onNavigateBack: (() -> Unit)? = null,
+    navController: NavHostController? = null,
+    onOpenFullscreen: ((String) -> Unit)? = null,
+    forcePhoneLayout: Boolean = false
 ) {
     val log = SpaceLogger.getLogger("LaunchDetailScreen")
     val viewModel = koinViewModel<LaunchViewModel>()
@@ -84,8 +95,9 @@ fun LaunchDetailScreen(
         if (cachedLaunchDetailed != null) {
             // We have preloaded data, set it immediately to avoid loading state
             viewModel.setLaunchDetails(cachedLaunchDetailed)
-        } else if (launchDetails == null && !isLoading) {
-            // No preloaded data and not currently loading, fetch from API
+        } else {
+            // Clear stale data so the loading state is visible while fetching
+            viewModel.clearLaunchDetails()
             viewModel.fetchLaunchDetails(launchId)
         }
 
@@ -150,7 +162,8 @@ fun LaunchDetailScreen(
                     },
                     onAstronautClick = { astronautId ->
                         navController?.navigate(AstronautDetail(astronautId = astronautId))
-                    }
+                    },
+                    forcePhoneLayout = forcePhoneLayout
                 )
             }
 
@@ -166,6 +179,25 @@ fun LaunchDetailScreen(
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
+
+        // Fullscreen button when embedded in list-detail pane
+        if (onOpenFullscreen != null) {
+            SmallFloatingActionButton(
+                onClick = { onOpenFullscreen(launchId) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Fullscreen,
+                    contentDescription = "Open fullscreen",
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
     }
 }
 

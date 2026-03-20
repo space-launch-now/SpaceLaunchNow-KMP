@@ -36,6 +36,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
@@ -231,6 +232,8 @@ fun LaunchCardHeaderOverlay(
                         blurRadius = 5f
                     )
                 ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 color = Color.White
             )
 
@@ -245,6 +248,8 @@ fun LaunchCardHeaderOverlay(
                             blurRadius = 5f
                         )
                     ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     color = Color.White.copy(alpha = 0.95f)
                 )
             }

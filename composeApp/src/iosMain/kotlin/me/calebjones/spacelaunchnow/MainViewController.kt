@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow
 
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.window.ComposeUIViewController
@@ -27,6 +28,18 @@ private val navigationDestinationState = mutableStateOf<String?>(null)
 
 // Shared state for notification-based navigation
 private val notificationLaunchIdState = mutableStateOf<String?>(null)
+
+// Callback for theme changes — set from Swift to receive updates
+private var themeChangeListener: ((Int) -> Unit)? = null
+
+/**
+ * Register a listener to be called when the app theme changes.
+ * The Int parameter is the UIUserInterfaceStyle raw value:
+ * 0 = Unspecified (follow system), 1 = Light, 2 = Dark.
+ */
+fun setThemeChangeListener(listener: ((Int) -> Unit)?) {
+    themeChangeListener = listener
+}
 
 // Public function for iOS to trigger navigation
 fun setNavigationDestination(destination: String?) {
@@ -111,6 +124,16 @@ fun MainViewController() = ComposeUIViewController {
     val appPreferences = getKoin().get<AppPreferences>()
     val useUtc by appPreferences.useUtcFlow.collectAsState(initial = false)
     val themeOption by appPreferences.themeFlow.collectAsState(initial = me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.System)
+
+    // Notify Swift when theme changes so it can set overrideUserInterfaceStyle
+    LaunchedEffect(themeOption) {
+        val style = when (themeOption) {
+            me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.Light -> 1
+            me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption.Dark -> 2
+            else -> 0
+        }
+        themeChangeListener?.invoke(style)
+    }
 
     SpaceLaunchNowApp(
         contextFactory = me.calebjones.spacelaunchnow.platform.ContextFactory(),

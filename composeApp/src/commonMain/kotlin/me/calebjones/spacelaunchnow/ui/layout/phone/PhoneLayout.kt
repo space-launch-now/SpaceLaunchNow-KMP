@@ -69,6 +69,13 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 
+@Deprecated(
+    message = "Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer",
+    replaceWith = ReplaceWith(
+        "AdaptiveAppScaffold(navController, themeOption, content)",
+        "me.calebjones.spacelaunchnow.ui.layout.AdaptiveAppScaffold"
+    )
+)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PhoneLayout(

@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.explore
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -24,8 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import me.calebjones.spacelaunchnow.isTabletOrDesktop
 import me.calebjones.spacelaunchnow.ui.explore.components.ExploreCard
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 
 /**
  * Explore screen displaying a grid of discovery sections.
@@ -47,18 +48,20 @@ fun ExploreScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val isTablet = isTabletOrDesktop()
+    val isTablet = rememberAdaptiveLayoutState().isExpanded
     
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
+                windowInsets = WindowInsets(0, 0, 0, 0),
                 title = {
                     Text(
                         text = "Explore",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 36.sp,
+                        fontSize = 32.sp,
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

@@ -22,6 +22,9 @@ import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 
+@Deprecated(
+    message = "Navigation is now handled by NavigationSuiteScaffold inside AdaptiveAppScaffold"
+)
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(

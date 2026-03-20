@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -63,6 +64,10 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.isTabletOrDesktop
+import me.calebjones.spacelaunchnow.ui.compose.ListDetailWrapper
+import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
+import me.calebjones.spacelaunchnow.ui.layout.AdaptiveLayoutState
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.schedule.components.ScheduleLaunchView
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
@@ -73,14 +78,50 @@ fun ScheduleScreen(
     onLaunchClick: (String) -> Unit,
     viewModel: ScheduleViewModel = koinViewModel()
 ) {
+    val layoutState = rememberAdaptiveLayoutState()
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        ScheduleContent(
-            viewModel = viewModel,
-            onLaunchClick = onLaunchClick
-        )
+        if (layoutState.isExpanded) {
+            // Tablet/desktop: two-pane list-detail layout
+            ListDetailWrapper<String>(
+                listContent = { onItemSelected ->
+                    ScheduleContent(
+                        viewModel = viewModel,
+                        onLaunchClick = onItemSelected
+                    )
+                },
+                detailContent = { launchId ->
+                    LaunchDetailScreen(
+                        launchId = launchId,
+                        onNavigateBack = null,
+                        onOpenFullscreen = onLaunchClick,
+                        forcePhoneLayout = true
+                    )
+                },
+                emptyDetailContent = {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Select a launch to view details",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                },
+                initialSelectedItem = viewModel.selectedLaunchId,
+                onSelectedItemChanged = { viewModel.selectedLaunchId = it }
+            )
+        } else {
+            // Phone/compact: single-pane, navigate via NavController
+            ScheduleContent(
+                viewModel = viewModel,
+                onLaunchClick = onLaunchClick
+            )
+        }
     }
 }
 
@@ -205,7 +246,7 @@ private fun ScheduleContent(
                             text = "Launch Schedule",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 36.sp,
+                            fontSize = 32.sp,
                             modifier = Modifier.weight(1f)
                         )
                         // Filter button with badge

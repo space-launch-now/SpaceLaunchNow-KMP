@@ -72,6 +72,13 @@ fun isMobile(): Boolean {
     return getPlatform().type.isMobile
 }
 
+@Deprecated(
+    message = "Use rememberAdaptiveLayoutState() from ui.layout instead",
+    replaceWith = ReplaceWith(
+        "rememberAdaptiveLayoutState()",
+        "me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState"
+    )
+)
 @Composable
 fun isLargeScreen(): Boolean {
     val windowSize = getWindowSize()
