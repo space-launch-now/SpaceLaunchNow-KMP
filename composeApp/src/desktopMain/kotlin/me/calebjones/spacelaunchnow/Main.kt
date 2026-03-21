@@ -1,9 +1,11 @@
 package me.calebjones.spacelaunchnow
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.DpSize
+import java.awt.Dimension
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -40,6 +42,9 @@ fun main() {
             onCloseRequest = ::exitApplication,
             state = windowState
         ) {
+            LaunchedEffect(Unit) {
+                window.minimumSize = Dimension(800, 600)
+            }
             DesktopApp()
         }
     }
