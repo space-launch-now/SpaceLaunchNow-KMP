@@ -1,14 +1,13 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.3.0 → 1.4.0
+Version Change: 1.4.0 → 1.5.0
 
 Modified Principles:
-  - VI. Multiplatform Architecture (EXPANDED)
-    - Added hard requirement: Android, iOS, and Desktop builds MUST all succeed
-    - Mobile-only dependencies MUST be scoped to androidMain/iosMain, never commonMain
-    - Desktop actuals MUST provide no-op stubs for mobile-only SDK features
-    - Breaking any platform build is not acceptable
+  - VIII. Jetpack Compose Best Practices (NEW)
+    - Added official Android patterns for composables, state, effects, performance
+    - Token-optimized format for agent task reference
+    - Sources: Android Jack MCP (kotlin_best_practices, architecture_reference, scalability_guide)
 
 Principles (Current):
   - I. Mobile-First Development (Android & iOS Equal Priority)
@@ -16,8 +15,9 @@ Principles (Current):
   - III. Accessibility & User Experience
   - IV. CI/CD & Conventional Commits (NON-NEGOTIABLE)
   - V. Code Generation & API Management
-  - VI. Multiplatform Architecture (EXPANDED)
+  - VI. Multiplatform Architecture
   - VII. Testing Standards
+  - VIII. Jetpack Compose Best Practices (NEW)
 
 Templates Status:
   ✅ plan-template.md - No updates required
@@ -25,11 +25,11 @@ Templates Status:
   ✅ tasks-template.md - No updates required
 
 Follow-up TODOs:
-  - None - principle expansion documented
+  - None - new principle documented
 
 Ratification Date: 2026-01-21 (initial adoption)
-Last Amendment: 2026-03-16
-Amendment Reason: Added cross-platform build success requirement to Principle VI
+Last Amendment: 2026-03-21
+Amendment Reason: Added Jetpack Compose best practices as Principle VIII
 -->
 
 # SpaceLaunchNow KMP Constitution
@@ -116,6 +116,24 @@ All code changes MUST include appropriate test coverage. Testing is a critical q
 
 **Rationale**: Testing catches regressions early, documents expected behavior, and provides confidence for refactoring. The multiplatform nature of this project makes automated testing essential for verifying behavior across Android, iOS, and Desktop targets.
 
+### VIII. Jetpack Compose Best Practices
+
+Compose patterns per official Android guidance. Ref: https://developer.android.com/jetpack/compose/documentation
+
+**Composables**: `modifier: Modifier = Modifier` first param; PascalCase names; small files → extract to `ui/components/`
+
+**State**: Hoist to screen; `collectAsStateWithLifecycle()` not `collectAsState()`; explicit `remember(key)` keys; NO MutableState in ViewModel
+
+**Effects**: `LaunchedEffect` = auto/init; `rememberCoroutineScope` = user-triggered; `DisposableEffect` = cleanup
+
+**Performance**: Defer reads to lambda/draw; `items(key = { it.id })`; `derivedStateOf` for computed; `@Stable`/`@Immutable` on UI state classes
+
+**Previews**: `SpaceLaunchNowPreviewTheme()` not `SpaceLaunchNowTheme()`; fake data only; dual light/dark (see Principle III)
+
+**Accessibility**: `contentDescription` on interactive; `null` for decorative; `semantics { role = }` for custom clickables; 48dp touch targets
+
+**Rationale**: Official Android patterns prevent recomposition bugs, optimize performance at scale, and ensure consistent behavior across Android, Desktop, and iOS Compose targets.
+
 ## Mobile Development Standards
 
 ### Target Features (MVP Priority Order)
@@ -160,4 +178,4 @@ This constitution supersedes all conflicting practices in the codebase. All pull
 
 **Runtime Guidance**: For day-to-day development guidance, reference `.github/copilot-instructions.md` which provides detailed implementation patterns and common gotchas aligned with these principles.
 
-**Version**: 1.4.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-03-16
+**Version**: 1.5.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-03-21
