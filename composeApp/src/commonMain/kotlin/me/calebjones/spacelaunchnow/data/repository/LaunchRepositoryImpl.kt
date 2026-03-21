@@ -697,6 +697,14 @@ class LaunchRepositoryImpl(
         }
     }
 
+    /**
+     * Get stale detailed launch data from local cache without checking TTL.
+     * Used for stale-while-revalidate pattern to show data immediately while refreshing.
+     */
+    override suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed? {
+        return localDataSource?.getDetailedLaunchStale(id)
+    }
+
     override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> {
         return try {
             log.d { "getAgencyDetails - id: $id" }

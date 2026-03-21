@@ -68,6 +68,10 @@ class LaunchViewModel(
     private val _eventsError = MutableStateFlow<String?>(null)
     val eventsError: StateFlow<String?> = _eventsError
 
+    // Stale-while-revalidate: Track when we're refreshing with stale data displayed
+    private val _isRefreshingWithStaleData = MutableStateFlow(false)
+    val isRefreshingWithStaleData: StateFlow<Boolean> = _isRefreshingWithStaleData
+
     fun fetchUpcomingLaunchesNormal(limit: Int) {
         viewModelScope.launch {
             val result = repository.getUpcomingLaunchesNormal(limit = limit)
@@ -83,6 +87,7 @@ class LaunchViewModel(
     fun fetchLaunchDetails(id: String, forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _error.value = null
+            _isRefreshingWithStaleData.value = false
 
             // Check if we have detailed data in cache first (unless forcing refresh)
             if (!forceRefresh) {
@@ -95,7 +100,18 @@ class LaunchViewModel(
                 }
             }
 
-            _isLoading.value = true
+            // Stale-while-revalidate: Check for stale data to display while fetching
+            val staleData = repository.getStaleDetailedLaunch(id)
+            if (staleData != null) {
+                // We have stale data - show it immediately while refreshing
+                _launchDetails.value = staleData
+                updateVideoPlayerState(staleData)
+                _isRefreshingWithStaleData.value = true
+                _isLoading.value = false // Don't show full shimmer, we have data
+            } else {
+                // No data at all - show loading shimmer
+                _isLoading.value = true
+            }
 
             val result = repository.getLaunchDetails(id, forceRefresh = forceRefresh)
             result.onSuccess { launch ->
@@ -104,9 +120,13 @@ class LaunchViewModel(
                 // Cache the detailed data for future use
                 launchCache.cacheLaunchDetailed(launch)
             }.onFailure { exception ->
-                _error.value = exception.message
+                // Only show error if we don't have any data to display
+                if (_launchDetails.value == null) {
+                    _error.value = exception.message
+                }
             }
             _isLoading.value = false
+            _isRefreshingWithStaleData.value = false
         }
     }
 

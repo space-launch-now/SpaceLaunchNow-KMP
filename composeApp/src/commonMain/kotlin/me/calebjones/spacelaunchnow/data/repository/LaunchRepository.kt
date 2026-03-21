@@ -45,6 +45,7 @@ interface LaunchRepository {
     ): Result<PaginatedLaunchNormalList>
 
     suspend fun getLaunchDetails(id: String, forceRefresh: Boolean = false): Result<LaunchDetailed>
+    suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed?
     suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed>
     suspend fun getNextStarshipLaunch(
         limit: Int,
