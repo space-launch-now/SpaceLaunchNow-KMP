@@ -31,11 +31,13 @@ class FeaturedLaunchViewModel(
     private val log = logger()
 
     // Featured Launch State (hero card - first result)
-    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
+    // Initialize with isLoading=true to show shimmer instead of empty state before first load
+    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null, isLoading = true))
     val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> = _featuredLaunchState.asStateFlow()
 
     // Additional Featured Launches State (row of 3 - results 2-4)
-    private val _additionalFeaturedLaunches = MutableStateFlow(ViewState<List<LaunchNormal>>(data = emptyList()))
+    // Initialize with isLoading=true to show shimmer instead of empty state before first load
+    private val _additionalFeaturedLaunches = MutableStateFlow(ViewState<List<LaunchNormal>>(data = emptyList(), isLoading = true))
     val additionalFeaturedLaunches: StateFlow<ViewState<List<LaunchNormal>>> = _additionalFeaturedLaunches.asStateFlow()
 
     /**

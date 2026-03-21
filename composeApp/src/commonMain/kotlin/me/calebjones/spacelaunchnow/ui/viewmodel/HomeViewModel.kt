@@ -65,7 +65,8 @@ class HomeViewModel(
     // ========== NEW ViewState-based State Management ==========
 
     // Featured Launch State
-    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
+    // Initialize with isLoading=true to show shimmer instead of empty state before first load
+    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null, isLoading = true))
     val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> =
         _featuredLaunchState.asStateFlow()
 

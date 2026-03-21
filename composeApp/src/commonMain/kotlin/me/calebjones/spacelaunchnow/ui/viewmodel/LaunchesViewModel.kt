@@ -43,7 +43,8 @@ class LaunchesViewModel(
     // ========== ViewState Properties ==========
 
     // Featured Launch State (uses dedicated API call with upcomingWithRecent filter)
-    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
+    // Initialize with isLoading=true to show shimmer instead of empty state before first load
+    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null, isLoading = true))
     val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> = _featuredLaunchState.asStateFlow()
 
     private val _upcomingLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
