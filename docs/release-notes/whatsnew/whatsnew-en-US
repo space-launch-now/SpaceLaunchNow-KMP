@@ -1,5 +1,3 @@
 ### Bug Fixes
 
-* optimize Gradle JVM arguments for iOS CI/CD on macOS xlarge runners [skip ci]
-* update macOS runner to xlarge for iOS build and deployment [skip-ci]
-* update paywall button styling
+* update launch mode to singleTop and enhance intent flags for navigation

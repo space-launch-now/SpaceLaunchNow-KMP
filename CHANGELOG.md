@@ -1,3 +1,12 @@
+## [5.22.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.2...v5.22.3) (2026-03-21)
+
+
+### Bug Fixes
+
+* update launch mode to singleTop and enhance intent flags for navigation ([ef87af0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ef87af043e3257615225e9b1f71464c7dc75033c))
+
+
+
 ## [5.22.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.1...v5.22.2) (2026-03-20)
 
 
@@ -48,15 +57,6 @@
 ### Bug Fixes
 
 * change coroutine dispatcher from IO to Default for background tasks ([51c259e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/51c259e382b9d78a7014e1d1ed5f844ced0817b0))
-
-
-
-## [5.21.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.21.1...v5.21.2) (2026-03-11)
-
-
-### Bug Fixes
-
-* **onboarding:** increase spacer height in onboarding content ([0195b52](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0195b524897936b6a551767770a6e38bdc81192d))
 
 
 
