@@ -300,6 +300,7 @@ fun LaunchListItem(launch: LaunchNormal) {
                 actionStartActivity(
                     Intent(context, MainActivity::class.java).apply {
                         putExtra("launch_id", launch.id)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     }
                 )
             )

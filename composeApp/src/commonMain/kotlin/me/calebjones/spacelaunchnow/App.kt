@@ -148,38 +148,6 @@ fun SpaceLaunchNowApp(
 
     log.v { "SpaceLaunchNowApp recomposing - NavController: ${navController.hashCode()}" }
 
-
-    // Handle notification-based navigation
-    LaunchedEffect(notificationLaunchId) {
-        if (notificationLaunchId != null) {
-            log.d { "Navigating to launch detail for ID: $notificationLaunchId" }
-            navController.navigate(
-                LaunchDetail(
-                    notificationLaunchId
-                )
-            )
-            // Clear the notification launch ID after navigation
-            onNotificationLaunchIdConsumed()
-        }
-    }
-
-    // Handle navigation destination (e.g., from widget)
-    LaunchedEffect(navigationDestination) {
-        when (navigationDestination) {
-            "subscription" -> {
-                log.d { "Navigating to SupportUs screen from widget" }
-                navController.navigate(SupportUs)
-                onNavigationDestinationConsumed()
-            }
-
-            null -> {} // No navigation destination
-            else -> {
-                log.w { "Unknown navigation destination: $navigationDestination" }
-                onNavigationDestinationConsumed()
-            }
-        }
-    }
-
     LaunchedEffect(Unit) {
         // Run all initialization on background thread to avoid blocking UI on iOS
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
@@ -284,9 +252,15 @@ fun SpaceLaunchNowApp(
             val onboardingPaywallShown by appPreferences.onboardingPaywallV1ShownFlow.collectAsState(initial = null)
             val subscriptionViewModel: SubscriptionViewModel = koinInject()
             val subscriptionState by subscriptionViewModel.subscriptionState.collectAsState()
-            val startRoute: Any? = when {
-                liveOnboardingCompleted == null || onboardingPaywallShown == null -> null
-                else -> Preload
+            // Lock startRoute once DataStore values resolve — prevents NavHost from
+            // getting a different startDestination on recomposition after the deep link
+            // is consumed (which would reset the navigation back-stack).
+            val startRoute: Any? = remember(liveOnboardingCompleted, onboardingPaywallShown) {
+                when {
+                    liveOnboardingCompleted == null || onboardingPaywallShown == null -> null
+                    notificationLaunchId != null || navigationDestination != null -> Home
+                    else -> Preload
+                }
             }
 
             // Show consent popup (platform-specific implementation)
@@ -590,6 +564,31 @@ fun SpaceLaunchNowApp(
                             }
                             composableWithCompositionLocal<Starship> {
                                 StarshipScreen(navController = navController)
+                            }
+                        }
+
+                        // Deep-link / notification navigation.
+                        // Placed after NavHost so the graph is guaranteed to be set.
+                        // Handles both cold start and warm start (onNewIntent).
+                        LaunchedEffect(notificationLaunchId) {
+                            if (notificationLaunchId != null) {
+                                log.d { "Navigating to launch detail for ID: $notificationLaunchId" }
+                                navController.navigate(LaunchDetail(notificationLaunchId))
+                                onNotificationLaunchIdConsumed()
+                            }
+                        }
+                        LaunchedEffect(navigationDestination) {
+                            when (navigationDestination) {
+                                "subscription" -> {
+                                    log.d { "Navigating to SupportUs from widget" }
+                                    navController.navigate(SupportUs)
+                                    onNavigationDestinationConsumed()
+                                }
+                                null -> {} // No navigation destination
+                                else -> {
+                                    log.w { "Unknown navigation destination: $navigationDestination" }
+                                    onNavigationDestinationConsumed()
+                                }
                             }
                         }
                     }
