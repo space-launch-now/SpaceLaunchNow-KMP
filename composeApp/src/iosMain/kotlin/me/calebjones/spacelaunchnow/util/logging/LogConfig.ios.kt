@@ -17,6 +17,9 @@ actual fun platformLogConfig(): LogConfig {
         // iOS OSLog for native logging
         add(platformLogWriter())
 
+        // Firebase Crashlytics integration — logs warnings+ and records non-fatal exceptions
+        add(FirebaseCrashlyticsLogWriter())
+
         // DataDog integration (if enabled) - always starts with WARN for production safety
         if (shouldEnableDataDog()) {
             add(DataDogLogWriter())

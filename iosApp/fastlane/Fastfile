@@ -100,4 +100,25 @@ platform :ios do
       skip_waiting_for_build_processing: true
     )
   end
+
+  desc "Upload dSYM files to Firebase Crashlytics"
+  lane :upload_crashlytics_dsyms do
+    output_dir = ENV["RUNNER_TEMP"] || "./build"
+    dsym_path = File.join(output_dir, "SpaceLaunchNow.app.dSYM.zip")
+
+    # Find the upload-symbols binary from SPM artifacts
+    derived_data = File.join(output_dir, "DerivedData")
+    upload_symbols = Dir.glob("#{derived_data}/**/upload-symbols").first
+
+    # Fallback: check Xcode default DerivedData location
+    unless upload_symbols
+      upload_symbols = Dir.glob("#{Dir.home}/Library/Developer/Xcode/DerivedData/**/SourcePackages/artifacts/**/upload-symbols").first
+    end
+
+    if upload_symbols && File.exist?(dsym_path)
+      sh("#{upload_symbols} -gsp iosApp/GoogleService-Info.plist -p ios #{dsym_path}")
+    else
+      UI.important("Skipping dSYM upload: upload-symbols=#{upload_symbols}, dsym=#{File.exist?(dsym_path.to_s)}")
+    end
+  end
 end

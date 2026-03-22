@@ -1,5 +1,6 @@
 import ComposeApp
 import FirebaseCore
+import FirebaseCrashlytics
 import FirebaseMessaging
 import GoogleMaps
 import UIKit
@@ -39,7 +40,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Initialize Firebase
         print("1️⃣ Configuring Firebase...")
         FirebaseApp.configure()
-        print("✅ Firebase configured\n")
+        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(true)
+        print("✅ Firebase + Crashlytics configured\n")
 
         // Initialize FCMBridge early so it registers its NSNotification observer
         // before any Kotlin code tries to post notifications

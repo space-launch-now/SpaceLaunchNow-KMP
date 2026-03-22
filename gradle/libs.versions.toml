@@ -61,6 +61,7 @@ play-core-review = "2.0.1"
 composeIcons = "1.1.1"
 
 firebase-bom = "34.3.0"
+firebase-crashlytics-plugin = "3.0.3"
 google-services-plugin = "4.4.4"
 
 about-libraries = "13.1.0"
@@ -183,6 +184,7 @@ android-firebase-auth = { module = "com.google.firebase:firebase-auth" }
 # Optional, include if using firebase analytics
 android-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 android-firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+android-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "androidx-datastore" }
 androidx-glance = { group = "androidx.glance", name = "glance-appwidget", version.ref = "androidx-glance" }
@@ -250,3 +252,4 @@ composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "com
 googleServices = { id = "com.google.gms.google-services", version.ref = "google-services-plugin" }
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+firebaseCrashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
