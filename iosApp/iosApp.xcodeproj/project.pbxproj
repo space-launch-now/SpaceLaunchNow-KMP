@@ -23,6 +23,7 @@
 		3C5463142E946EBF0032E227 /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C9137E42E9008320095D5AB /* Secrets.plist */; };
 		3C7AFD342EADADF0002FEDEE /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7AFD332EADADF0002FEDEE /* FirebaseMessaging */; };
 		F9FC00012F0E000100000001 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = F9FC00002F0E000100000001 /* FirebaseCrashlytics */; };
+		F9FC00032F0E000300000003 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = F9FC00042F0E000400000004 /* FirebaseCrashlytics */; };
 		3C7AFD382EADC588002FEDEE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C7AFD372EADC588002FEDEE /* GoogleService-Info.plist */; };
 		3C9137E52E9008320095D5AB /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C9137E42E9008320095D5AB /* Secrets.plist */; };
 		3CC6E4C52EAC8A84002F6FE9 /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = 3CC6E4C42EAC8A84002F6FE9 /* FirebaseAI */; };
@@ -157,6 +158,7 @@
 				3C2F71432E936FBD0026D5CD /* SwiftUI.framework in Frameworks */,
 				F907BC5F2EC38A4800C05E19 /* DatadogRUM in Frameworks */,
 				F907BC592EC38A4800C05E19 /* DatadogCrashReporting in Frameworks */,
+				F9FC00032F0E000300000003 /* FirebaseCrashlytics in Frameworks */,
 				3C35B9622EA9816900E28A01 /* PurchasesHybridCommonUI in Frameworks */,
 				3C35B9602EA9816900E28A01 /* PurchasesHybridCommon in Frameworks */,
 				F907BC5D2EC38A4800C05E19 /* DatadogLogs in Frameworks */,
@@ -308,6 +310,7 @@
 				F907BC602EC38A4800C05E19 /* DatadogSessionReplay */,
 				F907BC622EC38A4800C05E19 /* DatadogTrace */,
 				F907BC642EC38A4800C05E19 /* DatadogWebViewTracking */,
+				F9FC00042F0E000400000004 /* FirebaseCrashlytics */,
 			);
 			productName = LaunchWidgetExtension;
 			productReference = 3C2F71412E936FBD0026D5CD /* LaunchWidgetExtension.appex */;
@@ -530,9 +533,6 @@
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\necho \"JAVA_HOME is: $JAVA_HOME\"\necho \"java location: $(which java)\"\njava -version\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
 		};
-/* End PBXShellScriptBuildPhase section */
-
-/* Begin Firebase Crashlytics dSYM Upload section */
 		F9FC00022F0E000200000002 /* Upload dSYMs to Crashlytics */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -555,9 +555,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Firebase Crashlytics dSYM upload\n# Uses the upload-symbols binary from the SPM-resolved FirebaseCrashlytics package\nUPLOAD_SYMBOLS=$(find \"${BUILD_DIR%/Build/*}/SourcePackages/artifacts\" -name \"upload-symbols\" -type f 2>/dev/null | head -1)\nif [ -z \"$UPLOAD_SYMBOLS\" ]; then\n  echo \"warning: upload-symbols not found, skipping dSYM upload\"\n  exit 0\nfi\n\"$UPLOAD_SYMBOLS\" -gsp \"${SRCROOT}/iosApp/GoogleService-Info.plist\" -p ios \"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\"\n";
+			shellScript = "# Firebase Crashlytics dSYM upload\n# Try the SPM checkouts path first (Firebase 11+), then fall back to artifacts path\nRUN_SCRIPT=\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\nif [ -f \"$RUN_SCRIPT\" ]; then\n  \"$RUN_SCRIPT\" -gsp \"${SRCROOT}/iosApp/GoogleService-Info.plist\" -p ios \"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\"\n  exit 0\nfi\n# Fallback: look for upload-symbols in artifacts\nUPLOAD_SYMBOLS=$(find \"${BUILD_DIR%/Build/*}/SourcePackages/artifacts\" -name \"upload-symbols\" -type f 2>/dev/null | head -1)\nif [ -n \"$UPLOAD_SYMBOLS\" ]; then\n  \"$UPLOAD_SYMBOLS\" -gsp \"${SRCROOT}/iosApp/GoogleService-Info.plist\" -p ios \"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\"\n  exit 0\nfi\necho \"warning: Firebase Crashlytics upload tool not found, skipping dSYM upload\"\n";
 		};
-/* End Firebase Crashlytics dSYM Upload section */
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3C2F713D2E936FBD0026D5CD /* Sources */ = {
@@ -1141,6 +1141,11 @@
 			productName = FirebaseMessaging;
 		};
 		F9FC00002F0E000100000001 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		F9FC00042F0E000400000004 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
