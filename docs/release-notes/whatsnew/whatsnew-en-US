@@ -1,3 +1,8 @@
 ### Bug Fixes
 
-* update launch mode to singleTop and enhance intent flags for navigation
+* correct TOTP secret key name in EnvironmentManager
+* fix home view models for improved structure and maintainability
+* handle billing unavailability in SubscriptionViewModel and set minimum window size in DesktopApp
+* implement stale-while-revalidate pattern for launch details and UI updates
+* integrate Firebase Crashlytics for enhanced error reporting and logging
+* integrate Firebase Crashlytics for error reporting and add test functionality in DebugSettingsScreen...

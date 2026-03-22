@@ -1,3 +1,18 @@
+## [5.22.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.3...v5.22.4) (2026-03-22)
+
+
+### Bug Fixes
+
+* correct TOTP secret key name in EnvironmentManager ([c2c124d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c2c124d7ff994d523f5fb2b01aa2e2410ea3d38b))
+* fix home view models for improved structure and maintainability ([357ff3e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/357ff3e9c90acbaf984aeaa3b2feb5a0c85ef4ad))
+* handle billing unavailability in SubscriptionViewModel and set minimum window size in DesktopApp ([b291105](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b291105d9791be2ee012e6fd488a8542d6020114))
+* implement stale-while-revalidate pattern for launch details and UI updates ([cc8a06b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cc8a06b41ba95061be20bed0783f72b9f6acc5a6))
+* integrate Firebase Crashlytics for enhanced error reporting and logging ([3145c7f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3145c7faa33acac8b73000c5d33a2a3f9c119eb3))
+* integrate Firebase Crashlytics for error reporting and add test functionality in DebugSettingsScreen ([55661ae](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/55661aefd71a5ad8c21785f6ca3eff7c892d0fb8))
+* update Firebase Crashlytics integration and dSYM upload script ([1dbd8c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1dbd8c6f1eaa3e5fe3487d994d5c163a9eb20ce7))
+
+
+
 ## [5.22.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.2...v5.22.3) (2026-03-21)
 
 
@@ -48,15 +63,6 @@
 ### Features
 
 * Add Preload functionality and Notification permission handling ([5f2947f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5f2947faee46b248e58ac051f91e24099c80345d))
-
-
-
-## [5.21.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.21.2...v5.21.3) (2026-03-12)
-
-
-### Bug Fixes
-
-* change coroutine dispatcher from IO to Default for background tasks ([51c259e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/51c259e382b9d78a7014e1d1ed5f844ced0817b0))
 
 
 
