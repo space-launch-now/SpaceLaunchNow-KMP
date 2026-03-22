@@ -42,6 +42,7 @@ plugins {
     alias(libs.plugins.aboutLibraries)
     alias(libs.plugins.sqldelight)
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 
@@ -127,6 +128,7 @@ kotlin {
                 implementation(libs.android.firebase.auth)
                 implementation(libs.android.firebase.analytics)
                 implementation(libs.android.firebase.messaging)
+                implementation(libs.android.firebase.crashlytics)
 
                 implementation(libs.androidx.core.splashscreen)
 

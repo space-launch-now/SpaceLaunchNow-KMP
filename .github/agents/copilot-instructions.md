@@ -19,6 +19,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-21
 - Kotlin 2.1.0 (KMP), Java 21 + Compose Multiplatform, RevenueCat SDK (via `SubscriptionViewModel`), Koin DI, DataStore Preferences (006-onboarding-paywall)
 - DataStore Preferences (`AppPreferences`) — new `ONBOARDING_PAYWALL_SHOWN` boolean key (006-onboarding-paywall)
 
+Please check the project [consitution](.specify/memory/consitution.md) for architectural principles and guidelines.
+
 ## Project Structure
 
 ```text

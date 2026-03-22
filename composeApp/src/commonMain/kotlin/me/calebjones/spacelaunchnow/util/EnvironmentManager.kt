@@ -18,7 +18,7 @@ object EnvironmentManager {
             "DATADOG_CLIENT_TOKEN" -> AppSecrets.dataDogClientToken
             "DATADOG_APPLICATION_ID" -> AppSecrets.dataDogApplicationId
             "DATADOG_ENVIRONMENT" -> AppSecrets.dataDogEnv
-            "TOTP_SECRET" -> AppSecrets.totpSecret
+            "TOTP_SECRET_BASE32" -> AppSecrets.totpSecret
             "MAPS_API_KEY" -> AppSecrets.mapsApiKey
             else -> defaultValue
         }

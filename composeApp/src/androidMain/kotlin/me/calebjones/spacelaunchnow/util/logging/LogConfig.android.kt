@@ -17,6 +17,9 @@ actual fun platformLogConfig(): LogConfig {
         // Starts with Verbose, will be controlled by LoggingPreferences
         add(EnhancedLogcatWriter())
 
+        // Firebase Crashlytics integration — logs warnings+ and records non-fatal exceptions
+        add(FirebaseCrashlyticsLogWriter())
+
         // DataDog integration (if enabled) - always starts with WARN for production safety
         if (shouldEnableDataDog()) {
             add(DataDogLogWriter())

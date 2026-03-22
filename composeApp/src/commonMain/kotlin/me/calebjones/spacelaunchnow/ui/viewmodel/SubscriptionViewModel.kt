@@ -56,6 +56,13 @@ class SubscriptionViewModel(
                     _availableProducts.value = products
                     log.i { "Loaded ${products.size} products from BillingManager" }
 
+                    // Empty products means billing is unavailable on this platform (e.g. Desktop)
+                    if (products.isEmpty()) {
+                        log.i { "No products available - marking billing as unavailable" }
+                        _uiState.value = _uiState.value.copy(billingUnavailable = true)
+                        return@fold
+                    }
+
                     // Find products by RevenueCat package identifier
                     val monthlyProduct = products.find {
                         it.basePlanId?.contains("monthly", ignoreCase = true) == true

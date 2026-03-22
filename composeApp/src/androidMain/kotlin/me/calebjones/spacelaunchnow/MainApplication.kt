@@ -43,6 +43,19 @@ class MainApplication : Application() {
         SpaceLogger.initialize()
         log.i { "=== Starting Application onCreate ===" }
 
+        // Explicitly enable Crashlytics collection and verify initialization
+        try {
+            val crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
+            crashlytics.setCrashlyticsCollectionEnabled(true)
+            crashlytics.sendUnsentReports()
+            val variant = if (me.calebjones.spacelaunchnow.BuildConfig.IS_DEBUG) "debug" else "release"
+            crashlytics.setCustomKey("app_variant", variant)
+            crashlytics.log("Crashlytics initialized in MainApplication.onCreate ($variant)")
+            log.i { "\u2705 Firebase Crashlytics initialized and collection enabled ($variant)" }
+        } catch (e: Exception) {
+            log.e(e) { "\u274C Firebase Crashlytics initialization failed" }
+        }
+
         // Initialize BuildConfig FIRST before Koin to set DEBUG flag
         initializeBuildConfig()
         log.d { "BuildConfig initialized, IS_DEBUG = ${me.calebjones.spacelaunchnow.util.BuildConfig.IS_DEBUG}" }

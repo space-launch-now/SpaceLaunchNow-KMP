@@ -1,7 +1,9 @@
 package me.calebjones.spacelaunchnow.ui.detail
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -12,6 +14,7 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
@@ -68,6 +71,9 @@ fun LaunchDetailScreen(
     val isEventsLoading by viewModel.isEventsLoading.collectAsState()
     val eventsError by viewModel.eventsError.collectAsState()
 
+    // Stale-while-revalidate state: shows progress bar when refreshing with stale data
+    val isRefreshingWithStaleData by viewModel.isRefreshingWithStaleData.collectAsState()
+
     // Determine current launch data
     val currentLaunch = cachedLaunchDetailed ?: launchDetails
 
@@ -96,8 +102,8 @@ fun LaunchDetailScreen(
             // We have preloaded data, set it immediately to avoid loading state
             viewModel.setLaunchDetails(cachedLaunchDetailed)
         } else {
-            // Clear stale data so the loading state is visible while fetching
-            viewModel.clearLaunchDetails()
+            // Let ViewModel handle stale-while-revalidate pattern
+            // It will show stale data with progress bar if available, or shimmer if not
             viewModel.fetchLaunchDetails(launchId)
         }
 
@@ -171,6 +177,15 @@ fun LaunchDetailScreen(
                 // Show loading state
                 LaunchDetailLoadingView(onNavigateBack = onNavigateBack)
             }
+        }
+
+        // Show progress bar when refreshing with stale data displayed
+        if (isRefreshingWithStaleData) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+            )
         }
 
         // Pull-to-refresh indicator

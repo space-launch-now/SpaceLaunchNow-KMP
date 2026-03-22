@@ -173,6 +173,14 @@ jobs:
           echo "📦 IPA Size: $IPA_SIZE"
           echo "✅ IPA validation complete (signing verified by fastlane verify_build)"
 
+      # ==================== CRASHLYTICS dSYM UPLOAD ====================
+      - name: Upload dSYMs to Firebase Crashlytics
+        run: |
+          echo "📤 Uploading dSYM files to Firebase Crashlytics..."
+          cd iosApp
+          bundle exec fastlane upload_crashlytics_dsyms
+          echo "✅ dSYMs uploaded to Firebase Crashlytics"
+
       # ==================== DEPLOY ====================
       - name: Upload to TestFlight
         if: inputs.deploy_to == 'testflight'
