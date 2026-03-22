@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.util.logging
 
+import android.util.Log
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -14,7 +15,8 @@ class FirebaseCrashlyticsLogWriter : LogWriter(), ConfigurableLogWriter {
     private val crashlytics: FirebaseCrashlytics?
         get() = try {
             FirebaseCrashlytics.getInstance()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.w("CrashlyticsWriter", "FirebaseCrashlytics not available", e)
             null
         }
 
