@@ -402,6 +402,60 @@ private fun SystemTabContent(
             }
         }
         
+        // Section: Test Crashlytics
+        item {
+            val crashTestLog = remember { SpaceLogger.getLogger("CrashlyticsTest") }
+            var nonFatalSent by remember { mutableStateOf(false) }
+
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Crashlytics",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Test Crashlytics integration. Non-fatal exceptions appear in the dashboard within minutes. Fatal crashes are sent on the next app launch.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        OutlinedButton(
+                            onClick = {
+                                crashTestLog.e(
+                                    RuntimeException("Non-fatal test exception from Debug Settings")
+                                ) { "Crashlytics non-fatal test" }
+                                nonFatalSent = true
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(if (nonFatalSent) "Non-Fatal Sent \u2713" else "Send Non-Fatal Exception")
+                        }
+                        Button(
+                            onClick = { throw RuntimeException("Crashlytics test crash from Debug Settings") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            )
+                        ) {
+                            Text("Force Test Crash")
+                        }
+                    }
+                }
+            }
+        }
+
         // Section 4: API Configuration
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

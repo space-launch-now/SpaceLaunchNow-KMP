@@ -3,14 +3,15 @@ package me.calebjones.spacelaunchnow.data.billing
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
- * Desktop implementation of BillingManager - No billing support
- * Desktop apps don't have in-app purchases, so this is a no-op implementation
+ * Desktop implementation of BillingManager - Premium granted by default
+ * Desktop apps don't have in-app purchases, so premium is granted automatically
  */
 class DesktopBillingManager : BillingManager {
     private val log = logger()
@@ -18,14 +19,14 @@ class DesktopBillingManager : BillingManager {
     private val _isInitialized = MutableStateFlow(true) // Always initialized
     override val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
     
-    // Always FREE on desktop
+    // Desktop users get premium for free
     private val _purchaseState = MutableStateFlow(
         PurchaseState(
-            isSubscribed = false,
-            subscriptionType = SubscriptionType.FREE,
-            activeEntitlements = emptySet(),
-            activeProductIds = emptySet(),
-            features = emptySet(),
+            isSubscribed = true,
+            subscriptionType = SubscriptionType.LIFETIME,
+            activeEntitlements = setOf("pro"),
+            activeProductIds = setOf("desktop_premium"),
+            features = PremiumFeature.getPremiumFeatures(),
             lastRefreshed = System.currentTimeMillis()
         )
     )
@@ -62,12 +63,11 @@ class DesktopBillingManager : BillingManager {
     }
     
     override fun hasEntitlement(entitlementId: String): Boolean {
-        log.d { "DesktopBillingManager: ℹ️ No entitlements on desktop platform" }
-        return false
+        // Desktop always has premium entitlements
+        return true
     }
     
     override fun getActiveEntitlements(): Set<String> {
-        log.d { "DesktopBillingManager: ℹ️ No active entitlements on desktop" }
-        return emptySet()
+        return setOf("pro")
     }
 }
