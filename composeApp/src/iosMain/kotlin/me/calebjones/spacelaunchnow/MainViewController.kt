@@ -17,6 +17,7 @@ import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import me.calebjones.spacelaunchnow.util.logging.setupCrashlyticsExceptionHook
 import org.koin.core.context.startKoin
 import org.koin.mp.KoinPlatform.getKoin
 
@@ -56,6 +57,9 @@ fun MainViewController() = ComposeUIViewController {
     // Initialize BuildConfig and Koin once before the app starts
     if (!koinInitialized) {
         initializeBuildConfig()
+        // Register CrashKiOS unhandled exception hook so Kotlin crashes on iOS
+        // produce readable stack traces in Crashlytics
+        setupCrashlyticsExceptionHook()
         // Initialize SpaceLogger before any logging calls
         SpaceLogger.initialize()
         startKoin(koinConfig)
