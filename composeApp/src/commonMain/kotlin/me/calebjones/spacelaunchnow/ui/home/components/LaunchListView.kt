@@ -167,7 +167,8 @@ fun LaunchListView(
                 ) {
                 items(
                     count = combinedLaunches.size,
-                    key = { index -> combinedLaunches[index].id }
+                    // Use compound key with index to handle any remaining edge cases with duplicates
+                    key = { index -> "${combinedLaunches[index].id}_$index" }
                 ) { index ->
                     LaunchItemView(
                         launch = combinedLaunches[index],
