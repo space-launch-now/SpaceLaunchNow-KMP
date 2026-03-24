@@ -31,6 +31,8 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
@@ -326,6 +328,10 @@ val appModule = module {
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
     viewModelOf(::ThemeCustomizationViewModel)
+
+    // Remote Config Repository for Firebase Remote Config
+    single<RemoteConfigRepository> { RemoteConfigRepositoryImpl() }
+
     viewModelOf(::RoadmapViewModel)
 }
 

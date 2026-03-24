@@ -273,6 +273,8 @@ kotlin {
                 implementation(libs.sqldelight.runtime)
                 implementation(libs.sqldelight.coroutines)
 
+                // GitLive Firebase Remote Config (KMP)
+                implementation(libs.gitlive.firebase.config)
             }
         }
 
