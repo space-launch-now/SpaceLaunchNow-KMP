@@ -23,7 +23,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -121,13 +120,8 @@ fun LatestUpdatesView(
                         }
                     }
 
-                    // Show loading indicator
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(16.dp)
-                            .size(24.dp)
-                    )
+                    // Loading indicator removed - data already visible, no need
+                    // for additional visual distraction during background refresh
                 }
             }
 
@@ -215,14 +209,19 @@ fun UpdateCard(
                             .clip(CircleShape),
                         contentScale = ContentScale.Crop,
                         loading = {
+                            // Use shimmer instead of CircularProgressIndicator for warm start perf
                             Box(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .shimmer()
+                                    .background(MaterialTheme.colorScheme.surfaceContainer),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.primary
+                                Icon(
+                                    imageVector = Icons.Filled.Person,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 )
                             }
                         },
@@ -361,16 +360,20 @@ fun UpdateLoadingCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Profile image placeholder
+            // Profile image placeholder with shimmer
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(CircleShape),
+                    .clip(CircleShape)
+                    .shimmer()
+                    .background(MaterialTheme.colorScheme.surfaceContainer),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                 )
             }
 

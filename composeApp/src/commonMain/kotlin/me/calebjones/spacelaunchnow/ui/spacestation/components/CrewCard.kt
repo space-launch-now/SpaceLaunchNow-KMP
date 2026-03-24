@@ -1,21 +1,33 @@
 package me.calebjones.spacelaunchnow.ui.spacestation.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
+import me.calebjones.spacelaunchnow.ui.preview.PreviewData
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Card displaying current crew members aboard the space station
@@ -51,17 +63,40 @@ private fun CrewMemberItem(astronaut: AstronautNormal) {
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Astronaut profile image
-        AsyncImage(
-            model = astronaut.image?.imageUrl,
-            contentDescription = astronaut.name,
+        // Circular astronaut profile image
+        Box(
             modifier = Modifier
                 .size(56.dp)
-                .padding(end = 12.dp),
-            contentScale = ContentScale.Crop
-        )
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            SubcomposeAsyncImage(
+                model = astronaut.image?.thumbnailUrl ?: astronaut.image?.imageUrl,
+                contentDescription = astronaut.name,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+                loading = {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                error = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        modifier = Modifier.size(28.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            )
+        }
 
-        Column {
+        Column(modifier = Modifier.padding(start = 12.dp)) {
             astronaut.name?.let {
                 Text(
                     text = it,
@@ -69,5 +104,37 @@ private fun CrewMemberItem(astronaut: AstronautNormal) {
                 )
             }
         }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Previews
+// ---------------------------------------------------------------------------
+
+@Preview
+@Composable
+private fun CrewCardPreview() {
+    SpaceLaunchNowPreviewTheme {
+        CrewCard(
+            crew = listOf(
+                PreviewData.astronautNormal,
+                PreviewData.astronautNormal.copy(id = 2, name = "Oleg Kononenko"),
+                PreviewData.astronautNormal.copy(id = 3, name = "Tracy Caldwell Dyson")
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CrewCardDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        CrewCard(
+            crew = listOf(
+                PreviewData.astronautNormal,
+                PreviewData.astronautNormal.copy(id = 2, name = "Oleg Kononenko"),
+                PreviewData.astronautNormal.copy(id = 3, name = "Tracy Caldwell Dyson")
+            )
+        )
     }
 }

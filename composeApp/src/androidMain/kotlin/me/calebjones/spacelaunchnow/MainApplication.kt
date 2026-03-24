@@ -8,7 +8,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import me.calebjones.spacelaunchnow.analytics.initializeDatadog
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
@@ -81,6 +80,15 @@ class MainApplication : Application() {
 
             log.d { "Koin started successfully" }
 
+            // Configure Coil ImageLoader with memory-aware settings for low-RAM devices
+            val customImageLoader = koin.koin.getOrNull<coil3.ImageLoader>()
+            if (customImageLoader != null) {
+                coil3.SingletonImageLoader.setSafe { customImageLoader }
+                log.d { "✅ Custom Coil ImageLoader configured (memory-optimized)" }
+            } else {
+                log.d { "Using default Coil ImageLoader" }
+            }
+
             // Test if NotificationRepository is registered
             val notificationRepo = koin.koin.getOrNull<NotificationRepository>()
             if (notificationRepo != null) {
@@ -105,31 +113,51 @@ class MainApplication : Application() {
         }
 
         // Initialize Datadog analytics using KMP SDK
-        // IMPORTANT: Only initialize if diagnostic logging is enabled to prevent excessive costs
-        log.d { "Checking Datadog initialization requirements..." }
+        // Use safe defaults during startup to avoid blocking main thread, then reconfigure in background
+        log.d { "Initializing Datadog with safe startup defaults..." }
         try {
             val loggingPrefs = getKoin().get<LoggingPreferences>()
             val debugPrefs =
                 getKoin().get<me.calebjones.spacelaunchnow.data.storage.DebugPreferences>()
 
-            val consoleSeverity = runBlocking {
-                loggingPrefs.getConsoleSeverity().first()
-            }
-            val sampleRate = runBlocking {
-                debugPrefs.debugSettingsFlow.first().datadogSampleRate
-            }
+            // Use safe defaults during startup to avoid runBlocking calls
+            // These will be reconfigured in background if user preferences differ
+            val defaultSeverity = co.touchlab.kermit.Severity.Warn
+            val defaultSampleRate = 75f
 
-            // Initialize Datadog if console logging is more verbose than production default (Warn)
-            if (consoleSeverity <= co.touchlab.kermit.Severity.Debug || BuildConfig.IS_DEBUG) {
-                log.d { "Initializing Datadog (diagnostic logging enabled) with ${sampleRate.toInt()}% sample rate..." }
+            // Initialize Datadog with conservative defaults (always initialize in debug builds)
+            if (BuildConfig.IS_DEBUG) {
+                log.d { "Debug build - initializing Datadog with ${defaultSampleRate.toInt()}% sample rate..." }
                 initializeDatadog(
                     context = this,
-                    sampleRate = sampleRate,
+                    sampleRate = defaultSampleRate,
                     debugPreferences = debugPrefs
                 )
-                log.d { "✅ Datadog initialized successfully" }
+                log.d { "✅ Datadog initialized (debug mode)" }
             } else {
-                log.i { "⏭️ Datadog initialization skipped (diagnostic logging disabled - saves costs)" }
+                // For release builds: defer Datadog initialization to background to avoid startup blocking
+                // This checks actual user preferences asynchronously
+                @Suppress("OPT_IN_USAGE")
+                kotlinx.coroutines.GlobalScope.launch {
+                    try {
+                        val consoleSeverity = loggingPrefs.getConsoleSeverity().first()
+                        val sampleRate = debugPrefs.debugSettingsFlow.first().datadogSampleRate
+                        
+                        if (consoleSeverity <= co.touchlab.kermit.Severity.Debug) {
+                            log.d { "User has diagnostic logging enabled - initializing Datadog deferred with ${sampleRate.toInt()}% sample rate" }
+                            initializeDatadog(
+                                context = this@MainApplication,
+                                sampleRate = sampleRate,
+                                debugPreferences = debugPrefs
+                            )
+                            log.d { "✅ Datadog initialized (deferred)" }
+                        } else {
+                            log.i { "⏭️ Datadog skipped (diagnostic logging disabled - saves costs)" }
+                        }
+                    } catch (e: Exception) {
+                        log.w(e) { "Failed to check Datadog initialization preferences" }
+                    }
+                }
             }
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to initialize Datadog" }

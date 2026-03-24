@@ -3,6 +3,9 @@ package me.calebjones.spacelaunchnow.ui.preview
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautStatus
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.CelestialBodyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
@@ -502,6 +505,32 @@ object PreviewData {
         windowEnd = null,
         windowStart = null,
         webcastLive = true
+    )
+
+    // ========================================
+    // Astronauts
+    // ========================================
+
+    val astronautStatusActive = AstronautStatus(
+        id = 1,
+        name = "Active"
+    )
+
+    val astronautNormal = AstronautNormal(
+        id = 1,
+        url = "https://ll.thespacedevs.com/2.4.0/astronaut/1/",
+        responseMode = "normal",
+        name = "Sunita Williams",
+        status = astronautStatusActive,
+        agency = agencyNASAMini,
+        image = null,
+        age = 58,
+        bio = "Sunita Williams is a NASA astronaut who holds the record for longest spaceflight by a woman.",
+        type = AstronautType(
+            id = 1,
+            name = "Human"
+        ),
+        nationality = listOf(countryUSA)
     )
 }
 

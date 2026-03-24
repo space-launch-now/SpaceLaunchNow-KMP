@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,6 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
+import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.ui.components.AgencyChip
 import me.calebjones.spacelaunchnow.ui.components.InfoChip
@@ -68,13 +68,14 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                         contentScale = ContentScale.Fit,
                         loading = {
                             Box(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier.fillMaxSize().shimmer(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.primary
+                                Icon(
+                                    imageVector = Icons.Default.Public,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
                                 )
                             }
                         },

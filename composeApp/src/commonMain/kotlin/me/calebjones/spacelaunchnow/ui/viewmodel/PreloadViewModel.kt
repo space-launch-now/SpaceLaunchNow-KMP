@@ -8,6 +8,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -31,6 +33,7 @@ import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
 import me.calebjones.spacelaunchnow.navigation.Onboarding
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.isLowRamDevice
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -86,8 +89,16 @@ class PreloadViewModel(
                 else -> Onboarding
             }
 
+            // Detect low-RAM devices for memory-aware throttling
+            val isLowRam = isLowRamDevice()
+            // On low-RAM: limit to 2 concurrent network requests; normal: 4
+            val tier1Concurrency = if (isLowRam) 2 else 4
+            // On low-RAM: limit to 2 concurrent; normal: 6
+            val tier2Concurrency = if (isLowRam) 2 else 6
+
             val tier1Tasks = if (isNewUser) buildTier1Tasks() else emptyList()
-            val tier2Tasks = buildTier2Tasks()
+            // On low-RAM devices, skip tier 2 entirely to preserve memory for UI rendering
+            val tier2Tasks = if (isLowRam) emptyList() else buildTier2Tasks()
 
             _preloadState.update {
                 it.copy(
@@ -98,25 +109,28 @@ class PreloadViewModel(
                 )
             }
 
-            log.i { "Starting preload: ${tier1Tasks.size} tier1, ${tier2Tasks.size} tier2 (isNewUser=$isNewUser, next=$nextDestination)" }
+            log.i { "Starting preload: ${tier1Tasks.size} tier1, ${tier2Tasks.size} tier2 (isNewUser=$isNewUser, lowRam=$isLowRam, next=$nextDestination)" }
 
-            // Tier 1: must complete before navigation
+            // Tier 1: must complete before navigation (throttled on low-RAM)
             if (tier1Tasks.isNotEmpty()) {
                 val tier1Timeout = 15_000L
+                val semaphore = Semaphore(tier1Concurrency)
                 val deferredTier1 = tier1Tasks.map { task ->
                     async {
-                        try {
-                            task.execute()
-                            log.d { "✅ Tier 1 complete: ${task.name}" }
-                        } catch (e: Exception) {
-                            log.w(e) { "⚠️ Tier 1 failed: ${task.name}" }
-                        } finally {
-                            _preloadState.update { state ->
-                                val newCompleted = state.completedTasks + 1
-                                state.copy(
-                                    completedTasks = newCompleted,
-                                    isComplete = newCompleted >= state.totalTasks
-                                )
+                        semaphore.withPermit {
+                            try {
+                                task.execute()
+                                log.d { "✅ Tier 1 complete: ${task.name}" }
+                            } catch (e: Exception) {
+                                log.w(e) { "⚠️ Tier 1 failed: ${task.name}" }
+                            } finally {
+                                _preloadState.update { state ->
+                                    val newCompleted = state.completedTasks + 1
+                                    state.copy(
+                                        completedTasks = newCompleted,
+                                        isComplete = newCompleted >= state.totalTasks
+                                    )
+                                }
                             }
                         }
                     }
@@ -135,22 +149,27 @@ class PreloadViewModel(
                 _preloadState.update { it.copy(isComplete = true) }
             }
 
-            // Tier 2: fire-and-forget in background scope (survives ViewModel clearing)
+            // Tier 2: fire-and-forget in background scope (skipped on low-RAM, throttled otherwise)
             if (tier2Tasks.isNotEmpty()) {
-                log.i { "Launching ${tier2Tasks.size} tier 2 tasks in background" }
+                log.i { "Launching ${tier2Tasks.size} tier 2 tasks in background (concurrency=$tier2Concurrency)" }
+                val tier2Semaphore = Semaphore(tier2Concurrency)
                 backgroundScope.launch {
                     tier2Tasks.map { task ->
                         async {
-                            try {
-                                task.execute()
-                                log.d { "✅ Tier 2 complete: ${task.name}" }
-                            } catch (e: Exception) {
-                                log.w(e) { "⚠️ Tier 2 failed: ${task.name}" }
+                            tier2Semaphore.withPermit {
+                                try {
+                                    task.execute()
+                                    log.d { "✅ Tier 2 complete: ${task.name}" }
+                                } catch (e: Exception) {
+                                    log.w(e) { "⚠️ Tier 2 failed: ${task.name}" }
+                                }
                             }
                         }
                     }.awaitAll()
                     log.i { "All tier 2 tasks finished" }
                 }
+            } else if (isLowRam) {
+                log.i { "Tier 2 skipped on low-RAM device to preserve memory" }
             }
         }
     }
