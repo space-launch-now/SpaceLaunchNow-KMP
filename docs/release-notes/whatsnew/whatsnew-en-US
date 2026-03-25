@@ -1,8 +1,12 @@
 ### Bug Fixes
 
-* correct TOTP secret key name in EnvironmentManager
-* fix home view models for improved structure and maintainability
-* handle billing unavailability in SubscriptionViewModel and set minimum window size in DesktopApp
-* implement stale-while-revalidate pattern for launch details and UI updates
-* integrate Firebase Crashlytics for enhanced error reporting and logging
-* integrate Firebase Crashlytics for error reporting and add test functionality in DebugSettingsScreen...
+* deduplicate combined launches by ID to handle edge cases
+* handle corrupted subscription data files gracefully
+* integrate Firebase Remote Config for dynamic roadmap feature
+* **logging:** add Crashlytics setup for improved exception handling on iOS [skip ci]
+* pre-warming of ad requests and enhance ad handling for improved performance
+* refactor loading indicators to use shimmer effect for improved performance on low-RAM devices
+
+### Features
+
+* add events and news screen
