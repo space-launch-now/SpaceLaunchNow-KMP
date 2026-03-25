@@ -59,7 +59,7 @@ fun EventsView(
             // STATE 4: Error State - show error with retry OR data with error indicator
             state.error != null -> {
                 if (state.data.isNotEmpty()) {
-                    // Show stale data with error indicator
+                    // Show stale data with error indicatorE
                     Column {
                         // Error banner
                         Card(

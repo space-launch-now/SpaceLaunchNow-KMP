@@ -4,11 +4,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
+import me.calebjones.spacelaunchnow.navigation.NewsEvents
 import me.calebjones.spacelaunchnow.navigation.Onboarding
 import me.calebjones.spacelaunchnow.navigation.Preload
 import me.calebjones.spacelaunchnow.navigation.Schedule
@@ -49,6 +51,12 @@ val mainNavigationItems = listOf(
         contentDescription = "Explore tab"
     ),
     NavigationTabItem(
+        route = NewsEvents,
+        label = "News",
+        icon = Icons.Filled.Newspaper,
+        contentDescription = "News and Events tab"
+    ),
+    NavigationTabItem(
         route = Settings,
         label = "Settings",
         icon = Icons.Filled.Settings,
@@ -72,6 +80,7 @@ object NavigationRouteConfig {
         Home::class,
         Schedule::class,
         Explore::class,
+        NewsEvents::class,
         Settings::class
     )
 

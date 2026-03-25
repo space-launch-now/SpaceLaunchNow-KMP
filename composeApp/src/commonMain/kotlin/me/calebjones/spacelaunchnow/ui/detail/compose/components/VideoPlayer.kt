@@ -75,7 +75,7 @@ fun VideoPlayer(
 
         // Video picker (only show if there are multiple videos and showVideoPicker is true)
         if (showVideoPicker && videoPlayerState.availableVideos.size > 1) {
-            VideoPickerCard(
+            VideoPicker(
                 videos = videoPlayerState.availableVideos,
                 selectedIndex = videoPlayerState.selectedVideoIndex,
                 launchName = launchName,
@@ -87,37 +87,28 @@ fun VideoPlayer(
 }
 
 @Composable
-private fun VideoPickerCard(
+private fun VideoPicker(
     videos: List<VidURL>,
     selectedIndex: Int,
     launchName: String,
     onVideoSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    Column(
+        modifier = modifier.fillMaxWidth().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Select Video",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            VideoPickerDropdown(
-                videos = videos,
-                selectedIndex = selectedIndex,
-                launchName = launchName,
-                onVideoSelected = onVideoSelected
-            )
-        }
+        Text(
+            text = "Select Video",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        VideoPickerDropdown(
+            videos = videos,
+            selectedIndex = selectedIndex,
+            launchName = launchName,
+            onVideoSelected = onVideoSelected
+        )
     }
 }
 

@@ -219,4 +219,13 @@ val apiModule = module {
         )
         // No API key required for SNAPI
     }
+
+    single<me.calebjones.spacelaunchnow.api.snapi.apis.InfoApi> {
+        me.calebjones.spacelaunchnow.api.snapi.apis.InfoApi(
+            baseUrl = "https://api.spaceflightnewsapi.net",
+            httpClientEngine = get<HttpClientEngine>(),
+            httpClientConfig = httpClientConfig,
+        )
+        // No API key required for SNAPI
+    }
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
+import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 
 private val TitleHeight = 128.dp
@@ -44,13 +45,16 @@ fun SpaceStationDetailLoadingView(onNavigateBack: () -> Unit) {
         scrollEnabled = false
     ) {
         // Shimmer content matching SpaceStationDetailView layout
+        val isCollapsed = LocalDetailScaffoldCollapsed.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(Modifier.height(TitleHeight))
+            if (!isCollapsed) {
+                Spacer(Modifier.height(TitleHeight))
+            }
             // NASA live stream placeholder
             PlainShimmerCard(height = 200)
 

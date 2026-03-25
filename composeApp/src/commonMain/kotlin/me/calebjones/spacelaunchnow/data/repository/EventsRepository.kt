@@ -53,4 +53,22 @@ interface EventsRepository {
         launchId: String,
         limit: Int = 10
     ): Result<PaginatedEventEndpointNormalList>
+
+    /**
+     * Get events with full pagination and filtering support for News & Events screen
+     * @param limit Number of events per page
+     * @param offset Pagination offset
+     * @param search Optional search query
+     * @param typeIds Optional filter by event type IDs
+     * @param upcoming True for upcoming, False for past, null for all
+     * @param forceRefresh Force network fetch bypassing cache
+     */
+    suspend fun getEventsPaginated(
+        limit: Int = 20,
+        offset: Int = 0,
+        search: String? = null,
+        typeIds: List<Int>? = null,
+        upcoming: Boolean? = true,
+        forceRefresh: Boolean = false
+    ): Result<DataResult<PaginatedEventEndpointNormalList>>
 }

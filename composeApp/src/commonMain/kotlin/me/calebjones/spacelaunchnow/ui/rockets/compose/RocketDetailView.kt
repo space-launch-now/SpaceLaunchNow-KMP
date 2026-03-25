@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 
@@ -44,10 +45,13 @@ fun RocketDetailView(
 
 @Composable
 private fun RocketDetailContent(rocket: LauncherConfigDetailed) {
+    val isCollapsed = LocalDetailScaffoldCollapsed.current
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight))
+        if (!isCollapsed) {
+            Spacer(Modifier.height(TitleHeight))
+        }
 
         // Basic Info Card
         RocketInfoCard(rocket)

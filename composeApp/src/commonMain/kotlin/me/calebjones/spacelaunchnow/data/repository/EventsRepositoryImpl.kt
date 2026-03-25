@@ -274,4 +274,46 @@ class EventsRepositoryImpl(
             Result.failure(e)
         }
     }
+
+    override suspend fun getEventsPaginated(
+        limit: Int,
+        offset: Int,
+        search: String?,
+        typeIds: List<Int>?,
+        upcoming: Boolean?,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedEventEndpointNormalList>> {
+        return try {
+            log.d { "getEventsPaginated - limit: $limit, offset: $offset, search: $search, typeIds: $typeIds, upcoming: $upcoming" }
+            
+            val now = Clock.System.now().toEpochMilliseconds()
+            
+            val response = eventsApi.getEventList(
+                limit = limit,
+                offset = offset,
+                search = search,
+                typeIds = typeIds,
+                upcoming = upcoming,
+                ordering = "date"
+            )
+            
+            val body = response.body()
+            log.i { "Successfully fetched ${body.results.size} events (offset: $offset)" }
+            
+            Result.success(DataResult(
+                data = body,
+                source = DataSource.NETWORK,
+                timestamp = now
+            ))
+        } catch (e: ResponseException) {
+            log.e(e) { "API error in getEventsPaginated" }
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "Network error in getEventsPaginated" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "Unexpected error in getEventsPaginated" }
+            Result.failure(e)
+        }
+    }
 }

@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
+import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 
 /**
@@ -198,10 +199,13 @@ private fun ErrorCard(
  */
 @Composable
 private fun LaunchDetailLoadingContent() {
+    val isCollapsed = LocalDetailScaffoldCollapsed.current
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight))
+        if (!isCollapsed) {
+            Spacer(Modifier.height(TitleHeight))
+        }
 
         // 1. Combined Launch Overview Card shimmer
         LoadingCard(height = 200.dp)

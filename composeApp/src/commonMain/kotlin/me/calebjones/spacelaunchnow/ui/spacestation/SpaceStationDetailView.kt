@@ -118,7 +118,6 @@ private fun SpaceStationDetailContent(
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight))
 
         // ISS-specific: NASA live stream
         if (isIss) {
@@ -277,7 +276,7 @@ private fun SpaceStationDetailContent(
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    issPositionData?.altitude?.let {
+                                    issPositionData.altitude.let {
                                         Text(
                                             text = "${
                                                 NumberFormatUtil.formatDecimal(

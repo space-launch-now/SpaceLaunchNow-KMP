@@ -21,6 +21,8 @@ import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.InfoRepository
+import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
@@ -85,6 +87,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.NewsEventsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.OnboardingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.PreloadViewModel
@@ -145,6 +148,11 @@ val appModule = module {
             localDataSource = get()
         )
     }
+    single<InfoRepository> {
+        InfoRepositoryImpl(
+            infoApi = get()
+        )
+    }
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
     viewModelOf(::OnboardingViewModel)
@@ -164,6 +172,7 @@ val appModule = module {
     viewModelOf(::LaunchCarouselViewModel)
     viewModelOf(::FeedViewModel)
     viewModelOf(::EventsViewModel)
+    viewModelOf(::NewsEventsViewModel)
     viewModelOf(::HistoryViewModel)
     viewModelOf(::StatsViewModel)
     viewModelOf(::StarshipViewModel)

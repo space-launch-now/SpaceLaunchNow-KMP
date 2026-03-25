@@ -62,6 +62,7 @@ import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.components.CountryChip
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileData
+import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryInfoRow
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
@@ -103,10 +104,14 @@ private fun AgencyDetailContentInBody(
         }
     }
 
+    val isCollapsed = LocalDetailScaffoldCollapsed.current
+
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight))
+        if (!isCollapsed) {
+            Spacer(Modifier.height(TitleHeight))
+        }
 
         // Agency Overview Card
         AgencyOverviewCard(agency, openUrl)

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsFilterState
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleFilterState
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 
@@ -48,6 +49,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
         // Schedule filter state
         private val SCHEDULE_FILTER_STATE = stringPreferencesKey("schedule_filter_state")
+
+        // News & Events filter state
+        private val NEWS_EVENTS_FILTER_STATE = stringPreferencesKey("news_events_filter_state")
 
         // App rating preferences
         private val APP_LAUNCH_COUNT = longPreferencesKey("app_launch_count")
@@ -222,6 +226,40 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
             }
         } else {
             ScheduleFilterState()
+        }
+    }
+
+    // News & Events filter state methods
+    val newsEventsFilterStateFlow: Flow<NewsEventsFilterState> = dataStore.data.map { preferences ->
+        val jsonString = preferences[NEWS_EVENTS_FILTER_STATE]
+        if (jsonString != null) {
+            try {
+                json.decodeFromString<NewsEventsFilterState>(jsonString)
+            } catch (e: Exception) {
+                NewsEventsFilterState()
+            }
+        } else {
+            NewsEventsFilterState()
+        }
+    }
+
+    suspend fun updateNewsEventsFilterState(state: NewsEventsFilterState) {
+        dataStore.edit { preferences ->
+            val jsonString = json.encodeToString(state)
+            preferences[NEWS_EVENTS_FILTER_STATE] = jsonString
+        }
+    }
+
+    suspend fun getNewsEventsFilterState(): NewsEventsFilterState {
+        val jsonString = dataStore.data.map { it[NEWS_EVENTS_FILTER_STATE] }.first()
+        return if (jsonString != null) {
+            try {
+                json.decodeFromString<NewsEventsFilterState>(jsonString)
+            } catch (e: Exception) {
+                NewsEventsFilterState()
+            }
+        } else {
+            NewsEventsFilterState()
         }
     }
 

@@ -35,6 +35,7 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
+import me.calebjones.spacelaunchnow.navigation.NewsEvents
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Onboarding
 import me.calebjones.spacelaunchnow.navigation.Preload
@@ -61,6 +62,7 @@ import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.explore.ExploreScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.AdaptiveAppScaffold
+import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
 import me.calebjones.spacelaunchnow.ui.onboarding.LiveOnboardingScreen
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPaywallScreen
@@ -425,7 +427,8 @@ fun SpaceLaunchNowApp(
                                 val eventDetail = backStackEntry.toRoute<EventDetail>()
                                 EventDetailScreen(
                                     eventId = eventDetail.eventId,
-                                    onNavigateBack = { navController.popBackStack() }
+                                    onNavigateBack = { navController.popBackStack() },
+                                    navController = navController
                                 )
                             }
                             composableWithCompositionLocal<AgencyDetail> { backStackEntry ->
@@ -564,6 +567,13 @@ fun SpaceLaunchNowApp(
                             }
                             composableWithCompositionLocal<Starship> {
                                 StarshipScreen(navController = navController)
+                            }
+                            composableWithCompositionLocal<NewsEvents> {
+                                NewsEventsScreen(
+                                    onEventClick = { eventId ->
+                                        navController.navigate(EventDetail(eventId))
+                                    }
+                                )
                             }
                         }
 
