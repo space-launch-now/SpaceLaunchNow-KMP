@@ -186,6 +186,12 @@ fun SpaceLaunchNowApp(
                     kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                         AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
                     }
+                    
+                    // Pre-warm ad requests to reduce time-to-first-ad
+                    val koinForAds = org.koin.mp.KoinPlatform.getKoin()
+                    val globalAdManager = koinForAds.get<me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager>()
+                    globalAdManager.initializeAndPreload()
+                    globalAdManager.preWarmAdRequests()
                 }
 
                 try {

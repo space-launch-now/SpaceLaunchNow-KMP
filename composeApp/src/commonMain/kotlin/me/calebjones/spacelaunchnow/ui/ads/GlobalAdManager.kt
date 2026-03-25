@@ -45,6 +45,13 @@ expect class GlobalAdManager(contextFactory: ContextFactory?) {
      */
     fun getMinutesSinceLastInterstitial(): Long
     
+    /**
+     * Pre-warm ad requests to reduce time-to-first-ad.
+     * Call this immediately after SDK initialization to signal the system is ready
+     * for ad requests and optimize initial ad loading.
+     */
+    fun preWarmAdRequests()
+    
     companion object {
         /**
          * Get the correct Ad Unit ID for the current platform and ad type

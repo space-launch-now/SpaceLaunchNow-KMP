@@ -148,13 +148,29 @@ actual fun WithPreloadedAds(
         adSize = AdSize.BANNER
     )
 
-    // Navigation fallbacks reuse existing ads for efficiency
-    val preloadedNavigationLargeBannerAd = preloadedLargeBannerAd
-    val preloadedNavigationLeaderboardAd = preloadedLargeBannerAd
+    // Dedicated navigation ads for tablets (no sharing to avoid race conditions)
+    val preloadedNavigationLargeBannerAd by rememberBannerAd(
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
+        adSize = AdSize.LARGE_BANNER
+    )
 
-    // Tablet-specific ads reuse preloaded ads (lazy load on demand if needed)
-    val preloadedLeaderboardAd = preloadedLargeBannerAd
-    val preloadedFullBannerAd = preloadedLargeBannerAd
+    val preloadedNavigationLeaderboardAd by rememberBannerAd(
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
+        adSize = AdSize.LEADERBOARD
+    )
+
+    // Dedicated tablet-specific ads (no sharing to avoid race conditions)
+    val preloadedLeaderboardAd by rememberBannerAd(
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
+        adSize = AdSize.LEADERBOARD
+    )
+
+    val preloadedFullBannerAd by rememberBannerAd(
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
+        adSize = AdSize.FULL_BANNER
+    )
+
+    // Fluid ad can share with banner since it's rarely used simultaneously
     val preloadedFluidAd = preloadedBannerAd
 
     // Preload interstitial and rewarded ads

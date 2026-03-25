@@ -289,6 +289,26 @@ actual class GlobalAdManager actual constructor(
             999L // No ad shown yet
         }
     }
+    
+    /**
+     * Pre-warm ad requests to reduce time-to-first-ad.
+     * Call this immediately after SDK initialization to signal the system is ready.
+     */
+    actual fun preWarmAdRequests() {
+        if (!isInitialized) {
+            log.w { "🚨 Cannot pre-warm ads: GlobalAdManager not initialized" }
+            return
+        }
+        
+        log.d { "🚀 Pre-warming ad requests - SDK ready for ad loading (iOS)" }
+        
+        // Signal that optimization is ready for ad requests
+        // The actual preloading happens via WithPreloadedAds CompositionLocal
+        isOptimizationReady = true
+        
+        // Log configuration summary
+        log.d { "📊 Ad configurations ready: ${adConfigurations.size} sizes configured" }
+    }
 
     actual companion object {
         /**
