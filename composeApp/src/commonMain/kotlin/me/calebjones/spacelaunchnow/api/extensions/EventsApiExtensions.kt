@@ -15,6 +15,7 @@ import kotlin.time.Instant
 @OptIn(ExperimentalTime::class)
 suspend fun EventsApi.getEventList(
     limit: Int? = null,
+    offset: Int? = null,
     upcoming: Boolean? = null,
     ordering: String? = null,
     typeIds: List<Int>? = null,
@@ -37,7 +38,7 @@ suspend fun EventsApi.getEventList(
     lastUpdatedLte = null,
     limit = limit,
     month = null,
-    offset = null,
+    offset = offset,
     ordering = ordering,
     previous = null,
     program = program,

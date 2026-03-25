@@ -21,6 +21,8 @@ import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.InfoRepository
+import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
@@ -31,6 +33,8 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
@@ -83,6 +87,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.NewsEventsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.OnboardingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.PreloadViewModel
@@ -109,7 +114,7 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, appModule, debugModule)
+    modules(networkModule, apiModule, appModule, debugModule, imageLoaderModule)
 }
 
 val appModule = module {
@@ -143,6 +148,11 @@ val appModule = module {
             localDataSource = get()
         )
     }
+    single<InfoRepository> {
+        InfoRepositoryImpl(
+            infoApi = get()
+        )
+    }
     viewModelOf(::LaunchViewModel)
     viewModelOf(::NextUpViewModel)
     viewModelOf(::OnboardingViewModel)
@@ -162,6 +172,7 @@ val appModule = module {
     viewModelOf(::LaunchCarouselViewModel)
     viewModelOf(::FeedViewModel)
     viewModelOf(::EventsViewModel)
+    viewModelOf(::NewsEventsViewModel)
     viewModelOf(::HistoryViewModel)
     viewModelOf(::StatsViewModel)
     viewModelOf(::StarshipViewModel)
@@ -326,6 +337,10 @@ val appModule = module {
     single { AppSettingsViewModel(appPreferences = get()) }
     viewModelOf(::SettingsViewModel)
     viewModelOf(::ThemeCustomizationViewModel)
+
+    // Remote Config Repository for Firebase Remote Config
+    single<RemoteConfigRepository> { RemoteConfigRepositoryImpl() }
+
     viewModelOf(::RoadmapViewModel)
 }
 

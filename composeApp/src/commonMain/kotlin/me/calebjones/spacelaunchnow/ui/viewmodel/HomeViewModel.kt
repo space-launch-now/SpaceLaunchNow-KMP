@@ -103,11 +103,12 @@ class HomeViewModel(
     // ========== Derived States for Carousel ==========
 
     // Combined Launches (previous + upcoming for carousel) - derived from ViewStates
+    // Deduplicated by ID to handle edge cases where a launch appears in both lists.
     val combinedLaunches: StateFlow<List<LaunchNormal>> = kotlinx.coroutines.flow.combine(
         _previousLaunchesState,
         _upcomingLaunchesState
     ) { previousState, upcomingState ->
-        previousState.data.reversed() + upcomingState.data
+        (previousState.data.reversed() + upcomingState.data).distinctBy { it.id }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Index where upcoming launches start in combined list - derived from previousLaunchesState

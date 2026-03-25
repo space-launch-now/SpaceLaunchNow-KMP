@@ -44,8 +44,8 @@ actual class GlobalAdManager actual constructor(
     // Interstitial ad tracking for detailed views
     private var detailViewVisitCount = 0
     private var lastInterstitialShownAt = 0L
-    private val minInterstitialInterval = 300_000L // 5 minutes minimum between interstitials
-    private val visitsBeforeInterstitial = 10 // Show interstitial every Nth visit
+    private val minInterstitialInterval = 180_000L // 3 minutes minimum between interstitials
+    private val visitsBeforeInterstitial = 8 // Show interstitial every 8th visit for higher impression count
 
     // Ad configuration cache for faster setup
     private val adConfigurations = mutableMapOf<AdSize, AdConfig>()
@@ -85,10 +85,29 @@ actual class GlobalAdManager actual constructor(
 
         // Configuration happens synchronously now instead of in coroutine
         isInitialized = true
-        isOptimizationReady = true
     
         // Setup configurations synchronously for instant availability
         setupAdConfigurations()
+    }
+    
+    /**
+     * Pre-warm ad requests to reduce time-to-first-ad.
+     * Call this immediately after SDK initialization to signal the system is ready.
+     */
+    actual fun preWarmAdRequests() {
+        if (!isInitialized) {
+            log.w { "🚨 Cannot pre-warm ads: GlobalAdManager not initialized" }
+            return
+        }
+        
+        log.d { "🚀 Pre-warming ad requests - SDK ready for ad loading" }
+        
+        // Signal that optimization is ready for ad requests
+        // The actual preloading happens via WithPreloadedAds CompositionLocal
+        isOptimizationReady = true
+        
+        // Log configuration summary
+        log.d { "📊 Ad configurations ready: ${adConfigurations.size} sizes configured" }
     }
 
     private fun setupAdConfigurations() {

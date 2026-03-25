@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +19,9 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
@@ -29,6 +34,8 @@ import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.composable.BannerAd
+import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.LocalContextFactory
 import me.calebjones.spacelaunchnow.LocalPreloadedBannerAd
 import me.calebjones.spacelaunchnow.LocalPreloadedFluidAd
@@ -144,19 +151,58 @@ actual fun SmartBannerAd(
         return
     }
 
-    // 🚀 PERFORMANCE: Fast-path return for failing ads to avoid layout delays
-    if (availableAd.state == AdState.FAILING || availableAd.state == AdState.NONE) {
-        log.d { "Ad state is ${availableAd.state} - skipping to avoid layout delays" }
-        return
+    // 🚀 RETRY LOGIC: Track retry attempts for failed ads
+    var retryCount by remember { mutableIntStateOf(0) }
+    val maxRetries = 2
+
+    // Trigger retry with exponential backoff when ad fails
+    LaunchedEffect(availableAd.state, retryCount) {
+        if (availableAd.state == AdState.FAILING && retryCount < maxRetries) {
+            val delayMs = if (retryCount == 0) 1000L else 3000L
+            log.d { "Ad failed, retrying in ${delayMs}ms (attempt ${retryCount + 1}/$maxRetries)" }
+            delay(delayMs)
+            availableAd.load()
+            retryCount++
+        }
     }
 
     // Debug logging for ad state
-    log.d { "Ad state is ${availableAd.state} for placement $placementType" }
+    log.d { "Ad state is ${availableAd.state} for placement $placementType (retries: $retryCount/$maxRetries)" }
+
+    // Calculate banner height for shimmer placeholder
+    val bannerHeight = when {
+        actualAdSize.height > 0 -> actualAdSize.height.dp
+        actualAdSize.height == -2 -> 250.dp // FLUID
+        else -> 50.dp
+    }
 
     // IMPORTANT: Always render BannerAd Composable to trigger load
-    // Show layout when ad is ready, showing, or loading
+    // Show shimmer during loading/retry, ad when ready, nothing after final failure
     when (availableAd.state) {
-        AdState.READY, AdState.SHOWING, AdState.LOADING -> {
+        AdState.LOADING, AdState.NONE -> {
+            // Show shimmer placeholder while loading
+            AdShimmerPlaceholder(
+                height = bannerHeight,
+                showCard = showCard,
+                modifier = modifier
+            )
+        }
+
+        AdState.FAILING -> {
+            // Show shimmer during retries, hide after all retries exhausted
+            if (retryCount < maxRetries) {
+                AdShimmerPlaceholder(
+                    height = bannerHeight,
+                    showCard = showCard,
+                    modifier = modifier
+                )
+            } else {
+                log.d { "Ad failed after $maxRetries retries - hiding ad space" }
+                return
+            }
+        }
+
+        AdState.READY, AdState.SHOWING -> {
             // Show the banner ad with optional remove ads button
             // Note: We render even in LOADING state because iOS needs the Composable rendered to trigger load
             if (showCard) {
@@ -218,16 +264,64 @@ actual fun SmartBannerAd(
             }
         }
 
-        AdState.FAILING, AdState.NONE, AdState.DISMISSED -> {
-            // Ad failed to load or was dismissed - don't show anything (no placeholder)
-            // This prevents white gaps and invisible barriers when ads fail to load
-            log.w { "Ad state is ${availableAd.state} for placement $placementType - hiding ad space" }
-            // Don't render anything - let the layout collapse
+        AdState.DISMISSED -> {
+            // Ad was dismissed - don't show anything
+            log.w { "Ad dismissed for placement $placementType - hiding ad space" }
         }
 
         else -> {
-            // Unknown state or SHOWN (already displayed)
+            // Unknown state - show shimmer as fallback
             log.w { "Unknown ad state ${availableAd.state} for placement $placementType" }
+            AdShimmerPlaceholder(
+                height = bannerHeight,
+                showCard = showCard,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+/**
+ * Shimmer placeholder shown while ads are loading or during retry attempts.
+ * Prevents layout shift and provides visual feedback.
+ */
+@Composable
+private fun AdShimmerPlaceholder(
+    height: Dp,
+    showCard: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val placeholderContent = @Composable {
+        Box(
+            modifier = Modifier
+                .shimmer()
+                .fillMaxWidth()
+                .height(height)
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant,
+                    RoundedCornerShape(8.dp)
+                )
+        )
+    }
+
+    if (showCard) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            )
+        ) {
+            Box(modifier = Modifier.padding(8.dp)) {
+                placeholderContent()
+            }
+        }
+    } else {
+        Box(modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+            placeholderContent()
         }
     }
 }
@@ -303,7 +397,7 @@ fun getAdSizeForPlacement(placementType: AdPlacementType): AdSize {
         AdPlacementType.NAVIGATION -> {
             when (widthSizeClass) {
                 WindowWidthSizeClass.COMPACT -> AdSize.BANNER // 320x50 for phones
-                WindowWidthSizeClass.MEDIUM -> AdSize.FULL_BANNER // 468x60 for medium tablets
+                WindowWidthSizeClass.MEDIUM -> AdSize.LARGE_BANNER // 320x100 for medium tablets (higher visibility)
                 WindowWidthSizeClass.EXPANDED -> AdSize.LEADERBOARD // 728x90 for large tablets/desktop
                 else -> AdSize.BANNER
             }

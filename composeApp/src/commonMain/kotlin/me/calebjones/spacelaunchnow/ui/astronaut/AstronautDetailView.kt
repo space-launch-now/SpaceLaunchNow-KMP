@@ -27,6 +27,7 @@ import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautFlightHisto
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautInfoCard
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautLinksCard
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautStatsCard
+import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautDetailViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -83,15 +84,16 @@ fun AstronautDetailView(
                 imageUrl = astronaut.image?.imageUrl,
                 onNavigateBack = onNavigateBack
             ) {
+                val isCollapsed = LocalDetailScaffoldCollapsed.current
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // CRITICAL: Spacer required to prevent content from being hidden behind collapsing header
-                    // All SharedDetailScaffold implementations must include this spacer at the top
-                    Spacer(Modifier.height(TitleHeight - 28.dp))
+                    if (!isCollapsed) {
+                        Spacer(Modifier.height(TitleHeight - 28.dp))
+                    }
                     
                     // Career Statistics Card (includes status, age, nationality, and career stats)
                     AstronautStatsCard(astronaut = astronaut)

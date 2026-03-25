@@ -7,19 +7,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,11 +38,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
+import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
@@ -54,7 +57,10 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Update
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
+import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
+import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
@@ -65,7 +71,15 @@ private val TitleHeight = 128.dp
 @Composable
 fun EventDetailView(
     event: EventEndpointDetailed,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    videoPlayerState: VideoPlayerState = VideoPlayerState(),
+    onSelectVideo: (Int) -> Unit = {},
+    onSetPlayerVisible: (Boolean) -> Unit = {},
+    onNavigateToFullscreen: (String, String) -> Unit = { _, _ -> },
+    onAgencyClick: ((Int) -> Unit)? = null,
+    onLaunchClick: ((String) -> Unit)? = null,
+    onAstronautClick: ((Int) -> Unit)? = null,
+    onSpaceStationClick: ((Int) -> Unit)? = null,
 ) {
     SharedDetailScaffold(
         titleText = event.name,
@@ -78,16 +92,59 @@ fun EventDetailView(
             MaterialTheme.colorScheme.onSecondaryContainer
         ),
     ) {
-        EventDetailContentInBody(event)
+        EventDetailContentInBody(
+            event = event,
+            videoPlayerState = videoPlayerState,
+            onSelectVideo = onSelectVideo,
+            onSetPlayerVisible = onSetPlayerVisible,
+            onNavigateToFullscreen = onNavigateToFullscreen,
+            onAgencyClick = onAgencyClick,
+            onLaunchClick = onLaunchClick,
+            onAstronautClick = onAstronautClick,
+            onSpaceStationClick = onSpaceStationClick,
+        )
     }
 }
 
 @Composable
-private fun EventDetailContentInBody(event: EventEndpointDetailed) {
+private fun EventDetailContentInBody(
+    event: EventEndpointDetailed,
+    videoPlayerState: VideoPlayerState = VideoPlayerState(),
+    onSelectVideo: (Int) -> Unit = {},
+    onSetPlayerVisible: (Boolean) -> Unit = {},
+    onNavigateToFullscreen: (String, String) -> Unit = { _, _ -> },
+    onAgencyClick: ((Int) -> Unit)? = null,
+    onLaunchClick: ((String) -> Unit)? = null,
+    onAstronautClick: ((Int) -> Unit)? = null,
+    onSpaceStationClick: ((Int) -> Unit)? = null,
+) {
+    val isCollapsed = LocalDetailScaffoldCollapsed.current
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(TitleHeight - 28.dp))
+        if (!isCollapsed) {
+            Spacer(Modifier.height(TitleHeight - 28.dp))
+        }
+
+        // Video player (if videos available)
+        if (videoPlayerState.availableVideos.isNotEmpty()) {
+            VideoPlayerCard(
+                videoPlayerState = videoPlayerState,
+                launchName = event.name,
+                onSetPlayerVisible = onSetPlayerVisible,
+                onNavigateToFullscreen = onNavigateToFullscreen,
+                onVideoSelected = onSelectVideo,
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // Feature image (only show if no videos — video player takes this slot)
+        if (videoPlayerState.availableVideos.isEmpty()) {
+            event.image?.imageUrl?.let { imageUrl ->
+                EventFeatureImage(imageUrl = imageUrl, contentDescription = event.name)
+                Spacer(Modifier.height(16.dp))
+            }
+        }
 
         // Meta card
         EventInfoCard(event)
@@ -98,13 +155,13 @@ private fun EventDetailContentInBody(event: EventEndpointDetailed) {
         // Banner Ad - positioned after description
         SmartBannerAd(
             modifier = Modifier.fillMaxWidth(),
-            placementType = AdPlacementType.CONTENT // Content area ad
+            placementType = AdPlacementType.FEED
         )
 
         Spacer(Modifier.height(16.dp))
 
-        // Links card
-        if (event.vidUrls.isNotEmpty() || event.infoUrls.isNotEmpty()) {
+        // Info links card (video links removed — handled by video player above)
+        if (event.infoUrls.isNotEmpty()) {
             EventLinksCard(event)
             Spacer(Modifier.height(16.dp))
         }
@@ -123,18 +180,18 @@ private fun EventDetailContentInBody(event: EventEndpointDetailed) {
 
         // Agencies
         event.agencies.takeIf { it.isNotEmpty() }?.let { list ->
-            AgenciesCard(list)
+            AgenciesCard(list, onAgencyClick = onAgencyClick)
             Spacer(Modifier.height(16.dp))
         }
         // Astronauts
         event.astronauts?.takeIf { it.isNotEmpty() }?.let { list ->
-            AstronautsCard(list)
+            AstronautsCard(list, onAstronautClick = onAstronautClick)
             Spacer(Modifier.height(16.dp))
         }
 
         // Space Stations
         if (event.spacestations.isNotEmpty()) {
-            SpaceStationsCard(event.spacestations)
+            SpaceStationsCard(event.spacestations, onSpaceStationClick = onSpaceStationClick)
             Spacer(Modifier.height(16.dp))
         }
 
@@ -146,11 +203,29 @@ private fun EventDetailContentInBody(event: EventEndpointDetailed) {
 
         // Related Launches
         if (event.launches.isNotEmpty()) {
-            RelatedLaunchesCard(event.launches)
+            RelatedLaunchesCard(event.launches, onLaunchClick = onLaunchClick)
             Spacer(Modifier.height(16.dp))
         }
 
         Spacer(Modifier.height(200.dp))
+    }
+}
+
+@Composable
+private fun EventFeatureImage(imageUrl: String, contentDescription: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = contentDescription,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+                .clip(RoundedCornerShape(16.dp))
+        )
     }
 }
 
@@ -220,6 +295,7 @@ private fun EventInfoCard(event: EventEndpointDetailed) {
 
 @Composable
 private fun EventLinksCard(event: EventEndpointDetailed) {
+    val uriHandler = LocalUriHandler.current
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -233,18 +309,16 @@ private fun EventLinksCard(event: EventEndpointDetailed) {
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            event.vidUrls.forEach { v ->
-                Button(onClick = { /* open video */ }) {
-                    Icon(Icons.Filled.Link, contentDescription = null)
-                    Spacer(Modifier.size(8.dp))
-                    Text(v.title ?: "Video")
-                }
-            }
             event.infoUrls.forEach { u ->
-                Button(onClick = { /* open info */ }) {
+                Button(onClick = {
+                    try {
+                        uriHandler.openUri(u.url)
+                    } catch (_: Throwable) {
+                    }
+                }) {
                     Icon(Icons.Filled.OpenInNew, contentDescription = null)
-                    Spacer(Modifier.size(8.dp))
-                    Text(u.title ?: "Info")
+                    Spacer(Modifier.width(8.dp))
+                    Text(u.title ?: "Info", maxLines = 1)
                 }
             }
         }
@@ -252,7 +326,7 @@ private fun EventLinksCard(event: EventEndpointDetailed) {
 }
 
 @Composable
-private fun AgenciesCard(agencies: List<AgencyMini>) {
+private fun AgenciesCard(agencies: List<AgencyMini>, onAgencyClick: ((Int) -> Unit)? = null) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -267,7 +341,10 @@ private fun AgenciesCard(agencies: List<AgencyMini>) {
                 fontWeight = FontWeight.Bold
             )
             agencies.forEach { agency ->
-                AgencyRowWithLogo(agency = agency, onClick = { /* TODO open agency */ })
+                AgencyRowWithLogo(
+                    agency = agency,
+                    onClick = { onAgencyClick?.invoke(agency.id) }
+                )
             }
         }
     }
@@ -345,7 +422,10 @@ private fun AgencyRowWithLogo(agency: AgencyMini, onClick: () -> Unit) {
 }
 
 @Composable
-private fun AstronautsCard(astronauts: List<AstronautNormal>) {
+private fun AstronautsCard(
+    astronauts: List<AstronautNormal>,
+    onAstronautClick: ((Int) -> Unit)? = null
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -365,7 +445,7 @@ private fun AstronautsCard(astronauts: List<AstronautNormal>) {
                     subtitle = astro.nationality.firstOrNull()?.name ?: "",
                     imageUrl = astro.image?.imageUrl,
                     fallbackText = astro.name?.firstOrNull()?.uppercase() ?: "",
-                    onClick = { /* TODO open astronaut */ }
+                    onClick = { onAstronautClick?.invoke(astro.id) }
                 )
             }
         }
@@ -373,7 +453,10 @@ private fun AstronautsCard(astronauts: List<AstronautNormal>) {
 }
 
 @Composable
-private fun SpaceStationsCard(stations: List<SpaceStationNormal>) {
+private fun SpaceStationsCard(
+    stations: List<SpaceStationNormal>,
+    onSpaceStationClick: ((Int) -> Unit)? = null
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -393,7 +476,7 @@ private fun SpaceStationsCard(stations: List<SpaceStationNormal>) {
                     subtitle = ss.orbit ?: "",
                     imageUrl = ss.image?.imageUrl,
                     fallbackText = ss.name.firstOrNull()?.uppercase() ?: "",
-                    onClick = { /* TODO open station */ }
+                    onClick = { onSpaceStationClick?.invoke(ss.id) }
                 )
             }
         }
@@ -432,7 +515,10 @@ private fun ExpeditionsCard(expeditions: List<ExpeditionNormal>) {
 }
 
 @Composable
-private fun RelatedLaunchesCard(launches: List<LaunchBasic>) {
+private fun RelatedLaunchesCard(
+    launches: List<LaunchBasic>,
+    onLaunchClick: ((String) -> Unit)? = null
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -452,7 +538,7 @@ private fun RelatedLaunchesCard(launches: List<LaunchBasic>) {
                     subtitle = l.status?.name ?: "",
                     imageUrl = l.image?.imageUrl,
                     fallbackText = l.name?.firstOrNull()?.uppercase() ?: "",
-                    onClick = { /* TODO open launch */ }
+                    onClick = { onLaunchClick?.invoke(l.id) }
                 )
             }
         }
@@ -562,21 +648,60 @@ private fun ProgramsCard(programs: List<ProgramNormal>) {
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Program image if available
-                    program.image?.imageUrl?.let { imageUrl ->
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
-                        ) {
-                            AsyncImage(
-                                model = imageUrl,
-                                contentDescription = program.name,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .defaultMinSize(minHeight = 150.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                            )
+                    // Centered agency logo
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        // Program image if available
+                        program.image?.imageUrl?.let { imageUrl ->
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                            ) {
+                                SubcomposeAsyncImage(
+                                    model = imageUrl,
+                                    contentDescription = program.name,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .size(200.dp)
+                                        .padding(8.dp)
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    loading = {
+                                        Box(
+                                            modifier = Modifier.fillMaxSize().shimmer(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Public,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(48.dp),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                    alpha = 0.3f
+                                                )
+                                            )
+                                        }
+                                    },
+                                    error = {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(
+                                                    MaterialTheme.colorScheme.surfaceVariant,
+                                                    RoundedCornerShape(8.dp)
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Error,
+                                                contentDescription = "Mission",
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(32.dp)
+                                            )
+                                        }
+                                    }
+                                )
+                            }
                         }
                     }
 

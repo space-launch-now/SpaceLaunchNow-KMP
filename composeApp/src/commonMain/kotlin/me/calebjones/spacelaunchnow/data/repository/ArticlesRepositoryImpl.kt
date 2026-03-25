@@ -234,4 +234,43 @@ class ArticlesRepositoryImpl(
             Result.failure(e)
         }
     }
+
+    override suspend fun getArticlesPaginated(
+        limit: Int,
+        offset: Int,
+        search: String?,
+        newsSites: List<String>?,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedArticleList>> {
+        return try {
+            log.d { "getArticlesPaginated - limit: $limit, offset: $offset, search: $search, newsSites: $newsSites" }
+            
+            val now = Clock.System.now().toEpochMilliseconds()
+            
+            val response = articlesApi.getArticles(
+                limit = limit,
+                offset = offset,
+                search = search,
+                newsSite = newsSites?.joinToString(",")
+            )
+            
+            val body = response.body()
+            log.i { "Successfully fetched ${body.results.size} articles (offset: $offset)" }
+            
+            Result.success(DataResult(
+                data = body,
+                source = DataSource.NETWORK,
+                timestamp = now
+            ))
+        } catch (e: ResponseException) {
+            log.e(e) { "API error in getArticlesPaginated" }
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "Network error in getArticlesPaginated" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "Unexpected error in getArticlesPaginated" }
+            Result.failure(e)
+        }
+    }
 }

@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -83,6 +84,9 @@ data class SpaceStationDetail(val stationId: Int)
 data object Starship
 
 @Serializable
+data object NewsEvents
+
+@Serializable
 data class FullscreenVideo(
     val launchId: String,
     val videoUrl: String,
@@ -95,5 +99,6 @@ sealed class Screen(val label: String, val icon: ImageVector) {
     data object Home : Screen("Home", Icons.Filled.Home)
     data object Schedule : Screen("Schedule", Icons.AutoMirrored.Filled.List)
     data object Explore : Screen("Explore", Icons.Filled.Explore)
+    data object NewsEvents : Screen("News", Icons.Filled.Newspaper)
     data object Settings : Screen("Settings", Icons.Filled.Settings)
 }

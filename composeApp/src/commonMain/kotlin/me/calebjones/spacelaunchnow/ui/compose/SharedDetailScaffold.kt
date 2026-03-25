@@ -28,7 +28,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,13 +52,22 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import coil3.compose.SubcomposeAsyncImage
+import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+
+/**
+ * CompositionLocal indicating whether the SharedDetailScaffold is in collapsed/tablet mode.
+ * When true, content should skip its top spacer since the scaffold handles the header offset.
+ */
+val LocalDetailScaffoldCollapsed = compositionLocalOf { false }
 
 // Shared Transition Layout Constants (scoped to this file)
 private val TitleHeight = 128.dp
@@ -80,14 +88,18 @@ private val HzPadding = 24.dp
  * IMPORTANT USAGE NOTES:
  * ----------------------
  * Content provided to this scaffold MUST include a top spacer to prevent overlap 
- * with the collapsing header:
+ * with the collapsing header, but ONLY when not in collapsed/tablet mode.
+ * Use [LocalDetailScaffoldCollapsed] to check:
  * 
  * ```kotlin
  * private val TitleHeight = 128.dp  // Define in your view file
  * 
  * SharedDetailScaffold(...) {
+ *     val isCollapsed = LocalDetailScaffoldCollapsed.current
  *     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
- *         Spacer(Modifier.height(TitleHeight - 28.dp))  // REQUIRED!
+ *         if (!isCollapsed) {
+ *             Spacer(Modifier.height(TitleHeight - 28.dp))  // Only on phone
+ *         }
  *         // Your content here...
  *     }
  * }
@@ -237,7 +249,13 @@ private fun SharedDetailBody(
                     Modifier
                         .fillMaxWidth()
                 ) {
-                    content()
+                    CompositionLocalProvider(LocalDetailScaffoldCollapsed provides forceNoCollapse) {
+                        Column {
+                            // Common top spacing for collapsed (tablet/desktop) layout
+                            Spacer(Modifier.height(24.dp))
+                            content()
+                        }
+                    }
                 }
             }
         }
@@ -360,14 +378,18 @@ private fun SharedDetailImage(
                 .border(4.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape)
                 .fillMaxSize(),
             loading = {
+                // Use shimmer instead of CircularProgressIndicator for warm start perf
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
+                        .shimmer()
+                        .background(MaterialTheme.colorScheme.surfaceContainer),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(48.dp),
-                        strokeWidth = 4.dp,
-                        color = MaterialTheme.colorScheme.primary
+                    Icon(
+                        imageVector = Icons.Filled.Image,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
                 }
             },

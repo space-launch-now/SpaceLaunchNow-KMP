@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -60,7 +59,7 @@ fun EventsView(
             // STATE 4: Error State - show error with retry OR data with error indicator
             state.error != null -> {
                 if (state.data.isNotEmpty()) {
-                    // Show stale data with error indicator
+                    // Show stale data with error indicatorE
                     Column {
                         // Error banner
                         Card(
@@ -108,13 +107,8 @@ fun EventsView(
                         }
                     }
 
-                    // Show loading indicator
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(16.dp)
-                            .size(24.dp)
-                    )
+                    // Loading indicator removed - data already visible, no need
+                    // for additional visual distraction during background refresh
                 }
             }
 
@@ -210,14 +204,19 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
                             ),
                         contentScale = ContentScale.Crop,
                         loading = {
+                            // Use shimmer instead of CircularProgressIndicator for warm start perf
                             Box(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .shimmer()
+                                    .background(MaterialTheme.colorScheme.surfaceContainer),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(32.dp),
-                                    strokeWidth = 3.dp,
-                                    color = MaterialTheme.colorScheme.primary
+                                Icon(
+                                    imageVector = FontAwesomeIcons.Solid.CalendarDay,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp),
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 )
                             }
                         },
@@ -319,14 +318,19 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
                 loading = {
+                    // Use shimmer instead of CircularProgressIndicator for warm start perf
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .shimmer()
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(32.dp),
-                            strokeWidth = 3.dp,
-                            color = MaterialTheme.colorScheme.primary
+                        Icon(
+                            imageVector = FontAwesomeIcons.Solid.CalendarDay,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
                     }
                 },

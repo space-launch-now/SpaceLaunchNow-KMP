@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.data.model.RoadmapData
 import me.calebjones.spacelaunchnow.data.model.RoadmapItem
 import me.calebjones.spacelaunchnow.data.model.RoadmapPriority
 import me.calebjones.spacelaunchnow.data.model.RoadmapStatus
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 
 data class RoadmapUiState(
     val isLoading: Boolean = true,
@@ -20,65 +21,90 @@ data class RoadmapUiState(
 
 /**
  * ViewModel for the Roadmap screen
- *
- * Current implementation uses hardcoded placeholder data.
- *
- * TODO: Firebase Remote Config Integration
- * To enable remote configuration:
- * 1. Add Firebase Remote Config dependency to build.gradle.kts
- * 2. Create RemoteConfigRepository in data/repository/
- * 3. Inject repository into this ViewModel
- * 4. Replace loadPlaceholderData() with fetchRemoteRoadmap()
- *
- * See docs/features/ROADMAP_FIREBASE_SETUP.md for detailed instructions
+ * 
+ * Fetches roadmap data from Firebase Remote Config with fallback to placeholder data.
+ * Supports pull-to-refresh with force refresh capability.
  */
-class RoadmapViewModel : ViewModel() {
+class RoadmapViewModel(
+    private val remoteConfigRepository: RemoteConfigRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RoadmapUiState())
     val uiState: StateFlow<RoadmapUiState> = _uiState.asStateFlow()
 
     init {
-        loadRoadmap()
-    }
-
-    /**
-     * Load roadmap data
-     * Currently loads placeholder data
-     * Future: Fetch from Firebase Remote Config or API
-     */
-    private fun loadRoadmap() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-
-            try {
-                // TODO: Replace with Firebase Remote Config fetch
-                // val remoteData = remoteConfigRepository.getRoadmapData()
-                val placeholderData = loadPlaceholderData()
-
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    roadmapData = placeholderData
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    errorMessage = "Failed to load roadmap: ${e.message}"
-                )
-            }
+            // Set defaults before first fetch
+            remoteConfigRepository.setDefaults()
+            loadRoadmap(forceRefresh = false)
         }
     }
 
     /**
-     * Refresh roadmap data
-     * Call this to manually refresh from remote config
+     * Load roadmap data from Firebase Remote Config
+     * Falls back to placeholder data if remote config fails
      */
-    fun refresh() {
-        loadRoadmap()
+    private suspend fun loadRoadmap(forceRefresh: Boolean) {
+        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+
+        try {
+            // Fetch and activate remote config
+            val fetchResult = remoteConfigRepository.fetchAndActivate(forceRefresh)
+            
+            // Check for fetch failure
+            if (fetchResult.isFailure) {
+                handleError(fetchResult.exceptionOrNull())
+                return
+            }
+            
+            // Get roadmap data from remote config
+            val result = remoteConfigRepository.getRoadmapData()
+            
+            // Check for data fetch failure
+            if (result.isFailure) {
+                handleError(result.exceptionOrNull())
+                return
+            }
+            
+            val roadmapData = result.getOrNull()
+            
+            // If remote data is empty or failed, use placeholder
+            val finalData = if (roadmapData == null || roadmapData.items.isEmpty()) {
+                loadPlaceholderData()
+            } else {
+                roadmapData
+            }
+
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                roadmapData = finalData
+            )
+        } catch (e: Exception) {
+            handleError(e)
+        }
+    }
+    
+    private fun handleError(e: Throwable?) {
+        _uiState.value = _uiState.value.copy(
+            isLoading = false,
+            roadmapData = loadPlaceholderData(),
+            errorMessage = "Using cached data: ${e?.message ?: "Unknown error"}"
+        )
     }
 
     /**
-     * Placeholder data for initial implementation
-     * This data structure matches what Firebase Remote Config would provide
+     * Refresh roadmap data with force refresh
+     * Call this for pull-to-refresh to bypass cache
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            loadRoadmap(forceRefresh = true)
+        }
+    }
+
+    /**
+     * Placeholder data for fallback when remote config is unavailable
+     * This data structure matches what Firebase Remote Config provides
      */
     private fun loadPlaceholderData(): RoadmapData {
         return RoadmapData(

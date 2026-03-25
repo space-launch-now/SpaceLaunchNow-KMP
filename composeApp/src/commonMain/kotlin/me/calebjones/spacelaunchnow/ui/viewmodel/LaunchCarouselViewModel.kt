@@ -39,12 +39,13 @@ class LaunchCarouselViewModel(
     /**
      * Combined launches for bidirectional carousel (previous + upcoming)
      * Previous launches are reversed so most recent appears first in the carousel.
+     * Deduplicated by ID to handle edge cases where a launch appears in both lists.
      */
     val combinedLaunches: StateFlow<List<LaunchNormal>> = combine(
         _previousLaunchesState,
         _upcomingLaunchesState
     ) { previousState, upcomingState ->
-        previousState.data.reversed() + upcomingState.data
+        (previousState.data.reversed() + upcomingState.data).distinctBy { it.id }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     /**

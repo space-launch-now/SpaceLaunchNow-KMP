@@ -3,8 +3,10 @@ package me.calebjones.spacelaunchnow.data.subscription
 import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
@@ -64,22 +66,59 @@ data class LocalSubscriptionData(
 class LocalSubscriptionStorage {
     private val log = logger()
 
+    private val filePath = Path("${AppDirectories.getAppDataDir()}/subscription_data.json")
+
     private val store: KStore<LocalSubscriptionData> = storeOf(
-        file = Path("${AppDirectories.getAppDataDir()}/subscription_data.json"),
+        file = filePath,
         default = LocalSubscriptionData.DEFAULT
     )
 
     /**
      * Flow of current subscription data - UI observes this
+     * Recovers gracefully from corrupted files by emitting default data
      */
     val subscriptionData: Flow<LocalSubscriptionData> =
-        store.updates.map { it ?: LocalSubscriptionData.DEFAULT }
+        store.updates
+            .map { it ?: LocalSubscriptionData.DEFAULT }
+            .catch { e ->
+                log.e(e) { "Error reading subscription data stream, recovering with defaults" }
+                tryDeleteCorruptedFile()
+                emit(LocalSubscriptionData.DEFAULT)
+            }
 
     /**
      * Get current subscription data immediately (synchronous)
+     * Returns default data if file is corrupted or unreadable
      */
     suspend fun get(): LocalSubscriptionData {
-        return store.get() ?: LocalSubscriptionData.DEFAULT
+        return try {
+            store.get() ?: LocalSubscriptionData.DEFAULT
+        } catch (e: Exception) {
+            log.e(e) {
+                buildString {
+                    appendLine("❌ Error reading subscription data file, recovering with defaults")
+                    appendLine("File path: $filePath")
+                    appendLine("Error: ${e.message}")
+                }
+            }
+            tryDeleteCorruptedFile()
+            LocalSubscriptionData.DEFAULT
+        }
+    }
+
+    /**
+     * Attempt to delete corrupted subscription data file
+     * Safe operation - logs but does not throw on failure
+     */
+    private fun tryDeleteCorruptedFile() {
+        try {
+            if (SystemFileSystem.exists(filePath)) {
+                SystemFileSystem.delete(filePath)
+                log.i { "Deleted corrupted subscription data file: $filePath" }
+            }
+        } catch (e: Exception) {
+            log.w(e) { "Failed to delete corrupted file: $filePath" }
+        }
     }
 
     /**

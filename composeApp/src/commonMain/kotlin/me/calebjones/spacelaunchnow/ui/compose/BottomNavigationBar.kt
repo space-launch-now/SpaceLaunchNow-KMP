@@ -16,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.Home
+import me.calebjones.spacelaunchnow.navigation.NewsEvents
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Settings
@@ -31,10 +32,11 @@ fun BottomNavigationBar(navController: NavHostController) {
         Screen.Home,
         Screen.Schedule,
         Screen.Explore,
+        Screen.NewsEvents,
         Screen.Settings
     )
 
-    val routes = listOf(Home, Schedule, Explore, Settings)
+    val routes = listOf(Home, Schedule, Explore, NewsEvents, Settings)
 
     // Column to stack banner ad above navigation bar
     Column(

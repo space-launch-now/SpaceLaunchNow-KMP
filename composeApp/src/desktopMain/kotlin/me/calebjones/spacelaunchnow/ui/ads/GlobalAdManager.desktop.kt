@@ -34,6 +34,10 @@ actual class GlobalAdManager actual constructor(
         return 999L // Never shown
     }
     
+    actual fun preWarmAdRequests() {
+        log.d { "🎨 GlobalAdManager (Desktop): Pre-warming not needed on desktop" }
+    }
+    
     actual companion object {
         actual fun getPlatformAdUnitId(adType: AdType): String {
             // Return placeholder ad unit IDs for Desktop (not actually used)

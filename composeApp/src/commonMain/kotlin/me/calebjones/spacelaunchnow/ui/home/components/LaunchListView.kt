@@ -27,7 +27,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -50,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.SubcomposeAsyncImage
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
@@ -167,7 +167,8 @@ fun LaunchListView(
                 ) {
                 items(
                     count = combinedLaunches.size,
-                    key = { index -> combinedLaunches[index].id }
+                    // Use compound key with index to handle any remaining edge cases with duplicates
+                    key = { index -> "${combinedLaunches[index].id}_$index" }
                 ) { index ->
                     LaunchItemView(
                         launch = combinedLaunches[index],
@@ -214,14 +215,20 @@ fun LaunchItemView(
                         .fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     loading = {
+                        // NOTE: Use shimmer instead of CircularProgressIndicator for better
+                        // warm start performance on memory-constrained devices (3-4GB RAM)
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .shimmer()
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(32.dp),
-                                strokeWidth = 3.dp,
-                                color = MaterialTheme.colorScheme.primary
+                            Icon(
+                                imageVector = CustomIcons.RocketLaunch,
+                                contentDescription = null,
+                                modifier = Modifier.size(72.dp),
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                             )
                         }
                     },

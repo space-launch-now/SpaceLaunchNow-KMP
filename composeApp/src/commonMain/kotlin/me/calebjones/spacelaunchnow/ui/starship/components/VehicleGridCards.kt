@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
+import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
+import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
+import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 
 /**
  * Square grid card for spacecraft (individual vehicles)
@@ -55,12 +58,19 @@ internal fun SpacecraftGridCard(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     loading = {
+                        // Use shimmer instead of CircularProgressIndicator for warm start perf
                         Box(
                             modifier = Modifier.fillMaxSize()
+                                .shimmer()
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            Icon(
+                                imageVector = CustomIcons.RocketLaunch,
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            )
                         }
                     }
                 )
@@ -139,12 +149,19 @@ internal fun LauncherGridCard(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     loading = {
+                        // Use shimmer instead of CircularProgressIndicator for warm start perf
                         Box(
                             modifier = Modifier.fillMaxSize()
+                                .shimmer()
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            Icon(
+                                imageVector = CustomIcons.RocketLaunch,
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            )
                         }
                     }
                 )
