@@ -118,7 +118,7 @@ private fun FlightClubCardPreview() {
     MaterialTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             FlightClubCard(
-                flightClubUrl = "https://flightclub.io/result/2d?llId=abc123",
+                flightClubUrl = "https://flightclub.io/result/3d?llId=abc123",
                 modifier = Modifier.padding(16.dp)
             )
         }

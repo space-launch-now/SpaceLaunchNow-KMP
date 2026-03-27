@@ -68,7 +68,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryInfoRow
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 
-private val TitleHeight = 128.dp
+private val TitleHeight = 110.dp
 
 @Composable
 fun AgencyDetailView(

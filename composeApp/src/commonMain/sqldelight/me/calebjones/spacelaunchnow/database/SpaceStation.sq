@@ -1,0 +1,120 @@
+-- Space Station table for caching space station data (e.g., ISS)
+
+CREATE TABLE SpaceStationCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    orbit TEXT,
+    founded TEXT, -- LocalDate as ISO string
+    image_url TEXT,
+    onboard_crew INTEGER,
+    docked_vehicles INTEGER,
+    json_data TEXT NOT NULL, -- Full serialized SpaceStationDetailedEndpoint object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Index for cache expiration
+CREATE INDEX idx_spacestation_expires ON SpaceStationCache(expires_at);
+
+-- Expedition table for caching expedition data with crew
+CREATE TABLE ExpeditionCache (
+    id INTEGER NOT NULL PRIMARY KEY,
+    station_id INTEGER NOT NULL,
+    name TEXT,
+    start_date INTEGER, -- Instant as epoch milliseconds
+    end_date INTEGER, -- Instant as epoch milliseconds
+    crew_count INTEGER,
+    json_data TEXT NOT NULL, -- Full serialized ExpeditionDetailed object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Index for station lookups and expiration
+CREATE INDEX idx_expedition_station ON ExpeditionCache(station_id);
+CREATE INDEX idx_expedition_expires ON ExpeditionCache(expires_at);
+
+-- TLE table for caching ISS orbital elements
+CREATE TABLE IssTleCache (
+    id TEXT NOT NULL PRIMARY KEY, -- NORAD ID (25544 for ISS)
+    name TEXT NOT NULL,
+    header TEXT NOT NULL,
+    line1 TEXT NOT NULL,
+    line2 TEXT NOT NULL,
+    tle_timestamp INTEGER NOT NULL,
+    json_data TEXT NOT NULL, -- Full serialized IssTle object
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Index for cache expiration
+CREATE INDEX idx_isstle_expires ON IssTleCache(expires_at);
+
+-- Space Station queries
+insertOrReplaceSpaceStation:
+INSERT OR REPLACE INTO SpaceStationCache (
+    id, name, description, orbit, founded, image_url, onboard_crew, docked_vehicles,
+    json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getSpaceStationById:
+SELECT * FROM SpaceStationCache 
+WHERE id = ? AND expires_at > ?;
+
+getSpaceStationByIdStale:
+SELECT * FROM SpaceStationCache 
+WHERE id = ?;
+
+deleteExpiredSpaceStations:
+DELETE FROM SpaceStationCache WHERE expires_at < ?;
+
+clearAllSpaceStations:
+DELETE FROM SpaceStationCache;
+
+-- Expedition queries
+insertOrReplaceExpedition:
+INSERT OR REPLACE INTO ExpeditionCache (
+    id, station_id, name, start_date, end_date, crew_count,
+    json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getExpeditionById:
+SELECT * FROM ExpeditionCache 
+WHERE id = ? AND expires_at > ?;
+
+getExpeditionsByStationId:
+SELECT * FROM ExpeditionCache 
+WHERE station_id = ? AND expires_at > ?
+ORDER BY start_date DESC;
+
+getExpeditionsByStationIdStale:
+SELECT * FROM ExpeditionCache 
+WHERE station_id = ?
+ORDER BY start_date DESC;
+
+deleteExpiredExpeditions:
+DELETE FROM ExpeditionCache WHERE expires_at < ?;
+
+clearAllExpeditions:
+DELETE FROM ExpeditionCache;
+
+-- TLE queries
+insertOrReplaceTle:
+INSERT OR REPLACE INTO IssTleCache (
+    id, name, header, line1, line2, tle_timestamp,
+    json_data, cached_at, expires_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getTleById:
+SELECT * FROM IssTleCache 
+WHERE id = ? AND expires_at > ?;
+
+getTleByIdStale:
+SELECT * FROM IssTleCache 
+WHERE id = ?;
+
+deleteExpiredTle:
+DELETE FROM IssTleCache WHERE expires_at < ?;
+
+clearAllTle:
+DELETE FROM IssTleCache;

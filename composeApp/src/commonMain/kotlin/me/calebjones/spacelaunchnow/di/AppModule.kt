@@ -46,6 +46,8 @@ import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
+import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
@@ -67,6 +69,7 @@ import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
 import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
+import me.calebjones.spacelaunchnow.database.SpaceStationLocalDataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
@@ -132,6 +135,7 @@ val appModule = module {
     single { UpdateLocalDataSource(get(), get()) }
     single { ProgramLocalDataSource(get(), get()) }
     single { SpacecraftLocalDataSource(get(), get()) }
+    single { SpaceStationLocalDataSource(get(), get()) }
     single { FilterOptionsLocalDataSource(get(), get()) }
 
     single<LaunchRepository> {
@@ -193,6 +197,7 @@ val appModule = module {
     singleOf(::IssTrackingRepositoryImpl) {
         bind<IssTrackingRepository>()
     }
+    singleOf(::SpaceStationRepositoryImpl) { bind<SpaceStationRepository>() }
     viewModelOf(::SpaceStationViewModel)
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
     singleOf(::RocketFilterRepositoryImpl) { bind<RocketFilterRepository>() }
@@ -235,7 +240,8 @@ val appModule = module {
             articleDataSource = get(),
             updateDataSource = get(),
             programDataSource = get(),
-            spacecraftDataSource = get()
+            spacecraftDataSource = get(),
+            spaceStationDataSource = get()
         )
     }
 

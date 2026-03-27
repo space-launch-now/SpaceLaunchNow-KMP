@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -36,6 +37,7 @@ import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDate
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
@@ -52,9 +54,22 @@ fun StarshipHistoryTimeline(
     onLaunchClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth()
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger
+    
+    // On tablets, constrain timeline width and center it for better readability
+    val timelineModifier = if (isLargeScreen) {
+        Modifier.widthIn(max = 600.dp) // Max width for timeline on tablets
+    } else {
+        Modifier.fillMaxWidth()
+    }
+    
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = if (isLargeScreen) Alignment.Center else Alignment.TopStart
     ) {
+        Column(
+            modifier = timelineModifier
+        ) {
         // Section header
         Text(
             text = "Program Timeline",
@@ -145,6 +160,7 @@ fun StarshipHistoryTimeline(
                 }
             }
         }
+    }
     }
 }
 

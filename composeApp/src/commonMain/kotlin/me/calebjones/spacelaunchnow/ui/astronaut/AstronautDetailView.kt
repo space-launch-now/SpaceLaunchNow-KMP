@@ -42,7 +42,7 @@ import org.koin.core.parameter.parametersOf
  * This 28.dp offset accounts for the internal padding/margins in SharedDetailScaffold.
  * See: RocketDetailView.kt, SpaceStationDetailView.kt for reference implementations.
  */
-private val TitleHeight = 128.dp
+private val TitleHeight = 110.dp
 
 /**
  * Detail screen for viewing comprehensive astronaut information.
@@ -92,7 +92,7 @@ fun AstronautDetailView(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     if (!isCollapsed) {
-                        Spacer(Modifier.height(TitleHeight - 28.dp))
+                        Spacer(Modifier.height(TitleHeight))
                     }
                     
                     // Career Statistics Card (includes status, age, nationality, and career stats)

@@ -25,7 +25,7 @@ import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 
-private val TitleHeight = 128.dp
+private val TitleHeight = 110.dp
 
 /**
  * Loading view for space station details with shimmer placeholders.

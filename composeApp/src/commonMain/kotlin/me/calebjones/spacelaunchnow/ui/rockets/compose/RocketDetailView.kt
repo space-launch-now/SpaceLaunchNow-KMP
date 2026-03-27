@@ -21,7 +21,7 @@ import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 
-private val TitleHeight = 128.dp
+private val TitleHeight = 110.dp
 
 @Composable
 fun RocketDetailView(

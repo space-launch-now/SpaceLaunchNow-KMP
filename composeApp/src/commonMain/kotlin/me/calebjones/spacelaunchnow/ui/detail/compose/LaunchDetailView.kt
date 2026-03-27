@@ -27,7 +27,7 @@ import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 
 // Height constants for spacing adjustments
-private val TitleHeight = 120.dp
+private val TitleHeight = 110.dp
 private val CompactHeight = 40.dp
 
 /**

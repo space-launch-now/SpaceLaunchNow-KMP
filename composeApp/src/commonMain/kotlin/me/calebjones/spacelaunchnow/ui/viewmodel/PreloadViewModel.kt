@@ -25,6 +25,7 @@ import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
+import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -65,6 +66,7 @@ class PreloadViewModel(
     private val rocketRepository: RocketRepository,
     private val agencyRepository: AgencyRepository,
     private val scheduleFilterRepository: ScheduleFilterRepository,
+    private val spaceStationRepository: SpaceStationRepository,
     private val notificationStateStorage: NotificationStateStorage,
     private val launchFilterService: LaunchFilterService,
     private val appPreferences: AppPreferences
@@ -287,6 +289,9 @@ class PreloadViewModel(
             },
             PreloadTask("Filter: launcher families", PreloadTier.WARM_CACHE) {
                 scheduleFilterRepository.getLauncherConfigFamilies()
+            },
+            PreloadTask("ISS station details", PreloadTier.WARM_CACHE) {
+                spaceStationRepository.prewarmIssCache()
             }
         )
     }

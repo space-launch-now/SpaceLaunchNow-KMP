@@ -3,17 +3,13 @@ package me.calebjones.spacelaunchnow.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.HttpClient
-import io.ktor.client.statement.request
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.extensions.getSpaceStationDetailed
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ExpeditionsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpaceStationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.apis.ArticlesApi
@@ -22,6 +18,7 @@ import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLType
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Language
+import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.AppSecrets
 import me.calebjones.spacelaunchnow.util.LatLng
@@ -47,8 +44,7 @@ data class IssPositionData(
  * - SNAPI (related news reports)
  */
 class SpaceStationViewModel(
-    private val spaceStationsApi: SpaceStationsApi,
-    private val expeditionsApi: ExpeditionsApi,
+    private val spaceStationRepository: SpaceStationRepository,
     private val articlesApi: ArticlesApi,
     private val issTrackingRepository: IssTrackingRepository,
     private val httpClient: HttpClient
@@ -118,22 +114,27 @@ class SpaceStationViewModel(
                 _error.value = null
                 log.d { "Fetching space station details for ID: $stationId" }
 
-                // Fetch station details from Launch Library
-                val stationResponse = spaceStationsApi.getSpaceStationDetailed(stationId)
-                val station = stationResponse.body()
-                _stationDetails.value = station
-                log.i { "Successfully loaded station: ${station.name}" }
+                // Fetch station details from repository (cache-first)
+                val stationResult = spaceStationRepository.getSpaceStationDetails(stationId)
+                stationResult.onSuccess { result ->
+                    val station = result.data
+                    _stationDetails.value = station
+                    log.i { "Successfully loaded station: ${station.name} (source: ${result.source})" }
 
-                // Fetch detailed expedition data for each active expedition
-                fetchExpeditionDetails(station.activeExpeditions)
+                    // Fetch detailed expedition data for each active expedition
+                    fetchExpeditionDetails(station.activeExpeditions.map { it.id }, stationId)
 
-                // Fetch related news articles
-                fetchArticles()
+                    // Fetch related news articles
+                    fetchArticles()
 
-                // If this is the ISS, start live tracking and set up video
-                if (stationId == ISS_STATION_ID) {
-                    startIssTracking()
-                    initializeIssVideoPlayer()
+                    // If this is the ISS, start live tracking and set up video
+                    if (stationId == ISS_STATION_ID) {
+                        startIssTracking()
+                        initializeIssVideoPlayer()
+                    }
+                }.onFailure { exception ->
+                    log.e(exception as? Exception) { "Error fetching station details" }
+                    _error.value = exception.message ?: "Failed to load station details"
                 }
 
                 _isLoading.value = false
@@ -148,21 +149,22 @@ class SpaceStationViewModel(
     /**
      * Fetch detailed expedition data including crew for each active expedition
      */
-    private suspend fun fetchExpeditionDetails(expeditions: List<me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionMini>) {
+    private suspend fun fetchExpeditionDetails(expeditionIds: List<Int>, stationId: Int) {
         try {
-            log.d { "Fetching expedition details for ${expeditions.size} active expeditions" }
-            val detailedExpeditions = expeditions.mapNotNull { expedition ->
-                try {
-                    val response = expeditionsApi.expeditionsRetrieve(expedition.id)
-                    log.d { "Loaded expedition: ${response.body().name} with ${response.body().crew.size} crew members" }
-                    response.body()
-                } catch (e: Exception) {
-                    log.e(e) { "Error fetching expedition ${expedition.id}: ${e.message}" }
-                    null
-                }
+            log.d { "Fetching expedition details for ${expeditionIds.size} active expeditions" }
+            
+            val result = spaceStationRepository.getExpeditionDetails(
+                expeditionIds = expeditionIds,
+                stationId = stationId
+            )
+            
+            result.onSuccess { dataResult ->
+                _activeExpeditions.value = dataResult.data
+                log.i { "Loaded ${dataResult.data.size} expedition details (source: ${dataResult.source})" }
+            }.onFailure { exception ->
+                log.e(exception as? Exception) { "Error fetching expedition details: ${exception.message}" }
+                // Don't fail the whole screen if expedition details fail
             }
-            _activeExpeditions.value = detailedExpeditions
-            log.i { "Loaded ${detailedExpeditions.size} expedition details" }
         } catch (exception: Exception) {
             log.e(exception) { "Error fetching expedition details: ${exception.message}" }
             // Don't fail the whole screen if expedition details fail
