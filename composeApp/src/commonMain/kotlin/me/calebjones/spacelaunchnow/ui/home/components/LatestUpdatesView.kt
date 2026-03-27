@@ -67,85 +67,237 @@ fun LatestUpdatesView(
     modifier: Modifier = Modifier,
     navController: NavController? = null
 ) {
-    Column {
-        when {
-            // STATE 4: Error State - show cached data with banner OR just error
-            state.error != null -> {
-                if (state.data.isNotEmpty()) {
-                    // Show stale data with error indicator
-                    Column {
-                        // Error banner
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "Showing cached data",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                modifier = Modifier.padding(8.dp)
-                            )
+    when {
+        // STATE 4: Error State - show cached data with banner OR just error
+        state.error != null -> {
+            if (state.data.isNotEmpty()) {
+                // Show stale data with error indicator
+                Column {
+                    // Error banner
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Showing cached data",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                    // Show stale updates as vertical list
+                    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                        state.data.take(5).forEach { update ->
+                            UpdateItem(update = update, navController = navController)
                         }
-                        // Show stale updates
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            contentPadding = PaddingValues(all = 16.dp)
-                        ) {
-                            items(state.data) { update ->
-                                UpdateCard(update = update, navController = navController)
+                    }
+                }
+            } else {
+                // No cached data, just show error
+                ErrorCard(error = state.error!!)
+            }
+        }
+
+        // STATE 2 & 3: Loading with existing data
+        state.isLoading && state.data.isNotEmpty() -> {
+            Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                state.data.take(5).forEach { update ->
+                    UpdateItem(update = update, navController = navController)
+                }
+            }
+        }
+
+        // Data available (not loading)
+        state.data.isNotEmpty() -> {
+            Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                state.data.take(5).forEach { update ->
+                    UpdateItem(update = update, navController = navController)
+                }
+            }
+        }
+
+        // STATE 1: Fresh load, no data - show shimmer
+        state.isLoading -> {
+            UpdatesShimmer()
+        }
+
+        // Fallback
+        else -> {
+            UpdatesShimmer()
+        }
+    }
+}
+
+/**
+ * A single update item in a vertical list format.
+ * Shows profile image on left, update details on right.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UpdateItem(
+    update: UpdateEndpoint,
+    modifier: Modifier = Modifier,
+    navController: NavController? = null
+) {
+    val uriHandler = LocalUriHandler.current
+
+    Card(
+        onClick = {
+            if (navController != null) {
+                if (update.launch != null) {
+                    navController.navigate(LaunchDetail(update.launch.id))
+                } else if (update.event != null) {
+                    navController.navigate(EventDetail(update.event.id))
+                }
+            }
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            // Author profile image
+            SubcomposeAsyncImage(
+                model = update.profileImage ?: "",
+                contentDescription = "Author profile",
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .shimmer()
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        )
+                    }
+                },
+                error = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "Profile placeholder",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            )
+
+            // Update content
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                // Author and date row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = update.createdBy ?: "Unknown",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    update.createdOn?.let { createdOn ->
+                        Text(
+                            text = formatUpdateDate(createdOn),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            maxLines = 1
+                        )
+                    }
+                }
+
+                // Subject (launch/event name)
+                val updateSubject: String? = when {
+                    update.launch != null -> update.launch.name
+                    update.event != null -> update.event.name
+                    update.program != null -> update.program.name
+                    else -> null
+                }
+                if (updateSubject != null) {
+                    Text(
+                        text = updateSubject,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                // Comment
+                val comment = update.comment ?: "No comment"
+                Text(
+                    text = comment,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 18.sp
+                )
+
+                // Source link
+                update.infoUrl?.let { url ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.clickable {
+                            try {
+                                uriHandler.openUri(url)
+                            } catch (_: Throwable) {
+                                // Silently handle URL opening errors
                             }
                         }
-                    }
-                } else {
-                    // No cached data, just show error
-                    ErrorCard(error = state.error!!)
-                }
-            }
-
-            // STATE 2 & 3: Loading with existing data
-            state.isLoading && state.data.isNotEmpty() -> {
-                Box {
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(all = 16.dp)
                     ) {
-                        items(state.data) { update ->
-                            UpdateCard(update = update, navController = navController)
-                        }
-                    }
-
-                    // Loading indicator removed - data already visible, no need
-                    // for additional visual distraction during background refresh
-                }
-            }
-
-            // Data available (not loading)
-            state.data.isNotEmpty() -> {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(all = 16.dp)
-                ) {
-                    items(state.data) { update ->
-                        UpdateCard(update = update, navController = navController)
+                        Icon(
+                            imageVector = FontAwesomeIcons.Solid.InfoCircle,
+                            contentDescription = "Source",
+                            modifier = Modifier.size(10.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = url,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
-            }
-
-            // STATE 1: Fresh load, no data - show shimmer
-            state.isLoading -> {
-                UpdatesShimmer()
-            }
-
-            // Fallback
-            else -> {
-                UpdatesShimmer()
             }
         }
     }

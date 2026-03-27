@@ -1,23 +1,23 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.4.0 → 1.5.0
+Version Change: 1.5.0 → 1.6.0
 
 Modified Principles:
-  - VIII. Jetpack Compose Best Practices (NEW)
-    - Added official Android patterns for composables, state, effects, performance
-    - Token-optimized format for agent task reference
-    - Sources: Android Jack MCP (kotlin_best_practices, architecture_reference, scalability_guide)
+  - II. Pattern-Based Consistency (UPDATED)
+    - Added Stale-While-Revalidate caching pattern as REQUIRED for all Repository implementations
+    - Pattern: Check stale data first → Fresh cache → Return stale immediately → Network fallback
+    - Ensures fast UI rendering with offline-first user experience
 
 Principles (Current):
   - I. Mobile-First Development (Android & iOS Equal Priority)
-  - II. Pattern-Based Consistency
+  - II. Pattern-Based Consistency (UPDATED - added caching pattern)
   - III. Accessibility & User Experience
   - IV. CI/CD & Conventional Commits (NON-NEGOTIABLE)
   - V. Code Generation & API Management
   - VI. Multiplatform Architecture
   - VII. Testing Standards
-  - VIII. Jetpack Compose Best Practices (NEW)
+  - VIII. Jetpack Compose Best Practices
 
 Templates Status:
   ✅ plan-template.md - No updates required
@@ -25,11 +25,11 @@ Templates Status:
   ✅ tasks-template.md - No updates required
 
 Follow-up TODOs:
-  - None - new principle documented
+  - None - pattern already implemented in existing repositories
 
 Ratification Date: 2026-01-21 (initial adoption)
-Last Amendment: 2026-03-21
-Amendment Reason: Added Jetpack Compose best practices as Principle VIII
+Last Amendment: 2026-03-26
+Amendment Reason: Added Stale-While-Revalidate caching pattern requirement to Principle II
 -->
 
 # SpaceLaunchNow KMP Constitution
@@ -49,10 +49,17 @@ Code MUST follow established project patterns without deviation unless explicitl
 - **Launch Title Formatting**: MUST use `LaunchFormatUtil.formatLaunchTitle()` for all launch displays
 - **API Extension Functions**: MUST use extension functions (e.g., `getLaunchMiniList()`) instead of calling generated API methods directly with 70+ parameters
 - **Repository Pattern**: MUST return `Result<T>` wrapping API responses with proper error handling
+- **Stale-While-Revalidate Caching**: All Repository implementations with SQLDelight caching MUST follow this pattern:
+  1. Check for stale (expired) cache data first (for fallback)
+  2. Return fresh cache immediately if available and not forcing refresh
+  3. Return stale cache immediately if fresh cache expired (fast UI render)
+  4. Fetch from network only when no cache exists or force refresh requested
+  5. On network errors, return stale cache if available before failing
+  6. Use `DataSource.CACHE`, `DataSource.STALE_CACHE`, or `DataSource.NETWORK` to indicate data freshness
 - **DateTime Handling**: MUST use `DateTimeUtil` class for consistency supporting UTC toggle
 - **MVVM Architecture**: ViewModels MUST extend `ViewModel` with `StateFlow` properties
 
-**Rationale**: Pattern consistency eliminates cognitive overhead, reduces bugs from incorrect implementations, and enables team members to understand and modify any part of the codebase quickly.
+**Rationale**: Pattern consistency eliminates cognitive overhead, reduces bugs from incorrect implementations, and enables team members to understand and modify any part of the codebase quickly. Stale-while-revalidate ensures users see content immediately even with poor connectivity, providing offline-first UX.
 
 ### III. Accessibility & User Experience
 
@@ -178,4 +185,4 @@ This constitution supersedes all conflicting practices in the codebase. All pull
 
 **Runtime Guidance**: For day-to-day development guidance, reference `.github/copilot-instructions.md` which provides detailed implementation patterns and common gotchas aligned with these principles.
 
-**Version**: 1.5.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-03-21
+**Version**: 1.6.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-03-26

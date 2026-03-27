@@ -31,7 +31,6 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.FeaturedLaunchViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.FeedViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel
-import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchCarouselViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchesViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
@@ -45,7 +44,6 @@ fun HomeScreen(navController: NavController) {
     // Inject domain-specific ViewModels
     val launchesViewModel = koinViewModel<LaunchesViewModel>()
     val featuredLaunchViewModel = koinViewModel<FeaturedLaunchViewModel>()
-    val launchCarouselViewModel = koinViewModel<LaunchCarouselViewModel>()
     val feedViewModel = koinViewModel<FeedViewModel>()
     val eventsViewModel = koinViewModel<EventsViewModel>()
     val historyViewModel = koinViewModel<HistoryViewModel>()
@@ -56,8 +54,7 @@ fun HomeScreen(navController: NavController) {
     // Collect all ViewStates for offline detection AND to pass down as hoisted state
     val featuredLaunchState by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
     val additionalFeaturedLaunchesState by featuredLaunchViewModel.additionalFeaturedLaunches.collectAsStateWithLifecycle()
-    val upcomingLaunchesState by launchCarouselViewModel.upcomingLaunchesState.collectAsStateWithLifecycle()
-    val previousLaunchesState by launchCarouselViewModel.previousLaunchesState.collectAsStateWithLifecycle()
+    val previousLaunchesState by launchesViewModel.previousLaunchesState.collectAsStateWithLifecycle()
     val updatesState by feedViewModel.updatesState.collectAsStateWithLifecycle()
     val articlesState by feedViewModel.articlesState.collectAsStateWithLifecycle()
     val eventsState by eventsViewModel.eventsState.collectAsStateWithLifecycle()
@@ -68,19 +65,12 @@ fun HomeScreen(navController: NavController) {
     val nextWeekCount by statsViewModel.nextWeekCount.collectAsStateWithLifecycle()
     val nextMonthCount by statsViewModel.nextMonthCount.collectAsStateWithLifecycle()
 
-    // Collect carousel derived state
-    val combinedLaunches by launchCarouselViewModel.combinedLaunches.collectAsStateWithLifecycle()
-    val upcomingStartIndex by launchCarouselViewModel.upcomingStartIndex.collectAsStateWithLifecycle()
-    val carouselError by launchCarouselViewModel.carouselError.collectAsStateWithLifecycle()
-    val isCarouselLoading by launchCarouselViewModel.isCarouselLoading.collectAsStateWithLifecycle()
-
     // Check if user has ad-free premium feature
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
 
     // Check if ANY view is loading
     val isAnyViewLoading = remember(
         featuredLaunchState,
-        upcomingLaunchesState,
         updatesState,
         articlesState,
         eventsState,
@@ -88,7 +78,6 @@ fun HomeScreen(navController: NavController) {
     ) {
         listOf(
             featuredLaunchState,
-            upcomingLaunchesState,
             updatesState,
             articlesState,
             eventsState,
@@ -99,7 +88,6 @@ fun HomeScreen(navController: NavController) {
     // Check if ANY data has an error AND is from stale cache (indicating network failure)
     val isOffline = remember(
         featuredLaunchState,
-        upcomingLaunchesState,
         updatesState,
         articlesState,
         eventsState,
@@ -107,7 +95,6 @@ fun HomeScreen(navController: NavController) {
     ) {
         listOf(
             featuredLaunchState,
-            upcomingLaunchesState,
             updatesState,
             articlesState,
             eventsState,
@@ -118,7 +105,6 @@ fun HomeScreen(navController: NavController) {
     // Get the oldest cache timestamp from all stale data that has errors
     val oldestCacheTimestamp = remember(
         featuredLaunchState,
-        upcomingLaunchesState,
         updatesState,
         articlesState,
         eventsState,
@@ -126,7 +112,6 @@ fun HomeScreen(navController: NavController) {
     ) {
         listOfNotNull(
             featuredLaunchState.takeIf { it.error != null && it.dataSource == DataSource.STALE_CACHE }?.cacheTimestamp,
-            upcomingLaunchesState.takeIf { it.error != null && it.dataSource == DataSource.STALE_CACHE }?.cacheTimestamp,
             updatesState.takeIf { it.error != null && it.dataSource == DataSource.STALE_CACHE }?.cacheTimestamp,
             articlesState.takeIf { it.error != null && it.dataSource == DataSource.STALE_CACHE }?.cacheTimestamp,
             eventsState.takeIf { it.error != null && it.dataSource == DataSource.STALE_CACHE }?.cacheTimestamp,
@@ -148,7 +133,7 @@ fun HomeScreen(navController: NavController) {
             isRefreshing = true
             // Refresh all ViewModels
             featuredLaunchViewModel.refresh()
-            launchCarouselViewModel.refresh()
+            launchesViewModel.refresh()
             feedViewModel.refreshAll()
             eventsViewModel.refresh()
             statsViewModel.refresh()
@@ -160,7 +145,7 @@ fun HomeScreen(navController: NavController) {
     // Initial load of all sections
     LaunchedEffect(Unit) {
         featuredLaunchViewModel.loadFeaturedLaunch()
-        launchCarouselViewModel.loadLaunches()
+        launchesViewModel.loadLaunches()
         feedViewModel.loadUpdates()
         feedViewModel.loadArticles()
         eventsViewModel.loadEvents()
@@ -178,7 +163,6 @@ fun HomeScreen(navController: NavController) {
         isRefreshing = true
         launchesViewModel.refresh()
         featuredLaunchViewModel.refresh()
-        launchCarouselViewModel.refresh()
         feedViewModel.refreshAll()
         eventsViewModel.refresh()
         statsViewModel.refresh()
@@ -204,11 +188,6 @@ fun HomeScreen(navController: NavController) {
             next24HoursCount = next24HoursCount,
             nextWeekCount = nextWeekCount,
             nextMonthCount = nextMonthCount,
-            combinedLaunches = combinedLaunches,
-            upcomingStartIndex = upcomingStartIndex,
-            carouselError = carouselError,
-            isCarouselLoading = isCarouselLoading,
-            onCarouselRetry = { launchCarouselViewModel.loadLaunches(upcomingLimit = 10, forceRefresh = true) },
             isAnyViewLoading = isAnyViewLoading,
             hasAdFree = hasAdFree,
             onShareLaunch = { launchToShare ->

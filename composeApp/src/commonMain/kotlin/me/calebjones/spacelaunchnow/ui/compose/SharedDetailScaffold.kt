@@ -34,6 +34,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,13 +54,11 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
-import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -84,16 +84,16 @@ private val HzPadding = 24.dp
 
 /**
  * Shared detail scaffold with collapsing header for detail screens.
- * 
+ *
  * IMPORTANT USAGE NOTES:
  * ----------------------
- * Content provided to this scaffold MUST include a top spacer to prevent overlap 
+ * Content provided to this scaffold MUST include a top spacer to prevent overlap
  * with the collapsing header, but ONLY when not in collapsed/tablet mode.
  * Use [LocalDetailScaffoldCollapsed] to check:
- * 
+ *
  * ```kotlin
  * private val TitleHeight = 128.dp  // Define in your view file
- * 
+ *
  * SharedDetailScaffold(...) {
  *     val isCollapsed = LocalDetailScaffoldCollapsed.current
  *     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -104,14 +104,14 @@ private val HzPadding = 24.dp
  *     }
  * }
  * ```
- * 
+ *
  * The 28.dp offset accounts for internal padding/margins in the scaffold.
- * 
+ *
  * Reference implementations:
  * - RocketDetailView.kt
  * - SpaceStationDetailView.kt
  * - AstronautDetailView.kt
- * 
+ *
  * @param titleText Main title text displayed in the header
  * @param taglineText Optional subtitle/tagline text
  * @param imageUrl Optional image URL for the header
@@ -162,7 +162,12 @@ fun SharedDetailScaffold(
             showBackButton = onNavigateBack != null,
             forcePhoneLayout = forcePhoneLayout
         )
-        SharedDetailImage(imageUrl, scroll, forceNoCollapse = forceNoCollapse, forcePhoneLayout = forcePhoneLayout)
+        SharedDetailImage(
+            imageUrl,
+            scroll,
+            forceNoCollapse = forceNoCollapse,
+            forcePhoneLayout = forcePhoneLayout
+        )
         if (onNavigateBack != null) {
             SharedDetailUp(onNavigateBack, forcePhoneLayout = forcePhoneLayout)
         }
@@ -378,18 +383,26 @@ private fun SharedDetailImage(
                 .border(4.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape)
                 .fillMaxSize(),
             loading = {
-                // Use shimmer instead of CircularProgressIndicator for warm start perf
+                // Use shimmer with gradient background matching the header theme
                 Box(
-                    modifier = Modifier.fillMaxSize()
-                        .shimmer()
-                        .background(MaterialTheme.colorScheme.surfaceContainer),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                    MaterialTheme.colorScheme.secondaryContainer
+                                )
+                            )
+                        )
+                        .shimmer(),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Image,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.4f)
                     )
                 }
             },

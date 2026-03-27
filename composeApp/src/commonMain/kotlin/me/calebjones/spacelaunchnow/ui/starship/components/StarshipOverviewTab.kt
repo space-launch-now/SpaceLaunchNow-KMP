@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +43,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayer
 import me.calebjones.spacelaunchnow.ui.home.components.LaunchItemView
 import me.calebjones.spacelaunchnow.ui.home.components.SectionTitle
 import me.calebjones.spacelaunchnow.ui.home.components.UpdateCard
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 
@@ -105,120 +109,289 @@ fun StarshipOverviewTab(
             }
             // State 3: Has data - show content
             else -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    // Staleness indicator (if showing stale data)
-                    if (programState.isStale || nextLaunchState.isStale) {
-                        item {
-                            StalenessIndicator(
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
-                        }
-                    }
+                val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger
+                
+                if (isLargeScreen) {
+                    // Tablet layout: side-by-side video + program info
+                    TabletOverviewLayout(
+                        programState = programState,
+                        nextLaunchState = nextLaunchState,
+                        historyLaunchesState = historyLaunchesState,
+                        updatesState = updatesState,
+                        videoPlayerState = videoPlayerState,
+                        navController = navController,
+                        onSetPlayerVisible = onSetPlayerVisible,
+                        onVideoSelected = onVideoSelected,
+                        onNavigateToFullscreen = onNavigateToFullscreen
+                    )
+                } else {
+                    // Phone layout: stacked vertical
+                    PhoneOverviewLayout(
+                        programState = programState,
+                        nextLaunchState = nextLaunchState,
+                        historyLaunchesState = historyLaunchesState,
+                        allUpdates = allUpdates,
+                        videoPlayerState = videoPlayerState,
+                        navController = navController,
+                        onSetPlayerVisible = onSetPlayerVisible,
+                        onVideoSelected = onVideoSelected,
+                        onNavigateToFullscreen = onNavigateToFullscreen
+                    )
+                }
+            }
+        }
+    }
+}
 
-                    // Livestream Video Player (if available) - Edge to Edge
-                    if (videoPlayerState.availableVideos.isNotEmpty()) {
-                        item {
-                            Column {
-                                VideoPlayer(
-                                    videoPlayerState = videoPlayerState,
-                                    launchName = programState.data?.name ?: "Starship",
-                                    onSetPlayerVisible = onSetPlayerVisible,
-                                    onNavigateToFullscreen = onNavigateToFullscreen,
-                                    onVideoSelected = onVideoSelected
-                                )
-                            }
-                        }
-                    }
-
-                    // Program Info Card
-                    programState.data?.let { program ->
-                        item {
-                            ProgramInfoCard(
-                                program = program,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
-                    // // Next Launch Section
-                    // nextLaunchState.data?.let { launch ->
-                    //     item {
-                    //         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    //             SectionTitle(title = "Next Launch", hasAction = false)
-                    //             Spacer(modifier = Modifier.height(8.dp))
-                    //             LaunchItemView(
-                    //                 launch = launch,
-                    //                 navController = navController,
-                    //                 modifier = Modifier
-                    //                     .fillMaxWidth()
-                    //                     .height(200.dp)
-                    //             )
-                    //         }
-                    //     }
-                    // }
-
-                    // Status Updates Section (horizontal scrolling)
-                    if (allUpdates.isNotEmpty()) {
-                        item {
-                            Column {
-                                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                    SectionTitle(
-                                        title = "Updates",
-                                        hasAction = false
-                                    )
-                                }
-                                
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    contentPadding = PaddingValues(horizontal = 16.dp)
-                                ) {
-                                    items(allUpdates) { update ->
-                                        UpdateCard(
-                                            update = update,
-                                            navController = navController,
-                                            fillMaxWidth = false
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Program Timeline Section
-                    item {
-                        StarshipHistoryTimeline(
-                            nextLaunch = nextLaunchState.data,
-                            historyLaunchesState = historyLaunchesState,
-                            onLaunchClick = { launchId ->
-                                navController.navigate(LaunchDetail(launchId))
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp)
+/**
+ * Tablet layout with side-by-side video player and program info
+ */
+@Composable
+private fun TabletOverviewLayout(
+    programState: ViewState<ProgramNormal?>,
+    nextLaunchState: ViewState<LaunchNormal?>,
+    historyLaunchesState: ViewState<List<LaunchNormal>>,
+    updatesState: ViewState<List<UpdateEndpoint>>,
+    videoPlayerState: VideoPlayerState,
+    navController: NavController,
+    onSetPlayerVisible: (Boolean) -> Unit,
+    onVideoSelected: (Int) -> Unit,
+    onNavigateToFullscreen: (String, String) -> Unit
+) {
+    val scrollState = rememberScrollState()
+    val allUpdates = updatesState.data
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Top spacer for tablet
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Staleness indicator (if showing stale data)
+        if (programState.isStale || nextLaunchState.isStale) {
+            StalenessIndicator(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+        
+        // Side-by-side: Video (60%) + Program Info (40%)
+        val hasVideo = videoPlayerState.availableVideos.isNotEmpty()
+        val hasProgram = programState.data != null
+        
+        if (hasVideo || hasProgram) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Video Player (60%) - wrapped in card on tablet
+                if (hasVideo) {
+                    Card(
+                        modifier = Modifier.weight(0.6f),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        VideoPlayer(
+                            videoPlayerState = videoPlayerState,
+                            launchName = programState.data?.name ?: "Starship",
+                            onSetPlayerVisible = onSetPlayerVisible,
+                            onNavigateToFullscreen = onNavigateToFullscreen,
+                            onVideoSelected = onVideoSelected
                         )
                     }
+                }
+                
+                // Program Info Card (40%)
+                programState.data?.let { program ->
+                    ProgramInfoCard(
+                        program = program,
+                        modifier = if (hasVideo) Modifier.weight(0.4f) else Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+        
+        // Side-by-side: Timeline (60%) + Updates (40%)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Program Timeline Section (60%)
+            Column(modifier = Modifier.weight(0.6f)) {
+                StarshipHistoryTimeline(
+                    nextLaunch = nextLaunchState.data,
+                    historyLaunchesState = historyLaunchesState,
+                    onLaunchClick = { launchId ->
+                        navController.navigate(LaunchDetail(launchId))
+                    }
+                )
+            }
+            
+            // Updates Section (40%) - vertical list on tablet
+            Column(
+                modifier = Modifier.weight(0.4f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                SectionTitle(
+                    title = "Updates",
+                    hasAction = false
+                )
+                
+                if (allUpdates.isNotEmpty()) {
+                    allUpdates.forEach { update ->
+                        UpdateCard(
+                            update = update,
+                            navController = navController,
+                            fillMaxWidth = true
+                        )
+                    }
+                } else {
+                    Text(
+                        text = "No updates available",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+        
+        // Empty state (no data at all)
+        if (programState.data == null && nextLaunchState.data == null &&
+            updatesState.data.isEmpty() && !programState.isLoading
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No Starship data available",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
 
-                    // Empty state (no data at all)
-                    if (programState.data == null && nextLaunchState.data == null &&
-                        updatesState.data.isEmpty() && !programState.isLoading
+/**
+ * Phone layout with stacked vertical content
+ */
+@Composable
+private fun PhoneOverviewLayout(
+    programState: ViewState<ProgramNormal?>,
+    nextLaunchState: ViewState<LaunchNormal?>,
+    historyLaunchesState: ViewState<List<LaunchNormal>>,
+    allUpdates: List<UpdateEndpoint>,
+    videoPlayerState: VideoPlayerState,
+    navController: NavController,
+    onSetPlayerVisible: (Boolean) -> Unit,
+    onVideoSelected: (Int) -> Unit,
+    onNavigateToFullscreen: (String, String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(bottom = 16.dp)
+    ) {
+        // Staleness indicator (if showing stale data)
+        if (programState.isStale || nextLaunchState.isStale) {
+            item {
+                StalenessIndicator(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+        }
+
+        // Livestream Video Player (if available) - Edge to Edge
+        if (videoPlayerState.availableVideos.isNotEmpty()) {
+            item {
+                Column {
+                    VideoPlayer(
+                        videoPlayerState = videoPlayerState,
+                        launchName = programState.data?.name ?: "Starship",
+                        onSetPlayerVisible = onSetPlayerVisible,
+                        onNavigateToFullscreen = onNavigateToFullscreen,
+                        onVideoSelected = onVideoSelected
+                    )
+                }
+            }
+        }
+
+        // Program Info Card
+        programState.data?.let { program ->
+            item {
+                ProgramInfoCard(
+                    program = program,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+        }
+
+        // Status Updates Section (horizontal scrolling)
+        if (allUpdates.isNotEmpty()) {
+            item {
+                Column {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        SectionTitle(
+                            title = "Updates",
+                            hasAction = false
+                        )
+                    }
+                    
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(32.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "No Starship data available",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                        items(allUpdates) { update ->
+                            UpdateCard(
+                                update = update,
+                                navController = navController,
+                                fillMaxWidth = false
+                            )
                         }
                     }
+                }
+            }
+        }
+
+        // Program Timeline Section
+        item {
+            StarshipHistoryTimeline(
+                nextLaunch = nextLaunchState.data,
+                historyLaunchesState = historyLaunchesState,
+                onLaunchClick = { launchId ->
+                    navController.navigate(LaunchDetail(launchId))
+                },
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+
+        // Empty state (no data at all)
+        if (programState.data == null && nextLaunchState.data == null &&
+            allUpdates.isEmpty() && !programState.isLoading
+        ) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No Starship data available",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }

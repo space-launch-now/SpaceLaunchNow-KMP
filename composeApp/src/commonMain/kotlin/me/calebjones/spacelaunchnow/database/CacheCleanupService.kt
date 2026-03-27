@@ -17,7 +17,8 @@ class CacheCleanupService(
     private val articleDataSource: ArticleLocalDataSource,
     private val updateDataSource: UpdateLocalDataSource,
     private val programDataSource: ProgramLocalDataSource,
-    private val spacecraftDataSource: SpacecraftLocalDataSource
+    private val spacecraftDataSource: SpacecraftLocalDataSource,
+    private val spaceStationDataSource: SpaceStationLocalDataSource
 ) {
     private val log = logger()
 
@@ -87,6 +88,15 @@ class CacheCleanupService(
             println("CacheCleanupService: Cleaned up expired spacecraft")
         } catch (e: Exception) {
             println("CacheCleanupService: Error cleaning spacecraft: ${e.message}")
+        }
+
+        try {
+            spaceStationDataSource.deleteExpiredSpaceStations()
+            spaceStationDataSource.deleteExpiredExpeditions()
+            spaceStationDataSource.deleteExpiredTle()
+            log.d { "Cleaned up expired space station cache" }
+        } catch (e: Exception) {
+            log.e(e) { "Error cleaning space station cache: ${e.message}" }
         }
 
         log.i {
