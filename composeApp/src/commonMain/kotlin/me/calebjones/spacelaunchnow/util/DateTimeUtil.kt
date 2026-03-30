@@ -101,24 +101,38 @@ object DateTimeUtil {
      * - "PT2H30M" -> "T + 2h 30m"
      * - "-PT45S" -> "T - 45s"
      * - "PT1H" -> "T + 1h"
+     * - "-P1DT14H" -> "T - 1d 14h"
+     * - "P2D" -> "T + 2d"
      */
     fun formatTimelineRelativeTime(relativeTime: String?): String {
         if (relativeTime.isNullOrBlank()) return "T + 0s"
         
         return try {
-            // Parse ISO-8601 duration format (e.g., "-PT38M", "PT2H30M15S")
+            // Parse ISO-8601 duration format (e.g., "-PT38M", "PT2H30M15S", "-P1DT14H")
             val trimmed = relativeTime.trim()
             val isNegative = trimmed.startsWith("-")
             val durationPart = if (isNegative) trimmed.substring(1) else trimmed
             
-            // Must start with "PT" for time duration
-            if (!durationPart.startsWith("PT")) {
+            // Must start with "P" for a valid ISO-8601 duration
+            if (!durationPart.startsWith("P")) {
                 return "T + 0s"
             }
             
-            val timePart = durationPart.substring(2) // Remove "PT"
+            val afterP = durationPart.substring(1) // Remove "P"
             
-            // Parse hours, minutes, seconds
+            // Split into date part and time part at "T"
+            val tIndex = afterP.indexOf('T')
+            val datePart = if (tIndex >= 0) afterP.substring(0, tIndex) else afterP
+            val timePart = if (tIndex >= 0) afterP.substring(tIndex + 1) else ""
+            
+            // Parse days (D) from the date part
+            var days = 0
+            val daysMatch = Regex("(\\d+)D").find(datePart)
+            if (daysMatch != null) {
+                days = daysMatch.groupValues[1].toInt()
+            }
+            
+            // Parse hours, minutes, seconds from the time part
             var hours = 0
             var minutes = 0
             var seconds = 0
@@ -149,11 +163,12 @@ object DateTimeUtil {
             val sign = if (isNegative) "-" else "+"
             val parts = mutableListOf<String>()
             
+            if (days > 0) parts.add("${days}d")
             if (hours > 0) parts.add("${hours}h")
             if (minutes > 0) parts.add("${minutes}m")
             if (seconds > 0) parts.add("${seconds}s")
             
-            // If no time components found, default to 0s
+            // If no components found, default to 0s
             if (parts.isEmpty()) parts.add("0s")
             
             "T $sign ${parts.joinToString(" ")}"
