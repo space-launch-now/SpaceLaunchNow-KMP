@@ -4,7 +4,11 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import okio.Path.Companion.toPath
+
+private val log = SpaceLogger.getLogger("DataStoreProvider")
 
 
 actual fun createDataStore(name: String): DataStore<Preferences> {
@@ -26,7 +30,12 @@ actual fun createNotificationHistoryDataStore(): DataStore<Preferences> {
 }
 
 fun createDataStore(context: Context): DataStore<Preferences> {
-    return PreferenceDataStoreFactory.createWithPath {
+    return PreferenceDataStoreFactory.createWithPath(
+        corruptionHandler = androidx.datastore.core.handlers.ReplaceFileCorruptionHandler {
+            log.e(it) { "notification_datastore_corrupted file=sln_notification_settings.preferences_pb" }
+            emptyPreferences()
+        }
+    ) {
         context.filesDir.resolve("sln_notification_settings.preferences_pb").absolutePath.toPath()
     }
 }
@@ -44,7 +53,12 @@ fun createNotificationHistoryDataStore(context: Context): DataStore<Preferences>
 }
 
 fun createAppSettingsDataStore(context: Context): DataStore<Preferences> {
-    return PreferenceDataStoreFactory.createWithPath {
+    return PreferenceDataStoreFactory.createWithPath(
+        corruptionHandler = androidx.datastore.core.handlers.ReplaceFileCorruptionHandler {
+            log.e(it) { "app_settings_datastore_corrupted file=sln_app_settings.preferences_pb" }
+            emptyPreferences()
+        }
+    ) {
         context.filesDir.resolve("sln_app_settings.preferences_pb").absolutePath.toPath()
     }
 }

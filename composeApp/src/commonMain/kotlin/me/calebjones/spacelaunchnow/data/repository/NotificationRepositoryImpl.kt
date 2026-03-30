@@ -5,6 +5,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
@@ -29,8 +31,12 @@ class NotificationRepositoryImpl(
     // Repository scope for background work
     private val repositoryScope = CoroutineScope(SupervisorJob())
 
+    // Mutex to protect state mutations — prevents concurrent writes from corrupting persistence
+    private val stateMutex = Mutex()
+
     // Single source of truth - all UI observes this
-    private val _state = MutableStateFlow(NotificationState.DEFAULT)
+    // Start with isLoading=true to prevent flash of default values before persistence loads
+    private val _state = MutableStateFlow(NotificationState.DEFAULT.copy(isLoading = true))
     override val state: StateFlow<NotificationState> = _state.asStateFlow()
 
     // Background subscription processor
@@ -40,8 +46,8 @@ class NotificationRepositoryImpl(
         coroutineScope = repositoryScope,
         debounceMs = 300L,
         onSubscriptionUpdate = { actualTopics ->
-            // Update state with actual subscribed topics from FCM
-            _state.value = _state.value.copy(subscribedTopics = actualTopics)
+            // Route through mutex to prevent clobbering concurrent state updates
+            updateState { it.copy(subscribedTopics = actualTopics) }
         }
     )
 
@@ -51,10 +57,16 @@ class NotificationRepositoryImpl(
         try {
             // Load persisted state
             val persistedState = storage.getState()
-            _state.value = persistedState
+
+            // Protect state assignment with mutex to prevent race with concurrent updateState calls
+            stateMutex.withLock {
+                _state.value = persistedState
+            }
 
             log.i { "Loaded notification state - notificationsEnabled: ${persistedState.enableNotifications}" }
             log.v { "Topic settings: ${persistedState.topicSettings}" }
+
+            log.i { "notification_state_loaded agency_count=${persistedState.subscribedAgencies.size} location_count=${persistedState.subscribedLocations.size} enable_notifications=${persistedState.enableNotifications} follow_all=${persistedState.followAllLaunches}" }
 
             // Start background subscription processing
             subscriptionProcessor.requestUpdate(persistedState)
@@ -62,6 +74,8 @@ class NotificationRepositoryImpl(
             log.i { "NotificationRepository initialized successfully" }
         } catch (e: Exception) {
             log.e(e) { "Failed to initialize NotificationRepository" }
+            // On failure, clear loading state so UI isn't stuck on spinner
+            _state.value = NotificationState.DEFAULT
         }
     }
 
@@ -135,36 +149,44 @@ class NotificationRepositoryImpl(
     }
 
     /**
-     * Core state update method - handles immediate state update, persistence, and background work
+     * Core state update method — persist-first pattern:
+     * 1. Lock mutex to prevent concurrent writes
+     * 2. Compute new state from current state
+     * 3. Persist to disk FIRST
+     * 4. Only update in-memory state if persistence succeeded
+     * 5. On failure: keep old state, set error
      */
     private suspend fun updateState(update: (NotificationState) -> NotificationState) {
-        try {
-            log.d { "Notification state update requested" }
-
-            // 1. Update state immediately (instant UI feedback)
-            val oldState = _state.value
-            val newState = update(oldState)
-            _state.value = newState
-
-            log.i { "State updated - agencies: ${newState.subscribedAgencies.size}, locations: ${newState.subscribedLocations.size}" }
-            log.v { "Subscribed agencies: ${newState.subscribedAgencies}" }
-            log.v { "Subscribed locations: ${newState.subscribedLocations}" }
-
-            // 2. Persist to storage (synchronous to prevent race condition with notification evaluation)
+        stateMutex.withLock {
             try {
-                storage.saveState(newState)
-                log.d { "Notification state persisted to storage" }
+                log.d { "Notification state update requested" }
+
+                val oldState = _state.value
+                val newState = update(oldState)
+
+                log.i { "State updated - agencies: ${newState.subscribedAgencies.size}, locations: ${newState.subscribedLocations.size}" }
+                log.v { "Subscribed agencies: ${newState.subscribedAgencies}" }
+                log.v { "Subscribed locations: ${newState.subscribedLocations}" }
+
+                // Persist to storage FIRST — only update in-memory state on success
+                val result = storage.saveState(newState)
+                if (result.isSuccess) {
+                    _state.value = newState
+                    log.d { "Notification state persisted and applied" }
+                } else {
+                    log.e(result.exceptionOrNull()) { "Failed to persist notification state — keeping old state" }
+                    _state.value = oldState.withError(result.exceptionOrNull()?.message)
+                    return
+                }
+
+                // Trigger background FCM subscription updates (debounced)
+                log.d { "Triggering SubscriptionProcessor update..." }
+                subscriptionProcessor.requestUpdate(newState)
+
             } catch (e: Exception) {
-                log.e(e) { "Failed to persist notification state" }
+                log.e(e) { "Notification state update failed" }
+                _state.value = _state.value.withError(e.message)
             }
-
-            // 4. Trigger background FCM subscription updates (debounced)
-            log.d { "Triggering SubscriptionProcessor update..." }
-            subscriptionProcessor.requestUpdate(newState)
-
-        } catch (e: Exception) {
-            log.e(e) { "Notification state update failed" }
-            _state.value = _state.value.withError(e.message)
         }
     }
 }

@@ -28,8 +28,8 @@ import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.SpaceLaunchNotificationChannel
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.util.LocaleUtil
+import org.koin.mp.KoinPlatformTools
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -426,13 +426,10 @@ object NotificationDisplayHelper {
             // Create output formatter with user's locale
             val outputFormat = DateFormat.getTimeInstance(DateFormat.SHORT, userLocale)
 
-            // Get user's UTC preference from AppPreferences
-            // Note: This is a synchronous call in notification context, which is acceptable
-            // since notifications are already processed in background threads
+            // Get user's UTC preference from AppPreferences via Koin singleton
             val useUtc = try {
                 runBlocking {
-                    val dataStore = createDataStore(context)
-                    val prefs = AppPreferences(dataStore)
+                    val prefs = KoinPlatformTools.defaultContext().get().get<AppPreferences>()
                     prefs.getUseUtc()
                 }
             } catch (e: Exception) {
