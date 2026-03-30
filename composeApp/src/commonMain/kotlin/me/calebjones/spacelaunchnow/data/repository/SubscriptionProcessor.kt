@@ -20,7 +20,7 @@ class SubscriptionProcessor(
     private val debugPreferences: DebugPreferences?,
     private val coroutineScope: CoroutineScope,
     private val debounceMs: Long = 300L,
-    private val onSubscriptionUpdate: (Set<String>) -> Unit = {}
+    private val onSubscriptionUpdate: suspend (Set<String>) -> Unit = {}
 ) {
     private val log = logger()
     private val updateRequests = Channel<NotificationState>(Channel.CONFLATED)

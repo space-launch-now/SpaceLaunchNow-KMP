@@ -7,9 +7,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -54,7 +56,7 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
         val storedAgencies = preferences[SUBSCRIBED_AGENCIES]
         val storedLocations = preferences[SUBSCRIBED_LOCATIONS]
 
-        NotificationState(
+        val state = NotificationState(
             enableNotifications = preferences[ENABLE_NOTIFICATIONS] ?: default.enableNotifications,
             followAllLaunches = preferences[FOLLOW_ALL_LAUNCHES] ?: default.followAllLaunches,
             useStrictMatching = preferences[USE_STRICT_MATCHING] ?: default.useStrictMatching,
@@ -73,36 +75,55 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
             },
             subscribedTopics = preferences[SUBSCRIBED_TOPICS] ?: default.subscribedTopics
         )
+
+        // Detect suspicious state: notifications enabled but no filters and not following all
+        if (state.enableNotifications &&
+            state.subscribedAgencies.isEmpty() &&
+            state.subscribedLocations.isEmpty() &&
+            !state.followAllLaunches
+        ) {
+            log.w { "notification_state_suspicious_load agency_count=${state.subscribedAgencies.size} location_count=${state.subscribedLocations.size} follow_all=${state.followAllLaunches}" }
+        }
+
+        state
     }
 
-    suspend fun saveState(state: NotificationState) {
-        dataStore.edit { preferences ->
-            preferences[ENABLE_NOTIFICATIONS] = state.enableNotifications
-            preferences[FOLLOW_ALL_LAUNCHES] = state.followAllLaunches
-            preferences[USE_STRICT_MATCHING] = state.useStrictMatching
-            preferences[HIDE_TBD_LAUNCHES] = state.hideTbdLaunches
+    suspend fun saveState(state: NotificationState): Result<Unit> {
+        return try {
+            withContext(NonCancellable) {
+                dataStore.edit { preferences ->
+                    preferences[ENABLE_NOTIFICATIONS] = state.enableNotifications
+                    preferences[FOLLOW_ALL_LAUNCHES] = state.followAllLaunches
+                    preferences[USE_STRICT_MATCHING] = state.useStrictMatching
+                    preferences[HIDE_TBD_LAUNCHES] = state.hideTbdLaunches
 
-            preferences[TOPIC_SETTINGS] = Json.encodeToString(state.topicSettings)
-            
-            // Important: DataStore may remove keys with empty sets, so we use a sentinel value
-            // to distinguish between "never set" (null) and "explicitly empty" (set with sentinel)
-            preferences[SUBSCRIBED_AGENCIES] = if (state.subscribedAgencies.isEmpty()) {
-                setOf("__EMPTY__")  // Sentinel value for empty selection
-            } else {
-                state.subscribedAgencies.map { it.toString() }.toSet()
+                    preferences[TOPIC_SETTINGS] = Json.encodeToString(state.topicSettings)
+
+                    // Important: DataStore may remove keys with empty sets, so we use a sentinel value
+                    // to distinguish between "never set" (null) and "explicitly empty" (set with sentinel)
+                    preferences[SUBSCRIBED_AGENCIES] = if (state.subscribedAgencies.isEmpty()) {
+                        setOf("__EMPTY__")  // Sentinel value for empty selection
+                    } else {
+                        state.subscribedAgencies.map { it.toString() }.toSet()
+                    }
+
+                    preferences[SUBSCRIBED_LOCATIONS] = if (state.subscribedLocations.isEmpty()) {
+                        setOf("__EMPTY__")  // Sentinel value for empty selection
+                    } else {
+                        state.subscribedLocations.map { it.toString() }.toSet()
+                    }
+
+                    preferences[SUBSCRIBED_TOPICS] = state.subscribedTopics
+                }
             }
-            
-            preferences[SUBSCRIBED_LOCATIONS] = if (state.subscribedLocations.isEmpty()) {
-                setOf("__EMPTY__")  // Sentinel value for empty selection
-            } else {
-                state.subscribedLocations.map { it.toString() }.toSet()
-            }
-            
-            preferences[SUBSCRIBED_TOPICS] = state.subscribedTopics
+            // Sync to App Group UserDefaults so the NSE can read filter prefs when app is killed.
+            // iOS: writes to shared UserDefaults. Android/Desktop: no-op via expect/actual.
+            syncNotificationStateToNSE(state)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            log.e(e) { "notification_persistence_save_failed error_type=${e::class.simpleName} agency_count=${state.subscribedAgencies.size} location_count=${state.subscribedLocations.size} enable_notifications=${state.enableNotifications}" }
+            Result.failure(e)
         }
-        // Sync to App Group UserDefaults so the NSE can read filter prefs when app is killed.
-        // iOS: writes to shared UserDefaults. Android/Desktop: no-op via expect/actual.
-        syncNotificationStateToNSE(state)
     }
 
     suspend fun getState(): NotificationState {
