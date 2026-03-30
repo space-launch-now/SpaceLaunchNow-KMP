@@ -1,12 +1,4 @@
 ### Bug Fixes
 
-* deduplicate combined launches by ID to handle edge cases
-* handle corrupted subscription data files gracefully
-* integrate Firebase Remote Config for dynamic roadmap feature
-* **logging:** add Crashlytics setup for improved exception handling on iOS [skip ci]
-* pre-warming of ad requests and enhance ad handling for improved performance
-* refactor loading indicators to use shimmer effect for improved performance on low-RAM devices
-
-### Features
-
-* add events and news screen
+* **datetime:** enhance timeline relative time formatting to support days in ISO-8601 durations
+* **notifications:** implement notification filter persistence fix and error reporting

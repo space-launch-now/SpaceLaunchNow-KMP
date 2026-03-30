@@ -1,3 +1,13 @@
+## [5.23.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.0...v5.23.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* **datetime:** enhance timeline relative time formatting to support days in ISO-8601 durations ([3994605](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/399460551051ce866e86505fe75a3fe58175d343))
+* **notifications:** implement notification filter persistence fix and error reporting ([3f8c036](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f8c0363539e2a9759f3df0296f5170ff476c2ea))
+
+
+
 # [5.23.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.4...v5.23.0) (2026-03-25)
 
 
@@ -49,16 +59,6 @@
 * optimize Gradle JVM arguments for iOS CI/CD on macOS xlarge runners [skip ci] ([5ef3f3a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5ef3f3a45651f82f293e75c2f5a93d82e6ff1425))
 * update macOS runner to xlarge for iOS build and deployment [skip-ci] ([df548ba](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/df548ba534098af8ede16e217338b9b58a059131))
 * update paywall button styling ([f4733ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f4733ffc519a7f04a443f405e4dd027ff18b2add))
-
-
-
-## [5.22.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.0...v5.22.1) (2026-03-20)
-
-
-### Bug Fixes
-
-* enhance layout handling and theme change support across multiple screens ([408562a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/408562ae2cf4948c8a823d8c1ef5b66cdd2ea66c))
-* implement responsive navigation ([4a26a81](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4a26a81d653c2d67209fb15052247f73f364612e))
 
 
 
