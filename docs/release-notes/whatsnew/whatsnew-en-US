@@ -1,4 +1,3 @@
 ### Bug Fixes
 
-* **datetime:** enhance timeline relative time formatting to support days in ISO-8601 durations
-* **notifications:** implement notification filter persistence fix and error reporting
+* **timeline:** enhance TimelineCard to support NET and improve event status visualization
