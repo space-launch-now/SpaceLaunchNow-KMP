@@ -104,7 +104,7 @@ fun TabletLaunchDetailContent(
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                TimelineCard(timeline = launch.timeline)
+                TimelineCard(timeline = launch.timeline, net = launch.net)
 
                 // Flight Club link
                 launch.flightclubUrl?.let { url ->

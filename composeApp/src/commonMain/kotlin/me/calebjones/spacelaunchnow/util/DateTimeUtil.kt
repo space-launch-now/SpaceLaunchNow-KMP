@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.util
 
 import kotlin.time.Clock.System
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -175,6 +176,75 @@ object DateTimeUtil {
         } catch (e: Exception) {
             "T + 0s"
         }
+    }
+
+    /**
+     * Parses an ISO-8601 duration string into total seconds (signed).
+     * Negative durations (before NET) return negative values.
+     * Returns null if the string cannot be parsed.
+     *
+     * Examples:
+     * - "-PT38M" -> -2280
+     * - "PT2H30M" -> 9000
+     * - "-P1DT14H" -> -136800
+     * - "P2D" -> 172800
+     */
+    fun parseDurationToSeconds(relativeTime: String?): Long? {
+        if (relativeTime.isNullOrBlank()) return null
+
+        return try {
+            val trimmed = relativeTime.trim()
+            val isNegative = trimmed.startsWith("-")
+            val durationPart = if (isNegative) trimmed.substring(1) else trimmed
+
+            if (!durationPart.startsWith("P")) return null
+
+            val afterP = durationPart.substring(1)
+            val tIndex = afterP.indexOf('T')
+            val datePart = if (tIndex >= 0) afterP.substring(0, tIndex) else afterP
+            val timePart = if (tIndex >= 0) afterP.substring(tIndex + 1) else ""
+
+            var days = 0L
+            val daysMatch = Regex("(\\d+)D").find(datePart)
+            if (daysMatch != null) {
+                days = daysMatch.groupValues[1].toLong()
+            }
+
+            var hours = 0L
+            var minutes = 0L
+            var seconds = 0L
+
+            val hoursMatch = Regex("(\\d+)H").find(timePart)
+            if (hoursMatch != null) hours = hoursMatch.groupValues[1].toLong()
+
+            val minutesMatch = Regex("(\\d+)M").find(timePart)
+            if (minutesMatch != null) minutes = minutesMatch.groupValues[1].toLong()
+
+            val secondsMatch = Regex("(\\d+)S").find(timePart)
+            if (secondsMatch != null) seconds = secondsMatch.groupValues[1].toLong()
+
+            val totalSeconds = days * 86400 + hours * 3600 + minutes * 60 + seconds
+
+            if (totalSeconds == 0L && datePart.isEmpty() && timePart.isEmpty()) return null
+
+            if (isNegative) -totalSeconds else totalSeconds
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Determines whether a timeline event has already occurred based on the launch NET and
+     * the event's relative time offset.
+     *
+     * @param relativeTime ISO-8601 duration string relative to NET (e.g., "-PT38M", "PT2H30M")
+     * @param net The launch NET (Network Event Time) as an Instant
+     * @return true if the event time is in the past, false otherwise. Returns false if parsing fails.
+     */
+    fun isTimelineEventPassed(relativeTime: String?, net: Instant): Boolean {
+        val offsetSeconds = parseDurationToSeconds(relativeTime) ?: return false
+        val eventTime = net + offsetSeconds.seconds
+        return eventTime <= System.now()
     }
 
     /**

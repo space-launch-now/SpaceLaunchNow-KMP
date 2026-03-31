@@ -69,7 +69,7 @@ fun OverviewTabContent(
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(16.dp))
-            TimelineCard(timeline = launch.timeline)
+            TimelineCard(timeline = launch.timeline, net = launch.net)
 
             // Flight Club link
             launch.flightclubUrl?.let { url ->

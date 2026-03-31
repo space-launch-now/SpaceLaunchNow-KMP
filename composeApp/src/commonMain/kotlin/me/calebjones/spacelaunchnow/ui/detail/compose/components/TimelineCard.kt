@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.detail.compose.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,13 +32,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEventType
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
+import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun TimelineCard(timeline: List<TimelineEvent>) {
+fun TimelineCard(timeline: List<TimelineEvent>, net: Instant? = null) {
     var expanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -54,10 +58,21 @@ fun TimelineCard(timeline: List<TimelineEvent>) {
             ) {
                 val displayItems = if (expanded) timeline else timeline.take(4)
                 displayItems.forEachIndexed { idx, event ->
+                    val hasPassed = remember(net, event.relativeTime) {
+                        net?.let { DateTimeUtil.isTimelineEventPassed(event.relativeTime, it) } ?: false
+                    }
+                    // Check if the next event has also passed (to color the bottom connector)
+                    val nextHasPassed = remember(net, displayItems) {
+                        if (idx < displayItems.lastIndex) {
+                            net?.let { DateTimeUtil.isTimelineEventPassed(displayItems[idx + 1].relativeTime, it) } ?: false
+                        } else false
+                    }
                     TimelineEventRow(
                         event = event,
                         isFirst = idx == 0,
-                        isLast = idx == displayItems.lastIndex
+                        isLast = idx == displayItems.lastIndex,
+                        hasPassed = hasPassed,
+                        nextHasPassed = nextHasPassed
                     )
                 }
             }
@@ -84,8 +99,13 @@ fun TimelineCard(timeline: List<TimelineEvent>) {
 fun TimelineEventRow(
     event: TimelineEvent,
     isFirst: Boolean,
-    isLast: Boolean
+    isLast: Boolean,
+    hasPassed: Boolean = false,
+    nextHasPassed: Boolean = false
 ) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val outlineColor = MaterialTheme.colorScheme.outline
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,45 +114,52 @@ fun TimelineEventRow(
         verticalAlignment = Alignment.Top
     ) {
         // Timeline indicator column (dot and connecting lines)
+        // Dot is 12dp tall, starts at 4dp from top → spans 4dp to 16dp
         Box(
             modifier = Modifier
                 .width(24.dp)
                 .fillMaxHeight(),
             contentAlignment = Alignment.TopCenter
         ) {
-            // Top line segment (from top to dot center)
+            // Top line segment (from top edge to top of dot)
             if (!isFirst) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
-                        .height(10.dp)
+                        .height(4.dp)
                         .align(Alignment.TopCenter)
-                        .background(MaterialTheme.colorScheme.outline)
+                        .background(if (hasPassed) primaryColor else outlineColor)
                 )
             }
             
-            // Bottom line segment (from dot center to bottom)
+            // Bottom line segment (from bottom of dot to bottom edge)
             if (!isLast) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
                         .fillMaxHeight()
-                        .padding(top = 10.dp)
+                        .padding(top = 16.dp) // 4dp padding + 12dp dot
                         .align(Alignment.TopCenter)
-                        .background(MaterialTheme.colorScheme.outline)
+                        .background(if (nextHasPassed) primaryColor else outlineColor)
                 )
             }
             
-            // Timeline dot - positioned to align with title center
-            Box(
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .size(12.dp)
-                    .background(
-                        MaterialTheme.colorScheme.primary,
-                        CircleShape
-                    )
-            )
+            // Timeline dot - filled if passed, hollow outline if future
+            if (hasPassed) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .size(12.dp)
+                        .background(primaryColor, CircleShape)
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .size(12.dp)
+                        .border(2.dp, primaryColor, CircleShape)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -187,50 +214,50 @@ private val sampleTimelineEvents = listOf(
     TimelineEvent(
         type = TimelineEventType(
             id = 1,
-            abbrev = "T-0",
-            description = "Liftoff"
+            abbrev = "Launch Team On Stations",
+            description = "Launch team arrives at stations"
         ),
-        relativeTime = "00:00:00"
+        relativeTime = "-P1DT14H"
     ),
     TimelineEvent(
         type = TimelineEventType(
             id = 2,
-            abbrev = "Max-Q",
-            description = "Maximum dynamic pressure"
+            abbrev = "Countdown Start",
+            description = "Countdown clock begins"
         ),
-        relativeTime = "00:01:12"
+        relativeTime = "-PT4H"
     ),
     TimelineEvent(
         type = TimelineEventType(
             id = 3,
-            abbrev = "MECO",
-            description = "Main engine cutoff"
+            abbrev = "Prop Load",
+            description = "Propellant loading begins"
         ),
-        relativeTime = "00:02:33"
+        relativeTime = "-PT2H30M"
     ),
     TimelineEvent(
         type = TimelineEventType(
             id = 4,
-            abbrev = "Stage Sep",
-            description = "First stage separation"
+            abbrev = "T-0",
+            description = "Liftoff"
         ),
-        relativeTime = "00:02:36"
+        relativeTime = "PT0S"
     ),
     TimelineEvent(
         type = TimelineEventType(
             id = 5,
-            abbrev = "SES-1",
-            description = "Second engine start 1"
+            abbrev = "Max-Q",
+            description = "Maximum dynamic pressure"
         ),
-        relativeTime = "00:02:44"
+        relativeTime = "PT1M12S"
     ),
     TimelineEvent(
         type = TimelineEventType(
             id = 6,
-            abbrev = "Fairing Sep",
-            description = "Fairing separation"
+            abbrev = "MECO",
+            description = "Main engine cutoff"
         ),
-        relativeTime = "00:03:15"
+        relativeTime = "PT2M33S"
     )
 )
 
@@ -238,10 +265,23 @@ private val sampleTimelineEvents = listOf(
 
 // region Previews
 
+// NET set far in the past so all events show as passed
+private val allPassedNet = Instant.fromEpochMilliseconds(0L)
+
+// NET set far in the future so all events show as upcoming
+private val allFutureNet = Instant.fromEpochMilliseconds(32503680000000L) // year 3000
+
+// NET set to epoch + 3 hours so first 3 events (before T-0) are passed, rest are future
+private val partiallyPassedNet = Instant.fromEpochMilliseconds(
+    // Current time minus 1 hour — so events at T-4h and T-2h30m are passed, T-0 onward are future
+    // Using a fixed value for stable previews: epoch + enough offset that negative events pass
+    10800000L // 3 hours after epoch
+)
+
 @Preview
 @Composable
 private fun TimelineCardPreview() {
-    MaterialTheme {
+    SpaceLaunchNowPreviewTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             TimelineCard(
                 timeline = sampleTimelineEvents.take(4)
@@ -252,11 +292,11 @@ private fun TimelineCardPreview() {
 
 @Preview
 @Composable
-private fun TimelineCardExpandedPreview() {
-    MaterialTheme {
+private fun TimelineCardDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
         Surface(color = MaterialTheme.colorScheme.background) {
             TimelineCard(
-                timeline = sampleTimelineEvents
+                timeline = sampleTimelineEvents.take(4)
             )
         }
     }
@@ -264,11 +304,12 @@ private fun TimelineCardExpandedPreview() {
 
 @Preview
 @Composable
-private fun TimelineCardSingleItemPreview() {
-    MaterialTheme {
+private fun TimelineCardAllPassedPreview() {
+    SpaceLaunchNowPreviewTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             TimelineCard(
-                timeline = sampleTimelineEvents.take(1)
+                timeline = sampleTimelineEvents,
+                net = allPassedNet
             )
         }
     }
@@ -276,14 +317,67 @@ private fun TimelineCardSingleItemPreview() {
 
 @Preview
 @Composable
-private fun TimelineEventRowPreview() {
-    MaterialTheme {
+private fun TimelineCardAllPassedDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            TimelineEventRow(
-                event = sampleTimelineEvents.first(),
-                isFirst = true,
-                isLast = true
+            TimelineCard(
+                timeline = sampleTimelineEvents,
+                net = allPassedNet
             )
         }
     }
 }
+
+@Preview
+@Composable
+private fun TimelineCardAllFuturePreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            TimelineCard(
+                timeline = sampleTimelineEvents,
+                net = allFutureNet
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TimelineCardAllFutureDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            TimelineCard(
+                timeline = sampleTimelineEvents,
+                net = allFutureNet
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TimelineCardPartiallyPassedPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            TimelineCard(
+                timeline = sampleTimelineEvents,
+                net = partiallyPassedNet
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TimelineCardPartiallyPassedDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            TimelineCard(
+                timeline = sampleTimelineEvents,
+                net = partiallyPassedNet
+            )
+        }
+    }
+}
+
+// endregion

@@ -127,10 +127,7 @@ fun AdaptiveAppScaffold(
                             } else {
                                 // Tablet/Desktop: ModalWideNavigationRail with expand/collapse toggle
                                 val railState = rememberWideNavigationRailState(
-                                    initialValue = if (layoutState.isDesktop)
-                                        WideNavigationRailValue.Expanded
-                                    else
-                                        WideNavigationRailValue.Collapsed
+                                    initialValue = WideNavigationRailValue.Collapsed
                                 )
                                 val scope = rememberCoroutineScope()
                                 val headerDescription =
