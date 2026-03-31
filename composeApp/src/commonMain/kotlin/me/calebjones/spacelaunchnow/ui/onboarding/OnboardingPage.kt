@@ -51,6 +51,7 @@ enum class OnboardingPageType {
     SCHEDULE,
     NEWS_EVENTS,
     EXPLORE,
+    WIDGETS,
     NOTIFICATION_PERMISSION
 }
 

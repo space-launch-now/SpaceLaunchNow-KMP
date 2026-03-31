@@ -230,7 +230,10 @@ fun SupportUsScreen(
                         PremiumPerkCard(
                             icon = Icons.Default.Widgets,
                             title = "Premium Widget",
-                            description = "Unlock additional Launch List widget for your home screen",
+                            description = if (getPlatform().type.isIOS)
+                                "Lock Screen & Home Screen widgets to track launches at a glance"
+                            else
+                                "Unlock additional Launch List widget for your home screen",
                             gradient = listOf(
                                 MaterialTheme.colorScheme.primary,
                                 MaterialTheme.colorScheme.tertiary
@@ -812,7 +815,10 @@ private fun ThankYouSection(
                     ActivePerkItem(
                         icon = Icons.Default.Widgets,
                         title = "Premium Widget",
-                        description = "Additional Launch List widget"
+                        description = if (getPlatform().type.isIOS)
+                            "Lock Screen & Home Screen widgets"
+                        else
+                            "Additional Launch List widget"
                     )
                     ActivePerkItem(
                         icon = Icons.Default.Block,
@@ -834,7 +840,10 @@ private fun ThankYouSection(
                     ActivePerkItem(
                         icon = Icons.Default.Widgets,
                         title = "Premium Widget",
-                        description = "Additional Launch List widget"
+                        description = if (getPlatform().type.isIOS)
+                            "Lock Screen & Home Screen widgets"
+                        else
+                            "Additional Launch List widget"
                     )
                     ActivePerkItem(
                         icon = Icons.Default.FormatPaint,
