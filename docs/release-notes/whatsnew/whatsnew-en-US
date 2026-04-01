@@ -1,3 +1,5 @@
 ### Bug Fixes
 
-* **timeline:** enhance TimelineCard to support NET and improve event status visualization
+* **onboarding:** add button for auto-advancing when permission is granted
+* **onboarding:** add widgets showcase page and integrate into onboarding flow
+* **onboarding:** enhance onboarding flow with widget showcase and improve state management

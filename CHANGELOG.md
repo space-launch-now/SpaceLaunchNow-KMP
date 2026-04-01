@@ -1,3 +1,14 @@
+## [5.23.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.2...v5.23.3) (2026-04-01)
+
+
+### Bug Fixes
+
+* **onboarding:** add button for auto-advancing when permission is granted ([5ba616a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5ba616aaa254658a0189958fe107137e241f977a))
+* **onboarding:** add widgets showcase page and integrate into onboarding flow ([ece77bf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ece77bf240b08307bd54fb251fcc298d14d7ccbf))
+* **onboarding:** enhance onboarding flow with widget showcase and improve state management ([18debbb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/18debbb341ce4211233f490b82a620490fbb609c))
+
+
+
 ## [5.23.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.1...v5.23.2) (2026-03-31)
 
 
@@ -48,15 +59,6 @@
 * integrate Firebase Crashlytics for enhanced error reporting and logging ([3145c7f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3145c7faa33acac8b73000c5d33a2a3f9c119eb3))
 * integrate Firebase Crashlytics for error reporting and add test functionality in DebugSettingsScreen ([55661ae](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/55661aefd71a5ad8c21785f6ca3eff7c892d0fb8))
 * update Firebase Crashlytics integration and dSYM upload script ([1dbd8c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1dbd8c6f1eaa3e5fe3487d994d5c163a9eb20ce7))
-
-
-
-## [5.22.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.2...v5.22.3) (2026-03-21)
-
-
-### Bug Fixes
-
-* update launch mode to singleTop and enhance intent flags for navigation ([ef87af0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ef87af043e3257615225e9b1f71464c7dc75033c))
 
 
 
