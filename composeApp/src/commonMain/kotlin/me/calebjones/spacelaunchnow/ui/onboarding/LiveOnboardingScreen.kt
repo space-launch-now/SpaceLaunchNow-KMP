@@ -36,9 +36,12 @@ import me.calebjones.spacelaunchnow.ui.onboarding.pages.NewsEventsPage
 import me.calebjones.spacelaunchnow.ui.onboarding.pages.NotificationPermissionPage
 import me.calebjones.spacelaunchnow.ui.onboarding.pages.SchedulePage
 import me.calebjones.spacelaunchnow.ui.onboarding.pages.WelcomePage
+import me.calebjones.spacelaunchnow.ui.onboarding.pages.WidgetsPage
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.OnboardingViewModel
+import me.calebjones.spacelaunchnow.getPlatform
+import me.calebjones.spacelaunchnow.PlatformType
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -47,7 +50,8 @@ private val spaceGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFF0A0E2A), Color(0xFF1A1040), Color(0xFF2A1060))
 )
 
-private const val PAGE_COUNT = 6
+private val PAGE_COUNT: Int
+    get() = if (getPlatform().type.isIOS) 7 else 6
 
 /**
  * The main live-composable onboarding carousel.
@@ -58,7 +62,8 @@ private const val PAGE_COUNT = 6
  * 2. Schedule screen preview
  * 3. News & Events
  * 4. Explore
- * 5. Notification permission request
+ * 5. Widgets showcase (iOS only)
+ * 5/6. Notification permission request
  *
  * Includes a "Skip" button, [WavyProgressBar], and a "Next" / "Get Started" button.
  * On completion or skip, persists the completed state via [AppPreferences] and
@@ -111,13 +116,16 @@ fun LiveOnboardingScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, end = 16.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                if (!isLastPage && !isFirstPage) {
+            // Skip button row
+            val showWidgetsPage = getPlatform().type.isIOS
+
+            if (!isLastPage && !isFirstPage) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
                     TextButton(onClick = {
                         scope.launch {
                             pagerState.animateScrollToPage(PAGE_COUNT - 1)
@@ -163,7 +171,18 @@ fun LiveOnboardingScreen(
                         rockets = rockets,
                         agencies = agencies
                     )
-                    5 -> NotificationPermissionPage(
+                    5 -> if (showWidgetsPage) {
+                        WidgetsPage(modifier = Modifier.fillMaxSize())
+                    } else {
+                        NotificationPermissionPage(
+                            onPermissionResult = { granted ->
+                                if (granted) completeOnboarding()
+                            },
+                            onSkip = { completeOnboarding() },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    6 -> NotificationPermissionPage(
                         onPermissionResult = { granted ->
                             if (granted) completeOnboarding()
                         },
@@ -173,47 +192,46 @@ fun LiveOnboardingScreen(
                 }
             }
 
-            // Progress indicator
-            LinearProgressIndicator(
-                progress = {
-                    ((pagerState.currentPage + pagerState.currentPageOffsetFraction) / (PAGE_COUNT - 1).toFloat()).coerceIn(
-                        0f,
-                        1f
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                color = Color.White,
-                trackColor = Color.White.copy(alpha = 0.3f),
-            )
+            // Progress indicator & navigation — hidden on the notification page
+            // so the user must choose "Enable Notifications" or "Maybe Later"
+            if (!isLastPage) {
+                LinearProgressIndicator(
+                    progress = {
+                        ((pagerState.currentPage + pagerState.currentPageOffsetFraction) / (PAGE_COUNT - 1).toFloat()).coerceIn(
+                            0f,
+                            1f
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                    color = Color.White,
+                    trackColor = Color.White.copy(alpha = 0.3f),
+                )
 
-            // Next / Get Started button
-            Button(
-                onClick = {
-                    if (isLastPage) {
-                        completeOnboarding()
-                    } else {
+                // Next button
+                Button(
+                    onClick = {
                         scope.launch {
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp)
-                    .animateContentSize(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(0xFF0A0E2A)
-                )
-            ) {
-                Text(
-                    text = if (isLastPage) "Get Started" else "Next",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .animateContentSize(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF0A0E2A)
+                    )
+                ) {
+                    Text(
+                        text = "Next",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
             }
         }
     }
@@ -258,7 +276,15 @@ private fun LiveOnboardingScreenPreviewContent() {
                     2 -> SchedulePage(modifier = Modifier.fillMaxSize())
                     3 -> NewsEventsPage(modifier = Modifier.fillMaxSize())
                     4 -> ExplorePage(modifier = Modifier.fillMaxSize())
-                    5 -> NotificationPermissionPage(  // preview — uses default empty params
+                    5 -> if (getPlatform().type.isIOS) {
+                        WidgetsPage(modifier = Modifier.fillMaxSize())
+                    } else {
+                        NotificationPermissionPage(
+                            onPermissionResult = {},
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    6 -> NotificationPermissionPage(  // iOS only — page 6
                         onPermissionResult = {},
                         modifier = Modifier.fillMaxSize()
                     )

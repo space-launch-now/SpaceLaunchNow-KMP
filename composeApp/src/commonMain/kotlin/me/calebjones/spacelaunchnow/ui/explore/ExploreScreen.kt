@@ -61,7 +61,6 @@ fun ExploreScreen(
                         text = "Explore",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 32.sp,
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
