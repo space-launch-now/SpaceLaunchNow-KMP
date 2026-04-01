@@ -50,9 +50,14 @@ fun FlightClubCard(
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
+    val urlWithReferrer = if (flightClubUrl.contains("?")) {
+        "$flightClubUrl&ref=spacelaunchnow"
+    } else {
+        "$flightClubUrl?ref=spacelaunchnow"
+    }
 
     Card(
-        onClick = { uriHandler.openUri(flightClubUrl) },
+        onClick = { uriHandler.openUri(urlWithReferrer) },
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -86,7 +91,7 @@ fun FlightClubCard(
 
                     // Text content
                     Text(
-                        text = "View on Flight Club",
+                        text = "View Telemetry on Flight Club",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White

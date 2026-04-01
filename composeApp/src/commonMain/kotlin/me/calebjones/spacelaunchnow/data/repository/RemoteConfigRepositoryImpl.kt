@@ -6,6 +6,7 @@ import dev.gitlive.firebase.remoteconfig.remoteConfig
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
 import me.calebjones.spacelaunchnow.util.logging.logger
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
@@ -40,8 +41,8 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
     
     companion object {
         private const val ROADMAP_DATA_KEY = "roadmap_data"
-        private val DEFAULT_FETCH_INTERVAL = 1.hours
-        private val FORCE_REFRESH_INTERVAL = 0.seconds
+        private val DEFAULT_FETCH_INTERVAL: Duration = 1.hours
+        private val FORCE_REFRESH_INTERVAL: Duration = 0.seconds
         
         // Default JSON - empty state for initial load
         private val DEFAULT_ROADMAP_JSON = """
@@ -63,9 +64,10 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         return try {
             val interval = if (forceRefresh) FORCE_REFRESH_INTERVAL else DEFAULT_FETCH_INTERVAL
             config.settings {
-                minimumFetchIntervalInSeconds = interval.inWholeSeconds
+                minimumFetchInterval = interval
             }
             config.fetchAndActivate()
+            log.d { "Remote config fetch and activate succeeded" }
             Result.success(Unit)
         } catch (e: Exception) {
             log.e(e) { "Failed to fetch remote config" }

@@ -51,6 +51,7 @@ enum class OnboardingPageType {
     SCHEDULE,
     NEWS_EVENTS,
     EXPLORE,
+    WIDGETS,
     NOTIFICATION_PERMISSION
 }
 
@@ -139,7 +140,7 @@ private fun OnboardingPageWide(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .padding(vertical = 16.dp),
+                .padding(vertical = 32.dp),
             contentAlignment = Alignment.Center
         ) {
             DeviceFrame(
@@ -232,7 +233,7 @@ private fun OnboardingPageCompact(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.50f),
+                .weight(0.60f),
             contentAlignment = Alignment.TopCenter
         ) {
             DeviceFrame(
@@ -265,13 +266,13 @@ private fun OnboardingPageCompact(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.4f)
+                    .fillMaxHeight(0.5f)
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
                             colorStops = arrayOf(
                                 0.0f to Color.Transparent,
-                                0.5f to Color(0xFF1A1040).copy(alpha = 0.7f),
+                                0.5f to Color(0xFF1A1040).copy(alpha = 0.5f),
                                 1.0f to Color(0xFF1A1040),
                             )
                         )
@@ -284,7 +285,7 @@ private fun OnboardingPageCompact(
         // Scrollable text section
         Column(
             modifier = Modifier
-                .weight(0.1f)
+                .weight(0.2f)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

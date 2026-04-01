@@ -157,7 +157,21 @@ fun NotificationPermissionPage(
         when {
             // Permission already granted — no button needed (auto-advancing)
             hasPermission == true -> {
-                // Nothing to show, LaunchedEffect will auto-advance
+                Button(
+                    onClick = { onPermissionResult(true) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF0A0E2A)
+                    )
+                ) {
+                    Text(
+                        text = "Next",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
             }
 
             // User already tried the dialog and was denied — send to settings

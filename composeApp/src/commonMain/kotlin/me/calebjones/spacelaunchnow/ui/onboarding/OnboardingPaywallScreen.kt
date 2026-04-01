@@ -66,6 +66,7 @@ import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
 import me.calebjones.spacelaunchnow.ui.components.FinePrint
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
@@ -271,7 +272,10 @@ fun OnboardingContent(
                     OnboardingPerkCard(
                         icon = Icons.Default.Widgets,
                         title = "Premium Widgets",
-                        subtitle = "Premium customizable home screen widgets for upcoming launches."
+                        subtitle = if (getPlatform().type.isIOS)
+                            "Lock Screen & Home Screen widgets to track launches at a glance."
+                        else
+                            "Premium customizable home screen widgets for upcoming launches."
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     OnboardingPerkCard(

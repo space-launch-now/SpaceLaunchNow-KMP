@@ -46,8 +46,9 @@ class NotificationRepositoryImpl(
         coroutineScope = repositoryScope,
         debounceMs = 300L,
         onSubscriptionUpdate = { actualTopics ->
-            // Route through mutex to prevent clobbering concurrent state updates
-            updateState { it.copy(subscribedTopics = actualTopics) }
+            // Use dedicated method that does NOT re-trigger SubscriptionProcessor
+            // to avoid infinite loop: onSubscriptionUpdate -> updateState -> requestUpdate -> ...
+            updateSubscribedTopics(actualTopics)
         }
     )
 
@@ -186,6 +187,31 @@ class NotificationRepositoryImpl(
             } catch (e: Exception) {
                 log.e(e) { "Notification state update failed" }
                 _state.value = _state.value.withError(e.message)
+            }
+        }
+    }
+
+    /**
+     * Update only subscribedTopics from SubscriptionProcessor callback.
+     * Uses mutex for thread safety but does NOT re-trigger SubscriptionProcessor
+     * to avoid an infinite loop.
+     */
+    private suspend fun updateSubscribedTopics(topics: Set<String>) {
+        stateMutex.withLock {
+            try {
+                val oldState = _state.value
+                if (oldState.subscribedTopics == topics) return
+
+                val newState = oldState.copy(subscribedTopics = topics)
+                val result = storage.saveState(newState)
+                if (result.isSuccess) {
+                    _state.value = newState
+                    log.d { "Subscribed topics updated: $topics" }
+                } else {
+                    log.e(result.exceptionOrNull()) { "Failed to persist subscribed topics" }
+                }
+            } catch (e: Exception) {
+                log.e(e) { "Failed to update subscribed topics" }
             }
         }
     }

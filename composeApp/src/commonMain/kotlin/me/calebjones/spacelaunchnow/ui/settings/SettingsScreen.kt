@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,7 +33,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -53,7 +53,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
@@ -89,7 +88,8 @@ fun SettingsScreen(
     val coroutineScope = rememberCoroutineScope()
 
     // App rating for feedback dialog
-    val appRatingViewModel: me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel = koinViewModel()
+    val appRatingViewModel: me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel =
+        koinViewModel()
     val shouldShowFeedback by appRatingViewModel.shouldShowFeedbackDialog.collectAsState()
 
     // Tap counter for debug unlock
@@ -157,8 +157,7 @@ fun SettingsScreen(
                     Text(
                         text = "Settings",
                         style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             )
@@ -330,11 +329,13 @@ fun SettingsScreen(
                         )
                     }
                     // Ad privacy / consent revocation
-                    val privacyOptionsRequired = me.calebjones.spacelaunchnow.ui.ads.rememberPrivacyOptionsRequired()
+                    val privacyOptionsRequired =
+                        me.calebjones.spacelaunchnow.ui.ads.rememberPrivacyOptionsRequired()
                     if (privacyOptionsRequired) {
                         Spacer(Modifier.height(4.dp))
                         SettingsCardRow {
-                            val contextFactory = me.calebjones.spacelaunchnow.LocalContextFactory.current
+                            val contextFactory =
+                                me.calebjones.spacelaunchnow.LocalContextFactory.current
                             SettingsNavigationRow(
                                 title = "Ad privacy settings",
                                 onClick = {

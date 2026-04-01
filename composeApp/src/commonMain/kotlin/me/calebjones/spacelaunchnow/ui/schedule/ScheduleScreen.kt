@@ -245,10 +245,9 @@ private fun ScheduleContent(
                         Text(
                             text = "Launch Schedule",
                             style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 32.sp,
-                            modifier = Modifier.weight(1f)
+                            fontWeight = FontWeight.Bold
                         )
+                        Spacer(modifier = Modifier.weight(1f))
                         // Filter button with badge
                         if (uiState.filterState.hasActiveFilters()) {
                             BadgedBox(
