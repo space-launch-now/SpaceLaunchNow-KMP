@@ -1,3 +1,33 @@
+## [5.23.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.2...v5.23.3) (2026-04-01)
+
+
+### Bug Fixes
+
+* **onboarding:** add button for auto-advancing when permission is granted ([5ba616a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5ba616aaa254658a0189958fe107137e241f977a))
+* **onboarding:** add widgets showcase page and integrate into onboarding flow ([ece77bf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ece77bf240b08307bd54fb251fcc298d14d7ccbf))
+* **onboarding:** enhance onboarding flow with widget showcase and improve state management ([18debbb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/18debbb341ce4211233f490b82a620490fbb609c))
+
+
+
+## [5.23.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.1...v5.23.2) (2026-03-31)
+
+
+### Bug Fixes
+
+* **timeline:** enhance TimelineCard to support NET and improve event status visualization ([30ccba6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/30ccba637085c3b80fcc9f6fba5fbb4db089f67d))
+
+
+
+## [5.23.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.0...v5.23.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* **datetime:** enhance timeline relative time formatting to support days in ISO-8601 durations ([3994605](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/399460551051ce866e86505fe75a3fe58175d343))
+* **notifications:** implement notification filter persistence fix and error reporting ([3f8c036](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f8c0363539e2a9759f3df0296f5170ff476c2ea))
+
+
+
 # [5.23.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.4...v5.23.0) (2026-03-25)
 
 
@@ -29,36 +59,6 @@
 * integrate Firebase Crashlytics for enhanced error reporting and logging ([3145c7f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3145c7faa33acac8b73000c5d33a2a3f9c119eb3))
 * integrate Firebase Crashlytics for error reporting and add test functionality in DebugSettingsScreen ([55661ae](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/55661aefd71a5ad8c21785f6ca3eff7c892d0fb8))
 * update Firebase Crashlytics integration and dSYM upload script ([1dbd8c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1dbd8c6f1eaa3e5fe3487d994d5c163a9eb20ce7))
-
-
-
-## [5.22.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.2...v5.22.3) (2026-03-21)
-
-
-### Bug Fixes
-
-* update launch mode to singleTop and enhance intent flags for navigation ([ef87af0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ef87af043e3257615225e9b1f71464c7dc75033c))
-
-
-
-## [5.22.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.1...v5.22.2) (2026-03-20)
-
-
-### Bug Fixes
-
-* optimize Gradle JVM arguments for iOS CI/CD on macOS xlarge runners [skip ci] ([5ef3f3a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5ef3f3a45651f82f293e75c2f5a93d82e6ff1425))
-* update macOS runner to xlarge for iOS build and deployment [skip-ci] ([df548ba](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/df548ba534098af8ede16e217338b9b58a059131))
-* update paywall button styling ([f4733ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f4733ffc519a7f04a443f405e4dd027ff18b2add))
-
-
-
-## [5.22.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.0...v5.22.1) (2026-03-20)
-
-
-### Bug Fixes
-
-* enhance layout handling and theme change support across multiple screens ([408562a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/408562ae2cf4948c8a823d8c1ef5b66cdd2ea66c))
-* implement responsive navigation ([4a26a81](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4a26a81d653c2d67209fb15052247f73f364612e))
 
 
 
