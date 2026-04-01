@@ -141,26 +141,22 @@ fun SettingsScreen(
         }
     }
 
-    if (uiState.isLoading) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            androidx.compose.material3.CircularProgressIndicator()
-        }
-    } else {
-        Column {
-            TopAppBar(
-                windowInsets = WindowInsets(0, 0, 0, 0),
-                title = {
-                    Text(
-                        text = "Settings",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+    Column {
+        TopAppBar(
+            windowInsets = WindowInsets(0, 0, 0, 0),
+            title = {
+                Text(
+                    text = "Settings",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        )
+        if (uiState.isLoading) {
+            androidx.compose.material3.LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth()
             )
+        }
 
             LazyColumn(
                 modifier = Modifier
@@ -388,7 +384,6 @@ fun SettingsScreen(
                 }
             }
         }
-    }
 
     // Password dialog for debug unlock
     if (showPasswordDialog) {
