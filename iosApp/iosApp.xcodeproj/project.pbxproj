@@ -24,6 +24,8 @@
 		3C7AFD342EADADF0002FEDEE /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7AFD332EADADF0002FEDEE /* FirebaseMessaging */; };
 		F9FC00012F0E000100000001 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = F9FC00002F0E000100000001 /* FirebaseCrashlytics */; };
 		F9FC00032F0E000300000003 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = F9FC00042F0E000400000004 /* FirebaseCrashlytics */; };
+		F9FC00052F0E000500000005 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = F9FC00062F0E000600000006 /* FirebaseRemoteConfig */; };
+		F9FC00072F0E000700000007 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = F9FC00082F0E000800000008 /* FirebaseRemoteConfig */; };
 		3C7AFD382EADC588002FEDEE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C7AFD372EADC588002FEDEE /* GoogleService-Info.plist */; };
 		3C9137E52E9008320095D5AB /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C9137E42E9008320095D5AB /* Secrets.plist */; };
 		3CC6E4C52EAC8A84002F6FE9 /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = 3CC6E4C42EAC8A84002F6FE9 /* FirebaseAI */; };
@@ -159,6 +161,7 @@
 				F907BC5F2EC38A4800C05E19 /* DatadogRUM in Frameworks */,
 				F907BC592EC38A4800C05E19 /* DatadogCrashReporting in Frameworks */,
 				F9FC00032F0E000300000003 /* FirebaseCrashlytics in Frameworks */,
+				F9FC00052F0E000500000005 /* FirebaseRemoteConfig in Frameworks */,
 				3C35B9622EA9816900E28A01 /* PurchasesHybridCommonUI in Frameworks */,
 				3C35B9602EA9816900E28A01 /* PurchasesHybridCommon in Frameworks */,
 				F907BC5D2EC38A4800C05E19 /* DatadogLogs in Frameworks */,
@@ -179,6 +182,7 @@
 				3CC6E4C52EAC8A84002F6FE9 /* FirebaseAI in Frameworks */,
 				3C7AFD342EADADF0002FEDEE /* FirebaseMessaging in Frameworks */,
 				F9FC00012F0E000100000001 /* FirebaseCrashlytics in Frameworks */,
+				F9FC00072F0E000700000007 /* FirebaseRemoteConfig in Frameworks */,
 				3C35B95B2EA97E1B00E28A01 /* GoogleMobileAds in Frameworks */,
 				3CC6E4C72EAC8A84002F6FE9 /* FirebaseAnalytics in Frameworks */,
 				3CE684202E9D513C00AA177C /* PurchasesHybridCommonUI in Frameworks */,
@@ -311,6 +315,7 @@
 				F907BC622EC38A4800C05E19 /* DatadogTrace */,
 				F907BC642EC38A4800C05E19 /* DatadogWebViewTracking */,
 				F9FC00042F0E000400000004 /* FirebaseCrashlytics */,
+				F9FC00062F0E000600000006 /* FirebaseRemoteConfig */,
 			);
 			productName = LaunchWidgetExtension;
 			productReference = 3C2F71412E936FBD0026D5CD /* LaunchWidgetExtension.appex */;
@@ -346,6 +351,7 @@
 				3CC6E4CC2EAC8A84002F6FE9 /* FirebaseAppCheck */,
 				3C7AFD332EADADF0002FEDEE /* FirebaseMessaging */,
 				F9FC00002F0E000100000001 /* FirebaseCrashlytics */,
+				F9FC00082F0E000800000008 /* FirebaseRemoteConfig */,
 				F907BC462EC389C800C05E19 /* DatadogCore */,
 				F907BC482EC389C800C05E19 /* DatadogCrashReporting */,
 				F907BC4C2EC389C800C05E19 /* DatadogLogs */,
@@ -1149,6 +1155,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		F9FC00062F0E000600000006 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
+		};
+		F9FC00082F0E000800000008 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
 		};
 		3CC6E4C42EAC8A84002F6FE9 /* FirebaseAI */ = {
 			isa = XCSwiftPackageProductDependency;
