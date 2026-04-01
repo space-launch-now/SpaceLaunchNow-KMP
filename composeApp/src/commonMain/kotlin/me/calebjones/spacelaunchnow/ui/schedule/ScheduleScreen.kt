@@ -247,6 +247,7 @@ private fun ScheduleContent(
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold
                         )
+                        Spacer(modifier = Modifier.weight(1f))
                         // Filter button with badge
                         if (uiState.filterState.hasActiveFilters()) {
                             BadgedBox(
