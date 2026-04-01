@@ -40,11 +40,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -64,20 +64,21 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.ui.compose.EmptyStateCard
-import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.LaunchListShimmer
-import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
+import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Constants for layout dimensions
-private val CARD_WIDTH = 340.dp
-private val CARD_HEIGHT = 240.dp
+private val CARD_HEIGHT = 200.dp
 private val CARD_SPACING = 16.dp
+private val CONTENT_PADDING = 16.dp
+private val CARD_PEEK_AMOUNT = 48.dp // Amount of next card to show peeking
 
 @Composable
 fun LaunchListView(
@@ -90,7 +91,11 @@ fun LaunchListView(
 ) {
     BoxWithConstraints {
         val screenWidth = maxWidth
-        val density = LocalDensity.current
+        
+        // Calculate card width to show peek of next card
+        // Card width = screen width - content padding - spacing - peek amount
+        // This ensures the next card is visible peeking from the right edge
+        val cardWidth = screenWidth - CONTENT_PADDING - CARD_SPACING - CARD_PEEK_AMOUNT
 
         val error = carouselError
         val isLoading = isCarouselLoading
@@ -110,16 +115,8 @@ fun LaunchListView(
         // Scroll to center the first upcoming launch card - only once after data loads
         LaunchedEffect(combinedLaunches.isNotEmpty(), upcomingStartIndex) {
             if (!hasScrolledToPosition && combinedLaunches.isNotEmpty() && upcomingStartIndex > 0) {
-                // Calculate the offset to center the card
-                // Card width = 340dp, spacing = 16dp, contentPadding = 16dp
-                val cardWidthPx = with(density) { 340.dp.toPx() }
-                val screenWidthPx = with(density) { screenWidth.toPx() }
-
-                // Center offset: (screenWidth - cardWidth) / 2 - contentPadding
-                val centerOffset = ((screenWidthPx - cardWidthPx) / 2).toInt()
-
-                // Scroll to the first upcoming launch, centered
-                scrollState.scrollToItem(upcomingStartIndex, scrollOffset = -centerOffset)
+                // Scroll to the first upcoming launch
+                scrollState.scrollToItem(upcomingStartIndex)
                 hasScrolledToPosition = true
             }
         }
@@ -173,7 +170,7 @@ fun LaunchListView(
                     LaunchItemView(
                         launch = combinedLaunches[index],
                         navController = navController,
-                        modifier = Modifier.size(width = 380.dp, height = 200.dp)
+                        modifier = Modifier.size(width = cardWidth, height = CARD_HEIGHT)
                     )
                 }
             }
@@ -193,6 +190,16 @@ fun LaunchItemView(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+    // Format the launch title using the standard utility
+    val title = remember(launch) {
+        LaunchFormatUtil.formatLaunchTitle(launch)
+    }
+    
+    // Format the date/time
+    val dateTime = remember(launch.net) {
+        launch.net?.let { DateTimeUtil.formatLaunchDateTime(it) } ?: "TBD"
+    }
+
     Card(
         modifier = modifier
             .clickable {
@@ -237,7 +244,7 @@ fun LaunchItemView(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(
-                                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                                    Brush.verticalGradient(
                                         colors = listOf(
                                             MaterialTheme.colorScheme.surfaceVariant,
                                             MaterialTheme.colorScheme.surface
@@ -261,7 +268,7 @@ fun LaunchItemView(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                            Brush.verticalGradient(
                                 colors = listOf(
                                     MaterialTheme.colorScheme.surfaceVariant,
                                     MaterialTheme.colorScheme.surface
@@ -278,39 +285,71 @@ fun LaunchItemView(
                     )
                 }
             }
-            // Use the common LaunchCardHeader composable
-            LaunchCardHeaderOverlay(
-                launchData = launch.toLaunchCardData(),
-                showAgencyLogo = true,
-                logoSize = 56.dp,
-                modifier = Modifier.fillMaxSize()
+            
+            // Gradient scrim overlay for text readability
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colorStops = arrayOf(
+                                0.0f to Color.Transparent,
+                                0.4f to Color.Transparent,
+                                0.6f to Color.Black.copy(alpha = 0.3f),
+                                0.8f to Color.Black.copy(alpha = 0.7f),
+                                1.0f to Color.Black.copy(alpha = 0.85f)
+                            )
+                        )
+                    )
             )
 
-            // Chips in bottom right corner
-            Row(
+            // Bottom-aligned content with launch info
+            Column(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
+                    .fillMaxSize()
                     .padding(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.Bottom
             ) {
-                // Program chip (left side)
-                ProgramChip(
-                    programs = launch.program,
-                    modifier = Modifier
+                // Rocket configuration (title)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-
-                // Mission type chip (middle)
-                MissionTypeChip(
-                    mission = launch.mission,
-                    modifier = Modifier
-                )
-
-                // Status chip (right side)
-                LaunchStatusChip(
-                    status = launch.status,
-                    modifier = Modifier
-                )
+                
+                // Mission name (if available)
+                launch.mission?.name?.let { missionName ->
+                    Text(
+                        text = missionName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.9f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                
+                // Date/time and status row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Date/time on the left
+                    Text(
+                        text = dateTime,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.8f),
+                        maxLines = 1
+                    )
+                    
+                    // Status chip on the right
+                    LaunchStatusChip(
+                        status = launch.status
+                    )
+                }
             }
         }
     }
@@ -448,7 +487,7 @@ private fun LaunchItemViewPreview() {
         LaunchItemView(
             launch = PreviewData.launchNormalSpaceX,
             navController = rememberNavController(),
-            modifier = Modifier.size(width = 380.dp, height = 200.dp)
+            modifier = Modifier.size(width = 320.dp, height = CARD_HEIGHT)
         )
     }
 }
@@ -460,7 +499,7 @@ private fun LaunchItemViewDarkPreview() {
         LaunchItemView(
             launch = PreviewData.launchNormalSpaceX,
             navController = rememberNavController(),
-            modifier = Modifier.size(width = 380.dp, height = 200.dp)
+            modifier = Modifier.size(width = 320.dp, height = CARD_HEIGHT)
         )
     }
 }
@@ -472,7 +511,7 @@ private fun LaunchItemViewNoImagePreview() {
         LaunchItemView(
             launch = PreviewData.launchNormalULA,
             navController = rememberNavController(),
-            modifier = Modifier.size(width = 380.dp, height = 200.dp)
+            modifier = Modifier.size(width = 320.dp, height = CARD_HEIGHT)
         )
     }
 }
@@ -484,7 +523,7 @@ private fun LaunchItemViewNoImageDarkPreview() {
         LaunchItemView(
             launch = PreviewData.launchNormalULA,
             navController = rememberNavController(),
-            modifier = Modifier.size(width = 380.dp, height = 200.dp)
+            modifier = Modifier.size(width = 320.dp, height = CARD_HEIGHT)
         )
     }
 }

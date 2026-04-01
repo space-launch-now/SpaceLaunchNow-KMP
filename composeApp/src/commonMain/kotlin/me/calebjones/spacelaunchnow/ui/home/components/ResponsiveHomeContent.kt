@@ -17,10 +17,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +39,6 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.model.DataSource
-import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
@@ -58,11 +63,6 @@ fun ResponsiveHomeContent(
     next24HoursCount: Int,
     nextWeekCount: Int,
     nextMonthCount: Int,
-    combinedLaunches: List<LaunchNormal>,
-    upcomingStartIndex: Int,
-    carouselError: String?,
-    isCarouselLoading: Boolean,
-    onCarouselRetry: () -> Unit,
     isAnyViewLoading: Boolean,
     hasAdFree: Boolean,
     onShareLaunch: (LaunchNormal) -> Unit = {},
@@ -73,6 +73,31 @@ fun ResponsiveHomeContent(
 ) {
     val layoutState = rememberAdaptiveLayoutState()
     val isTabletOrDesktop = layoutState.isExpanded
+    
+    // Dialog state for Updates info
+    var showUpdatesInfoDialog by remember { mutableStateOf(false) }
+    
+    // Updates info dialog
+    if (showUpdatesInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showUpdatesInfoDialog = false },
+            title = { Text("About Latest Updates") },
+            text = {
+                Text(
+                    "Updates are sourced from The Space Devs' volunteer librarians who use " +
+                    "open-source intelligence (OSINT) techniques to track launches worldwide. " +
+                    "They monitor agency announcements, regulatory filings, and social media " +
+                    "to keep the database accurate and current.\n\n" +
+                    "As Space Launch Now's developer, I am a Founding Board Member and Proud Supporter of The Space Devs!"
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showUpdatesInfoDialog = false }) {
+                    Text("Got it")
+                }
+            }
+        )
+    }
 
     BoxWithConstraints(modifier = if (isTabletOrDesktop) modifier.fillMaxSize() else modifier) {
     val useWideHeroLayout = isTabletOrDesktop && maxWidth >= 1000.dp
@@ -193,11 +218,12 @@ fun ResponsiveHomeContent(
         // This Day in History (shown separately when not using wide hero layout)
         if (!useWideHeroLayout) {
             item(key = "history_section") {
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                Column(modifier = Modifier.padding(vertical = 8.dp)) {
                     Text(
                         text = "This Day in History",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     ThisDayInHistorySection(
@@ -222,32 +248,14 @@ fun ResponsiveHomeContent(
             }
         }
 
-        item(key = "launch_schedule_title") {
+        item(key = "updates_title") {
             SectionTitle(
-                title = "Launch Schedule",
-                hasAction = true,
-                onActionClick = {
-                    navController.navigate(Schedule) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                title = "Latest Updates",
+                hasAction = false,
+                showInfoButton = true,
+                onInfoClick = { showUpdatesInfoDialog = true }
             )
         }
-
-        item(key = "launch_list") {
-            LaunchListView(
-                combinedLaunches = combinedLaunches,
-                upcomingStartIndex = upcomingStartIndex,
-                carouselError = carouselError,
-                isCarouselLoading = isCarouselLoading,
-                onRetry = onCarouselRetry,
-                navController = navController
-            )
-        }
-
-        item(key = "updates_title") { SectionTitle(title = "Latest Updates", hasAction = false) }
         item(key = "updates_view") {
             LatestUpdatesView(
                 state = updatesState,
@@ -333,11 +341,6 @@ private fun ResponsiveHomeContentPreview() {
             next24HoursCount = 2,
             nextWeekCount = 8,
             nextMonthCount = 24,
-            combinedLaunches = launches,
-            upcomingStartIndex = 1,
-            carouselError = null,
-            isCarouselLoading = false,
-            onCarouselRetry = {},
             isAnyViewLoading = false,
             hasAdFree = true
         )
@@ -370,11 +373,6 @@ private fun ResponsiveHomeContentDarkPreview() {
             next24HoursCount = 2,
             nextWeekCount = 8,
             nextMonthCount = 24,
-            combinedLaunches = launches,
-            upcomingStartIndex = 1,
-            carouselError = null,
-            isCarouselLoading = false,
-            onCarouselRetry = {},
             isAnyViewLoading = false,
             hasAdFree = true
         )
@@ -400,11 +398,6 @@ private fun ResponsiveHomeContentLoadingPreview() {
             next24HoursCount = 0,
             nextWeekCount = 0,
             nextMonthCount = 0,
-            combinedLaunches = emptyList(),
-            upcomingStartIndex = 0,
-            carouselError = null,
-            isCarouselLoading = true,
-            onCarouselRetry = {},
             isAnyViewLoading = true,
             hasAdFree = true
         )
@@ -434,11 +427,6 @@ private fun ResponsiveHomeContentOfflinePreview() {
             next24HoursCount = 1,
             nextWeekCount = 3,
             nextMonthCount = 10,
-            combinedLaunches = launches,
-            upcomingStartIndex = 0,
-            carouselError = null,
-            isCarouselLoading = false,
-            onCarouselRetry = {},
             isAnyViewLoading = false,
             hasAdFree = true,
             isOffline = true,
@@ -465,11 +453,6 @@ private fun ResponsiveHomeContentErrorPreview() {
             next24HoursCount = 0,
             nextWeekCount = 0,
             nextMonthCount = 0,
-            combinedLaunches = emptyList(),
-            upcomingStartIndex = 0,
-            carouselError = "Failed to connect to server",
-            isCarouselLoading = false,
-            onCarouselRetry = {},
             isAnyViewLoading = false,
             hasAdFree = true
         )

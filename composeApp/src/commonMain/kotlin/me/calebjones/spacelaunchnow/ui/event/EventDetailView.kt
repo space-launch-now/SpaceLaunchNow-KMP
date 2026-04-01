@@ -66,7 +66,7 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.koin.compose.viewmodel.koinViewModel
 
-private val TitleHeight = 128.dp
+private val TitleHeight = 110.dp
 
 @Composable
 fun EventDetailView(

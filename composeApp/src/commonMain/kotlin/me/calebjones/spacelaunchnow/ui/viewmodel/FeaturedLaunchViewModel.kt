@@ -32,18 +32,22 @@ class FeaturedLaunchViewModel(
 
     // Featured Launch State (hero card - first result)
     // Initialize with isLoading=true to show shimmer instead of empty state before first load
-    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null, isLoading = true))
-    val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> = _featuredLaunchState.asStateFlow()
+    private val _featuredLaunchState =
+        MutableStateFlow(ViewState<LaunchNormal?>(data = null, isLoading = true))
+    val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> =
+        _featuredLaunchState.asStateFlow()
 
     // Additional Featured Launches State (row of 3 - results 2-4)
     // Initialize with isLoading=true to show shimmer instead of empty state before first load
-    private val _additionalFeaturedLaunches = MutableStateFlow(ViewState<List<LaunchNormal>>(data = emptyList(), isLoading = true))
-    val additionalFeaturedLaunches: StateFlow<ViewState<List<LaunchNormal>>> = _additionalFeaturedLaunches.asStateFlow()
+    private val _additionalFeaturedLaunches =
+        MutableStateFlow(ViewState<List<LaunchNormal>>(data = emptyList(), isLoading = true))
+    val additionalFeaturedLaunches: StateFlow<ViewState<List<LaunchNormal>>> =
+        _additionalFeaturedLaunches.asStateFlow()
 
     /**
      * Loads featured launches using dedicated API call with upcomingWithRecent filter.
      * Fetches 4 launches: first for hero card, remaining 3 for additional featured row.
-     * 
+     *
      * @param forceRefresh If true, bypass cache (user-initiated refresh)
      */
     fun loadFeaturedLaunch(forceRefresh: Boolean = false) {
@@ -79,15 +83,16 @@ class FeaturedLaunchViewModel(
 
                     val allLaunches = paginatedLaunches.results
                     val firstLaunch = allLaunches.firstOrNull()
-                    val additionalLaunches = if (allLaunches.size > 1) allLaunches.drop(1).take(3) else emptyList()
-                    
+                    val additionalLaunches =
+                        if (allLaunches.size > 1) allLaunches.drop(1).take(3) else emptyList()
+
                     if (firstLaunch != null) {
                         log.i { "Featured launch: ${firstLaunch.name} (ID: ${firstLaunch.id})" }
                         log.i { "Additional featured launches: ${additionalLaunches.size}" }
                     } else {
                         log.w { "No launches returned from repository!" }
                     }
-                    
+
                     _featuredLaunchState.update {
                         it.copy(
                             data = firstLaunch,
@@ -96,7 +101,7 @@ class FeaturedLaunchViewModel(
                             cacheTimestamp = dataResult.timestamp
                         )
                     }
-                    
+
                     _additionalFeaturedLaunches.update {
                         it.copy(
                             data = additionalLaunches,

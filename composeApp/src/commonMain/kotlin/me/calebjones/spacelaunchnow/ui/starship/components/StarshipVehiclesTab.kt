@@ -38,6 +38,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
 import me.calebjones.spacelaunchnow.ui.compose.StarshipVehiclesShimmer
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.viewmodel.VehicleNavigationLevel
 import me.calebjones.spacelaunchnow.ui.viewmodel.VehicleType
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
@@ -135,6 +136,8 @@ private fun ConfigurationsView(
     val isLoading = launcherConfigsState.isLoading || spacecraftConfigsState.isLoading
     val launcherConfigs = launcherConfigsState.data
     val spacecraftConfigs = spacecraftConfigsState.data
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger
+    val columnCount = if (isLargeScreen) 3 else 2
 
     Box(modifier = modifier.fillMaxSize()) {
         when {
@@ -144,7 +147,7 @@ private fun ConfigurationsView(
 
             else -> {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                    columns = GridCells.Fixed(columnCount),
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -152,7 +155,7 @@ private fun ConfigurationsView(
                 ) {
                     // Spacecraft Configurations Section
                     if (spacecraftConfigs.isNotEmpty() || spacecraftConfigsState.isLoading) {
-                        item(span = { GridItemSpan(2) }) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             VehicleSectionHeader(
                                 title = "Spacecraft",
                                 subtitle = "Starship vehicles"
@@ -169,18 +172,20 @@ private fun ConfigurationsView(
                                 spacecraftConfigs,
                                 key = { _, item -> "spacecraft_config_${item.id}" },
                                 span = { index, _ ->
-                                    // Last item spans full width if odd count
-                                    if (index == spacecraftCount - 1 && spacecraftCount % 2 == 1) {
-                                        GridItemSpan(2)
+                                    // Last item spans full width if not filling row
+                                    val remainder = spacecraftCount % columnCount
+                                    if (index == spacecraftCount - 1 && remainder != 0) {
+                                        GridItemSpan(maxLineSpan)
                                     } else {
                                         GridItemSpan(1)
                                     }
                                 }
                             ) { index, config ->
+                                val remainder = spacecraftCount % columnCount
                                 SpacecraftConfigCard(
                                     config = config,
                                     onClick = { onSelectSpacecraftConfig(config) },
-                                    isFullWidth = index == spacecraftCount - 1 && spacecraftCount % 2 == 1
+                                    isFullWidth = index == spacecraftCount - 1 && remainder != 0
                                 )
                             }
                         }
@@ -188,14 +193,14 @@ private fun ConfigurationsView(
 
                     // Spacer between sections
                     if (spacecraftConfigs.isNotEmpty() && launcherConfigs.isNotEmpty()) {
-                        item(span = { GridItemSpan(2) }) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
 
                     // Launcher Configurations Section
                     if (launcherConfigs.isNotEmpty() || launcherConfigsState.isLoading) {
-                        item(span = { GridItemSpan(2) }) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             VehicleSectionHeader(
                                 title = "Boosters",
                                 subtitle = "Super Heavy first stages"
@@ -212,18 +217,20 @@ private fun ConfigurationsView(
                                 launcherConfigs,
                                 key = { _, item -> "launcher_config_${item.id}" },
                                 span = { index, _ ->
-                                    // Last item spans full width if odd count
-                                    if (index == launcherCount - 1 && launcherCount % 2 == 1) {
-                                        GridItemSpan(2)
+                                    // Last item spans full width if not filling row
+                                    val remainder = launcherCount % columnCount
+                                    if (index == launcherCount - 1 && remainder != 0) {
+                                        GridItemSpan(maxLineSpan)
                                     } else {
                                         GridItemSpan(1)
                                     }
                                 }
                             ) { index, config ->
+                                val remainder = launcherCount % columnCount
                                 LauncherConfigCard(
                                     config = config,
                                     onClick = { onSelectLauncherConfig(config) },
-                                    isFullWidth = index == launcherCount - 1 && launcherCount % 2 == 1
+                                    isFullWidth = index == launcherCount - 1 && remainder != 0
                                 )
                             }
                         }
@@ -233,7 +240,7 @@ private fun ConfigurationsView(
                     if (launcherConfigs.isEmpty() && spacecraftConfigs.isEmpty() &&
                         !launcherConfigsState.isLoading && !spacecraftConfigsState.isLoading
                     ) {
-                        item(span = { GridItemSpan(2) }) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             VehicleEmptyState(message = "No vehicle configurations found")
                         }
                     }
