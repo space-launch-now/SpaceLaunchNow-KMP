@@ -116,13 +116,16 @@ fun LiveOnboardingScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, end = 16.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                if (!isLastPage && !isFirstPage) {
+            // Skip button row
+            val showWidgetsPage = getPlatform().type.isIOS
+
+            if (!isLastPage && !isFirstPage) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
                     TextButton(onClick = {
                         scope.launch {
                             pagerState.animateScrollToPage(PAGE_COUNT - 1)
@@ -138,8 +141,6 @@ fun LiveOnboardingScreen(
             }
 
             // Pager content
-            val showWidgetsPage = getPlatform().type.isIOS
-
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
@@ -191,47 +192,46 @@ fun LiveOnboardingScreen(
                 }
             }
 
-            // Progress indicator
-            LinearProgressIndicator(
-                progress = {
-                    ((pagerState.currentPage + pagerState.currentPageOffsetFraction) / (PAGE_COUNT - 1).toFloat()).coerceIn(
-                        0f,
-                        1f
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                color = Color.White,
-                trackColor = Color.White.copy(alpha = 0.3f),
-            )
+            // Progress indicator & navigation — hidden on the notification page
+            // so the user must choose "Enable Notifications" or "Maybe Later"
+            if (!isLastPage) {
+                LinearProgressIndicator(
+                    progress = {
+                        ((pagerState.currentPage + pagerState.currentPageOffsetFraction) / (PAGE_COUNT - 1).toFloat()).coerceIn(
+                            0f,
+                            1f
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                    color = Color.White,
+                    trackColor = Color.White.copy(alpha = 0.3f),
+                )
 
-            // Next / Get Started button
-            Button(
-                onClick = {
-                    if (isLastPage) {
-                        completeOnboarding()
-                    } else {
+                // Next button
+                Button(
+                    onClick = {
                         scope.launch {
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp)
-                    .animateContentSize(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(0xFF0A0E2A)
-                )
-            ) {
-                Text(
-                    text = if (isLastPage) "Get Started" else "Next",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .animateContentSize(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF0A0E2A)
+                    )
+                ) {
+                    Text(
+                        text = "Next",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
             }
         }
     }

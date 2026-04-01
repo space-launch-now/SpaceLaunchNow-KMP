@@ -14,6 +14,9 @@
 # Keep Firebase
 -keep class com.google.firebase.** { *; }
 
+# Keep GitLive Firebase SDK (KMP wrapper for Firebase)
+-keep class dev.gitlive.firebase.** { *; }
+
 # Keep serialization classes
 -keep class kotlinx.serialization.** { *; }
 -keep @kotlinx.serialization.Serializable class * { *; }
