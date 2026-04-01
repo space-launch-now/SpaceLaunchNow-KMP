@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -44,30 +42,28 @@ private val PremiumGradient = Brush.linearGradient(
 )
 
 /**
- * Full widget showcase layout displaying lock screen and home screen widget mockups.
- * Uses static mock data to approximate the appearance of iOS WidgetKit widgets.
+ * iOS widget showcase — single medium home screen widget mockup.
  */
 @Composable
-fun WidgetShowcaseContent(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .background(Color(0xFF000000))
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+fun IOSWidgetShowcaseContent(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
-        // Lock Screen section
-        SectionLabel(text = "Lock Screen")
-        LockScreenWidgetMockup()
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Home Screen section
-        SectionLabel(text = "Home Screen")
-        HomeScreenWidgetSmallMockup()
-
-        Spacer(modifier = Modifier.height(4.dp))
-
         HomeScreenWidgetMediumMockup()
+    }
+}
+
+/**
+ * Android widget showcase — launch list widget mockup matching the actual Glance widget.
+ */
+@Composable
+fun AndroidWidgetShowcaseContent(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        AndroidLaunchListWidgetMockup()
     }
 }
 
@@ -189,100 +185,238 @@ fun HomeScreenWidgetSmallMockup(modifier: Modifier = Modifier) {
 
 /**
  * Mockup of the iOS system medium home screen widget.
- * Shows image placeholder on left, launch details on right.
+ * Matches the actual SpaceLaunchNow iOS "Next Launch" widget:
+ * image on left, title + status badge + countdown + agency on right.
  */
 @Composable
 fun HomeScreenWidgetMediumMockup(modifier: Modifier = Modifier) {
+    val statusGreen = Color(0xFF34C759)
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(150.dp)
             .clip(RoundedCornerShape(20.dp))
             .background(WidgetDark)
             .padding(14.dp)
     ) {
-        Row(
-            modifier = Modifier.matchParentSize(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Image placeholder
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(WidgetSurface),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.RocketLaunch,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = WidgetAccent.copy(alpha = 0.6f)
-                )
-            }
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Header
+            Text(
+                text = "NEXT LAUNCH",
+                style = MaterialTheme.typography.labelSmall,
+                color = WidgetTextSecondary,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.8.sp,
+                fontSize = 9.sp
+            )
 
-            // Details
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    // Header
-                    Text(
-                        text = "NEXT LAUNCH",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = WidgetTextSecondary,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.8.sp,
-                        fontSize = 9.sp
+                // Image placeholder
+                Box(
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(WidgetSurface),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.RocketLaunch,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = WidgetAccent.copy(alpha = 0.6f)
                     )
+                }
 
+                // Details
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
                     // Launch name
                     Text(
-                        text = "SpaceX | Falcon 9 Block 5",
+                        text = "SLS Block 1 | Artemis II",
                         style = MaterialTheme.typography.bodySmall,
                         color = WidgetTextPrimary,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
-                }
 
-                // Status + Countdown
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Status badge
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    // Status badge (pill)
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(statusGreen)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .clip(CircleShape)
-                                .background(WidgetAccent)
-                        )
                         Text(
-                            text = "Go",
+                            text = "GO FOR LAUNCH",
                             style = MaterialTheme.typography.labelSmall,
-                            color = WidgetAccent,
-                            fontWeight = FontWeight.Medium
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 8.sp
                         )
                     }
 
                     // Countdown
                     Text(
-                        text = "2d 5hr",
+                        text = "1 hr, 34 min",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = WidgetTextPrimary,
+                        color = WidgetAccent,
                         fontWeight = FontWeight.Bold
                     )
+
+                    // Agency + Location
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.RocketLaunch,
+                            contentDescription = null,
+                            modifier = Modifier.size(10.dp),
+                            tint = WidgetTextSecondary
+                        )
+                        Text(
+                            text = "NASA \u00B7 Kennedy Space Ce\u2026",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = WidgetTextSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 10.sp
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Android Launch List Widget Mockup
+// ---------------------------------------------------------------------------
+
+/**
+ * Mockup of the Android Glance launch list widget.
+ * Shows a header and a short list of upcoming launches with agency, location,
+ * countdown, and status — matching the real widget's appearance.
+ */
+@Composable
+fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
+    val widgetGreen = Color(0xFF4CAF50)
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(WidgetDark)
+            .padding(16.dp)
+    ) {
+        // Header
+        Text(
+            text = "Upcoming Launches",
+            style = MaterialTheme.typography.bodyMedium,
+            color = widgetGreen,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Launch items
+        AndroidWidgetLaunchItem(
+            name = "SLS Block 1 | Artemis II",
+            agency = "National Aeronautics and Space Administration",
+            location = "Kennedy Space Center, FL, USA",
+            countdown = "1h 24m",
+            status = "Go for Launch",
+            accentColor = widgetGreen
+        )
+        AndroidWidgetLaunchItem(
+            name = "Falcon 9 Block 5 | Starlink Group 10-58",
+            agency = "SpaceX",
+            location = "Cape Canaveral SFS, FL, USA",
+            countdown = "14h 52m",
+            status = "Go for Launch",
+            accentColor = widgetGreen
+        )
+        AndroidWidgetLaunchItem(
+            name = "Falcon 9 Block 5 | Starlink Group 17-35",
+            agency = "SpaceX",
+            location = "Vandenberg SFB, CA, USA",
+            countdown = "1d 2h",
+            status = "Go for Launch",
+            accentColor = widgetGreen
+        )
+        AndroidWidgetLaunchItem(
+            name = "Tianlong-3 | Demo Flight",
+            agency = "Space Pioneer",
+            location = "Jiuquan Satellite Launch Center, People's Republic of China",
+            countdown = "1d 7h",
+            status = "Go for Launch",
+            accentColor = widgetGreen
+        )
+    }
+}
+
+@Composable
+private fun AndroidWidgetLaunchItem(
+    name: String,
+    agency: String,
+    location: String,
+    countdown: String,
+    status: String,
+    accentColor: Color
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+    ) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodySmall,
+            color = WidgetTextPrimary,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = agency,
+            style = MaterialTheme.typography.labelSmall,
+            color = WidgetTextSecondary,
+            maxLines = 1
+        )
+        Text(
+            text = location,
+            style = MaterialTheme.typography.labelSmall,
+            color = WidgetTextSecondary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = countdown,
+                style = MaterialTheme.typography.labelSmall,
+                color = accentColor,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = status,
+                style = MaterialTheme.typography.labelSmall,
+                color = accentColor,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -293,40 +427,32 @@ fun HomeScreenWidgetMediumMockup(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun WidgetShowcaseContentPreview() {
+private fun IOSWidgetShowcaseContentPreview() {
     SpaceLaunchNowPreviewTheme {
-        WidgetShowcaseContent()
+        IOSWidgetShowcaseContent()
     }
 }
 
 @Preview
 @Composable
-private fun WidgetShowcaseContentDarkPreview() {
+private fun IOSWidgetShowcaseContentDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
-        WidgetShowcaseContent()
+        IOSWidgetShowcaseContent()
     }
 }
 
 @Preview
 @Composable
-private fun LockScreenWidgetMockupPreview() {
+private fun AndroidWidgetShowcaseContentPreview() {
     SpaceLaunchNowPreviewTheme {
-        LockScreenWidgetMockup(modifier = Modifier.width(200.dp))
+        AndroidWidgetShowcaseContent()
     }
 }
 
 @Preview
 @Composable
-private fun HomeScreenWidgetSmallMockupPreview() {
-    SpaceLaunchNowPreviewTheme {
-        HomeScreenWidgetSmallMockup()
-    }
-}
-
-@Preview
-@Composable
-private fun HomeScreenWidgetMediumMockupPreview() {
-    SpaceLaunchNowPreviewTheme {
-        HomeScreenWidgetMediumMockup(modifier = Modifier.width(320.dp))
+private fun AndroidWidgetShowcaseContentDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        AndroidWidgetShowcaseContent()
     }
 }
