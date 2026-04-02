@@ -4,6 +4,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.remoteconfig.FirebaseRemoteConfig
 import dev.gitlive.firebase.remoteconfig.remoteConfig
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration
@@ -41,6 +42,7 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
     
     companion object {
         private const val ROADMAP_DATA_KEY = "roadmap_data"
+        private const val PINNED_CONTENT_KEY = "pinned_content"
         private val DEFAULT_FETCH_INTERVAL: Duration = 1.hours
         private val FORCE_REFRESH_INTERVAL: Duration = 0.seconds
         
@@ -52,6 +54,9 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
             "message": "Loading roadmap data..."
         }
         """.trimIndent()
+        
+        // Default JSON - no pinned content
+        private val DEFAULT_PINNED_CONTENT_JSON = ""
     }
     
     override suspend fun fetchAndActivate(forceRefresh: Boolean): Result<Unit> {
@@ -97,11 +102,38 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         }
     }
     
+    override suspend fun getPinnedContent(): Result<PinnedContent?> {
+        val config = remoteConfig
+        if (config == null) {
+            log.d { "Remote config unavailable - no pinned content" }
+            return Result.success(null)
+        }
+        
+        return try {
+            val jsonString = config.getValue(PINNED_CONTENT_KEY).asString()
+            
+            if (jsonString.isBlank()) {
+                log.d { "No pinned content configured" }
+                return Result.success(null)
+            }
+            
+            val pinnedContent = json.decodeFromString<PinnedContent>(jsonString)
+            log.d { "Pinned content loaded: type=${pinnedContent.type}, id=${pinnedContent.id}, enabled=${pinnedContent.enabled}" }
+            Result.success(pinnedContent)
+        } catch (e: Exception) {
+            log.e(e) { "Failed to parse pinned content" }
+            Result.failure(e)
+        }
+    }
+    
     override suspend fun setDefaults() {
         val config = remoteConfig ?: return // No-op when Firebase unavailable
         
         try {
-            config.setDefaults(ROADMAP_DATA_KEY to DEFAULT_ROADMAP_JSON)
+            config.setDefaults(
+                ROADMAP_DATA_KEY to DEFAULT_ROADMAP_JSON,
+                PINNED_CONTENT_KEY to DEFAULT_PINNED_CONTENT_JSON
+            )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
             log.w(e) { "Failed to set remote config defaults" }
