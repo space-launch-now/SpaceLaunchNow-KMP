@@ -156,6 +156,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
  */
 @OptIn(ExperimentalTime::class)
 suspend fun LaunchesApi.getLaunchList(
+    id: String? = null, // UUID of specific launch to retrieve
     limit: Int? = null,
     offset: Int? = null,
     upcoming: Boolean? = null,
@@ -191,7 +192,7 @@ suspend fun LaunchesApi.getLaunchList(
     agencyLaunchAttemptCountYearGte = null,
     agencyLaunchAttemptCountYearLt = null,
     agencyLaunchAttemptCountYearLte = null,
-    id = null,
+    id = id?.let { listOf(it) },
     includeSuborbital = includeSuborbital,
     isCrewed = isCrewed,
     lastUpdatedGte = null,
@@ -295,4 +296,18 @@ suspend fun LaunchesApi.getStarshipLaunches(
     upcoming = upcoming,
     program = listOf(1),
     ordering = "net"
+)
+
+/**
+ * Get a single launch by UUID.
+ * Returns the launch as LaunchNormal if found, or null if not found.
+ *
+ * @param launchId The UUID of the launch to retrieve
+ * @return The launch if found, null otherwise
+ */
+suspend fun LaunchesApi.getLaunchById(
+    launchId: String
+): HttpResponse<PaginatedLaunchNormalList> = getLaunchList(
+    id = launchId,
+    limit = 1
 )

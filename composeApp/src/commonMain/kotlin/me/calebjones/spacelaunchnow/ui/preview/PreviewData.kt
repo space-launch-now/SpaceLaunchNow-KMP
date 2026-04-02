@@ -17,6 +17,9 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LocationList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PadDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini
+import me.calebjones.spacelaunchnow.data.model.PinnedContent
+import me.calebjones.spacelaunchnow.data.model.PinnedContentType
+import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedLaunchContent
 import kotlin.time.Instant
 
 /**
@@ -154,6 +157,13 @@ object PreviewData {
         name = "Launch Failure",
         abbrev = "Failure",
         description = "Launch failed"
+    )
+
+    val statusInFlight = LaunchStatus(
+        id = 6,
+        name = "In Flight",
+        abbrev = "InFlight",
+        description = "Vehicle is currently in flight"
     )
 
     // ========================================
@@ -531,6 +541,37 @@ object PreviewData {
             name = "Human"
         ),
         nationality = listOf(countryUSA)
+    )
+
+    // ========================================
+    // Pinned Content
+    // ========================================
+
+    val pinnedContent = PinnedContent(
+        type = PinnedContentType.LAUNCH,
+        id = "abc-123",
+        enabled = true,
+        expiresAt = null,
+        customMessage = null
+    )
+
+    val pinnedContentWithMessage = PinnedContent(
+        type = PinnedContentType.LAUNCH,
+        id = "abc-123",
+        enabled = true,
+        expiresAt = null,
+        customMessage = "Don't miss this historic launch!"
+    )
+
+    val pinnedLaunchContent = PinnedLaunchContent(
+        config = pinnedContent,
+        launch = launchNormalSpaceX
+    )
+
+    val pinnedLaunchContentWithMessage = PinnedLaunchContent(
+        config = pinnedContentWithMessage,
+        launch = launchNormalSpaceX,
+        customMessage = "Don't miss this historic launch!"
     )
 }
 

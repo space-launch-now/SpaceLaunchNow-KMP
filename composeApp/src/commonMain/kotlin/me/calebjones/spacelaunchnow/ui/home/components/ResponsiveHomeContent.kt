@@ -47,6 +47,8 @@ import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel
+import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedContentData
+import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedLaunchContent
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -57,7 +59,7 @@ fun ResponsiveHomeContent(
     previousLaunchesState: ViewState<List<LaunchNormal>>,
     historyState: ViewState<HistoryViewModel.HistoryData>,
     featuredLaunchState: ViewState<LaunchNormal?>,
-    updatesState: ViewState<List<UpdateEndpoint>>,
+    inFlightLaunchState: ViewState<LaunchNormal?> = ViewState(data = null),    pinnedContentState: ViewState<PinnedContentData?> = ViewState(data = null),    updatesState: ViewState<List<UpdateEndpoint>>,
     articlesState: ViewState<List<Article>>,
     eventsState: ViewState<List<EventEndpointNormal>>,
     next24HoursCount: Int,
@@ -66,6 +68,7 @@ fun ResponsiveHomeContent(
     isAnyViewLoading: Boolean,
     hasAdFree: Boolean,
     onShareLaunch: (LaunchNormal) -> Unit = {},
+    onDismissPinnedContent: () -> Unit = {},
     modifier: Modifier = Modifier,
     isOffline: Boolean = false,
     oldestCacheTimestamp: Long? = null,
@@ -73,6 +76,30 @@ fun ResponsiveHomeContent(
 ) {
     val layoutState = rememberAdaptiveLayoutState()
     val isTabletOrDesktop = layoutState.isExpanded
+
+    // Deduplication: If pinned launch is same as featured hero, don't show in featured section
+    // Priority order: Pinned > In-Flight > Featured
+    // Only dedupe if pinned content is a launch (not an event)
+    val pinnedLaunchId = (pinnedContentState.data as? PinnedLaunchContent)?.launch?.id
+    val dedupedInFlightLaunch = if (pinnedLaunchId != null && 
+        inFlightLaunchState.data?.id == pinnedLaunchId) {
+        null // Don't show in-flight if it's already pinned
+    } else {
+        inFlightLaunchState.data
+    }
+    val dedupedFeaturedLaunch = if (pinnedLaunchId != null && 
+        featuredLaunchState.data?.id == pinnedLaunchId) {
+        // Replace hero with second launch from additional if available
+        additionalFeaturedLaunchesState.data.firstOrNull()
+    } else if (inFlightLaunchState.data?.id != null && 
+        featuredLaunchState.data?.id == inFlightLaunchState.data?.id) {
+        // Don't show in featured if it's already in-flight
+        additionalFeaturedLaunchesState.data.firstOrNull()
+    } else {
+        featuredLaunchState.data
+    }
+    // Create modified state for deduped featured launch
+    val dedupedFeaturedState = featuredLaunchState.copy(data = dedupedFeaturedLaunch)
     
     // Dialog state for Updates info
     var showUpdatesInfoDialog by remember { mutableStateOf(false) }
@@ -128,6 +155,23 @@ fun ResponsiveHomeContent(
             }
         }
 
+        // Pinned/Featured content card at the very top (from Remote Config)
+        item(key = "pinned_content") {
+            PinnedContentSection(
+                pinnedContent = pinnedContentState.data,
+                navController = navController,
+                onDismiss = onDismissPinnedContent
+            )
+        }
+
+        // LIVE launch card at top (if in-flight launch exists)
+        item(key = "live_launch") {
+            LiveLaunchSection(
+                launch = dedupedInFlightLaunch,
+                navController = navController
+            )
+        }
+
         if (isTabletOrDesktop) {
             // Desktop/Tablet: Hero cards row
             if (useWideHeroLayout) {
@@ -157,7 +201,7 @@ fun ResponsiveHomeContent(
 
                         Box(modifier = Modifier.weight(0.6f)) {
                             NextLaunchView(
-                                state = featuredLaunchState,
+                                state = dedupedFeaturedState,
                                 navController = navController,
                                 onShare = onShareLaunch
                             )
@@ -168,7 +212,7 @@ fun ResponsiveHomeContent(
                 // Medium expanded (e.g. foldable): Single column, full width
                 item(key = "next_launch_view") {
                     NextLaunchView(
-                        state = featuredLaunchState,
+                        state = dedupedFeaturedState,
                         navController = navController,
                         onShare = onShareLaunch
                     )
@@ -185,7 +229,7 @@ fun ResponsiveHomeContent(
             // Phone: Next launch hero
             item(key = "next_launch_view") {
                 NextLaunchView(
-                    state = featuredLaunchState,
+                    state = dedupedFeaturedState,
                     navController = navController,
                     onShare = onShareLaunch
                 )
@@ -453,6 +497,78 @@ private fun ResponsiveHomeContentErrorPreview() {
             next24HoursCount = 0,
             nextWeekCount = 0,
             nextMonthCount = 0,
+            isAnyViewLoading = false,
+            hasAdFree = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ResponsiveHomeContentLivePreview() {
+    SpaceLaunchNowPreviewTheme {
+        val launches = listOf(
+            PreviewData.launchNormalSpaceX,
+            PreviewData.launchNormalULA
+        )
+        // Create an in-flight launch copy
+        val inFlightLaunch = PreviewData.launchNormalSpaceX.copy(
+            status = PreviewData.statusInFlight
+        )
+        ResponsiveHomeContent(
+            navController = rememberNavController(),
+            additionalFeaturedLaunchesState = ViewState(data = launches),
+            previousLaunchesState = ViewState(data = launches),
+            historyState = ViewState(
+                data = HistoryViewModel.HistoryData(
+                    count = 3,
+                    launches = launches
+                )
+            ),
+            featuredLaunchState = ViewState(data = launches.first()),
+            inFlightLaunchState = ViewState(data = inFlightLaunch),
+            updatesState = ViewState(data = emptyList()),
+            articlesState = ViewState(data = emptyList()),
+            eventsState = ViewState(data = emptyList()),
+            next24HoursCount = 1,
+            nextWeekCount = 5,
+            nextMonthCount = 15,
+            isAnyViewLoading = false,
+            hasAdFree = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ResponsiveHomeContentLiveDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        val launches = listOf(
+            PreviewData.launchNormalSpaceX,
+            PreviewData.launchNormalULA
+        )
+        // Create an in-flight launch copy
+        val inFlightLaunch = PreviewData.launchNormalSpaceX.copy(
+            status = PreviewData.statusInFlight
+        )
+        ResponsiveHomeContent(
+            navController = rememberNavController(),
+            additionalFeaturedLaunchesState = ViewState(data = launches),
+            previousLaunchesState = ViewState(data = launches),
+            historyState = ViewState(
+                data = HistoryViewModel.HistoryData(
+                    count = 3,
+                    launches = launches
+                )
+            ),
+            featuredLaunchState = ViewState(data = launches.first()),
+            inFlightLaunchState = ViewState(data = inFlightLaunch),
+            updatesState = ViewState(data = emptyList()),
+            articlesState = ViewState(data = emptyList()),
+            eventsState = ViewState(data = emptyList()),
+            next24HoursCount = 1,
+            nextWeekCount = 5,
+            nextMonthCount = 15,
             isAnyViewLoading = false,
             hasAdFree = true
         )

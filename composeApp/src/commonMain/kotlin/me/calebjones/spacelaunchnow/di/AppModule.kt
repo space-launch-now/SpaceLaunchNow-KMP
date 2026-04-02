@@ -56,6 +56,7 @@ import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.data.storage.PinnedContentPreferences
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
@@ -286,6 +287,12 @@ val appModule = module {
     single {
         val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
         LoggingPreferences(appDataStore)
+    }
+
+    // Pinned content preferences for storing dismissed pinned content IDs
+    single {
+        val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
+        PinnedContentPreferences(appDataStore)
     }
 
     // NotificationRepository - new clean architecture

@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.api.extensions.getLaunchById
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
@@ -236,6 +237,53 @@ class LaunchRepositoryImpl(
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "Unexpected error while fetching featured launch" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getInFlightLaunches(
+        forceRefresh: Boolean,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): Result<DataResult<PaginatedLaunchNormalList>> {
+        return try {
+            log.d { "getInFlightLaunches - forceRefresh: $forceRefresh, agencyIds: $agencyIds, locationIds: $locationIds" }
+
+            val now = Clock.System.now().toEpochMilliseconds()
+
+            // Fetch from API - status_ids=6 means "In Flight"
+            log.d { "Fetching in-flight launches from API with statusIds=[6]" }
+            val response = launchesApi.getLaunchList(
+                statusIds = listOf(6),  // In Flight status
+                lspId = agencyIds,
+                locationIds = locationIds,
+                limit = 5,
+                ordering = "net"
+            )
+
+            val launches = response.body()
+            log.i { "\u2705 API SUCCESS: Fetched ${launches.results.size} in-flight launches" }
+
+            // Log each in-flight launch
+            launches.results.forEachIndexed { index, launch ->
+                log.v { "InFlight[$index]: name='${launch.name}', id=${launch.id}, status=${launch.status?.name}" }
+            }
+
+            Result.success(
+                DataResult(
+                    data = launches,
+                    source = DataSource.NETWORK,
+                    timestamp = now
+                )
+            )
+        } catch (e: ResponseException) {
+            log.e(e) { "\u274C API ERROR in getInFlightLaunches: ${e.message}" }
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "\u274C NETWORK ERROR in getInFlightLaunches: ${e.message}" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "\u274C UNEXPECTED ERROR in getInFlightLaunches: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }
@@ -969,6 +1017,25 @@ class LaunchRepositoryImpl(
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "Exception in getNextNormalLaunch: ${e::class.simpleName}: ${e.message}" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getLaunchById(id: String): Result<LaunchNormal?> {
+        return try {
+            log.d { "getLaunchById - id: $id" }
+            val response = launchesApi.getLaunchById(launchId = id)
+            val body = response.body()
+            val launch = body.results?.firstOrNull()
+            Result.success(launch)
+        } catch (e: ResponseException) {
+            log.e(e) { "ResponseException in getLaunchById: ${e.message}" }
+            Result.failure(e)
+        } catch (e: IOException) {
+            log.e(e) { "IOException in getLaunchById: ${e.message}" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "Exception in getLaunchById: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }

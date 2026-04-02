@@ -54,6 +54,8 @@ fun HomeScreen(navController: NavController) {
     // Collect all ViewStates for offline detection AND to pass down as hoisted state
     val featuredLaunchState by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
     val additionalFeaturedLaunchesState by featuredLaunchViewModel.additionalFeaturedLaunches.collectAsStateWithLifecycle()
+    val inFlightLaunchState by featuredLaunchViewModel.inFlightLaunchState.collectAsStateWithLifecycle()
+    val pinnedContentState by featuredLaunchViewModel.pinnedContentState.collectAsStateWithLifecycle()
     val previousLaunchesState by launchesViewModel.previousLaunchesState.collectAsStateWithLifecycle()
     val updatesState by feedViewModel.updatesState.collectAsStateWithLifecycle()
     val articlesState by feedViewModel.articlesState.collectAsStateWithLifecycle()
@@ -145,6 +147,8 @@ fun HomeScreen(navController: NavController) {
     // Initial load of all sections
     LaunchedEffect(Unit) {
         featuredLaunchViewModel.loadFeaturedLaunch()
+        featuredLaunchViewModel.loadInFlightLaunch()
+        featuredLaunchViewModel.loadPinnedContent()
         launchesViewModel.loadLaunches()
         feedViewModel.loadUpdates()
         feedViewModel.loadArticles()
@@ -182,6 +186,8 @@ fun HomeScreen(navController: NavController) {
             previousLaunchesState = previousLaunchesState,
             historyState = historyState,
             featuredLaunchState = featuredLaunchState,
+            inFlightLaunchState = inFlightLaunchState,
+            pinnedContentState = pinnedContentState,
             updatesState = updatesState,
             articlesState = articlesState,
             eventsState = eventsState,
@@ -194,6 +200,9 @@ fun HomeScreen(navController: NavController) {
                 coroutineScope.launch {
                     sharingService.shareUrl(launchToShare.launchUrl)
                 }
+            },
+            onDismissPinnedContent = {
+                featuredLaunchViewModel.dismissPinnedContent()
             },
             modifier = Modifier.fillMaxSize(),
             isOffline = isOffline,
