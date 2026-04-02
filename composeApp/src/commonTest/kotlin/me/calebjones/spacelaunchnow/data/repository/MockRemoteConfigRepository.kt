@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
 
 /**
@@ -11,6 +12,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     var shouldFail = false
     var failureException = Exception("Mock failure")
     var mockRoadmapData: RoadmapData? = null
+    var mockPinnedContent: PinnedContent? = null
     var fetchAndActivateCalled = false
     var setDefaultsCalled = false
     var lastForceRefresh: Boolean? = null
@@ -40,10 +42,19 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
         // like the real implementation
     }
     
+    override suspend fun getPinnedContent(): Result<PinnedContent?> {
+        return if (shouldFail) {
+            Result.failure(failureException)
+        } else {
+            Result.success(mockPinnedContent)
+        }
+    }
+    
     fun reset() {
         shouldFail = false
         failureException = Exception("Mock failure")
         mockRoadmapData = null
+        mockPinnedContent = null
         fetchAndActivateCalled = false
         setDefaultsCalled = false
         lastForceRefresh = null
