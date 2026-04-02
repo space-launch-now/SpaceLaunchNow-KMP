@@ -1,3 +1,24 @@
+# [5.24.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.3...v5.24.0) (2026-04-02)
+
+
+### Bug Fixes
+
+* add Firebase Remote Config integration to project ([fb2376f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fb2376fe422506c95cf0d4188215f5058590e598))
+* add Firebase Remote Config integration to project ([cc74155](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cc74155bf53a245af5b76651d53f208cb954f40c))
+* add mock implementation for remote config ([983f008](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/983f008b43a62dfd35722e0877ef68c4da86b7fb))
+* **onboarding:** update WidgetsPage to support platform-specific widget showcases for iOS and Android ([3e86143](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3e861438e55237271ef71738387afd038c5197d0))
+* **onboarding:** update WidgetsPage to support platform-specific widget showcases for iOS and Android ([5056bf6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5056bf65e168886870d8e9241172c6398c4e0e07))
+* refactor home screen and tablet layouts ([1089b7d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1089b7dc57069cef81eea40d2104570edc0f5d51))
+* refactor home screen and tablet layouts ([7074a2d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7074a2dbd8a22516b1f58593e91bd27bd9d34d30))
+* **settings:** replace CircularProgressIndicator with LinearProgressIndicator for better loading feedback ([c1b852d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c1b852da7253903abfa900ce28d0254e48abed80))
+
+
+### Features
+
+* implement Live Launches card and pinned content ([4be0d4b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4be0d4b8792aeff008f4faa4194ab05157acd6a0))
+
+
+
 ## [5.23.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.2...v5.23.3) (2026-04-01)
 
 
@@ -44,21 +65,6 @@
 ### Features
 
 * add events and news screen ([2882bd3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2882bd33428a8698efdc5891a13c66c502b5a39a))
-
-
-
-## [5.22.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.3...v5.22.4) (2026-03-22)
-
-
-### Bug Fixes
-
-* correct TOTP secret key name in EnvironmentManager ([c2c124d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c2c124d7ff994d523f5fb2b01aa2e2410ea3d38b))
-* fix home view models for improved structure and maintainability ([357ff3e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/357ff3e9c90acbaf984aeaa3b2feb5a0c85ef4ad))
-* handle billing unavailability in SubscriptionViewModel and set minimum window size in DesktopApp ([b291105](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b291105d9791be2ee012e6fd488a8542d6020114))
-* implement stale-while-revalidate pattern for launch details and UI updates ([cc8a06b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cc8a06b41ba95061be20bed0783f72b9f6acc5a6))
-* integrate Firebase Crashlytics for enhanced error reporting and logging ([3145c7f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3145c7faa33acac8b73000c5d33a2a3f9c119eb3))
-* integrate Firebase Crashlytics for error reporting and add test functionality in DebugSettingsScreen ([55661ae](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/55661aefd71a5ad8c21785f6ca3eff7c892d0fb8))
-* update Firebase Crashlytics integration and dSYM upload script ([1dbd8c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1dbd8c6f1eaa3e5fe3487d994d5c163a9eb20ce7))
 
 
 
