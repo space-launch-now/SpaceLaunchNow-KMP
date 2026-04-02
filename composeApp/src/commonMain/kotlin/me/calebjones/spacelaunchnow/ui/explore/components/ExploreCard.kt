@@ -47,11 +47,11 @@ fun ExploreCard(
     isLargeScreen: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val cardHeight = if (isLargeScreen) 260.dp else 250.dp
-    val iconSurfaceSize = if (isLargeScreen) 140.dp else 120.dp
-    val iconPadding = if (isLargeScreen) 18.dp else 12.dp
-    val cardPadding = if (isLargeScreen) 24.dp else 16.dp
-    val titleStyle = if (isLargeScreen) MaterialTheme.typography.titleLarge else MaterialTheme.typography.titleMedium
+    val cardHeight = if (isLargeScreen) 200.dp else 200.dp
+    val iconSurfaceSize = if (isLargeScreen) 100.dp else 90.dp
+    val iconPadding = if (isLargeScreen) 14.dp else 10.dp
+    val cardPadding = if (isLargeScreen) 16.dp else 12.dp
+    val titleStyle = if (isLargeScreen) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleMedium
 
     Card(
         modifier = modifier

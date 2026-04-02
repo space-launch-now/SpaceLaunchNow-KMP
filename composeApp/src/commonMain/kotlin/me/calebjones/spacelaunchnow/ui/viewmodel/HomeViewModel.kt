@@ -70,6 +70,11 @@ class HomeViewModel(
     val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> =
         _featuredLaunchState.asStateFlow()
 
+    // In-Flight Launch State (LIVE launches currently flying)
+    private val _inFlightLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
+    val inFlightLaunchState: StateFlow<ViewState<LaunchNormal?>> =
+        _inFlightLaunchState.asStateFlow()
+
     // Upcoming Launches State
     private val _upcomingLaunchesState =
         MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
@@ -164,6 +169,9 @@ class HomeViewModel(
                 // PRIORITY 2: Upcoming launches - start immediately after featured begins
                 val upcomingJob = async { loadUpcomingLaunches() }
 
+                // PRIORITY 2.5: In-flight launches (LIVE) - important for real-time updates
+                launch(kotlinx.coroutines.Dispatchers.Default) { loadInFlightLaunch() }
+
                 // PRIORITY 3: Everything else - run on IO dispatcher (lower priority for background work)
                 // These don't block the UI and can use lower priority IO threads
                 launch(kotlinx.coroutines.Dispatchers.Default) { loadUpdates() }
@@ -257,6 +265,70 @@ class HomeViewModel(
                     )
                 }
                 log.d { "Updated featuredLaunchState with exception error, isLoading=false" }
+            }
+        }
+    }
+
+    /**
+     * Loads in-flight launches (status_id = 6) for LIVE card display.
+     * These are launches that are currently flying and match user's filter preferences.
+     * @param forceRefresh If true, bypass cache (user-initiated refresh)
+     */
+    fun loadInFlightLaunch(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                log.d { "Loading in-flight launches - forceRefresh: $forceRefresh" }
+
+                _inFlightLaunchState.update {
+                    it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
+                }
+
+                // Get filter settings from DataStore
+                val currentFilters = notificationStateStorage.stateFlow.first()
+                val filterParams = launchFilterService.getFilterParams(currentFilters)
+                log.v { "In-flight filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
+
+                val result = launchRepository.getInFlightLaunches(
+                    forceRefresh = forceRefresh,
+                    agencyIds = filterParams.agencyIds,
+                    locationIds = filterParams.locationIds
+                )
+
+                result.onSuccess { dataResult ->
+                    val inFlightLaunches = dataResult.data.results
+                    log.i { "In-flight launches found: ${inFlightLaunches.size}" }
+
+                    // Take the first in-flight launch for display (US5 can be expanded later)
+                    val firstInFlight = inFlightLaunches.firstOrNull()
+                    if (firstInFlight != null) {
+                        log.i { "LIVE launch: ${firstInFlight.name} (status: ${firstInFlight.status?.name})" }
+                    }
+
+                    _inFlightLaunchState.update {
+                        it.copy(
+                            data = firstInFlight,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+                }.onFailure { exception ->
+                    log.e(exception) { "Failed to load in-flight launches: ${exception.message}" }
+                    _inFlightLaunchState.update {
+                        it.copy(
+                            error = formatErrorMessage(exception),
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                log.e(exception) { "Exception in loadInFlightLaunch: ${exception.message}" }
+                _inFlightLaunchState.update {
+                    it.copy(
+                        error = exception.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
             }
         }
     }

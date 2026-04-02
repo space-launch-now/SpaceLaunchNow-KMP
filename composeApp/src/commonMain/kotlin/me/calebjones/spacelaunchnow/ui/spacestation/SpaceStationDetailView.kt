@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fullscreen
@@ -37,9 +39,11 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetaile
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.spacestation.components.DockingLocationsCard
 import me.calebjones.spacelaunchnow.ui.spacestation.components.ExpeditionInfoCard
 import me.calebjones.spacelaunchnow.ui.spacestation.components.IssMapView
@@ -51,7 +55,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.IssPositionData
 import me.calebjones.spacelaunchnow.util.LatLng
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 
-private val TitleHeight = 128.dp
+private val TitleHeight = 110.dp
 private const val ISS_STATION_ID = 4
 
 /**
@@ -115,47 +119,124 @@ private fun SpaceStationDetailContent(
     onVideoSelected: (Int) -> Unit,
     onNavigateToFullscreen: (String, String) -> Unit
 ) {
+    val isCollapsed = LocalDetailScaffoldCollapsed.current
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger
+    
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-
-        // ISS-specific: NASA live stream
-        if (isIss) {
-            if (videoPlayerState.availableVideos.isNotEmpty()) {
-                VideoPlayerCard(
-                    videoPlayerState = videoPlayerState,
-                    launchName = station.name,
-                    onSetPlayerVisible = onSetPlayerVisible,
-                    onNavigateToFullscreen = onNavigateToFullscreen,
-                    onVideoSelected = onVideoSelected,
-                    playerConfig = VideoPlayerConfig(
-                        isSeekBarVisible = false,
-                        isDurationVisible = false,
-                        isFullScreenEnabled = false,
-                        isLiveStream = true,
-                        showControls = false,
-                        isGestureVolumeControlEnabled = false,
-                    )
-                )
-            } else {
-                // Show loading placeholder while videos are loading
-                PlainShimmerCard(height = 200)
-            }
-            Spacer(Modifier.height(16.dp))
+        if (!isCollapsed) {
+            Spacer(Modifier.height(TitleHeight - 28.dp))
         }
 
-        // Active expedition info - use detailed expeditions if available, fall back to station's mini list
-        if (activeExpeditions.isNotEmpty()) {
-            for (expedition in activeExpeditions) {
-                ExpeditionInfoCard(expedition = expedition)
+        // ISS-specific: NASA live stream + Expedition info
+        if (isIss) {
+            val hasVideo = videoPlayerState.availableVideos.isNotEmpty()
+            val hasExpeditions = activeExpeditions.isNotEmpty() || station.activeExpeditions.isNotEmpty()
+            
+            if (isLargeScreen && hasVideo && hasExpeditions) {
+                // Tablet: Side-by-side video (60%) + expedition (40%)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Video player - 60% width
+                    Box(modifier = Modifier.weight(0.6f)) {
+                        VideoPlayerCard(
+                            videoPlayerState = videoPlayerState,
+                            launchName = station.name,
+                            onSetPlayerVisible = onSetPlayerVisible,
+                            onNavigateToFullscreen = onNavigateToFullscreen,
+                            onVideoSelected = onVideoSelected,
+                            playerConfig = VideoPlayerConfig(
+                                isSeekBarVisible = false,
+                                isDurationVisible = false,
+                                isFullScreenEnabled = false,
+                                isLiveStream = true,
+                                showControls = false,
+                                isGestureVolumeControlEnabled = false,
+                            )
+                        )
+                    }
+                    
+                    // Expedition info - 40% width (show first expedition)
+                    Column(modifier = Modifier.weight(0.4f)) {
+                        if (activeExpeditions.isNotEmpty()) {
+                            ExpeditionInfoCard(expedition = activeExpeditions.first())
+                        } else {
+                            station.activeExpeditions.firstOrNull()?.let { expedition ->
+                                ExpeditionInfoCard(expeditionMini = expedition)
+                            }
+                        }
+                    }
+                }
                 Spacer(Modifier.height(16.dp))
+                
+                // Show remaining expeditions below (if more than one)
+                if (activeExpeditions.size > 1) {
+                    for (expedition in activeExpeditions.drop(1)) {
+                        ExpeditionInfoCard(expedition = expedition)
+                        Spacer(Modifier.height(16.dp))
+                    }
+                } else if (activeExpeditions.isEmpty() && station.activeExpeditions.size > 1) {
+                    for (expedition in station.activeExpeditions.drop(1)) {
+                        ExpeditionInfoCard(expeditionMini = expedition)
+                        Spacer(Modifier.height(16.dp))
+                    }
+                }
+            } else {
+                // Phone: Vertical stacked layout (original)
+                if (hasVideo) {
+                    VideoPlayerCard(
+                        videoPlayerState = videoPlayerState,
+                        launchName = station.name,
+                        onSetPlayerVisible = onSetPlayerVisible,
+                        onNavigateToFullscreen = onNavigateToFullscreen,
+                        onVideoSelected = onVideoSelected,
+                        playerConfig = VideoPlayerConfig(
+                            isSeekBarVisible = false,
+                            isDurationVisible = false,
+                            isFullScreenEnabled = false,
+                            isLiveStream = true,
+                            showControls = false,
+                            isGestureVolumeControlEnabled = false,
+                        )
+                    )
+                    Spacer(Modifier.height(16.dp))
+                } else if (isIss) {
+                    // Show loading placeholder while videos are loading
+                    PlainShimmerCard(height = 200)
+                    Spacer(Modifier.height(16.dp))
+                }
+                
+                // Expedition cards - all stacked vertically
+                if (activeExpeditions.isNotEmpty()) {
+                    for (expedition in activeExpeditions) {
+                        ExpeditionInfoCard(expedition = expedition)
+                        Spacer(Modifier.height(16.dp))
+                    }
+                } else {
+                    station.activeExpeditions.let { expeditions ->
+                        for (expedition in expeditions) {
+                            ExpeditionInfoCard(expeditionMini = expedition)
+                            Spacer(Modifier.height(16.dp))
+                        }
+                    }
+                }
             }
         } else {
-            // Fallback to station's basic expedition list
-            station.activeExpeditions.let { expeditions ->
-                for (expedition in expeditions) {
-                    ExpeditionInfoCard(expeditionMini = expedition)
+            // Non-ISS stations: Just show expedition info
+            if (activeExpeditions.isNotEmpty()) {
+                for (expedition in activeExpeditions) {
+                    ExpeditionInfoCard(expedition = expedition)
                     Spacer(Modifier.height(16.dp))
+                }
+            } else {
+                station.activeExpeditions.let { expeditions ->
+                    for (expedition in expeditions) {
+                        ExpeditionInfoCard(expeditionMini = expedition)
+                        Spacer(Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -164,206 +245,90 @@ private fun SpaceStationDetailContent(
         if (isIss) {
             // Show shimmer if position data is still loading
             if (issPosition == null || issPositionData == null) {
-                PlainShimmerCard(height = 400)
+                PlainShimmerCard(height = if (isLargeScreen) 320 else 400)
                 Spacer(Modifier.height(16.dp))
             } else {
                 var isMapFullscreen by remember { mutableStateOf(false) }
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column {
-                        // Map section
-                        Box(modifier = Modifier.fillMaxWidth().height(250.dp)) {
-                            IssMapView(
-                                currentPosition = issPosition,
-                                orbitPath = orbitPath,
-                                modifier = Modifier.fillMaxSize(),
-                                isInteractive = false
-                            )
-
-                            // Fullscreen button
-                            FloatingActionButton(
-                                onClick = { isMapFullscreen = true },
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(16.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Fullscreen,
-                                    contentDescription = "Fullscreen Map"
+                
+                // Tablet: Side-by-side layout; Phone: Stacked layout
+                if (isLargeScreen) {
+                    // Tablet landscape: Map (60%) + Position info (40%) side by side
+                    Row(
+                        modifier = Modifier.fillMaxWidth().height(320.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        // Map card - 60% width
+                        Card(
+                            modifier = Modifier.weight(0.6f).fillMaxHeight(),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                IssMapView(
+                                    currentPosition = issPosition,
+                                    orbitPath = orbitPath,
+                                    modifier = Modifier.fillMaxSize(),
+                                    isInteractive = false
                                 )
+                                FloatingActionButton(
+                                    onClick = { isMapFullscreen = true },
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(16.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Fullscreen,
+                                        contentDescription = "Fullscreen Map"
+                                    )
+                                }
                             }
                         }
-
-                        // Position info section (inside same card)
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "Current Position",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(bottom = 12.dp)
+                        
+                        // Position info card - 40% width
+                        Card(
+                            modifier = Modifier.weight(0.4f).fillMaxHeight(),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            IssPositionInfoSection(
+                                issPositionData = issPositionData,
+                                orbit = station.orbit,
+                                modifier = Modifier.fillMaxSize().padding(16.dp)
                             )
-
-                            if (issPositionData != null) {
-                                val position = issPositionData.position
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                        }
+                    }
+                } else {
+                    // Phone: Vertical stacked layout (original)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Column {
+                            // Map section
+                            Box(modifier = Modifier.fillMaxWidth().height(250.dp)) {
+                                IssMapView(
+                                    currentPosition = issPosition,
+                                    orbitPath = orbitPath,
+                                    modifier = Modifier.fillMaxSize(),
+                                    isInteractive = false
+                                )
+                                FloatingActionButton(
+                                    onClick = { isMapFullscreen = true },
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(16.dp)
                                 ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Default.LocationOn,
-                                                contentDescription = "Location",
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                            Column(modifier = Modifier.padding(start = 8.dp)) {
-                                                Text(
-                                                    text = "Latitude",
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                                Text(
-                                                    text = "${
-                                                        NumberFormatUtil.formatDecimal(
-                                                            position.latitude,
-                                                            4
-                                                        )
-                                                    }°",
-                                                    style = MaterialTheme.typography.bodyLarge
-                                                )
-                                            }
-                                        }
-                                    }
-
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Default.LocationOn,
-                                                contentDescription = "Location",
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                            Column(modifier = Modifier.padding(start = 8.dp)) {
-                                                Text(
-                                                    text = "Longitude",
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                                Text(
-                                                    text = "${
-                                                        NumberFormatUtil.formatDecimal(
-                                                            position.longitude,
-                                                            4
-                                                        )
-                                                    }°",
-                                                    style = MaterialTheme.typography.bodyLarge
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Additional ISS info: altitude, velocity, visibility
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = "Altitude",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    Icon(
+                                        imageVector = Icons.Default.Fullscreen,
+                                        contentDescription = "Fullscreen Map"
                                     )
-                                    issPositionData.altitude.let {
-                                        Text(
-                                            text = "${
-                                                NumberFormatUtil.formatDecimal(
-                                                    it,
-                                                    1
-                                                )
-                                            } km",
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
-                                    }
-                                }
-
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Default.Speed,
-                                            contentDescription = "Velocity",
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                        Column(modifier = Modifier.padding(start = 8.dp)) {
-                                            Text(
-                                                text = "Velocity",
-                                                style = MaterialTheme.typography.labelSmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                            issPositionData?.velocity?.let {
-                                                Text(
-                                                    text = "${
-                                                        NumberFormatUtil.formatDecimal(
-                                                            it,
-                                                            0
-                                                        )
-                                                    } km/h",
-                                                    style = MaterialTheme.typography.bodyMedium
-                                                )
-                                            }
-                                        }
-                                    }
                                 }
                             }
-
-                            // Visibility status
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "Visibility",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    issPositionData?.visibility?.replaceFirstChar { it.uppercase() }
-                                        ?.let {
-                                            Text(
-                                                text = it,
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                color = if (issPositionData.visibility == "daylight")
-                                                    MaterialTheme.colorScheme.primary
-                                                else
-                                                    MaterialTheme.colorScheme.onSurface,
-                                                modifier = Modifier.padding(top = 4.dp)
-                                            )
-                                        }
-                                }
-                            }
-
-                            // Orbit info
-                            station.orbit?.let { orbitInfo ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-                                    horizontalArrangement = Arrangement.Start
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = "Orbit",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        Text(
-                                            text = orbitInfo,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            modifier = Modifier.padding(top = 4.dp)
-                                        )
-                                    }
-                                }
-                            }
+                            
+                            // Position info section (inside same card)
+                            IssPositionInfoSection(
+                                issPositionData = issPositionData,
+                                orbit = station.orbit,
+                                modifier = Modifier.padding(16.dp)
+                            )
                         }
                     }
                 }
@@ -438,5 +403,159 @@ private fun SpaceStationDetailContent(
 
         // Bottom spacing
         Spacer(Modifier.height(32.dp))
+    }
+}
+
+/**
+ * Extracted composable for ISS position information display.
+ * Used in both phone (vertical) and tablet (side-by-side) layouts.
+ */
+@Composable
+private fun IssPositionInfoSection(
+    issPositionData: IssPositionData,
+    orbit: String?,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = "Current Position",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        val position = issPositionData.position
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Location",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Column(modifier = Modifier.padding(start = 8.dp)) {
+                        Text(
+                            text = "Latitude",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "${NumberFormatUtil.formatDecimal(position.latitude, 4)}°",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Location",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Column(modifier = Modifier.padding(start = 8.dp)) {
+                        Text(
+                            text = "Longitude",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "${NumberFormatUtil.formatDecimal(position.longitude, 4)}°",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+
+        // Altitude and velocity
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Altitude",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "${NumberFormatUtil.formatDecimal(issPositionData.altitude, 1)} km",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Speed,
+                        contentDescription = "Velocity",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Column(modifier = Modifier.padding(start = 8.dp)) {
+                        Text(
+                            text = "Velocity",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        issPositionData.velocity?.let {
+                            Text(
+                                text = "${NumberFormatUtil.formatDecimal(it, 0)} km/h",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Visibility status
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Column {
+                Text(
+                    text = "Visibility",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                issPositionData.visibility?.replaceFirstChar { it.uppercase() }?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (issPositionData.visibility == "daylight")
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+        }
+
+        // Orbit info
+        orbit?.let { orbitInfo ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Column {
+                    Text(
+                        text = "Orbit",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = orbitInfo,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+        }
     }
 }

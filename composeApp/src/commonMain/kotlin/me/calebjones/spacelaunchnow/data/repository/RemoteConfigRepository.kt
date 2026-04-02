@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
 
 /**
@@ -36,6 +37,17 @@ interface RemoteConfigRepository {
      * @return Result.failure with exception if parsing failed
      */
     suspend fun getRoadmapData(): Result<RoadmapData>
+    
+    /**
+     * Get pinned/featured content from remote config
+     * 
+     * Reads the 'pinned_content' parameter and deserializes to PinnedContent.
+     * Use this to feature specific launches or events at the top of the home screen.
+     * 
+     * @return Result.success with PinnedContent (null if not configured or disabled)
+     * @return Result.failure with exception if parsing failed
+     */
+    suspend fun getPinnedContent(): Result<PinnedContent?>
     
     /**
      * Set default values for remote config parameters

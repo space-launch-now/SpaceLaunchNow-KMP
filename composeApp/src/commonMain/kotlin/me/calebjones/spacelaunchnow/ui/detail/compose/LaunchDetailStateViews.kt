@@ -49,7 +49,7 @@ import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
  */
 
 // Keep only TitleHeight which is used for spacing
-private val TitleHeight = 120.dp
+private val TitleHeight = 100.dp
 
 /**
  * Error state view for launch details

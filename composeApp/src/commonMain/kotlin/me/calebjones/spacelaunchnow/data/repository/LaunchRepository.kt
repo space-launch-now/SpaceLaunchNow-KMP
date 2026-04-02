@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.data.repository
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
@@ -19,6 +20,16 @@ interface LaunchRepository {
     suspend fun getPreviousLaunchesList(limit: Int): Result<PaginatedLaunchBasicList>
 
     suspend fun getFeaturedLaunch(
+        forceRefresh: Boolean = false,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): Result<DataResult<PaginatedLaunchNormalList>>
+
+    /**
+     * Get launches that are currently in flight (status_id = 6).
+     * Used to display LIVE launch cards on the home screen.
+     */
+    suspend fun getInFlightLaunches(
         forceRefresh: Boolean = false,
         agencyIds: List<Int>? = null,
         locationIds: List<Int>? = null
@@ -60,5 +71,14 @@ interface LaunchRepository {
 
     suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList>
     suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedLaunchNormalList>
+
+    /**
+     * Get a single launch by its UUID.
+     * Returns LaunchNormal for consistent card display.
+     *
+     * @param id The UUID of the launch
+     * @return The launch if found, null otherwise wrapped in Result
+     */
+    suspend fun getLaunchById(id: String): Result<LaunchNormal?>
 }
  

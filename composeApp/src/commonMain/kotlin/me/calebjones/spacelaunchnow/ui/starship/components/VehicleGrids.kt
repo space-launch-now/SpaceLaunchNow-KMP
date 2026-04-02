@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
 import me.calebjones.spacelaunchnow.ui.compose.StarshipVehiclesShimmer
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 
 /**
@@ -38,7 +39,11 @@ internal fun SpacecraftGrid(
     modifier: Modifier = Modifier
 ) {
     val spacecraft = spacecraftState.data ?: emptyList()
-    val gridState = rememberLazyGridState()
+    val gridState = rememberLazyStaggeredGridState()
+    
+    // Adaptive column count: 2 on phones, 3-4 on tablets
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger
+    val columnCount = if (isLargeScreen) 4 else 2
 
     // Trigger load more when scrolled near the end
     val shouldLoadMore by remember(hasMore, isLoadingMore) {
@@ -63,41 +68,32 @@ internal fun SpacecraftGrid(
             }
 
             spacecraft.isNotEmpty() -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(columnCount),
                     state = gridState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalItemSpacing = 12.dp
                 ) {
                     if (spacecraftState.isStale) {
-                        item(span = { GridItemSpan(2) }) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
                             StalenessIndicator(modifier = Modifier.padding(bottom = 8.dp))
                         }
                     }
 
-                    val spacecraftCount = spacecraft.size
-                    val showFullWidthLast = !hasMore && spacecraftCount % 2 == 1
                     itemsIndexed(
                         spacecraft,
-                        key = { _, item -> "spacecraft_${item.id}" },
-                        span = { index, _ ->
-                            if (showFullWidthLast && index == spacecraftCount - 1) {
-                                GridItemSpan(2)
-                            } else {
-                                GridItemSpan(1)
-                            }
-                        }
-                    ) { index, item ->
+                        key = { _, item -> "spacecraft_${item.id}" }
+                    ) { _, item ->
                         SpacecraftGridCard(
                             spacecraft = item,
-                            isFullWidth = showFullWidthLast && index == spacecraftCount - 1
+                            isFullWidth = false
                         )
                     }
 
                     if (isLoadingMore) {
-                        item(span = { GridItemSpan(2) }) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
                             Box(
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                                 contentAlignment = Alignment.Center
@@ -135,7 +131,11 @@ internal fun LaunchersGrid(
     modifier: Modifier = Modifier
 ) {
     val launchers = launchersState.data ?: emptyList()
-    val gridState = rememberLazyGridState()
+    val gridState = rememberLazyStaggeredGridState()
+    
+    // Adaptive column count: 2 on phones, 4 on tablets
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger
+    val columnCount = if (isLargeScreen) 4 else 2
 
     // Trigger load more when scrolled near the end
     val shouldLoadMore by remember(hasMore, isLoadingMore) {
@@ -160,41 +160,32 @@ internal fun LaunchersGrid(
             }
 
             launchers.isNotEmpty() -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(columnCount),
                     state = gridState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalItemSpacing = 12.dp
                 ) {
                     if (launchersState.isStale) {
-                        item(span = { GridItemSpan(2) }) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
                             StalenessIndicator(modifier = Modifier.padding(bottom = 8.dp))
                         }
                     }
 
-                    val launcherCount = launchers.size
-                    val showFullWidthLast = !hasMore && launcherCount % 2 == 1
                     itemsIndexed(
                         launchers,
-                        key = { _, item -> "launcher_${item.id}" },
-                        span = { index, _ ->
-                            if (showFullWidthLast && index == launcherCount - 1) {
-                                GridItemSpan(2)
-                            } else {
-                                GridItemSpan(1)
-                            }
-                        }
-                    ) { index, item ->
+                        key = { _, item -> "launcher_${item.id}" }
+                    ) { _, item ->
                         LauncherGridCard(
                             launcher = item,
-                            isFullWidth = showFullWidthLast && index == launcherCount - 1
+                            isFullWidth = false
                         )
                     }
 
                     if (isLoadingMore) {
-                        item(span = { GridItemSpan(2) }) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
                             Box(
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                                 contentAlignment = Alignment.Center
