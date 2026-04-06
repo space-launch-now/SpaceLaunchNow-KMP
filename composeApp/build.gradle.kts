@@ -275,6 +275,8 @@ kotlin {
 
                 // GitLive Firebase Remote Config (KMP)
                 implementation(libs.gitlive.firebase.config)
+                // GitLive Firebase Analytics (KMP)
+                implementation(libs.gitlive.firebase.analytics)
             }
         }
 

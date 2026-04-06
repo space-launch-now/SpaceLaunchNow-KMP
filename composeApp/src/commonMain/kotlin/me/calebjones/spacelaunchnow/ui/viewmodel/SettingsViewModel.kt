@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
@@ -78,7 +80,8 @@ class AppSettingsViewModel(
 class SettingsViewModel(
     private val notificationRepository: NotificationRepository,
     private val appSettingsViewModel: AppSettingsViewModel,
-    private val subscriptionRepository: SubscriptionRepository
+    private val subscriptionRepository: SubscriptionRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
     private val log = logger()
 
@@ -233,6 +236,9 @@ class SettingsViewModel(
 
     // Topic update methods
     fun updateTopic(topic: NotificationTopic, enabled: Boolean) {
+        analyticsManager.track(
+            AnalyticsEvent.NotificationSettingChanged(type = topic.name, enabled = enabled)
+        )
         viewModelScope.launch {
             notificationRepository.setTopicEnabled(topic, enabled)
         }
@@ -260,6 +266,7 @@ class SettingsViewModel(
 
     // App settings delegation
     fun updateTheme(theme: ThemeOption) {
+        analyticsManager.track(AnalyticsEvent.ThemeChanged(theme = theme.name))
         viewModelScope.launch {
             try {
                 appSettingsViewModel.updateTheme(theme)

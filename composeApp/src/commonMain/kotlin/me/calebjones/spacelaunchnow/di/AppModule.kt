@@ -118,7 +118,7 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, appModule, debugModule, imageLoaderModule)
+    modules(networkModule, apiModule, appModule, debugModule, imageLoaderModule, analyticsModule)
 }
 
 val appModule = module {
@@ -192,7 +192,7 @@ val appModule = module {
     singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
     singleOf(::AstronautFilterRepositoryImpl) { bind<AstronautFilterRepository>() }
     viewModelOf(::AstronautListViewModel)
-    viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), astronautId) }
+    viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), get(), astronautId) }
 
     // Space Station tracking
     singleOf(::IssTrackingRepositoryImpl) {

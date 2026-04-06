@@ -13,6 +13,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
@@ -23,7 +25,8 @@ class LaunchViewModel(
     private val repository: LaunchRepository,
     private val launchCache: LaunchCache,
     private val articlesRepository: ArticlesRepository,
-    private val eventsRepository: EventsRepository
+    private val eventsRepository: EventsRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _upcomingLaunches = MutableStateFlow<PaginatedLaunchBasicList?>(null)
@@ -72,6 +75,28 @@ class LaunchViewModel(
     private val _isRefreshingWithStaleData = MutableStateFlow(false)
     val isRefreshingWithStaleData: StateFlow<Boolean> = _isRefreshingWithStaleData
 
+    // ========== Analytics ==========
+
+    fun trackLinkOpened(url: String, launchId: String) {
+        analyticsManager.track(
+            AnalyticsEvent.ThirdPartyReferral(
+                provider = "launch_detail",
+                url = url,
+                contentType = "launch_link",
+                contentId = launchId
+            )
+        )
+    }
+
+    fun trackVideoOpened(videoUrl: String, videoSource: String) {
+        analyticsManager.track(
+            AnalyticsEvent.VideoOpenedExternal(
+                videoUrl = videoUrl,
+                videoSource = videoSource
+            )
+        )
+    }
+
     fun fetchUpcomingLaunchesNormal(limit: Int) {
         viewModelScope.launch {
             val result = repository.getUpcomingLaunchesNormal(limit = limit)
@@ -119,6 +144,7 @@ class LaunchViewModel(
                 updateVideoPlayerState(launch)
                 // Cache the detailed data for future use
                 launchCache.cacheLaunchDetailed(launch)
+                analyticsManager.track(AnalyticsEvent.LaunchViewed(launch.id.toString(), launch.name ?: "Unknown"))
             }.onFailure { exception ->
                 // Only show error if we don't have any data to display
                 if (_launchDetails.value == null) {

@@ -85,7 +85,8 @@ fun PhoneLaunchDetailContent(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
-    openUrl: (String) -> Unit
+    openUrl: (String) -> Unit,
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     val tabs = LaunchDetailTab.values()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -114,7 +115,8 @@ fun PhoneLaunchDetailContent(
                 onSetPlayerVisible = onSetPlayerVisible,
                 onNavigateToFullscreen = onNavigateToFullscreen,
                 onVideoSelected = { /* Video selection handled below */ },
-                showVideoPicker = false // Video picker is shown separately below
+                showVideoPicker = false,
+                onExternalVideoOpened = onExternalVideoOpened
             )
             Spacer(Modifier.height(16.dp))
 

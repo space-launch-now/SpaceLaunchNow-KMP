@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
@@ -13,7 +15,8 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 
 class AgencyViewModel(
     private val repository: LaunchRepository,
-    private val agencyRepository: AgencyRepository
+    private val agencyRepository: AgencyRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
     private val log = logger()
 
@@ -57,6 +60,7 @@ class AgencyViewModel(
             result.onSuccess { agency ->
                 log.i { "Successfully loaded agency details: ${agency.name}" }
                 _agencyDetails.value = agency
+                analyticsManager.track(AnalyticsEvent.AgencyViewed(agency.id))
             }.onFailure { exception ->
                 log.e(exception) { "Failed to fetch agency details for id: $id" }
                 _error.value = exception.message

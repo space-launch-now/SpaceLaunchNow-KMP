@@ -310,16 +310,24 @@ class FeaturedLaunchViewModel(
 
     /**
      * Loads pinned content from Firebase Remote Config.
-     * If valid pinned content exists and is a LAUNCH type, fetches the launch data.
-     * Events are not yet supported (TODO: add events repository).
+     * Fetches and activates the latest Remote Config values before reading pinned content.
+     * If valid pinned content exists, fetches the associated launch or event data.
+     *
+     * @param forceRefresh If true, bypass Remote Config cache (e.g., pull-to-refresh)
      */
-    fun loadPinnedContent() {
+    fun loadPinnedContent(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                log.d { "Loading pinned content from Remote Config..." }
+                log.d { "Loading pinned content from Remote Config (forceRefresh=$forceRefresh)..." }
 
                 _pinnedContentState.update {
                     it.copy(isLoading = true, error = null)
+                }
+
+                // Fetch latest Remote Config values before reading
+                val fetchResult = remoteConfigRepository.fetchAndActivate(forceRefresh)
+                fetchResult.onFailure { e ->
+                    log.w(e) { "Remote Config fetch failed, will use cached values: ${e.message}" }
                 }
 
                 val configResult = remoteConfigRepository.getPinnedContent()

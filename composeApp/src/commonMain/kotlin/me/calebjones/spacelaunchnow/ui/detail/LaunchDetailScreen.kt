@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import me.calebjones.spacelaunchnow.cache.LaunchCache
@@ -53,6 +54,7 @@ fun LaunchDetailScreen(
     val log = SpaceLogger.getLogger("LaunchDetailScreen")
     val viewModel = koinViewModel<LaunchViewModel>()
     val launchCache = koinInject<LaunchCache>()
+    val uriHandler = LocalUriHandler.current
 
     // Check if we have pre-loaded detailed data in cache
     val cachedLaunchDetailed = remember(launchId) { launchCache.getCachedLaunchDetailed(launchId) }
@@ -169,7 +171,14 @@ fun LaunchDetailScreen(
                     onAstronautClick = { astronautId ->
                         navController?.navigate(AstronautDetail(astronautId = astronautId))
                     },
-                    forcePhoneLayout = forcePhoneLayout
+                    forcePhoneLayout = forcePhoneLayout,
+                    onOpenUrl = { url ->
+                        viewModel.trackLinkOpened(url, launchId)
+                        try { uriHandler.openUri(url) } catch (_: Throwable) {}
+                    },
+                    onExternalVideoOpened = { videoUrl, videoSource ->
+                        viewModel.trackVideoOpened(videoUrl, videoSource)
+                    }
                 )
             }
 

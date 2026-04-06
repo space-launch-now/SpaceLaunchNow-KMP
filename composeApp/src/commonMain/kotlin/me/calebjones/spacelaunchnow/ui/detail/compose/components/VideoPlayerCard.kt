@@ -21,7 +21,8 @@ fun VideoPlayerCard(
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false),
-    showVideoPicker: Boolean = true
+    showVideoPicker: Boolean = true,
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -35,7 +36,8 @@ fun VideoPlayerCard(
             onNavigateToFullscreen = onNavigateToFullscreen,
             onVideoSelected = onVideoSelected,
             playerConfig = playerConfig,
-            showVideoPicker = showVideoPicker
+            showVideoPicker = showVideoPicker,
+            onExternalVideoOpened = onExternalVideoOpened
         )
     }
 }

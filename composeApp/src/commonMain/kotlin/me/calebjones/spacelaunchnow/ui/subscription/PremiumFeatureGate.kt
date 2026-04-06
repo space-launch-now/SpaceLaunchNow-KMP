@@ -194,8 +194,12 @@ fun PremiumPromptCard(
     description: String,
     icon: ImageVector,
     onUpgradeClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPaywallViewed: () -> Unit = {}
 ) {
+    LaunchedEffect(Unit) {
+        onPaywallViewed()
+    }
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer

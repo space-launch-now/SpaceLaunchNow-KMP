@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
@@ -23,7 +25,8 @@ import me.calebjones.spacelaunchnow.util.logging.logger
  */
 class FeedViewModel(
     private val updatesRepository: UpdatesRepository,
-    private val articlesRepository: ArticlesRepository
+    private val articlesRepository: ArticlesRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val log = logger()
@@ -35,6 +38,16 @@ class FeedViewModel(
 
     private val _articlesState = MutableStateFlow(ViewState(data = emptyList<Article>()))
     val articlesState: StateFlow<ViewState<List<Article>>> = _articlesState.asStateFlow()
+
+    // ========== Analytics ==========
+
+    fun trackArticleClicked(articleId: String, newsSite: String) {
+        analyticsManager.track(AnalyticsEvent.ArticleViewed(articleId, newsSite))
+    }
+
+    fun trackLaunchShared(launchId: String) {
+        analyticsManager.track(AnalyticsEvent.LaunchShared(launchId, "share_sheet"))
+    }
 
     // ========== Public API ==========
 

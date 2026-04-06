@@ -189,6 +189,8 @@ android-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlyt
 
 # GitLive Firebase Remote Config (KMP)
 gitlive-firebase-config = { module = "dev.gitlive:firebase-config", version.ref = "gitlive-firebase" }
+# GitLive Firebase Analytics (KMP)
+gitlive-firebase-analytics = { module = "dev.gitlive:firebase-analytics", version.ref = "gitlive-firebase" }
 
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "androidx-datastore" }
 androidx-glance = { group = "androidx.glance", name = "glance-appwidget", version.ref = "androidx-glance" }

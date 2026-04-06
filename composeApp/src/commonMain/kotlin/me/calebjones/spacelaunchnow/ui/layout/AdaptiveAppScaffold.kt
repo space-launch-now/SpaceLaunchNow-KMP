@@ -72,6 +72,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 fun AdaptiveAppScaffold(
     navController: NavHostController,
     themeOption: ThemeOption = ThemeOption.System,
+    onTabSelected: ((String) -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -109,6 +110,7 @@ fun AdaptiveAppScaffold(
                                                         label = { Text(tab.label) },
                                                         selected = currentRoute == tab.route::class.qualifiedName,
                                                         onClick = {
+                                                            onTabSelected?.invoke(tab.label)
                                                             navController.navigate(tab.route) {
                                                                 launchSingleTop = true
                                                                 restoreState = true
@@ -159,6 +161,7 @@ fun AdaptiveAppScaffold(
                                             WideNavigationRailItem(
                                                 selected = currentRoute == tab.route::class.qualifiedName,
                                                 onClick = {
+                                                    onTabSelected?.invoke(tab.label)
                                                     navController.navigate(tab.route) {
                                                         launchSingleTop = true
                                                         restoreState = true
