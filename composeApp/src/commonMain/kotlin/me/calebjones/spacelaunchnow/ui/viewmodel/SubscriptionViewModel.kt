@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
@@ -21,10 +23,17 @@ import me.calebjones.spacelaunchnow.util.logging.logger
  */
 class SubscriptionViewModel(
     private val repository: SubscriptionRepository,
-    private val billingManager: BillingManager
+    private val billingManager: BillingManager,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val log = logger()
+
+    // ========== Analytics ==========
+
+    fun trackPaywallViewed(source: String) {
+        analyticsManager.track(AnalyticsEvent.PaywallViewed(source = source))
+    }
 
     // Subscription state from repository
     val subscriptionState: StateFlow<SubscriptionState> = repository.state
@@ -171,6 +180,7 @@ class SubscriptionViewModel(
     fun purchaseProduct(productId: String, basePlanId: String? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
+            analyticsManager.track(AnalyticsEvent.PurchaseStarted(productId = productId))
 
             billingManager.launchPurchaseFlow(productId, basePlanId).fold(
                 onSuccess = { _ ->
@@ -178,6 +188,7 @@ class SubscriptionViewModel(
                         isProcessing = false,
                         successMessage = "Purchase completed successfully!"
                     )
+                    analyticsManager.track(AnalyticsEvent.PurchaseCompleted(productId = productId))
                     log.i { "Purchase successful for $productId" }
                 },
                 onFailure = { error ->
@@ -245,6 +256,7 @@ class SubscriptionViewModel(
 
             repository.restorePurchases().fold(
                 onSuccess = { state ->
+                    analyticsManager.track(AnalyticsEvent.PurchaseRestored(success = state.isSubscribed))
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
                         successMessage = if (state.isSubscribed) {
@@ -255,6 +267,7 @@ class SubscriptionViewModel(
                     )
                 },
                 onFailure = { error ->
+                    analyticsManager.track(AnalyticsEvent.PurchaseRestored(success = false))
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
                         errorMessage = error.message ?: "Restore failed"

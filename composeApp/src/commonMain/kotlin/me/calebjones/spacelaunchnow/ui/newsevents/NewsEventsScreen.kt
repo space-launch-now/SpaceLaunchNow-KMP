@@ -80,6 +80,7 @@ fun NewsEventsScreen(
     viewModel: NewsEventsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -93,6 +94,10 @@ fun NewsEventsScreen(
             onLoadMoreNews = viewModel::loadMoreNews,
             onLoadMoreEvents = viewModel::loadMoreEvents,
             onEventClick = onEventClick,
+            onArticleClick = { article ->
+                viewModel.trackArticleClicked(article.id.toString(), article.newsSite, article.url)
+                uriHandler.openUri(article.url)
+            },
             onSearchQueryChange = viewModel::updateSearchQuery,
             onClearSearch = viewModel::clearSearch,
             onNewsSiteToggled = viewModel::toggleNewsSiteFilter,
@@ -111,6 +116,7 @@ private fun NewsEventsContent(
     onLoadMoreNews: () -> Unit,
     onLoadMoreEvents: () -> Unit,
     onEventClick: (Int) -> Unit,
+    onArticleClick: (me.calebjones.spacelaunchnow.api.snapi.models.Article) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
     onNewsSiteToggled: (String) -> Unit,
@@ -295,6 +301,7 @@ private fun NewsEventsContent(
                         isLoadingMore = uiState.isLoadingMoreNews,
                         error = uiState.newsError,
                         searchQuery = uiState.searchQuery,
+                        onArticleClick = onArticleClick,
                         listState = newsListState
                     )
                     NewsEventsTab.EVENTS -> EventsTabContent(
@@ -330,6 +337,7 @@ private fun NewsTabContent(
     isLoadingMore: Boolean,
     error: String?,
     searchQuery: String,
+    onArticleClick: (me.calebjones.spacelaunchnow.api.snapi.models.Article) -> Unit = {},
     listState: androidx.compose.foundation.lazy.LazyListState
 ) {
     LazyColumn(
@@ -360,7 +368,7 @@ private fun NewsTabContent(
             items = news,
             key = { it.id }
         ) { article ->
-            NewsListItem(article = article)
+            NewsListItem(article = article, onClick = { onArticleClick(article) })
         }
 
         // Loading more indicator

@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -18,6 +20,7 @@ import me.calebjones.spacelaunchnow.util.logging.logger
  */
 class AstronautDetailViewModel(
     private val astronautRepository: AstronautRepository,
+    private val analyticsManager: AnalyticsManager,
     private val astronautId: Int
 ) : ViewModel() {
 
@@ -49,6 +52,7 @@ class AstronautDetailViewModel(
                                 isLoading = false
                             )
                         }
+                        analyticsManager.track(AnalyticsEvent.AstronautViewed(astronautId))
                     },
                     onFailure = { exception ->
                         log.e(exception) { "❌ Failed to load astronaut detail (ID: $astronautId)" }

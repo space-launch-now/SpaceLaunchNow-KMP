@@ -80,6 +80,8 @@ fun EventDetailView(
     onLaunchClick: ((String) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
     onSpaceStationClick: ((Int) -> Unit)? = null,
+    onOpenUrl: (String) -> Unit = {},
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = event.name,
@@ -102,6 +104,8 @@ fun EventDetailView(
             onLaunchClick = onLaunchClick,
             onAstronautClick = onAstronautClick,
             onSpaceStationClick = onSpaceStationClick,
+            onOpenUrl = onOpenUrl,
+            onExternalVideoOpened = onExternalVideoOpened
         )
     }
 }
@@ -117,6 +121,8 @@ private fun EventDetailContentInBody(
     onLaunchClick: ((String) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
     onSpaceStationClick: ((Int) -> Unit)? = null,
+    onOpenUrl: (String) -> Unit = {},
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     val isCollapsed = LocalDetailScaffoldCollapsed.current
     Column(
@@ -134,6 +140,7 @@ private fun EventDetailContentInBody(
                 onSetPlayerVisible = onSetPlayerVisible,
                 onNavigateToFullscreen = onNavigateToFullscreen,
                 onVideoSelected = onSelectVideo,
+                onExternalVideoOpened = onExternalVideoOpened
             )
             Spacer(Modifier.height(16.dp))
         }
@@ -162,7 +169,7 @@ private fun EventDetailContentInBody(
 
         // Info links card (video links removed — handled by video player above)
         if (event.infoUrls.isNotEmpty()) {
-            EventLinksCard(event)
+            EventLinksCard(event, onOpenUrl = onOpenUrl)
             Spacer(Modifier.height(16.dp))
         }
 
@@ -294,8 +301,7 @@ private fun EventInfoCard(event: EventEndpointDetailed) {
 }
 
 @Composable
-private fun EventLinksCard(event: EventEndpointDetailed) {
-    val uriHandler = LocalUriHandler.current
+private fun EventLinksCard(event: EventEndpointDetailed, onOpenUrl: (String) -> Unit = {}) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -311,10 +317,7 @@ private fun EventLinksCard(event: EventEndpointDetailed) {
             )
             event.infoUrls.forEach { u ->
                 Button(onClick = {
-                    try {
-                        uriHandler.openUri(u.url)
-                    } catch (_: Throwable) {
-                    }
+                    onOpenUrl(u.url)
                 }) {
                     Icon(Icons.Filled.OpenInNew, contentDescription = null)
                     Spacer(Modifier.width(8.dp))

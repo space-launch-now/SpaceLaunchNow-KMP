@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.NavController
 import me.calebjones.spacelaunchnow.navigation.AgencyDetail
 import me.calebjones.spacelaunchnow.navigation.AstronautDetail
@@ -23,6 +24,7 @@ fun EventDetailScreen(
 ) {
     val log = SpaceLogger.getLogger("EventDetailScreen")
     val viewModel = koinViewModel<EventViewModel>()
+    val uriHandler = LocalUriHandler.current
     val eventDetails by viewModel.eventDetails.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -74,6 +76,13 @@ fun EventDetailScreen(
                 onSpaceStationClick = navController?.let { nav ->
                     { stationId: Int -> nav.navigate(SpaceStationDetail(stationId)) }
                 },
+                onOpenUrl = { url ->
+                    viewModel.trackLinkOpened(url, eventId)
+                    try { uriHandler.openUri(url) } catch (_: Throwable) {}
+                },
+                onExternalVideoOpened = { videoUrl, videoSource ->
+                    viewModel.trackVideoOpened(videoUrl, videoSource)
+                }
             )
         }
 

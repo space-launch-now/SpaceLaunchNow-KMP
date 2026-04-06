@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -20,7 +22,8 @@ import me.calebjones.spacelaunchnow.util.logging.logger
  * and filter options for the agency list screen.
  */
 class AgencyListViewModel(
-    private val agencyRepository: AgencyRepository
+    private val agencyRepository: AgencyRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val log = logger()
@@ -72,6 +75,15 @@ class AgencyListViewModel(
                                 currentPage = 1,
                                 hasMore = paginatedList.next != null,
                                 totalCount = paginatedList.count ?: 0
+                            )
+                        }
+                        // Track search analytics when search query is active
+                        if (currentState.searchQuery.isNotBlank()) {
+                            analyticsManager.track(
+                                AnalyticsEvent.SearchPerformed(
+                                    query = currentState.searchQuery,
+                                    resultCount = paginatedList.results.size
+                                )
                             )
                         }
                     },
@@ -199,6 +211,10 @@ class AgencyListViewModel(
      */
     fun updateSortOrder(sortOrder: AgencySortOrder) {
         _uiState.update { it.copy(selectedSortOrder = sortOrder) }
+        analyticsManager.track(AnalyticsEvent.FilterChanged(
+            filterType = "agency_sort",
+            value = sortOrder.apiValue
+        ))
         refresh()
     }
 
@@ -207,6 +223,10 @@ class AgencyListViewModel(
      */
     fun updateTypeFilter(typeId: Int?) {
         _uiState.update { it.copy(selectedTypeId = typeId) }
+        analyticsManager.track(AnalyticsEvent.FilterChanged(
+            filterType = "agency_type",
+            value = typeId?.toString() ?: "all"
+        ))
         refresh()
     }
 
@@ -215,6 +235,10 @@ class AgencyListViewModel(
      */
     fun updateCountryFilter(countryCodes: List<String>) {
         _uiState.update { it.copy(selectedCountryCodes = countryCodes) }
+        analyticsManager.track(AnalyticsEvent.FilterChanged(
+            filterType = "agency_country",
+            value = countryCodes.joinToString(",").ifEmpty { "all" }
+        ))
         refresh()
     }
 
@@ -223,6 +247,10 @@ class AgencyListViewModel(
      */
     fun updateFeaturedFilter(featured: Boolean?) {
         _uiState.update { it.copy(featuredFilter = featured) }
+        analyticsManager.track(AnalyticsEvent.FilterChanged(
+            filterType = "agency_featured",
+            value = featured?.toString() ?: "all"
+        ))
         refresh()
     }
 

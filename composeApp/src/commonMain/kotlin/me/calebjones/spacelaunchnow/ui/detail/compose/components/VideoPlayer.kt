@@ -54,7 +54,8 @@ fun VideoPlayer(
     onVideoSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
     playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false),
-    showVideoPicker: Boolean = true
+    showVideoPicker: Boolean = true,
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -70,7 +71,8 @@ fun VideoPlayer(
             onSetPlayerVisible = onSetPlayerVisible,
             onNavigateToFullscreen = onNavigateToFullscreen,
             modifier = Modifier.fillMaxWidth(),
-            playerConfig = playerConfig
+            playerConfig = playerConfig,
+            onExternalVideoOpened = onExternalVideoOpened
         )
 
         // Video picker (only show if there are multiple videos and showVideoPicker is true)

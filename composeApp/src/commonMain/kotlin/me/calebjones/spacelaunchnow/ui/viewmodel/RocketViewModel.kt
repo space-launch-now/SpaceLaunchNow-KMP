@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigNormal
 import me.calebjones.spacelaunchnow.data.model.FilterOption
@@ -23,7 +25,8 @@ import me.calebjones.spacelaunchnow.util.logging.logger
  */
 class RocketViewModel(
     private val repository: RocketRepository,
-    private val filterRepository: RocketFilterRepository
+    private val filterRepository: RocketFilterRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val log = logger()
@@ -77,6 +80,15 @@ class RocketViewModel(
                                 currentPage = 1,
                                 hasMore = paginatedList.next != null,
                                 totalCount = paginatedList.count ?: 0
+                            )
+                        }
+                        // Track search analytics when search query is active
+                        if (currentState.searchQuery.isNotBlank()) {
+                            analyticsManager.track(
+                                AnalyticsEvent.SearchPerformed(
+                                    query = currentState.searchQuery,
+                                    resultCount = paginatedList.results.size
+                                )
                             )
                         }
                     },
@@ -285,6 +297,7 @@ class RocketViewModel(
      * Update the program filter and reload the list.
      */
     fun updateProgramFilter(programIds: List<Int>) {
+        analyticsManager.track(AnalyticsEvent.FilterChanged(filterType = "rocket_program", value = programIds.joinToString(",")))
         _uiState.update { it.copy(selectedProgramIds = programIds) }
         refresh()
     }
@@ -293,6 +306,7 @@ class RocketViewModel(
      * Update the family filter and reload the list.
      */
     fun updateFamilyFilter(families: List<String>) {
+        analyticsManager.track(AnalyticsEvent.FilterChanged(filterType = "rocket_family", value = families.joinToString(",")))
         _uiState.update { it.copy(selectedFamilies = families) }
         refresh()
     }
@@ -301,6 +315,7 @@ class RocketViewModel(
      * Update the active filter and reload the list.
      */
     fun updateActiveFilter(active: Boolean?) {
+        analyticsManager.track(AnalyticsEvent.FilterChanged(filterType = "rocket_active", value = active?.toString() ?: "all"))
         _uiState.update { it.copy(activeFilter = active) }
         refresh()
     }
@@ -343,6 +358,7 @@ class RocketViewModel(
                 log.i { "Successfully loaded rocket details: ${rocket.name}" }
                 _rocketDetails.value = rocket
                 _uiState.update { it.copy(isLoading = false) }
+                analyticsManager.track(AnalyticsEvent.RocketViewed(rocket.id))
             }.onFailure { exception ->
                 log.e(exception) { "Failed to fetch rocket details for id: $id" }
                 _uiState.update { 

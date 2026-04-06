@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -60,14 +59,10 @@ fun NewsListItem(
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val uriHandler = LocalUriHandler.current
     val useUtc = LocalUseUtc.current
 
     Card(
-        onClick = {
-            uriHandler.openUri(article.url)
-            onClick()
-        },
+        onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)

@@ -44,6 +44,7 @@ import kotlin.time.Instant
 @Composable
 fun ArticlesView(
     state: ViewState<List<Article>>,
+    onArticleClick: (Article) -> Unit = {},
 ) {
     when {
         // STATE 4: Error State - show cached data with banner OR just error
@@ -103,7 +104,7 @@ fun ArticlesView(
         state.data.isNotEmpty() && state.error == null -> {
             Column(modifier = Modifier.padding(vertical = 4.dp)) {
                 state.data.take(5).forEach { article ->
-                    ArticleItem(article = article)
+                    ArticleItem(article = article, onClick = { onArticleClick(article) })
                 }
             }
         }
@@ -130,10 +131,10 @@ fun ArticlesView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticleItem(article: Article, onClick: (() -> Unit)? = null) {
+fun ArticleItem(article: Article, onClick: () -> Unit = {}) {
     val uriHandler = LocalUriHandler.current
     Card(
-        onClick = { (onClick ?: { uriHandler.openUri(article.url) }).invoke() },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),

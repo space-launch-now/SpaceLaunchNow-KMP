@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventType
@@ -39,7 +41,8 @@ class NewsEventsViewModel(
     private val eventsRepository: EventsRepository,
     private val infoRepository: InfoRepository,
     private val configApi: ConfigApi,
-    private val appPreferences: AppPreferences
+    private val appPreferences: AppPreferences,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     companion object {
@@ -61,6 +64,19 @@ class NewsEventsViewModel(
         loadNewsSites()
         loadEventTypes()
         observeSearchInput()
+    }
+
+    // ========== Analytics ==========
+
+    fun trackArticleClicked(articleId: String, newsSite: String, url: String) {
+        analyticsManager.track(
+            AnalyticsEvent.ThirdPartyReferral(
+                provider = newsSite,
+                url = url,
+                contentType = "news_article",
+                contentId = articleId
+            )
+        )
     }
 
     /**

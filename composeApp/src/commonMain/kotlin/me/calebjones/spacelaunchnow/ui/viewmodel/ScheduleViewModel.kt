@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
@@ -58,7 +60,8 @@ data class FilterOptions(
 class ScheduleViewModel(
     private val launchesApi: LaunchesApi,
     private val appPreferences: AppPreferences,
-    private val filterRepository: ScheduleFilterRepository
+    private val filterRepository: ScheduleFilterRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val log = logger()
@@ -315,6 +318,17 @@ class ScheduleViewModel(
                 )
                 log.i { "loadTab completed successfully for $tab" }
 
+                // Track search analytics when search query is active
+                val currentQuery = _uiState.value.searchQuery
+                if (currentQuery.isNotBlank() && tab == _uiState.value.selectedTab) {
+                    analyticsManager.track(
+                        AnalyticsEvent.SearchPerformed(
+                            query = currentQuery,
+                            resultCount = newItems.size
+                        )
+                    )
+                }
+
             } catch (t: Throwable) {
                 // Check if this was a cancellation - if so, don't log as error
                 if (t is kotlinx.coroutines.CancellationException) {
@@ -393,6 +407,14 @@ class ScheduleViewModel(
     fun applyFilters(newFilterState: ScheduleFilterState) {
         viewModelScope.launch {
             log.d { "Applying filters - ${newFilterState.activeFilterCount()} active" }
+
+            // Track filter changes
+            analyticsManager.track(
+                AnalyticsEvent.FilterChanged(
+                    filterType = "schedule",
+                    value = "active_count:${newFilterState.activeFilterCount()}"
+                )
+            )
 
             // Save to preferences
             appPreferences.updateScheduleFilterState(newFilterState)

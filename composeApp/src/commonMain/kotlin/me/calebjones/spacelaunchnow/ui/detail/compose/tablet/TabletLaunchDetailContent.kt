@@ -64,7 +64,8 @@ fun TabletLaunchDetailContent(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
-    openUrl: (String) -> Unit
+    openUrl: (String) -> Unit,
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -230,7 +231,8 @@ fun TabletLaunchDetailContent(
                     launchName = launch.mission?.name ?: "Space Launch",
                     onSetPlayerVisible = onSetPlayerVisible,
                     onNavigateToFullscreen = onNavigateToFullscreen,
-                    onVideoSelected = onVideoSelected
+                    onVideoSelected = onVideoSelected,
+                    onExternalVideoOpened = onExternalVideoOpened
                 )
             }
 

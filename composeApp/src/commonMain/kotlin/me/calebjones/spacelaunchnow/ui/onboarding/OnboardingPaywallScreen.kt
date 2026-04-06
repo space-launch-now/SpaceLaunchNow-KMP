@@ -109,6 +109,7 @@ fun OnboardingPaywallScreen(
 
     LaunchedEffect(Unit) {
         nextUpViewModel.fetchNextLaunch()
+        viewModel.trackPaywallViewed("onboarding")
         DatadogLogger.info(
             "onboarding_paywall_shown",
             mapOf("source" to "onboarding", "screen" to "OnboardingScreen")

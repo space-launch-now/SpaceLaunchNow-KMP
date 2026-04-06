@@ -50,6 +50,7 @@ fun HomeScreen(navController: NavController) {
     val statsViewModel = koinViewModel<StatsViewModel>()
     val sharingService = koinInject<LaunchSharingService>()
     val coroutineScope = rememberCoroutineScope()
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
 
     // Collect all ViewStates for offline detection AND to pass down as hoisted state
     val featuredLaunchState by featuredLaunchViewModel.featuredLaunchState.collectAsStateWithLifecycle()
@@ -135,6 +136,7 @@ fun HomeScreen(navController: NavController) {
             isRefreshing = true
             // Refresh all ViewModels
             featuredLaunchViewModel.refresh()
+            featuredLaunchViewModel.loadPinnedContent(forceRefresh = true)
             launchesViewModel.refresh()
             feedViewModel.refreshAll()
             eventsViewModel.refresh()
@@ -197,9 +199,14 @@ fun HomeScreen(navController: NavController) {
             isAnyViewLoading = isAnyViewLoading,
             hasAdFree = hasAdFree,
             onShareLaunch = { launchToShare ->
+                feedViewModel.trackLaunchShared(launchToShare.id.toString())
                 coroutineScope.launch {
                     sharingService.shareUrl(launchToShare.launchUrl)
                 }
+            },
+            onArticleClick = { article ->
+                feedViewModel.trackArticleClicked(article.id.toString(), article.newsSite)
+                uriHandler.openUri(article.url)
             },
             onDismissPinnedContent = {
                 featuredLaunchViewModel.dismissPinnedContent()

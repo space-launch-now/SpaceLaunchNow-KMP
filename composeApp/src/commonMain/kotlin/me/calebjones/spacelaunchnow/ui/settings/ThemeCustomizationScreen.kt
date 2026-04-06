@@ -73,6 +73,8 @@ import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.subscription.TemporaryPremiumCard
@@ -802,7 +804,8 @@ class ThemeCustomizationViewModel(
     private val appPreferences: AppPreferences,
     private val widgetPreferences: WidgetPreferences,
     private val subscriptionRepository: SubscriptionRepository,
-    val temporaryPremiumAccess: TemporaryPremiumAccess  // Make it public val instead of private
+    val temporaryPremiumAccess: TemporaryPremiumAccess,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
     private val log = logger()
 
@@ -935,6 +938,7 @@ class ThemeCustomizationViewModel(
         viewModelScope.launch {
             _selectedTheme.value = theme
             appPreferences.updateTheme(theme)
+            analyticsManager.track(AnalyticsEvent.ThemeChanged(theme = theme.name))
         }
     }
 

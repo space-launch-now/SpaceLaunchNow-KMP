@@ -9,6 +9,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
@@ -47,7 +49,8 @@ class SpaceStationViewModel(
     private val spaceStationRepository: SpaceStationRepository,
     private val articlesApi: ArticlesApi,
     private val issTrackingRepository: IssTrackingRepository,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val log = logger()
@@ -120,6 +123,7 @@ class SpaceStationViewModel(
                     val station = result.data
                     _stationDetails.value = station
                     log.i { "Successfully loaded station: ${station.name} (source: ${result.source})" }
+                    analyticsManager.track(AnalyticsEvent.SpaceStationViewed(stationId))
 
                     // Fetch detailed expedition data for each active expedition
                     fetchExpeditionDetails(station.activeExpeditions.map { it.id }, stationId)

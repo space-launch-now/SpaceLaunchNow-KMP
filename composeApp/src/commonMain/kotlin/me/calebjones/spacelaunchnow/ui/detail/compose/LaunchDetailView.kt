@@ -14,7 +14,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
@@ -83,7 +82,9 @@ fun LaunchDetailView(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
-    forcePhoneLayout: Boolean = false
+    forcePhoneLayout: Boolean = false,
+    onOpenUrl: (String) -> Unit = {},
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     val isLargeScreen = rememberAdaptiveLayoutState().isExpanded && !forcePhoneLayout
 
@@ -106,7 +107,9 @@ fun LaunchDetailView(
             onVideoSelected = onVideoSelected,
             onNavigateToSettings = onNavigateToSettings,
             onEventClick = onEventClick,
-            onAstronautClick = onAstronautClick
+            onAstronautClick = onAstronautClick,
+            onOpenUrl = onOpenUrl,
+            onExternalVideoOpened = onExternalVideoOpened
         )
     } else {
         // PHONE: Non-scrollable scaffold with tabbed layout (tabs handle their own scrolling)
@@ -127,7 +130,9 @@ fun LaunchDetailView(
             onNavigateToSettings = onNavigateToSettings,
             onEventClick = onEventClick,
             onAstronautClick = onAstronautClick,
-            forcePhoneLayout = forcePhoneLayout
+            forcePhoneLayout = forcePhoneLayout,
+            onOpenUrl = onOpenUrl,
+            onExternalVideoOpened = onExternalVideoOpened
         )
     }
 }
@@ -152,7 +157,9 @@ private fun TabletLaunchDetailView(
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
-    onAstronautClick: ((Int) -> Unit)? = null
+    onAstronautClick: ((Int) -> Unit)? = null,
+    onOpenUrl: (String) -> Unit = {},
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = launch.name ?: "Unknown Launch",
@@ -166,14 +173,6 @@ private fun TabletLaunchDetailView(
             MaterialTheme.colorScheme.surfaceVariant
         ),
     ) {
-        val uriHandler = LocalUriHandler.current
-        val openUrl: (String) -> Unit = { url ->
-            try {
-                uriHandler.openUri(url)
-            } catch (_: Throwable) {
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -197,7 +196,8 @@ private fun TabletLaunchDetailView(
                 onNavigateToSettings = onNavigateToSettings,
                 onEventClick = onEventClick,
                 onAstronautClick = onAstronautClick,
-                openUrl = openUrl
+                openUrl = onOpenUrl,
+                onExternalVideoOpened = onExternalVideoOpened
             )
 
             Spacer(Modifier.height(200.dp))
@@ -227,7 +227,9 @@ private fun PhoneLaunchDetailView(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
-    forcePhoneLayout: Boolean = false
+    forcePhoneLayout: Boolean = false,
+    onOpenUrl: (String) -> Unit = {},
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = launch.name ?: "Unknown Launch",
@@ -242,14 +244,6 @@ private fun PhoneLaunchDetailView(
             MaterialTheme.colorScheme.surfaceVariant
         ),
     ) {
-        val uriHandler = LocalUriHandler.current
-        val openUrl: (String) -> Unit = { url ->
-            try {
-                uriHandler.openUri(url)
-            } catch (_: Throwable) {
-            }
-        }
-
         // Column provides layout for content, parent scaffold handles scrolling
         Column(
             modifier = Modifier
@@ -274,7 +268,8 @@ private fun PhoneLaunchDetailView(
                 onNavigateToSettings = onNavigateToSettings,
                 onEventClick = onEventClick,
                 onAstronautClick = onAstronautClick,
-                openUrl = openUrl
+                openUrl = onOpenUrl,
+                onExternalVideoOpened = onExternalVideoOpened
             )
 
             Spacer(Modifier.height(200.dp))

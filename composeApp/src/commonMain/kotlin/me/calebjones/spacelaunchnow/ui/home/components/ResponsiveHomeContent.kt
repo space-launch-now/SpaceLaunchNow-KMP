@@ -68,6 +68,7 @@ fun ResponsiveHomeContent(
     isAnyViewLoading: Boolean,
     hasAdFree: Boolean,
     onShareLaunch: (LaunchNormal) -> Unit = {},
+    onArticleClick: (Article) -> Unit = {},
     onDismissPinnedContent: () -> Unit = {},
     modifier: Modifier = Modifier,
     isOffline: Boolean = false,
@@ -307,7 +308,7 @@ fun ResponsiveHomeContent(
             )
         }
         item(key = "news_title") { SectionTitle(title = "Latest News", hasAction = false) }
-        item(key = "news_view") { ArticlesView(state = articlesState) }
+        item(key = "news_view") { ArticlesView(state = articlesState, onArticleClick = onArticleClick) }
         item(key = "events_title") { SectionTitle(title = "Upcoming Events", hasAction = false) }
         item(key = "events_view") { EventsView(state = eventsState, navController = navController) }
         item(key = "bottom_spacer") {
