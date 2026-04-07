@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -44,6 +43,7 @@ import kotlin.time.Instant
 @Composable
 fun ArticlesView(
     state: ViewState<List<Article>>,
+    onArticleClick: (Article) -> Unit = {},
 ) {
     when {
         // STATE 4: Error State - show cached data with banner OR just error
@@ -70,7 +70,7 @@ fun ArticlesView(
                     // Show stale articles
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         state.data.take(5).forEach { article ->
-                            ArticleItem(article = article)
+                            ArticleItem(article = article, onClick = { onArticleClick(article) })
                         }
                     }
                 }
@@ -85,7 +85,7 @@ fun ArticlesView(
             Box {
                 Column(modifier = Modifier.padding(vertical = 4.dp)) {
                     state.data.take(5).forEach { article ->
-                        ArticleItem(article = article)
+                        ArticleItem(article = article, onClick = { onArticleClick(article) })
                     }
                 }
 
@@ -103,7 +103,7 @@ fun ArticlesView(
         state.data.isNotEmpty() && state.error == null -> {
             Column(modifier = Modifier.padding(vertical = 4.dp)) {
                 state.data.take(5).forEach { article ->
-                    ArticleItem(article = article)
+                    ArticleItem(article = article, onClick = { onArticleClick(article) })
                 }
             }
         }
@@ -130,10 +130,9 @@ fun ArticlesView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticleItem(article: Article, onClick: (() -> Unit)? = null) {
-    val uriHandler = LocalUriHandler.current
+fun ArticleItem(article: Article, onClick: () -> Unit = {}) {
     Card(
-        onClick = { (onClick ?: { uriHandler.openUri(article.url) }).invoke() },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),

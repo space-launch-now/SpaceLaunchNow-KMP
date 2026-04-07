@@ -8,6 +8,8 @@ import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.data.storage.createNotificationHistoryDataStore
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.rating.AppRatingManager
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsProvider
+import me.calebjones.spacelaunchnow.analytics.providers.FirebaseAnalyticsProvider
 import me.calebjones.spacelaunchnow.util.AndroidSharingService
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
@@ -37,6 +39,9 @@ val androidModule = module {
 
     // App rating manager (Activity will be passed at call time)
     single { AppRatingManager() }
+
+    // Firebase analytics provider (Android platform)
+    single<AnalyticsProvider>(named("firebase")) { FirebaseAnalyticsProvider() }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {

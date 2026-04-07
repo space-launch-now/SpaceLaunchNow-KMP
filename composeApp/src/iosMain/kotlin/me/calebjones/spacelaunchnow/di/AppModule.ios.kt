@@ -6,6 +6,8 @@ import me.calebjones.spacelaunchnow.data.storage.createDataStore
 import me.calebjones.spacelaunchnow.data.storage.createDebugDataStore
 import me.calebjones.spacelaunchnow.data.storage.createNotificationHistoryDataStore
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsProvider
+import me.calebjones.spacelaunchnow.analytics.providers.FirebaseAnalyticsProvider
 import me.calebjones.spacelaunchnow.rating.AppRatingManager
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.util.createPlatformSharingService
@@ -33,6 +35,9 @@ val iosModule = module {
 
     // Widget timeline reloader — triggers WidgetCenter.shared.reloadAllTimelines() via Swift bridge
     single { PlatformWidgetUpdater(context = null) }
+
+    // Firebase analytics provider (iOS platform)
+    single<AnalyticsProvider>(named("firebase")) { FirebaseAnalyticsProvider() }
 }
 
 actual fun nativeConfig(): KoinAppDeclaration = {

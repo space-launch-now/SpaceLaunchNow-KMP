@@ -96,6 +96,14 @@ fun LiveOnboardingScreen(
         onboardingViewModel.fetchExploreData()
     }
 
+    // Track onboarding page navigation
+    LaunchedEffect(pagerState.currentPage) {
+        onboardingViewModel.trackOnboardingStep(
+            step = pagerState.currentPage,
+            completed = pagerState.currentPage == PAGE_COUNT - 1
+        )
+    }
+
     fun completeOnboarding() {
         scope.launch {
             appPreferences.setLiveOnboardingCompleted(true)

@@ -18,6 +18,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
+import me.calebjones.spacelaunchnow.analytics.navigation.AnalyticsScreenTracker
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
@@ -163,6 +166,10 @@ fun SpaceLaunchNowApp(
                 val subscriptionRepository = koin.get<SubscriptionRepository>()
                 val pushMessaging = koin.get<PushMessaging>()
                 val appRatingViewModel = koin.get<AppRatingViewModel>()
+
+                // Track app opened
+                val analyticsManager = koin.get<AnalyticsManager>()
+                analyticsManager.track(AnalyticsEvent.AppOpened())
 
                 // Record app launch for rating tracking
                 appRatingViewModel.recordAppLaunch()
@@ -363,6 +370,8 @@ fun SpaceLaunchNowApp(
                         modifier = Modifier.fillMaxSize()
                     ) {}
                 } else {
+                    val analyticsManager: AnalyticsManager = koinInject()
+
                     // Hoisted NavHost - preserved across layout switches to maintain navigation state
                     val navHostContent: @Composable () -> Unit = {
                         NavHost(
@@ -583,6 +592,12 @@ fun SpaceLaunchNowApp(
                             }
                         }
 
+                        // Analytics screen tracking — fires a screen-view event on each navigation change.
+                        AnalyticsScreenTracker(
+                            navController = navController,
+                            analyticsManager = analyticsManager
+                        )
+
                         // Deep-link / notification navigation.
                         // Placed after NavHost so the graph is guaranteed to be set.
                         // Handles both cold start and warm start (onNewIntent).
@@ -613,6 +628,9 @@ fun SpaceLaunchNowApp(
                     AdaptiveAppScaffold(
                         navController = navController,
                         themeOption = themeOption,
+                        onTabSelected = { tab ->
+                            analyticsManager.track(AnalyticsEvent.TabSelected(tab = tab))
+                        },
                         content = navHostContent
                     )
                 } // end else — onboarding state resolved

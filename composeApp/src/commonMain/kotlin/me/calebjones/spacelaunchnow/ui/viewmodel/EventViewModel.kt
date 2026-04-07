@@ -5,13 +5,16 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class EventViewModel(
-    private val repository: EventsRepository
+    private val repository: EventsRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
     private val log = logger()
 
@@ -27,6 +30,28 @@ class EventViewModel(
     private val _videoPlayerState = MutableStateFlow(VideoPlayerState())
     val videoPlayerState: StateFlow<VideoPlayerState> = _videoPlayerState
 
+    // ========== Analytics ==========
+
+    fun trackLinkOpened(url: String, eventId: Int) {
+        analyticsManager.track(
+            AnalyticsEvent.ThirdPartyReferral(
+                provider = "event_detail",
+                url = url,
+                contentType = "event_link",
+                contentId = eventId.toString()
+            )
+        )
+    }
+
+    fun trackVideoOpened(videoUrl: String, videoSource: String) {
+        analyticsManager.track(
+            AnalyticsEvent.VideoOpenedExternal(
+                videoUrl = videoUrl,
+                videoSource = videoSource
+            )
+        )
+    }
+
     fun fetchEventDetails(id: Int) {
         viewModelScope.launch {
             log.d { "Fetching event details for id: $id" }
@@ -38,6 +63,7 @@ class EventViewModel(
                 log.i { "Successfully loaded event details: ${event.name}" }
                 _eventDetails.value = event
                 updateVideoPlayerState(event)
+                analyticsManager.track(AnalyticsEvent.EventViewed(event.id))
             }.onFailure { exception ->
                 log.e(exception) { "Failed to fetch event details for id: $id" }
                 _error.value = exception.message

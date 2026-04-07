@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
@@ -22,10 +24,17 @@ class OnboardingViewModel(
     private val articlesRepository: ArticlesRepository,
     private val astronautRepository: AstronautRepository,
     private val rocketRepository: RocketRepository,
-    private val agencyRepository: AgencyRepository
+    private val agencyRepository: AgencyRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val log = logger()
+
+    // ========== Analytics ==========
+
+    fun trackOnboardingStep(step: Int, completed: Boolean) {
+        analyticsManager.track(AnalyticsEvent.OnboardingStep(step = step, completed = completed))
+    }
 
     private val _upcomingLaunches = MutableStateFlow<List<LaunchBasic>>(emptyList())
     val upcomingLaunches: StateFlow<List<LaunchBasic>> = _upcomingLaunches

@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNormal
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -19,7 +21,8 @@ import me.calebjones.spacelaunchnow.util.logging.logger
  */
 class AstronautListViewModel(
     private val astronautRepository: AstronautRepository,
-    private val filterRepository: me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository
+    private val filterRepository: me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val log = logger()
@@ -63,6 +66,15 @@ class AstronautListViewModel(
                                 currentPage = 1,
                                 hasMore = paginatedList.next != null,
                                 totalCount = paginatedList.count ?: 0
+                            )
+                        }
+                        // Track search analytics when search query is active
+                        if (currentState.searchQuery.isNotBlank()) {
+                            analyticsManager.track(
+                                AnalyticsEvent.SearchPerformed(
+                                    query = currentState.searchQuery,
+                                    resultCount = paginatedList.results.size
+                                )
                             )
                         }
                     },

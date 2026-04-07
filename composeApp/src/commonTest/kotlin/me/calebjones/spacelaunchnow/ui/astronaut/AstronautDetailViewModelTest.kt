@@ -11,6 +11,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDe
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautEndpointNormalList
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautDetailViewModel
 import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 import kotlin.test.AfterTest
@@ -31,6 +33,7 @@ class AstronautDetailViewModelTest {
 
     private lateinit var mockRepository: MockAstronautDetailRepository
     private val testDispatcher = StandardTestDispatcher()
+    private val analyticsManager: AnalyticsManager = AnalyticsManagerImpl(emptyList())
     private val testAstronautId = 1
 
     @BeforeTest
@@ -55,7 +58,7 @@ class AstronautDetailViewModelTest {
         mockRepository.shouldReturnError = true
         
         // When: ViewModel is created (loads automatically in init)
-        val viewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val viewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
         advanceUntilIdle()
         
         // Then: Should have attempted to load and got an error
@@ -78,7 +81,7 @@ class AstronautDetailViewModelTest {
         )
         val newMockRepo = MockAstronautDetailRepository()
         newMockRepo.setAstronautDetailResponse(mockAstronaut)
-        val newViewModel = AstronautDetailViewModel(newMockRepo, testAstronautId)
+        val newViewModel = AstronautDetailViewModel(newMockRepo, analyticsManager, testAstronautId)
 
         // When: Loading astronaut detail (called automatically in init)
         advanceUntilIdle()
@@ -96,7 +99,7 @@ class AstronautDetailViewModelTest {
         // Given: Repository configured
         val mockAstronaut = createMockAstronautDetailed(id = testAstronautId, name = "Test")
         mockRepository.setAstronautDetailResponse(mockAstronaut)
-        val viewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val viewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
 
         // When: Loading astronaut detail (called automatically in init)
         // Note: The loading state may already be done by the time we check
@@ -112,7 +115,7 @@ class AstronautDetailViewModelTest {
     fun `loadAstronautDetail should handle error`() = runTest {
         // Given: Repository returns failure
         mockRepository.shouldReturnError = true
-        val viewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val viewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
 
         // When: Loading astronaut detail (called automatically in init)
         advanceUntilIdle()
@@ -129,7 +132,7 @@ class AstronautDetailViewModelTest {
         val astronautId = 42
         val mockAstronaut = createMockAstronautDetailed(id = astronautId, name = "Test")
         mockRepository.setAstronautDetailResponse(mockAstronaut)
-        val customViewModel = AstronautDetailViewModel(mockRepository, astronautId)
+        val customViewModel = AstronautDetailViewModel(mockRepository, analyticsManager, astronautId)
 
         // When: Loading astronaut detail (called automatically in init)
         advanceUntilIdle()
@@ -170,7 +173,7 @@ class AstronautDetailViewModelTest {
             spacewalks = emptyList()
         )
         mockRepository.setAstronautDetailResponse(mockAstronaut)
-        val newViewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val newViewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
 
         // When: Loading astronaut detail (called automatically in init)
         advanceUntilIdle()
@@ -189,7 +192,7 @@ class AstronautDetailViewModelTest {
     fun `retry should reload astronaut detail`() = runTest {
         // Given: Initial error state
         mockRepository.shouldReturnError = true
-        val errorViewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val errorViewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
         advanceUntilIdle()
         assertTrue(errorViewModel.uiState.value.error?.isNotEmpty() == true)
         val initialCallCount = mockRepository.astronautDetailCallCount
@@ -211,7 +214,7 @@ class AstronautDetailViewModelTest {
     fun `retry should clear previous error message`() = runTest {
         // Given: Error state with error message
         mockRepository.shouldReturnError = true
-        val errorViewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val errorViewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
         advanceUntilIdle()
         val errorMessage = errorViewModel.uiState.value.error
         assertNotNull(errorMessage)
@@ -236,7 +239,7 @@ class AstronautDetailViewModelTest {
     fun `clearError should clear error message`() = runTest {
         // Given: Error state
         mockRepository.shouldReturnError = true
-        val errorViewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val errorViewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
         advanceUntilIdle()
         assertNotNull(errorViewModel.uiState.value.error)
 
@@ -252,7 +255,7 @@ class AstronautDetailViewModelTest {
         // Given: Successful load
         val mockAstronaut = createMockAstronautDetailed(id = testAstronautId, name = "Test")
         mockRepository.setAstronautDetailResponse(mockAstronaut)
-        val successViewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val successViewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
         advanceUntilIdle()
         
         // Manually set error to simulate error after successful load
@@ -278,7 +281,7 @@ class AstronautDetailViewModelTest {
         // Given: Repository configured
         val mockAstronaut = createMockAstronautDetailed(id = testAstronautId, name = "Test")
         mockRepository.setAstronautDetailResponse(mockAstronaut)
-        val newViewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val newViewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
         advanceUntilIdle()
 
         // When: Making multiple retry calls quickly
@@ -299,7 +302,7 @@ class AstronautDetailViewModelTest {
         // Given: Successful initial load
         val mockAstronaut = createMockAstronautDetailed(id = testAstronautId, name = "Neil Armstrong")
         mockRepository.setAstronautDetailResponse(mockAstronaut)
-        val newViewModel = AstronautDetailViewModel(mockRepository, testAstronautId)
+        val newViewModel = AstronautDetailViewModel(mockRepository, analyticsManager, testAstronautId)
         advanceUntilIdle()
         assertEquals("Neil Armstrong", newViewModel.uiState.value.astronaut?.name)
 

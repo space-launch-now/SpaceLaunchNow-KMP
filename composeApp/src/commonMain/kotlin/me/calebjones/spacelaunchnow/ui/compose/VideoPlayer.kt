@@ -55,7 +55,8 @@ fun LaunchVideoPlayer(
     onSetPlayerVisible: ((Boolean) -> Unit)? = null,
     onNavigateToFullscreen: ((String, String) -> Unit)? = null,
     modifier: Modifier = Modifier,
-    playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false)
+    playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false),
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     val uriHandler = LocalUriHandler.current
 
@@ -110,6 +111,10 @@ fun LaunchVideoPlayer(
                             if (VideoUtil.isYouTubeUrl(vidUrl.url)) {
                                 onSetPlayerVisible?.invoke(true) // Use ViewModel state instead of local state
                             } else {
+                                onExternalVideoOpened?.invoke(
+                                    vidUrl.url,
+                                    VideoUtil.getVideoSourceName(vidUrl)
+                                )
                                 uriHandler.openUri(vidUrl.url)
                             }
                         },
@@ -232,7 +237,13 @@ fun LaunchVideoPlayer(
 
                 // Open in app button
                 Button(
-                    onClick = { uriHandler.openUri(vidUrl.url) }
+                    onClick = {
+                        onExternalVideoOpened?.invoke(
+                            vidUrl.url,
+                            VideoUtil.getVideoSourceName(vidUrl)
+                        )
+                        uriHandler.openUri(vidUrl.url)
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.OpenInNew,

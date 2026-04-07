@@ -12,6 +12,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNo
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautEndpointNormalList
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautListViewModel
 import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 import kotlin.test.AfterTest
@@ -90,6 +92,7 @@ class AstronautListViewModelTest {
     private lateinit var mockRepository: MockAstronautListRepository
     private lateinit var mockFilterRepository: MockAstronautFilterRepository
     private val testDispatcher = StandardTestDispatcher()
+    private val analyticsManager: AnalyticsManager = AnalyticsManagerImpl(emptyList())
 
     @BeforeTest
     fun setup() {
@@ -116,7 +119,7 @@ class AstronautListViewModelTest {
         )
         
         // When: ViewModel is created (loads automatically in init)
-        val viewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val viewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
         advanceUntilIdle()
         
         // Then: Should have been attempted to load
@@ -143,7 +146,7 @@ class AstronautListViewModelTest {
                 results = mockAstronauts
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
 
         // When: Loading astronauts (called automatically in init)
         advanceUntilIdle()
@@ -162,7 +165,7 @@ class AstronautListViewModelTest {
         mockRepository.setAstronautsResponse(
             PaginatedAstronautEndpointNormalList(count = 0, next = null, previous = null, results = emptyList())
         )
-        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
 
         // When: Loading astronauts (called automatically in init)
         // Load completes
@@ -178,7 +181,7 @@ class AstronautListViewModelTest {
         mockRepository.setAstronautsResponse(
             PaginatedAstronautEndpointNormalList(count = 0, next = null, previous = null, results = emptyList())
         )
-        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
 
         // When: Loading astronauts (called automatically in init)
         advanceUntilIdle()
@@ -193,7 +196,7 @@ class AstronautListViewModelTest {
     fun `loadAstronauts should handle error`() = runTest {
         // Given: Repository returns failure
         mockRepository.shouldReturnError = true
-        val errorViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val errorViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
 
         // When: Loading astronauts (called automatically in init)
         advanceUntilIdle()
@@ -208,7 +211,7 @@ class AstronautListViewModelTest {
     fun `loadAstronauts should clear error on retry`() = runTest {
         // Given: Initial error state
         mockRepository.shouldReturnError = true
-        val errorViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val errorViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
         advanceUntilIdle()
         assertTrue(errorViewModel.uiState.value.error?.isNotEmpty() == true)
 
@@ -248,7 +251,7 @@ class AstronautListViewModelTest {
                 )
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
         advanceUntilIdle()
 
         // When: Loading more
@@ -283,7 +286,7 @@ class AstronautListViewModelTest {
                 results = listOf(createMockAstronaut(id = 1, name = "Test"))
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
         advanceUntilIdle()
 
         // When: Loading more
@@ -315,7 +318,7 @@ class AstronautListViewModelTest {
                 results = listOf(createMockAstronaut(id = 1, name = "Test"))
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
         advanceUntilIdle()
         val callCountAfterInit = mockRepository.astronautsCallCount
 
@@ -352,7 +355,7 @@ class AstronautListViewModelTest {
                 results = listOf(createMockAstronaut(id = 1, name = "Test"))
             )
         )
-        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository)
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
         advanceUntilIdle()
         assertTrue(newViewModel.uiState.value.hasMore)
 

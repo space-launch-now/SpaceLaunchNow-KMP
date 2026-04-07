@@ -18,6 +18,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.CombinedLaunchOverviewCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyLaunchStatistics
@@ -37,6 +39,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.TimelineCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import kotlin.time.Clock.System
+import org.koin.compose.koinInject
 
 /**
  * Tablet/Desktop-specific layout for launch detail view.
@@ -64,7 +67,8 @@ fun TabletLaunchDetailContent(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
-    openUrl: (String) -> Unit
+    openUrl: (String) -> Unit,
+    onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -108,8 +112,14 @@ fun TabletLaunchDetailContent(
 
                 // Flight Club link
                 launch.flightclubUrl?.let { url ->
+                    val analyticsManager: AnalyticsManager = koinInject()
                     Spacer(Modifier.height(8.dp))
-                    FlightClubCard(flightClubUrl = url)
+                    FlightClubCard(
+                        flightClubUrl = url,
+                        onReferralTracked = { referralUrl ->
+                            analyticsManager.track(AnalyticsEvent.ThirdPartyReferral("flightclub", referralUrl))
+                        }
+                    )
                 }
             }
 
@@ -230,7 +240,8 @@ fun TabletLaunchDetailContent(
                     launchName = launch.mission?.name ?: "Space Launch",
                     onSetPlayerVisible = onSetPlayerVisible,
                     onNavigateToFullscreen = onNavigateToFullscreen,
-                    onVideoSelected = onVideoSelected
+                    onVideoSelected = onVideoSelected,
+                    onExternalVideoOpened = onExternalVideoOpened
                 )
             }
 

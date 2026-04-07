@@ -47,6 +47,7 @@ private val FlightClubLogo = Color(0xFFF5B65B)
 @Composable
 fun FlightClubCard(
     flightClubUrl: String,
+    onReferralTracked: (url: String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
@@ -57,7 +58,10 @@ fun FlightClubCard(
     }
 
     Card(
-        onClick = { uriHandler.openUri(urlWithReferrer) },
+        onClick = {
+            onReferralTracked(urlWithReferrer)
+            uriHandler.openUri(urlWithReferrer)
+        },
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
