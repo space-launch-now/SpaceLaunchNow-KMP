@@ -1,3 +1,15 @@
+## [5.24.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.24.0...v5.24.1) (2026-04-07)
+
+
+### Bug Fixes
+
+* add analytics module ([f764699](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f76469945700ae5aca2d3a60a5ca4c413ad9f7e5))
+* **analytics:** address review feedback - async dispatch, throwable logging, console provider default ([b4fc727](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b4fc7270e701c8ebdb1141f360ee8c2afd110127))
+* **analytics:** enhance analytics integration across the app ([d03b6b9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d03b6b9aa1b23b54b7e10b87ae0b3a3ef19a1e24))
+* ios build ([d431867](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d431867008d6efc5fb144be77f80837d1d233507))
+
+
+
 # [5.24.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.3...v5.24.0) (2026-04-02)
 
 
@@ -46,25 +58,6 @@
 
 * **datetime:** enhance timeline relative time formatting to support days in ISO-8601 durations ([3994605](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/399460551051ce866e86505fe75a3fe58175d343))
 * **notifications:** implement notification filter persistence fix and error reporting ([3f8c036](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f8c0363539e2a9759f3df0296f5170ff476c2ea))
-
-
-
-# [5.23.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.22.4...v5.23.0) (2026-03-25)
-
-
-### Bug Fixes
-
-* deduplicate combined launches by ID to handle edge cases ([b3f2593](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b3f259372b671db25920466a1a1f899386200bcd))
-* handle corrupted subscription data files gracefully ([296094b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/296094b2cafa2c5a6949395e104255dbf59ceff9))
-* integrate Firebase Remote Config for dynamic roadmap feature ([4039945](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/40399455c00f2f783c972bb051c093e3f77370a2))
-* **logging:** add Crashlytics setup for improved exception handling on iOS [skip ci] ([4ca0c0b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4ca0c0bc24793a3082f1ce149e181264b1f0ef70))
-* pre-warming of ad requests and enhance ad handling for improved performance ([079b13f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/079b13f085464045ec5389d5878ffab8ac9c95ba))
-* refactor loading indicators to use shimmer effect for improved performance on low-RAM devices ([dc3e4e5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dc3e4e51be7b9177ff68ce9f6176e9eb05cd02f3))
-
-
-### Features
-
-* add events and news screen ([2882bd3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2882bd33428a8698efdc5891a13c66c502b5a39a))
 
 
 

@@ -1,9 +1,6 @@
 ### Bug Fixes
 
-* add Firebase Remote Config integration to project
-* add Firebase Remote Config integration to project
-* add mock implementation for remote config
-* **onboarding:** update WidgetsPage to support platform-specific widget showcases for iOS and Android
-* **onboarding:** update WidgetsPage to support platform-specific widget showcases for iOS and Android
-* refactor home screen and tablet layouts
-* refactor home screen and tablet layouts...
+* add analytics module
+* **analytics:** address review feedback - async dispatch, throwable logging, console provider default
+* **analytics:** enhance analytics integration across the app
+* ios build
