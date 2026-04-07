@@ -7,6 +7,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
 import me.calebjones.spacelaunchnow.data.billing.MockBillingManager
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
@@ -30,6 +32,7 @@ class SubscriptionViewModelTest {
     
     private lateinit var billingManager: MockBillingManager
     private lateinit var repository: MockSubscriptionRepository
+    private val analyticsManager: AnalyticsManager = AnalyticsManagerImpl(emptyList())
     private lateinit var viewModel: SubscriptionViewModel
     private val testDispatcher = StandardTestDispatcher()
     
@@ -39,7 +42,7 @@ class SubscriptionViewModelTest {
         Dispatchers.setMain(testDispatcher)
         billingManager = MockBillingManager()
         repository = MockSubscriptionRepository()
-        viewModel = SubscriptionViewModel(repository, billingManager)
+        viewModel = SubscriptionViewModel(repository, billingManager, analyticsManager)
     }
     
     @AfterTest

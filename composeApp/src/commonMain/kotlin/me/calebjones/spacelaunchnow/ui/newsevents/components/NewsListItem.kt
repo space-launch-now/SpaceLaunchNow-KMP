@@ -49,7 +49,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  * Shows article image, title, summary, news source, and publication date.
  * 
  * @param article The article to display
- * @param onClick Callback when the card is tapped (opens article URL by default)
+ * @param onClick Callback when the card is tapped
  * @param modifier Optional modifier for customization
  */
 @OptIn(ExperimentalMaterial3Api::class)

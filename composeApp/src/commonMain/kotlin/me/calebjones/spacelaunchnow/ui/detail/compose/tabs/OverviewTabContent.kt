@@ -15,6 +15,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.FlightClubCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchUpdatesSection
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.QuickStatsGrid
@@ -22,6 +24,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedEventsCa
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.TimelineCard
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
+import org.koin.compose.koinInject
 
 /**
  * Overview tab content for launch detail view.
@@ -73,8 +76,14 @@ fun OverviewTabContent(
 
             // Flight Club link
             launch.flightclubUrl?.let { url ->
+                val analyticsManager: AnalyticsManager = koinInject()
                 Spacer(Modifier.height(8.dp))
-                FlightClubCard(flightClubUrl = url)
+                FlightClubCard(
+                    flightClubUrl = url,
+                    onReferralTracked = { referralUrl ->
+                        analyticsManager.track(AnalyticsEvent.ThirdPartyReferral("flightclub", referralUrl))
+                    }
+                )
             }
             Spacer(Modifier.height(16.dp))
         }

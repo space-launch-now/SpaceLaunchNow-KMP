@@ -37,6 +37,16 @@ class AnalyticsManagerImpl(
                     .launchIn(scope)
             }
         }
+        // Initialize all providers at construction time
+        providers.forEach { provider ->
+            scope.launch {
+                try {
+                    provider.initialize()
+                } catch (e: Exception) {
+                    log.e { "Provider '${provider.name}' threw on initialize: $e" }
+                }
+            }
+        }
     }
 
     override fun track(event: AnalyticsEvent) {

@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -71,7 +70,7 @@ fun ArticlesView(
                     // Show stale articles
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         state.data.take(5).forEach { article ->
-                            ArticleItem(article = article)
+                            ArticleItem(article = article, onClick = { onArticleClick(article) })
                         }
                     }
                 }
@@ -86,7 +85,7 @@ fun ArticlesView(
             Box {
                 Column(modifier = Modifier.padding(vertical = 4.dp)) {
                     state.data.take(5).forEach { article ->
-                        ArticleItem(article = article)
+                        ArticleItem(article = article, onClick = { onArticleClick(article) })
                     }
                 }
 
@@ -132,7 +131,6 @@ fun ArticlesView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleItem(article: Article, onClick: () -> Unit = {}) {
-    val uriHandler = LocalUriHandler.current
     Card(
         onClick = onClick,
         modifier = Modifier

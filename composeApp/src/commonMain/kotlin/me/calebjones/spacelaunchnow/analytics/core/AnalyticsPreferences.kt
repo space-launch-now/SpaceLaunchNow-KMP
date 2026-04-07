@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 /**
  * Persists per-provider analytics consent using the shared [AppSettingsDataStore].
  *
- * Keys follow the pattern `analytics_<providerName>_enabled`. The global
+ * Keys follow the pattern `analytics_provider_enabled_<providerName>`. The global
  * `analytics_enabled` key gates the entire analytics system; when false, all providers
  * are treated as disabled regardless of their individual setting.
  */

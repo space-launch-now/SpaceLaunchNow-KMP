@@ -19,6 +19,7 @@ import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.analytics.navigation.AnalyticsScreenTracker
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
@@ -369,6 +370,8 @@ fun SpaceLaunchNowApp(
                         modifier = Modifier.fillMaxSize()
                     ) {}
                 } else {
+                    val analyticsManager: AnalyticsManager = koinInject()
+
                     // Hoisted NavHost - preserved across layout switches to maintain navigation state
                     val navHostContent: @Composable () -> Unit = {
                         NavHost(
@@ -590,7 +593,6 @@ fun SpaceLaunchNowApp(
                         }
 
                         // Analytics screen tracking — fires a screen-view event on each navigation change.
-                        val analyticsManager: AnalyticsManager = org.koin.compose.koinInject()
                         AnalyticsScreenTracker(
                             navController = navController,
                             analyticsManager = analyticsManager
@@ -627,8 +629,7 @@ fun SpaceLaunchNowApp(
                         navController = navController,
                         themeOption = themeOption,
                         onTabSelected = { tab ->
-                            val analyticsManager = org.koin.mp.KoinPlatform.getKoin().get<me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager>()
-                            analyticsManager.track(me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent.TabSelected(tab = tab))
+                            analyticsManager.track(AnalyticsEvent.TabSelected(tab = tab))
                         },
                         content = navHostContent
                     )

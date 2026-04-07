@@ -28,11 +28,8 @@ import androidx.compose.ui.unit.dp
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.ExternalLinkAlt
-import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
-import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.koinInject
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.flightclub
 
@@ -50,10 +47,10 @@ private val FlightClubLogo = Color(0xFFF5B65B)
 @Composable
 fun FlightClubCard(
     flightClubUrl: String,
+    onReferralTracked: (url: String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
-    val analyticsManager: AnalyticsManager = koinInject()
     val urlWithReferrer = if (flightClubUrl.contains("?")) {
         "$flightClubUrl&ref=spacelaunchnow"
     } else {
@@ -62,7 +59,7 @@ fun FlightClubCard(
 
     Card(
         onClick = {
-            analyticsManager.track(AnalyticsEvent.ThirdPartyReferral("flightclub", urlWithReferrer))
+            onReferralTracked(urlWithReferrer)
             uriHandler.openUri(urlWithReferrer)
         },
         modifier = modifier.fillMaxWidth(),
