@@ -1,3 +1,12 @@
+# [5.25.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.24.1...v5.25.0) (2026-04-07)
+
+
+### Features
+
+* bump version ([da57aa8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/da57aa861aeedea29519dd2bebed6f7413589eed))
+
+
+
 ## [5.24.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.24.0...v5.24.1) (2026-04-07)
 
 
@@ -48,16 +57,6 @@
 ### Bug Fixes
 
 * **timeline:** enhance TimelineCard to support NET and improve event status visualization ([30ccba6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/30ccba637085c3b80fcc9f6fba5fbb4db089f67d))
-
-
-
-## [5.23.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.0...v5.23.1) (2026-03-30)
-
-
-### Bug Fixes
-
-* **datetime:** enhance timeline relative time formatting to support days in ISO-8601 durations ([3994605](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/399460551051ce866e86505fe75a3fe58175d343))
-* **notifications:** implement notification filter persistence fix and error reporting ([3f8c036](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f8c0363539e2a9759f3df0296f5170ff476c2ea))
 
 
 

@@ -1,6 +1,3 @@
-### Bug Fixes
+### Features
 
-* add analytics module
-* **analytics:** address review feedback - async dispatch, throwable logging, console provider default
-* **analytics:** enhance analytics integration across the app
-* ios build
+* bump version
