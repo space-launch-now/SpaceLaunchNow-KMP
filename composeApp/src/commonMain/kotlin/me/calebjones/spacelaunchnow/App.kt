@@ -168,8 +168,8 @@ fun SpaceLaunchNowApp(
                 val appRatingViewModel = koin.get<AppRatingViewModel>()
 
                 // Track app opened
-                val analyticsManager = koin.get<me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager>()
-                analyticsManager.track(me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent.AppOpened())
+                val analyticsManager = koin.get<AnalyticsManager>()
+                analyticsManager.track(AnalyticsEvent.AppOpened())
 
                 // Record app launch for rating tracking
                 appRatingViewModel.recordAppLaunch()
