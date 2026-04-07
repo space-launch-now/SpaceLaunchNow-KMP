@@ -32,7 +32,7 @@ class FirebaseAnalyticsProvider(
                 .mapValues { (_, v) -> v!! }
             analytics.logEvent(event.name, params)
         } catch (e: Exception) {
-            log.e { "[Analytics] Firebase trackEvent failed for ${event.name}: $e" }
+            log.e(e) { "[Analytics] Firebase trackEvent failed for ${event.name}" }
         }
     }
 
@@ -45,7 +45,7 @@ class FirebaseAnalyticsProvider(
             }
             analytics.logEvent("screen_view", params)
         } catch (e: Exception) {
-            log.e { "[Analytics] Firebase trackScreenView failed for $screenName: $e" }
+            log.e(e) { "[Analytics] Firebase trackScreenView failed for $screenName" }
         }
     }
 
@@ -53,7 +53,7 @@ class FirebaseAnalyticsProvider(
         try {
             analytics.setUserId(userId)
         } catch (e: Exception) {
-            log.e { "[Analytics] Firebase setUserId failed: $e" }
+            log.e(e) { "[Analytics] Firebase setUserId failed" }
         }
     }
 
@@ -61,7 +61,7 @@ class FirebaseAnalyticsProvider(
         try {
             analytics.setUserProperty(key, value)
         } catch (e: Exception) {
-            log.e { "[Analytics] Firebase setUserProperty($key) failed: $e" }
+            log.e(e) { "[Analytics] Firebase setUserProperty($key) failed" }
         }
     }
 
@@ -73,7 +73,7 @@ class FirebaseAnalyticsProvider(
         try {
             analytics.resetAnalyticsData()
         } catch (e: Exception) {
-            log.e { "[Analytics] Firebase reset failed: $e" }
+            log.e(e) { "[Analytics] Firebase reset failed" }
         }
     }
 }

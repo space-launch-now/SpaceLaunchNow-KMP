@@ -43,7 +43,7 @@ class AnalyticsManagerImpl(
                 try {
                     provider.initialize()
                 } catch (e: Exception) {
-                    log.e { "Provider '${provider.name}' threw on initialize: $e" }
+                    log.e(e) { "Provider '${provider.name}' threw on initialize" }
                 }
             }
         }
@@ -56,7 +56,7 @@ class AnalyticsManagerImpl(
                 try {
                     provider.trackEvent(event)
                 } catch (e: Exception) {
-                    log.e { "Provider '${provider.name}' threw on trackEvent(${event.name}): $e" }
+                    log.e(e) { "Provider '${provider.name}' threw on trackEvent(${event.name})" }
                 }
             }
         }
@@ -69,7 +69,7 @@ class AnalyticsManagerImpl(
                 try {
                     provider.trackScreenView(screenName, screenClass)
                 } catch (e: Exception) {
-                    log.e { "Provider '${provider.name}' threw on trackScreenView($screenName): $e" }
+                    log.e(e) { "Provider '${provider.name}' threw on trackScreenView($screenName)" }
                 }
             }
         }
@@ -77,20 +77,24 @@ class AnalyticsManagerImpl(
 
     override fun setUserId(userId: String?) {
         providers.forEach { provider ->
-            try {
-                provider.setUserId(userId)
-            } catch (e: Exception) {
-                log.e { "Provider '${provider.name}' threw on setUserId: $e" }
+            scope.launch {
+                try {
+                    provider.setUserId(userId)
+                } catch (e: Exception) {
+                    log.e(e) { "Provider '${provider.name}' threw on setUserId" }
+                }
             }
         }
     }
 
     override fun setUserProperty(key: String, value: String) {
         providers.forEach { provider ->
-            try {
-                provider.setUserProperty(key, value)
-            } catch (e: Exception) {
-                log.e { "Provider '${provider.name}' threw on setUserProperty($key): $e" }
+            scope.launch {
+                try {
+                    provider.setUserProperty(key, value)
+                } catch (e: Exception) {
+                    log.e(e) { "Provider '${provider.name}' threw on setUserProperty($key)" }
+                }
             }
         }
     }
@@ -100,17 +104,19 @@ class AnalyticsManagerImpl(
             try {
                 provider.flush()
             } catch (e: Exception) {
-                log.e { "Provider '${provider.name}' threw on flush: $e" }
+                log.e(e) { "Provider '${provider.name}' threw on flush" }
             }
         }
     }
 
     override fun reset() {
         providers.forEach { provider ->
-            try {
-                provider.reset()
-            } catch (e: Exception) {
-                log.e { "Provider '${provider.name}' threw on reset: $e" }
+            scope.launch {
+                try {
+                    provider.reset()
+                } catch (e: Exception) {
+                    log.e(e) { "Provider '${provider.name}' threw on reset" }
+                }
             }
         }
     }

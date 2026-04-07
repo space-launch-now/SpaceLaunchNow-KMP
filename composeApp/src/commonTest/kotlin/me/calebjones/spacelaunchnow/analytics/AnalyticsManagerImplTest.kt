@@ -77,6 +77,7 @@ class AnalyticsManagerImplTest {
         val manager = AnalyticsManagerImpl(listOf(p1, p2), scope = CoroutineScope(SupervisorJob() + dispatcher))
 
         manager.setUserId("user-123")
+        advanceUntilIdle()
 
         assertEquals("user-123", p1.lastUserId)
         assertEquals("user-123", p2.lastUserId)
@@ -90,6 +91,7 @@ class AnalyticsManagerImplTest {
         val manager = AnalyticsManagerImpl(listOf(p1, p2), scope = CoroutineScope(SupervisorJob() + dispatcher))
 
         manager.reset()
+        advanceUntilIdle()
 
         assertTrue(p1.reset)
         assertTrue(p2.reset)
