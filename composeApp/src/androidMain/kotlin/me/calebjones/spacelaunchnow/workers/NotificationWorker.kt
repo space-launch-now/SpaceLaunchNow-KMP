@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.calebjones.spacelaunchnow.data.model.EventNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.FilterResult
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
@@ -46,6 +47,13 @@ class NotificationWorker(
 
             // Extract notification data from input
             val notificationDataMap = inputData.keyValueMap.mapValues { it.value.toString() }
+
+            // Check for event notification first (before V5/V4 launch detection)
+            val isEvent = EventNotificationPayload.isEventPayload(notificationDataMap)
+            if (isEvent) {
+                log.d { "🔔 NotificationWorker: Event notification detected" }
+                return@withContext processEventNotification(notificationDataMap)
+            }
             
             // Detect V5 vs V4 payload
             val isV5 = V5NotificationPayload.isV5Payload(notificationDataMap)
@@ -60,6 +68,60 @@ class NotificationWorker(
             log.e(e) { "❌ NotificationWorker failed: ${e.message}" }
             Result.failure()
         }
+    }
+
+    /**
+     * Process event notification (space events like EVAs, dockings, etc.)
+     * Events bypass launch filtering — they always show if notifications are enabled.
+     */
+    private suspend fun processEventNotification(dataMap: Map<String, String>): Result {
+        val eventPayload = EventNotificationPayload.fromMap(dataMap)
+        if (eventPayload == null) {
+            log.w { "⚠️ Failed to parse event notification data - keys: ${dataMap.keys.joinToString(",")}" }
+            return Result.failure()
+        }
+
+        log.d { "🔔 Event Parsed: ${eventPayload.toDebugString()}" }
+
+        // Check global notification toggle
+        val state = notificationStateStorage.getState()
+        if (!state.enableNotifications) {
+            log.i { "🔇 Event notification filtered - notifications disabled globally" }
+            return Result.success()
+        }
+
+        val title = eventPayload.title
+        val body = eventPayload.body
+
+        log.i { "✅ Displaying event notification - ${eventPayload.eventName}" }
+
+        NotificationDisplayHelper.showEventNotification(
+            context = applicationContext,
+            payload = eventPayload,
+            title = title,
+            body = body
+        )
+
+        // Save to history
+        saveToHistory(
+            notificationType = eventPayload.notificationType,
+            launchId = eventPayload.eventId.toString(),
+            launchUuid = eventPayload.eventId.toString(),
+            launchName = eventPayload.eventName,
+            launchImage = eventPayload.eventFeatureImage,
+            launchNet = eventPayload.eventDate,
+            launchLocation = eventPayload.eventLocation,
+            webcast = eventPayload.webcast.toString(),
+            webcastLive = eventPayload.eventWebcastLive.toString(),
+            agencyId = "",
+            locationId = "",
+            displayedTitle = title,
+            displayedBody = body,
+            rawData = dataMap,
+            wasFiltered = false
+        )
+
+        return Result.success()
     }
 
     /**

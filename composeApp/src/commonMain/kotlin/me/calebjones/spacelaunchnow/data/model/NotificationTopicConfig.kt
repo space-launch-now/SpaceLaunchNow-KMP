@@ -64,6 +64,19 @@ object NotificationTopicConfig {
 
         // V4 Legacy Fields (for backward compatibility)
         const val AGENCY_ID = "agency_id"
+
+        // Event notification fields (V5 events)
+        const val EVENT_ID = "event_id"
+        const val EVENT_NAME = "event_name"
+        const val EVENT_DESCRIPTION = "event_description"
+        const val EVENT_TYPE_ID = "event_type_id"
+        const val EVENT_TYPE_NAME = "event_type_name"
+        const val EVENT_DATE = "event_date"
+        const val EVENT_LOCATION = "event_location"
+        const val EVENT_NEWS_URL = "event_news_url"
+        const val EVENT_VIDEO_URL = "event_video_url"
+        const val EVENT_WEBCAST_LIVE = "event_webcast_live"
+        const val EVENT_FEATURE_IMAGE = "event_feature_image"
     }
 
     /**

@@ -40,6 +40,9 @@ class MainActivity : ComponentActivity() {
     // Use mutable state for notification launch ID to trigger recomposition
     private var notificationLaunchIdState by mutableStateOf<String?>(null)
 
+    // Use mutable state for notification event ID to trigger recomposition
+    private var notificationEventIdState by mutableStateOf<Int?>(null)
+
     // Use mutable state for navigation destination (e.g., from widget)
     private var navigationDestinationState by mutableStateOf<String?>(null)
 
@@ -67,11 +70,15 @@ class MainActivity : ComponentActivity() {
         // triggers the system permission dialog at the appropriate time.
         log.d { "Notification permission check skipped - handled by LiveOnboarding flow" }
 
-        // Check if launched from notification (with launch_id)
+        // Check if launched from notification (with launch_id or event_id)
         val intentLaunchId = intent?.getStringExtra("launch_id")
+        val intentEventId = intent?.getIntExtra("event_id", -1)?.takeIf { it != -1 }
         if (intentLaunchId != null) {
             log.i { "App launched from notification - launch_id: $intentLaunchId" }
             notificationLaunchIdState = intentLaunchId
+        } else if (intentEventId != null) {
+            log.i { "App launched from event notification - event_id: $intentEventId" }
+            notificationEventIdState = intentEventId
         }
 
         // Check if launched with navigation destination (from widget)
@@ -122,6 +129,8 @@ class MainActivity : ComponentActivity() {
                 useUtc = useUtc,
                 notificationLaunchId = notificationLaunchIdState,
                 onNotificationLaunchIdConsumed = { notificationLaunchIdState = null },
+                notificationEventId = notificationEventIdState,
+                onNotificationEventIdConsumed = { notificationEventIdState = null },
                 navigationDestination = navigationDestinationState,
                 onNavigationDestinationConsumed = { navigationDestinationState = null }
             )
@@ -206,9 +215,13 @@ class MainActivity : ComponentActivity() {
 
         // Check if new intent has launch_id from notification
         val newLaunchId = intent?.getStringExtra("launch_id")
+        val newEventId = intent?.getIntExtra("event_id", -1)?.takeIf { it != -1 }
         if (newLaunchId != null) {
             log.i { "New notification intent received - launch_id: $newLaunchId" }
             notificationLaunchIdState = newLaunchId
+        } else if (newEventId != null) {
+            log.i { "New event notification intent received - event_id: $newEventId" }
+            notificationEventIdState = newEventId
         }
 
         // Check if new intent has navigation destination (from widget)

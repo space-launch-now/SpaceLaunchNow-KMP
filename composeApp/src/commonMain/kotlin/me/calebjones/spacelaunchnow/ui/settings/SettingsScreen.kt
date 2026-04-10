@@ -158,232 +158,232 @@ fun SettingsScreen(
             )
         }
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 0.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                // GENERAL
-                item {
-                    SectionHeaderText("General")
-                    Spacer(Modifier.height(2.dp))
-                    SettingsCardRow {
-                        Column(Modifier.fillMaxWidth()) {
-                            SettingsToggleRow(
-                                title = "Use UTC time",
-                                subtitle = "Show dates/times in UTC instead of local timezone",
-                                checked = uiState.useUtc,
-                                onCheckedChange = viewModel::updateUseUtc
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            NotificationTopicToggle(
-                                title = "Hide TBD Launches",
-                                description = "Hide launches without confirmed dates",
-                                checked = uiState.hideTbdLaunches,
-                                onCheckedChange = viewModel::updateHideTbdLaunches
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            SettingsNavigationRow(
-                                title = "Theme Settings",
-                                subtitle = "Appearance, colors, and palette customization",
-                                onClick = { navController.navigate(ThemeCustomization) },
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            SettingsNavigationRow(
-                                title = "Calendar Sync",
-                                subtitle = "Sync Launches and Events to your calendar",
-                                onClick = { navController.navigate(CalendarSync) },
-                            )
-                        }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 0.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            // GENERAL
+            item {
+                SectionHeaderText("General")
+                Spacer(Modifier.height(2.dp))
+                SettingsCardRow {
+                    Column(Modifier.fillMaxWidth()) {
+                        SettingsToggleRow(
+                            title = "Use UTC time",
+                            subtitle = "Show dates/times in UTC instead of local timezone",
+                            checked = uiState.useUtc,
+                            onCheckedChange = viewModel::updateUseUtc
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        NotificationTopicToggle(
+                            title = "Hide TBD Launches",
+                            description = "Hide launches without confirmed dates",
+                            checked = uiState.hideTbdLaunches,
+                            onCheckedChange = viewModel::updateHideTbdLaunches
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SettingsNavigationRow(
+                            title = "Theme Settings",
+                            subtitle = "Appearance, colors, and palette customization",
+                            onClick = { navController.navigate(ThemeCustomization) },
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SettingsNavigationRow(
+                            title = "Calendar Sync",
+                            subtitle = "Sync Launches and Events to your calendar",
+                            onClick = { navController.navigate(CalendarSync) },
+                        )
                     }
                 }
-                // NOTIFICATIONS
+            }
+            // NOTIFICATIONS
+            item {
+                SectionHeaderText("Notifications")
+                Spacer(Modifier.height(2.dp))
+                SettingsCardRow {
+                    Column(Modifier.fillMaxWidth()) {
+                        if (!hasNotificationPermission) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Notifications Disabled",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                    Text(
+                                        text = "Permission required to send notifications",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(top = 2.dp)
+                                    )
+                                }
+                                TextButton(
+                                    onClick = { openPlatformNotificationSettings() }
+                                ) {
+                                    Text("Open Settings")
+                                }
+                            }
+                        } else {
+                            SettingsToggleRow(
+                                title = "Notifications Enabled",
+                                subtitle = "Allow notifications for news, launches and events",
+                                checked = uiState.notificationsEnabled,
+                                onCheckedChange = viewModel::updateNotificationsEnabled
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SettingsNavigationRow(
+                            title = "Notification Filters",
+                            subtitle = "Filter launches shown in app and notifications",
+                            onClick = onOpenNotificationSettings,
+                            enabled = hasNotificationPermission && uiState.notificationsEnabled
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SettingsNavigationRow(
+                            title = "System Settings",
+                            subtitle = "Manage notification channels, sounds, and do-not-disturb",
+                            onClick = onOpenSystemNotificationSettings,
+                            enabled = hasNotificationPermission && uiState.notificationsEnabled
+                        )
+                    }
+                }
+            }
+
+            // SUPPORT & MEMBERSHIP
+            item {
+                SectionHeaderText("Premium")
+                Spacer(Modifier.height(2.dp))
+                SettingsCardRow {
+                    Column(Modifier.fillMaxWidth()) {
+                        SettingsNavigationRow(
+                            title = "Go Premium \u2728",
+                            subtitle = "Ad-free, widgets, themes & more",
+                            onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs) },
+                            icon = Icons.Filled.Star
+                        )
+                    }
+                }
+            }
+
+            // DIAGNOSTIC LOGGING
+            item {
+                val loggingPreferences: LoggingPreferences = koinInject()
+                SectionHeaderText("Diagnostic")
+                Spacer(Modifier.height(2.dp))
+                LoggingSettingsSection(
+                    loggingPreferences = loggingPreferences,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+            }
+
+            // DEBUG
+            if (BuildConfig.IS_DEBUG || debugMenuUnlocked) {
                 item {
-                    SectionHeaderText("Notifications")
+                    SectionHeaderText("Developer")
                     Spacer(Modifier.height(2.dp))
                     SettingsCardRow {
-                        Column(Modifier.fillMaxWidth()) {
-                            if (!hasNotificationPermission) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = "Notifications Disabled",
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.error
-                                        )
-                                        Text(
-                                            text = "Permission required to send notifications",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.padding(top = 2.dp)
-                                        )
-                                    }
-                                    TextButton(
-                                        onClick = { openPlatformNotificationSettings() }
-                                    ) {
-                                        Text("Open Settings")
-                                    }
-                                }
-                            } else {
-                                SettingsToggleRow(
-                                    title = "Notifications Enabled",
-                                    subtitle = "Allow notifications for news, launches and events",
-                                    checked = uiState.notificationsEnabled,
-                                    onCheckedChange = viewModel::updateNotificationsEnabled
+                        SettingsNavigationRow(
+                            title = "Debug Settings",
+                            subtitle = "API URL switching, topic testing, and developer options",
+                            onClick = onOpenDebugSettings,
+                            icon = Icons.Filled.Warning
+                        )
+                    }
+                }
+            }
+
+            // ABOUT
+            item {
+                SectionHeaderText("About")
+                Spacer(Modifier.height(2.dp))
+                SettingsCardRow {
+                    SettingsNavigationRow(
+                        title = "Roadmap",
+                        subtitle = "View planned features and development timeline",
+                        onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Roadmap) }
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                SettingsCardRow {
+                    SettingsNavigationRow(
+                        title = "Send Feedback",
+                        subtitle = "Report issues or suggest improvements",
+                        onClick = { appRatingViewModel.showFeedbackDialog() }
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                SettingsCardRow {
+                    SettingsNavigationRow(
+                        title = "About Details",
+                        onClick = onAbout
+                    )
+                }
+                // Ad privacy / consent revocation
+                val privacyOptionsRequired =
+                    me.calebjones.spacelaunchnow.ui.ads.rememberPrivacyOptionsRequired()
+                if (privacyOptionsRequired) {
+                    Spacer(Modifier.height(4.dp))
+                    SettingsCardRow {
+                        val contextFactory =
+                            me.calebjones.spacelaunchnow.LocalContextFactory.current
+                        SettingsNavigationRow(
+                            title = "Ad privacy settings",
+                            onClick = {
+                                me.calebjones.spacelaunchnow.ui.ads.showPrivacyOptionsForm(
+                                    activity = contextFactory?.getActivity()
                                 )
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            SettingsNavigationRow(
-                                title = "Launch Filters",
-                                subtitle = "Filter launches shown in app and notifications",
-                                onClick = onOpenNotificationSettings,
-                                enabled = hasNotificationPermission && uiState.notificationsEnabled
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            SettingsNavigationRow(
-                                title = "System Settings",
-                                subtitle = "Manage notification channels, sounds, and do-not-disturb",
-                                onClick = onOpenSystemNotificationSettings,
-                                enabled = hasNotificationPermission && uiState.notificationsEnabled
-                            )
-                        }
+                        )
                     }
                 }
 
-                // SUPPORT & MEMBERSHIP
-                item {
-                    SectionHeaderText("Premium")
-                    Spacer(Modifier.height(2.dp))
-                    SettingsCardRow {
-                        Column(Modifier.fillMaxWidth()) {
-                            SettingsNavigationRow(
-                                title = "Go Premium \u2728",
-                                subtitle = "Ad-free, widgets, themes & more",
-                                onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs) },
-                                icon = Icons.Filled.Star
-                            )
-                        }
-                    }
+                Spacer(Modifier.height(4.dp))
+                SettingsCardRow {
+                    SettingsNavigationRow(
+                        title = "Privacy policy",
+                        onClick = onPrivacyPolicy
+                    )
                 }
-
-                // DIAGNOSTIC LOGGING
-                item {
-                    val loggingPreferences: LoggingPreferences = koinInject()
-                    SectionHeaderText("Diagnostic")
-                    Spacer(Modifier.height(2.dp))
-                    LoggingSettingsSection(
-                        loggingPreferences = loggingPreferences,
-                        modifier = Modifier.padding(horizontal = 8.dp)
+                Spacer(Modifier.height(4.dp))
+                SettingsCardRow {
+                    SettingsNavigationRow(
+                        title = "Terms of service",
+                        onClick = onTerms
                     )
                 }
 
-                // DEBUG
-                if (BuildConfig.IS_DEBUG || debugMenuUnlocked) {
-                    item {
-                        SectionHeaderText("Developer")
-                        Spacer(Modifier.height(2.dp))
-                        SettingsCardRow {
-                            SettingsNavigationRow(
-                                title = "Debug Settings",
-                                subtitle = "API URL switching, topic testing, and developer options",
-                                onClick = onOpenDebugSettings,
-                                icon = Icons.Filled.Warning
-                            )
-                        }
-                    }
-                }
 
-                // ABOUT
-                item {
-                    SectionHeaderText("About")
-                    Spacer(Modifier.height(2.dp))
-                    SettingsCardRow {
-                        SettingsNavigationRow(
-                            title = "Roadmap",
-                            subtitle = "View planned features and development timeline",
-                            onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Roadmap) }
-                        )
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    SettingsCardRow {
-                        SettingsNavigationRow(
-                            title = "Send Feedback",
-                            subtitle = "Report issues or suggest improvements",
-                            onClick = { appRatingViewModel.showFeedbackDialog() }
-                        )
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    SettingsCardRow {
-                        SettingsNavigationRow(
-                            title = "About Details",
-                            onClick = onAbout
-                        )
-                    }
-                    // Ad privacy / consent revocation
-                    val privacyOptionsRequired =
-                        me.calebjones.spacelaunchnow.ui.ads.rememberPrivacyOptionsRequired()
-                    if (privacyOptionsRequired) {
-                        Spacer(Modifier.height(4.dp))
-                        SettingsCardRow {
-                            val contextFactory =
-                                me.calebjones.spacelaunchnow.LocalContextFactory.current
-                            SettingsNavigationRow(
-                                title = "Ad privacy settings",
-                                onClick = {
-                                    me.calebjones.spacelaunchnow.ui.ads.showPrivacyOptionsForm(
-                                        activity = contextFactory?.getActivity()
-                                    )
-                                }
-                            )
-                        }
-                    }
-
-                    Spacer(Modifier.height(4.dp))
-                    SettingsCardRow {
-                        SettingsNavigationRow(
-                            title = "Privacy policy",
-                            onClick = onPrivacyPolicy
-                        )
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    SettingsCardRow {
-                        SettingsNavigationRow(
-                            title = "Terms of service",
-                            onClick = onTerms
-                        )
-                    }
-
-
-                    Spacer(Modifier.height(16.dp))
-                    Box(
+                Spacer(Modifier.height(16.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .clickable {
-                                    tapCount++
-                                    if (tapCount >= 7) {
-                                        showPasswordDialog = true
-                                        tapCount = 0
-                                    }
-                                },
-                            text = "Version ${BuildConfig.VERSION_NAME}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Spacer(Modifier.height(32.dp))
+                            .clickable {
+                                tapCount++
+                                if (tapCount >= 7) {
+                                    showPasswordDialog = true
+                                    tapCount = 0
+                                }
+                            },
+                        text = "Version ${BuildConfig.VERSION_NAME}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
+                Spacer(Modifier.height(32.dp))
             }
         }
+    }
 
     // Password dialog for debug unlock
     if (showPasswordDialog) {

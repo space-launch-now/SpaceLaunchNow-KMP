@@ -104,7 +104,7 @@ fun NotificationSettingsScreen(
             viewModel.clearError()
         }
     }
-    
+
     // Show snackbar for validation messages
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
@@ -118,7 +118,7 @@ fun NotificationSettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Launch Filters",
+                        text = "Notification Filters",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -254,7 +254,7 @@ fun NotificationSettingsScreen(
                 }
             }
 
-                        // Strict Matching Card
+            // Strict Matching Card
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),

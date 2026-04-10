@@ -24,6 +24,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.data.model.EventNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.SpaceLaunchNotificationChannel
@@ -109,7 +110,9 @@ object NotificationDisplayHelper {
                 SpaceLaunchNotificationChannel.WEBCAST_NOTIFICATIONS.id
 
             // Space events
-            notificationType.equals("event", ignoreCase = true) ->
+            notificationType.equals("event", ignoreCase = true) ||
+                    notificationType.contains("event_notification", ignoreCase = true) ||
+                    notificationType.contains("event_webcast", ignoreCase = true) ->
                 SpaceLaunchNotificationChannel.SPACE_EVENTS.id
 
             // News and updates
@@ -789,5 +792,113 @@ object NotificationDisplayHelper {
             notification
         )
         log.i("📱 [V5 Notification] ✅ V5 Notification shown successfully!")
+    }
+
+    /**
+     * Display an event notification using EventNotificationPayload
+     *
+     * Event notifications deep-link to the EventDetail screen using event_id.
+     * Uses the SPACE_EVENTS notification channel.
+     *
+     * @param context Android context
+     * @param payload Event notification payload with all data
+     * @param title Server-provided title (event name)
+     * @param body Server-provided body text
+     */
+    fun showEventNotification(
+        context: Context,
+        payload: EventNotificationPayload,
+        title: String,
+        body: String
+    ) {
+        log.d("📱 [Event Notification] Starting event notification display...")
+        log.d("📱 [Event Notification] Title: $title")
+        log.d("📱 [Event Notification] Body: $body")
+        log.d("📱 [Event Notification] Event: ${payload.eventName} (ID: ${payload.eventId})")
+
+        // Ensure channels exist
+        createNotificationChannels(context)
+
+        // Events always use the SPACE_EVENTS channel
+        val channelId = getChannelId(payload.notificationType)
+        log.d("📱 [Event Notification] Channel: $channelId")
+
+        // Add 🔴 emoji to title if webcast is live
+        val displayTitle = if (payload.eventWebcastLive) {
+            "🔴 $title"
+        } else {
+            title
+        }
+
+        // Create intent with event data for deep linking to EventDetail
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("event_id", payload.eventId)
+            putExtra("event_name", payload.eventName)
+            putExtra("notification_type", payload.notificationType)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            payload.eventId.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Build base notification
+        val notificationBuilder = NotificationCompat.Builder(context, channelId)
+            .setContentTitle(displayTitle)
+            .setContentText(body)
+            .setSmallIcon(R.drawable.ic_rocket_notification)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setOnlyAlertOnce(true)
+
+        // Load and display image if available
+        log.d("📱 [Event Notification] Image URL: ${payload.eventFeatureImage}")
+
+        var imageBitmap = loadImageFromUrlSync(context, payload.eventFeatureImage)
+        log.d("📱 [Event Notification] Image bitmap result: $imageBitmap")
+
+        // Add LIVE badge if webcast is live
+        if (imageBitmap != null && payload.eventWebcastLive) {
+            log.d("📱 [Event Notification] 🔴 Adding LIVE badge")
+            imageBitmap = drawLiveBadge(imageBitmap)
+        }
+
+        if (imageBitmap != null) {
+            log.d("📱 [Event Notification] ✅ Setting large icon and BigPictureStyle")
+            notificationBuilder
+                .setLargeIcon(imageBitmap)
+                .setStyle(
+                    NotificationCompat.BigPictureStyle()
+                        .bigPicture(imageBitmap)
+                        .bigLargeIcon(null as Bitmap?)
+                )
+        } else {
+            log.d("📱 [Event Notification] Using BigTextStyle (no image)")
+            notificationBuilder.setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(body)
+            )
+        }
+
+        val notification = notificationBuilder.build()
+        log.i("📱 [Event Notification] Notification built successfully")
+
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Use event ID as the notification tag (collapse key)
+        val notificationTag = "event_${payload.eventId}"
+        log.i("📱 [Event Notification] Showing notification - Tag: $notificationTag, ID: ${payload.eventId}")
+
+        notificationManager.notify(
+            notificationTag,
+            payload.eventId,
+            notification
+        )
+        log.i("📱 [Event Notification] ✅ Event notification shown successfully!")
     }
 }

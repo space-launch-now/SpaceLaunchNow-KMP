@@ -143,6 +143,8 @@ fun SpaceLaunchNowApp(
     useUtc: Boolean = false,
     notificationLaunchId: String? = null,
     onNotificationLaunchIdConsumed: () -> Unit = {},
+    notificationEventId: Int? = null,
+    onNotificationEventIdConsumed: () -> Unit = {},
     navigationDestination: String? = null,
     onNavigationDestinationConsumed: () -> Unit = {}
 ) {
@@ -273,7 +275,7 @@ fun SpaceLaunchNowApp(
             val startRoute: Any? = remember(liveOnboardingCompleted, onboardingPaywallShown) {
                 when {
                     liveOnboardingCompleted == null || onboardingPaywallShown == null -> null
-                    notificationLaunchId != null || navigationDestination != null -> Home
+                    notificationLaunchId != null || notificationEventId != null || navigationDestination != null -> Home
                     else -> Preload
                 }
             }
@@ -606,6 +608,13 @@ fun SpaceLaunchNowApp(
                                 log.d { "Navigating to launch detail for ID: $notificationLaunchId" }
                                 navController.navigate(LaunchDetail(notificationLaunchId))
                                 onNotificationLaunchIdConsumed()
+                            }
+                        }
+                        LaunchedEffect(notificationEventId) {
+                            if (notificationEventId != null) {
+                                log.d { "Navigating to event detail for ID: $notificationEventId" }
+                                navController.navigate(EventDetail(notificationEventId))
+                                onNotificationEventIdConsumed()
                             }
                         }
                         LaunchedEffect(navigationDestination) {
