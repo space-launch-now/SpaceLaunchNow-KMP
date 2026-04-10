@@ -1,3 +1,12 @@
+# [5.26.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.25.0...v5.26.0) (2026-04-10)
+
+
+### Features
+
+* add event notification handling and payload structure ([bab857f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bab857f03b50580a12680db59ec42c643fbb195f))
+
+
+
 # [5.25.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.24.1...v5.25.0) (2026-04-07)
 
 
@@ -48,15 +57,6 @@
 * **onboarding:** add button for auto-advancing when permission is granted ([5ba616a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5ba616aaa254658a0189958fe107137e241f977a))
 * **onboarding:** add widgets showcase page and integrate into onboarding flow ([ece77bf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ece77bf240b08307bd54fb251fcc298d14d7ccbf))
 * **onboarding:** enhance onboarding flow with widget showcase and improve state management ([18debbb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/18debbb341ce4211233f490b82a620490fbb609c))
-
-
-
-## [5.23.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.1...v5.23.2) (2026-03-31)
-
-
-### Bug Fixes
-
-* **timeline:** enhance TimelineCard to support NET and improve event status visualization ([30ccba6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/30ccba637085c3b80fcc9f6fba5fbb4db089f67d))
 
 
 
