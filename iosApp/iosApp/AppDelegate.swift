@@ -721,8 +721,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
 
         print("🚀 Navigating to launch detail for ID: \(launchId)")
-        // Call Kotlin function to trigger navigation
-        MainViewControllerKt.setNotificationLaunchId(launchId: launchId)
+        // Dispatch to main thread to ensure Compose state is modified safely.
+        // During cold-start, didFinishLaunchingWithOptions can fire before the
+        // Compose UI is fully initialised; dispatching asynchronously gives the
+        // run-loop a chance to finish setting up the view hierarchy first.
+        DispatchQueue.main.async {
+            MainViewControllerKt.setNotificationLaunchId(launchId: launchId)
+        }
     }
 
     // MARK: - Helper Methods

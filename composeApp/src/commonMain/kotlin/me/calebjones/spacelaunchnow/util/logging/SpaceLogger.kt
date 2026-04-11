@@ -92,11 +92,17 @@ object SpaceLogger {
      * Uses our custom Logger instance (not the global singleton)
      */
     fun getLogger(tag: String): Logger {
-        val logger =
-            baseLogger ?: error("SpaceLogger not initialized! Call SpaceLogger.initialize() first")
         val fullTag = if (tag.isEmpty()) BASE_TAG else "$BASE_TAG-$tag"
-
-        return logger.withTag(fullTag)
+        val logger = baseLogger
+        if (logger != null) {
+            return logger.withTag(fullTag)
+        }
+        // Fallback: return a basic Logger so callers don't crash when SpaceLogger
+        // hasn't been initialized yet (e.g. iOS cold-start from notification tap).
+        return Logger(
+            StaticConfig(minSeverity = Severity.Info, logWriterList = emptyList()),
+            fullTag
+        )
     }
 
     /**
