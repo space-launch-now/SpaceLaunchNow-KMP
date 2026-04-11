@@ -46,25 +46,23 @@ fun setThemeChangeListener(listener: ((Int) -> Unit)?) {
 fun setNavigationDestination(destination: String?) {
     try {
         log.i { "iOS: Setting navigation destination: $destination" }
-        navigationDestinationState.value = destination
     } catch (e: Exception) {
-        // Fallback: set state even if logging fails (e.g. SpaceLogger not yet initialized)
+        // Fallback when SpaceLogger not yet initialized (e.g. deep link during cold start)
         println("iOS: Setting navigation destination: $destination (logger unavailable: ${e.message})")
-        navigationDestinationState.value = destination
     }
+    navigationDestinationState.value = destination
 }
 
 // Public function for iOS to trigger navigation from notification
 fun setNotificationLaunchId(launchId: String?) {
     try {
         log.i { "iOS: Setting notification launch ID: $launchId" }
-        notificationLaunchIdState.value = launchId
     } catch (e: Exception) {
-        // Fallback: set state even if logging fails (e.g. SpaceLogger not yet initialized
-        // during cold-start from notification tap before MainViewController composable runs)
+        // Fallback when SpaceLogger not yet initialized (e.g. cold-start from notification tap
+        // before MainViewController composable runs)
         println("iOS: Setting notification launch ID: $launchId (logger unavailable: ${e.message})")
-        notificationLaunchIdState.value = launchId
     }
+    notificationLaunchIdState.value = launchId
 }
 
 fun MainViewController() = ComposeUIViewController {
