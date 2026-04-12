@@ -39,6 +39,12 @@ object SpaceLogger {
     private var consoleWriters: List<LogWriter> = emptyList()
     private var dataDogWriter: ConfigurableLogWriter? = null
 
+    /** Reusable no-op logger returned before [initialize] is called. */
+    private val NO_OP_LOGGER = Logger(
+        StaticConfig(minSeverity = Severity.Assert, logWriterList = emptyList()),
+        BASE_TAG
+    )
+
     /**
      * Initialize logging with platform-specific configuration
      * Should be called in Application.onCreate() / main()
@@ -92,11 +98,15 @@ object SpaceLogger {
      * Uses our custom Logger instance (not the global singleton)
      */
     fun getLogger(tag: String): Logger {
-        val logger =
-            baseLogger ?: error("SpaceLogger not initialized! Call SpaceLogger.initialize() first")
         val fullTag = if (tag.isEmpty()) BASE_TAG else "$BASE_TAG-$tag"
-
-        return logger.withTag(fullTag)
+        val logger = baseLogger
+        if (logger != null) {
+            return logger.withTag(fullTag)
+        }
+        // No-op fallback: avoids crashes when SpaceLogger hasn't been initialized yet
+        // (e.g. iOS cold-start from notification tap). Uses Severity.Assert so message
+        // lambdas are never evaluated and no writers are invoked.
+        return NO_OP_LOGGER.withTag(fullTag)
     }
 
     /**

@@ -44,12 +44,23 @@ fun setThemeChangeListener(listener: ((Int) -> Unit)?) {
 
 // Public function for iOS to trigger navigation
 fun setNavigationDestination(destination: String?) {
+    try {
+        log.i { "iOS: Setting navigation destination: $destination" }
+    } catch (t: Throwable) {
+        // Catch Throwable (not just Exception) so nothing escapes across the ObjC boundary
+        println("iOS: Setting navigation destination: $destination (logging failed: ${t.message})")
+    }
     navigationDestinationState.value = destination
 }
 
 // Public function for iOS to trigger navigation from notification
 fun setNotificationLaunchId(launchId: String?) {
-    log.i { "iOS: Setting notification launch ID: $launchId" }
+    try {
+        log.i { "iOS: Setting notification launch ID: $launchId" }
+    } catch (t: Throwable) {
+        // Catch Throwable (not just Exception) so nothing escapes across the ObjC boundary
+        println("iOS: Setting notification launch ID: $launchId (logging failed: ${t.message})")
+    }
     notificationLaunchIdState.value = launchId
 }
 
