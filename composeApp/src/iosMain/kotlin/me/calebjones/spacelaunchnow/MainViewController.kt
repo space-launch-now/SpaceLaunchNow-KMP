@@ -46,9 +46,9 @@ fun setThemeChangeListener(listener: ((Int) -> Unit)?) {
 fun setNavigationDestination(destination: String?) {
     try {
         log.i { "iOS: Setting navigation destination: $destination" }
-    } catch (e: Exception) {
-        // Fallback when SpaceLogger not yet initialized (e.g. deep link during cold start)
-        println("iOS: Setting navigation destination: $destination (logger unavailable: ${e.message})")
+    } catch (t: Throwable) {
+        // Catch Throwable (not just Exception) so nothing escapes across the ObjC boundary
+        println("iOS: Setting navigation destination: $destination (logging failed: ${t.message})")
     }
     navigationDestinationState.value = destination
 }
@@ -57,10 +57,9 @@ fun setNavigationDestination(destination: String?) {
 fun setNotificationLaunchId(launchId: String?) {
     try {
         log.i { "iOS: Setting notification launch ID: $launchId" }
-    } catch (e: Exception) {
-        // Fallback when SpaceLogger not yet initialized (e.g. cold-start from notification tap
-        // before MainViewController composable runs)
-        println("iOS: Setting notification launch ID: $launchId (logger unavailable: ${e.message})")
+    } catch (t: Throwable) {
+        // Catch Throwable (not just Exception) so nothing escapes across the ObjC boundary
+        println("iOS: Setting notification launch ID: $launchId (logging failed: ${t.message})")
     }
     notificationLaunchIdState.value = launchId
 }
