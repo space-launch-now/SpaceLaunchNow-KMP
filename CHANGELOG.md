@@ -1,3 +1,13 @@
+## [5.26.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.26.0...v5.26.1) (2026-04-12)
+
+
+### Bug Fixes
+
+* **ios:** prevent crash on cold-start notification tap ([2d4749b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2d4749b459c91121e2fdf35ed6fbbbc0d3e92d1c))
+* **ios:** use static no-op fallback logger and catch Throwable in ObjC-exported functions ([0b07103](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0b0710365d1753fd49c80103f63635b2f4e29ea0))
+
+
+
 # [5.26.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.25.0...v5.26.0) (2026-04-10)
 
 
@@ -46,17 +56,6 @@
 ### Features
 
 * implement Live Launches card and pinned content ([4be0d4b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4be0d4b8792aeff008f4faa4194ab05157acd6a0))
-
-
-
-## [5.23.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.2...v5.23.3) (2026-04-01)
-
-
-### Bug Fixes
-
-* **onboarding:** add button for auto-advancing when permission is granted ([5ba616a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5ba616aaa254658a0189958fe107137e241f977a))
-* **onboarding:** add widgets showcase page and integrate into onboarding flow ([ece77bf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ece77bf240b08307bd54fb251fcc298d14d7ccbf))
-* **onboarding:** enhance onboarding flow with widget showcase and improve state management ([18debbb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/18debbb341ce4211233f490b82a620490fbb609c))
 
 
 

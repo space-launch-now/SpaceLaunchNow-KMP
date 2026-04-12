@@ -1,3 +1,4 @@
-### Features
+### Bug Fixes
 
-* add event notification handling and payload structure
+* **ios:** prevent crash on cold-start notification tap
+* **ios:** use static no-op fallback logger and catch Throwable in ObjC-exported functions
