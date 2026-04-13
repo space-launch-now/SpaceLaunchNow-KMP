@@ -32,7 +32,8 @@ class LaunchRepositoryImpl(
     private val launchesApi: LaunchesApi,
     private val agenciesApi: AgenciesApi,
     private val appPreferences: AppPreferences,
-    private val localDataSource: LaunchLocalDataSource? = null
+    private val localDataSource: LaunchLocalDataSource? = null,
+    private val statsLocalDataSource: me.calebjones.spacelaunchnow.database.StatsLocalDataSource? = null
 ) : LaunchRepository {
 
     private val log = logger()
@@ -251,6 +252,31 @@ class LaunchRepositoryImpl(
 
             val now = Clock.System.now().toEpochMilliseconds()
 
+            // STALE-WHILE-REVALIDATE: check stale first for fallback
+            val staleCached = localDataSource?.getInFlightNormalLaunchesStale(5)
+            val hasStaleData = staleCached != null && staleCached.isNotEmpty()
+
+            // Try fresh cache if not forcing refresh
+            if (!forceRefresh) {
+                val cached = localDataSource?.getInFlightNormalLaunches(5)
+                if (cached != null && cached.isNotEmpty()) {
+                    log.d { "In-flight cache HIT: ${cached.size} launches" }
+                    return Result.success(DataResult(
+                        data = PaginatedLaunchNormalList(count = cached.size, results = cached, next = null, previous = null),
+                        source = DataSource.CACHE,
+                        timestamp = now
+                    ))
+                }
+                if (hasStaleData) {
+                    log.d { "In-flight stale cache HIT: ${staleCached!!.size} launches" }
+                    return Result.success(DataResult(
+                        data = PaginatedLaunchNormalList(count = staleCached!!.size, results = staleCached, next = null, previous = null),
+                        source = DataSource.STALE_CACHE,
+                        timestamp = now
+                    ))
+                }
+            }
+
             // Fetch from API - status_ids=6 means "In Flight"
             log.d { "Fetching in-flight launches from API with statusIds=[6]" }
             val response = launchesApi.getLaunchList(
@@ -269,6 +295,12 @@ class LaunchRepositoryImpl(
                 log.v { "InFlight[$index]: name='${launch.name}', id=${launch.id}, status=${launch.status?.name}" }
             }
 
+            // Cache the results
+            if (launches.results.isNotEmpty()) {
+                localDataSource?.cacheNormalLaunches(launches.results)
+                log.d { "Cached ${launches.results.size} in-flight launches" }
+            }
+
             Result.success(
                 DataResult(
                     data = launches,
@@ -278,10 +310,30 @@ class LaunchRepositoryImpl(
             )
         } catch (e: ResponseException) {
             log.e(e) { "\u274C API ERROR in getInFlightLaunches: ${e.message}" }
-            Result.failure(e)
+            val staleCached = localDataSource?.getInFlightNormalLaunchesStale(5)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                val now = Clock.System.now().toEpochMilliseconds()
+                Result.success(DataResult(
+                    data = PaginatedLaunchNormalList(count = staleCached.size, results = staleCached, next = null, previous = null),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = now
+                ))
+            } else {
+                Result.failure(e)
+            }
         } catch (e: IOException) {
             log.e(e) { "\u274C NETWORK ERROR in getInFlightLaunches: ${e.message}" }
-            Result.failure(e)
+            val staleCached = localDataSource?.getInFlightNormalLaunchesStale(5)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                val now = Clock.System.now().toEpochMilliseconds()
+                Result.success(DataResult(
+                    data = PaginatedLaunchNormalList(count = staleCached.size, results = staleCached, next = null, previous = null),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = now
+                ))
+            } else {
+                Result.failure(e)
+            }
         } catch (e: Exception) {
             log.e(e) { "\u274C UNEXPECTED ERROR in getInFlightLaunches: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
@@ -1104,6 +1156,59 @@ class LaunchRepositoryImpl(
         } catch (e: Exception) {
             log.e(e) { "❌ ERROR in getCrewedLaunches: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
+        }
+    }
+
+    override suspend fun getStatsCount(
+        key: String,
+        netGt: Instant,
+        netLt: Instant,
+        forceRefresh: Boolean
+    ): Result<DataResult<Int>> {
+        return try {
+            val now = Clock.System.now().toEpochMilliseconds()
+
+            // Check stale data first for fallback
+            val staleResult = statsLocalDataSource?.getStatCountStale(key)
+
+            // Try fresh cache if not forcing refresh
+            if (!forceRefresh) {
+                val cached = statsLocalDataSource?.getStatCount(key)
+                if (cached != null) {
+                    log.d { "Stats cache HIT for '$key': $cached" }
+                    return Result.success(DataResult(data = cached, source = DataSource.CACHE, timestamp = now))
+                }
+                // Try stale
+                if (staleResult != null) {
+                    log.d { "Stats stale cache HIT for '$key': ${staleResult.first}" }
+                    return Result.success(DataResult(data = staleResult.first, source = DataSource.STALE_CACHE, timestamp = staleResult.second))
+                }
+            }
+
+            // Fetch from API
+            log.d { "Fetching stats count from API for key='$key', netGt=$netGt, netLt=$netLt" }
+            val response = launchesApi.getLaunchMiniList(
+                limit = 1,
+                upcoming = true,
+                netGt = netGt,
+                netLt = netLt
+            )
+            val count = response.body().count
+
+            // Cache the count
+            statsLocalDataSource?.cacheStat(key, count)
+            log.i { "Stats API SUCCESS for '$key': count=$count" }
+
+            Result.success(DataResult(data = count, source = DataSource.NETWORK, timestamp = now))
+        } catch (e: Exception) {
+            log.e(e) { "Error in getStatsCount for key='$key': ${e.message}" }
+            // Fallback to stale on error
+            val staleResult = statsLocalDataSource?.getStatCountStale(key)
+            if (staleResult != null) {
+                Result.success(DataResult(data = staleResult.first, source = DataSource.STALE_CACHE, timestamp = staleResult.second))
+            } else {
+                Result.failure(e)
+            }
         }
     }
 

@@ -71,6 +71,7 @@ import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
 import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceStationLocalDataSource
+import me.calebjones.spacelaunchnow.database.StatsLocalDataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
@@ -138,13 +139,15 @@ val appModule = module {
     single { SpacecraftLocalDataSource(get(), get()) }
     single { SpaceStationLocalDataSource(get(), get()) }
     single { FilterOptionsLocalDataSource(get(), get()) }
+    single { StatsLocalDataSource(get(), get()) }
 
     single<LaunchRepository> {
         LaunchRepositoryImpl(
             launchesApi = get(),
             agenciesApi = get(),
             appPreferences = get(),
-            localDataSource = get()
+            localDataSource = get(),
+            statsLocalDataSource = get()
         )
     }
     single<ArticlesRepository> {
@@ -242,7 +245,8 @@ val appModule = module {
             updateDataSource = get(),
             programDataSource = get(),
             spacecraftDataSource = get(),
-            spaceStationDataSource = get()
+            spaceStationDataSource = get(),
+            statsDataSource = get()
         )
     }
 

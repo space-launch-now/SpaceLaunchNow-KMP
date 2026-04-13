@@ -18,6 +18,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-21
 - Kotlin 2.0+ with Compose Multiplatform + Compose Material3, Compose Foundation (HorizontalPager), Koin DI (main)
 - Kotlin 2.1.0 (KMP), Java 21 + Compose Multiplatform, RevenueCat SDK (via `SubscriptionViewModel`), Koin DI, DataStore Preferences (006-onboarding-paywall)
 - DataStore Preferences (`AppPreferences`) — new `ONBOARDING_PAYWALL_SHOWN` boolean key (006-onboarding-paywall)
+- Kotlin 2.0+ (KMP), Java 21 (JetBrains JDK) + Ktor (HTTP client), Koin (DI), Jetpack Compose Multiplatform, kotlinx.serialization (012-reduce-api-calls-caching)
+- SQLDelight (persistent cache), in-memory `LaunchCache`, JSON blob serialization (012-reduce-api-calls-caching)
 
 Please check the project [consitution](.specify/memory/consitution.md) for architectural principles and guidelines.
 
@@ -37,6 +39,6 @@ tests/
 Kotlin 2.0+ with Compose Multiplatform: Follow standard conventions
 
 ## Recent Changes
+- 012-reduce-api-calls-caching: Added Kotlin 2.0+ (KMP), Java 21 (JetBrains JDK) + Ktor (HTTP client), Koin (DI), Jetpack Compose Multiplatform, kotlinx.serialization
 - 006-onboarding-paywall: Added Kotlin 2.1.0 (KMP), Java 21 + Compose Multiplatform, RevenueCat SDK (via `SubscriptionViewModel`), Koin DI, DataStore Preferences
 - 005-fix-stale-filtered-data: Added Kotlin 2.1.x (KMP), Swift 5.x (iOS widgets) + Compose Multiplatform, Ktor, Koin, Glance (Android widgets), WidgetKit (iOS)
-- 004-fix-subscription-trial-disclosure: Added Kotlin 2.x (KMP), Compose Multiplatform + Jetpack Compose, Koin DI, DataStore Preferences
