@@ -1,4 +1,8 @@
 ### Bug Fixes
 
-* **ios:** prevent crash on cold-start notification tap
-* **ios:** use static no-op fallback logger and catch Throwable in ObjC-exported functions
+* change navigation and ad placement
+* enhance analytics tracking for FlightClub referrals
+
+### Features
+
+* reduce api calls and increase caching

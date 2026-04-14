@@ -1,3 +1,18 @@
+# [5.27.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.26.1...v5.27.0) (2026-04-14)
+
+
+### Bug Fixes
+
+* change navigation and ad placement ([3c055db](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3c055dbe9048b0522e0245d46f99b76e9a43ff83))
+* enhance analytics tracking for FlightClub referrals ([88acaef](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/88acaef8eae735836ad7f174cb28001b9cc138a2))
+
+
+### Features
+
+* reduce api calls and increase caching ([e2290ea](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e2290ea42684c39a074e22be38876a1b6be2253a))
+
+
+
 ## [5.26.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.26.0...v5.26.1) (2026-04-12)
 
 
@@ -35,27 +50,6 @@
 * **analytics:** address review feedback - async dispatch, throwable logging, console provider default ([b4fc727](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b4fc7270e701c8ebdb1141f360ee8c2afd110127))
 * **analytics:** enhance analytics integration across the app ([d03b6b9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d03b6b9aa1b23b54b7e10b87ae0b3a3ef19a1e24))
 * ios build ([d431867](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d431867008d6efc5fb144be77f80837d1d233507))
-
-
-
-# [5.24.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.23.3...v5.24.0) (2026-04-02)
-
-
-### Bug Fixes
-
-* add Firebase Remote Config integration to project ([fb2376f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fb2376fe422506c95cf0d4188215f5058590e598))
-* add Firebase Remote Config integration to project ([cc74155](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cc74155bf53a245af5b76651d53f208cb954f40c))
-* add mock implementation for remote config ([983f008](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/983f008b43a62dfd35722e0877ef68c4da86b7fb))
-* **onboarding:** update WidgetsPage to support platform-specific widget showcases for iOS and Android ([3e86143](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3e861438e55237271ef71738387afd038c5197d0))
-* **onboarding:** update WidgetsPage to support platform-specific widget showcases for iOS and Android ([5056bf6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5056bf65e168886870d8e9241172c6398c4e0e07))
-* refactor home screen and tablet layouts ([1089b7d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1089b7dc57069cef81eea40d2104570edc0f5d51))
-* refactor home screen and tablet layouts ([7074a2d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7074a2dbd8a22516b1f58593e91bd27bd9d34d30))
-* **settings:** replace CircularProgressIndicator with LinearProgressIndicator for better loading feedback ([c1b852d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c1b852da7253903abfa900ce28d0254e48abed80))
-
-
-### Features
-
-* implement Live Launches card and pinned content ([4be0d4b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4be0d4b8792aeff008f4faa4194ab05157acd6a0))
 
 
 
