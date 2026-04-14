@@ -236,3 +236,16 @@ DELETE FROM StarshipHistoryCache WHERE expires_at < ?;
 clearAllStarshipHistory:
 DELETE FROM StarshipHistoryCache;
 
+-- Queries for in-flight launches (status_id = 6)
+getInFlightNormal:
+SELECT * FROM LaunchNormalCache
+WHERE status_id = 6 AND expires_at > ?
+ORDER BY net ASC
+LIMIT ?;
+
+getInFlightNormalStale:
+SELECT * FROM LaunchNormalCache
+WHERE status_id = 6
+ORDER BY net ASC
+LIMIT ?;
+

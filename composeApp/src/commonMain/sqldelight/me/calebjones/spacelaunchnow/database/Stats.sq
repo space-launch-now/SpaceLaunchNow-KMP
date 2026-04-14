@@ -1,0 +1,33 @@
+-- StatsCache table for caching launch count stats (24h, week, month)
+
+CREATE TABLE StatsCache (
+    stat_key TEXT NOT NULL PRIMARY KEY,
+    count INTEGER NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX idx_stats_expires ON StatsCache(expires_at);
+
+-- Get fresh stat count (not expired)
+getStatCount:
+SELECT count FROM StatsCache
+WHERE stat_key = ? AND expires_at > ?;
+
+-- Get stale stat count (ignores TTL, for stale-while-revalidate)
+getStatCountStale:
+SELECT count, cached_at FROM StatsCache
+WHERE stat_key = ?;
+
+-- Insert or replace stat count
+upsertStat:
+INSERT OR REPLACE INTO StatsCache(stat_key, count, cached_at, expires_at)
+VALUES (?, ?, ?, ?);
+
+-- Delete expired stats entries (called by CacheCleanupService)
+deleteExpiredStats:
+DELETE FROM StatsCache WHERE expires_at < ?;
+
+-- Delete all stats entries
+deleteAllStats:
+DELETE FROM StatsCache;

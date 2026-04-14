@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalWideNavigationRail
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.WideNavigationRailItem
@@ -83,46 +82,20 @@ fun AdaptiveAppScaffold(
     SpaceLaunchNowTheme(themeOption = themeOption) {
         SharedTransitionLayout {
             CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+                val layoutState = rememberAdaptiveLayoutState()
+                val showCompactNavBar = showNavigation && layoutState.isCompact
+
                 Column(modifier = Modifier.fillMaxSize()) {
                     // Main content area with optional navigation
                     Box(modifier = Modifier.weight(1f)) {
                         if (showNavigation) {
-                            val layoutState = rememberAdaptiveLayoutState()
-
-                            if (layoutState.tier == LayoutTier.COMPACT) {
-                                // Phone: Scaffold with ad above NavigationBar
-                                Scaffold(
-                                    bottomBar = {
-                                        Column {
-                                            if (showAds) SmartBannerAd(
-                                                placementType = AdPlacementType.NAVIGATION,
-                                                showCard = false,
-                                            )
-                                            NavigationBar {
-                                                mainNavigationItems.forEach { tab ->
-                                                    NavigationBarItem(
-                                                        icon = {
-                                                            Icon(
-                                                                tab.icon,
-                                                                contentDescription = tab.contentDescription
-                                                            )
-                                                        },
-                                                        label = { Text(tab.label) },
-                                                        selected = currentRoute == tab.route::class.qualifiedName,
-                                                        onClick = {
-                                                            onTabSelected?.invoke(tab.label)
-                                                            navController.navigate(tab.route) {
-                                                                launchSingleTop = true
-                                                                restoreState = true
-                                                            }
-                                                        }
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                ) { innerPadding ->
-                                    Box(modifier = Modifier.padding(innerPadding)) {
+                            if (layoutState.isCompact) {
+                                // Phone: content fills the weighted space; banner + nav bar are below
+                                Surface(
+                                    color = MaterialTheme.colorScheme.background,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Box(modifier = Modifier.statusBarsPadding()) {
                                         content()
                                     }
                                 }
@@ -199,17 +172,48 @@ fun AdaptiveAppScaffold(
                         }
                     }
 
-                    // Banner ad for tablet/desktop and non-navigation screens
-                    // (Phone/compact ad is placed above NavigationBar in the Scaffold bottomBar)
-                    if (showAds && !(showNavigation && rememberAdaptiveLayoutState().tier == LayoutTier.COMPACT)) {
+                    // Persistent banner ad — single instance stays in composition across
+                    // all navigations so the ad is never destroyed/recreated on screen changes.
+                    // Positioned above the NavigationBar on compact (phone) layouts.
+                    if (showAds) {
                         SmartBannerAd(
-                            modifier = Modifier.padding(
-                                bottom = WindowInsets.navigationBars.asPaddingValues()
-                                    .calculateBottomPadding()
-                            ),
+                            modifier = if (!showCompactNavBar) {
+                                // No NavigationBar below — banner needs system nav bar inset
+                                Modifier.padding(
+                                    bottom = WindowInsets.navigationBars.asPaddingValues()
+                                        .calculateBottomPadding()
+                                )
+                            } else {
+                                Modifier
+                            },
                             placementType = AdPlacementType.NAVIGATION,
                             showCard = false,
                         )
+                    }
+
+                    // Bottom NavigationBar — only for compact (phone) layouts with main tabs
+                    if (showCompactNavBar) {
+                        NavigationBar {
+                            mainNavigationItems.forEach { tab ->
+                                NavigationBarItem(
+                                    icon = {
+                                        Icon(
+                                            tab.icon,
+                                            contentDescription = tab.contentDescription
+                                        )
+                                    },
+                                    label = { Text(tab.label) },
+                                    selected = currentRoute == tab.route::class.qualifiedName,
+                                    onClick = {
+                                        onTabSelected?.invoke(tab.label)
+                                        navController.navigate(tab.route) {
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }

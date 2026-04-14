@@ -1,0 +1,11 @@
+-- Migration from version 9 to version 10
+-- Adds StatsCache table for caching launch count stats (24h, week, month)
+
+CREATE TABLE StatsCache (
+    stat_key TEXT NOT NULL PRIMARY KEY,
+    count INTEGER NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX idx_stats_expires ON StatsCache(expires_at);

@@ -223,6 +223,34 @@ class LaunchLocalDataSource(
         }
     }
     
+    // In-flight launch cache methods (status_id = 6)
+    suspend fun getInFlightNormalLaunches(limit: Int): List<LaunchNormal> {
+        val now = System.now().toEpochMilliseconds()
+        return queries.getInFlightNormal(now, limit.toLong())
+            .executeAsList()
+            .mapNotNull { cached ->
+                try {
+                    json.decodeFromString<LaunchNormal>(cached.json_data)
+                } catch (e: Exception) {
+                    log.e(e) { "Error decoding in-flight LaunchNormal from cache: ${e.message}" }
+                    null
+                }
+            }
+    }
+
+    suspend fun getInFlightNormalLaunchesStale(limit: Int): List<LaunchNormal> {
+        return queries.getInFlightNormalStale(limit.toLong())
+            .executeAsList()
+            .mapNotNull { cached ->
+                try {
+                    json.decodeFromString<LaunchNormal>(cached.json_data)
+                } catch (e: Exception) {
+                    log.e(e) { "Error decoding stale in-flight LaunchNormal from cache: ${e.message}" }
+                    null
+                }
+            }
+    }
+
     // Stale cache methods - return data regardless of expiration for stale-while-revalidate pattern
     suspend fun getUpcomingNormalLaunchesStale(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
