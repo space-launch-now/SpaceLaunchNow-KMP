@@ -81,7 +81,12 @@ fun OverviewTabContent(
                 FlightClubCard(
                     flightClubUrl = url,
                     onReferralTracked = { referralUrl ->
-                        analyticsManager.track(AnalyticsEvent.ThirdPartyReferral("flightclub", referralUrl))
+                        analyticsManager.track(AnalyticsEvent.ThirdPartyReferral(
+                            provider = "flightclub",
+                            url = referralUrl,
+                            contentType = "flight_club",
+                            contentId = launch.id.toString()
+                        ))
                     }
                 )
             }
