@@ -292,11 +292,78 @@ class LaunchesViewModel(
     }
 
     /**
+     * Loads only upcoming launches. Used on initial home mount to defer the previous
+     * launches API call until the LastLaunchCard scrolls into view.
+     */
+    fun loadUpcomingLaunches(limit: Int = 10, forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                _upcomingLaunchesState.update { it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null) }
+                val filterParams = loadFilters()
+                launchRepository.getUpcomingLaunchesNormal(
+                    limit = limit,
+                    forceRefresh = forceRefresh,
+                    agencyIds = filterParams.agencyIds,
+                    locationIds = filterParams.locationIds
+                ).onSuccess { dataResult ->
+                    _upcomingLaunchesState.update {
+                        it.copy(
+                            data = dataResult.data.results,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+                }.onFailure { exception ->
+                    _upcomingLaunchesState.update { it.copy(error = formatErrorMessage(exception), isLoading = false) }
+                }
+            } catch (exception: Exception) {
+                _upcomingLaunchesState.update { it.copy(error = exception.message ?: "Unknown error", isLoading = false) }
+            }
+        }
+    }
+
+    /**
+     * Loads only previous launches. Called lazily when the LastLaunchCard scrolls into view.
+     * On phone layout this item never renders, saving one API call per home mount.
+     */
+    fun loadPreviousLaunches(limit: Int = 5, forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                _previousLaunchesState.update { it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null) }
+                val filterParams = loadFilters()
+                launchRepository.getPreviousLaunchesNormal(
+                    limit = limit,
+                    forceRefresh = forceRefresh,
+                    agencyIds = filterParams.agencyIds,
+                    locationIds = filterParams.locationIds
+                ).onSuccess { dataResult ->
+                    _previousLaunchesState.update {
+                        it.copy(
+                            data = dataResult.data.results,
+                            isLoading = false,
+                            dataSource = dataResult.source,
+                            cacheTimestamp = dataResult.timestamp
+                        )
+                    }
+                }.onFailure { exception ->
+                    _previousLaunchesState.update { it.copy(error = formatErrorMessage(exception), isLoading = false) }
+                }
+            } catch (exception: Exception) {
+                _previousLaunchesState.update { it.copy(error = exception.message ?: "Unknown error", isLoading = false) }
+            }
+        }
+    }
+
+    /**
      * Refreshes all launch data (user-initiated)
      */
     fun refresh() = loadLaunches(forceRefresh = true)
 
     // ========== Private Helper Methods ==========
+
+    private suspend fun loadFilters() =
+        launchFilterService.getFilterParams(notificationStateStorage.stateFlow.first())
 
     /**
      * Pre-fetches detailed launch data in the background to prepare for instant loading

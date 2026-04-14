@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
@@ -63,17 +62,17 @@ class StatsViewModel(
                 val now: Instant = Clock.System.now()
                 val tomorrow: Instant = now.plus(24.hours)
 
-                val result: Result<PaginatedLaunchBasicList> =
-                    launchRepository.getUpcomingLaunchesList(
-                        limit = 1, // We only need the count, not the actual data
-                        netGt = now,
-                        netLt = tomorrow
-                    )
+                val result = launchRepository.getStatsCount(
+                    key = "stats_24h",
+                    netGt = now,
+                    netLt = tomorrow,
+                    forceRefresh = forceRefresh
+                )
 
-                result.onSuccess { paginatedLaunches: PaginatedLaunchBasicList ->
-                    _next24HoursCount.value = paginatedLaunches.count
-                    log.i { "Next 24 hours count: ${paginatedLaunches.count}" }
-                }.onFailure { exception: Throwable ->
+                result.onSuccess { dataResult ->
+                    _next24HoursCount.value = dataResult.data
+                    log.i { "Next 24 hours count: ${dataResult.data} (source: ${dataResult.source})" }
+                }.onFailure { exception ->
                     log.e(exception) { "Failed to get next 24 hours count" }
                     _next24HoursCount.value = 0
                 }
@@ -93,17 +92,17 @@ class StatsViewModel(
                 val now: Instant = Clock.System.now()
                 val nextWeek: Instant = now.plus(7.days)
 
-                val result: Result<PaginatedLaunchBasicList> =
-                    launchRepository.getUpcomingLaunchesList(
-                        limit = 1, // We only need the count, not the actual data
-                        netGt = now,
-                        netLt = nextWeek
-                    )
+                val result = launchRepository.getStatsCount(
+                    key = "stats_week",
+                    netGt = now,
+                    netLt = nextWeek,
+                    forceRefresh = forceRefresh
+                )
 
-                result.onSuccess { paginatedLaunches: PaginatedLaunchBasicList ->
-                    _nextWeekCount.value = paginatedLaunches.count
-                    log.i { "Next week count: ${paginatedLaunches.count}" }
-                }.onFailure { exception: Throwable ->
+                result.onSuccess { dataResult ->
+                    _nextWeekCount.value = dataResult.data
+                    log.i { "Next week count: ${dataResult.data} (source: ${dataResult.source})" }
+                }.onFailure { exception ->
                     log.e(exception) { "Failed to get next week count" }
                     _nextWeekCount.value = 0
                 }
@@ -123,17 +122,17 @@ class StatsViewModel(
                 val now: Instant = Clock.System.now()
                 val nextMonth: Instant = now.plus(30.days)
 
-                val result: Result<PaginatedLaunchBasicList> =
-                    launchRepository.getUpcomingLaunchesList(
-                        limit = 1, // We only need the count, not the actual data
-                        netGt = now,
-                        netLt = nextMonth
-                    )
+                val result = launchRepository.getStatsCount(
+                    key = "stats_month",
+                    netGt = now,
+                    netLt = nextMonth,
+                    forceRefresh = forceRefresh
+                )
 
-                result.onSuccess { paginatedLaunches: PaginatedLaunchBasicList ->
-                    _nextMonthCount.value = paginatedLaunches.count
-                    log.i { "Next month count: ${paginatedLaunches.count}" }
-                }.onFailure { exception: Throwable ->
+                result.onSuccess { dataResult ->
+                    _nextMonthCount.value = dataResult.data
+                    log.i { "Next month count: ${dataResult.data} (source: ${dataResult.source})" }
+                }.onFailure { exception ->
                     log.e(exception) { "Failed to get next month count" }
                     _nextMonthCount.value = 0
                 }

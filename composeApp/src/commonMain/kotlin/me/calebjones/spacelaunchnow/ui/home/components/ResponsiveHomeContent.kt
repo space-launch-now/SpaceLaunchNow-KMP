@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,6 +71,8 @@ fun ResponsiveHomeContent(
     onShareLaunch: (LaunchNormal) -> Unit = {},
     onArticleClick: (Article) -> Unit = {},
     onDismissPinnedContent: () -> Unit = {},
+    onStatsVisible: () -> Unit = {},
+    onPreviousLaunchesVisible: () -> Unit = {},
     modifier: Modifier = Modifier,
     isOffline: Boolean = false,
     oldestCacheTimestamp: Long? = null,
@@ -178,6 +181,9 @@ fun ResponsiveHomeContent(
             if (useWideHeroLayout) {
                 // Wide layout: Last Launch + History (left) + Next Up (right)
                 item(key = "hero_cards_row") {
+                    LaunchedEffect(Unit) {
+                        onPreviousLaunchesVisible()
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -219,6 +225,9 @@ fun ResponsiveHomeContent(
                     )
                 }
                 item(key = "last_launch_card") {
+                    LaunchedEffect(Unit) {
+                        onPreviousLaunchesVisible()
+                    }
                     LastLaunchCard(
                         previousLaunch = previousLaunchesState.data.firstOrNull(),
                         navController = navController,
@@ -245,8 +254,11 @@ fun ResponsiveHomeContent(
             )
         }
 
-        // Quick Stats
+        // Quick Stats — loads when this section scrolls into view
         item(key = "quick_stats") {
+            LaunchedEffect(Unit) {
+                onStatsVisible()
+            }
             QuickStatsSection(
                 next24HoursCount = next24HoursCount,
                 nextWeekCount = nextWeekCount,

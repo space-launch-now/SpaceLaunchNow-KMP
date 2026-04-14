@@ -80,5 +80,21 @@ interface LaunchRepository {
      * @return The launch if found, null otherwise wrapped in Result
      */
     suspend fun getLaunchById(id: String): Result<LaunchNormal?>
+
+    /**
+     * Get cached stats count for a time range. Uses StatsCache for lightweight caching.
+     * Returns DataResult with count and DataSource indicator.
+     *
+     * @param key Cache identifier (e.g., "stats_24h", "stats_week", "stats_month")
+     * @param netGt Lower bound for launch NET (net greater than)
+     * @param netLt Upper bound for launch NET (net less than)
+     * @param forceRefresh If true, bypass cache and fetch from API
+     */
+    suspend fun getStatsCount(
+        key: String,
+        netGt: Instant,
+        netLt: Instant,
+        forceRefresh: Boolean = false
+    ): Result<DataResult<Int>>
 }
  

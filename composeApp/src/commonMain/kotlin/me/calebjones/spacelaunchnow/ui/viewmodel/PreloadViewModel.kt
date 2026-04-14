@@ -177,26 +177,17 @@ class PreloadViewModel(
     }
 
     private fun buildTier1Tasks(): List<PreloadTask> = listOf(
-        PreloadTask("Next launch", PreloadTier.CRITICAL) {
-            launchRepository.getNextNormalLaunch(1)
+        PreloadTask("Featured launch", PreloadTier.CRITICAL) {
+            launchRepository.getFeaturedLaunch(agencyIds = null, locationIds = null)
         },
-        PreloadTask("Upcoming basic launches", PreloadTier.CRITICAL) {
-            launchRepository.getUpcomingLaunchesList(5)
+        PreloadTask("Upcoming normal launches", PreloadTier.CRITICAL) {
+            launchRepository.getUpcomingLaunchesNormal(limit = 8, agencyIds = null, locationIds = null)
         },
-        PreloadTask("Previous basic launches", PreloadTier.CRITICAL) {
-            launchRepository.getPreviousLaunchesList(5)
+        PreloadTask("Articles", PreloadTier.CRITICAL) {
+            articlesRepository.getArticles()
         },
-        PreloadTask("Articles for onboarding", PreloadTier.CRITICAL) {
-            articlesRepository.getArticles(3)
-        },
-        PreloadTask("Astronauts in space", PreloadTier.CRITICAL) {
-            astronautRepository.getAstronauts(limit = 3, inSpace = true)
-        },
-        PreloadTask("Active rockets", PreloadTier.CRITICAL) {
-            rocketRepository.getRockets(limit = 3, active = true)
-        },
-        PreloadTask("Featured agencies", PreloadTier.CRITICAL) {
-            agencyRepository.getAgencies(limit = 3, featured = true)
+        PreloadTask("Upcoming events", PreloadTier.CRITICAL) {
+            eventsRepository.getUpcomingEvents()
         }
     )
 
@@ -245,27 +236,6 @@ class PreloadViewModel(
             PreloadTask("History launches", PreloadTier.WARM_CACHE) {
                 launchRepository.getLaunchesByDayAndMonth(today.day, today.month.ordinal)
             },
-            PreloadTask("Stats: next 24h", PreloadTier.WARM_CACHE) {
-                launchRepository.getUpcomingLaunchesList(
-                    limit = 1,
-                    netGt = now,
-                    netLt = now.plus(24.hours)
-                )
-            },
-            PreloadTask("Stats: next week", PreloadTier.WARM_CACHE) {
-                launchRepository.getUpcomingLaunchesList(
-                    limit = 1,
-                    netGt = now,
-                    netLt = now.plus(7.days)
-                )
-            },
-            PreloadTask("Stats: next month", PreloadTier.WARM_CACHE) {
-                launchRepository.getUpcomingLaunchesList(
-                    limit = 1,
-                    netGt = now,
-                    netLt = now.plus(30.days)
-                )
-            },
             PreloadTask("Filter: agencies", PreloadTier.WARM_CACHE) {
                 scheduleFilterRepository.getAgencies()
             },
@@ -289,9 +259,6 @@ class PreloadViewModel(
             },
             PreloadTask("Filter: launcher families", PreloadTier.WARM_CACHE) {
                 scheduleFilterRepository.getLauncherConfigFamilies()
-            },
-            PreloadTask("ISS station details", PreloadTier.WARM_CACHE) {
-                spaceStationRepository.prewarmIssCache()
             }
         )
     }

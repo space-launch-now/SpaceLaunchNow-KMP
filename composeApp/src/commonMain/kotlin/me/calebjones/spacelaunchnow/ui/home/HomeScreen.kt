@@ -151,14 +151,16 @@ fun HomeScreen(navController: NavController) {
         featuredLaunchViewModel.loadFeaturedLaunch()
         featuredLaunchViewModel.loadInFlightLaunch()
         featuredLaunchViewModel.loadPinnedContent()
-        launchesViewModel.loadLaunches()
+        launchesViewModel.loadUpcomingLaunches()
         feedViewModel.loadUpdates()
         feedViewModel.loadArticles()
         eventsViewModel.loadEvents()
-        statsViewModel.loadAllStats()
+        // Stats, history, and previous launches are deferred — they load when their sections scroll into view
     }
 
     // Load history launches based on current date
+    // NOTE: kept here as a fallback for tablet layout (history section visible above fold on wide screens).
+    // On phone, history is also lazily triggered from within ResponsiveHomeContent.
     LaunchedEffect(currentDay, currentMonth) {
         if (historyState.data.count == 0 && !historyState.isLoading && historyState.error == null) {
             historyViewModel.loadHistoryLaunches(day = currentDay, month = currentMonth)
@@ -214,7 +216,9 @@ fun HomeScreen(navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             isOffline = isOffline,
             oldestCacheTimestamp = oldestCacheTimestamp,
-            onRetry = onRetry
+            onRetry = onRetry,
+            onStatsVisible = { statsViewModel.loadAllStats() },
+            onPreviousLaunchesVisible = { launchesViewModel.loadPreviousLaunches() }
         )
 
         // Pull-to-refresh indicator
