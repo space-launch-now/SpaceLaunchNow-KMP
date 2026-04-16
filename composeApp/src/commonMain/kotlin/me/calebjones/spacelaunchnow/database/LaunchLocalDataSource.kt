@@ -239,7 +239,8 @@ class LaunchLocalDataSource(
     }
 
     suspend fun getInFlightNormalLaunchesStale(limit: Int): List<LaunchNormal> {
-        return queries.getInFlightNormalStale(limit.toLong())
+        val now = System.now().toEpochMilliseconds()
+        return queries.getInFlightNormalStale(now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
                 try {

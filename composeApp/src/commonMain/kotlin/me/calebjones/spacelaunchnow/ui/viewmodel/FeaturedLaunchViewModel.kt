@@ -81,6 +81,10 @@ class FeaturedLaunchViewModel(
     private val pinnedContentPreferences: PinnedContentPreferences
 ) : ViewModel() {
 
+    companion object {
+        private const val IN_FLIGHT_STATUS_ID = 6
+    }
+
     private val log = logger()
 
     // Featured Launch State (hero card - first result)
@@ -241,7 +245,10 @@ class FeaturedLaunchViewModel(
         return exception.message ?: "An unknown error occurred"
     }
 
-    fun refresh() = loadFeaturedLaunch(forceRefresh = true)
+    fun refresh() {
+        loadFeaturedLaunch(forceRefresh = true)
+        loadInFlightLaunch(forceRefresh = true)
+    }
 
     /**
      * Loads in-flight launches (status_id = 6) for LIVE card display.
@@ -273,8 +280,9 @@ class FeaturedLaunchViewModel(
                     val inFlightLaunches = dataResult.data.results
                     log.i { "In-flight launches found: ${inFlightLaunches.size}" }
 
-                    // Take the first in-flight launch for display
-                    val firstInFlight = inFlightLaunches.firstOrNull()
+                    // Filter out launches that are no longer in-flight (status 6)
+                    // This guards against stale cache entries whose status has changed
+                    val firstInFlight = inFlightLaunches.firstOrNull { it.status?.id == IN_FLIGHT_STATUS_ID }
                     if (firstInFlight != null) {
                         log.i { "LIVE launch: ${firstInFlight.name} (status: ${firstInFlight.status?.name})" }
                     }
