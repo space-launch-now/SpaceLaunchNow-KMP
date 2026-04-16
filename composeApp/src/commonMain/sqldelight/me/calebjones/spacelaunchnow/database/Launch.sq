@@ -245,7 +245,7 @@ LIMIT ?;
 
 getInFlightNormalStale:
 SELECT * FROM LaunchNormalCache
-WHERE status_id = 6
+WHERE status_id = 6 AND expires_at > ? - 3600000
 ORDER BY net ASC
 LIMIT ?;
 
