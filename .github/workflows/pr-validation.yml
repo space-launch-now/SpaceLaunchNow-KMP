@@ -95,13 +95,15 @@ jobs:
           fail-on-error: false
 
       - name: Build Debug APK (parallel)
-        run: ./gradlew :composeApp:assembleDebug --parallel --build-cache
+        run: ./gradlew :composeApp:assembleDebug :wearApp:assembleDebug --parallel --build-cache
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: composeApp/build/outputs/apk/debug/*.apk
+          path: |
+            composeApp/build/outputs/apk/debug/*.apk
+            wearApp/build/outputs/apk/debug/*.apk
           retention-days: 7
 
       - name: Comment PR

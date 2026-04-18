@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Space Launch Now</string>
+    <string name="next_launch_complication_label">Next Launch</string>
+    <string name="next_launch_tile_label">Next Launch</string>
+    <string name="subscribe_prompt">Subscribe on phone</string>
+    <string name="no_upcoming_launches">No upcoming launches</string>
+    <string name="loading">Loading…</string>
+    <string name="open_on_phone">Open on Phone</string>
+    <string name="settings">Settings</string>
+    <string name="utc_toggle">Use UTC Time</string>
+    <string name="premium_required">Premium Required</string>
+    <string name="premium_gate_message">Upgrade on your phone to unlock Wear OS features</string>
+    <string name="last_updated">Last updated %1$s</string>
+    <string name="data_source_direct">Direct API</string>
+    <string name="data_source_phone">Phone Sync</string>
+    <string name="data_source_cache">Cached</string>
+</resources>

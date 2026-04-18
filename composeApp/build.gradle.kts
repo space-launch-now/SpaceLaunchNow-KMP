@@ -167,6 +167,9 @@ kotlin {
 
                 // Google Maps Compose for Android
                 implementation(libs.maps.compose)
+
+                // Play Services Wearable (DataLayer for phone-watch sync)
+                implementation(libs.play.services.wearable)
             }
         }
 

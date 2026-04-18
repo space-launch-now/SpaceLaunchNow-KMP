@@ -193,6 +193,11 @@ class MainApplication : Application() {
                 syncer.syncNow()
                 log.d { "✅ Initial subscription sync complete" }
 
+                // Step 5: Start Wear OS entitlement pusher (observes state changes)
+                val wearPusher = getKoin().get<me.calebjones.spacelaunchnow.sync.WearEntitlementPusher>()
+                wearPusher.start()
+                log.d { "✅ WearEntitlementPusher started" }
+
                 log.i { "🎉 All billing and subscription systems initialized" }
             } catch (e: Exception) {
                 log.e(e) { "❌ Failed to initialize Billing/Subscription system" }

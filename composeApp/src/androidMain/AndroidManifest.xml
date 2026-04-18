@@ -77,5 +77,18 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/launch_list_widget_info" />
         </receiver>
+
+        <!-- Phone-side DataLayer listener for watch sync requests -->
+        <service
+            android:name=".sync.PhoneDataLayerListenerService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data
+                    android:host="*"
+                    android:pathPrefix="/spacelaunchnow/request-sync"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>
