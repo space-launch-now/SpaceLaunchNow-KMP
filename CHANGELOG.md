@@ -1,3 +1,12 @@
+## [5.27.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.27.0...v5.27.1) (2026-04-19)
+
+
+### Bug Fixes
+
+* update in-flight launch retrieval to filter out stale entries ([e9deff0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9deff0f8f5703745880da95f6e437e66cddd30e))
+
+
+
 # [5.27.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.26.1...v5.27.0) (2026-04-14)
 
 
@@ -38,18 +47,6 @@
 ### Features
 
 * bump version ([da57aa8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/da57aa861aeedea29519dd2bebed6f7413589eed))
-
-
-
-## [5.24.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.24.0...v5.24.1) (2026-04-07)
-
-
-### Bug Fixes
-
-* add analytics module ([f764699](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f76469945700ae5aca2d3a60a5ca4c413ad9f7e5))
-* **analytics:** address review feedback - async dispatch, throwable logging, console provider default ([b4fc727](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b4fc7270e701c8ebdb1141f360ee8c2afd110127))
-* **analytics:** enhance analytics integration across the app ([d03b6b9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d03b6b9aa1b23b54b7e10b87ae0b3a3ef19a1e24))
-* ios build ([d431867](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d431867008d6efc5fb144be77f80837d1d233507))
 
 
 
