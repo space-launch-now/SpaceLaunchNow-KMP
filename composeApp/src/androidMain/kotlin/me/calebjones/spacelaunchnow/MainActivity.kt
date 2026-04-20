@@ -88,6 +88,9 @@ class MainActivity : ComponentActivity() {
             navigationDestinationState = navigateTo
         }
 
+        // Handle deep links from Wear OS companion (spacelaunchnow://...)
+        handleDeepLinkIntent(intent)
+
         PlaybackPreference.initialize(this)
 
         setContent {
@@ -229,6 +232,28 @@ class MainActivity : ComponentActivity() {
         if (navigateTo != null) {
             log.i { "New intent received with navigation destination: $navigateTo" }
             navigationDestinationState = navigateTo
+        }
+
+        // Handle deep links from Wear OS companion (spacelaunchnow://...)
+        handleDeepLinkIntent(intent)
+    }
+
+    private fun handleDeepLinkIntent(intent: Intent?) {
+        val uri = intent?.data ?: return
+        if (uri.scheme != "spacelaunchnow") return
+        when (uri.host) {
+            "launch" -> {
+                val launchId = uri.lastPathSegment
+                if (!launchId.isNullOrEmpty()) {
+                    log.i { "Deep link from Wear - launch_id: $launchId" }
+                    notificationLaunchIdState = launchId
+                }
+            }
+            "premium" -> {
+                log.i { "Deep link from Wear - navigating to premium/subscription" }
+                navigationDestinationState = "subscription"
+            }
+            else -> log.w { "Unknown deep link host: ${uri.host}" }
         }
     }
 
