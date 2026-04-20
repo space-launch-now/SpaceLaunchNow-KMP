@@ -271,6 +271,43 @@ fun SettingsScreen(
                 }
             }
 
+            // WEAR OS EARLY RELEASE NOTICE
+            item {
+                SectionHeaderText("Wear OS")
+                Spacer(Modifier.height(2.dp))
+                SettingsCardRow {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Warning,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                text = "Early Release",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Wear OS support is in early release. More features, polish, and improvements are on the way.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
             // DIAGNOSTIC LOGGING
             item {
                 val loggingPreferences: LoggingPreferences = koinInject()

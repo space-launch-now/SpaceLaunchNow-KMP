@@ -49,6 +49,9 @@
             <intent-filter>
                 <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />
             </intent-filter>
+            <meta-data
+                android:name="androidx.wear.tiles.LABEL"
+                android:resource="@string/next_launch_tile_label" />
         </service>
 
         <!-- DataLayer Listener -->

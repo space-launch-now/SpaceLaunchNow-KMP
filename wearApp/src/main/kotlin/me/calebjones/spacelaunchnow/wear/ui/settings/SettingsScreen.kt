@@ -2,8 +2,10 @@ package me.calebjones.spacelaunchnow.wear.ui.settings
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.ListHeader
@@ -43,6 +45,24 @@ fun SettingsScreen() {
                 Text(
                     text = "v${getAppVersion()}",
                     style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.transformedHeight(this, transformationSpec),
+                )
+            }
+            item {
+                Text(
+                    text = "\u26a0 Early Release",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .transformedHeight(this, transformationSpec)
+                        .padding(top = 8.dp),
+                )
+            }
+            item {
+                Text(
+                    text = "Wear OS support is in early release. More features and improvements are coming.",
+                    style = MaterialTheme.typography.bodyExtraSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.transformedHeight(this, transformationSpec),
                 )
             }
