@@ -21,8 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
+import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
+import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import me.calebjones.spacelaunchnow.ui.compose.StarshipVehiclesShimmer
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
@@ -32,7 +32,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
  */
 @Composable
 internal fun SpacecraftGrid(
-    spacecraftState: ViewState<List<SpacecraftEndpointDetailed>>,
+    spacecraftState: ViewState<List<Spacecraft>>,
     hasMore: Boolean,
     isLoadingMore: Boolean,
     onLoadMore: () -> Unit,
@@ -124,7 +124,7 @@ internal fun SpacecraftGrid(
  */
 @Composable
 internal fun LaunchersGrid(
-    launchersState: ViewState<List<LauncherDetailed>>,
+    launchersState: ViewState<List<LauncherDetail>>,
     hasMore: Boolean,
     isLoadingMore: Boolean,
     onLoadMore: () -> Unit,

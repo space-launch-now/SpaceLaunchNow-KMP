@@ -20,10 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautStatus
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
+import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
+import me.calebjones.spacelaunchnow.domain.model.Country
 import me.calebjones.spacelaunchnow.ui.components.CountryChip
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
@@ -36,7 +34,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AstronautPersonalInfoCard(
-    astronaut: AstronautEndpointDetailed,
+    astronaut: AstronautDetail,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -54,15 +52,15 @@ fun AstronautPersonalInfoCard(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             // Status
-            astronaut.status?.let { status ->
+            astronaut.statusName?.let { statusName ->
                 InfoTile(
                     icon = Icons.Default.EmojiEvents,
                     label = "Status",
                     modifier = Modifier.weight(1f),
                     customComposable = {
                         StatusChip(
-                            text = status.name,
-                            color = getStatusColor(status.name)
+                            text = statusName,
+                            color = getStatusColor(statusName)
                         )
                     }
                 )
@@ -135,20 +133,19 @@ private fun formatDate(date: LocalDate): String {
 private fun AstronautPersonalInfoCardPreview() {
     SpaceLaunchNowPreviewTheme {
         AstronautPersonalInfoCard(
-            astronaut = AstronautEndpointDetailed(
+            astronaut = AstronautDetail(
                 id = 1,
-                url = "https://ll.thespacedevs.com/2.4.0/astronaut/1/",
-                responseMode = "detailed",
                 name = "Neil Armstrong",
-                status = AstronautStatus(
-                    id = 11,
-                    name = "Deceased"
-                ),
-                agency = null,
-                image = null,
+                statusName = "Deceased",
+                statusId = 11,
+                agencyName = "NASA",
+                agencyAbbrev = "NASA",
+                agencyId = 44,
+                imageUrl = null,
+                thumbnailUrl = null,
                 age = null,
                 bio = "First person to walk on the Moon",
-                type = AstronautType(id = 1, name = "Government"),
+                typeName = "Government",
                 nationality = listOf(
                     Country(
                         id = 1,
@@ -164,10 +161,10 @@ private fun AstronautPersonalInfoCardPreview() {
                 evaTime = "P2H32M",
                 dateOfBirth = LocalDate.parse("1930-08-05"),
                 dateOfDeath = LocalDate.parse("2012-08-25"),
-                wiki = "https://en.wikipedia.org/wiki/Neil_Armstrong",
+                wikiUrl = "https://en.wikipedia.org/wiki/Neil_Armstrong",
                 lastFlight = null,
                 firstFlight = null,
-                socialMediaLinks = null,
+                socialMediaLinks = emptyList(),
                 flightsCount = 2,
                 landingsCount = 2,
                 spacewalksCount = 1,
@@ -184,20 +181,19 @@ private fun AstronautPersonalInfoCardPreview() {
 private fun AstronautPersonalInfoCardActivePreview() {
     SpaceLaunchNowPreviewTheme {
         AstronautPersonalInfoCard(
-            astronaut = AstronautEndpointDetailed(
+            astronaut = AstronautDetail(
                 id = 2,
-                url = "https://ll.thespacedevs.com/2.4.0/astronaut/2/",
-                responseMode = "detailed",
                 name = "Jessica Watkins",
-                status = AstronautStatus(
-                    id = 1,
-                    name = "Active"
-                ),
-                agency = null,
-                image = null,
+                statusName = "Active",
+                statusId = 1,
+                agencyName = "NASA",
+                agencyAbbrev = "NASA",
+                agencyId = 44,
+                imageUrl = null,
+                thumbnailUrl = null,
                 age = 35,
                 bio = "NASA astronaut",
-                type = AstronautType(id = 1, name = "Government"),
+                typeName = "Government",
                 nationality = listOf(
                     Country(
                         id = 1,
@@ -213,10 +209,10 @@ private fun AstronautPersonalInfoCardActivePreview() {
                 evaTime = null,
                 dateOfBirth = LocalDate.parse("1988-11-14"),
                 dateOfDeath = null,
-                wiki = "https://en.wikipedia.org/wiki/Jessica_Watkins",
+                wikiUrl = "https://en.wikipedia.org/wiki/Jessica_Watkins",
                 lastFlight = null,
                 firstFlight = null,
-                socialMediaLinks = null,
+                socialMediaLinks = emptyList(),
                 flightsCount = 1,
                 landingsCount = 1,
                 spacewalksCount = 0,

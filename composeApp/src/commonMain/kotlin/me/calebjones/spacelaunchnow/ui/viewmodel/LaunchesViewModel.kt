@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -44,21 +44,21 @@ class LaunchesViewModel(
 
     // Featured Launch State (uses dedicated API call with upcomingWithRecent filter)
     // Initialize with isLoading=true to show shimmer instead of empty state before first load
-    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null, isLoading = true))
-    val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> = _featuredLaunchState.asStateFlow()
+    private val _featuredLaunchState = MutableStateFlow(ViewState<Launch?>(data = null, isLoading = true))
+    val featuredLaunchState: StateFlow<ViewState<Launch?>> = _featuredLaunchState.asStateFlow()
 
-    private val _upcomingLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
-    val upcomingLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> = _upcomingLaunchesState.asStateFlow()
+    private val _upcomingLaunchesState = MutableStateFlow(ViewState(data = emptyList<Launch>()))
+    val upcomingLaunchesState: StateFlow<ViewState<List<Launch>>> = _upcomingLaunchesState.asStateFlow()
 
-    private val _previousLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
-    val previousLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> = _previousLaunchesState.asStateFlow()
+    private val _previousLaunchesState = MutableStateFlow(ViewState(data = emptyList<Launch>()))
+    val previousLaunchesState: StateFlow<ViewState<List<Launch>>> = _previousLaunchesState.asStateFlow()
 
     // ========== Derived States (Automatic Computation) ==========
 
     /**
      * Upcoming launches for carousel (uses full upcoming list, not derived from featured)
      */
-    val upcomingForCarousel: StateFlow<List<LaunchNormal>> = _upcomingLaunchesState
+    val upcomingForCarousel: StateFlow<List<Launch>> = _upcomingLaunchesState
         .map { it.data }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -67,7 +67,7 @@ class LaunchesViewModel(
      * Previous launches are reversed so most recent appears first in the carousel.
      * Deduplicated by ID to handle edge cases where a launch appears in both lists.
      */
-    val combinedLaunches: StateFlow<List<LaunchNormal>> = combine(
+    val combinedLaunches: StateFlow<List<Launch>> = combine(
         _previousLaunchesState,
         upcomingForCarousel
     ) { previousState, upcomingList ->
@@ -128,7 +128,7 @@ class LaunchesViewModel(
                 log.v { "Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
                 log.d { "Calling repository.getFeaturedLaunch with upcomingWithRecent filter..." }
-                val result = launchRepository.getFeaturedLaunch(
+                val result = launchRepository.getFeaturedLaunchDomain(
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
                     locationIds = filterParams.locationIds
@@ -221,7 +221,7 @@ class LaunchesViewModel(
 
                 // Load both in parallel for better performance
                 val upcomingDeferred = async {
-                    launchRepository.getUpcomingLaunchesNormal(
+                    launchRepository.getUpcomingLaunchesNormalDomain(
                         limit = upcomingLimit,
                         forceRefresh = forceRefresh,
                         agencyIds = filterParams.agencyIds,
@@ -229,7 +229,7 @@ class LaunchesViewModel(
                     )
                 }
                 val previousDeferred = async {
-                    launchRepository.getPreviousLaunchesNormal(
+                    launchRepository.getPreviousLaunchesNormalDomain(
                         limit = previousLimit,
                         forceRefresh = forceRefresh,
                         agencyIds = filterParams.agencyIds,
@@ -300,7 +300,7 @@ class LaunchesViewModel(
             try {
                 _upcomingLaunchesState.update { it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null) }
                 val filterParams = loadFilters()
-                launchRepository.getUpcomingLaunchesNormal(
+                launchRepository.getUpcomingLaunchesNormalDomain(
                     limit = limit,
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
@@ -332,7 +332,7 @@ class LaunchesViewModel(
             try {
                 _previousLaunchesState.update { it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null) }
                 val filterParams = loadFilters()
-                launchRepository.getPreviousLaunchesNormal(
+                launchRepository.getPreviousLaunchesNormalDomain(
                     limit = limit,
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
@@ -373,12 +373,11 @@ class LaunchesViewModel(
         viewModelScope.launch {
             try {
                 log.d { "Pre-fetching detailed data for launch: $launchId" }
-                val result = launchRepository.getLaunchDetails(launchId)
+                val result = launchRepository.getLaunchDetailDomain(launchId)
 
-                result.onSuccess { launchDetailed ->
-                    // Cache the detailed launch data for instant access later
-                    launchCache.cacheLaunchDetailed(launchDetailed)
-                    log.d { "Successfully pre-fetched and cached detailed data for launch: ${launchDetailed.name}" }
+                result.onSuccess { launch ->
+                    launchCache.cacheLaunch(launch)
+                    log.d { "Successfully pre-fetched and cached detailed data for launch: ${launch.name}" }
                 }.onFailure { exception ->
                     log.w(exception) { "Failed to pre-fetch detailed data for launch $launchId" }
                     // Don't show error to user since this is background prefetch

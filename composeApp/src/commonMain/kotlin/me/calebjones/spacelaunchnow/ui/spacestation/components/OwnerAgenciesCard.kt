@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
+import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryInfoRow
 
 /**
@@ -38,7 +38,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryInfoRow
  */
 @Composable
 fun OwnerAgenciesCard(
-    agencies: List<AgencyNormal>,
+    agencies: List<Agency>,
     modifier: Modifier = Modifier
 ) {
     if (agencies.isEmpty()) return
@@ -65,7 +65,7 @@ fun OwnerAgenciesCard(
 
 @Composable
 private fun AgencyItem(
-    agency: AgencyNormal
+    agency: Agency
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -87,7 +87,7 @@ private fun AgencyItem(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                agency.socialLogo?.imageUrl?.let { logoUrl ->
+                agency.socialLogoUrl?.let { logoUrl ->
                     AsyncImage(
                         model = logoUrl,
                         contentDescription = "${agency.name} logo",
@@ -120,7 +120,7 @@ private fun AgencyItem(
                 )
 
                 // Agency type
-                agency.type?.name?.let { type ->
+                agency.typeName?.let { type ->
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = type,
@@ -130,9 +130,9 @@ private fun AgencyItem(
                 }
 
                 // Countries as chips
-                if (agency.country.isNotEmpty()) {
+                if (agency.countries.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
-                    CountryInfoRow(countries = agency.country)
+                    CountryInfoRow(countries = agency.countries)
                 }
             }
         }

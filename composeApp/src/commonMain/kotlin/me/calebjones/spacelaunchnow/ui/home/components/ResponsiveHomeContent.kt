@@ -35,9 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.navigation.SupportUs
@@ -56,19 +56,21 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ResponsiveHomeContent(
     navController: NavController,
-    additionalFeaturedLaunchesState: ViewState<List<LaunchNormal>>,
-    previousLaunchesState: ViewState<List<LaunchNormal>>,
+    additionalFeaturedLaunchesState: ViewState<List<Launch>>,
+    previousLaunchesState: ViewState<List<Launch>>,
     historyState: ViewState<HistoryViewModel.HistoryData>,
-    featuredLaunchState: ViewState<LaunchNormal?>,
-    inFlightLaunchState: ViewState<LaunchNormal?> = ViewState(data = null),    pinnedContentState: ViewState<PinnedContentData?> = ViewState(data = null),    updatesState: ViewState<List<UpdateEndpoint>>,
+    featuredLaunchState: ViewState<Launch?>,
+    inFlightLaunchState: ViewState<Launch?> = ViewState(data = null),
+    pinnedContentState: ViewState<PinnedContentData?> = ViewState(data = null),
+    updatesState: ViewState<List<Update>>,
     articlesState: ViewState<List<Article>>,
-    eventsState: ViewState<List<EventEndpointNormal>>,
+    eventsState: ViewState<List<Event>>,
     next24HoursCount: Int,
     nextWeekCount: Int,
     nextMonthCount: Int,
     isAnyViewLoading: Boolean,
     hasAdFree: Boolean,
-    onShareLaunch: (LaunchNormal) -> Unit = {},
+    onShareLaunch: (Launch) -> Unit = {},
     onArticleClick: (Article) -> Unit = {},
     onDismissPinnedContent: () -> Unit = {},
     onStatsVisible: () -> Unit = {},
@@ -254,7 +256,7 @@ fun ResponsiveHomeContent(
             )
         }
 
-        // Quick Stats — loads when this section scrolls into view
+        // Quick Stats Ã¢â‚¬â€ loads when this section scrolls into view
         item(key = "quick_stats") {
             LaunchedEffect(Unit) {
                 onStatsVisible()
@@ -377,9 +379,9 @@ private fun TabletHistoryCard(
 private fun ResponsiveHomeContentPreview() {
     SpaceLaunchNowPreviewTheme {
         val launches = listOf(
-            PreviewData.launchNormalSpaceX,
-            PreviewData.launchNormalULA,
-            PreviewData.launchNormalCrewMission
+            PreviewData.domainLaunchSpaceX,
+            PreviewData.domainLaunchULA,
+            PreviewData.domainLaunchCrewMission
         )
         ResponsiveHomeContent(
             navController = rememberNavController(),
@@ -409,9 +411,9 @@ private fun ResponsiveHomeContentPreview() {
 private fun ResponsiveHomeContentDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         val launches = listOf(
-            PreviewData.launchNormalSpaceX,
-            PreviewData.launchNormalULA,
-            PreviewData.launchNormalCrewMission
+            PreviewData.domainLaunchSpaceX,
+            PreviewData.domainLaunchULA,
+            PreviewData.domainLaunchCrewMission
         )
         ResponsiveHomeContent(
             navController = rememberNavController(),
@@ -465,7 +467,7 @@ private fun ResponsiveHomeContentLoadingPreview() {
 @Composable
 private fun ResponsiveHomeContentOfflinePreview() {
     SpaceLaunchNowPreviewTheme {
-        val launches = listOf(PreviewData.launchNormalSpaceX)
+        val launches = listOf(PreviewData.domainLaunchSpaceX)
         ResponsiveHomeContent(
             navController = rememberNavController(),
             additionalFeaturedLaunchesState = ViewState(
@@ -521,12 +523,12 @@ private fun ResponsiveHomeContentErrorPreview() {
 private fun ResponsiveHomeContentLivePreview() {
     SpaceLaunchNowPreviewTheme {
         val launches = listOf(
-            PreviewData.launchNormalSpaceX,
-            PreviewData.launchNormalULA
+            PreviewData.domainLaunchSpaceX,
+            PreviewData.domainLaunchULA
         )
         // Create an in-flight launch copy
-        val inFlightLaunch = PreviewData.launchNormalSpaceX.copy(
-            status = PreviewData.statusInFlight
+        val inFlightLaunch = PreviewData.domainLaunchSpaceX.copy(
+            status = PreviewData.domainStatusInFlight
         )
         ResponsiveHomeContent(
             navController = rememberNavController(),
@@ -557,12 +559,12 @@ private fun ResponsiveHomeContentLivePreview() {
 private fun ResponsiveHomeContentLiveDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         val launches = listOf(
-            PreviewData.launchNormalSpaceX,
-            PreviewData.launchNormalULA
+            PreviewData.domainLaunchSpaceX,
+            PreviewData.domainLaunchULA
         )
         // Create an in-flight launch copy
-        val inFlightLaunch = PreviewData.launchNormalSpaceX.copy(
-            status = PreviewData.statusInFlight
+        val inFlightLaunch = PreviewData.domainLaunchSpaceX.copy(
+            status = PreviewData.domainStatusInFlight
         )
         ResponsiveHomeContent(
             navController = rememberNavController(),

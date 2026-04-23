@@ -10,11 +10,13 @@ import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
 import me.calebjones.spacelaunchnow.api.iss.IssTle
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ExpeditionsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpaceStationsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.SpaceStationLocalDataSource
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
+import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
+import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 
@@ -34,7 +36,7 @@ class SpaceStationRepositoryImpl(
     override suspend fun getSpaceStationDetails(
         stationId: Int,
         forceRefresh: Boolean
-    ): Result<DataResult<SpaceStationDetailedEndpoint>> {
+    ): Result<DataResult<SpaceStationDetail>> {
         return try {
             log.d { "getSpaceStationDetails called - stationId: $stationId, forceRefresh: $forceRefresh" }
 
@@ -85,7 +87,7 @@ class SpaceStationRepositoryImpl(
 
             Result.success(
                 DataResult(
-                    data = station,
+                    data = station.toDomain(),
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -106,7 +108,7 @@ class SpaceStationRepositoryImpl(
     private suspend fun returnStaleStationOrFailure(
         stationId: Int,
         error: Exception
-    ): Result<DataResult<SpaceStationDetailedEndpoint>> {
+    ): Result<DataResult<SpaceStationDetail>> {
         val stale = localDataSource?.getSpaceStationStale(stationId)
         return if (stale != null) {
             val timestamp = localDataSource?.getStationCacheTimestamp(stationId)
@@ -127,7 +129,7 @@ class SpaceStationRepositoryImpl(
         expeditionIds: List<Int>,
         stationId: Int,
         forceRefresh: Boolean
-    ): Result<DataResult<List<ExpeditionDetailed>>> {
+    ): Result<DataResult<List<ExpeditionDetailItem>>> {
         return try {
             log.d { "getExpeditionDetails called - ${expeditionIds.size} expeditions, stationId: $stationId" }
 
@@ -189,7 +191,7 @@ class SpaceStationRepositoryImpl(
 
             Result.success(
                 DataResult(
-                    data = expeditions,
+                    data = expeditions.map { it.toDomainDetail() },
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -204,7 +206,7 @@ class SpaceStationRepositoryImpl(
     private suspend fun returnStaleExpeditionsOrFailure(
         stationId: Int,
         error: Exception
-    ): Result<DataResult<List<ExpeditionDetailed>>> {
+    ): Result<DataResult<List<ExpeditionDetailItem>>> {
         val stale = localDataSource?.getExpeditionsByStationIdStale(stationId)
         return if (stale != null && stale.isNotEmpty()) {
             log.w { "Returning ${stale.size} stale cached expeditions due to error" }

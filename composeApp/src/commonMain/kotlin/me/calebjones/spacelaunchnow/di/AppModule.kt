@@ -224,6 +224,7 @@ val appModule = module {
     single<EventsRepository> {
         EventsRepositoryImpl(
             eventsApi = get(),
+            configApi = get(),
             localDataSource = get()
         )
     }

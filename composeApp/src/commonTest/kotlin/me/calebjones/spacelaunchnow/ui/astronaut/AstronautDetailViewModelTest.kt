@@ -7,12 +7,12 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautEndpointNormalList
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
+import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautDetailViewModel
 import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 import kotlin.test.AfterTest
@@ -145,26 +145,29 @@ class AstronautDetailViewModelTest {
     @Test
     fun `loadAstronautDetail should handle astronaut with null fields gracefully`() = runTest {
         // Given: Astronaut with many null fields
-        val mockAstronaut = AstronautEndpointDetailed(
+        val mockAstronaut = AstronautDetail(
             id = testAstronautId,
-            url = "https://test.example.com",
             name = "John Doe",
-            status = null,
-            type = AstronautType(id = 1, name = "Government"),
+            statusName = null,
+            statusId = null,
+            agencyName = null,
+            agencyAbbrev = null,
+            agencyId = null,
+            imageUrl = null,
+            thumbnailUrl = null,
             age = null,
             bio = "",
             nationality = emptyList(),
+            typeName = "Government",
             inSpace = false,
             timeInSpace = null,
             evaTime = null,
             dateOfBirth = null,
             dateOfDeath = null,
-            wiki = null,
-            agency = null,
-            image = null,
+            wikiUrl = null,
             lastFlight = null,
             firstFlight = null,
-            socialMediaLinks = null,
+            socialMediaLinks = emptyList(),
             flightsCount = null,
             landingsCount = null,
             spacewalksCount = null,
@@ -323,27 +326,30 @@ class AstronautDetailViewModelTest {
         id: Int,
         name: String,
         bio: String = "Test biography"
-    ): AstronautEndpointDetailed {
-        return AstronautEndpointDetailed(
+    ): AstronautDetail {
+        return AstronautDetail(
             id = id,
-            url = "https://test.example.com/astronaut/$id",
             name = name,
-            status = null,
-            type = AstronautType(id = 1, name = "Government"),
+            statusName = null,
+            statusId = null,
+            agencyName = null,
+            agencyAbbrev = null,
+            agencyId = null,
+            imageUrl = null,
+            thumbnailUrl = null,
             age = 50,
             bio = bio,
+            typeName = "Government",
             nationality = emptyList(),
             inSpace = false,
             timeInSpace = "P100D",
             evaTime = "P20H",
             dateOfBirth = null,
             dateOfDeath = null,
-            wiki = null,
-            agency = null,
-            image = null,
+            wikiUrl = null,
             lastFlight = null,
             firstFlight = null,
-            socialMediaLinks = null,
+            socialMediaLinks = emptyList(),
             flightsCount = 3,
             landingsCount = 2,
             spacewalksCount = 5,
@@ -358,12 +364,12 @@ class AstronautDetailViewModelTest {
  * Mock implementation of AstronautRepository for testing ViewModels.
  */
 class MockAstronautDetailRepository : AstronautRepository {
-    private var astronautDetailResponse: AstronautEndpointDetailed? = null
+    private var astronautDetailResponse: AstronautDetail? = null
     var shouldReturnError = false
     var astronautDetailCallCount = 0
     var lastAstronautId: Int? = null
 
-    fun setAstronautDetailResponse(response: AstronautEndpointDetailed) {
+    fun setAstronautDetailResponse(response: AstronautDetail) {
         astronautDetailResponse = response
     }
 
@@ -377,11 +383,11 @@ class MockAstronautDetailRepository : AstronautRepository {
         hasFlown: Boolean?,
         inSpace: Boolean?,
         isHuman: Boolean?
-    ): Result<PaginatedAstronautEndpointNormalList> {
+    ): Result<PaginatedResult<AstronautListItem>> {
         throw NotImplementedError("Not needed for detail view model tests")
     }
 
-    override suspend fun getAstronautDetail(id: Int): Result<AstronautEndpointDetailed> {
+    override suspend fun getAstronautDetail(id: Int): Result<AstronautDetail> {
         astronautDetailCallCount++
         lastAstronautId = id
 

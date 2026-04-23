@@ -31,14 +31,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import kotlinx.datetime.LocalDate
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautStatus
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageLicense
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SocialMedia
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SocialMediaLink
+import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
+import me.calebjones.spacelaunchnow.domain.model.SocialMediaLink
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -47,10 +41,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun AstronautLinksCard(
-    astronaut: AstronautEndpointDetailed,
+    astronaut: AstronautDetail,
     modifier: Modifier = Modifier
 ) {
-    val hasWiki = !astronaut.wiki.isNullOrBlank()
+    val hasWiki = !astronaut.wikiUrl.isNullOrBlank()
     val hasSocialMedia = !astronaut.socialMediaLinks.isNullOrEmpty()
 
     if (!hasWiki && !hasSocialMedia) return
@@ -85,8 +79,8 @@ fun AstronautLinksCard(
                 LinkItem(
                     icon = Icons.Default.Language,
                     label = "Wikipedia",
-                    url = astronaut.wiki!!,
-                    onClick = { uriHandler.openUri(astronaut.wiki!!) }
+                    url = astronaut.wikiUrl!!,
+                    onClick = { uriHandler.openUri(astronaut.wikiUrl!!) }
                 )
             }
 
@@ -96,10 +90,10 @@ fun AstronautLinksCard(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                 }
                 
-                astronaut.socialMediaLinks!!.forEach { link ->
+                astronaut.socialMediaLinks.forEach { link ->
                     link.url?.let { url ->
-                        val platformName = link.socialMedia.name ?: "Social Media"
-                        val logoUrl = link.socialMedia.logo?.thumbnailUrl ?: link.socialMedia.logo?.imageUrl
+                        val platformName = link.platformName ?: "Social Media"
+                        val logoUrl = link.platformLogoUrl
                         
                         SocialMediaLinkItem(
                             platformName = platformName,
@@ -212,57 +206,42 @@ private fun SocialMediaLinkItem(
 private fun AstronautLinksCardPreview() {
     SpaceLaunchNowPreviewTheme {
         AstronautLinksCard(
-            astronaut = AstronautEndpointDetailed(
+            astronaut = AstronautDetail(
                 id = 1,
-                url = "https://ll.thespacedevs.com/2.4.0/astronaut/1/",
-                responseMode = "detailed",
                 name = "Neil Armstrong",
-                status = AstronautStatus(id = 11, name = "Deceased"),
-                agency = null,
-                image = null,
-                age = null,
+                statusName = "Deceased",
+                statusId = 11,
+                agencyName = "NASA",
+                agencyAbbrev = "NASA",
+                agencyId = 44,
+                imageUrl = null,
+                thumbnailUrl = null,
+                age = 82,
                 bio = "First person to walk on the Moon",
-                type = AstronautType(id = 1, name = "Government"),
+                typeName = "Government",
                 nationality = emptyList(),
-                inSpace = false,
-                timeInSpace = null,
-                evaTime = null,
                 dateOfBirth = LocalDate.parse("1930-08-05"),
                 dateOfDeath = LocalDate.parse("2012-08-25"),
-                wiki = "https://en.wikipedia.org/wiki/Neil_Armstrong",
-                lastFlight = null,
-                firstFlight = null,
+                wikiUrl = "https://en.wikipedia.org/wiki/Neil_Armstrong",
                 socialMediaLinks = listOf(
                     SocialMediaLink(
                         id = 1,
-                        socialMedia = SocialMedia(
-                            id = 1,
-                            url = null,
-                            logo = Image(
-                                id = 1,
-                                name = "Twitter Logo",
-                                imageUrl = "https://example.com/twitter.png",
-                                thumbnailUrl = "https://example.com/twitter_thumb.png",
-                                credit = null,
-                                license = ImageLicense(id = 1, name = "CC-BY"),
-                                variants = emptyList(),
-                                singleUse = null
-                            ),
-                            name = "Twitter"
-                        ),
-                        url = "https://twitter.com/neilarmstrong"
+                        url = "https://twitter.com/neilarmstrong",
+                        platformName = "Twitter",
+                        platformLogoUrl = "https://example.com/twitter.png"
                     ),
                     SocialMediaLink(
                         id = 2,
-                        socialMedia = SocialMedia(
-                            id = 2,
-                            url = null,
-                            logo = null,
-                            name = "Instagram"
-                        ),
-                        url = "https://instagram.com/neilarmstrong"
+                        url = "https://instagram.com/neilarmstrong",
+                        platformName = "Instagram",
+                        platformLogoUrl = null
                     )
                 ),
+                inSpace = false,
+                timeInSpace = null,
+                evaTime = null,
+                lastFlight = null,
+                firstFlight = null,
                 flightsCount = 2,
                 landingsCount = 2,
                 spacewalksCount = 1,

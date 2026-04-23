@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Clock
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
@@ -22,6 +20,8 @@ import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.data.storage.PinnedContentPreferences
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -42,12 +42,12 @@ sealed class PinnedContentData {
  */
 data class PinnedLaunchContent(
     override val config: PinnedContent,
-    val launch: LaunchNormal,
+    val launch: Launch,
     override val customMessage: String? = config.customMessage
 ) : PinnedContentData() {
     override val id: String get() = launch.id
-    override val name: String get() = launch.name ?: "Unknown Launch"
-    override val imageUrl: String? get() = launch.image?.imageUrl
+    override val name: String get() = launch.name
+    override val imageUrl: String? get() = launch.imageUrl
     override val location: String? get() = launch.pad?.location?.name
 }
 
@@ -56,13 +56,27 @@ data class PinnedLaunchContent(
  */
 data class PinnedEventContent(
     override val config: PinnedContent,
-    val event: EventEndpointDetailed,
+    val event: Event,
     override val customMessage: String? = config.customMessage
 ) : PinnedContentData() {
     override val id: String get() = event.id.toString()
-    override val name: String get() = event.name ?: "Unknown Event"
-    override val imageUrl: String? get() = event.image?.imageUrl
+    override val name: String get() = event.name
+    override val imageUrl: String? get() = event.imageUrl
     override val location: String? get() = event.location
+}
+
+/**
+ * Container for a message-of-the-day banner from Remote Config.
+ * No external data fetch required — the message is in [config.customMessage].
+ */
+data class PinnedMotdContent(
+    override val config: PinnedContent
+) : PinnedContentData() {
+    override val id: String get() = config.id
+    override val name: String get() = config.customMessage ?: "Message of the Day"
+    override val customMessage: String? get() = config.customMessage
+    override val imageUrl: String? get() = null
+    override val location: String? get() = null
 }
 
 /**
@@ -90,20 +104,20 @@ class FeaturedLaunchViewModel(
     // Featured Launch State (hero card - first result)
     // Initialize with isLoading=true to show shimmer instead of empty state before first load
     private val _featuredLaunchState =
-        MutableStateFlow(ViewState<LaunchNormal?>(data = null, isLoading = true))
-    val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> =
+        MutableStateFlow(ViewState<Launch?>(data = null, isLoading = true))
+    val featuredLaunchState: StateFlow<ViewState<Launch?>> =
         _featuredLaunchState.asStateFlow()
 
     // Additional Featured Launches State (row of 3 - results 2-4)
     // Initialize with isLoading=true to show shimmer instead of empty state before first load
     private val _additionalFeaturedLaunches =
-        MutableStateFlow(ViewState<List<LaunchNormal>>(data = emptyList(), isLoading = true))
-    val additionalFeaturedLaunches: StateFlow<ViewState<List<LaunchNormal>>> =
+        MutableStateFlow(ViewState<List<Launch>>(data = emptyList(), isLoading = true))
+    val additionalFeaturedLaunches: StateFlow<ViewState<List<Launch>>> =
         _additionalFeaturedLaunches.asStateFlow()
 
     // In-Flight Launch State (LIVE launches currently flying - status_id = 6)
-    private val _inFlightLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
-    val inFlightLaunchState: StateFlow<ViewState<LaunchNormal?>> =
+    private val _inFlightLaunchState = MutableStateFlow(ViewState<Launch?>(data = null))
+    val inFlightLaunchState: StateFlow<ViewState<Launch?>> =
         _inFlightLaunchState.asStateFlow()
 
     // Pinned Content State (featured launch/event from Firebase Remote Config)
@@ -137,7 +151,7 @@ class FeaturedLaunchViewModel(
                 log.v { "Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
                 log.d { "Calling repository.getFeaturedLaunch with upcomingWithRecent filter..." }
-                val result = launchRepository.getFeaturedLaunch(
+                val result = launchRepository.getFeaturedLaunchDomain(
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
                     locationIds = filterParams.locationIds
@@ -235,7 +249,7 @@ class FeaturedLaunchViewModel(
     private suspend fun preFetchLaunchDetails(launchId: String) {
         try {
             // Pre-cache the detailed launch data for faster detail screen loading
-            launchCache.getCachedLaunchDetailed(launchId)
+            launchCache.getCachedLaunch(launchId)
         } catch (e: Exception) {
             log.w(e) { "Failed to pre-fetch launch details" }
         }
@@ -270,7 +284,7 @@ class FeaturedLaunchViewModel(
                 val filterParams = launchFilterService.getFilterParams(currentFilters)
                 log.v { "In-flight filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
-                val result = launchRepository.getInFlightLaunches(
+                val result = launchRepository.getInFlightLaunchesDomain(
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
                     locationIds = filterParams.locationIds
@@ -367,7 +381,7 @@ class FeaturedLaunchViewModel(
                     when (pinnedContent.type) {
                         PinnedContentType.LAUNCH -> {
                             // Fetch the launch data
-                            val launchResult = launchRepository.getLaunchById(pinnedContent.id)
+                            val launchResult = launchRepository.getLaunchByIdDomain(pinnedContent.id)
                             launchResult.onSuccess { launch ->
                                 if (launch != null) {
                                     log.i { "Pinned launch loaded: ${launch.name}" }
@@ -405,7 +419,7 @@ class FeaturedLaunchViewModel(
                                 return@onSuccess
                             }
                             
-                            val eventResult = eventsRepository.getEventDetails(eventId)
+                            val eventResult = eventsRepository.getEventDetailDomain(eventId)
                             eventResult.onSuccess { event ->
                                 log.i { "Pinned event loaded: ${event.name}" }
                                 _pinnedContentState.update {
@@ -423,6 +437,15 @@ class FeaturedLaunchViewModel(
                                 _pinnedContentState.update {
                                     it.copy(error = e.message, isLoading = false)
                                 }
+                            }
+                        }
+                        PinnedContentType.MESSAGE_OF_THE_DAY -> {
+                            log.i { "Pinned MOTD loaded: ${pinnedContent.customMessage}" }
+                            _pinnedContentState.update {
+                                it.copy(
+                                    data = PinnedMotdContent(config = pinnedContent),
+                                    isLoading = false
+                                )
                             }
                         }
                     }

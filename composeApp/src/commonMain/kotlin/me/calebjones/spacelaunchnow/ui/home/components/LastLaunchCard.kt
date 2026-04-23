@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -37,7 +37,7 @@ private val LoadingPlaceholderHeight = 240.dp
  */
 @Composable
 fun LastLaunchCard(
-    previousLaunch: LaunchNormal?,
+    previousLaunch: Launch?,
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
@@ -93,7 +93,7 @@ fun LastLaunchCard(
 private fun LastLaunchCardPreview() {
     SpaceLaunchNowPreviewTheme {
         LastLaunchCard(
-            previousLaunch = PreviewData.launchNormalSpaceX,
+            previousLaunch = PreviewData.domainLaunchSpaceX,
             navController = rememberNavController()
         )
     }
@@ -104,7 +104,7 @@ private fun LastLaunchCardPreview() {
 private fun LastLaunchCardDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         LastLaunchCard(
-            previousLaunch = PreviewData.launchNormalSpaceX,
+            previousLaunch = PreviewData.domainLaunchSpaceX,
             navController = rememberNavController()
         )
     }

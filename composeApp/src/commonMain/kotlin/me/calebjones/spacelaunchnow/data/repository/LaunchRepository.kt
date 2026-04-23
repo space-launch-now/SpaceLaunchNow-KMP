@@ -3,51 +3,14 @@ package me.calebjones.spacelaunchnow.data.repository
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
 
 interface LaunchRepository {
-    suspend fun getUpcomingLaunchesList(limit: Int): Result<PaginatedLaunchBasicList>
-    suspend fun getUpcomingLaunchesList(
-        limit: Int,
-        netGt: Instant?,
-        netLt: Instant?
-    ): Result<PaginatedLaunchBasicList>
-    suspend fun getPreviousLaunchesList(limit: Int): Result<PaginatedLaunchBasicList>
-
-    suspend fun getFeaturedLaunch(
-        forceRefresh: Boolean = false,
-        agencyIds: List<Int>? = null,
-        locationIds: List<Int>? = null
-    ): Result<DataResult<PaginatedLaunchNormalList>>
-
-    /**
-     * Get launches that are currently in flight (status_id = 6).
-     * Used to display LIVE launch cards on the home screen.
-     */
-    suspend fun getInFlightLaunches(
-        forceRefresh: Boolean = false,
-        agencyIds: List<Int>? = null,
-        locationIds: List<Int>? = null
-    ): Result<DataResult<PaginatedLaunchNormalList>>
-
-    suspend fun getUpcomingLaunchesNormal(
-        limit: Int,
-        forceRefresh: Boolean = false,
-        agencyIds: List<Int>? = null,
-        locationIds: List<Int>? = null
-    ): Result<DataResult<PaginatedLaunchNormalList>>
-
-    suspend fun getPreviousLaunchesNormal(
-        limit: Int,
-        forceRefresh: Boolean = false,
-        agencyIds: List<Int>? = null,
-        locationIds: List<Int>? = null
-    ): Result<DataResult<PaginatedLaunchNormalList>>
 
     suspend fun getLaunchesByDayAndMonth(
         day: Int,
@@ -55,46 +18,93 @@ interface LaunchRepository {
         limit: Int = 100
     ): Result<PaginatedLaunchNormalList>
 
-    suspend fun getLaunchDetails(id: String, forceRefresh: Boolean = false): Result<LaunchDetailed>
     suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed?
     suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed>
-    suspend fun getNextStarshipLaunch(
-        limit: Int,
-        forceRefresh: Boolean = false,
-        programId: List<Int>? = null
-    ): Result<PaginatedLaunchNormalList>
-
-    suspend fun getStarshipHistoryLaunches(
-        limit: Int,
-        forceRefresh: Boolean = false
-    ): Result<DataResult<PaginatedLaunchNormalList>>
 
     suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList>
     suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedLaunchNormalList>
 
-    /**
-     * Get a single launch by its UUID.
-     * Returns LaunchNormal for consistent card display.
-     *
-     * @param id The UUID of the launch
-     * @return The launch if found, null otherwise wrapped in Result
-     */
-    suspend fun getLaunchById(id: String): Result<LaunchNormal?>
-
-    /**
-     * Get cached stats count for a time range. Uses StatsCache for lightweight caching.
-     * Returns DataResult with count and DataSource indicator.
-     *
-     * @param key Cache identifier (e.g., "stats_24h", "stats_week", "stats_month")
-     * @param netGt Lower bound for launch NET (net greater than)
-     * @param netLt Upper bound for launch NET (net less than)
-     * @param forceRefresh If true, bypass cache and fetch from API
-     */
     suspend fun getStatsCount(
         key: String,
         netGt: Instant,
         netLt: Instant,
         forceRefresh: Boolean = false
     ): Result<DataResult<Int>>
+
+    // -- Domain-returning methods --------------------------------------------
+
+    suspend fun getUpcomingLaunchesDomain(
+        limit: Int,
+        offset: Int = 0,
+        netGt: Instant? = null,
+        netLt: Instant? = null
+    ): Result<PaginatedResult<Launch>>
+
+    suspend fun getPreviousLaunchesDomain(
+        limit: Int,
+        offset: Int = 0
+    ): Result<PaginatedResult<Launch>>
+
+    suspend fun getFeaturedLaunchDomain(
+        forceRefresh: Boolean = false,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): Result<DataResult<PaginatedResult<Launch>>>
+
+    suspend fun getInFlightLaunchesDomain(
+        forceRefresh: Boolean = false,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): Result<DataResult<PaginatedResult<Launch>>>
+
+    suspend fun getUpcomingLaunchesNormalDomain(
+        limit: Int,
+        forceRefresh: Boolean = false,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): Result<DataResult<PaginatedResult<Launch>>>
+
+    suspend fun getPreviousLaunchesNormalDomain(
+        limit: Int,
+        forceRefresh: Boolean = false,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): Result<DataResult<PaginatedResult<Launch>>>
+
+    suspend fun getLaunchDetailDomain(
+        id: String,
+        forceRefresh: Boolean = false
+    ): Result<Launch>
+
+    suspend fun getStarshipLaunchesDomain(
+        limit: Int,
+        forceRefresh: Boolean = false,
+        programId: List<Int>? = null
+    ): Result<PaginatedResult<Launch>>
+
+    suspend fun getStarshipHistoryDomain(
+        limit: Int,
+        forceRefresh: Boolean = false
+    ): Result<DataResult<PaginatedResult<Launch>>>
+
+    suspend fun getLaunchByIdDomain(id: String): Result<Launch?>
+
+    suspend fun getFilteredLaunchesDomain(
+        limit: Int,
+        offset: Int = 0,
+        upcoming: Boolean? = null,
+        previous: Boolean? = null,
+        ordering: String? = null,
+        search: String? = null,
+        lspIds: List<Int>? = null,
+        locationIds: List<Int>? = null,
+        programIds: List<Int>? = null,
+        rocketConfigurationId: Int? = null,
+        isCrewed: Boolean? = null,
+        includeSuborbital: Boolean? = null,
+        statusIds: List<Int>? = null,
+        orbitIds: List<Int>? = null,
+        missionTypeIds: List<Int>? = null,
+        launcherConfigFamilyIds: List<Int>? = null
+    ): Result<PaginatedResult<Launch>>
 }
- 

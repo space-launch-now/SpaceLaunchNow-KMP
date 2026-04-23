@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
+import me.calebjones.spacelaunchnow.domain.model.Country
 import me.calebjones.spacelaunchnow.ui.components.CountryChip
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -73,19 +73,25 @@ private fun CountryInfoRowPreview() {
                         id = 1,
                         name = "United States",
                         alpha2Code = "US",
-                        alpha3Code = "USA"
+                        alpha3Code = "USA",
+                        nationalityName = "American",
+                        nationalityNameComposed = "American"
                     ),
                     Country(
                         id = 2,
                         name = "Russia",
                         alpha2Code = "RU",
-                        alpha3Code = "RUS"
+                        alpha3Code = "RUS",
+                        nationalityName = "Russian",
+                        nationalityNameComposed = "Russian"
                     ),
                     Country(
                         id = 3,
                         name = "France",
                         alpha2Code = "FR",
-                        alpha3Code = "FRA"
+                        alpha3Code = "FRA",
+                        nationalityName = "French",
+                        nationalityNameComposed = "French"
                     )
                 )
             )

@@ -12,22 +12,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed
+import me.calebjones.spacelaunchnow.domain.model.ProviderDetail
 import me.calebjones.spacelaunchnow.ui.components.StatCard
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 
 @Composable
-fun AgencyLaunchStatistics(agency: AgencyDetailed) {
+fun AgencyLaunchStatistics(providerDetail: ProviderDetail?) {
+    if (providerDetail == null) return
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // Launch statistics
-        val totalLaunches = agency.totalLaunchCount ?: 0
+        val totalLaunches = providerDetail.totalLaunchCount ?: 0
         if (totalLaunches > 0) {
 
-            val successfulLaunches = agency.successfulLaunches ?: 0
-            val failedLaunches = agency.failedLaunches ?: 0
+            val successfulLaunches = providerDetail.successfulLaunches ?: 0
+            val failedLaunches = providerDetail.failedLaunches ?: 0
             val successRate =
                 if (totalLaunches > 0) (successfulLaunches * 100.0 / totalLaunches) else 0.0
 

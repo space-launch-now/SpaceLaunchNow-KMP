@@ -19,9 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
+import kotlinx.datetime.LocalDate
+import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
-import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -33,7 +33,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun AstronautInfoCard(
-    astronaut: AstronautEndpointDetailed,
+    astronaut: AstronautDetail,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -86,30 +86,29 @@ fun AstronautInfoCard(
 private fun AstronautInfoCardPreview() {
     SpaceLaunchNowPreviewTheme {
         AstronautInfoCard(
-            astronaut = AstronautEndpointDetailed(
+            astronaut = AstronautDetail(
                 id = 1,
-                url = "https://test.example.com/astronaut/1",
-                responseMode = "detailed",
                 name = "Neil Armstrong",
-                status = null,
-                agency = null,
-                image = null,
+                statusName = "Retired",
+                statusId = 2,
+                agencyName = "NASA",
+                agencyAbbrev = "NASA",
+                agencyId = 44,
+                imageUrl = null,
+                thumbnailUrl = null,
                 age = null,
                 bio = "Neil Alden Armstrong was an American astronaut and aeronautical engineer, and the first person to walk on the Moon. He was also a naval aviator, test pilot, and university professor. A graduate of Purdue University, Armstrong studied aeronautical engineering with his college tuition paid for by the U.S. Navy under the Holloway Plan.",
-                type = me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType(
-                    id = 1,
-                    name = "Astronaut"
-                ),
+                typeName = "Astronaut",
                 nationality = emptyList(),
                 inSpace = false,
                 timeInSpace = null,
                 evaTime = null,
-                dateOfBirth = null,
+                dateOfBirth = LocalDate.parse("1930-08-05"),
                 dateOfDeath = null,
-                wiki = null,
+                wikiUrl = null,
                 lastFlight = null,
                 firstFlight = null,
-                socialMediaLinks = null,
+                socialMediaLinks = emptyList(),
                 flightsCount = null,
                 landingsCount = null,
                 spacewalksCount = null,

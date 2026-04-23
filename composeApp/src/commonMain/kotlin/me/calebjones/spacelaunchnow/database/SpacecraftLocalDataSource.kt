@@ -5,6 +5,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Clock.System
@@ -12,6 +14,11 @@ import kotlin.time.Clock.System
 /**
  * Local data source for spacecraft data using SQLDelight.
  * Provides caching with automatic expiration for Starship vehicles and other spacecraft.
+ *
+ * Writes accept raw API types (the payload received from the network); reads expose the
+ * domain [Spacecraft] type so callers outside this layer never need to depend on
+ * `api.launchlibrary.models.*`. The cached JSON is the API representation; we deserialize
+ * to the API type and then map with [toDomain] before returning.
  */
 class SpacecraftLocalDataSource(
     database: SpaceLaunchDatabase,
@@ -62,105 +69,78 @@ class SpacecraftLocalDataSource(
     suspend fun cacheSpacecraftList(spacecraftList: List<SpacecraftEndpointDetailed>) {
         spacecraftList.forEach { cacheSpacecraft(it) }
     }
-    
+
+    private fun deserialize(jsonData: String): Spacecraft? = try {
+        json.decodeFromString<SpacecraftEndpointDetailed>(jsonData).toDomain()
+    } catch (e: Exception) {
+        println("  [SPACECRAFT] Failed to deserialize cached spacecraft: ${e.message}")
+        null
+    }
+
     /**
      * Get a spacecraft from fresh cache (within TTL).
      * Returns null if expired or not found.
      */
-    suspend fun getSpacecraft(id: Int): SpacecraftEndpointDetailed? {
+    suspend fun getSpacecraft(id: Int): Spacecraft? {
         val now = System.now().toEpochMilliseconds()
         val cached = queries.getSpacecraftById(id.toLong(), now).executeAsOneOrNull()
-        return cached?.let { 
-            try {
-                val ageMinutes = (now - it.cached_at) / 60000
-                println("  [SPACECRAFT] Cache entry age: ${ageMinutes} minutes")
-                json.decodeFromString<SpacecraftEndpointDetailed>(it.json_data)
-            } catch (e: Exception) {
-                println("  [SPACECRAFT] Failed to deserialize cached spacecraft: ${e.message}")
-                null
-            }
+        return cached?.let {
+            val ageMinutes = (now - it.cached_at) / 60000
+            println("  [SPACECRAFT] Cache entry age: ${ageMinutes} minutes")
+            deserialize(it.json_data)
         }
     }
-    
+
     /**
      * Get a spacecraft from stale cache (ignores expiration).
      * Used for stale-while-revalidate pattern when API fails.
      */
-    suspend fun getSpacecraftStale(id: Int): SpacecraftEndpointDetailed? {
+    suspend fun getSpacecraftStale(id: Int): Spacecraft? {
         val cached = queries.getSpacecraftByIdStale(id.toLong()).executeAsOneOrNull()
-        return cached?.let { 
-            try {
-                val now = System.now().toEpochMilliseconds()
-                val ageMinutes = (now - it.cached_at) / 60000
-                println("  [SPACECRAFT] Stale cache entry age: ${ageMinutes} minutes")
-                json.decodeFromString<SpacecraftEndpointDetailed>(it.json_data)
-            } catch (e: Exception) {
-                println("  [SPACECRAFT] Failed to deserialize stale spacecraft: ${e.message}")
-                null
-            }
+        return cached?.let {
+            val now = System.now().toEpochMilliseconds()
+            val ageMinutes = (now - it.cached_at) / 60000
+            println("  [SPACECRAFT] Stale cache entry age: ${ageMinutes} minutes")
+            deserialize(it.json_data)
         }
     }
-    
+
     /**
      * Get all spacecraft from fresh cache.
      */
-    suspend fun getAllSpacecraft(limit: Int): List<SpacecraftEndpointDetailed> {
+    suspend fun getAllSpacecraft(limit: Int): List<Spacecraft> {
         val now = System.now().toEpochMilliseconds()
         return queries.getAllSpacecraft(now, limit.toLong())
             .executeAsList()
-            .mapNotNull { cached ->
-                try {
-                    json.decodeFromString<SpacecraftEndpointDetailed>(cached.json_data)
-                } catch (e: Exception) {
-                    null
-                }
-            }
+            .mapNotNull { deserialize(it.json_data) }
     }
-    
+
     /**
      * Get all spacecraft from stale cache (ignores expiration).
      */
-    suspend fun getAllSpacecraftStale(limit: Int): List<SpacecraftEndpointDetailed> {
+    suspend fun getAllSpacecraftStale(limit: Int): List<Spacecraft> {
         return queries.getAllSpacecraftStale(limit.toLong())
             .executeAsList()
-            .mapNotNull { cached ->
-                try {
-                    json.decodeFromString<SpacecraftEndpointDetailed>(cached.json_data)
-                } catch (e: Exception) {
-                    null
-                }
-            }
+            .mapNotNull { deserialize(it.json_data) }
     }
-    
+
     /**
      * Get spacecraft by config ID (e.g., Starship config) from fresh cache.
      */
-    suspend fun getSpacecraftByConfigId(configId: Int, limit: Int): List<SpacecraftEndpointDetailed> {
+    suspend fun getSpacecraftByConfigId(configId: Int, limit: Int): List<Spacecraft> {
         val now = System.now().toEpochMilliseconds()
         return queries.getSpacecraftByConfigId(configId.toLong(), now, limit.toLong())
             .executeAsList()
-            .mapNotNull { cached ->
-                try {
-                    json.decodeFromString<SpacecraftEndpointDetailed>(cached.json_data)
-                } catch (e: Exception) {
-                    null
-                }
-            }
+            .mapNotNull { deserialize(it.json_data) }
     }
-    
+
     /**
      * Get spacecraft by config ID from stale cache.
      */
-    suspend fun getSpacecraftByConfigIdStale(configId: Int, limit: Int): List<SpacecraftEndpointDetailed> {
+    suspend fun getSpacecraftByConfigIdStale(configId: Int, limit: Int): List<Spacecraft> {
         return queries.getSpacecraftByConfigIdStale(configId.toLong(), limit.toLong())
             .executeAsList()
-            .mapNotNull { cached ->
-                try {
-                    json.decodeFromString<SpacecraftEndpointDetailed>(cached.json_data)
-                } catch (e: Exception) {
-                    null
-                }
-            }
+            .mapNotNull { deserialize(it.json_data) }
     }
     
     /**

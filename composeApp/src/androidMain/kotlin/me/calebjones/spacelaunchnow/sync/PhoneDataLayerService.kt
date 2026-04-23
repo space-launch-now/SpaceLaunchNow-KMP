@@ -11,8 +11,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.time.Clock
@@ -62,7 +62,7 @@ class PhoneDataLayerService(
     override suspend fun syncToWatch() {
         try {
             log.d { "Syncing launch data to watch" }
-            val result = launchRepository.getUpcomingLaunchesList(limit = 20)
+            val result = launchRepository.getUpcomingLaunchesDomain(limit = 20)
             val launchList = result.getOrThrow()
 
             val syncLaunches = launchList.results.map { it.toSyncLaunch() }
@@ -119,19 +119,19 @@ class PhoneDataLayerService(
     }
 }
 
-private fun LaunchBasic.toSyncLaunch(): PhoneSyncLaunch {
+private fun Launch.toSyncLaunch(): PhoneSyncLaunch {
     return PhoneSyncLaunch(
         id = id,
-        name = name ?: "Unknown",
+        name = name,
         net = net?.toString() ?: "",
         statusAbbrev = status?.abbrev,
         statusName = status?.name,
-        lspName = launchServiceProvider.name,
-        lspAbbrev = launchServiceProvider.abbrev,
-        rocketConfigName = launchDesignator,
-        missionName = null, // Not available in basic list mode
-        missionDescription = null,
-        padLocationName = locationName,
-        imageUrl = image?.imageUrl,
+        lspName = provider.name,
+        lspAbbrev = provider.abbrev,
+        rocketConfigName = rocket?.fullName ?: rocket?.name,
+        missionName = mission?.name,
+        missionDescription = mission?.description,
+        padLocationName = pad?.location?.name,
+        imageUrl = imageUrl,
     )
 }

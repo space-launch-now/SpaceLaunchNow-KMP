@@ -40,10 +40,8 @@ import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.brands.WikipediaW
 import compose.icons.fontawesomeicons.solid.InfoCircle
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
-import me.calebjones.spacelaunchnow.ui.components.CountryChip
+import me.calebjones.spacelaunchnow.domain.model.Provider
+import me.calebjones.spacelaunchnow.domain.model.ProviderDetail
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileData
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -57,7 +55,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun AgencyDetailsCard(
-    agency: AgencyDetailed,
+    provider: Provider,
+    providerDetail: ProviderDetail? = null,
     openUrl: (String) -> Unit = { /* TODO: Implement for platform */ }
 ) {
     Card(
@@ -77,7 +76,7 @@ fun AgencyDetailsCard(
                 modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 200.dp),
             ) {
                 SubcomposeAsyncImage(
-                    model = agency.logo?.imageUrl ?: "",
+                    model = provider.logoUrl ?: "",
                     contentDescription = "Agency logo",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,31 +120,25 @@ fun AgencyDetailsCard(
 
             // Agency name
             Text(
-                text = agency.name,
+                text = provider.name,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Grid of key details (above countries)
+            // Grid of key details
             val infoTiles = buildList {
-                agency.type?.name?.takeIf { it.isNotBlank() }?.let {
+                provider.type?.takeIf { it.isNotBlank() }?.let {
                     add(InfoTileData(Icons.Filled.Business, "Type", it))
                 }
-                agency.foundingYear?.let { year ->
+                providerDetail?.foundingYear?.let { year ->
                     add(InfoTileData(Icons.Filled.CalendarToday, "Founded", year.toString()))
                 }
-                agency.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
+                providerDetail?.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
                     add(InfoTileData(Icons.Filled.Person, "Administrator", admin))
                 }
-                if (agency.country.isNotEmpty() && agency.country.size == 1) {
-                    add(
-                        InfoTileData(
-                            icon = Icons.Filled.Flag,
-                            label = "Country",
-                            value = null,
-                            customComposable = { CountryChip(agency.country.first()) }
-                        ))
+                provider.countryCode?.takeIf { it.isNotBlank() }?.let { code ->
+                    add(InfoTileData(Icons.Filled.Flag, "Country", code))
                 }
             }
             if (infoTiles.isNotEmpty()) {
@@ -167,12 +160,8 @@ fun AgencyDetailsCard(
                 }
             }
 
-            // Countries as chips (moved below grid)
-            if (agency.country.isNotEmpty() && agency.country.size > 1) {
-                CountryInfoRow(countries = agency.country)
-            }
             // Agency description
-            agency.description?.let { description ->
+            providerDetail?.description?.let { description ->
                 Text(
                     text = "About",
                     style = MaterialTheme.typography.titleMedium,
@@ -189,7 +178,7 @@ fun AgencyDetailsCard(
 
             // Info & Wiki links
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                agency.infoUrl?.let { url ->
+                providerDetail?.infoUrl?.let { url ->
                     Button(
                         onClick = { openUrl(url) },
                         modifier = Modifier.weight(1f)
@@ -203,7 +192,7 @@ fun AgencyDetailsCard(
                         Text("Website")
                     }
                 }
-                agency.wikiUrl?.let { url ->
+                providerDetail?.wikiUrl?.let { url ->
                     Button(
                         onClick = { openUrl(url) },
                         modifier = Modifier.weight(1f),
@@ -229,49 +218,30 @@ private fun AgencyDetailsCardPreview() {
     MaterialTheme {
         Surface {
             AgencyDetailsCard(
-                agency = AgencyDetailed(
+                provider = Provider(
                     id = 44,
-                    url = "https://ll.thespacedevs.com/2.2.0/agencies/44/",
                     name = "National Aeronautics and Space Administration",
-                    featured = true,
-                    type = AgencyType(id = 1, name = "Government"),
                     abbrev = "NASA",
+                    type = "Government",
+                    countryCode = "US",
+                    logoUrl = null,
+                    imageUrl = null
+                ),
+                providerDetail = ProviderDetail(
                     description = "The National Aeronautics and Space Administration is an independent agency of the executive branch of the United States federal government responsible for the civilian space program, as well as aeronautics and aerospace research.",
                     administrator = "Bill Nelson",
                     foundingYear = 1958,
-                    launchers = "Space Shuttle, SLS",
-                    spacecraft = "Orion, Dragon",
-                    parent = null,
-                    image = null,
-                    logo = null,
-                    socialLogo = null,
-                    country = listOf(
-                        Country(
-                            id = 1,
-                            name = "United States",
-                            alpha2Code = "US",
-                            alpha3Code = "USA",
-                        )
-                    ),
                     totalLaunchCount = 1500,
-                    consecutiveSuccessfulLaunches = 50,
                     successfulLaunches = 1400,
                     failedLaunches = 100,
                     pendingLaunches = 20,
-                    consecutiveSuccessfulLandings = 30,
+                    consecutiveSuccessfulLaunches = 50,
                     successfulLandings = 200,
                     failedLandings = 10,
                     attemptedLandings = 210,
+                    consecutiveSuccessfulLandings = 30,
                     infoUrl = "https://www.nasa.gov",
-                    responseMode = "list",
-                    successfulLandingsSpacecraft = 1,
-                    failedLandingsSpacecraft = 2,
-                    attemptedLandingsSpacecraft = 3,
-                    successfulLandingsPayload = 4,
-                    failedLandingsPayload = 5,
-                    attemptedLandingsPayload = 6,
-                    wikiUrl = "",
-                    socialMediaLinks = emptyList(),
+                    wikiUrl = ""
                 )
             )
         }

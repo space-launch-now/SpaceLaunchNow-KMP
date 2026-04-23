@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LandingDetailsCard
@@ -26,7 +26,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.PadQuickStatsRo
  */
 @Composable
 fun MissionTabContent(
-    launch: LaunchDetailed,
+    launch: Launch,
     openUrl: (String) -> Unit
 ) {
     Column(
@@ -66,8 +66,8 @@ fun MissionTabContent(
         }
 
         // Landing Details Card
-        val landingStages = launch.rocket?.launcherStage ?: emptyList()
-        if (landingStages.any { it.landing != null }) {
+        val landingStages = launch.rocketDetail?.stages ?: emptyList()
+        if (landingStages.any { it.landingAttempt != null }) {
             Text(
                 text = "Landing Details",
                 style = MaterialTheme.typography.titleLarge,

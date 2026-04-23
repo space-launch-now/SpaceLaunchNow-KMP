@@ -19,32 +19,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.components.StatCard
 
 @Composable
-fun QuickStatsGrid(launch: LaunchDetailed) {
+fun QuickStatsGrid(launch: Launch) {
     // Build a dynamic list of facts that are available
     data class Fact(val icon: ImageVector, val value: String, val label: String)
 
     val currentYear = launch.net?.toLocalDateTime(TimeZone.currentSystemDefault())?.year
 
     val facts = buildList {
-        launch.orbitalLaunchAttemptCount?.let { count ->
+        launch.launchAttemptCounts?.orbital?.let { count ->
             add(Fact(Icons.Filled.Public, "#${count}", "Launch\nAll Time"))
         }
-        launch.padLaunchAttemptCount?.let { count ->
+        launch.launchAttemptCounts?.pad?.let { count ->
             add(Fact(Icons.Filled.Place, "#${count}", "Location\nAll Time"))
         }
-        launch.orbitalLaunchAttemptCountYear?.let { count ->
+        launch.launchAttemptCounts?.orbitalYear?.let { count ->
             add(Fact(Icons.Filled.CalendarToday, "#${count}", "Total\n$currentYear"))
         }
-        launch.agencyLaunchAttemptCountYear?.let { count ->
+        launch.launchAttemptCounts?.agencyYear?.let { count ->
             add(
                 Fact(
                     Icons.Filled.Business,
                     "#${count}",
-                    "${launch.launchServiceProvider.abbrev}\n$currentYear"
+                    "${launch.provider.abbrev}\n$currentYear"
                 )
             )
         }

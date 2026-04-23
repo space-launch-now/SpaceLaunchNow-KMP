@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -33,8 +33,8 @@ class FeedViewModel(
 
     // ========== ViewState Properties ==========
 
-    private val _updatesState = MutableStateFlow(ViewState(data = emptyList<UpdateEndpoint>()))
-    val updatesState: StateFlow<ViewState<List<UpdateEndpoint>>> = _updatesState.asStateFlow()
+    private val _updatesState = MutableStateFlow(ViewState(data = emptyList<Update>()))
+    val updatesState: StateFlow<ViewState<List<Update>>> = _updatesState.asStateFlow()
 
     private val _articlesState = MutableStateFlow(ViewState(data = emptyList<Article>()))
     val articlesState: StateFlow<ViewState<List<Article>>> = _articlesState.asStateFlow()

@@ -6,6 +6,10 @@ import me.calebjones.spacelaunchnow.api.iss.IssTle
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
+import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
+import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -14,7 +18,16 @@ import kotlin.time.Clock.System
 /**
  * Local data source for space station, expedition, and TLE data using SQLDelight.
  * Provides caching with automatic expiration.
- * 
+ *
+ * Writes accept raw API types (the payload received from the network); reads expose the
+ * domain types [SpaceStationDetail] and [ExpeditionDetailItem] so callers outside this
+ * layer do not need to import `api.launchlibrary.models.*`. The cached JSON is the API
+ * representation; we deserialize to the API type and then map via [toDomain] /
+ * [toDomainDetail] before returning.
+ *
+ * TLE data stays as [IssTle] (sourced from the separate wheretheiss.at API, not
+ * launchlibrary) — no domain equivalent is needed.
+ *
  * TTLs:
  * - Space station details: 4 hours (data rarely changes)
  * - Expedition/crew data: 4 hours (only changes when astronauts arrive/depart)
@@ -76,38 +89,37 @@ class SpaceStationLocalDataSource(
         )
         log.d { "Cached space station: ${station.name} (expires in ${duration.inWholeHours}h)" }
     }
-    
-    suspend fun getSpaceStation(id: Int): SpaceStationDetailedEndpoint? {
+
+    private fun deserializeStation(jsonData: String): SpaceStationDetail? = try {
+        json.decodeFromString<SpaceStationDetailedEndpoint>(jsonData).toDomain()
+    } catch (e: Exception) {
+        log.e(e) { "Failed to parse cached space station JSON" }
+        null
+    }
+
+    suspend fun getSpaceStation(id: Int): SpaceStationDetail? {
         val now = System.now().toEpochMilliseconds()
         val cached = spaceStationQueries.getSpaceStationById(id.toLong(), now).executeAsOneOrNull()
-        return cached?.let { 
-            try {
-                val station = json.decodeFromString<SpaceStationDetailedEndpoint>(it.json_data)
+        return cached?.let {
+            val station = deserializeStation(it.json_data)
+            if (station != null) {
                 val ageMinutes = (now - it.cached_at) / 60000
                 log.d { "Cache HIT for space station $id (age: ${ageMinutes}min)" }
-                station
-            } catch (e: Exception) {
-                log.e(e) { "Failed to parse cached space station: ${it.json_data}" }
-                null
             }
+            station
         }
     }
-    
+
     /**
      * Get stale (expired) space station data for offline support.
      * Use when fresh cache misses but we want to show something.
      */
-    suspend fun getSpaceStationStale(id: Int): SpaceStationDetailedEndpoint? {
+    suspend fun getSpaceStationStale(id: Int): SpaceStationDetail? {
         val cached = spaceStationQueries.getSpaceStationByIdStale(id.toLong()).executeAsOneOrNull()
-        return cached?.let { 
-            try {
-                val station = json.decodeFromString<SpaceStationDetailedEndpoint>(it.json_data)
-                log.d { "Cache STALE HIT for space station $id" }
-                station
-            } catch (e: Exception) {
-                log.e(e) { "Failed to parse stale cached space station" }
-                null
-            }
+        return cached?.let {
+            val station = deserializeStation(it.json_data)
+            if (station != null) log.d { "Cache STALE HIT for space station $id" }
+            station
         }
     }
     
@@ -141,39 +153,34 @@ class SpaceStationLocalDataSource(
     suspend fun cacheExpeditions(expeditions: List<ExpeditionDetailed>, stationId: Int) {
         expeditions.forEach { cacheExpedition(it, stationId) }
     }
-    
-    suspend fun getExpeditionsByStationId(stationId: Int): List<ExpeditionDetailed> {
+
+    private fun deserializeExpedition(jsonData: String): ExpeditionDetailItem? = try {
+        json.decodeFromString<ExpeditionDetailed>(jsonData).toDomainDetail()
+    } catch (e: Exception) {
+        log.e(e) { "Failed to parse cached expedition JSON" }
+        null
+    }
+
+    suspend fun getExpeditionsByStationId(stationId: Int): List<ExpeditionDetailItem> {
         val now = System.now().toEpochMilliseconds()
         return spaceStationQueries.getExpeditionsByStationId(stationId.toLong(), now)
             .executeAsList()
-            .mapNotNull { cached ->
-                try {
-                    json.decodeFromString<ExpeditionDetailed>(cached.json_data)
-                } catch (e: Exception) {
-                    log.e(e) { "Failed to parse cached expedition" }
-                    null
-                }
-            }.also { expeditions ->
+            .mapNotNull { deserializeExpedition(it.json_data) }
+            .also { expeditions ->
                 if (expeditions.isNotEmpty()) {
                     log.d { "Cache HIT for ${expeditions.size} expeditions (station $stationId)" }
                 }
             }
     }
-    
+
     /**
      * Get stale (expired) expedition data for offline support.
      */
-    suspend fun getExpeditionsByStationIdStale(stationId: Int): List<ExpeditionDetailed> {
+    suspend fun getExpeditionsByStationIdStale(stationId: Int): List<ExpeditionDetailItem> {
         return spaceStationQueries.getExpeditionsByStationIdStale(stationId.toLong())
             .executeAsList()
-            .mapNotNull { cached ->
-                try {
-                    json.decodeFromString<ExpeditionDetailed>(cached.json_data)
-                } catch (e: Exception) {
-                    log.e(e) { "Failed to parse stale cached expedition" }
-                    null
-                }
-            }.also { expeditions ->
+            .mapNotNull { deserializeExpedition(it.json_data) }
+            .also { expeditions ->
                 if (expeditions.isNotEmpty()) {
                     log.d { "Cache STALE HIT for ${expeditions.size} expeditions (station $stationId)" }
                 }

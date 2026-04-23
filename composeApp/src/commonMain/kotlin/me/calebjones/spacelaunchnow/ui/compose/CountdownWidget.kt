@@ -37,8 +37,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
+import me.calebjones.spacelaunchnow.domain.model.LaunchStatus
+import me.calebjones.spacelaunchnow.domain.model.NetPrecision
 import me.calebjones.spacelaunchnow.util.StatusColorUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.abs
@@ -53,8 +53,8 @@ fun BuildLaunchCountdown() {
     Card {
         LaunchCountdown(
             launchTime = System.now().plus(120.days),
-            status = LaunchStatus(1, "Go for Launch", "The launch is a go!"),
-            precision = NetPrecision(id = 7, name = "Minute")
+            status = LaunchStatus(1, "Go for Launch", abbrev = "Go", description = "The launch is a go!"),
+            precision = NetPrecision(id = 7, name = "Minute", abbrev = null, description = null)
         )
     }
 }

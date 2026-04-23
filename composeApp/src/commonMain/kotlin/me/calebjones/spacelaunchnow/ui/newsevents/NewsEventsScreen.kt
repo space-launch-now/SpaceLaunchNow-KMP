@@ -401,7 +401,7 @@ private fun NewsTabContent(
 
 @Composable
 private fun EventsTabContent(
-    events: List<me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal>,
+    events: List<me.calebjones.spacelaunchnow.domain.model.Event>,
     isLoading: Boolean,
     isLoadingMore: Boolean,
     error: String?,

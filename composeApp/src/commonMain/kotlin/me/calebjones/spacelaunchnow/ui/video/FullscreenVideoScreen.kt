@@ -49,9 +49,7 @@ import chaintech.videoplayer.host.MediaPlayerHost
 import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import kotlinx.coroutines.delay
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Language
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLType
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Clock.System
@@ -61,9 +59,9 @@ private val log by lazy { SpaceLogger.getLogger("FullscreenVideoScreen") }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullscreenVideoScreen(
-    vidUrl: VidURL,
+    vidUrl: VideoLink,
     launchName: String,
-    availableVideos: List<VidURL> = emptyList(),
+    availableVideos: List<VideoLink> = emptyList(),
     selectedVideoIndex: Int = 0,
     onNavigateBack: () -> Unit,
     onVideoSelected: ((Int) -> Unit)? = null,
@@ -266,7 +264,7 @@ fun FullscreenVideoScreen(
 
 @Composable
 private fun VideoSelectionControls(
-    videos: List<VidURL>,
+    videos: List<VideoLink>,
     selectedIndex: Int,
     launchName: String,
     onVideoSelected: (Int) -> Unit,
@@ -305,7 +303,7 @@ private fun VideoSelectionControls(
 
 @Composable
 private fun VideoSelectionButton(
-    video: VidURL,
+    video: VideoLink,
     launchName: String,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -374,18 +372,17 @@ fun FullscreenVideoScreen(
         }
     }
 
-    // Create a simple VidURL object for the single video
+    // Create a simple VideoLink object for the single video
     val vidUrl = remember(videoUrl) {
-        VidURL(
+        VideoLink(
             url = videoUrl,
-            type = VidURLType(1, "Local"),  // VidURLType is optional
-            language = Language(1, "English", "code"),  // Language is optional
             title = launchName,
             description = null,
             source = null,
             publisher = null,
             featureImage = null,
-            live = null
+            live = null,
+            priority = null
         )
     }
 

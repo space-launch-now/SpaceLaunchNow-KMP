@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
+import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -25,8 +25,8 @@ class EventsViewModel(
 
     // ========== ViewState Properties ==========
 
-    private val _eventsState = MutableStateFlow(ViewState(data = emptyList<EventEndpointNormal>()))
-    val eventsState: StateFlow<ViewState<List<EventEndpointNormal>>> = _eventsState.asStateFlow()
+    private val _eventsState = MutableStateFlow(ViewState(data = emptyList<Event>()))
+    val eventsState: StateFlow<ViewState<List<Event>>> = _eventsState.asStateFlow()
 
     // ========== Public API ==========
 
@@ -43,7 +43,7 @@ class EventsViewModel(
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
                 }
 
-                val result = eventsRepository.getUpcomingEvents(limit, forceRefresh)
+                val result = eventsRepository.getUpcomingEventsDomain(limit, forceRefresh)
 
                 result.onSuccess { dataResult ->
                     log.i { "Received events - Total: ${dataResult.data.count}" }

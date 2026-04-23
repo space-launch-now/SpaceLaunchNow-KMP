@@ -57,7 +57,7 @@ fun LaunchDetailScreen(
     val uriHandler = LocalUriHandler.current
 
     // Check if we have pre-loaded detailed data in cache
-    val cachedLaunchDetailed = remember(launchId) { launchCache.getCachedLaunchDetailed(launchId) }
+    val cachedLaunchDetailed = remember(launchId) { launchCache.getCachedLaunch(launchId) }
     val launchDetails by viewModel.launchDetails.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()

@@ -1,35 +1,25 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacecraftEndpointDetailedList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
 import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 
 interface SpacecraftRepository {
-    /**
-     * Get spacecraft by configuration ID with caching support.
-     * Returns DataResult to indicate data freshness.
-     */
-    suspend fun getSpacecraftByConfig(
+
+    suspend fun getSpacecraftByConfigDomain(
         configId: Int,
         limit: Int = 20,
         forceRefresh: Boolean = false,
         isPlaceholder: Boolean? = null
-    ): Result<DataResult<List<SpacecraftEndpointDetailed>>>
+    ): Result<DataResult<List<Spacecraft>>>
 
-    /**
-     * Get spacecraft details by ID
-     */
-    suspend fun getSpacecraftDetails(spacecraftId: Int): Result<SpacecraftEndpointDetailed>
+    suspend fun getSpacecraftDetailsDomain(spacecraftId: Int): Result<Spacecraft>
 
-    /**
-     * Get all spacecraft with basic filters and pagination
-     */
-    suspend fun getSpacecraft(
+    suspend fun getSpacecraftDomain(
         limit: Int = 20,
         offset: Int = 0,
         inSpace: Boolean? = null,
         search: String? = null,
-        isPlaceholder: Boolean?
-    ): Result<PaginatedSpacecraftEndpointDetailedList>
+        isPlaceholder: Boolean? = null
+    ): Result<PaginatedResult<Spacecraft>>
 }
-

@@ -43,15 +43,11 @@ import com.valentinilk.shimmer.shimmer
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.InfoCircle
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.NetPrecision
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.UpdatesShimmer
+import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock.System
@@ -63,7 +59,7 @@ import kotlin.time.Instant
 
 @Composable
 fun LatestUpdatesView(
-    state: ViewState<List<UpdateEndpoint>>,
+    state: ViewState<List<Update>>,
     modifier: Modifier = Modifier,
     navController: NavController? = null
 ) {
@@ -139,7 +135,7 @@ fun LatestUpdatesView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateItem(
-    update: UpdateEndpoint,
+    update: Update,
     modifier: Modifier = Modifier,
     navController: NavController? = null
 ) {
@@ -306,7 +302,7 @@ fun UpdateItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateCard(
-    update: UpdateEndpoint,
+    update: Update,
     modifier: Modifier = Modifier,
     navController: NavController? = null,
     fillMaxWidth: Boolean = false
@@ -659,105 +655,41 @@ private fun formatUpdateDate(createdOn: Instant): String {
 /**
  * Sample updates for preview purposes
  */
-private val sampleUpdateWithInfoUrl = UpdateEndpoint(
+private val sampleUpdateWithInfoUrl = Update(
     id = 1,
     profileImage = null,
     comment = "Vehicle is vertical on the pad. Weather looking good for tomorrow's launch attempt. All systems nominal.",
     infoUrl = "https://example.com/update1",
     createdBy = "SpaceX",
-    launch = null,
-    event = null,
-    program = null,
     createdOn = System.now() - 30.minutes
 )
 
-private val sampleUpdateWithoutInfoUrl = UpdateEndpoint(
+private val sampleUpdateWithoutInfoUrl = Update(
     id = 2,
     profileImage = null,
     comment = "Static fire test completed successfully. All systems nominal.",
     infoUrl = null,
     createdBy = "Launch Director",
-    launch = null,
-    event = null,
-    program = null,
     createdOn = System.now() - 2.hours
 )
 
-private val sampleUpdateLongComment = UpdateEndpoint(
+private val sampleUpdateLongComment = Update(
     id = 3,
     profileImage = null,
     comment = "Weather forecast updated: 80% chance of favorable conditions for launch window. Upper level winds are within acceptable limits. Ground weather team confirms go for propellant loading.",
     infoUrl = "https://example.com/weather",
     createdBy = "45th Weather Squadron",
-    launch = LaunchBasic(
-        id = "1",
-        name = "Falcon 9 Test Flight",
-        status = LaunchStatus(
-            id = 1,
-            name = "Test"
-        ),
-        net = System.now() - 3.days,
-        windowEnd = null,
-        windowStart = null,
-        url = "TODO()",
-        slug = "TODO()",
-        launchDesignator = "TODO()",
-        netPrecision = NetPrecision(
-            id = 1
-        ),
-        image = null,
-        launchServiceProvider = AgencyMini(
-            id = 1,
-            url = "TODO()",
-            name = "TODO",
-            type = AgencyType(
-                id = 1
-            )
-        ),
-        infographic = "TODO()",
-        locationName = "TODO()",
-    ),
-    event = null,
-    program = null,
+    launch = PreviewData.domainLaunchSpaceX,
     createdOn = System.now() - 1.days
 )
 
-private val sampleUpdateOld = UpdateEndpoint(
+private val sampleUpdateOld = Update(
     id = 4,
     profileImage = null,
     comment = "Payload integration complete. Fairing encapsulation scheduled for tomorrow.",
     infoUrl = null,
     createdBy = "Mission Integration Team",
-    launch = LaunchBasic(
-        id = "1",
-        name = "Falcon 9 Test Flight",
-        status = LaunchStatus(
-            id = 1,
-            name = "Test"
-        ),
-        net = System.now() - 3.days,
-        windowEnd = null,
-        windowStart = null,
-        url = "TODO()",
-        slug = "TODO()",
-        launchDesignator = "TODO()",
-        netPrecision = NetPrecision(
-            id = 1
-        ),
-        image = null,
-        launchServiceProvider = AgencyMini(
-            id = 1,
-            url = "TODO()",
-            name = "TODO",
-            type = AgencyType(
-                id = 1
-            )
-        ),
-        infographic = "TODO()",
-        locationName = "TODO()",
-    ),
-    event = null,
-    program = null,
+    launch = PreviewData.domainLaunchULA,
     createdOn = System.now() - 5.days
 )
 

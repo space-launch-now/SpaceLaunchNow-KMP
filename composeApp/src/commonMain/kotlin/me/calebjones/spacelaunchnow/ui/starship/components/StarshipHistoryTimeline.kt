@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
@@ -49,8 +49,8 @@ import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
  */
 @Composable
 fun StarshipHistoryTimeline(
-    nextLaunch: LaunchNormal?,
-    historyLaunchesState: ViewState<List<LaunchNormal>>,
+    nextLaunch: Launch?,
+    historyLaunchesState: ViewState<List<Launch>>,
     onLaunchClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -169,7 +169,7 @@ fun StarshipHistoryTimeline(
  */
 @Composable
 private fun NextLaunchTimelineCard(
-    launch: LaunchNormal,
+    launch: Launch,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -196,9 +196,9 @@ private fun NextLaunchTimelineCard(
             )
 
             // Launch image
-            if (launch.image?.imageUrl != null) {
+            if (launch.imageUrl != null) {
                 AsyncImage(
-                    model = launch.image.imageUrl,
+                    model = launch.imageUrl,
                     contentDescription = "Launch image",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -257,7 +257,7 @@ private fun NextLaunchTimelineCard(
  */
 @Composable
 private fun HistoryTimelineCard(
-    launch: LaunchNormal,
+    launch: Launch,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -281,9 +281,9 @@ private fun HistoryTimelineCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Launch image
-            if (launch.image?.imageUrl != null) {
+            if (launch.imageUrl != null) {
                 AsyncImage(
-                    model = launch.image.imageUrl,
+                    model = launch.imageUrl,
                     contentDescription = "Launch image",
                     modifier = Modifier
                         .fillMaxWidth()

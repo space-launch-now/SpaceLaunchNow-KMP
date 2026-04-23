@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.valentinilk.shimmer.shimmer
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 
@@ -24,7 +24,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
  */
 @Composable
 fun FeaturedLaunchesRow(
-    launchesState: ViewState<List<LaunchNormal>>,
+    launchesState: ViewState<List<Launch>>,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {

@@ -56,7 +56,7 @@ import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.brands.WikipediaW
 import compose.icons.fontawesomeicons.solid.InfoCircle
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
+import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.components.CountryChip
@@ -72,14 +72,14 @@ private val TitleHeight = 110.dp
 
 @Composable
 fun AgencyDetailView(
-    agency: AgencyEndpointDetailed,
+    agency: Agency,
     onNavigateBack: () -> Unit,
     onNavigateToSchedule: ((Int) -> Unit)? = null
 ) {
     SharedDetailScaffold(
         titleText = agency.name,
-        taglineText = agency.type?.name,
-        imageUrl = agency.socialLogo?.imageUrl,
+        taglineText = agency.typeName,
+        imageUrl = agency.socialLogoUrl,
         onNavigateBack = onNavigateBack,
         backgroundColors = listOf(
             MaterialTheme.colorScheme.tertiary,
@@ -93,7 +93,7 @@ fun AgencyDetailView(
 
 @Composable
 private fun AgencyDetailContentInBody(
-    agency: AgencyEndpointDetailed,
+    agency: Agency,
     onNavigateToSchedule: ((Int) -> Unit)? = null
 ) {
     val uriHandler = LocalUriHandler.current
@@ -198,7 +198,7 @@ private fun AgencyDetailContentInBody(
         }
 
         // Launchers and Spacecraft Info
-        if (!agency.launchers.isNullOrBlank() || !agency.spacecraft.isNullOrBlank()) {
+        if (!agency.launchersDescription.isNullOrBlank() || !agency.spacecraftDescription.isNullOrBlank()) {
             Text(
                 text = "Vehicles & Spacecraft",
                 style = MaterialTheme.typography.titleLarge,
@@ -215,7 +215,7 @@ private fun AgencyDetailContentInBody(
 
 @Composable
 private fun AgencyOverviewCard(
-    agency: AgencyEndpointDetailed,
+    agency: Agency,
     openUrl: (String) -> Unit
 ) {
     Card(
@@ -236,7 +236,7 @@ private fun AgencyOverviewCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 SubcomposeAsyncImage(
-                    model = agency.logo?.imageUrl ?: "",
+                    model = agency.logoUrl ?: "",
                     contentDescription = "Agency logo",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -281,7 +281,7 @@ private fun AgencyOverviewCard(
 
             // Grid of key details
             val infoTiles = buildList {
-                agency.type?.name?.takeIf { it.isNotBlank() }?.let {
+                agency.typeName?.takeIf { it.isNotBlank() }?.let {
                     add(InfoTileData(Icons.Filled.Business, "Type", it))
                 }
                 agency.abbrev?.takeIf { it.isNotBlank() }?.let {
@@ -293,13 +293,13 @@ private fun AgencyOverviewCard(
                 agency.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
                     add(InfoTileData(Icons.Filled.Person, "Administrator", admin))
                 }
-                if (agency.country.isNotEmpty() && agency.country.size == 1) {
+                if (agency.countries.isNotEmpty() && agency.countries.size == 1) {
                     add(
                         InfoTileData(
                             icon = Icons.Filled.Flag,
                             label = "Country",
                             value = null,
-                            customComposable = { CountryChip(agency.country.first()) }
+                            customComposable = { CountryChip(agency.countries.first()) }
                         )
                     )
                 }
@@ -324,8 +324,8 @@ private fun AgencyOverviewCard(
             }
 
             // Countries as chips (if multiple countries)
-            if (agency.country.isNotEmpty() && agency.country.size > 1) {
-                CountryInfoRow(countries = agency.country)
+            if (agency.countries.isNotEmpty() && agency.countries.size > 1) {
+                CountryInfoRow(countries = agency.countries)
             }
 
             // Description
@@ -380,7 +380,7 @@ private fun AgencyOverviewCard(
 }
 
 @Composable
-private fun AgencyLaunchStatistics(agency: AgencyEndpointDetailed) {
+private fun AgencyLaunchStatistics(agency: Agency) {
     val totalLaunches = agency.totalLaunchCount ?: 0
     val successfulLaunches = agency.successfulLaunches ?: 0
     val failedLaunches = agency.failedLaunches ?: 0
@@ -458,7 +458,7 @@ private fun AgencyLaunchStatistics(agency: AgencyEndpointDetailed) {
 }
 
 @Composable
-private fun AgencyLandingStatistics(agency: AgencyEndpointDetailed) {
+private fun AgencyLandingStatistics(agency: Agency) {
     val attemptedLandings = agency.attemptedLandings ?: 0
     val successfulLandings = agency.successfulLandings ?: 0
     val failedLandings = agency.failedLandings ?: 0
@@ -518,7 +518,7 @@ private fun AgencyLandingStatistics(agency: AgencyEndpointDetailed) {
 }
 
 @Composable
-private fun AgencySpacecraftLandingStatistics(agency: AgencyEndpointDetailed) {
+private fun AgencySpacecraftLandingStatistics(agency: Agency) {
     val attemptedLandings = agency.attemptedLandingsSpacecraft ?: 0
     val successfulLandings = agency.successfulLandingsSpacecraft ?: 0
     val failedLandings = agency.failedLandingsSpacecraft ?: 0
@@ -558,7 +558,7 @@ private fun AgencySpacecraftLandingStatistics(agency: AgencyEndpointDetailed) {
 }
 
 @Composable
-private fun VehiclesCard(agency: AgencyEndpointDetailed) {
+private fun VehiclesCard(agency: Agency) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -570,7 +570,7 @@ private fun VehiclesCard(agency: AgencyEndpointDetailed) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            agency.launchers?.takeIf { it.isNotBlank() }?.let { launchers ->
+            agency.launchersDescription?.takeIf { it.isNotBlank() }?.let { launchers ->
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         text = "Launch Vehicles",
@@ -585,7 +585,7 @@ private fun VehiclesCard(agency: AgencyEndpointDetailed) {
                 }
             }
 
-            agency.spacecraft?.takeIf { it.isNotBlank() }?.let { spacecraft ->
+            agency.spacecraftDescription?.takeIf { it.isNotBlank() }?.let { spacecraft ->
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         text = "Spacecraft",

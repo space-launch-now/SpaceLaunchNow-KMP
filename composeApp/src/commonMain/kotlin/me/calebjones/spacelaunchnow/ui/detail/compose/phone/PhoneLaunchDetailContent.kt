@@ -40,9 +40,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
@@ -70,12 +70,12 @@ import kotlin.time.Clock
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhoneLaunchDetailContent(
-    launch: LaunchDetailed,
+    launch: Launch,
     videoPlayerState: VideoPlayerState,
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
-    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    relatedEvents: List<Event> = emptyList(),
     isEventsLoading: Boolean = false,
     eventsError: String? = null,
     onSelectVideo: (Int) -> Unit,
@@ -134,7 +134,9 @@ fun PhoneLaunchDetailContent(
 
         // Crew Information Card (if crewed launch)
         CrewInformationCard(
-            launch = launch,
+            launchCrew = launch.rocketDetail?.spacecraftFlights?.flatMap { it.launchCrew } ?: emptyList(),
+            onboardCrew = launch.rocketDetail?.spacecraftFlights?.flatMap { it.onboardCrew } ?: emptyList(),
+            landingCrew = launch.rocketDetail?.spacecraftFlights?.flatMap { it.landingCrew } ?: emptyList(),
             onAstronautClick = onAstronautClick
         )
         Spacer(Modifier.height(16.dp))
@@ -210,7 +212,7 @@ fun PhoneLaunchDetailContent(
 
 @Composable
 private fun VideoPickerCardSeparate(
-    videos: List<VidURL>,
+    videos: List<VideoLink>,
     selectedIndex: Int,
     launchName: String,
     onVideoSelected: (Int) -> Unit,

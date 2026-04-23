@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.ui.detail.compose.components
+﻿package me.calebjones.spacelaunchnow.ui.detail.compose.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,15 +36,15 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.brands.WikipediaW
 import compose.icons.fontawesomeicons.solid.InfoCircle
 import compose.icons.fontawesomeicons.solid.Map
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LocationList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PadDetailed
+import me.calebjones.spacelaunchnow.domain.model.Location
+import me.calebjones.spacelaunchnow.domain.model.Pad
 import me.calebjones.spacelaunchnow.ui.components.StatCard
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 
 @Composable
 fun LaunchLocationCard(
-    location: LocationList?,
-    pad: PadDetailed?,
+    location: Location?,
+    pad: Pad?,
     openUrl: (String) -> Unit = { /* TODO: Implement for platform */ }
 ) {
     if (location == null) return
@@ -61,8 +61,8 @@ fun LaunchLocationCard(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Map image centered at the top (if exists)
-                // Prefer location.image, fallback to mapImage if image is null
-                location.image?.imageUrl?.let { mapUrl ->
+                // Prefer location.imageUrl, fallback to mapImage if imageUrl is null
+                location.imageUrl?.let { mapUrl ->
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
@@ -99,27 +99,33 @@ fun LaunchLocationCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                location.country?.let { country ->
+                location.countryAlpha2?.let { alpha2 ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        country.alpha2Code?.let { code ->
-                            AsyncImage(
-                                model = "https://flagcdn.com/w40/${code.lowercase()}.png",
-                                contentDescription = "Flag",
-                                modifier = Modifier.width(24.dp).height(16.dp)
-                                    .clip(RoundedCornerShape(2.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
+                        AsyncImage(
+                            model = "https://flagcdn.com/w40/${alpha2.lowercase()}.png",
+                            contentDescription = "Flag",
+                            modifier = Modifier.width(24.dp).height(16.dp)
+                                .clip(RoundedCornerShape(2.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = country.name ?: country.alpha2Code ?: "Unknown",
+                            text = location.countryName ?: alpha2,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                } ?: location.countryName?.let { name ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = name,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
 
-                location.celestialBody.let { celestialBody ->
+                location.celestialBodyName?.let { celestialBody ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.Public,
@@ -128,7 +134,7 @@ fun LaunchLocationCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(Modifier.width(4.dp))
-                        Text(text = celestialBody.name, style = MaterialTheme.typography.bodyMedium)
+                        Text(text = celestialBody, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
                 location.timezoneName?.let { tz ->
@@ -168,8 +174,8 @@ fun LaunchLocationCard(
                 pad?.let { it ->
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         // Map image centered at the top (if exists)
-                        // Prefer pad.image, fallback to mapImage if image is null
-                        it.image?.imageUrl?.let { mapUrl ->
+                        // Prefer pad.imageUrl, fallback to mapImage if imageUrl is null
+                        it.imageUrl?.let { mapUrl ->
                             Box(
                                 modifier = Modifier.fillMaxWidth(),
                                 contentAlignment = Alignment.Center
@@ -299,7 +305,7 @@ fun LaunchLocationCard(
 }
 
 @Composable
-fun PadQuickStatsRow(pad: PadDetailed?) {
+fun PadQuickStatsRow(pad: Pad?) {
     if (pad == null) return
     Row(
         modifier = Modifier.fillMaxWidth(),

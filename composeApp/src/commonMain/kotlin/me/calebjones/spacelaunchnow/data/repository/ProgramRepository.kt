@@ -1,18 +1,11 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
 import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.domain.model.Program
 
 interface ProgramRepository {
-    /**
-     * Get program details with caching support.
-     * 
-     * @param id The program ID
-     * @param forceRefresh If true, bypass cache and fetch from API
-     * @return DataResult containing the program and source metadata
-     */
-    suspend fun getProgram(
+    suspend fun getProgramDomain(
         id: Int,
         forceRefresh: Boolean = false
-    ): Result<DataResult<ProgramNormal>>
+    ): Result<DataResult<Program>>
 }

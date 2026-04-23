@@ -11,8 +11,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
+import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -55,7 +55,7 @@ class AgencyListViewModel(
                 
                 val currentState = _uiState.value
                 log.d { "📡 Making API call to getAgencies..." }
-                val result = agencyRepository.getAgencies(
+                val result = agencyRepository.getAgenciesDomain(
                     limit = PAGE_SIZE,
                     offset = 0,
                     ordering = currentState.selectedSortOrder.apiValue,
@@ -74,7 +74,7 @@ class AgencyListViewModel(
                                 isLoading = false,
                                 currentPage = 1,
                                 hasMore = paginatedList.next != null,
-                                totalCount = paginatedList.count ?: 0
+                                totalCount = paginatedList.count
                             )
                         }
                         // Track search analytics when search query is active
@@ -130,7 +130,7 @@ class AgencyListViewModel(
                 val nextPage = currentState.currentPage + 1
                 val offset = (nextPage - 1) * PAGE_SIZE
                 
-                val result = agencyRepository.getAgencies(
+                val result = agencyRepository.getAgenciesDomain(
                     limit = PAGE_SIZE,
                     offset = offset,
                     ordering = currentState.selectedSortOrder.apiValue,
@@ -279,7 +279,7 @@ class AgencyListViewModel(
  * UI state for the agency list screen.
  */
 data class AgencyListUiState(
-    val agencies: List<AgencyNormal> = emptyList(),
+    val agencies: List<Agency> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val error: String? = null,

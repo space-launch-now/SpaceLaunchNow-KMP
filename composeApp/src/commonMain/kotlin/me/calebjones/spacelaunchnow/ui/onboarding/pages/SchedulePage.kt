@@ -25,21 +25,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPage
 import me.calebjones.spacelaunchnow.ui.schedule.components.ScheduleLaunchView
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * Onboarding page 2 — shows a schedule screen with live launch data,
+ * Onboarding page 2 Ã¢â‚¬â€ shows a schedule screen with live launch data,
  * functional Upcoming/Previous tabs inside a device frame.
  */
 @Composable
 fun SchedulePage(
     modifier: Modifier = Modifier,
-    upcomingLaunches: List<LaunchBasic> = emptyList(),
-    previousLaunches: List<LaunchBasic> = emptyList()
+    upcomingLaunches: List<Launch> = emptyList(),
+    previousLaunches: List<Launch> = emptyList()
 ) {
     OnboardingPage(
         title = "Your Launch Schedule",
@@ -57,8 +57,8 @@ fun SchedulePage(
 
 @Composable
 private fun SchedulePreviewContent(
-    upcomingLaunches: List<LaunchBasic>,
-    previousLaunches: List<LaunchBasic>
+    upcomingLaunches: List<Launch>,
+    previousLaunches: List<Launch>
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val launches = if (selectedTabIndex == 0) upcomingLaunches else previousLaunches

@@ -37,7 +37,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.CalendarDay
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -53,7 +53,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventListItem(
-    event: EventEndpointNormal,
+    event: Event,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -81,7 +81,7 @@ fun EventListItem(
         ) {
             // Event image
             SubcomposeAsyncImage(
-                model = event.image?.imageUrl,
+                model = event.imageUrl,
                 contentDescription = "Event image for ${event.name}",
                 modifier = Modifier
                     .size(100.dp)
@@ -163,7 +163,7 @@ fun EventListItem(
                 ) {
                     // Event type
                     Text(
-                        text = event.type.name ?: "Event",
+                        text = event.type.name ?: "Unknown",
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.labelSmall,
@@ -211,20 +211,20 @@ private fun EventListItemDarkPreview() {
     }
 }
 
-private val previewEvent = EventEndpointNormal(
+private val previewEvent = Event(
     id = 1,
-    url = "https://example.com/event/1",
     name = "ISS Expedition 71 Spacewalk",
-    infoUrls = emptyList(),
-    vidUrls = emptyList(),
-    image = null,
     slug = "iss-expedition-71-spacewalk",
-    type = me.calebjones.spacelaunchnow.api.launchlibrary.models.EventType(
+    type = me.calebjones.spacelaunchnow.domain.model.EventType(
         id = 1,
         name = "Spacewalk"
     ),
-    datePrecision = null,
+    description = "Astronauts will perform a scheduled spacewalk to replace a faulty antenna on the International Space Station.",
+    date = null,
+    location = null,
+    imageUrl = null,
+    webcastLive = false,
+    lastUpdated = null,
     duration = null,
-    updates = emptyList(),
-    description = "Astronauts will perform a scheduled spacewalk to replace a faulty antenna on the International Space Station."
+    datePrecision = null
 )
