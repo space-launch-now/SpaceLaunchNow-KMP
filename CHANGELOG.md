@@ -1,3 +1,12 @@
+## [5.27.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.27.1...v5.27.2) (2026-04-24)
+
+
+### Bug Fixes
+
+* purchase restoration functionality and initial pre-warm logic ([75c3af6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/75c3af65663ef512cfaa6ca07d938c3d16bbda67))
+
+
+
 ## [5.27.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.27.0...v5.27.1) (2026-04-19)
 
 
@@ -38,15 +47,6 @@
 ### Features
 
 * add event notification handling and payload structure ([bab857f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bab857f03b50580a12680db59ec42c643fbb195f))
-
-
-
-# [5.25.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.24.1...v5.25.0) (2026-04-07)
-
-
-### Features
-
-* bump version ([da57aa8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/da57aa861aeedea29519dd2bebed6f7413589eed))
 
 
 
