@@ -38,8 +38,7 @@ class IosBillingManager : BillingManager {
         get() = Purchases.sharedInstance
     
     override suspend fun initialize(appUserId: String?): Result<Unit> {
-        // Guard against double initialization — each init triggers syncPurchases()
-        // which hits StoreKit and can show the Apple ID sign-in dialog
+        // Guard against double initialization
         if (_isInitialized.value) {
             log.d { "IosBillingManager already initialized, skipping" }
             return Result.success(Unit)
@@ -66,11 +65,16 @@ class IosBillingManager : BillingManager {
             _isInitialized.value = true
             log.i { "✅ IosBillingManager initialized successfully" }
             
-            // NOTE: syncPurchases() is NOT called here on purpose.
-            // Calling it at launch triggers a StoreKit transaction sync which
-            // shows the App Store / Apple ID sign-in dialog immediately.
-            // Syncing is deferred to when the user interacts with billing
-            // (e.g. paywall, restore, or settings).
+            // Sync on-device App Store receipt with RevenueCat (silent, no UI).
+            // This is required for users upgrading from legacy versions of the app
+            // so that RevenueCat learns about their prior purchases before we query
+            // customer info. Without this, legacy users appear as FREE tier until
+            // they manually tap "Restore Purchases".
+            // Note: syncPurchases() reads the local receipt and POSTs it to RevenueCat
+            // — it does NOT trigger an Apple ID / StoreKit sign-in dialog.
+            syncPurchases()
+
+            // Now fetch the updated customer info (which includes the synced purchases)
             refreshPurchaseState()
             
             Result.success(Unit)
@@ -152,20 +156,29 @@ class IosBillingManager : BillingManager {
     }
     
     override suspend fun restorePurchases(): Result<PurchaseState> {
-        return suspendCancellableCoroutine { continuation ->
-            log.i { "🔄 Restoring purchases..." }
-            
-            purchases.restorePurchases(
-                onError = { error ->
-                    log.e { "❌ Restore failed: ${error.message}" }
-                    continuation.resume(Result.failure(Exception(error.message)))
-                },
-                onSuccess = { customerInfo ->
-                    log.i { "✅ Purchases restored successfully" }
-                    updatePurchaseState(customerInfo)
-                    continuation.resume(Result.success(_purchaseState.value))
-                }
-            )
+        log.i { "🔄 restorePurchases() called, initialized=${_isInitialized.value}" }
+        if (!_isInitialized.value) {
+            log.e { "❌ Cannot restore purchases - SDK not initialized" }
+            return Result.failure(IllegalStateException("Billing SDK not initialized"))
+        }
+        return try {
+            suspendCancellableCoroutine { continuation ->
+                log.i { "🔄 Calling purchases.restorePurchases()..." }
+                purchases.restorePurchases(
+                    onError = { error ->
+                        log.e { "❌ Restore failed: ${error.message}" }
+                        continuation.resume(Result.failure(Exception(error.message)))
+                    },
+                    onSuccess = { customerInfo ->
+                        log.i { "✅ Purchases restored successfully" }
+                        updatePurchaseState(customerInfo)
+                        continuation.resume(Result.success(_purchaseState.value))
+                    }
+                )
+            }
+        } catch (e: Exception) {
+            log.e(e) { "❌ restorePurchases threw an exception: ${e.message}" }
+            Result.failure(e)
         }
     }
     

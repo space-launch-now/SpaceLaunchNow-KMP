@@ -84,6 +84,7 @@ class PreloadViewModel(
         viewModelScope.launch {
             val liveOnboardingCompleted = appPreferences.liveOnboardingCompletedFlow.first()
             val onboardingPaywallShown = appPreferences.onboardingPaywallV1ShownFlow.first()
+            val initialPrewarmCompleted = appPreferences.initialPrewarmCompletedFlow.first()
 
             val nextDestination: Any = when {
                 liveOnboardingCompleted == false -> LiveOnboarding
@@ -98,9 +99,10 @@ class PreloadViewModel(
             // On low-RAM: limit to 2 concurrent; normal: 6
             val tier2Concurrency = if (isLowRam) 2 else 6
 
-            val tier1Tasks = if (isNewUser) buildTier1Tasks() else emptyList()
-            // On low-RAM devices, skip tier 2 entirely to preserve memory for UI rendering
-            val tier2Tasks = if (isLowRam) emptyList() else buildTier2Tasks()
+            // Both tiers only run on first launch ever; skip entirely on subsequent launches
+            val tier1Tasks = if (!initialPrewarmCompleted) buildTier1Tasks() else emptyList()
+            // Skip tier 2 on low-RAM devices or if this is not the first launch
+            val tier2Tasks = if (isLowRam || initialPrewarmCompleted) emptyList() else buildTier2Tasks()
 
             _preloadState.update {
                 it.copy(
@@ -151,9 +153,11 @@ class PreloadViewModel(
                 _preloadState.update { it.copy(isComplete = true) }
             }
 
-            // Tier 2: fire-and-forget in background scope (skipped on low-RAM, throttled otherwise)
+            // Tier 2: fire-and-forget in background scope (first launch only, skipped on low-RAM)
             if (tier2Tasks.isNotEmpty()) {
                 log.i { "Launching ${tier2Tasks.size} tier 2 tasks in background (concurrency=$tier2Concurrency)" }
+                // Mark pre-warm as completed before tasks finish — prevents re-running if app is killed mid-prewarm
+                appPreferences.setInitialPrewarmCompleted()
                 val tier2Semaphore = Semaphore(tier2Concurrency)
                 backgroundScope.launch {
                     tier2Tasks.map { task ->
@@ -170,6 +174,8 @@ class PreloadViewModel(
                     }.awaitAll()
                     log.i { "All tier 2 tasks finished" }
                 }
+            } else if (initialPrewarmCompleted) {
+                log.i { "Tier 2 skipped — initial pre-warm already completed" }
             } else if (isLowRam) {
                 log.i { "Tier 2 skipped on low-RAM device to preserve memory" }
             }
