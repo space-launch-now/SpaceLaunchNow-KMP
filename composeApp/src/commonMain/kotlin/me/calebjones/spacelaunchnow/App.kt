@@ -167,14 +167,10 @@ fun SpaceLaunchNowApp(
                 val notificationRepository = koin.get<NotificationRepository>()
                 val subscriptionRepository = koin.get<SubscriptionRepository>()
                 val pushMessaging = koin.get<PushMessaging>()
-                val appRatingViewModel = koin.get<AppRatingViewModel>()
 
                 // Track app opened
                 val analyticsManager = koin.get<AnalyticsManager>()
                 analyticsManager.track(AnalyticsEvent.AppOpened())
-
-                // Record app launch for rating tracking
-                appRatingViewModel.recordAppLaunch()
 
                 // Initialize ads using platform-specific abstraction
                 val testDeviceIds = if (BuildConfig.IS_DEBUG) {
@@ -295,6 +291,10 @@ fun SpaceLaunchNowApp(
 
             // App rating integration - shows enjoyment dialog first, then native review or feedback
             val appRatingViewModel: AppRatingViewModel = koinInject()
+            // recordAppLaunch must be called on the same instance whose StateFlow the UI observes
+            LaunchedEffect(Unit) {
+                appRatingViewModel.recordAppLaunch()
+            }
             val shouldShowEnjoymentDialog by appRatingViewModel.shouldShowEnjoymentDialog.collectAsState()
             val shouldShowFeedbackDialog by appRatingViewModel.shouldShowFeedbackDialog.collectAsState()
             val shouldShowNativeReview by appRatingViewModel.shouldShowNativeReview.collectAsState()
