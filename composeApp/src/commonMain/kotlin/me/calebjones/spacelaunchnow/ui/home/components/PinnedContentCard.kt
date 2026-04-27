@@ -84,12 +84,14 @@ fun PinnedContentCard(
     val title = when (pinnedContent) {
         is PinnedLaunchContent -> LaunchFormatUtil.formatLaunchTitle(pinnedContent.launch)
         is PinnedEventContent -> pinnedContent.event.name ?: "Unknown Event"
+        is PinnedMotdContent -> pinnedContent.name
     }
-    
+
     // Get the mission/subtitle text
     val subtitle = pinnedContent.customMessage ?: when (pinnedContent) {
         is PinnedLaunchContent -> pinnedContent.launch.mission?.name ?: pinnedContent.launch.name ?: "Unknown Mission"
         is PinnedEventContent -> pinnedContent.event.type?.name ?: "Event"
+        is PinnedMotdContent -> ""
     }
 
     Card(
@@ -101,6 +103,7 @@ fun PinnedContentCard(
                 when (pinnedContent) {
                     is PinnedLaunchContent -> navController.navigate(LaunchDetail(pinnedContent.launch.id))
                     is PinnedEventContent -> navController.navigate(EventDetail(pinnedContent.event.id))
+                    is PinnedMotdContent -> Unit
                 }
             }
             .semantics {
