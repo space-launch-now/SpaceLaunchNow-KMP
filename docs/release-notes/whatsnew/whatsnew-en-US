@@ -1,9 +1,3 @@
 ### Bug Fixes
 
-* add early release notice for Wear OS support in settings
-* add handling for PinnedMotdContent in PinnedContentCard
-* implement deep link handling for Wear OS companion app
-* implement rating migration to resolve dual-instance bug and improve user experience
-* improve ad fallback logic to ensure size compatibility
-* initial wear os implementation
-* optimize ad preloading and interstitial ad handling for improved performance...
+* Enhance Wear OS app with versioning, ProGuard rules, and manifest updates

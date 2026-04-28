@@ -1,3 +1,12 @@
+## [5.28.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.0...v5.28.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* Enhance Wear OS app with versioning, ProGuard rules, and manifest updates ([22c83e9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/22c83e93f8f499696157ec320e99775b78202439))
+
+
+
 # [5.28.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.27.2...v5.28.0) (2026-04-28)
 
 
@@ -51,16 +60,6 @@
 ### Features
 
 * reduce api calls and increase caching ([e2290ea](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e2290ea42684c39a074e22be38876a1b6be2253a))
-
-
-
-## [5.26.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.26.0...v5.26.1) (2026-04-12)
-
-
-### Bug Fixes
-
-* **ios:** prevent crash on cold-start notification tap ([2d4749b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2d4749b459c91121e2fdf35ed6fbbbc0d3e92d1c))
-* **ios:** use static no-op fallback logger and catch Throwable in ObjC-exported functions ([0b07103](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0b0710365d1753fd49c80103f63635b2f4e29ea0))
 
 
 
