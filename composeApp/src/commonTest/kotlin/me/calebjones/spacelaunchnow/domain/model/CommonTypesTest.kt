@@ -9,7 +9,7 @@ class CommonTypesTest {
 
     @Test
     fun providerConstruction() {
-        val p = Provider(id = 1, name = "NASA", abbrev = "NASA", type = "Government", countryCode = "US", logoUrl = null, imageUrl = null)
+        val p = Provider(id = 1, name = "NASA", abbrev = "NASA", type = "Government", countryCode = "US", logoUrl = null, socialLogo = null, imageUrl = null)
         assertEquals(1, p.id)
         assertEquals("NASA", p.name)
         assertEquals("Government", p.type)

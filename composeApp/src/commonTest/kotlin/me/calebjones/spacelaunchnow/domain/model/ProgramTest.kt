@@ -30,6 +30,7 @@ class ProgramTest {
             type = "Government",
             countryCode = "USA",
             logoUrl = null,
+            socialLogo = null,
             imageUrl = null
         )
         val patch = MissionPatchSummary(

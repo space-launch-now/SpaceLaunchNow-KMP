@@ -197,7 +197,7 @@ fun VidURL.toDomain(): VideoLink = VideoLink(
     publisher = publisher,
     description = description,
     featureImage = featureImage,
-    live = live,
+    live = live ?: false,
     priority = priority
 )
 

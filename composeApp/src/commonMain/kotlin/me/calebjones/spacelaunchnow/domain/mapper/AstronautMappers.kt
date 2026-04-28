@@ -18,7 +18,7 @@ import me.calebjones.spacelaunchnow.domain.model.SpacewalkSummary
 
 fun AstronautEndpointNormal.toDomainListItem(): AstronautListItem = AstronautListItem(
     id = id,
-    name = name,
+    name = name ?: "Unknown",
     statusName = status?.name,
     statusId = status?.id,
     agencyName = agency?.name,
@@ -34,7 +34,7 @@ fun AstronautEndpointNormal.toDomainListItem(): AstronautListItem = AstronautLis
 
 fun AstronautNormal.toDomainListItem(): AstronautListItem = AstronautListItem(
     id = id,
-    name = name,
+    name = name ?: "Unknown",
     statusName = status?.name,
     statusId = status?.id,
     agencyName = agency?.name,
