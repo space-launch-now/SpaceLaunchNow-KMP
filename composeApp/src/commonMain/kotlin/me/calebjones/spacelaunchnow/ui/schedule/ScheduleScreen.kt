@@ -163,7 +163,7 @@ private fun ScheduleContent(
     }
 
     // When user taps the tab, animate pager to page
-    fun onTabSelected(tab: ScheduleTab) {
+    val onTabSelected: (ScheduleTab) -> Unit = { tab ->
         val target = if (tab == ScheduleTab.Upcoming) 0 else 1
         if (pagerState.currentPage != target) {
             viewModel.selectTab(tab)

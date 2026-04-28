@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.util
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -16,7 +16,7 @@ class DesktopSharingService : LaunchSharingService {
     /**
      * Shares a launch by copying formatted text to clipboard
      */
-    override suspend fun shareLaunch(launch: LaunchNormal) {
+    override suspend fun shareLaunch(launch: Launch) {
         val shareText = SharingFormatUtil.formatLaunchShareText(launch)
         copyToClipboard(shareText)
         

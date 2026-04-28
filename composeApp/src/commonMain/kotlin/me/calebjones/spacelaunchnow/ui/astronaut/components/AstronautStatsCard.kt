@@ -25,12 +25,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
+import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
+import me.calebjones.spacelaunchnow.domain.model.Country
 import me.calebjones.spacelaunchnow.ui.components.CountryChip
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
-import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -45,7 +45,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AstronautStatsCard(
-    astronaut: AstronautEndpointDetailed,
+    astronaut: AstronautDetail,
     modifier: Modifier = Modifier
 ) {
     val color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
@@ -73,7 +73,7 @@ fun AstronautStatsCard(
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 // Status
-                astronaut.status?.let { status ->
+                astronaut.statusName?.let { statusName ->
                     InfoTile(
                         icon = Icons.Default.EmojiEvents,
                         label = "Status",
@@ -81,8 +81,8 @@ fun AstronautStatsCard(
                         color = color,
                         customComposable = {
                             StatusChip(
-                                text = status.name,
-                                color = getStatusColor(status.name)
+                                text = statusName,
+                                color = getStatusColor(statusName)
                             )
                         }
                     )
@@ -203,25 +203,21 @@ private fun formatDate(date: LocalDate): String {
 private fun AstronautStatsCardPreview() {
     SpaceLaunchNowPreviewTheme {
         AstronautStatsCard(
-            astronaut = AstronautEndpointDetailed(
+            astronaut = AstronautDetail(
                 id = 1,
-                url = "https://test.example.com/astronaut/1",
-                responseMode = "detailed",
                 name = "Neil Armstrong",
-                status = me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautStatus(
-                    id = 11,
-                    name = "Deceased"
-                ),
-                agency = null,
-                image = null,
+                statusName = "Deceased",
+                statusId = 11,
+                agencyName = "NASA",
+                agencyAbbrev = "NASA",
+                agencyId = 44,
+                imageUrl = null,
+                thumbnailUrl = null,
                 age = null,
                 bio = "",
-                type = me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType(
-                    id = 1,
-                    name = "Government"
-                ),
+                typeName = "Government",
                 nationality = listOf(
-                    me.calebjones.spacelaunchnow.api.launchlibrary.models.Country(
+                    Country(
                         id = 1,
                         name = "United States",
                         alpha2Code = "US",
@@ -235,10 +231,10 @@ private fun AstronautStatsCardPreview() {
                 evaTime = "PT2H31M40S",
                 dateOfBirth = LocalDate.parse("1930-08-05"),
                 dateOfDeath = LocalDate.parse("2012-08-25"),
-                wiki = null,
+                wikiUrl = null,
                 lastFlight = null,
                 firstFlight = null,
-                socialMediaLinks = null,
+                socialMediaLinks = emptyList(),
                 flightsCount = 2,
                 landingsCount = null,
                 spacewalksCount = 1,

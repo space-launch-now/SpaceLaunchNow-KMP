@@ -41,74 +41,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.time.Instant
-
-/**
- * Common interface to extract launch data needed for the card header
- */
-sealed interface LaunchCardData {
-    val name: String?
-    val status: LaunchStatus?
-    val net: Instant?
-    val image: Image?
-    val locationName: String?
-    val agencyLogoUrl: String?
-
-    fun getFormattedTitle(): String
-}
-
-/**
- * Wrapper for LaunchBasic
- */
-data class BasicLaunchCardData(val launch: LaunchBasic) : LaunchCardData {
-    override val name: String? = launch.name
-    override val status: LaunchStatus? = launch.status
-    override val net: Instant? = launch.net
-    override val image: Image? = launch.image
-    override val locationName: String? = null // LaunchBasic doesn't have pad/location
-    override val agencyLogoUrl: String? = null // LaunchBasic doesnt have a agencyLogo
-
-    override fun getFormattedTitle(): String = launch.name ?: "Unknown Launch"
-}
-
-/**
- * Wrapper for LaunchNormal
- */
-data class NormalLaunchCardData(val launch: LaunchNormal) : LaunchCardData {
-    override val name: String? = launch.name
-    override val status: LaunchStatus? = launch.status
-    override val net: Instant? = launch.net
-    override val image: Image? = launch.image
-    override val locationName: String? = launch.pad?.location?.name
-    override val agencyLogoUrl: String? = launch.launchServiceProvider.socialLogo?.imageUrl
-        ?: launch.launchServiceProvider.logo?.imageUrl
-
-    override fun getFormattedTitle(): String = launch.name ?: "Unknown Launch"
-}
-
-/**
- * Wrapper for LaunchDetailed
- */
-data class DetailedLaunchCardData(val launch: LaunchDetailed) : LaunchCardData {
-    override val name: String? = launch.name
-    override val status: LaunchStatus? = launch.status
-    override val net: Instant? = launch.net
-    override val image: Image? = launch.image
-    override val locationName: String? = launch.pad?.location?.name
-    override val agencyLogoUrl: String? = launch.launchServiceProvider.socialLogo?.imageUrl
-        ?: launch.launchServiceProvider.logo?.imageUrl
-
-    override fun getFormattedTitle(): String = launch.name ?: "Unknown Launch"
-}
 
 @Composable
 private fun AgencyLogoShimmer(logoSize: Dp) {
@@ -141,7 +78,7 @@ private fun AgencyLogoShimmer(logoSize: Dp) {
 
 /**
  *
- * @param launchData The launch data wrapped in LaunchCardData interface
+ * @param launch The launch data
  * @param showAgencyLogo Whether to show the circular agency logo on the left
  * @param logoSize Size of the agency logo
  * @param useRelativeTime Whether to use relative time formatting (e.g., "in 2 days") vs absolute time
@@ -149,7 +86,7 @@ private fun AgencyLogoShimmer(logoSize: Dp) {
  */
 @Composable
 fun LaunchCardHeaderOverlay(
-    launchData: LaunchCardData,
+    launch: Launch,
     showAgencyLogo: Boolean = true,
     logoSize: Dp = 56.dp,
     useRelativeTime: Boolean = true,
@@ -159,8 +96,8 @@ fun LaunchCardHeaderOverlay(
     val useUtc = LocalUseUtc.current
 
     // Split launch name into rocket config and mission name
-    val (rocketConfig, missionName) = remember(launchData) {
-        val title = launchData.getFormattedTitle()
+    val (rocketConfig, missionName) = remember(launch) {
+        val title = launch.name
         // Split on " | " to separate rocket config from mission name
         val parts = title.split(" | ", limit = 2)
         if (parts.size == 2) {
@@ -171,9 +108,9 @@ fun LaunchCardHeaderOverlay(
         }
     }
 
-    val formattedDate by remember(launchData.net, useRelativeTime, useUtc) {
+    val formattedDate by remember(launch.net, useRelativeTime, useUtc) {
         mutableStateOf(
-            launchData.net?.let {
+            launch.net?.let {
                 if (useRelativeTime) {
                     DateTimeUtil.formatLaunchDateTimeRelative(it, useUtc)
                 } else {
@@ -188,9 +125,9 @@ fun LaunchCardHeaderOverlay(
         verticalAlignment = Alignment.Top,
     ) {
         // Circular Agency Logo (if enabled and available) - always top-aligned
-        if (showAgencyLogo && launchData.agencyLogoUrl != null) {
+        if (showAgencyLogo && launch.provider.socialLogo != null) {
             SubcomposeAsyncImage(
-                model = launchData.agencyLogoUrl,
+                model = launch.provider.socialLogo,
                 contentDescription = "Agency Logo",
                 modifier = Modifier
                     .size(logoSize)
@@ -255,7 +192,7 @@ fun LaunchCardHeaderOverlay(
             }
 
             // Launch Location (if available) with icon and drop shadow
-            launchData.locationName?.let { locationName ->
+            launch.pad?.location?.name?.let { locationName ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -307,13 +244,6 @@ fun LaunchCardHeaderOverlay(
     }
 }
 
-/**
- * Extension functions to easily convert launch objects to LaunchCardData
- */
-fun LaunchBasic.toLaunchCardData(): LaunchCardData = BasicLaunchCardData(this)
-fun LaunchNormal.toLaunchCardData(): LaunchCardData = NormalLaunchCardData(this)
-fun LaunchDetailed.toLaunchCardData(): LaunchCardData = DetailedLaunchCardData(this)
-
 // ========================================
 // Previews
 // ========================================
@@ -344,7 +274,7 @@ private fun LaunchCardHeaderOverlayPreview() {
     SpaceLaunchNowPreviewTheme {
         Box(modifier = Modifier.background(Color.DarkGray)) {
             LaunchCardHeaderOverlay(
-                launchData = PreviewData.launchNormalSpaceX.toLaunchCardData(),
+                launch = PreviewData.domainLaunchSpaceX,
                 showAgencyLogo = true,
                 useRelativeTime = true
             )
@@ -358,7 +288,7 @@ private fun LaunchCardHeaderOverlayDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         Box(modifier = Modifier.background(Color.DarkGray)) {
             LaunchCardHeaderOverlay(
-                launchData = PreviewData.launchNormalSpaceX.toLaunchCardData(),
+                launch = PreviewData.domainLaunchSpaceX,
                 showAgencyLogo = true,
                 useRelativeTime = true
             )
@@ -372,7 +302,7 @@ private fun LaunchCardHeaderOverlayNoLogoPreview() {
     SpaceLaunchNowPreviewTheme {
         Box(modifier = Modifier.background(Color.DarkGray)) {
             LaunchCardHeaderOverlay(
-                launchData = PreviewData.launchBasicULA.toLaunchCardData(),
+                launch = PreviewData.domainLaunchULA,
                 showAgencyLogo = false,
                 useRelativeTime = false
             )
@@ -386,7 +316,7 @@ private fun LaunchCardHeaderOverlayNoLogoDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         Box(modifier = Modifier.background(Color.DarkGray)) {
             LaunchCardHeaderOverlay(
-                launchData = PreviewData.launchBasicULA.toLaunchCardData(),
+                launch = PreviewData.domainLaunchULA,
                 showAgencyLogo = false,
                 useRelativeTime = false
             )

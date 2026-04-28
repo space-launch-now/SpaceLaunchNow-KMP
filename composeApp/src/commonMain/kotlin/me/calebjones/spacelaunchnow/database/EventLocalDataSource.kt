@@ -5,6 +5,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -56,13 +58,21 @@ class EventLocalDataSource(
         events.forEach { cacheEvent(it) }
     }
     
-    suspend fun getEvent(id: Int): EventEndpointNormal? {
+    suspend fun getEvent(id: Int): Event? {
+        return getEventApi(id)?.toDomain()
+    }
+
+    suspend fun getEventApi(id: Int): EventEndpointNormal? {
         val now = System.now().toEpochMilliseconds()
         val cached = queries.getEventById(id.toLong(), now).executeAsOneOrNull()
         return cached?.let { json.decodeFromString<EventEndpointNormal>(it.json_data) }
     }
     
-    suspend fun getUpcomingEvents(limit: Int): List<EventEndpointNormal> {
+    suspend fun getUpcomingEvents(limit: Int): List<Event> {
+        return getUpcomingEventsApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getUpcomingEventsApi(limit: Int): List<EventEndpointNormal> {
         val now = System.now().toEpochMilliseconds()
         val results = queries.getUpcomingEvents(now, now, limit.toLong())
             .executeAsList()
@@ -79,7 +89,11 @@ class EventLocalDataSource(
         return results
     }
     
-    suspend fun getAllEvents(limit: Int): List<EventEndpointNormal> {
+    suspend fun getAllEvents(limit: Int): List<Event> {
+        return getAllEventsApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getAllEventsApi(limit: Int): List<EventEndpointNormal> {
         val now = System.now().toEpochMilliseconds()
         return queries.getAllEvents(now, limit.toLong())
             .executeAsList()

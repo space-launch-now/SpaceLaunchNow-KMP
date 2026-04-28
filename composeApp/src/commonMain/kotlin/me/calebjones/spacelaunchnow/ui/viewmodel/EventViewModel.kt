@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
+import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.logging.logger
 
@@ -18,8 +18,8 @@ class EventViewModel(
 ) : ViewModel() {
     private val log = logger()
 
-    private val _eventDetails = MutableStateFlow<EventEndpointDetailed?>(null)
-    val eventDetails: StateFlow<EventEndpointDetailed?> = _eventDetails
+    private val _eventDetails = MutableStateFlow<Event?>(null)
+    val eventDetails: StateFlow<Event?> = _eventDetails
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -58,7 +58,7 @@ class EventViewModel(
             _error.value = null
             _isLoading.value = true
 
-            val result = repository.getEventDetails(id)
+            val result = repository.getEventDetailDomain(id)
             result.onSuccess { event ->
                 log.i { "Successfully loaded event details: ${event.name}" }
                 _eventDetails.value = event
@@ -72,7 +72,7 @@ class EventViewModel(
         }
     }
 
-    private fun updateVideoPlayerState(event: EventEndpointDetailed) {
+    private fun updateVideoPlayerState(event: Event) {
         val videos = event.vidUrls
         _videoPlayerState.value = _videoPlayerState.value.copy(
             availableVideos = videos,

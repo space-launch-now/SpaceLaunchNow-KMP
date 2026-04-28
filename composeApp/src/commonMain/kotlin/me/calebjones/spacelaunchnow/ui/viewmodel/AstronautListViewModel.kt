@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNormal
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -327,7 +327,7 @@ class AstronautListViewModel(
  * UI state for the astronaut list screen.
  */
 data class AstronautListUiState(
-    val astronauts: List<AstronautEndpointNormal> = emptyList(),
+    val astronauts: List<AstronautListItem> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val error: String? = null,

@@ -44,12 +44,12 @@ import chaintech.videoplayer.host.MediaPlayerHost
 import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.util.VideoUtil
 
 @Composable
 fun LaunchVideoPlayer(
-    vidUrl: VidURL,
+    vidUrl: VideoLink,
     launchName: String,
     isPlayerVisible: Boolean = false,
     onSetPlayerVisible: ((Boolean) -> Unit)? = null,

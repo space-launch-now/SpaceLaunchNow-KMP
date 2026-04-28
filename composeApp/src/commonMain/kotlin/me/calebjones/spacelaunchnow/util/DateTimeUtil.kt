@@ -6,7 +6,6 @@ import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -248,17 +247,17 @@ object DateTimeUtil {
     }
 
     /**
-     * Formats a LaunchBasic's NET date with custom precision fallback logic used in ScheduleScreen. Now shared for reuse.
-     *
-     * @param launch The launch to format
-     * @param useUtc If true, displays time in UTC instead of local timezone
+     * Formats a domain Launch's NET date with custom precision fallback logic.
      */
-    fun formatDateWithPrecisionFallback(launch: LaunchBasic, useUtc: Boolean = false): String {
+    fun formatDateWithPrecisionFallback(launch: me.calebjones.spacelaunchnow.domain.model.Launch, useUtc: Boolean = false): String {
         val net = launch.net ?: return "TBD"
         val precisionId = launch.netPrecision?.id
 
+        return formatDateWithPrecisionFallback(net, precisionId, useUtc)
+    }
+
+    private fun formatDateWithPrecisionFallback(net: kotlinx.datetime.Instant, precisionId: Int?, useUtc: Boolean): String {
         return when (precisionId) {
-            2 -> formatLaunchDate(net, useUtc)
             7 -> formatMonthYear(net, useUtc)
             8, 9, 10, 11 -> "${formatQuarter(net, useUtc)} ${formatYear(net, useUtc)}"
             12 -> "H1 ${formatYear(net, useUtc)}"

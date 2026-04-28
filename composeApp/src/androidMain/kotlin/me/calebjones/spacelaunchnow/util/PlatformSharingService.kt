@@ -2,14 +2,14 @@ package me.calebjones.spacelaunchnow.util
 
 import android.content.Context
 import android.content.Intent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 
 /**
  * Android-specific sharing implementation using native Android sharing intents
  */
 class AndroidSharingService(private val context: Context) : LaunchSharingService {
     
-    override suspend fun shareLaunch(launch: LaunchNormal) {
+    override suspend fun shareLaunch(launch: Launch) {
         val shareText = SharingFormatUtil.formatLaunchShareText(launch)
         shareText(shareText)
     }

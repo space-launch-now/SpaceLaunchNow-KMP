@@ -40,7 +40,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.CalendarAlt
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 
 /**
@@ -56,10 +56,10 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
  */
 @Composable
 fun RelatedEventsCard(
-    events: List<EventEndpointNormal>,
+    events: List<Event>,
     isLoading: Boolean,
     error: String?,
-    onEventClick: ((EventEndpointNormal) -> Unit)? = null
+    onEventClick: ((Event) -> Unit)? = null
 ) {
     var showAll by remember { mutableStateOf(false) }
 
@@ -123,7 +123,7 @@ fun RelatedEventsCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelatedEventItem(
-    event: EventEndpointNormal,
+    event: Event,
     onClick: () -> Unit
 ) {
     Card(
@@ -141,7 +141,7 @@ fun RelatedEventItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val imageUrl = event.image?.imageUrl
+            val imageUrl = event.imageUrl
             SubcomposeAsyncImage(
                 model = imageUrl,
                 contentDescription = "Event Image",

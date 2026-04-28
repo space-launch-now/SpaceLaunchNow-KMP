@@ -15,7 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
+import me.calebjones.spacelaunchnow.domain.model.Country
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -70,6 +70,8 @@ private fun CountryChipPreview() {
                     name = "United States",
                     alpha2Code = "US",
                     alpha3Code = "USA",
+                    nationalityName = "American",
+                    nationalityNameComposed = "American"
                 )
             )
         }

@@ -6,9 +6,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 
@@ -16,8 +15,8 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
 
     private val log = logger()
 
-    private val _nextLaunch = MutableStateFlow<LaunchNormal?>(null)
-    val nextLaunch: StateFlow<LaunchNormal?> = _nextLaunch
+    private val _nextLaunch = MutableStateFlow<Launch?>(null)
+    val nextLaunch: StateFlow<Launch?> = _nextLaunch
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -33,14 +32,15 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
                 log.d { "Fetching next launch..." }
 
                 val futureDeferred = async {
-                    repository.getNextNormalLaunch(
+                    repository.getUpcomingLaunchesNormalDomain(
                         limit = 1
                     )
                 }
 
                 val futureResult = futureDeferred.await()
 
-                futureResult.onSuccess { paginatedLaunches: PaginatedLaunchNormalList ->
+                futureResult.onSuccess { dataResult ->
+                    val paginatedLaunches = dataResult.data
                     log.d { "Received paginated launches - Total: ${paginatedLaunches.results.size}, Count: ${paginatedLaunches.count}" }
                     paginatedLaunches.results.forEachIndexed { index, launch ->
                         log.v { "Launch $index: ${launch.name} - ${launch.net} - ID: ${launch.id}" }

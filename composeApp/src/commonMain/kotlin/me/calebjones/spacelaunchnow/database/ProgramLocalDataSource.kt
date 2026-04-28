@@ -5,6 +5,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.domain.mapper.toDomainProgram
+import me.calebjones.spacelaunchnow.domain.model.Program
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Clock.System
@@ -56,41 +58,38 @@ class ProgramLocalDataSource(
         )
     }
     
+    private fun deserialize(jsonData: String): Program? = try {
+        json.decodeFromString<ProgramNormal>(jsonData).toDomainProgram()
+    } catch (e: Exception) {
+        println("  [PROGRAM] Failed to deserialize cached program: ${e.message}")
+        null
+    }
+
     /**
-     * Get a program from fresh cache (within TTL).
+     * Get a program from fresh cache (within TTL) as a domain [Program].
      * Returns null if expired or not found.
      */
-    suspend fun getProgram(id: Int): ProgramNormal? {
+    suspend fun getProgram(id: Int): Program? {
         val now = System.now().toEpochMilliseconds()
         val cached = queries.getProgramById(id.toLong(), now).executeAsOneOrNull()
-        return cached?.let { 
-            try {
-                val ageMinutes = (now - it.cached_at) / 60000
-                println("  [PROGRAM] Cache entry age: ${ageMinutes} minutes (cached at ${it.cached_at}, expires at ${it.expires_at})")
-                json.decodeFromString<ProgramNormal>(it.json_data)
-            } catch (e: Exception) {
-                println("  [PROGRAM] Failed to deserialize cached program: ${e.message}")
-                null
-            }
+        return cached?.let {
+            val ageMinutes = (now - it.cached_at) / 60000
+            println("  [PROGRAM] Cache entry age: ${ageMinutes} minutes (cached at ${it.cached_at}, expires at ${it.expires_at})")
+            deserialize(it.json_data)
         }
     }
-    
+
     /**
-     * Get a program from stale cache (ignores expiration).
+     * Get a program from stale cache (ignores expiration) as a domain [Program].
      * Used for stale-while-revalidate pattern when API fails.
      */
-    suspend fun getProgramStale(id: Int): ProgramNormal? {
+    suspend fun getProgramStale(id: Int): Program? {
         val cached = queries.getProgramByIdStale(id.toLong()).executeAsOneOrNull()
-        return cached?.let { 
-            try {
-                val now = System.now().toEpochMilliseconds()
-                val ageMinutes = (now - it.cached_at) / 60000
-                println("  [PROGRAM] Stale cache entry age: ${ageMinutes} minutes")
-                json.decodeFromString<ProgramNormal>(it.json_data)
-            } catch (e: Exception) {
-                println("  [PROGRAM] Failed to deserialize stale program: ${e.message}")
-                null
-            }
+        return cached?.let {
+            val now = System.now().toEpochMilliseconds()
+            val ageMinutes = (now - it.cached_at) / 60000
+            println("  [PROGRAM] Stale cache entry age: ${ageMinutes} minutes")
+            deserialize(it.json_data)
         }
     }
     

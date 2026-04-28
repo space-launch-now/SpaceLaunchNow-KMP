@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventType
+import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.NewsEventsTab
 import org.jetbrains.compose.ui.tooling.preview.Preview

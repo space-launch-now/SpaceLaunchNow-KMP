@@ -1,7 +1,8 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautEndpointNormalList
+import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
 /**
  * Repository interface for astronaut-related data operations.
@@ -37,7 +38,7 @@ interface AstronautRepository {
         hasFlown: Boolean? = null,
         inSpace: Boolean? = null,
         isHuman: Boolean? = null
-    ): Result<PaginatedAstronautEndpointNormalList>
+    ): Result<PaginatedResult<AstronautListItem>>
 
     /**
      * Fetch detailed information about a specific astronaut.
@@ -47,5 +48,5 @@ interface AstronautRepository {
      * @return Result wrapping AstronautEndpointDetailed on success,
      *         or an exception on failure (404 if astronaut not found)
      */
-    suspend fun getAstronautDetail(id: Int): Result<AstronautEndpointDetailed>
+    suspend fun getAstronautDetail(id: Int): Result<AstronautDetail>
 }

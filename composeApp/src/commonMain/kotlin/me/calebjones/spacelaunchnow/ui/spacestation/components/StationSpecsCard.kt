@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
+import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 
@@ -29,7 +29,7 @@ import me.calebjones.spacelaunchnow.util.NumberFormatUtil
  */
 @Composable
 fun StationSpecsCard(
-    station: SpaceStationDetailedEndpoint,
+    station: SpaceStationDetail,
     modifier: Modifier = Modifier
 ) {
     val hasSpecs = station.height != null || station.width != null ||

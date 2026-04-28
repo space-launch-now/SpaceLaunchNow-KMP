@@ -15,9 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
@@ -26,6 +23,10 @@ import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Clock.System
@@ -66,50 +67,50 @@ class HomeViewModel(
 
     // Featured Launch State
     // Initialize with isLoading=true to show shimmer instead of empty state before first load
-    private val _featuredLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null, isLoading = true))
-    val featuredLaunchState: StateFlow<ViewState<LaunchNormal?>> =
+    private val _featuredLaunchState = MutableStateFlow(ViewState<Launch?>(data = null, isLoading = true))
+    val featuredLaunchState: StateFlow<ViewState<Launch?>> =
         _featuredLaunchState.asStateFlow()
 
     // In-Flight Launch State (LIVE launches currently flying)
-    private val _inFlightLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
-    val inFlightLaunchState: StateFlow<ViewState<LaunchNormal?>> =
+    private val _inFlightLaunchState = MutableStateFlow(ViewState<Launch?>(data = null))
+    val inFlightLaunchState: StateFlow<ViewState<Launch?>> =
         _inFlightLaunchState.asStateFlow()
 
     // Upcoming Launches State
     private val _upcomingLaunchesState =
-        MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
-    val upcomingLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> =
+        MutableStateFlow(ViewState(data = emptyList<Launch>()))
+    val upcomingLaunchesState: StateFlow<ViewState<List<Launch>>> =
         _upcomingLaunchesState.asStateFlow()
 
     // Updates State
-    private val _updatesState = MutableStateFlow(ViewState(data = emptyList<UpdateEndpoint>()))
-    val updatesState: StateFlow<ViewState<List<UpdateEndpoint>>> = _updatesState.asStateFlow()
+    private val _updatesState = MutableStateFlow(ViewState(data = emptyList<Update>()))
+    val updatesState: StateFlow<ViewState<List<Update>>> = _updatesState.asStateFlow()
 
     // Articles State
     private val _articlesState = MutableStateFlow(ViewState(data = emptyList<Article>()))
     val articlesState: StateFlow<ViewState<List<Article>>> = _articlesState.asStateFlow()
 
     // Events State
-    private val _eventsState = MutableStateFlow(ViewState(data = emptyList<EventEndpointNormal>()))
-    val eventsState: StateFlow<ViewState<List<EventEndpointNormal>>> = _eventsState.asStateFlow()
+    private val _eventsState = MutableStateFlow(ViewState(data = emptyList<Event>()))
+    val eventsState: StateFlow<ViewState<List<Event>>> = _eventsState.asStateFlow()
 
     // History Launches State (This Day in History)
-    data class HistoryData(val count: Int, val launches: List<LaunchNormal>)
+    data class HistoryData(val count: Int, val launches: List<Launch>)
 
     private val _historyState = MutableStateFlow(ViewState(data = HistoryData(0, emptyList())))
     val historyState: StateFlow<ViewState<HistoryData>> = _historyState.asStateFlow()
 
     // Previous Launches State (for bidirectional carousel)
     private val _previousLaunchesState =
-        MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
-    val previousLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> =
+        MutableStateFlow(ViewState(data = emptyList<Launch>()))
+    val previousLaunchesState: StateFlow<ViewState<List<Launch>>> =
         _previousLaunchesState.asStateFlow()
 
     // ========== Derived States for Carousel ==========
 
     // Combined Launches (previous + upcoming for carousel) - derived from ViewStates
     // Deduplicated by ID to handle edge cases where a launch appears in both lists.
-    val combinedLaunches: StateFlow<List<LaunchNormal>> = kotlinx.coroutines.flow.combine(
+    val combinedLaunches: StateFlow<List<Launch>> = kotlinx.coroutines.flow.combine(
         _previousLaunchesState,
         _upcomingLaunchesState
     ) { previousState, upcomingState ->
@@ -209,7 +210,7 @@ class HomeViewModel(
                 log.v { "Filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
                 log.d { "Calling repository.getFeaturedLaunch with upcomingWithRecent filter..." }
-                val result = launchRepository.getFeaturedLaunch(
+                val result = launchRepository.getFeaturedLaunchDomain(
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
                     locationIds = filterParams.locationIds
@@ -288,7 +289,7 @@ class HomeViewModel(
                 val filterParams = launchFilterService.getFilterParams(currentFilters)
                 log.v { "In-flight filter params - agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
 
-                val result = launchRepository.getInFlightLaunches(
+                val result = launchRepository.getInFlightLaunchesDomain(
                     forceRefresh = forceRefresh,
                     agencyIds = filterParams.agencyIds,
                     locationIds = filterParams.locationIds
@@ -359,7 +360,7 @@ class HomeViewModel(
 
                 // Load both upcoming and previous in parallel
                 val upcomingDeferred = async {
-                    launchRepository.getUpcomingLaunchesNormal(
+                    launchRepository.getUpcomingLaunchesNormalDomain(
                         limit = limit,
                         forceRefresh = forceRefresh,
                         agencyIds = filterParams.agencyIds,
@@ -367,7 +368,7 @@ class HomeViewModel(
                     )
                 }
                 val previousDeferred = async {
-                    launchRepository.getPreviousLaunchesNormal(
+                    launchRepository.getPreviousLaunchesNormalDomain(
                         limit = 5,
                         forceRefresh = forceRefresh,
                         agencyIds = filterParams.agencyIds,
@@ -531,7 +532,7 @@ class HomeViewModel(
                     it.copy(isLoading = true, isUserInitiated = forceRefresh, error = null)
                 }
 
-                val result = eventsRepository.getUpcomingEvents(
+                val result = eventsRepository.getUpcomingEventsDomain(
                     limit = limit,
                     forceRefresh = forceRefresh
                 )
@@ -636,7 +637,7 @@ class HomeViewModel(
                         it.copy(
                             data = HistoryData(
                                 count = paginatedLaunches.count,
-                                launches = paginatedLaunches.results.reversed() // Most recent first
+                                launches = paginatedLaunches.results.reversed().map { launch -> launch.toDomain() }
                             ),
                             isLoading = false
                         )
@@ -670,7 +671,7 @@ class HomeViewModel(
                 val now = System.now()
                 val tomorrow = now.plus(24.hours)
 
-                val result = launchRepository.getUpcomingLaunchesList(
+                val result = launchRepository.getUpcomingLaunchesDomain(
                     limit = 1, // We only need the count, not the actual data
                     netGt = now,
                     netLt = tomorrow
@@ -699,7 +700,7 @@ class HomeViewModel(
                 val now = System.now()
                 val nextWeek = now.plus(7.days)
 
-                val result = launchRepository.getUpcomingLaunchesList(
+                val result = launchRepository.getUpcomingLaunchesDomain(
                     limit = 1, // We only need the count, not the actual data
                     netGt = now,
                     netLt = nextWeek
@@ -728,7 +729,7 @@ class HomeViewModel(
                 val now = System.now()
                 val nextMonth = now.plus(30.days)
 
-                val result = launchRepository.getUpcomingLaunchesList(
+                val result = launchRepository.getUpcomingLaunchesDomain(
                     limit = 1, // We only need the count, not the actual data
                     netGt = now,
                     netLt = nextMonth
@@ -756,12 +757,12 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 log.d { "Pre-fetching detailed data for launch: $launchId" }
-                val result = launchRepository.getLaunchDetails(launchId)
+                val result = launchRepository.getLaunchDetailDomain(launchId)
 
-                result.onSuccess { launchDetailed ->
+                result.onSuccess { launch ->
                     // Cache the detailed launch data for instant access later
-                    launchCache.cacheLaunchDetailed(launchDetailed)
-                    log.d { "Successfully pre-fetched and cached detailed data for launch: ${launchDetailed.name}" }
+                    launchCache.cacheLaunch(launch)
+                    log.d { "Successfully pre-fetched and cached detailed data for launch: ${launch.name}" }
                 }.onFailure { exception ->
                     log.w(exception) { "Failed to pre-fetch detailed data for launch $launchId" }
                     // Don't show error to user since this is background prefetch

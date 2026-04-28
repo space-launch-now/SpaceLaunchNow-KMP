@@ -45,19 +45,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageLicense
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageVariant
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageVariantType
+import me.calebjones.spacelaunchnow.domain.model.Agency
+import me.calebjones.spacelaunchnow.domain.model.Country
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgencyListView(
-    agencies: List<AgencyNormal>,
+    agencies: List<Agency>,
     isLoading: Boolean,
     error: String?,
     onAgencyClick: (Int) -> Unit,
@@ -117,7 +112,7 @@ fun AgencyListView(
 
 @Composable
 private fun AgencyList(
-    agencies: List<AgencyNormal>,
+    agencies: List<Agency>,
     onAgencyClick: (Int) -> Unit
 ) {
     LazyColumn(
@@ -135,7 +130,7 @@ private fun AgencyList(
 
 @Composable
 fun AgencyListItem(
-    agency: AgencyNormal,
+    agency: Agency,
     onClick: () -> Unit
 ) {
     Card(
@@ -157,7 +152,7 @@ fun AgencyListItem(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                val image = agency.socialLogo?.imageUrl ?: agency.logo?.imageUrl
+                val image = agency.socialLogoUrl ?: agency.logoUrl
 
                 image?.let { logoUrl ->
                     Surface(
@@ -197,7 +192,7 @@ fun AgencyListItem(
                     fontWeight = FontWeight.Bold
                 )
 
-                agency.type?.name?.let { type ->
+                agency.typeName?.let { type ->
                     Text(
                         text = type,
                         style = MaterialTheme.typography.bodySmall,
@@ -206,18 +201,18 @@ fun AgencyListItem(
                 }
 
                 // Push chips to bottom
-                if (agency.country.isNotEmpty()) {
+                if (agency.countries.isNotEmpty()) {
                     Spacer(modifier = Modifier.weight(1f))
                 }
 
                 // Country chips
-                if (agency.country.isNotEmpty()) {
+                if (agency.countries.isNotEmpty()) {
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         contentPadding = PaddingValues(vertical = 4.dp),
 
                     ) {
-                        items(agency.country) { country ->
+                        items(agency.countries) { country ->
                             AssistChip(
                                 onClick = { },
                                 label = {
@@ -311,14 +306,12 @@ private fun EmptyContent() {
 @Composable
 fun AgencyListItemPreview() {
     MaterialTheme {
-        val sampleAgency = AgencyNormal(
+        val sampleAgency = Agency(
             id = 1,
             name = "SpaceX",
-            type = AgencyType(
-                id = 1,
-                name = "Commercial"
-            ),
-            country = listOf(
+            abbrev = "SpX",
+            typeName = "Commercial",
+            countries = listOf(
                 Country(
                     id = 1,
                     name = "USA",
@@ -328,21 +321,15 @@ fun AgencyListItemPreview() {
                     nationalityNameComposed = "American"
                 )
             ),
-            abbrev = "SpX",
+            imageUrl = null,
+            logoUrl = null,
+            socialLogoUrl = null,
             description = null,
             administrator = null,
             foundingYear = null,
-            launchers = null,
-            spacecraft = null,
-            parent = null,
-            image = null,
-            logo = null,
-            socialLogo = null,
-            responseMode = "Normal",
-            url = "",
             featured = true
         )
-        
+
         AgencyListItem(
             agency = sampleAgency,
             onClick = {}
@@ -354,65 +341,46 @@ fun AgencyListItemPreview() {
 @Composable
 fun AgencyListItemMultiNationalPreview() {
     MaterialTheme {
-        val sampleAgency = AgencyNormal(
+        val sampleAgency = Agency(
             id = 2,
             name = "European Space Agency",
-            type = AgencyType(
-                id = 2,
-                name = "Multinational"
-            ),
-            country = listOf(
+            abbrev = "ESA",
+            typeName = "Multinational",
+            countries = listOf(
                 Country(
                     id = 2,
                     name = "France",
                     alpha2Code = "FR",
-                    alpha3Code = "FRA"
+                    alpha3Code = "FRA",
+                    nationalityName = null,
+                    nationalityNameComposed = null
                 ),
                 Country(
                     id = 3,
                     name = "Germany",
                     alpha2Code = "DE",
                     alpha3Code = "DEU",
+                    nationalityName = null,
+                    nationalityNameComposed = null
                 ),
                 Country(
                     id = 4,
                     name = "Italy",
                     alpha2Code = "IT",
                     alpha3Code = "ITA",
+                    nationalityName = null,
+                    nationalityNameComposed = null
                 )
             ),
-            abbrev = "ESA",
+            imageUrl = null,
+            logoUrl = null,
+            socialLogoUrl = "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/china2520national2520space2520administration_nation_20190602114400.png",
             description = null,
             administrator = null,
             foundingYear = null,
-            launchers = null,
-            spacecraft = null,
-            parent = null,
-            image = null,
-            logo = null,
-            socialLogo = Image(
-                id = 1,
-                name = "Image",
-                imageUrl = "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/china2520national2520space2520administration_nation_20190602114400.png",
-                thumbnailUrl = "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/china2520national2520space2520administration_nation_20190602114400.png",
-                credit = null,
-                license = ImageLicense(
-                    id = 1
-                ),
-                variants = listOf(ImageVariant(
-                    id = 1,
-                    type = ImageVariantType(
-                        id = 1
-                    ),
-                    imageUrl =  "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/china2520national2520space2520administration_nation_20190602114400.png",
-                )),
-                singleUse = null,
-            ),
-            responseMode = "Normal",
-            url = "",
             featured = true
         )
-        
+
         AgencyListItem(
             agency = sampleAgency,
             onClick = {}

@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
+import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
+import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 
@@ -37,7 +37,7 @@ import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
  */
 @Composable
 internal fun SpacecraftGridCard(
-    spacecraft: SpacecraftEndpointDetailed,
+    spacecraft: Spacecraft,
     modifier: Modifier = Modifier,
     isFullWidth: Boolean = false
 ) {
@@ -50,7 +50,7 @@ internal fun SpacecraftGridCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background image
-            val imageUrl = spacecraft.image?.imageUrl
+            val imageUrl = spacecraft.imageUrl
             if (imageUrl != null) {
                 SubcomposeAsyncImage(
                     model = imageUrl,
@@ -110,13 +110,15 @@ internal fun SpacecraftGridCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text(
-                        text = spacecraft.status.name,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.7f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    spacecraft.status?.name?.let { statusName ->
+                        Text(
+                            text = statusName,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.7f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }
@@ -128,7 +130,7 @@ internal fun SpacecraftGridCard(
  */
 @Composable
 internal fun LauncherGridCard(
-    launcher: LauncherDetailed,
+    launcher: LauncherDetail,
     modifier: Modifier = Modifier,
     isFullWidth: Boolean = false
 ) {
@@ -141,7 +143,7 @@ internal fun LauncherGridCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background image
-            val imageUrl = launcher.image?.imageUrl
+            val imageUrl = launcher.imageUrl
             if (imageUrl != null) {
                 SubcomposeAsyncImage(
                     model = imageUrl,
@@ -213,16 +215,14 @@ internal fun LauncherGridCard(
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White.copy(alpha = 0.7f)
                         )
-                        launcher.status?.let { status ->
-                            status.name?.let {
-                                Text(
-                                    text = it.capitalize(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color.White.copy(alpha = 0.7f),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
+                        launcher.status?.name?.let { statusName ->
+                            Text(
+                                text = statusName.capitalize(),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White.copy(alpha = 0.7f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
                     }
                 }

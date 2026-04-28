@@ -1,7 +1,6 @@
 package me.calebjones.spacelaunchnow.cache
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -10,67 +9,36 @@ import kotlin.time.Instant
 /**
  * Cache service for storing launch data to avoid unnecessary API calls
  * when navigating between screens with partial launch data.
+ * Uses unified domain Launch type for all cache entries.
  */
 class LaunchCache {
-    private val normalCache = mutableMapOf<String, LaunchNormal>()
-    private val detailedCache = mutableMapOf<String, LaunchDetailed>()
-    private val normalCacheTimestamps = mutableMapOf<String, Instant>()
-    private val detailedCacheTimestamps = mutableMapOf<String, Instant>()
+    private val cache = mutableMapOf<String, Launch>()
+    private val cacheTimestamps = mutableMapOf<String, Instant>()
 
     /**
-     * Store a LaunchNormal object in cache
+     * Store a Launch object in cache
      */
-    fun cacheLaunchNormal(launch: LaunchNormal) {
-        normalCache[launch.id] = launch
-        normalCacheTimestamps[launch.id] = Clock.System.now()
+    fun cacheLaunch(launch: Launch) {
+        cache[launch.id] = launch
+        cacheTimestamps[launch.id] = Clock.System.now()
     }
 
     /**
-     * Store a LaunchDetailed object in cache
-     */
-    fun cacheLaunchDetailed(launch: LaunchDetailed) {
-        detailedCache[launch.id] = launch
-        detailedCacheTimestamps[launch.id] = Clock.System.now()
-    }
-
-    /**
-     * Get cached LaunchNormal by ID
+     * Get cached Launch by ID
      * Returns null if cache is stale (older than cacheDuration)
      */
-    fun getCachedLaunchNormal(
+    fun getCachedLaunch(
         launchId: String,
         cacheDuration: Duration = 15.minutes
-    ): LaunchNormal? {
-        val cached = normalCache[launchId] ?: return null
-        val timestamp = normalCacheTimestamps[launchId] ?: return null
+    ): Launch? {
+        val cached = cache[launchId] ?: return null
+        val timestamp = cacheTimestamps[launchId] ?: return null
 
         return if (isCacheValid(timestamp, cacheDuration)) {
             cached
         } else {
-            // Cache is stale, remove it
-            normalCache.remove(launchId)
-            normalCacheTimestamps.remove(launchId)
-            null
-        }
-    }
-
-    /**
-     * Get cached LaunchDetailed by ID
-     * Returns null if cache is stale (older than cacheDuration)
-     */
-    fun getCachedLaunchDetailed(
-        launchId: String,
-        cacheDuration: Duration = 5.minutes
-    ): LaunchDetailed? {
-        val cached = detailedCache[launchId] ?: return null
-        val timestamp = detailedCacheTimestamps[launchId] ?: return null
-
-        return if (isCacheValid(timestamp, cacheDuration)) {
-            cached
-        } else {
-            // Cache is stale, remove it
-            detailedCache.remove(launchId)
-            detailedCacheTimestamps.remove(launchId)
+            cache.remove(launchId)
+            cacheTimestamps.remove(launchId)
             null
         }
     }
@@ -85,29 +53,25 @@ class LaunchCache {
     }
 
     /**
-     * Check if we have any cached data for a launch ID (either normal or detailed)
+     * Check if we have any cached data for a launch ID
      */
     fun hasCachedData(launchId: String): Boolean {
-        return normalCache.containsKey(launchId) || detailedCache.containsKey(launchId)
+        return cache.containsKey(launchId)
     }
 
     /**
      * Clear all cached data
      */
     fun clearCache() {
-        normalCache.clear()
-        detailedCache.clear()
-        normalCacheTimestamps.clear()
-        detailedCacheTimestamps.clear()
+        cache.clear()
+        cacheTimestamps.clear()
     }
 
     /**
      * Remove specific launch from cache
      */
     fun removeLaunch(launchId: String) {
-        normalCache.remove(launchId)
-        detailedCache.remove(launchId)
-        normalCacheTimestamps.remove(launchId)
-        detailedCacheTimestamps.remove(launchId)
+        cache.remove(launchId)
+        cacheTimestamps.remove(launchId)
     }
 }

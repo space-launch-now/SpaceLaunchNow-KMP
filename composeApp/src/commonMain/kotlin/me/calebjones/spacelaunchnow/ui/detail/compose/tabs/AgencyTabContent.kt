@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyDetailsCard
@@ -24,7 +24,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyLaunchSta
  */
 @Composable
 fun AgencyTabContent(
-    launch: LaunchDetailed,
+    launch: Launch,
     openUrl: (String) -> Unit
 ) {
     Column(
@@ -37,7 +37,7 @@ fun AgencyTabContent(
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(16.dp))
-        AgencyDetailsCard(agency = launch.launchServiceProvider, openUrl = openUrl)
+        AgencyDetailsCard(provider = launch.provider, providerDetail = launch.providerDetail, openUrl = openUrl)
         Spacer(Modifier.height(16.dp))
         Text(
             text = "Launch Service Provider Statistics",
@@ -45,7 +45,7 @@ fun AgencyTabContent(
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(16.dp))
-        AgencyLaunchStatistics(agency = launch.launchServiceProvider)
+        AgencyLaunchStatistics(providerDetail = launch.providerDetail)
         Spacer(Modifier.height(16.dp))
 
         // Ad placement

@@ -44,8 +44,8 @@ actual class GlobalAdManager actual constructor(
     // Interstitial ad tracking for detailed views
     private var detailViewVisitCount = 0
     private var lastInterstitialShownAt = 0L
-    private val minInterstitialInterval = 180_000L // 3 minutes minimum between interstitials
-    private val visitsBeforeInterstitial = 8 // Show interstitial every 8th visit for higher impression count
+    private val minInterstitialInterval = 120_000L // 2 minutes minimum between interstitials
+    private val visitsBeforeInterstitial = 6 // Show interstitial every 6th visit
 
     // Ad configuration cache for faster setup
     private val adConfigurations = mutableMapOf<AdSize, AdConfig>()

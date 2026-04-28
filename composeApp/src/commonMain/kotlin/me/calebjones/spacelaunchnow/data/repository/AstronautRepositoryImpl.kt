@@ -5,8 +5,11 @@ import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getAstronautDetail
 import me.calebjones.spacelaunchnow.api.extensions.getAstronautList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AstronautsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautEndpointNormalList
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
+import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -31,7 +34,7 @@ class AstronautRepositoryImpl(
         hasFlown: Boolean?,
         inSpace: Boolean?,
         isHuman: Boolean?
-    ): Result<PaginatedAstronautEndpointNormalList> {
+    ): Result<PaginatedResult<AstronautListItem>> {
         return try {
             log.d { "getAstronauts - limit: $limit, offset: $offset, search: $search" }
             
@@ -49,7 +52,7 @@ class AstronautRepositoryImpl(
             
             val astronauts = response.body()
             log.i { "✅ API SUCCESS: Fetched ${astronauts.results.size} astronauts (total: ${astronauts.count})" }
-            Result.success(astronauts)
+            Result.success(astronauts.toDomain())
             
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getAstronauts: ${e.message}" }
@@ -63,7 +66,7 @@ class AstronautRepositoryImpl(
         }
     }
 
-    override suspend fun getAstronautDetail(id: Int): Result<AstronautEndpointDetailed> {
+    override suspend fun getAstronautDetail(id: Int): Result<AstronautDetail> {
         return try {
             log.d { "getAstronautDetail - id: $id" }
             
@@ -71,7 +74,7 @@ class AstronautRepositoryImpl(
             val astronaut = response.body()
             
             log.i { "✅ API SUCCESS: Fetched astronaut detail for '${astronaut.name}' (ID: $id)" }
-            Result.success(astronaut)
+            Result.success(astronaut.toDomainDetail())
             
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getAstronautDetail (ID: $id): ${e.message}" }

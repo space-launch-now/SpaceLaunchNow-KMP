@@ -28,6 +28,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Deep links from Wear OS companion app -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="spacelaunchnow" />
+            </intent-filter>
         </activity>
 
         <service
@@ -77,5 +84,18 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/launch_list_widget_info" />
         </receiver>
+
+        <!-- Phone-side DataLayer listener for watch sync requests -->
+        <service
+            android:name=".sync.PhoneDataLayerListenerService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data
+                    android:host="*"
+                    android:pathPrefix="/spacelaunchnow/request-sync"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

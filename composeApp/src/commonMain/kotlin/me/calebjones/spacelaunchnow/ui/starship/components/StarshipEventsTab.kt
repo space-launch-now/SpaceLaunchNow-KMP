@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.ui.compose.StarshipEventsShimmer
@@ -48,7 +48,7 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
  */
 @Composable
 fun StarshipEventsTab(
-    eventsState: ViewState<List<EventEndpointNormal>>,
+    eventsState: ViewState<List<Event>>,
     newsState: ViewState<List<Article>>,
     navController: NavController,
     onRefresh: () -> Unit,
@@ -183,7 +183,7 @@ fun StarshipEventsTab(
  */
 @Composable
 private fun EventListCard(
-    event: EventEndpointNormal,
+    event: Event,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -204,7 +204,7 @@ private fun EventListCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Event Image
-            event.image?.imageUrl?.let { imageUrl ->
+            event.imageUrl?.let { imageUrl ->
                 SubcomposeAsyncImage(
                     model = imageUrl,
                     contentDescription = event.name,

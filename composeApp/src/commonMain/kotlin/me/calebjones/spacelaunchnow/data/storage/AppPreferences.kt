@@ -62,6 +62,8 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         private val RATING_DIALOG_SHOWN_COUNT = longPreferencesKey("rating_dialog_shown_count")
         private val USER_HAS_RATED = booleanPreferencesKey("user_has_rated")
         private val USER_GAVE_FEEDBACK = booleanPreferencesKey("user_gave_feedback")
+        // Migration: clears corrupt cooldown state written by the dual-instance bug
+        private val RATING_V2_MIGRATED = booleanPreferencesKey("rating_v2_migrated")
     }
 
     val themeFlow: Flow<ThemeOption> = dataStore.data.map { preferences ->
@@ -348,5 +350,32 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
     suspend fun hasUserGivenFeedback(): Boolean {
         return dataStore.data.map { it[USER_GAVE_FEEDBACK] }.first() ?: false
+    }
+
+    /**
+     * One-time migration to recover users silently blocked by the dual-instance bug.
+     * Clears `last_rating_prompt_date` and `rating_dialog_shown_count` for users who
+     * never actually saw the dialog (i.e. they have not given feedback and have not rated).
+     * Safe to call repeatedly — the `rating_v2_migrated` flag prevents re-running.
+     */
+    suspend fun applyRatingV2Migration() {
+        val alreadyMigrated = dataStore.data.map { it[RATING_V2_MIGRATED] }.first() ?: false
+        if (alreadyMigrated) return
+
+        val hasRated = dataStore.data.map { it[USER_HAS_RATED] }.first() ?: false
+        val gaveFeedback = dataStore.data.map { it[USER_GAVE_FEEDBACK] }.first() ?: false
+
+        // Only reset state for users who never genuinely engaged with the dialog
+        if (!hasRated && !gaveFeedback) {
+            dataStore.edit { preferences ->
+                preferences.remove(LAST_RATING_PROMPT_DATE)
+                preferences[RATING_DIALOG_SHOWN_COUNT] = 0L
+                preferences[RATING_V2_MIGRATED] = true
+            }
+        } else {
+            dataStore.edit { preferences ->
+                preferences[RATING_V2_MIGRATED] = true
+            }
+        }
     }
 }

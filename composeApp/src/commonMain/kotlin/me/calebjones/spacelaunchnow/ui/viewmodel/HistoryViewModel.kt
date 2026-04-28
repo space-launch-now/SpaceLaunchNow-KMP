@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -28,7 +29,7 @@ class HistoryViewModel(
     /**
      * Holds history data including count and list of launches
      */
-    data class HistoryData(val count: Int, val launches: List<LaunchNormal>)
+    data class HistoryData(val count: Int, val launches: List<Launch>)
 
     // ========== ViewState Properties ==========
 
@@ -70,7 +71,7 @@ class HistoryViewModel(
                         it.copy(
                             data = HistoryData(
                                 count = paginatedLaunches.count,
-                                launches = paginatedLaunches.results.reversed() // Most recent first
+                                launches = paginatedLaunches.results.reversed().map { launch -> launch.toDomain() }
                             ),
                             isLoading = false
                         )

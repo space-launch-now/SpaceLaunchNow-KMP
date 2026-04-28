@@ -31,9 +31,9 @@ import com.valentinilk.shimmer.shimmer
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.UserAstronaut
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautFlight
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionMini
+import me.calebjones.spacelaunchnow.domain.model.CrewMember
+import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
+import me.calebjones.spacelaunchnow.domain.model.ExpeditionMiniItem
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 
 /**
@@ -41,7 +41,7 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
  */
 @Composable
 fun ExpeditionInfoCard(
-    expedition: ExpeditionDetailed?,
+    expedition: ExpeditionDetailItem?,
     modifier: Modifier = Modifier
 ) {
     if (expedition == null) return
@@ -155,8 +155,8 @@ fun ExpeditionInfoCard(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    for (astronautFlight in crew) {
-                        CrewMemberRow(astronautFlight = astronautFlight)
+                    for (crewMember in crew) {
+                        CrewMemberRow(crewMember = crewMember)
                     }
                 }
             }
@@ -169,7 +169,7 @@ fun ExpeditionInfoCard(
  */
 @Composable
 fun ExpeditionInfoCard(
-    expeditionMini: ExpeditionMini?,
+    expeditionMini: ExpeditionMiniItem?,
     modifier: Modifier = Modifier
 ) {
     if (expeditionMini == null) return
@@ -226,10 +226,10 @@ fun ExpeditionInfoCard(
  */
 @Composable
 private fun CrewMemberRow(
-    astronautFlight: AstronautFlight,
+    crewMember: CrewMember,
     modifier: Modifier = Modifier
 ) {
-    val astronaut = astronautFlight.astronaut
+    val astronaut = crewMember.astronaut
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -237,7 +237,7 @@ private fun CrewMemberRow(
     ) {
         // Astronaut photo
         SubcomposeAsyncImage(
-            model = astronaut.image?.thumbnailUrl ?: astronaut.image?.imageUrl,
+            model = astronaut.thumbnailUrl ?: astronaut.imageUrl,
             contentDescription = astronaut.name,
             modifier = Modifier
                 .size(48.dp)
@@ -286,7 +286,7 @@ private fun CrewMemberRow(
                 overflow = TextOverflow.Ellipsis
             )
 
-            astronautFlight.role?.role?.let { role ->
+            crewMember.role?.let { role ->
                 Text(
                     text = role,
                     style = MaterialTheme.typography.bodySmall,
@@ -296,7 +296,7 @@ private fun CrewMemberRow(
                 )
             }
 
-            astronaut.agency?.name?.let { agencyName ->
+            astronaut.agencyName?.let { agencyName ->
                 Text(
                     text = agencyName,
                     style = MaterialTheme.typography.labelSmall,

@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
+import me.calebjones.spacelaunchnow.domain.model.SpacecraftFlightSummary
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileData
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
@@ -60,7 +60,7 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 
 @Composable
 fun SpacecraftDetailsCard(
-    spacecraftStages: List<SpacecraftFlightDetailedSerializerNoLaunch>
+    spacecraftStages: List<SpacecraftFlightSummary>
 ) {
     if (spacecraftStages.isEmpty()) return
 
@@ -76,7 +76,7 @@ fun SpacecraftDetailsCard(
 
 @Composable
 fun SpacecraftDetailCard(
-    spacecraftFlight: SpacecraftFlightDetailedSerializerNoLaunch
+    spacecraftFlight: SpacecraftFlightSummary
 ) {
     val spacecraft = spacecraftFlight.spacecraft
     val useUtc = LocalUseUtc.current
@@ -91,7 +91,7 @@ fun SpacecraftDetailCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Spacecraft image
-            spacecraft.image?.imageUrl?.let { imageUrl ->
+            spacecraft?.imageUrl?.let { imageUrl ->
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -102,7 +102,7 @@ fun SpacecraftDetailCard(
                     ) {
                         SubcomposeAsyncImage(
                             model = imageUrl,
-                            contentDescription = spacecraft.name,
+                            contentDescription = spacecraft?.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp)),
@@ -145,7 +145,7 @@ fun SpacecraftDetailCard(
             }
             // Header with spacecraft name
             Text(
-                text = spacecraft.name,
+                text = spacecraft?.name ?: "",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -155,21 +155,21 @@ fun SpacecraftDetailCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                spacecraft.status.name.let { status ->
+                spacecraft?.status?.name?.let { status ->
                     StatusChip(
                         text = status,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
 
-                spacecraft.serialNumber?.let { serial ->
+                spacecraft?.serialNumber?.let { serial ->
                     StatusChip(
                         text = "S/N: $serial",
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
 
-                if (spacecraft.inSpace == true) {
+                if (spacecraft?.inSpace == true) {
                     StatusChip(
                         text = "In Space",
                         color = MaterialTheme.colorScheme.tertiary
@@ -178,7 +178,7 @@ fun SpacecraftDetailCard(
             }
 
             // Description (overflow-aware)
-            spacecraft.description.takeIf { it.isNotBlank() }?.let { desc ->
+            spacecraft?.description?.takeIf { it.isNotBlank() }?.let { desc ->
                 var expanded by remember { mutableStateOf(false) }
                 var hasOverflow by remember { mutableStateOf(false) }
                 Text(
@@ -203,14 +203,14 @@ fun SpacecraftDetailCard(
                     add(InfoTileData(Icons.Filled.LocationOn, "Destination", it))
                 }
 
-                if (spacecraft.isPlaceholder != true) {
-                    spacecraft.flightsCount?.let {
+                if (spacecraft?.isPlaceholder != true) {
+                    spacecraft?.flightsCount?.let {
                         add(InfoTileData(CustomIcons.RocketLaunch, "Total Flights", "$it"))
                     }
                 }
 
-                if (spacecraft.isPlaceholder != true) {
-                    spacecraft.missionEndsCount?.let {
+                if (spacecraft?.isPlaceholder != true) {
+                    spacecraft?.missionEndsCount?.let {
                         add(InfoTileData(Icons.Filled.CheckCircle, "Completed Missions", "$it"))
                     }
                 }
@@ -235,8 +235,8 @@ fun SpacecraftDetailCard(
                     )
                 }
 
-                if (spacecraft.isPlaceholder != true) {
-                    spacecraft.timeInSpace?.let {
+                if (spacecraft?.isPlaceholder != true) {
+                    spacecraft?.timeInSpace?.let {
                         add(
                             InfoTileData(
                                 Icons.Filled.Satellite,
@@ -247,8 +247,8 @@ fun SpacecraftDetailCard(
                     }
                 }
 
-                if (spacecraft.isPlaceholder != true) {
-                    spacecraft.timeDocked?.let {
+                if (spacecraft?.isPlaceholder != true) {
+                    spacecraft?.timeDocked?.let {
                         add(
                             InfoTileData(
                                 Icons.Filled.SatelliteAlt,
@@ -259,7 +259,7 @@ fun SpacecraftDetailCard(
                     }
                 }
 
-                if (spacecraft.isPlaceholder != true) {
+                if (spacecraft?.isPlaceholder != true) {
                     spacecraftFlight.turnAroundTime?.let {
                         add(
                             InfoTileData(
@@ -271,8 +271,8 @@ fun SpacecraftDetailCard(
                     }
                 }
 
-                if (spacecraft.isPlaceholder != true) {
-                    spacecraft.fastestTurnaround?.let {
+                if (spacecraft?.isPlaceholder != true) {
+                    spacecraft?.fastestTurnaround?.let {
                         add(
                             InfoTileData(
                                 Icons.Filled.Speed,

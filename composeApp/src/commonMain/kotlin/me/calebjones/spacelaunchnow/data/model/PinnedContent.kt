@@ -61,5 +61,9 @@ enum class PinnedContentType {
     
     /** An event - id should be event ID (integer as string) */
     @SerialName("EVENT")
-    EVENT
+    EVENT,
+
+    /** A message-of-the-day banner - id is an arbitrary unique string, customMessage holds the text */
+    @SerialName("MESSAGE_OF_THE_DAY")
+    MESSAGE_OF_THE_DAY
 }

@@ -1,12 +1,12 @@
 package me.calebjones.spacelaunchnow.data.model
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigNormal
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 
 /**
  * UI state for Rockets screen combining data, filters, and loading states.
  */
 data class RocketFilterState(
-    val rockets: List<LauncherConfigNormal> = emptyList(),
+    val rockets: List<VehicleConfig> = emptyList(),
     val filters: RocketFilters = RocketFilters.DEFAULT,
     val manufacturers: List<ManufacturerFilter> = emptyList(),
     val isLoading: Boolean = false,

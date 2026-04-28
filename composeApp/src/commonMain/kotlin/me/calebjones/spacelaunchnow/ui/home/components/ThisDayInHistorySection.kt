@@ -151,7 +151,7 @@ fun ThisDayInHistorySection(
 
 @Composable
 private fun HistoryLaunchRow(
-    launches: List<me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal>,
+    launches: List<me.calebjones.spacelaunchnow.domain.model.Launch>,
     cardWidth: Dp,
     navController: NavController,
 ) {
@@ -183,8 +183,8 @@ private fun ThisDayInHistorySectionPreview() {
                 data = HistoryData(
                     count = 2,
                     launches = listOf(
-                        PreviewData.launchNormalSpaceX,
-                        PreviewData.launchNormalULA
+                        PreviewData.domainLaunchSpaceX,
+                        PreviewData.domainLaunchULA
                     )
                 )
             ),
@@ -202,8 +202,8 @@ private fun ThisDayInHistorySectionDarkPreview() {
                 data = HistoryData(
                     count = 2,
                     launches = listOf(
-                        PreviewData.launchNormalSpaceX,
-                        PreviewData.launchNormalULA
+                        PreviewData.domainLaunchSpaceX,
+                        PreviewData.domainLaunchULA
                     )
                 )
             ),

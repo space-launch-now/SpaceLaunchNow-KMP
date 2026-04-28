@@ -46,11 +46,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -117,7 +117,7 @@ class LaunchListWidget : GlanceAppWidget() {
 
     // Removed checkWidgetAccess() - now reads from cached DataStore value
 
-    private suspend fun fetchUpcomingLaunches(): List<LaunchNormal> {
+    private suspend fun fetchUpcomingLaunches(): List<Launch> {
         return withContext(Dispatchers.IO) {
             try {
                 val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
@@ -128,7 +128,7 @@ class LaunchListWidget : GlanceAppWidget() {
                 val agencyIds = launchFilterService.getAgencyIds(state)
                 val locationIds = launchFilterService.getLocationIds(state)
 
-                val result = launchRepository.getUpcomingLaunchesNormal(
+                val result = launchRepository.getUpcomingLaunchesNormalDomain(
                     limit = 10,
                     agencyIds = agencyIds,
                     locationIds = locationIds
@@ -211,7 +211,7 @@ fun LaunchListWidgetLockedContent(
 
 @Composable
 fun LaunchListWidgetContent(
-    launches: List<LaunchNormal>,
+    launches: List<Launch>,
     cornerRadius: Int = 16
 ) {
     val context = LocalContext.current
@@ -288,7 +288,7 @@ fun LaunchListWidgetContent(
 }
 
 @Composable
-fun LaunchListItem(launch: LaunchNormal) {
+fun LaunchListItem(launch: Launch) {
     val context = LocalContext.current
 
     Column(
@@ -307,7 +307,7 @@ fun LaunchListItem(launch: LaunchNormal) {
     ) {
         // Launch Name
         Text(
-            text = launch.name ?: "Unknown Launch",
+            text = launch.name,
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
@@ -319,7 +319,7 @@ fun LaunchListItem(launch: LaunchNormal) {
         Spacer(modifier = GlanceModifier.height(4.dp))
 
         // Agency
-        launch.launchServiceProvider.name.let { agencyName ->
+        launch.provider.name.let { agencyName ->
             Text(
                 text = agencyName,
                 style = TextStyle(
@@ -371,7 +371,7 @@ fun LaunchListItem(launch: LaunchNormal) {
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = when (launch.status.id) {
+                        color = when (launch.status?.id) {
                             1 -> GlanceTheme.colors.secondary // Go
                             2 -> GlanceTheme.colors.error // TBD
                             3, 4, 6 -> GlanceTheme.colors.tertiary // Success/Failure/Hold

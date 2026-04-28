@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.util
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import platform.Foundation.NSNotificationCenter
 
 /**
@@ -22,7 +22,7 @@ class IOSSharingService : LaunchSharingService {
         private const val SHARE_URL_NOTIFICATION = "SpaceLaunchNow.ShareURL"
     }
     
-    override suspend fun shareLaunch(launch: LaunchNormal) {
+    override suspend fun shareLaunch(launch: Launch) {
         val shareText = SharingFormatUtil.formatLaunchShareText(launch)
         shareText(shareText)
     }

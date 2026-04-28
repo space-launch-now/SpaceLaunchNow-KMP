@@ -34,9 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.Update
+import me.calebjones.spacelaunchnow.domain.model.Program
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.StarshipOverviewShimmer
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayer
@@ -63,10 +63,10 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
  */
 @Composable
 fun StarshipOverviewTab(
-    programState: ViewState<ProgramNormal?>,
-    nextLaunchState: ViewState<LaunchNormal?>,
-    historyLaunchesState: ViewState<List<LaunchNormal>>,
-    updatesState: ViewState<List<UpdateEndpoint>>,
+    programState: ViewState<Program?>,
+    nextLaunchState: ViewState<Launch?>,
+    historyLaunchesState: ViewState<List<Launch>>,
+    updatesState: ViewState<List<Update>>,
     videoPlayerState: VideoPlayerState,
     navController: NavController,
     onRefresh: () -> Unit,
@@ -148,10 +148,10 @@ fun StarshipOverviewTab(
  */
 @Composable
 private fun TabletOverviewLayout(
-    programState: ViewState<ProgramNormal?>,
-    nextLaunchState: ViewState<LaunchNormal?>,
-    historyLaunchesState: ViewState<List<LaunchNormal>>,
-    updatesState: ViewState<List<UpdateEndpoint>>,
+    programState: ViewState<Program?>,
+    nextLaunchState: ViewState<Launch?>,
+    historyLaunchesState: ViewState<List<Launch>>,
+    updatesState: ViewState<List<Update>>,
     videoPlayerState: VideoPlayerState,
     navController: NavController,
     onSetPlayerVisible: (Boolean) -> Unit,
@@ -288,10 +288,10 @@ private fun TabletOverviewLayout(
  */
 @Composable
 private fun PhoneOverviewLayout(
-    programState: ViewState<ProgramNormal?>,
-    nextLaunchState: ViewState<LaunchNormal?>,
-    historyLaunchesState: ViewState<List<LaunchNormal>>,
-    allUpdates: List<UpdateEndpoint>,
+    programState: ViewState<Program?>,
+    nextLaunchState: ViewState<Launch?>,
+    historyLaunchesState: ViewState<List<Launch>>,
+    allUpdates: List<Update>,
     videoPlayerState: VideoPlayerState,
     navController: NavController,
     onSetPlayerVisible: (Boolean) -> Unit,
@@ -422,7 +422,7 @@ internal fun StalenessIndicator(modifier: Modifier = Modifier) {
  */
 @Composable
 private fun ProgramInfoCard(
-    program: me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal,
+    program: Program,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -438,7 +438,7 @@ private fun ProgramInfoCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Program image if available
-            program.image?.imageUrl?.let { imageUrl ->
+            program.imageUrl?.let { imageUrl ->
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)

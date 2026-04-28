@@ -10,6 +10,10 @@ import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.rating.AppRatingManager
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsProvider
 import me.calebjones.spacelaunchnow.analytics.providers.FirebaseAnalyticsProvider
+import me.calebjones.spacelaunchnow.sync.PhoneDataLayerService
+import me.calebjones.spacelaunchnow.sync.PhoneDataLayerSync
+import me.calebjones.spacelaunchnow.sync.WearEntitlementPusher
+import me.calebjones.spacelaunchnow.sync.WearFilterSyncPusher
 import me.calebjones.spacelaunchnow.util.AndroidSharingService
 import me.calebjones.spacelaunchnow.util.LaunchSharingService
 import me.calebjones.spacelaunchnow.widgets.PlatformWidgetUpdater
@@ -24,9 +28,18 @@ val androidModule = module {
     single(named("AppSettingsDataStore")) { createAppSettingsDataStore(androidContext()) }
     single(named("NotificationHistoryDataStore")) { createNotificationHistoryDataStore(androidContext()) }
 
+    // Phone-to-Watch DataLayer sync
+    single<PhoneDataLayerSync> { PhoneDataLayerService(androidContext(), get(), get(), get()) }
+
+    // Observe subscription state and push entitlement changes to watch
+    single { WearEntitlementPusher(get(), get(), kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default + kotlinx.coroutines.SupervisorJob())) }
+
+    // Observe filter preference changes and push updated launch list to watch
+    single { WearFilterSyncPusher(get(), get(), kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default + kotlinx.coroutines.SupervisorJob())) }
+
     // Platform-specific BillingManager
     single<BillingManager> {
-        createBillingManager(androidContext())
+        createBillingManager(androidContext(), getOrNull())
     }
     // Database driver factory
     single { DatabaseDriverFactory(androidContext()) }

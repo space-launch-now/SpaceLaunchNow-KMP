@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.components.AppIconBox
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
@@ -43,15 +43,15 @@ private val spaceGradient = Brush.verticalGradient(
 )
 
 /**
- * Onboarding page 0 — branded welcome screen with the app icon,
+ * Onboarding page 0 Ã¢â‚¬â€ branded welcome screen with the app icon,
  * "Welcome to" label, and "Space Launch Now" title.
  */
 @Composable
 fun WelcomePage(
     modifier: Modifier = Modifier,
-    nextLaunch: LaunchNormal? = null
+    nextLaunch: Launch? = null
 ) {
-    // Use wide (side-by-side) layout only when width is EXPANDED (≥840dp).
+    // Use wide (side-by-side) layout only when width is EXPANDED (Ã¢â€°Â¥840dp).
     // MEDIUM (600-840dp, e.g. tablet portrait) is too narrow for side-by-side.
     val useWideLayout = rememberAdaptiveLayoutState().isExpanded
 
@@ -65,7 +65,7 @@ fun WelcomePage(
 @Composable
 private fun WelcomePageWide(
     modifier: Modifier = Modifier,
-    nextLaunch: LaunchNormal? = null
+    nextLaunch: Launch? = null
 ) {
     Row(
         modifier = modifier
@@ -97,7 +97,7 @@ private fun WelcomePageWide(
 @Composable
 private fun WelcomePageCompact(
     modifier: Modifier = Modifier,
-    nextLaunch: LaunchNormal? = null
+    nextLaunch: Launch? = null
 ) {
     Column(
         modifier = modifier
@@ -185,7 +185,7 @@ private fun WelcomeCardContent(modifier: Modifier = Modifier) {
 @Composable
 private fun NextLaunchContent(
     modifier: Modifier = Modifier,
-    nextLaunch: LaunchNormal? = null
+    nextLaunch: Launch? = null
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),

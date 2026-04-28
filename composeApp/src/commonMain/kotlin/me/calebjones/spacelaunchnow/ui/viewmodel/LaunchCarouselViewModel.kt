@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -30,18 +30,18 @@ class LaunchCarouselViewModel(
 
     private val log = logger()
 
-    private val _upcomingLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
-    val upcomingLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> = _upcomingLaunchesState
+    private val _upcomingLaunchesState = MutableStateFlow(ViewState(data = emptyList<Launch>()))
+    val upcomingLaunchesState: StateFlow<ViewState<List<Launch>>> = _upcomingLaunchesState
 
-    private val _previousLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
-    val previousLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> = _previousLaunchesState
+    private val _previousLaunchesState = MutableStateFlow(ViewState(data = emptyList<Launch>()))
+    val previousLaunchesState: StateFlow<ViewState<List<Launch>>> = _previousLaunchesState
 
     /**
      * Combined launches for bidirectional carousel (previous + upcoming)
      * Previous launches are reversed so most recent appears first in the carousel.
      * Deduplicated by ID to handle edge cases where a launch appears in both lists.
      */
-    val combinedLaunches: StateFlow<List<LaunchNormal>> = combine(
+    val combinedLaunches: StateFlow<List<Launch>> = combine(
         _previousLaunchesState,
         _upcomingLaunchesState
     ) { previousState, upcomingState ->
@@ -110,7 +110,7 @@ class LaunchCarouselViewModel(
 
                 // Load both in parallel for better performance
                 val upcomingDeferred = async {
-                    launchRepository.getUpcomingLaunchesNormal(
+                    launchRepository.getUpcomingLaunchesNormalDomain(
                         limit = upcomingLimit,
                         forceRefresh = forceRefresh,
                         agencyIds = filterParams.agencyIds,
@@ -118,7 +118,7 @@ class LaunchCarouselViewModel(
                     )
                 }
                 val previousDeferred = async {
-                    launchRepository.getPreviousLaunchesNormal(
+                    launchRepository.getPreviousLaunchesNormalDomain(
                         limit = previousLimit,
                         forceRefresh = forceRefresh,
                         agencyIds = filterParams.agencyIds,

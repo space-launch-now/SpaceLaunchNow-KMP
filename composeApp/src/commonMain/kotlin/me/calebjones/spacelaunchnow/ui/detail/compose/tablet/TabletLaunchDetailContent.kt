@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
@@ -52,12 +52,12 @@ import org.koin.compose.koinInject
  */
 @Composable
 fun TabletLaunchDetailContent(
-    launch: LaunchDetailed,
+    launch: Launch,
     videoPlayerState: VideoPlayerState,
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
-    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    relatedEvents: List<Event> = emptyList(),
     isEventsLoading: Boolean = false,
     eventsError: String? = null,
     onSelectVideo: (Int) -> Unit,
@@ -201,25 +201,25 @@ fun TabletLaunchDetailContent(
             }
 
             // Spacecraft Details Card
-            if (!launch.rocket?.spacecraftStage.isNullOrEmpty()) {
+            if (!launch.rocketDetail?.spacecraftFlights.isNullOrEmpty()) {
                 Text(
                     text = "Spacecraft Details",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 SpacecraftDetailsCard(
-                    spacecraftStages = launch.rocket.spacecraftStage
+                    spacecraftStages = launch.rocketDetail!!.spacecraftFlights
                 )
             }
 
             // Agency Card
-            launch.launchServiceProvider.let { agency ->
+            launch.provider.let { provider ->
                 Text(
                     text = "Launch Service Provider",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                AgencyDetailsCard(agency = agency, openUrl = openUrl)
+                AgencyDetailsCard(provider = provider, providerDetail = launch.providerDetail, openUrl = openUrl)
             }
         }
 
@@ -251,7 +251,7 @@ fun TabletLaunchDetailContent(
             }
 
             // Launch Vehicle Details Card
-            launch.rocket?.configuration?.let { rocketConfig ->
+            launch.rocket?.let { rocketConfig ->
                 Text(
                     text = "Launch Vehicle Details",
                     style = MaterialTheme.typography.titleLarge,
@@ -263,8 +263,8 @@ fun TabletLaunchDetailContent(
 
             // Landing Details Card
             run {
-                val landingStages = launch.rocket?.launcherStage ?: emptyList()
-                if (landingStages.any { it.landing != null }) {
+                val landingStages = launch.rocketDetail?.stages ?: emptyList()
+                if (landingStages.any { it.landingAttempt != null }) {
                     Text(
                         text = "Landing Details",
                         style = MaterialTheme.typography.titleLarge,
@@ -275,13 +275,13 @@ fun TabletLaunchDetailContent(
             }
 
             // Agency Statistics
-            launch.launchServiceProvider.let { agency ->
+            launch.providerDetail.let { providerDetail ->
                 Text(
                     text = "Launch Service Provider Statistics",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                AgencyLaunchStatistics(agency = agency)
+                AgencyLaunchStatistics(providerDetail = providerDetail)
             }
         }
     }

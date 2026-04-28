@@ -37,15 +37,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal
+import me.calebjones.spacelaunchnow.domain.model.RocketStage
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileHorizontal
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 
 @Composable
-        fun LandingDetailsCard(launcherStages: List<FirstStageNormal>) {
-    val stagesWithLanding = launcherStages.filter { it.landing != null }
+        fun LandingDetailsCard(launcherStages: List<RocketStage>) {
+    val stagesWithLanding = launcherStages.filter { it.landingAttempt != null }
 
     // Guard: if nothing to show, return early
     if (stagesWithLanding.isEmpty()) return
@@ -69,7 +69,7 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
                 ) {
                     val header = buildString {
                         append("Stage #${index + 1}")
-                        stage.launcher.serialNumber?.takeIf { it.isNotBlank() }?.let {
+                        stage.launcher?.serialNumber?.takeIf { it.isNotBlank() }?.let {
                             append(" • ")
                             append(it)
                         }
@@ -99,7 +99,7 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
                     }
                 }
 
-                stage.landing?.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                stage.landingAttempt?.description?.takeIf { it.isNotBlank() }?.let { desc ->
                     var expanded by remember { mutableStateOf(false) }
                     var hasOverflow by remember { mutableStateOf(false) }
                     Text(
@@ -134,7 +134,7 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
                         value = parseIsoDurationToHumanReadable(it)
                     )
                 }
-                if (stage.landing != null) {
+                if (stage.landingAttempt != null) {
                     LandingStageGridContent(stage)
                 }
             }
@@ -146,12 +146,12 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 }
 
 @Composable
-fun LandingStageGridContent(stage: FirstStageNormal) {
-    val landing = stage.landing
+fun LandingStageGridContent(stage: RocketStage) {
+    val landing = stage.landingAttempt
 
     val tiles = buildList {
         add(Triple(Icons.Filled.Category, "Stage Type", stage.type))
-        landing?.type?.name?.let { add(Triple(Icons.Filled.FlightLand, "Landing Type", it)) }
+        landing?.type?.let { add(Triple(Icons.Filled.FlightLand, "Landing Type", it)) }
         landing?.attempt?.let {
             if (it) {
                 add(

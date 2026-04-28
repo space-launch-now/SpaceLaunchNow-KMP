@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.schedule.components.ScheduleLaunchView
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -29,7 +29,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun AstronautFlightHistoryCard(
-    flights: List<LaunchBasic>,
+    flights: List<Launch>,
     onLaunchClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {

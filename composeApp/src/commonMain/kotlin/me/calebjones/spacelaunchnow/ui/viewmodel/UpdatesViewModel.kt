@@ -5,13 +5,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.Update
 
 class UpdatesViewModel(private val repository: UpdatesRepository) : ViewModel() {
 
-    private val _updates = MutableStateFlow<PaginatedUpdateEndpointList?>(null)
-    val updates: StateFlow<PaginatedUpdateEndpointList?> = _updates
+    private val _updates = MutableStateFlow<PaginatedResult<Update>?>(null)
+    val updates: StateFlow<PaginatedResult<Update>?> = _updates
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading

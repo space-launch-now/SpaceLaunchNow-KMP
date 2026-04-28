@@ -50,6 +50,7 @@ class AppRatingViewModel(
 
     init {
         viewModelScope.launch {
+            appPreferences.applyRatingV2Migration()
             checkRatingConditions()
         }
     }

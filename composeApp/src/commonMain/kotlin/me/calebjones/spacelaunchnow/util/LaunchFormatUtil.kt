@@ -1,8 +1,6 @@
 package me.calebjones.spacelaunchnow.util
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 
 /**
  * Utility object for formatting launch information consistently across the application
@@ -47,37 +45,13 @@ object LaunchFormatUtil {
     }
 
     /**
-     * Formats a LaunchDetailed title using the standard format
+     * Formats a domain Launch title using the standard format
      */
-    fun formatLaunchTitle(launch: LaunchDetailed): String {
+    fun formatLaunchTitle(launch: Launch): String {
         return formatLaunchTitle(
-            launchServiceProviderName = launch.launchServiceProvider.name,
-            launchServiceProviderAbbrev = launch.launchServiceProvider.abbrev,
-            rocketConfigurationName = launch.rocket?.configuration?.name,
-            launchName = launch.name
-        )
-    }
-
-    /**
-     * Formats a LaunchNormal title using the standard format
-     */
-    fun formatLaunchTitle(launch: LaunchNormal): String {
-        return formatLaunchTitle(
-            launchServiceProviderName = launch.launchServiceProvider.name,
-            launchServiceProviderAbbrev = launch.launchServiceProvider.abbrev,
-            rocketConfigurationName = launch.rocket?.configuration?.name,
-            launchName = launch.name
-        )
-    }
-
-    /**
-     * Formats a LaunchBasic title using the standard format
-     */
-    fun formatLaunchTitle(launch: LaunchBasic): String {
-        return formatLaunchTitle(
-            launchServiceProviderName = launch.launchServiceProvider.name,
-            launchServiceProviderAbbrev = launch.launchServiceProvider.abbrev,
-            rocketConfigurationName = launch.name?.split("|")?.last(),
+            launchServiceProviderName = launch.provider?.name ?: "",
+            launchServiceProviderAbbrev = launch.provider?.abbrev,
+            rocketConfigurationName = launch.rocket?.fullName ?: launch.rocket?.name,
             launchName = launch.name
         )
     }

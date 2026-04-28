@@ -5,12 +5,17 @@ import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getEventList
 import me.calebjones.spacelaunchnow.api.extensions.getEventsByLaunchId
 import me.calebjones.spacelaunchnow.api.extensions.getUpcomingEvents
+import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.EventType
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Clock.System
@@ -18,12 +23,13 @@ import kotlin.time.Clock.System
 
 class EventsRepositoryImpl(
     private val eventsApi: EventsApi,
+    private val configApi: ConfigApi,
     private val localDataSource: EventLocalDataSource? = null
 ) : EventsRepository {
 
     private val log = logger()
 
-    override suspend fun getUpcomingEvents(
+    private suspend fun getUpcomingEvents(
         limit: Int,
         forceRefresh: Boolean
     ): Result<DataResult<PaginatedEventEndpointNormalList>> {
@@ -36,7 +42,7 @@ class EventsRepositoryImpl(
 
             // Try cache first if available and not forcing refresh
             if (!forceRefresh) {
-                val cachedEvents = localDataSource?.getUpcomingEvents(limit)
+                val cachedEvents = localDataSource?.getUpcomingEventsApi(limit)
                 log.v { "Cache query result: ${cachedEvents?.size ?: 0} events found" }
                 if (cachedEvents != null && cachedEvents.isNotEmpty()) {
                     log.i { "Cache hit - Returning ${cachedEvents.size} cached upcoming events" }
@@ -85,7 +91,7 @@ class EventsRepositoryImpl(
         } catch (e: ResponseException) {
             log.e(e) { "API error while fetching upcoming events (status: ${e.response.status})" }
             // On error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingEvents(limit)
+            val staleCached = localDataSource?.getUpcomingEventsApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("events")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 log.w { "Returning ${staleCached.size} stale cached events due to API error" }
@@ -107,7 +113,7 @@ class EventsRepositoryImpl(
         } catch (e: IOException) {
             log.e(e) { "Network error while fetching upcoming events" }
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingEvents(limit)
+            val staleCached = localDataSource?.getUpcomingEventsApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("events")
             if (staleCached != null && staleCached.isNotEmpty()) {
 
@@ -133,7 +139,7 @@ class EventsRepositoryImpl(
         }
     }
 
-    override suspend fun getEventsByType(
+    private suspend fun getEventsByType(
         typeIds: List<Int>,
         limit: Int
     ): Result<PaginatedEventEndpointNormalList> {
@@ -233,7 +239,7 @@ class EventsRepositoryImpl(
         }
     }
 
-    override suspend fun getEventDetails(eventId: Int): Result<EventEndpointDetailed> {
+    private suspend fun getEventDetails(eventId: Int): Result<EventEndpointDetailed> {
         return try {
             log.d { "Getting event details for $eventId" }
             val response = eventsApi.eventsRetrieve(eventId)
@@ -248,7 +254,7 @@ class EventsRepositoryImpl(
         }
     }
 
-    override suspend fun getEventsByLaunchId(
+    private suspend fun getEventsByLaunchId(
         launchId: String,
         limit: Int
     ): Result<PaginatedEventEndpointNormalList> {
@@ -275,7 +281,7 @@ class EventsRepositoryImpl(
         }
     }
 
-    override suspend fun getEventsPaginated(
+    private suspend fun getEventsPaginated(
         limit: Int,
         offset: Int,
         search: String?,
@@ -313,6 +319,72 @@ class EventsRepositoryImpl(
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "Unexpected error in getEventsPaginated" }
+            Result.failure(e)
+        }
+    }
+
+    // ── Domain-returning method implementations ───────────────────────────
+
+    override suspend fun getUpcomingEventsDomain(
+        limit: Int,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedResult<Event>>> {
+        return getUpcomingEvents(limit, forceRefresh).map { dataResult ->
+            DataResult(
+                data = dataResult.data.toDomain(),
+                source = dataResult.source,
+                timestamp = dataResult.timestamp
+            )
+        }
+    }
+
+    override suspend fun getEventDetailDomain(eventId: Int): Result<Event> {
+        return getEventDetails(eventId).map { it.toDomain() }
+    }
+
+    override suspend fun getEventsByTypeDomain(
+        typeIds: List<Int>,
+        limit: Int
+    ): Result<PaginatedResult<Event>> {
+        return getEventsByType(typeIds, limit).map { it.toDomain() }
+    }
+
+    override suspend fun getEventsByLaunchIdDomain(
+        launchId: String,
+        limit: Int
+    ): Result<PaginatedResult<Event>> {
+        return getEventsByLaunchId(launchId, limit).map { it.toDomain() }
+    }
+
+    override suspend fun getEventsPaginatedDomain(
+        limit: Int,
+        offset: Int,
+        search: String?,
+        typeIds: List<Int>?,
+        upcoming: Boolean?,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedResult<Event>>> {
+        return getEventsPaginated(limit, offset, search, typeIds, upcoming, forceRefresh).map { dataResult ->
+            DataResult(
+                data = dataResult.data.toDomain(),
+                source = dataResult.source,
+                timestamp = dataResult.timestamp
+            )
+        }
+    }
+
+    override suspend fun getEventTypesDomain(): Result<List<EventType>> {
+        return try {
+            log.d { "getEventTypesDomain called" }
+            val response = configApi.configEventTypesList()
+            val types = response.body().results.map { it.toDomain() }
+            log.i { "Fetched ${types.size} event types" }
+            Result.success(types)
+        } catch (e: ResponseException) {
+            log.e(e) { "API error fetching event types" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "Unexpected error fetching event types" }
             Result.failure(e)
         }
     }

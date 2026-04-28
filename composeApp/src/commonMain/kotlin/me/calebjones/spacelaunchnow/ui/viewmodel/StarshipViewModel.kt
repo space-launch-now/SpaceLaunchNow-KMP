@@ -12,15 +12,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
+import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
@@ -31,6 +23,15 @@ import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
+import me.calebjones.spacelaunchnow.domain.model.Program
+import me.calebjones.spacelaunchnow.domain.model.Spacecraft
+import me.calebjones.spacelaunchnow.domain.model.SpacecraftConfig
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.StarshipConstants
 
@@ -74,33 +75,33 @@ class StarshipViewModel(
 
     // ========== Per-Section ViewState Flows ==========
 
-    private val _programState = MutableStateFlow(ViewState<ProgramNormal?>(data = null))
-    val programState: StateFlow<ViewState<ProgramNormal?>> = _programState.asStateFlow()
+    private val _programState = MutableStateFlow(ViewState<Program?>(data = null))
+    val programState: StateFlow<ViewState<Program?>> = _programState.asStateFlow()
 
-    private val _nextLaunchState = MutableStateFlow(ViewState<LaunchNormal?>(data = null))
-    val nextLaunchState: StateFlow<ViewState<LaunchNormal?>> = _nextLaunchState.asStateFlow()
+    private val _nextLaunchState = MutableStateFlow(ViewState<Launch?>(data = null))
+    val nextLaunchState: StateFlow<ViewState<Launch?>> = _nextLaunchState.asStateFlow()
 
-    private val _historyLaunchesState = MutableStateFlow(ViewState(data = emptyList<LaunchNormal>()))
-    val historyLaunchesState: StateFlow<ViewState<List<LaunchNormal>>> = _historyLaunchesState.asStateFlow()
+    private val _historyLaunchesState = MutableStateFlow(ViewState(data = emptyList<Launch>()))
+    val historyLaunchesState: StateFlow<ViewState<List<Launch>>> = _historyLaunchesState.asStateFlow()
 
-    private val _updatesState = MutableStateFlow(ViewState(data = emptyList<UpdateEndpoint>()))
-    val updatesState: StateFlow<ViewState<List<UpdateEndpoint>>> = _updatesState.asStateFlow()
+    private val _updatesState = MutableStateFlow(ViewState(data = emptyList<Update>()))
+    val updatesState: StateFlow<ViewState<List<Update>>> = _updatesState.asStateFlow()
 
-    private val _eventsState = MutableStateFlow(ViewState(data = emptyList<EventEndpointNormal>()))
-    val eventsState: StateFlow<ViewState<List<EventEndpointNormal>>> = _eventsState.asStateFlow()
+    private val _eventsState = MutableStateFlow(ViewState(data = emptyList<Event>()))
+    val eventsState: StateFlow<ViewState<List<Event>>> = _eventsState.asStateFlow()
 
     private val _newsState = MutableStateFlow(ViewState(data = emptyList<Article>()))
     val newsState: StateFlow<ViewState<List<Article>>> = _newsState.asStateFlow()
 
     // Spacecraft (Starship ships like S24, S25)
     private val _spacecraftState =
-        MutableStateFlow(ViewState(data = emptyList<SpacecraftEndpointDetailed>()))
-    val spacecraftState: StateFlow<ViewState<List<SpacecraftEndpointDetailed>>> =
+        MutableStateFlow(ViewState(data = emptyList<Spacecraft>()))
+    val spacecraftState: StateFlow<ViewState<List<Spacecraft>>> =
         _spacecraftState.asStateFlow()
 
     // Launchers (Super Heavy boosters like B7, B9)
-    private val _launchersState = MutableStateFlow(ViewState(data = emptyList<LauncherDetailed>()))
-    val launchersState: StateFlow<ViewState<List<LauncherDetailed>>> = _launchersState.asStateFlow()
+    private val _launchersState = MutableStateFlow(ViewState(data = emptyList<LauncherDetail>()))
+    val launchersState: StateFlow<ViewState<List<LauncherDetail>>> = _launchersState.asStateFlow()
 
     // Vehicle type selector
     private val _selectedVehicleType = MutableStateFlow(VehicleType.SPACECRAFT)
@@ -124,14 +125,14 @@ class StarshipViewModel(
 
     // Launcher configurations (rocket types like "Super Heavy")
     private val _launcherConfigsState =
-        MutableStateFlow(ViewState(data = emptyList<LauncherConfigDetailed>()))
-    val launcherConfigsState: StateFlow<ViewState<List<LauncherConfigDetailed>>> =
+        MutableStateFlow(ViewState(data = emptyList<VehicleConfig>()))
+    val launcherConfigsState: StateFlow<ViewState<List<VehicleConfig>>> =
         _launcherConfigsState.asStateFlow()
 
     // Spacecraft configurations (spacecraft types like "Starship")
     private val _spacecraftConfigsState =
-        MutableStateFlow(ViewState(data = emptyList<SpacecraftConfigDetailed>()))
-    val spacecraftConfigsState: StateFlow<ViewState<List<SpacecraftConfigDetailed>>> =
+        MutableStateFlow(ViewState(data = emptyList<SpacecraftConfig>()))
+    val spacecraftConfigsState: StateFlow<ViewState<List<SpacecraftConfig>>> =
         _spacecraftConfigsState.asStateFlow()
 
     // Navigation level - configs or individual vehicles
@@ -140,13 +141,13 @@ class StarshipViewModel(
         _vehicleNavigationLevel.asStateFlow()
 
     // Selected launcher config for drilling into individual vehicles
-    private val _selectedLauncherConfig = MutableStateFlow<LauncherConfigDetailed?>(null)
-    val selectedLauncherConfig: StateFlow<LauncherConfigDetailed?> =
+    private val _selectedLauncherConfig = MutableStateFlow<VehicleConfig?>(null)
+    val selectedLauncherConfig: StateFlow<VehicleConfig?> =
         _selectedLauncherConfig.asStateFlow()
 
     // Selected spacecraft config for drilling into individual vehicles
-    private val _selectedSpacecraftConfig = MutableStateFlow<SpacecraftConfigDetailed?>(null)
-    val selectedSpacecraftConfig: StateFlow<SpacecraftConfigDetailed?> =
+    private val _selectedSpacecraftConfig = MutableStateFlow<SpacecraftConfig?>(null)
+    val selectedSpacecraftConfig: StateFlow<SpacecraftConfig?> =
         _selectedSpacecraftConfig.asStateFlow()
 
     // Tab selection (simple state, not ViewState)
@@ -271,7 +272,7 @@ class StarshipViewModel(
     /**
      * Navigate to individual vehicles for a launcher configuration
      */
-    fun selectLauncherConfig(config: LauncherConfigDetailed) {
+    fun selectLauncherConfig(config: VehicleConfig) {
         _selectedLauncherConfig.value = config
         _selectedSpacecraftConfig.value = null
         _selectedVehicleType.value = VehicleType.LAUNCHERS
@@ -287,7 +288,7 @@ class StarshipViewModel(
     /**
      * Navigate to individual vehicles for a spacecraft configuration
      */
-    fun selectSpacecraftConfig(config: SpacecraftConfigDetailed) {
+    fun selectSpacecraftConfig(config: SpacecraftConfig) {
         _selectedSpacecraftConfig.value = config
         _selectedLauncherConfig.value = null
         _selectedVehicleType.value = VehicleType.SPACECRAFT
@@ -320,7 +321,7 @@ class StarshipViewModel(
             )
         }
 
-        programRepository.getProgram(StarshipConstants.STARSHIP_PROGRAM_ID, forceRefresh)
+        programRepository.getProgramDomain(StarshipConstants.STARSHIP_PROGRAM_ID, forceRefresh)
             .onSuccess { dataResult ->
                 _programState.update {
                     it.copy(
@@ -348,13 +349,13 @@ class StarshipViewModel(
             )
         }
 
-        launchRepository.getNextStarshipLaunch(
+        launchRepository.getStarshipLaunchesDomain(
             limit = 1,
             forceRefresh = forceRefresh,
             programId = listOf(StarshipConstants.STARSHIP_PROGRAM_ID)
         )
-            .onSuccess { dataResult ->
-                val nextLaunch = dataResult.results.firstOrNull()
+            .onSuccess { paginatedResult ->
+                val nextLaunch = paginatedResult.results.firstOrNull()
                 _nextLaunchState.update {
                     it.copy(
                         data = nextLaunch,
@@ -378,7 +379,7 @@ class StarshipViewModel(
             )
         }
 
-        launchRepository.getStarshipHistoryLaunches(
+        launchRepository.getStarshipHistoryDomain(
             limit = 50,
             forceRefresh = forceRefresh
         )
@@ -449,7 +450,7 @@ class StarshipViewModel(
                 println("[STARSHIP] Events loaded: ${dataResult.data.results.size} items")
                 _eventsState.update {
                     it.copy(
-                        data = dataResult.data.results,
+                        data = dataResult.data.results.map { event -> event.toDomain() },
                         isLoading = false,
                         dataSource = dataResult.source,
                         cacheTimestamp = dataResult.timestamp
@@ -505,7 +506,7 @@ class StarshipViewModel(
             )
         }
 
-        launcherConfigRepository.getConfigurationsByProgram(
+        launcherConfigRepository.getConfigurationsByProgramDomain(
             programId = StarshipConstants.STARSHIP_PROGRAM_ID,
             limit = 20
         )
@@ -537,7 +538,7 @@ class StarshipViewModel(
 
         // SpacecraftConfigurations API doesn't have program filter, so we filter by SpaceX agency
         // and then filter client-side by checking the name contains "Starship"
-        spacecraftConfigRepository.getConfigurationsByAgency(
+        spacecraftConfigRepository.getConfigurationsByAgencyDomain(
             agencyId = StarshipConstants.SPACEX_AGENCY_ID,
             limit = 20
         )
@@ -583,7 +584,7 @@ class StarshipViewModel(
 
         // If we have a selected config, filter by it; otherwise fallback to search
         val result = if (selectedConfig != null) {
-            spacecraftRepository.getSpacecraftByConfig(
+            spacecraftRepository.getSpacecraftByConfigDomain(
                 configId = selectedConfig.id,
                 limit = StarshipConstants.VEHICLES_LIMIT,
                 forceRefresh = forceRefresh
@@ -592,7 +593,7 @@ class StarshipViewModel(
                 dataResult.data
             }
         } else {
-            spacecraftRepository.getSpacecraft(
+            spacecraftRepository.getSpacecraftDomain(
                 limit = StarshipConstants.VEHICLES_LIMIT,
                 search = "Starship",
                 isPlaceholder = false
@@ -639,13 +640,13 @@ class StarshipViewModel(
 
         // If we have a selected config, filter by it; otherwise fallback to search
         val result = if (selectedConfig != null) {
-            launcherRepository.getLaunchersByConfig(
+            launcherRepository.getLaunchersByConfigDomain(
                 configId = selectedConfig.id,
                 limit = StarshipConstants.VEHICLES_LIMIT,
                 offset = 0
             )
         } else {
-            launcherRepository.getLaunchers(
+            launcherRepository.getLaunchersDomain(
                 limit = StarshipConstants.VEHICLES_LIMIT,
                 search = "Super Heavy"
             )
@@ -688,7 +689,7 @@ class StarshipViewModel(
 
             // Note: getSpacecraftByConfig doesn't support offset, so for now use search-based pagination
             // In a future update, could add offset support to the repository
-            spacecraftRepository.getSpacecraft(
+            spacecraftRepository.getSpacecraftDomain(
                 limit = StarshipConstants.VEHICLES_LIMIT,
                 offset = spacecraftOffset,
                 search = selectedConfig?.name ?: "Starship",
@@ -725,13 +726,13 @@ class StarshipViewModel(
 
             // Use config-based filtering if a config is selected
             val result = if (selectedConfig != null) {
-                launcherRepository.getLaunchers(
+                launcherRepository.getLaunchersDomain(
                     limit = StarshipConstants.VEHICLES_LIMIT,
                     offset = launchersOffset,
                     launcherConfigId = selectedConfig.id
                 )
             } else {
-                launcherRepository.getLaunchers(
+                launcherRepository.getLaunchersDomain(
                     limit = StarshipConstants.VEHICLES_LIMIT,
                     offset = launchersOffset,
                     search = "Super Heavy"
@@ -765,7 +766,7 @@ class StarshipViewModel(
 
     // ========== Video Player Helpers ==========
 
-    private fun updateVideoPlayerState(videos: List<VidURL>) {
+    private fun updateVideoPlayerState(videos: List<VideoLink>) {
         if (videos.isEmpty()) {
             _videoPlayerState.value = VideoPlayerState()
             return

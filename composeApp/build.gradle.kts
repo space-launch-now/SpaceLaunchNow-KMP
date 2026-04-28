@@ -53,6 +53,9 @@ kotlin {
 
     jvm("desktop") {
         // JVM target configuration moved to compilations
+        mainRun {
+            mainClass = "me.calebjones.spacelaunchnow.MainKt"
+        }
     }
 
     listOf(
@@ -167,6 +170,9 @@ kotlin {
 
                 // Google Maps Compose for Android
                 implementation(libs.maps.compose)
+
+                // Play Services Wearable (DataLayer for phone-watch sync)
+                implementation(libs.play.services.wearable)
             }
         }
 
@@ -460,8 +466,7 @@ tasks.withType<ProcessResources> {
 
 compose.desktop {
     application {
-        mainClass =
-            "me.calebjones.spacelaunchnow.MainKt" // Correct path to the Kotlin file containing the main function
+        mainClass = "me.calebjones.spacelaunchnow.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "SpaceLaunchNow"
@@ -580,7 +585,10 @@ sqldelight {
             // Version 5 adds FilterableStatus table for launch status filtering
             // Version 6 adds FilterableOrbit, FilterableMissionType, and FilterableLauncherConfigFamily tables
             // Version 7 adds abbreviation column to FilterableRocket table
-            version = 7
+            // Version 8 adds FilterableRocket abbreviation (7.sqm)
+            // Version 9 adds SpaceStationCache, ExpeditionCache, IssTleCache tables (8.sqm)
+            // Version 10 adds StatsCache table (9.sqm)
+            version = 10
         }
     }
 }

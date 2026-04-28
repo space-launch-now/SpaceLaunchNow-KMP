@@ -39,7 +39,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.CalendarDay
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.ui.EventSharedElementKey
 import me.calebjones.spacelaunchnow.ui.SharedElementType
@@ -51,7 +51,7 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 
 @Composable
 fun EventsView(
-    state: ViewState<List<EventEndpointNormal>>,
+    state: ViewState<List<Event>>,
     navController: NavController,
 ) {
     Column {
@@ -156,7 +156,7 @@ fun EventsView(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun EventItem(event: EventEndpointNormal, navController: NavController) {
+fun EventItem(event: Event, navController: NavController) {
     val useUtc = LocalUseUtc.current
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
@@ -184,7 +184,7 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
                     modifier = Modifier.padding(12.dp)
                 ) {
                     // Event image with icon fallback
-                    val image = event.image?.imageUrl
+                    val image = event.imageUrl
                     SubcomposeAsyncImage(
                         model = image,
                         contentDescription = "Event Image",
@@ -308,7 +308,7 @@ fun EventItem(event: EventEndpointNormal, navController: NavController) {
             modifier = Modifier.padding(12.dp)
         ) {
             // Event image with icon fallback
-            val image = event.image?.imageUrl
+            val image = event.imageUrl
             SubcomposeAsyncImage(
                 model = image,
                 contentDescription = "Event Image",

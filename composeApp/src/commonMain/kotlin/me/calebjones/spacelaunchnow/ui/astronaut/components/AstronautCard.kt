@@ -34,14 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautStatus
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageLicense
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageVariant
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
@@ -55,13 +48,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun AstronautCard(
-    astronaut: AstronautEndpointNormal,
+    astronaut: AstronautListItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val contentDesc = "Astronaut card for ${astronaut.name ?: "Unknown"}. " +
-            "Status: ${astronaut.status?.name ?: "Unknown"}. " +
-            "Agency: ${astronaut.agency?.name ?: "Unknown"}. " +
+    val contentDesc = "Astronaut card for ${astronaut.name?.ifBlank { "Unknown" } ?: "Unknown"}. " +
+            "Status: ${astronaut.statusName ?: "Unknown"}. " +
+            "Agency: ${astronaut.agencyName ?: "Unknown"}. " +
             "Tap to view details."
     
     Card(
@@ -91,7 +84,7 @@ fun AstronautCard(
                 contentAlignment = Alignment.Center
             ) {
                 SubcomposeAsyncImage(
-                    model = astronaut.image?.thumbnailUrl ?: astronaut.image?.imageUrl,
+                    model = astronaut.thumbnailUrl ?: astronaut.imageUrl,
                     contentDescription = null, // Described in parent semantics
                     modifier = Modifier
                         .fillMaxSize()
@@ -128,16 +121,15 @@ fun AstronautCard(
             ) {
                 // Name
                 Text(
-                    text = astronaut.name ?: "Unknown Astronaut",
+                    text = astronaut.name?.ifBlank { "Unknown Astronaut" } ?: "Unknown Astronaut",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                
                 // Agency
-                astronaut.agency?.name?.let { agencyName ->
+                astronaut.agencyName?.let { agencyName ->
                     Text(
                         text = agencyName,
                         style = MaterialTheme.typography.bodyMedium,
@@ -146,12 +138,11 @@ fun AstronautCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
                 // Status Chip
-                astronaut.status?.let { status ->
+                astronaut.statusName?.let { statusName ->
                     Spacer(modifier = Modifier.height(4.dp))
                     StatusChip(
-                        text = status.name,
+                        text = statusName,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -165,40 +156,20 @@ fun AstronautCard(
 private fun AstronautCardPreview() {
     SpaceLaunchNowPreviewTheme {
         AstronautCard(
-            astronaut = AstronautEndpointNormal(
-                responseMode = "normal",
+            astronaut = AstronautListItem(
                 id = 1,
-                url = "https://ll.thespacedevs.com/2.4.0/astronaut/1/",
                 name = "Neil Armstrong",
-                status = AstronautStatus(
-                    id = 2,
-                    name = "Retired"
-                ),
-                agency = AgencyMini(
-                    responseMode = "list",
-                    id = 44,
-                    url = "https://ll.thespacedevs.com/2.4.0/agencies/44/",
-                    name = "NASA",
-                    type = null,
-                    abbrev = "NASA"
-                ),
-                image = null,
+                statusName = "Retired",
+                statusId = 2,
+                agencyName = "NASA",
+                agencyAbbrev = "NASA",
+                agencyId = 44,
+                imageUrl = null,
+                thumbnailUrl = null,
                 age = 93,
                 bio = "First person to walk on the Moon",
-                type = AstronautType(
-                    id = 1,
-                    name = "Government"
-                ),
-                nationality = listOf(
-                    Country(
-                        id = 1,
-                        name = "United States",
-                        alpha2Code = "US",
-                        alpha3Code = "USA",
-                        nationalityName = "American",
-                        nationalityNameComposed = "American"
-                    )
-                )
+                typeName = "Government",
+                nationality = emptyList()
             ),
             onClick = {}
         )

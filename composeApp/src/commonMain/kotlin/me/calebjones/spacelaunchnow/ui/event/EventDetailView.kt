@@ -47,14 +47,14 @@ import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Update
+import me.calebjones.spacelaunchnow.domain.model.AstronautSummary
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.ExpeditionSummary
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.ProgramSummary
+import me.calebjones.spacelaunchnow.domain.model.Provider
+import me.calebjones.spacelaunchnow.domain.model.SpaceStationSummary
+import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
@@ -70,7 +70,7 @@ private val TitleHeight = 110.dp
 
 @Composable
 fun EventDetailView(
-    event: EventEndpointDetailed,
+    event: Event,
     onNavigateBack: () -> Unit,
     videoPlayerState: VideoPlayerState = VideoPlayerState(),
     onSelectVideo: (Int) -> Unit = {},
@@ -86,7 +86,7 @@ fun EventDetailView(
     SharedDetailScaffold(
         titleText = event.name,
         taglineText = event.type.name,
-        imageUrl = event.image?.imageUrl,
+        imageUrl = event.imageUrl,
         onNavigateBack = onNavigateBack,
         backgroundColors = listOf(
             MaterialTheme.colorScheme.secondary,
@@ -112,7 +112,7 @@ fun EventDetailView(
 
 @Composable
 private fun EventDetailContentInBody(
-    event: EventEndpointDetailed,
+    event: Event,
     videoPlayerState: VideoPlayerState = VideoPlayerState(),
     onSelectVideo: (Int) -> Unit = {},
     onSetPlayerVisible: (Boolean) -> Unit = {},
@@ -147,7 +147,7 @@ private fun EventDetailContentInBody(
 
         // Feature image (only show if no videos — video player takes this slot)
         if (videoPlayerState.availableVideos.isEmpty()) {
-            event.image?.imageUrl?.let { imageUrl ->
+            event.imageUrl?.let { imageUrl ->
                 EventFeatureImage(imageUrl = imageUrl, contentDescription = event.name)
                 Spacer(Modifier.height(16.dp))
             }
@@ -174,7 +174,7 @@ private fun EventDetailContentInBody(
         }
 
         // Programs
-        event.program?.takeIf { it.isNotEmpty() }?.let { programs ->
+        event.programs.takeIf { it.isNotEmpty() }?.let { programs ->
             ProgramsCard(programs)
             Spacer(Modifier.height(16.dp))
         }
@@ -197,8 +197,8 @@ private fun EventDetailContentInBody(
         }
 
         // Space Stations
-        if (event.spacestations.isNotEmpty()) {
-            SpaceStationsCard(event.spacestations, onSpaceStationClick = onSpaceStationClick)
+        if (event.spaceStations.isNotEmpty()) {
+            SpaceStationsCard(event.spaceStations, onSpaceStationClick = onSpaceStationClick)
             Spacer(Modifier.height(16.dp))
         }
 
@@ -237,7 +237,7 @@ private fun EventFeatureImage(imageUrl: String, contentDescription: String) {
 }
 
 @Composable
-private fun EventInfoCard(event: EventEndpointDetailed) {
+private fun EventInfoCard(event: Event) {
     val useUtc = LocalUseUtc.current
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -285,7 +285,7 @@ private fun EventInfoCard(event: EventEndpointDetailed) {
                     InfoRow(label = "Duration", value = parseIsoDurationToHumanReadable(duration))
                 }
 
-                if (event.webcastLive == true) {
+                if (event.webcastLive) {
                     InfoRow(label = "Status", value = "Live Now 🔴")
                 }
 
@@ -301,7 +301,7 @@ private fun EventInfoCard(event: EventEndpointDetailed) {
 }
 
 @Composable
-private fun EventLinksCard(event: EventEndpointDetailed, onOpenUrl: (String) -> Unit = {}) {
+private fun EventLinksCard(event: Event, onOpenUrl: (String) -> Unit = {}) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -329,7 +329,7 @@ private fun EventLinksCard(event: EventEndpointDetailed, onOpenUrl: (String) -> 
 }
 
 @Composable
-private fun AgenciesCard(agencies: List<AgencyMini>, onAgencyClick: ((Int) -> Unit)? = null) {
+private fun AgenciesCard(agencies: List<Provider>, onAgencyClick: ((Int) -> Unit)? = null) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -354,7 +354,7 @@ private fun AgenciesCard(agencies: List<AgencyMini>, onAgencyClick: ((Int) -> Un
 }
 
 @Composable
-private fun AgencyRowWithLogo(agency: AgencyMini, onClick: () -> Unit) {
+private fun AgencyRowWithLogo(agency: Provider, onClick: () -> Unit) {
     val launchViewModel = koinViewModel<LaunchViewModel>()
     val agencyMap by launchViewModel.agencyDataMap.collectAsState()
     val detailed = agencyMap[agency.id]
@@ -376,7 +376,7 @@ private fun AgencyRowWithLogo(agency: AgencyMini, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // Logo or fallback avatar
-        val logoUrl = detailed?.socialLogo?.imageUrl
+        val logoUrl = detailed?.socialLogoUrl ?: agency.logoUrl
         if (!logoUrl.isNullOrBlank()) {
             Surface(
                 shape = CircleShape,
@@ -426,7 +426,7 @@ private fun AgencyRowWithLogo(agency: AgencyMini, onClick: () -> Unit) {
 
 @Composable
 private fun AstronautsCard(
-    astronauts: List<AstronautNormal>,
+    astronauts: List<AstronautSummary>,
     onAstronautClick: ((Int) -> Unit)? = null
 ) {
     Card(
@@ -444,10 +444,10 @@ private fun AstronautsCard(
             )
             astronauts.forEach { astro ->
                 RowWithImage(
-                    title = astro.name ?: "Astronaut",
-                    subtitle = astro.nationality.firstOrNull()?.name ?: "",
-                    imageUrl = astro.image?.imageUrl,
-                    fallbackText = astro.name?.firstOrNull()?.uppercase() ?: "",
+                    title = astro.name,
+                    subtitle = astro.nationality ?: "",
+                    imageUrl = astro.profileImageUrl,
+                    fallbackText = astro.name.firstOrNull()?.uppercase() ?: "",
                     onClick = { onAstronautClick?.invoke(astro.id) }
                 )
             }
@@ -457,7 +457,7 @@ private fun AstronautsCard(
 
 @Composable
 private fun SpaceStationsCard(
-    stations: List<SpaceStationNormal>,
+    stations: List<SpaceStationSummary>,
     onSpaceStationClick: ((Int) -> Unit)? = null
 ) {
     Card(
@@ -477,7 +477,7 @@ private fun SpaceStationsCard(
                 RowWithImage(
                     title = ss.name,
                     subtitle = ss.orbit ?: "",
-                    imageUrl = ss.image?.imageUrl,
+                    imageUrl = ss.imageUrl,
                     fallbackText = ss.name.firstOrNull()?.uppercase() ?: "",
                     onClick = { onSpaceStationClick?.invoke(ss.id) }
                 )
@@ -487,7 +487,7 @@ private fun SpaceStationsCard(
 }
 
 @Composable
-private fun ExpeditionsCard(expeditions: List<ExpeditionNormal>) {
+private fun ExpeditionsCard(expeditions: List<ExpeditionSummary>) {
     val useUtc = LocalUseUtc.current
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -504,11 +504,11 @@ private fun ExpeditionsCard(expeditions: List<ExpeditionNormal>) {
             )
             expeditions.forEach { exp ->
                 val subtitle =
-                    exp.end?.let { formatLaunchDateTime(it, useUtc) } ?: exp.spacestation.name
+                    exp.end?.let { formatLaunchDateTime(it, useUtc) } ?: (exp.name ?: "")
                 RowWithImage(
                     title = exp.name ?: "Expedition",
                     subtitle = subtitle,
-                    imageUrl = exp.spacestation.image?.imageUrl,
+                    imageUrl = exp.imageUrl,
                     fallbackText = exp.name?.firstOrNull()?.uppercase() ?: "",
                     onClick = { /* TODO open expedition */ }
                 )
@@ -519,7 +519,7 @@ private fun ExpeditionsCard(expeditions: List<ExpeditionNormal>) {
 
 @Composable
 private fun RelatedLaunchesCard(
-    launches: List<LaunchBasic>,
+    launches: List<Launch>,
     onLaunchClick: ((String) -> Unit)? = null
 ) {
     Card(
@@ -537,10 +537,10 @@ private fun RelatedLaunchesCard(
             )
             launches.forEach { l ->
                 RowWithImage(
-                    title = l.name ?: "Launch",
+                    title = l.name,
                     subtitle = l.status?.name ?: "",
-                    imageUrl = l.image?.imageUrl,
-                    fallbackText = l.name?.firstOrNull()?.uppercase() ?: "",
+                    imageUrl = l.imageUrl,
+                    fallbackText = l.name.firstOrNull()?.uppercase() ?: "",
                     onClick = { onLaunchClick?.invoke(l.id) }
                 )
             }
@@ -633,7 +633,7 @@ private fun InfoRow(label: String, value: String) {
 }
 
 @Composable
-private fun ProgramsCard(programs: List<ProgramNormal>) {
+private fun ProgramsCard(programs: List<ProgramSummary>) {
     val useUtc = LocalUseUtc.current
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         programs.forEach { program ->
@@ -657,7 +657,7 @@ private fun ProgramsCard(programs: List<ProgramNormal>) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         // Program image if available
-                        program.image?.imageUrl?.let { imageUrl ->
+                        program.imageUrl?.let { imageUrl ->
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
@@ -720,31 +720,6 @@ private fun ProgramsCard(programs: List<ProgramNormal>) {
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             lineHeight = 20.sp
-                        )
-                    }
-
-                    // Date range if available
-                    if (program.startDate != null || program.endDate != null) {
-                        val dateRange = buildString {
-                            program.startDate?.let { append(formatLaunchDateTime(it, useUtc)) }
-                            if (program.startDate != null && program.endDate != null) {
-                                append(" → ")
-                            }
-                            program.endDate?.let { append(formatLaunchDateTime(it, useUtc)) }
-                        }
-                        Text(
-                            dateRange,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    // Agencies
-                    if (program.agencies.isNotEmpty()) {
-                        Text(
-                            "Agencies: ${program.agencies.joinToString(", ") { it.abbrev ?: it.name }}",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
