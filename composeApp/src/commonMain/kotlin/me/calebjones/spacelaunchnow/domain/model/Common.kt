@@ -19,6 +19,7 @@ data class Provider(
     val type: String?,
     val countryCode: String?,
     val logoUrl: String?,
+    val socialLogo: String?,
     val imageUrl: String?
 )
 

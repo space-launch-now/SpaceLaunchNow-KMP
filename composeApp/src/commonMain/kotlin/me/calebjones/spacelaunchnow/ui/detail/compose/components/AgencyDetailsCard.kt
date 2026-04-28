@@ -225,6 +225,7 @@ private fun AgencyDetailsCardPreview() {
                     type = "Government",
                     countryCode = "US",
                     logoUrl = null,
+                    socialLogo = null,
                     imageUrl = null
                 ),
                 providerDetail = ProviderDetail(

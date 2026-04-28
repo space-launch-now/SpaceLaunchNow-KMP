@@ -24,4 +24,10 @@ data class DataLayerSyncPayload(
     val entitlementActive: Boolean,
     val syncTimestamp: String,
     val phoneAppVersion: String,
+    /** When true, no agency/location filtering is applied (show all launches). */
+    val followAllLaunches: Boolean = true,
+    /** Agency IDs to filter by (LSP), or null/empty for no filter. */
+    val agencyIds: List<Int>? = null,
+    /** Location IDs to filter by, or null/empty for no filter. */
+    val locationIds: List<Int>? = null,
 )

@@ -6,12 +6,15 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -27,6 +30,9 @@ private data class PhoneSyncPayload(
     val entitlementActive: Boolean,
     val syncTimestamp: String,
     val phoneAppVersion: String,
+    val followAllLaunches: Boolean = true,
+    val agencyIds: List<Int>? = null,
+    val locationIds: List<Int>? = null,
 )
 
 @Serializable
@@ -53,6 +59,8 @@ interface PhoneDataLayerSync {
 class PhoneDataLayerService(
     private val context: Context,
     private val launchRepository: LaunchRepository,
+    private val notificationStateStorage: NotificationStateStorage,
+    private val launchFilterService: LaunchFilterService,
 ) : PhoneDataLayerSync {
 
     private val log = Logger.withTag("PhoneDataLayerService")
@@ -62,10 +70,20 @@ class PhoneDataLayerService(
     override suspend fun syncToWatch() {
         try {
             log.d { "Syncing launch data to watch" }
-            val result = launchRepository.getUpcomingLaunchesDomain(limit = 20)
+
+            // Read filter preferences from phone settings
+            val notificationState = notificationStateStorage.stateFlow.first()
+            val filterParams = launchFilterService.getFilterParams(notificationState)
+            log.d { "Wear sync filter params - followAll: ${notificationState.followAllLaunches}, agencyIds: ${filterParams.agencyIds}, locationIds: ${filterParams.locationIds}" }
+
+            val result = launchRepository.getUpcomingLaunchesNormalDomain(
+                limit = 20,
+                agencyIds = filterParams.agencyIds,
+                locationIds = filterParams.locationIds,
+            )
             val launchList = result.getOrThrow()
 
-            val syncLaunches = launchList.results.map { it.toSyncLaunch() }
+            val syncLaunches = launchList.data.results.map { it.toSyncLaunch() }
 
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             val payload = PhoneSyncPayload(
@@ -73,6 +91,9 @@ class PhoneDataLayerService(
                 entitlementActive = false, // Entitlement set separately via syncEntitlementToWatch()
                 syncTimestamp = Clock.System.now().toString(),
                 phoneAppVersion = packageInfo.versionName ?: "unknown",
+                followAllLaunches = notificationState.followAllLaunches,
+                agencyIds = filterParams.agencyIds,
+                locationIds = filterParams.locationIds,
             )
 
             val payloadJson = json.encodeToString(PhoneSyncPayload.serializer(), payload)
@@ -83,7 +104,7 @@ class PhoneDataLayerService(
             withContext(Dispatchers.IO) {
                 Tasks.await(dataClient.putDataItem(putDataReq))
             }
-            log.i { "Successfully synced ${syncLaunches.size} launches to watch" }
+            log.i { "Successfully synced ${syncLaunches.size} launches to watch (filtered: ${!notificationState.followAllLaunches})" }
         } catch (e: Exception) {
             log.e(e) { "Failed to sync launch data to watch" }
         }

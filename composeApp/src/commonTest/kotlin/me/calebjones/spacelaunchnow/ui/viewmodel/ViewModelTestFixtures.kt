@@ -34,6 +34,7 @@ internal fun sampleProvider(
     type = "Commercial",
     countryCode = "US",
     logoUrl = null,
+    socialLogo = null,
     imageUrl = null
 )
 

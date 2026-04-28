@@ -198,6 +198,11 @@ class MainApplication : Application() {
                 wearPusher.start()
                 log.d { "✅ WearEntitlementPusher started" }
 
+                // Step 6: Start Wear OS filter sync pusher (re-syncs launches when user changes filters)
+                val wearFilterPusher = getKoin().get<me.calebjones.spacelaunchnow.sync.WearFilterSyncPusher>()
+                wearFilterPusher.start()
+                log.d { "✅ WearFilterSyncPusher started" }
+
                 log.i { "🎉 All billing and subscription systems initialized" }
             } catch (e: Exception) {
                 log.e(e) { "❌ Failed to initialize Billing/Subscription system" }

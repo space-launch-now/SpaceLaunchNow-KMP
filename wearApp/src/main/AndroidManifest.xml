@@ -38,8 +38,17 @@
                 android:value="SHORT_TEXT,LONG_TEXT,RANGED_VALUE" />
             <meta-data
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
-                android:value="300" />
+                android:value="1800" />
         </service>
+
+        <!-- Receives AlarmManager broadcasts to force rapid complication refresh (<1 hr countdown) -->
+        <receiver
+            android:name=".complication.ComplicationUpdateReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="me.calebjones.spacelaunchnow.wear.ACTION_UPDATE_COMPLICATION" />
+            </intent-filter>
+        </receiver>
 
         <!-- Tile Service -->
         <service

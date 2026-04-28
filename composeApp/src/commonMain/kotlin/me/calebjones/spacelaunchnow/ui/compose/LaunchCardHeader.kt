@@ -46,7 +46,6 @@ import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.time.Instant
 
 @Composable
 private fun AgencyLogoShimmer(logoSize: Dp) {
@@ -126,9 +125,9 @@ fun LaunchCardHeaderOverlay(
         verticalAlignment = Alignment.Top,
     ) {
         // Circular Agency Logo (if enabled and available) - always top-aligned
-        if (showAgencyLogo && launch.provider.logoUrl != null) {
+        if (showAgencyLogo && launch.provider.socialLogo != null) {
             SubcomposeAsyncImage(
-                model = launch.provider.logoUrl,
+                model = launch.provider.socialLogo,
                 contentDescription = "Agency Logo",
                 modifier = Modifier
                     .size(logoSize)

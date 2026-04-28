@@ -18,6 +18,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -25,7 +26,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.wear.data.model.CachedLaunch
 import me.calebjones.spacelaunchnow.wear.data.model.DataLayerSyncPayload
@@ -76,6 +76,16 @@ private data class ApiImage(
     @SerialName("thumbnail_url") val thumbnailUrl: String? = null,
 )
 
+/**
+ * Persisted filter preferences synced from the phone app.
+ */
+@Serializable
+private data class WatchFilterPreferences(
+    val followAllLaunches: Boolean = true,
+    val agencyIds: List<Int>? = null,
+    val locationIds: List<Int>? = null,
+)
+
 class WatchLaunchRepositoryImpl(
     private val context: Context,
     private val dataStore: DataStore<Preferences>,
@@ -95,6 +105,7 @@ class WatchLaunchRepositoryImpl(
         private const val LL_API_BASE_URL = "https://ll.thespacedevs.com/2.4.0/launches/upcoming/"
         private const val PATH_SYNC = "/spacelaunchnow/sync"
         val LAUNCH_CACHE_KEY = stringPreferencesKey("launch_cache_json")
+        val FILTER_PREFS_KEY = stringPreferencesKey("watch_filter_prefs_json")
     }
 
     override val launches: Flow<List<CachedLaunch>> = dataStore.data.map { prefs ->
@@ -146,14 +157,23 @@ class WatchLaunchRepositoryImpl(
     private suspend fun tryDirectApi(limit: Int): List<CachedLaunch>? {
         return try {
             log.d { "Tier 1: Attempting direct API call" }
+            val filterPrefs = loadFilterPreferences()
             val response = httpClient.get(LL_API_BASE_URL) {
                 parameter("limit", limit)
                 parameter("mode", "list")
                 parameter("format", "json")
+                if (!filterPrefs.followAllLaunches) {
+                    filterPrefs.agencyIds?.takeIf { it.isNotEmpty() }?.let {
+                        parameter("lsp__id", it.joinToString(","))
+                    }
+                    filterPrefs.locationIds?.takeIf { it.isNotEmpty() }?.let {
+                        parameter("location__ids", it.joinToString(","))
+                    }
+                }
             }
             val apiResponse = response.body<ApiLaunchListResponse>()
             val launches = apiResponse.results.mapNotNull { it.toCachedLaunch() }
-            log.i { "Tier 1 SUCCESS: Fetched ${launches.size} launches via direct API" }
+            log.i { "Tier 1 SUCCESS: Fetched ${launches.size} launches via direct API (filtered: ${!filterPrefs.followAllLaunches})" }
             updateCache(launches, DataSource.DIRECT_API)
             launches
         } catch (e: Exception) {
@@ -182,6 +202,12 @@ class WatchLaunchRepositoryImpl(
                             val payload = json.decodeFromString<DataLayerSyncPayload>(
                                 payloadBytes.decodeToString()
                             )
+                            // Persist filter preferences from phone for use in direct API calls
+                            saveFilterPreferences(WatchFilterPreferences(
+                                followAllLaunches = payload.followAllLaunches,
+                                agencyIds = payload.agencyIds,
+                                locationIds = payload.locationIds,
+                            ))
                             val launches = payload.launches.mapNotNull { syncLaunch ->
                                 try {
                                     CachedLaunch(
@@ -203,7 +229,7 @@ class WatchLaunchRepositoryImpl(
                                     null
                                 }
                             }
-                            log.i { "Tier 2 SUCCESS: Read ${launches.size} launches from DataLayer" }
+                            log.i { "Tier 2 SUCCESS: Read ${launches.size} launches from DataLayer (filtered: ${!payload.followAllLaunches})" }
                             updateCache(launches, DataSource.PHONE_SYNC)
                             launches
                         } else null
@@ -254,6 +280,26 @@ class WatchLaunchRepositoryImpl(
         )
         dataStore.edit { prefs ->
             prefs[LAUNCH_CACHE_KEY] = json.encodeToString(WatchLaunchCache.serializer(), cache)
+        }
+    }
+
+    private suspend fun loadFilterPreferences(): WatchFilterPreferences {
+        return try {
+            val prefs = dataStore.data.first()
+            val json = prefs[FILTER_PREFS_KEY] ?: return WatchFilterPreferences()
+            this.json.decodeFromString<WatchFilterPreferences>(json)
+        } catch (e: Exception) {
+            WatchFilterPreferences()
+        }
+    }
+
+    private suspend fun saveFilterPreferences(filterPrefs: WatchFilterPreferences) {
+        try {
+            dataStore.edit { prefs ->
+                prefs[FILTER_PREFS_KEY] = json.encodeToString(WatchFilterPreferences.serializer(), filterPrefs)
+            }
+        } catch (e: Exception) {
+            log.w(e) { "Failed to save filter preferences" }
         }
     }
 }

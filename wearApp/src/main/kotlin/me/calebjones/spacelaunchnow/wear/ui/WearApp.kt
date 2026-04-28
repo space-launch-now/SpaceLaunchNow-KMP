@@ -26,7 +26,7 @@ import org.koin.compose.koinInject
 private val log = Logger.withTag("WearApp")
 
 @Composable
-fun WearApp() {
+fun WearApp(deepLinkLaunchId: String? = null) {
     val entitlementSyncManager = koinInject<EntitlementSyncManager>()
     val entitlement by entitlementSyncManager.entitlementState.collectAsState(
         initial = null
@@ -56,6 +56,12 @@ fun WearApp() {
         navController.navigate(target) {
             popUpTo(navController.graph.startDestinationId) { inclusive = true }
             launchSingleTop = true
+        }
+
+        // If launched from a complication tap, deep-link straight to the launch detail
+        if (resolvedEntitlement.hasWearOs && deepLinkLaunchId != null) {
+            log.i { "Deep-linking to launch detail: $deepLinkLaunchId" }
+            navController.navigate("launch_detail/$deepLinkLaunchId")
         }
     }
 

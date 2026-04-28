@@ -2,21 +2,26 @@ package me.calebjones.spacelaunchnow.wear.ui.premium
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
@@ -25,6 +30,7 @@ import androidx.wear.remote.interactions.RemoteActivityHelper
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.wear.R
 
 @Composable
 fun PremiumGateScreen() {
@@ -39,9 +45,10 @@ fun PremiumGateScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(
-                text = "🚀",
-                style = MaterialTheme.typography.displayMedium,
+            Image(
+                painter = painterResource(id = R.mipmap.ic_launcher),
+                contentDescription = null,
+                modifier = Modifier.size(52.dp).clip(CircleShape),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -63,7 +70,13 @@ fun PremiumGateScreen() {
                     }
                 },
                 modifier = Modifier.fillMaxWidth(0.8f),
-                label = { Text("Open on Phone") },
+                label = {
+                    Text(
+                        text = "Open App",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                    )
+                },
             )
         }
     }
@@ -75,7 +88,7 @@ private suspend fun openPaywallOnPhone(context: Context) {
         val remoteActivityHelper = RemoteActivityHelper(context)
         val intent = Intent(Intent.ACTION_VIEW)
             .addCategory(Intent.CATEGORY_BROWSABLE)
-            .setData(Uri.parse("https://spacelaunchnow.app/premium"))
+            .setData("spacelaunchnow://premium".toUri())
         remoteActivityHelper.startRemoteActivity(intent).await()
         log.i { "Opened paywall on phone" }
     } catch (e: Exception) {

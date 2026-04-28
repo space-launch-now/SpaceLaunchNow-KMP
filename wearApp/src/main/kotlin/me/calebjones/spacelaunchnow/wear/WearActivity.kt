@@ -28,9 +28,10 @@ class WearActivity : ComponentActivity(), DataClient.OnDataChangedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val deepLinkLaunchId = intent?.getStringExtra(EXTRA_LAUNCH_ID)
         setContent {
             WearTheme {
-                WearApp()
+                WearApp(deepLinkLaunchId = deepLinkLaunchId)
             }
         }
     }
@@ -77,6 +78,7 @@ class WearActivity : ComponentActivity(), DataClient.OnDataChangedListener {
     }
 
     companion object {
+        const val EXTRA_LAUNCH_ID = "extra_launch_id"
         private const val PATH_ENTITLEMENT = "/spacelaunchnow/entitlement"
         private const val KEY_ACTIVE = "active"
         private const val KEY_EXPIRES_AT = "expiresAt"

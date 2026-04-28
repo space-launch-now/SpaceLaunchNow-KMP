@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.wear.tile
 
+import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.sp
@@ -34,6 +35,9 @@ class NextLaunchTileService : TileService() {
     override fun onTileRequest(requestParams: RequestBuilders.TileRequest): ListenableFuture<TileBuilders.Tile> {
         return serviceScope.future {
             try {
+                // Always refresh data on tile request (handles caching internally)
+                watchLaunchRepository.refreshLaunches()
+
                 val isPremium = entitlementSyncManager.isWearOsPremium()
                 val layout = if (!isPremium) {
                     buildFreeUserLayout()
@@ -106,6 +110,8 @@ class NextLaunchTileService : TileService() {
             .addContent(buildText(countdownText, 20f, TEXT_COLOR_ACCENT))
             .addContent(buildSpacer(4f))
             .addContent(buildText(locationText, 10f, TEXT_COLOR_SECONDARY))
+            .addContent(buildSpacer(8f))
+            .addContent(buildRefreshButton())
             .build()
     }
 
@@ -146,6 +152,34 @@ class NextLaunchTileService : TileService() {
             .addContent(buildText("Space Launch Now", 14f, TEXT_COLOR_PRIMARY))
             .addContent(buildSpacer(8f))
             .addContent(buildText("No upcoming launches", 14f, TEXT_COLOR_SECONDARY))
+            .addContent(buildSpacer(8f))
+            .addContent(buildRefreshButton())
+            .build()
+    }
+
+    private fun buildRefreshButton(): LayoutElementBuilders.LayoutElement {
+        return LayoutElementBuilders.Box.Builder()
+            .setWidth(wrap())
+            .setHeight(wrap())
+            .setModifiers(
+                ModifiersBuilders.Modifiers.Builder()
+                    .setClickable(
+                        ModifiersBuilders.Clickable.Builder()
+                            .setId(ACTION_REFRESH)
+                            .setOnClick(ActionBuilders.LoadAction.Builder().build())
+                            .build()
+                    )
+                    .setPadding(
+                        ModifiersBuilders.Padding.Builder()
+                            .setTop(dp(4f))
+                            .setBottom(dp(4f))
+                            .setStart(dp(12f))
+                            .setEnd(dp(12f))
+                            .build()
+                    )
+                    .build()
+            )
+            .addContent(buildText("↻ Refresh", 11f, TEXT_COLOR_SECONDARY))
             .build()
     }
 
@@ -223,10 +257,10 @@ class NextLaunchTileService : TileService() {
         val minutes = totalMinutes % 60
 
         return when {
-            hours >= 24 -> "T-${hours / 24}d ${hours % 24}h"
-            hours > 0 -> "T-${hours}h ${minutes}m"
-            minutes > 0 -> "T-${minutes}m"
-            else -> "T-0"
+            hours >= 24 -> "T-${hours / 24}D ${hours % 24}H"
+            hours > 0   -> "T-${hours}H ${minutes}M"
+            minutes > 0 -> "T-${minutes}M"
+            else        -> "T-0"
         }
     }
 
@@ -236,5 +270,6 @@ class NextLaunchTileService : TileService() {
         private const val TEXT_COLOR_PRIMARY = 0xFFFFFFFF.toInt()
         private const val TEXT_COLOR_SECONDARY = 0xB3FFFFFF.toInt()
         private const val TEXT_COLOR_ACCENT = 0xFF80CBFF.toInt()
+        private const val ACTION_REFRESH = "action_refresh"
     }
 }

@@ -4,6 +4,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.DockingEventForChaserNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.FirstStageNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.InfoURL
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
@@ -15,13 +16,16 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightSerial
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.RocketDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.DockingEventForChaserNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightDetailedSerializerNoLaunch
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
+import me.calebjones.spacelaunchnow.domain.model.CrewMemberSummary
+import me.calebjones.spacelaunchnow.domain.model.DockingLocationRef
 import me.calebjones.spacelaunchnow.domain.model.InfoLink
 import me.calebjones.spacelaunchnow.domain.model.LandingAttemptSummary
 import me.calebjones.spacelaunchnow.domain.model.LandingLocationSummary
+import me.calebjones.spacelaunchnow.domain.model.LandingTypeSummary
 import me.calebjones.spacelaunchnow.domain.model.LauncherSummary
 import me.calebjones.spacelaunchnow.domain.model.Location
 import me.calebjones.spacelaunchnow.domain.model.MissionPatchSummary
@@ -31,28 +35,24 @@ import me.calebjones.spacelaunchnow.domain.model.ProgramSummary
 import me.calebjones.spacelaunchnow.domain.model.Provider
 import me.calebjones.spacelaunchnow.domain.model.ProviderDetail
 import me.calebjones.spacelaunchnow.domain.model.RocketConfig
+import me.calebjones.spacelaunchnow.domain.model.RocketDetail
 import me.calebjones.spacelaunchnow.domain.model.RocketFamily
 import me.calebjones.spacelaunchnow.domain.model.RocketManufacturer
-import me.calebjones.spacelaunchnow.domain.model.RocketDetail
 import me.calebjones.spacelaunchnow.domain.model.RocketStage
-import me.calebjones.spacelaunchnow.domain.model.DockingLocationRef
-import me.calebjones.spacelaunchnow.domain.model.LandingTypeSummary
+import me.calebjones.spacelaunchnow.domain.model.SpaceStationRef
 import me.calebjones.spacelaunchnow.domain.model.SpacecraftDockingEventSummary
-import me.calebjones.spacelaunchnow.domain.model.CrewMemberSummary
 import me.calebjones.spacelaunchnow.domain.model.SpacecraftFlightSummary
 import me.calebjones.spacelaunchnow.domain.model.SpacecraftFlightVehicle
 import me.calebjones.spacelaunchnow.domain.model.SpacecraftLandingSummary
 import me.calebjones.spacelaunchnow.domain.model.SpacecraftStatus
-import me.calebjones.spacelaunchnow.domain.model.SpaceStationRef
 import me.calebjones.spacelaunchnow.domain.model.TimelineEntry
+import me.calebjones.spacelaunchnow.domain.model.UpdateEventRef
 import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.domain.model.LaunchStatus as DomainLaunchStatus
 import me.calebjones.spacelaunchnow.domain.model.Mission as DomainMission
 import me.calebjones.spacelaunchnow.domain.model.NetPrecision as DomainNetPrecision
 import me.calebjones.spacelaunchnow.domain.model.Orbit as DomainOrbit
 import me.calebjones.spacelaunchnow.domain.model.Update as DomainUpdate
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
-import me.calebjones.spacelaunchnow.domain.model.UpdateEventRef
 
 // --- Agency / Provider mappers ---
 
@@ -63,6 +63,7 @@ fun AgencyMini.toDomain(): Provider = Provider(
     type = type?.name,
     countryCode = null,
     logoUrl = null,
+    socialLogo = null,
     imageUrl = null
 )
 
@@ -73,6 +74,7 @@ fun AgencyNormal.toDomain(): Provider = Provider(
     type = type?.name,
     countryCode = country.firstOrNull()?.toCountryCode(),
     logoUrl = logo?.imageUrl,
+    socialLogo = socialLogo?.imageUrl,
     imageUrl = image?.imageUrl
 )
 
@@ -82,8 +84,10 @@ fun AgencyDetailed.toDomain(): Provider = Provider(
     abbrev = abbrev,
     type = type?.name,
     countryCode = country.firstOrNull()?.toCountryCode(),
+    socialLogo = socialLogo?.imageUrl,
     logoUrl = logo?.imageUrl,
     imageUrl = image?.imageUrl
+
 )
 
 fun AgencyDetailed.toProviderDetail(): ProviderDetail = ProviderDetail(

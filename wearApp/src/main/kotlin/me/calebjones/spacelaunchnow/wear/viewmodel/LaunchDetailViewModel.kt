@@ -64,7 +64,7 @@ class LaunchDetailViewModel(
                 val remoteActivityHelper = RemoteActivityHelper(context)
                 val intent = Intent(Intent.ACTION_VIEW)
                     .addCategory(Intent.CATEGORY_BROWSABLE)
-                    .setData(Uri.parse("https://spacelaunchnow.app/launch/$launchId"))
+                    .setData(Uri.parse("spacelaunchnow://launch/$launchId"))
                 remoteActivityHelper.startRemoteActivity(intent).await()
                 log.i { "Opened launch $launchId on phone" }
             } catch (e: Exception) {

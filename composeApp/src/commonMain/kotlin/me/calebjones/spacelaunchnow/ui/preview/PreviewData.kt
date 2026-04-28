@@ -53,7 +53,8 @@ object PreviewData {
         type = "Commercial",
         countryCode = "US",
         logoUrl = "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/spacex_image_20190207032501.jpeg",
-        imageUrl = null
+        imageUrl = null,
+        socialLogo = null,
     )
 
     val domainProviderULA = Provider(
@@ -63,7 +64,8 @@ object PreviewData {
         type = "Commercial",
         countryCode = "US",
         logoUrl = null,
-        imageUrl = null
+        imageUrl = null,
+        socialLogo = null
     )
 
     val domainMissionStarlink = Mission(
