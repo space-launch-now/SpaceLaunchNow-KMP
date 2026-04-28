@@ -6,6 +6,7 @@ import me.calebjones.spacelaunchnow.data.model.Platform
 import me.calebjones.spacelaunchnow.data.model.PlatformPurchase
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductPricing
+import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 
 /**
@@ -148,6 +149,13 @@ class BillingClient(
     fun disconnect() {
         // BillingManager handles lifecycle - no-op here
     }
+
+    /**
+     * Restore previous purchases.
+     * Contacts the App Store / Play Store, fetches all transactions for the current account,
+     * and syncs them to RevenueCat. On iOS this may prompt for Apple ID credentials.
+     */
+    suspend fun restorePurchases(): Result<PurchaseState> = billingManager.restorePurchases()
 }
 
 /**

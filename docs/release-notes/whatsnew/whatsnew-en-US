@@ -1,4 +1,3 @@
 ### Bug Fixes
 
-* **ios:** prevent crash on cold-start notification tap
-* **ios:** use static no-op fallback logger and catch Throwable in ObjC-exported functions
+* purchase restoration functionality and initial pre-warm logic

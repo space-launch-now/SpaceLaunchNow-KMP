@@ -251,8 +251,10 @@ class SubscriptionViewModel(
      * Restore previous purchases
      */
     fun restorePurchases() {
+        log.i { "🔄 restorePurchases() called" }
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
+            log.i { "🔄 Calling repository.restorePurchases()..." }
 
             repository.restorePurchases().fold(
                 onSuccess = { state ->
