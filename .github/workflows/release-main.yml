@@ -246,15 +246,22 @@ jobs:
 
       - name: Commit version changes
         run: |
+          # Extract semver without build number for git tag
+          SEMVER=$(echo "${{ needs.version.outputs.version_name }}" | sed 's/-b[0-9]*$//')
+
+          # Check if this tag already exists on the remote (e.g. from a previous run attempt)
+          if git ls-remote --tags origin "refs/tags/v${SEMVER}" | grep -q "v${SEMVER}"; then
+            echo "✅ Tag v${SEMVER} already exists on remote — skipping commit, tag and push (idempotent re-run)"
+            exit 0
+          fi
+
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git add version.properties CHANGELOG.md docs/release-notes/
           git commit -m "chore(release): bump version to ${{ needs.version.outputs.version_name }} [skip ci]"
 
-          # Extract semver without build number for git tag
-          SEMVER=$(echo "${{ needs.version.outputs.version_name }}" | sed 's/-b[0-9]*$//')
           git tag -a "v${SEMVER}" -m "Release ${{ needs.version.outputs.version_name }}"
-          
+
           # Push both commit and tag
           git push origin HEAD:${{ github.ref_name }}
           git push origin "v${SEMVER}"
