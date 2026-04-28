@@ -1,3 +1,3 @@
 ### Bug Fixes
 
-* Enhance Wear OS app with versioning, ProGuard rules, and manifest updates
+* disable minification for release build in wear app

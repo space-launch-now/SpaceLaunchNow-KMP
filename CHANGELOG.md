@@ -1,3 +1,12 @@
+## [5.28.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.1...v5.28.2) (2026-04-28)
+
+
+### Bug Fixes
+
+* disable minification for release build in wear app ([67ae2c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/67ae2c67136280f655b55c9d1569a340c28015cf))
+
+
+
 ## [5.28.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.0...v5.28.1) (2026-04-28)
 
 
@@ -45,21 +54,6 @@
 ### Bug Fixes
 
 * update in-flight launch retrieval to filter out stale entries ([e9deff0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9deff0f8f5703745880da95f6e437e66cddd30e))
-
-
-
-# [5.27.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.26.1...v5.27.0) (2026-04-14)
-
-
-### Bug Fixes
-
-* change navigation and ad placement ([3c055db](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3c055dbe9048b0522e0245d46f99b76e9a43ff83))
-* enhance analytics tracking for FlightClub referrals ([88acaef](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/88acaef8eae735836ad7f174cb28001b9cc138a2))
-
-
-### Features
-
-* reduce api calls and increase caching ([e2290ea](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e2290ea42684c39a074e22be38876a1b6be2253a))
 
 
 
