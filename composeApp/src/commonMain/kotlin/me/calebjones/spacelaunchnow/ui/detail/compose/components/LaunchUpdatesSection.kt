@@ -15,8 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Update
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.ui.home.components.UpdateCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
@@ -28,7 +27,7 @@ import kotlin.time.Duration.Companion.minutes
  * Displays a vertical list of launch updates with expandable show more/less functionality
  * Shows the last 5 updates initially with option to expand to all updates
  *
- * Uses the existing UpdateCard component by converting Update to UpdateEndpoint
+ * Uses the shared UpdateCard component.
  */
 @Composable
 fun LaunchUpdatesSection(
@@ -37,10 +36,9 @@ fun LaunchUpdatesSection(
 ) {
     var showAll by remember { mutableStateOf(false) }
 
-    // Sort by newest first and convert to UpdateEndpoint
+    // Sort by newest first
     val sortedUpdates = remember(updates) {
         updates.sortedByDescending { it.createdOn }
-            .map { it.toUpdateEndpoint() }
     }
 
     Column(
@@ -88,24 +86,6 @@ fun LaunchUpdatesSection(
             }
         }
     }
-}
-
-/**
- * Convert Update to UpdateEndpoint for use with existing UpdateCard component
- * Update doesn't have launch/event/program references, so those are null
- */
-private fun Update.toUpdateEndpoint(): UpdateEndpoint {
-    return UpdateEndpoint(
-        id = this.id,
-        profileImage = this.profileImage,
-        comment = this.comment,
-        infoUrl = this.infoUrl,
-        createdBy = this.createdBy,
-        launch = null,
-        event = null,
-        program = null,
-        createdOn = this.createdOn
-    )
 }
 
 // region Preview Data

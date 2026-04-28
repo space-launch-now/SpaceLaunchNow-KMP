@@ -32,6 +32,7 @@ Built with **Compose Multiplatform** and powered by [The Space Devs](https://the
 - **Space News & Events** &mdash; Stay up to date with the latest happenings in spaceflight
 - **Push Notifications** &mdash; Get alerts before launches you care about
 - **iOS & Android Widgets** &mdash; Glanceable launch info right on your home screen
+- **Wear OS** &mdash; Complications, tiles, and companion app for Wear OS watches (premium)
 - **Dark Mode** &mdash; Full light and dark theme support
 - **Multiplatform** &mdash; Android, iOS, and Desktop from a single codebase
 
@@ -44,6 +45,7 @@ composeApp/
 │   ├── androidMain/    # Android-specific integrations
 │   ├── iosMain/        # iOS-specific integrations
 │   └── desktopMain/    # Desktop (JVM) entry point
+wearApp/                # Wear OS companion app (standalone Android)
 iosApp/                 # Xcode project, widgets, notifications
 docs/                   # Architecture, CI/CD, and integration docs
 ```
@@ -88,6 +90,10 @@ cp .env.example .env
 # Android
 ./gradlew installDebug
 
+# Wear OS
+./gradlew :wearApp:installDebug
+# Requires a Wear OS emulator (API 30+) or device
+
 # Desktop
 ./gradlew desktopRun
 
@@ -104,6 +110,7 @@ open iosApp/iosApp.xcodeproj
 | Path | Description |
 |------|-------------|
 | `composeApp/` | Shared Kotlin + Compose Multiplatform code |
+| `wearApp/` | Wear OS standalone companion app (minSdk 30) |
 | `iosApp/` | Native iOS entry point, widgets, and notifications |
 | `iosApp/LaunchWidget/` | iOS WidgetKit extension for home screen widgets |
 | `docs/` | Architecture, CI/CD, billing, and integration docs |

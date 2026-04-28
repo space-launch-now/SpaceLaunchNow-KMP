@@ -43,7 +43,8 @@ actual class GlobalAdManager actual constructor(
     // Interstitial ad tracking for detailed views
     private var detailViewVisitCount = 0
     private var lastInterstitialShownAt = 0L
-    private val minInterstitialInterval = 300_000L // 5 minutes minimum between interstitials
+    private val minInterstitialInterval = 120_000L // 2 minutes minimum between interstitials
+    private val visitsBeforeInterstitial = 6 // Show interstitial every 6th visit
 
     // Ad configuration cache for faster setup
     private val adConfigurations = mutableMapOf<AdSize, AdConfig>()
@@ -243,12 +244,13 @@ actual class GlobalAdManager actual constructor(
 
     /**
      * Should show interstitial ad when entering detail view?
-     * Shows every 4th visit with minimum 30-second interval
+     * Shows every Nth visit (configurable via visitsBeforeInterstitial) with minimum
+     * time interval between ads (minInterstitialInterval).
      */
     actual fun shouldShowInterstitialOnDetailView(): Boolean {
         detailViewVisitCount++
 
-        val shouldShowByCount = detailViewVisitCount % 4 == 0
+        val shouldShowByCount = detailViewVisitCount % visitsBeforeInterstitial == 0
         val currentTime = System.now().toEpochMilliseconds()
         val enoughTimeElapsed = (currentTime - lastInterstitialShownAt) >= minInterstitialInterval
 

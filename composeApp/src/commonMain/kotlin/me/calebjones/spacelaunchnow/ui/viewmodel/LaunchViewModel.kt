@@ -5,20 +5,20 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.cache.LaunchCache
+import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Agency
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 
 class LaunchViewModel(
@@ -26,20 +26,21 @@ class LaunchViewModel(
     private val launchCache: LaunchCache,
     private val articlesRepository: ArticlesRepository,
     private val eventsRepository: EventsRepository,
+    private val agencyRepository: AgencyRepository,
     private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
-    private val _upcomingLaunches = MutableStateFlow<PaginatedLaunchBasicList?>(null)
-    val upcomingLaunches: StateFlow<PaginatedLaunchBasicList?> = _upcomingLaunches
+    private val _upcomingLaunches = MutableStateFlow<PaginatedResult<Launch>?>(null)
+    val upcomingLaunches: StateFlow<PaginatedResult<Launch>?> = _upcomingLaunches
 
-    private val _upcomingLaunchesNormal = MutableStateFlow<PaginatedLaunchNormalList?>(null)
-    val upcomingLaunchesNormal: StateFlow<PaginatedLaunchNormalList?> = _upcomingLaunchesNormal
+    private val _upcomingLaunchesNormal = MutableStateFlow<PaginatedResult<Launch>?>(null)
+    val upcomingLaunchesNormal: StateFlow<PaginatedResult<Launch>?> = _upcomingLaunchesNormal
 
-    private val _launchDetails = MutableStateFlow<LaunchDetailed?>(null)
-    val launchDetails: StateFlow<LaunchDetailed?> = _launchDetails
+    private val _launchDetails = MutableStateFlow<Launch?>(null)
+    val launchDetails: StateFlow<Launch?> = _launchDetails
 
-    private val _agencyDataMap = MutableStateFlow<Map<Int, AgencyEndpointDetailed>>(emptyMap())
-    val agencyDataMap: StateFlow<Map<Int, AgencyEndpointDetailed>> = _agencyDataMap
+    private val _agencyDataMap = MutableStateFlow<Map<Int, Agency>>(emptyMap())
+    val agencyDataMap: StateFlow<Map<Int, Agency>> = _agencyDataMap
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -62,8 +63,8 @@ class LaunchViewModel(
     val newsError: StateFlow<String?> = _newsError
 
     // Related Events State
-    private val _relatedEvents = MutableStateFlow<List<EventEndpointNormal>>(emptyList())
-    val relatedEvents: StateFlow<List<EventEndpointNormal>> = _relatedEvents
+    private val _relatedEvents = MutableStateFlow<List<Event>>(emptyList())
+    val relatedEvents: StateFlow<List<Event>> = _relatedEvents
 
     private val _isEventsLoading = MutableStateFlow(false)
     val isEventsLoading: StateFlow<Boolean> = _isEventsLoading
@@ -99,7 +100,7 @@ class LaunchViewModel(
 
     fun fetchUpcomingLaunchesNormal(limit: Int) {
         viewModelScope.launch {
-            val result = repository.getUpcomingLaunchesNormal(limit = limit)
+            val result = repository.getUpcomingLaunchesNormalDomain(limit = limit)
 
             result.onSuccess { dataResult ->
                 _upcomingLaunchesNormal.value = dataResult.data
@@ -116,17 +117,17 @@ class LaunchViewModel(
 
             // Check if we have detailed data in cache first (unless forcing refresh)
             if (!forceRefresh) {
-                val cachedDetailed = launchCache.getCachedLaunchDetailed(id)
-                if (cachedDetailed != null) {
-                    _launchDetails.value = cachedDetailed
-                    updateVideoPlayerState(cachedDetailed)
+                val cachedLaunch = launchCache.getCachedLaunch(id)
+                if (cachedLaunch != null) {
+                    _launchDetails.value = cachedLaunch
+                    updateVideoPlayerState(cachedLaunch)
                     _isLoading.value = false
                     return@launch
                 }
             }
 
             // Stale-while-revalidate: Check for stale data to display while fetching
-            val staleData = repository.getStaleDetailedLaunch(id)
+            val staleData = repository.getStaleDetailedLaunch(id)?.toDomain()
             if (staleData != null) {
                 // We have stale data - show it immediately while refreshing
                 _launchDetails.value = staleData
@@ -138,13 +139,13 @@ class LaunchViewModel(
                 _isLoading.value = true
             }
 
-            val result = repository.getLaunchDetails(id, forceRefresh = forceRefresh)
+            val result = repository.getLaunchDetailDomain(id, forceRefresh = forceRefresh)
             result.onSuccess { launch ->
                 _launchDetails.value = launch
                 updateVideoPlayerState(launch)
                 // Cache the detailed data for future use
-                launchCache.cacheLaunchDetailed(launch)
-                analyticsManager.track(AnalyticsEvent.LaunchViewed(launch.id.toString(), launch.name ?: "Unknown"))
+                launchCache.cacheLaunch(launch)
+                analyticsManager.track(AnalyticsEvent.LaunchViewed(launch.id, launch.name))
             }.onFailure { exception ->
                 // Only show error if we don't have any data to display
                 if (_launchDetails.value == null) {
@@ -167,9 +168,9 @@ class LaunchViewModel(
     /**
      * Set launch details directly (used when we have preloaded data)
      */
-    fun setLaunchDetails(launchDetailed: LaunchDetailed) {
-        _launchDetails.value = launchDetailed
-        updateVideoPlayerState(launchDetailed)
+    fun setLaunchDetails(launch: Launch) {
+        _launchDetails.value = launch
+        updateVideoPlayerState(launch)
         _error.value = null
         _isLoading.value = false
     }
@@ -187,8 +188,8 @@ class LaunchViewModel(
      * Get cached launch normal data if available. This can be used by the UI
      * to show basic information while detailed data is being fetched.
      */
-    fun getCachedLaunchNormal(id: String): LaunchNormal? {
-        return launchCache.getCachedLaunchNormal(id)
+    fun getCachedLaunch(id: String): Launch? {
+        return launchCache.getCachedLaunch(id)
     }
 
     fun fetchAgencyData(agencyId: Int) {
@@ -198,7 +199,7 @@ class LaunchViewModel(
                 return@launch
             }
 
-            val result = repository.getAgencyDetails(agencyId)
+            val result = agencyRepository.getAgencyDetailDomain(agencyId)
             result.onSuccess { agencyData ->
                 _agencyDataMap.value = _agencyDataMap.value.toMutableMap().apply {
                     put(agencyId, agencyData)
@@ -211,7 +212,7 @@ class LaunchViewModel(
 
     // Video Player State Management
 
-    private fun updateVideoPlayerState(launch: LaunchDetailed) {
+    private fun updateVideoPlayerState(launch: Launch) {
         val youTubeVideos = launch.vidUrls
 
         _videoPlayerState.value = _videoPlayerState.value.copy(
@@ -251,7 +252,7 @@ class LaunchViewModel(
     /**
      * Get the currently selected video
      */
-    fun getCurrentVideo(): VidURL? {
+    fun getCurrentVideo(): VideoLink? {
         val state = _videoPlayerState.value
         return if (state.selectedVideoIndex < state.availableVideos.size) {
             state.availableVideos[state.selectedVideoIndex]
@@ -311,14 +312,14 @@ class LaunchViewModel(
             _isEventsLoading.value = true
             _eventsError.value = null
 
-            val result = eventsRepository.getEventsByLaunchId(
+            val result = eventsRepository.getEventsByLaunchIdDomain(
                 launchId = launchId,
                 limit = limit
             )
 
-            result.onSuccess { paginatedList ->
-                print("Related events size: ${paginatedList.results.size}")
-                _relatedEvents.value = paginatedList.results
+            result.onSuccess { paginatedResult ->
+                print("Related events size: ${paginatedResult.results.size}")
+                _relatedEvents.value = paginatedResult.results
             }.onFailure { exception ->
                 print("Error fetching related events: ${exception.message}")
                 _eventsError.value = exception.message

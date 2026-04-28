@@ -38,8 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
-import me.calebjones.spacelaunchnow.ui.components.AgencyChip
+import me.calebjones.spacelaunchnow.domain.model.Mission
 import me.calebjones.spacelaunchnow.ui.components.InfoChip
 
 @Composable
@@ -108,7 +107,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                 }
             }
             Text(
-                text = mission.name,
+                text = mission.name ?: "Unknown Mission",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -117,7 +116,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // Tag chips row for type and orbit
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    mission.type.takeIf { it.isNotBlank() }?.let { type ->
+                    mission.type?.takeIf { it.isNotBlank() }?.let { type ->
                         item { InfoChip(icon = Icons.Filled.Category, text = type) }
                     }
                     mission.orbit?.name?.takeIf { it.isNotBlank() }?.let { orbitName ->
@@ -145,25 +144,6 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                             TextButton(onClick = { expanded = !expanded }) {
                                 Text(if (expanded) "Read less" else "Read more")
                             }
-                        }
-                    }
-                }
-
-                // Agencies chips (if present)
-                if (mission.agencies.isNotEmpty()) {
-                    Text(
-                        text = "Agencies",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        mission.agencies.forEach { agency ->
-                            AgencyChip(agency = agency)
                         }
                     }
                 }

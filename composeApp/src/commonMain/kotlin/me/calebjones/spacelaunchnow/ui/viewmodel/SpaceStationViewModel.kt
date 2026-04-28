@@ -12,15 +12,13 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.apis.ArticlesApi
 import me.calebjones.spacelaunchnow.api.snapi.extensions.searchArticles
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURLType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Language
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
+import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
+import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.AppSecrets
 import me.calebjones.spacelaunchnow.util.LatLng
@@ -63,12 +61,12 @@ class SpaceStationViewModel(
     }
 
     // Station details from Launch Library
-    private val _stationDetails = MutableStateFlow<SpaceStationDetailedEndpoint?>(null)
-    val stationDetails: StateFlow<SpaceStationDetailedEndpoint?> = _stationDetails
+    private val _stationDetails = MutableStateFlow<SpaceStationDetail?>(null)
+    val stationDetails: StateFlow<SpaceStationDetail?> = _stationDetails
 
     // Active expedition details with crew information
-    private val _activeExpeditions = MutableStateFlow<List<ExpeditionDetailed>>(emptyList())
-    val activeExpeditions: StateFlow<List<ExpeditionDetailed>> = _activeExpeditions
+    private val _activeExpeditions = MutableStateFlow<List<ExpeditionDetailItem>>(emptyList())
+    val activeExpeditions: StateFlow<List<ExpeditionDetailItem>> = _activeExpeditions
 
     // ISS live position with full data
     private val _issPositionData = MutableStateFlow<IssPositionData?>(null)
@@ -226,17 +224,14 @@ class SpaceStationViewModel(
                 log.w { "No live stream found, using fallback: $videoUrl" }
             }
             
-            val nasaLiveStream = VidURL(
+            val nasaLiveStream = VideoLink(
                 url = videoUrl,
-                type = VidURLType(id = 1, name = "Official"),
-                language = Language(id = 1, name = "English", code = "en"),
-                priority = 0,
-                source = "NASA",
-                publisher = "NASA",
                 title = videoTitle,
+                source = "NASA",
                 description = "Live HD views of Earth from the International Space Station",
                 featureImage = thumbnailUrl,
-                live = true
+                live = true,
+                priority = 0
             )
             _videoPlayerState.value = VideoPlayerState(
                 availableVideos = listOf(nasaLiveStream),

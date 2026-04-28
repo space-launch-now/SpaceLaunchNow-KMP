@@ -24,6 +24,9 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
@@ -49,7 +52,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getUpcomingLaunchesList(limit: Int): Result<PaginatedLaunchBasicList> {
+    private suspend fun getUpcomingLaunchesList(limit: Int): Result<PaginatedLaunchBasicList> {
         return try {
             log.d { "getUpcomingLaunchesList - limit: $limit" }
             val response = launchesApi.launchesMiniList(
@@ -72,7 +75,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getFeaturedLaunch(
+    private suspend fun getFeaturedLaunch(
         forceRefresh: Boolean,
         agencyIds: List<Int>?,
         locationIds: List<Int>?
@@ -86,13 +89,13 @@ class LaunchRepositoryImpl(
             val cacheKey = buildCacheKey("featured_launch", agencyIds, locationIds)
 
             // STALE-WHILE-REVALIDATE: Check for stale data (up to 4 featured launches)
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(4)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStaleApi(4)
             val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
 
             // Try fresh cache if available and not forcing refresh
             if (!forceRefresh) {
-                val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(4)
+                val cachedLaunches = localDataSource?.getUpcomingNormalLaunchesApi(4)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
                     // Apply user filter preferences to fresh cache (prevents returning unfiltered data on cold start)
                     val filteredCache = filterLaunchesByPreferences(cachedLaunches, agencyIds, locationIds)
@@ -193,7 +196,7 @@ class LaunchRepositoryImpl(
         } catch (e: ResponseException) {
             log.e(e) { "API error while fetching featured launches" }
             // On error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(4)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStaleApi(4)
             if (staleCached != null && staleCached.isNotEmpty()) {
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
                 if (filteredStale.isNotEmpty()) {
@@ -216,7 +219,7 @@ class LaunchRepositoryImpl(
         } catch (e: IOException) {
             log.e(e) { "Network error while fetching featured launch" }
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(1)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStaleApi(1)
             if (staleCached != null && staleCached.isNotEmpty()) {
                 val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
                 if (filteredStale.isNotEmpty()) {
@@ -242,7 +245,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getInFlightLaunches(
+    private suspend fun getInFlightLaunches(
         forceRefresh: Boolean,
         agencyIds: List<Int>?,
         locationIds: List<Int>?
@@ -253,12 +256,12 @@ class LaunchRepositoryImpl(
             val now = Clock.System.now().toEpochMilliseconds()
 
             // STALE-WHILE-REVALIDATE: check stale first for fallback
-            val staleCached = localDataSource?.getInFlightNormalLaunchesStale(5)
+            val staleCached = localDataSource?.getInFlightNormalLaunchesStaleApi(5)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
 
             // Try fresh cache if not forcing refresh
             if (!forceRefresh) {
-                val cached = localDataSource?.getInFlightNormalLaunches(5)
+                val cached = localDataSource?.getInFlightNormalLaunchesApi(5)
                 if (cached != null && cached.isNotEmpty()) {
                     log.d { "In-flight cache HIT: ${cached.size} launches" }
                     return Result.success(DataResult(
@@ -310,7 +313,7 @@ class LaunchRepositoryImpl(
             )
         } catch (e: ResponseException) {
             log.e(e) { "\u274C API ERROR in getInFlightLaunches: ${e.message}" }
-            val staleCached = localDataSource?.getInFlightNormalLaunchesStale(5)
+            val staleCached = localDataSource?.getInFlightNormalLaunchesStaleApi(5)
             if (staleCached != null && staleCached.isNotEmpty()) {
                 val now = Clock.System.now().toEpochMilliseconds()
                 Result.success(DataResult(
@@ -323,7 +326,7 @@ class LaunchRepositoryImpl(
             }
         } catch (e: IOException) {
             log.e(e) { "\u274C NETWORK ERROR in getInFlightLaunches: ${e.message}" }
-            val staleCached = localDataSource?.getInFlightNormalLaunchesStale(5)
+            val staleCached = localDataSource?.getInFlightNormalLaunchesStaleApi(5)
             if (staleCached != null && staleCached.isNotEmpty()) {
                 val now = Clock.System.now().toEpochMilliseconds()
                 Result.success(DataResult(
@@ -340,7 +343,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getUpcomingLaunchesNormal(
+    private suspend fun getUpcomingLaunchesNormal(
         limit: Int,
         forceRefresh: Boolean,
         agencyIds: List<Int>?,
@@ -355,13 +358,13 @@ class LaunchRepositoryImpl(
             val cacheKey = buildCacheKey("upcoming_launches", agencyIds, locationIds)
 
             // STALE-WHILE-REVALIDATE: Always check for stale data first
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
 
             // Try fresh cache if available and not forcing refresh
             if (!forceRefresh) {
-                val cachedLaunches = localDataSource?.getUpcomingNormalLaunches(limit)
+                val cachedLaunches = localDataSource?.getUpcomingNormalLaunchesApi(limit)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
                     // Apply user filter preferences to fresh cache (prevents returning unfiltered data on cold start)
                     val filteredCache = filterLaunchesByPreferences(cachedLaunches, agencyIds, locationIds)
@@ -462,7 +465,7 @@ class LaunchRepositoryImpl(
             )
         } catch (e: ResponseException) {
             // On error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("upcoming_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 // Filter stale cache by user preferences
@@ -484,7 +487,7 @@ class LaunchRepositoryImpl(
             Result.failure(e)
         } catch (e: IOException) {
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getUpcomingNormalLaunchesStale(limit)
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("upcoming_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 // Filter stale cache by user preferences
@@ -509,7 +512,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getPreviousLaunchesList(limit: Int): Result<PaginatedLaunchBasicList> {
+    private suspend fun getPreviousLaunchesList(limit: Int): Result<PaginatedLaunchBasicList> {
         return try {
             log.d { "getPreviousLaunchesList - limit: $limit" }
             val response = launchesApi.getLaunchMiniList(
@@ -532,7 +535,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getUpcomingLaunchesList(
+    private suspend fun getUpcomingLaunchesList(
         limit: Int,
         netGt: Instant?,
         netLt: Instant?
@@ -560,7 +563,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getPreviousLaunchesNormal(
+    private suspend fun getPreviousLaunchesNormal(
         limit: Int,
         forceRefresh: Boolean,
         agencyIds: List<Int>?,
@@ -575,13 +578,13 @@ class LaunchRepositoryImpl(
             val cacheKey = buildCacheKey("previous_launches", agencyIds, locationIds)
 
             // STALE-WHILE-REVALIDATE: Check for stale data
-            val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
+            val staleCached = localDataSource?.getPreviousNormalLaunchesStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
 
             // Try fresh cache if available and not forcing refresh
             if (!forceRefresh) {
-                val cachedLaunches = localDataSource?.getPreviousNormalLaunches(limit)
+                val cachedLaunches = localDataSource?.getPreviousNormalLaunchesApi(limit)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
                     // Apply user filter preferences to fresh cache (prevents returning unfiltered data on cold start)
                     val filteredCache = filterLaunchesByPreferences(cachedLaunches, agencyIds, locationIds)
@@ -650,7 +653,7 @@ class LaunchRepositoryImpl(
             )
         } catch (e: ResponseException) {
             // On error, try to return stale cache if available
-            val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
+            val staleCached = localDataSource?.getPreviousNormalLaunchesStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("previous_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 // Apply user preference filters to stale cached data
@@ -672,7 +675,7 @@ class LaunchRepositoryImpl(
             Result.failure(e)
         } catch (e: IOException) {
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getPreviousNormalLaunchesStale(limit)
+            val staleCached = localDataSource?.getPreviousNormalLaunchesStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("previous_launches")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 // Filter stale cache by user preferences
@@ -726,7 +729,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getLaunchDetails(
+    private suspend fun getLaunchDetails(
         id: String,
         forceRefresh: Boolean
     ): Result<LaunchDetailed> {
@@ -734,11 +737,11 @@ class LaunchRepositoryImpl(
             log.d { "getLaunchDetails - id: $id, forceRefresh: $forceRefresh" }
 
             // STALE-WHILE-REVALIDATE: Check for stale data
-            val staleCached = localDataSource?.getDetailedLaunchStale(id)
+            val staleCached = localDataSource?.getDetailedLaunchStaleApi(id)
 
             // Try fresh cache if available and not forcing refresh
             if (!forceRefresh) {
-                val cachedLaunch = localDataSource?.getDetailedLaunch(id)
+                val cachedLaunch = localDataSource?.getDetailedLaunchApi(id)
                 if (cachedLaunch != null) {
                     log.i { "✅ CACHE HIT: Returning fresh cached detailed launch: ${cachedLaunch.name}" }
                     return Result.success(cachedLaunch)
@@ -772,7 +775,7 @@ class LaunchRepositoryImpl(
                 log.e { "Error response body: $errorBody" }
 
                 // On error, try to return stale cache if available
-                val staleCached = localDataSource?.getDetailedLaunchStale(id)
+                val staleCached = localDataSource?.getDetailedLaunchStaleApi(id)
                 if (staleCached != null) {
                     log.w { "⚠️ API ERROR: Returning stale cached detailed launch as fallback: ${staleCached.name}" }
                     return Result.success(staleCached)
@@ -785,7 +788,7 @@ class LaunchRepositoryImpl(
         } catch (e: IOException) {
             log.e(e) { "IOException in getLaunchDetails for ID $id" }
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getDetailedLaunchStale(id)
+            val staleCached = localDataSource?.getDetailedLaunchStaleApi(id)
             if (staleCached != null) {
                 log.w { "⚠️ NETWORK ERROR: Returning stale cached detailed launch as fallback: ${staleCached.name}" }
                 return Result.success(staleCached)
@@ -802,7 +805,7 @@ class LaunchRepositoryImpl(
      * Used for stale-while-revalidate pattern to show data immediately while refreshing.
      */
     override suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed? {
-        return localDataSource?.getDetailedLaunchStale(id)
+        return localDataSource?.getDetailedLaunchStaleApi(id)
     }
 
     override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> {
@@ -824,7 +827,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getNextStarshipLaunch(
+    private suspend fun getNextStarshipLaunch(
         limit: Int,
         forceRefresh: Boolean,
         programId: List<Int>?
@@ -879,7 +882,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getStarshipHistoryLaunches(
+    private suspend fun getStarshipHistoryLaunches(
         limit: Int,
         forceRefresh: Boolean
     ): Result<DataResult<PaginatedLaunchNormalList>> {
@@ -890,13 +893,13 @@ class LaunchRepositoryImpl(
             val cacheKey = "starship_history"
 
             // STALE-WHILE-REVALIDATE: Check for stale data
-            val staleCached = localDataSource?.getStarshipHistoryStale(limit)
+            val staleCached = localDataSource?.getStarshipHistoryStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp(cacheKey)
             val hasStaleData = staleCached != null && staleCached.isNotEmpty()
 
             // Try fresh cache if available and not forcing refresh
             if (!forceRefresh) {
-                val cachedLaunches = localDataSource?.getStarshipHistory(limit)
+                val cachedLaunches = localDataSource?.getStarshipHistoryApi(limit)
                 if (cachedLaunches != null && cachedLaunches.isNotEmpty()) {
                     log.i { "Cache hit - Returning ${cachedLaunches.size} fresh cached Starship history launches" }
                     return Result.success(
@@ -953,7 +956,7 @@ class LaunchRepositoryImpl(
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getStarshipHistoryLaunches: ${e.message}" }
             // On API error, try to return stale cache if available
-            val staleCached = localDataSource?.getStarshipHistoryStale(limit)
+            val staleCached = localDataSource?.getStarshipHistoryStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("starship_history")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 log.w { "⚠️ API ERROR: Returning ${staleCached.size} stale Starship history launches as fallback" }
@@ -974,7 +977,7 @@ class LaunchRepositoryImpl(
         } catch (e: IOException) {
             log.e(e) { "❌ NETWORK ERROR in getStarshipHistoryLaunches: ${e.message}" }
             // On network error, try to return stale cache if available
-            val staleCached = localDataSource?.getStarshipHistoryStale(limit)
+            val staleCached = localDataSource?.getStarshipHistoryStaleApi(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("starship_history")
             if (staleCached != null && staleCached.isNotEmpty()) {
                 log.w { "⚠️ NETWORK ERROR: Returning ${staleCached.size} stale Starship history launches as fallback" }
@@ -1073,7 +1076,7 @@ class LaunchRepositoryImpl(
         }
     }
 
-    override suspend fun getLaunchById(id: String): Result<LaunchNormal?> {
+    private suspend fun getLaunchById(id: String): Result<LaunchNormal?> {
         return try {
             log.d { "getLaunchById - id: $id" }
             val response = launchesApi.getLaunchById(launchId = id)
@@ -1258,5 +1261,166 @@ class LaunchRepositoryImpl(
         }
 
         return filtered
+    }
+
+    // ── Domain-returning method implementations ───────────────────────────
+
+    override suspend fun getUpcomingLaunchesDomain(
+        limit: Int,
+        offset: Int,
+        netGt: Instant?,
+        netLt: Instant?
+    ): Result<PaginatedResult<Launch>> {
+        val result = if (netGt != null || netLt != null) {
+            getUpcomingLaunchesList(limit, netGt, netLt)
+        } else {
+            getUpcomingLaunchesList(limit)
+        }
+        return result.map { it.toDomain() }
+    }
+
+    override suspend fun getPreviousLaunchesDomain(
+        limit: Int,
+        offset: Int
+    ): Result<PaginatedResult<Launch>> {
+        return getPreviousLaunchesList(limit).map { it.toDomain() }
+    }
+
+    override suspend fun getFeaturedLaunchDomain(
+        forceRefresh: Boolean,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): Result<DataResult<PaginatedResult<Launch>>> {
+        return getFeaturedLaunch(forceRefresh, agencyIds, locationIds).map { dataResult ->
+            DataResult(
+                data = dataResult.data.toDomain(),
+                source = dataResult.source,
+                timestamp = dataResult.timestamp
+            )
+        }
+    }
+
+    override suspend fun getInFlightLaunchesDomain(
+        forceRefresh: Boolean,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): Result<DataResult<PaginatedResult<Launch>>> {
+        return getInFlightLaunches(forceRefresh, agencyIds, locationIds).map { dataResult ->
+            DataResult(
+                data = dataResult.data.toDomain(),
+                source = dataResult.source,
+                timestamp = dataResult.timestamp
+            )
+        }
+    }
+
+    override suspend fun getUpcomingLaunchesNormalDomain(
+        limit: Int,
+        forceRefresh: Boolean,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): Result<DataResult<PaginatedResult<Launch>>> {
+        return getUpcomingLaunchesNormal(limit, forceRefresh, agencyIds, locationIds).map { dataResult ->
+            DataResult(
+                data = dataResult.data.toDomain(),
+                source = dataResult.source,
+                timestamp = dataResult.timestamp
+            )
+        }
+    }
+
+    override suspend fun getPreviousLaunchesNormalDomain(
+        limit: Int,
+        forceRefresh: Boolean,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): Result<DataResult<PaginatedResult<Launch>>> {
+        return getPreviousLaunchesNormal(limit, forceRefresh, agencyIds, locationIds).map { dataResult ->
+            DataResult(
+                data = dataResult.data.toDomain(),
+                source = dataResult.source,
+                timestamp = dataResult.timestamp
+            )
+        }
+    }
+
+    override suspend fun getLaunchDetailDomain(
+        id: String,
+        forceRefresh: Boolean
+    ): Result<Launch> {
+        return getLaunchDetails(id, forceRefresh).map { it.toDomain() }
+    }
+
+    override suspend fun getStarshipLaunchesDomain(
+        limit: Int,
+        forceRefresh: Boolean,
+        programId: List<Int>?
+    ): Result<PaginatedResult<Launch>> {
+        return getNextStarshipLaunch(limit, forceRefresh, programId).map { it.toDomain() }
+    }
+
+    override suspend fun getStarshipHistoryDomain(
+        limit: Int,
+        forceRefresh: Boolean
+    ): Result<DataResult<PaginatedResult<Launch>>> {
+        return getStarshipHistoryLaunches(limit, forceRefresh).map { dataResult ->
+            DataResult(
+                data = dataResult.data.toDomain(),
+                source = dataResult.source,
+                timestamp = dataResult.timestamp
+            )
+        }
+    }
+
+    override suspend fun getLaunchByIdDomain(id: String): Result<Launch?> {
+        return getLaunchById(id).map { it?.toDomain() }
+    }
+
+    override suspend fun getFilteredLaunchesDomain(
+        limit: Int,
+        offset: Int,
+        upcoming: Boolean?,
+        previous: Boolean?,
+        ordering: String?,
+        search: String?,
+        lspIds: List<Int>?,
+        locationIds: List<Int>?,
+        programIds: List<Int>?,
+        rocketConfigurationId: Int?,
+        isCrewed: Boolean?,
+        includeSuborbital: Boolean?,
+        statusIds: List<Int>?,
+        orbitIds: List<Int>?,
+        missionTypeIds: List<Int>?,
+        launcherConfigFamilyIds: List<Int>?
+    ): Result<PaginatedResult<Launch>> {
+        return try {
+            log.d { "getFilteredLaunchesDomain - limit: $limit, offset: $offset, upcoming: $upcoming, previous: $previous" }
+            val response = launchesApi.getLaunchMiniList(
+                limit = limit,
+                offset = offset,
+                upcoming = upcoming,
+                previous = previous,
+                ordering = ordering,
+                search = search,
+                lspId = lspIds,
+                locationIds = locationIds,
+                program = programIds,
+                rocketConfigurationId = rocketConfigurationId,
+                isCrewed = isCrewed,
+                includeSuborbital = includeSuborbital,
+                statusIds = statusIds,
+                orbitIds = orbitIds,
+                missionTypeIds = missionTypeIds,
+                launcherConfigFamilyIds = launcherConfigFamilyIds
+            )
+            Result.success(response.body().toDomain())
+        } catch (e: ResponseException) {
+            log.e(e) { "API error in getFilteredLaunchesDomain" }
+            Result.failure(e)
+        } catch (e: Exception) {
+            log.e(e) { "Unexpected error in getFilteredLaunchesDomain" }
+            Result.failure(e)
+        }
     }
 }

@@ -1,43 +1,30 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacecraftConfigDetailedList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigDetailed
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.SpacecraftConfig
 
 /**
  * Repository interface for spacecraft configuration (spacecraft type) data.
- * 
+ *
  * SpacecraftConfig represents a spacecraft type/model (e.g., "Starship", "Dragon 2").
  * This is the "category" level - individual spacecraft belong to a configuration.
- * 
+ *
  * NOTE: Unlike LauncherConfigRepository, the API does NOT support filtering by program.
  * We filter by agency instead (SpaceX = 121) or use search.
  */
 interface SpacecraftConfigRepository {
-    
-    /**
-     * Get spacecraft configurations filtered by agency ID with pagination.
-     * 
-     * @param agencyId Agency ID to filter by (e.g., 121 for SpaceX)
-     * @param limit Number of results per page
-     * @param offset Pagination offset
-     */
-    suspend fun getConfigurationsByAgency(
+
+    suspend fun getConfigurationsByAgencyDomain(
         agencyId: Int,
         limit: Int = 20,
         offset: Int = 0
-    ): Result<PaginatedSpacecraftConfigDetailedList>
+    ): Result<PaginatedResult<SpacecraftConfig>>
 
-    /**
-     * Get all spacecraft configurations with pagination.
-     */
-    suspend fun getConfigurations(
+    suspend fun getConfigurationsDomain(
         limit: Int = 20,
         offset: Int = 0,
         search: String? = null
-    ): Result<PaginatedSpacecraftConfigDetailedList>
+    ): Result<PaginatedResult<SpacecraftConfig>>
 
-    /**
-     * Get spacecraft configuration details by ID.
-     */
-    suspend fun getConfigurationDetails(configId: Int): Result<SpacecraftConfigDetailed>
+    suspend fun getConfigurationDetailsDomain(configId: Int): Result<SpacecraftConfig>
 }

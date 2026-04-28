@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -43,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
@@ -53,6 +53,7 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedContentData
 import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedEventContent
 import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedLaunchContent
+import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedMotdContent
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -83,12 +84,14 @@ fun PinnedContentCard(
     val title = when (pinnedContent) {
         is PinnedLaunchContent -> LaunchFormatUtil.formatLaunchTitle(pinnedContent.launch)
         is PinnedEventContent -> pinnedContent.event.name ?: "Unknown Event"
+        is PinnedMotdContent -> pinnedContent.name
     }
-    
+
     // Get the mission/subtitle text
     val subtitle = pinnedContent.customMessage ?: when (pinnedContent) {
         is PinnedLaunchContent -> pinnedContent.launch.mission?.name ?: pinnedContent.launch.name ?: "Unknown Mission"
         is PinnedEventContent -> pinnedContent.event.type?.name ?: "Event"
+        is PinnedMotdContent -> ""
     }
 
     Card(
@@ -100,6 +103,7 @@ fun PinnedContentCard(
                 when (pinnedContent) {
                     is PinnedLaunchContent -> navController.navigate(LaunchDetail(pinnedContent.launch.id))
                     is PinnedEventContent -> navController.navigate(EventDetail(pinnedContent.event.id))
+                    is PinnedMotdContent -> Unit
                 }
             }
             .semantics {
@@ -268,8 +272,74 @@ fun PinnedContentCard(
 }
 
 /**
+ * Dismissable banner for a Message of the Day from Firebase Remote Config.
+ *
+ * Displayed at the very top of the home screen as a slim, full-width info strip.
+ * Unlike [PinnedContentCard] this banner carries no image and is not tappable
+ * (there is nothing to navigate to).
+ */
+@Composable
+fun MessageOfTheDayBanner(
+    motd: PinnedMotdContent,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val message = motd.customMessage ?: return
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .semantics { contentDescription = "Message of the Day: $message" },
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        tonalElevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Text(
+                text = message,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(32.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Dismiss message",
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
+}
+
+/**
  * Composable to render the pinned/featured content section on home screen.
  * Shows nothing if there is no pinned content.
+ * Dispatches to [MessageOfTheDayBanner] for MOTD content and [PinnedContentCard] for
+ * launch/event content.
  */
 @Composable
 fun PinnedContentSection(
@@ -280,11 +350,17 @@ fun PinnedContentSection(
 ) {
     if (pinnedContent != null) {
         Column(modifier = modifier) {
-            PinnedContentCard(
-                pinnedContent = pinnedContent,
-                navController = navController,
-                onDismiss = onDismiss
-            )
+            when (pinnedContent) {
+                is PinnedMotdContent -> MessageOfTheDayBanner(
+                    motd = pinnedContent,
+                    onDismiss = onDismiss
+                )
+                else -> PinnedContentCard(
+                    pinnedContent = pinnedContent,
+                    navController = navController,
+                    onDismiss = onDismiss
+                )
+            }
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -453,6 +529,36 @@ private fun PinnedContentCardWithCustomMessageDarkPreview() {
             PinnedContentCardPreviewContent(
                 pinnedContent = PreviewData.pinnedLaunchContentWithMessage
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MessageOfTheDayBannerPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                MessageOfTheDayBanner(
+                    motd = PreviewData.motdContent,
+                    onDismiss = {}
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MessageOfTheDayBannerDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                MessageOfTheDayBanner(
+                    motd = PreviewData.motdContent,
+                    onDismiss = {}
+                )
+            }
         }
     }
 }

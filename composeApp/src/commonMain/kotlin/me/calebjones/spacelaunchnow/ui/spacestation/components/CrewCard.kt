@@ -24,8 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
-import me.calebjones.spacelaunchnow.ui.preview.PreviewData
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -34,7 +33,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun CrewCard(
-    crew: List<AstronautNormal>,
+    crew: List<AstronautListItem>,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -56,7 +55,7 @@ fun CrewCard(
 }
 
 @Composable
-private fun CrewMemberItem(astronaut: AstronautNormal) {
+private fun CrewMemberItem(astronaut: AstronautListItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -72,7 +71,7 @@ private fun CrewMemberItem(astronaut: AstronautNormal) {
             contentAlignment = Alignment.Center
         ) {
             SubcomposeAsyncImage(
-                model = astronaut.image?.thumbnailUrl ?: astronaut.image?.imageUrl,
+                model = astronaut.thumbnailUrl ?: astronaut.imageUrl,
                 contentDescription = astronaut.name,
                 modifier = Modifier
                     .fillMaxSize()
@@ -97,12 +96,10 @@ private fun CrewMemberItem(astronaut: AstronautNormal) {
         }
 
         Column(modifier = Modifier.padding(start = 12.dp)) {
-            astronaut.name?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            Text(
+                text = astronaut.name ?: "Unknown",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
@@ -117,9 +114,9 @@ private fun CrewCardPreview() {
     SpaceLaunchNowPreviewTheme {
         CrewCard(
             crew = listOf(
-                PreviewData.astronautNormal,
-                PreviewData.astronautNormal.copy(id = 2, name = "Oleg Kononenko"),
-                PreviewData.astronautNormal.copy(id = 3, name = "Tracy Caldwell Dyson")
+                sampleCrewMember(id = 1, name = "Suni Williams"),
+                sampleCrewMember(id = 2, name = "Oleg Kononenko"),
+                sampleCrewMember(id = 3, name = "Tracy Caldwell Dyson")
             )
         )
     }
@@ -131,10 +128,26 @@ private fun CrewCardDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         CrewCard(
             crew = listOf(
-                PreviewData.astronautNormal,
-                PreviewData.astronautNormal.copy(id = 2, name = "Oleg Kononenko"),
-                PreviewData.astronautNormal.copy(id = 3, name = "Tracy Caldwell Dyson")
+                sampleCrewMember(id = 1, name = "Suni Williams"),
+                sampleCrewMember(id = 2, name = "Oleg Kononenko"),
+                sampleCrewMember(id = 3, name = "Tracy Caldwell Dyson")
             )
         )
     }
 }
+
+private fun sampleCrewMember(id: Int, name: String) = AstronautListItem(
+    id = id,
+    name = name,
+    statusName = "Active",
+    statusId = 1,
+    agencyName = "NASA",
+    agencyAbbrev = "NASA",
+    agencyId = 44,
+    imageUrl = null,
+    thumbnailUrl = null,
+    age = null,
+    bio = null,
+    typeName = "Government",
+    nationality = emptyList()
+)

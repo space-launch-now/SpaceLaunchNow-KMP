@@ -28,8 +28,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigDetailed
+import me.calebjones.spacelaunchnow.domain.model.SpacecraftConfig
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 
@@ -38,7 +38,7 @@ import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
  */
 @Composable
 internal fun SpacecraftConfigCard(
-    config: SpacecraftConfigDetailed,
+    config: SpacecraftConfig,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isFullWidth: Boolean = false
@@ -55,7 +55,7 @@ internal fun SpacecraftConfigCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background image
-            config.image?.imageUrl?.let { imageUrl ->
+            config.imageUrl?.let { imageUrl ->
                 SubcomposeAsyncImage(
                     model = imageUrl,
                     contentDescription = config.name,
@@ -121,7 +121,7 @@ internal fun SpacecraftConfigCard(
  */
 @Composable
 internal fun LauncherConfigCard(
-    config: LauncherConfigDetailed,
+    config: VehicleConfig,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isFullWidth: Boolean = false
@@ -138,7 +138,7 @@ internal fun LauncherConfigCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background image
-            config.image?.imageUrl?.let { imageUrl ->
+            config.imageUrl?.let { imageUrl ->
                 SubcomposeAsyncImage(
                     model = imageUrl,
                     contentDescription = config.name,
@@ -184,7 +184,7 @@ internal fun LauncherConfigCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    config.manufacturer?.name?.let { manufacturerName ->
+                    config.manufacturerName?.let { manufacturerName ->
                         Text(
                             text = manufacturerName,
                             style = MaterialTheme.typography.bodySmall,

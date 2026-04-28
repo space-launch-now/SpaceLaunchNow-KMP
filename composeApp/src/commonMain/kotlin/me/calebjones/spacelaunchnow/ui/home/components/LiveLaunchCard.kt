@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.LiveIndicator
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
@@ -68,7 +68,7 @@ private val InFlightBlue = Color(0xFF1976D2)
  */
 @Composable
 fun LiveLaunchCard(
-    launch: LaunchNormal,
+    launch: Launch,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
@@ -77,7 +77,7 @@ fun LiveLaunchCard(
     }
     val statusText = launch.status?.name ?: "In Flight"
     val statusColor = getLaunchStatusColor(launch.status?.id)
-    val isWebcastLive = launch.webcastLive == true
+    val isWebcastLive = launch.webcastLive
 
     Card(
         modifier = modifier
@@ -105,7 +105,7 @@ fun LiveLaunchCard(
                     .width(130.dp)
                     .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
             ) {
-                launch.image?.imageUrl?.let { url ->
+                launch.imageUrl?.let { url ->
                     SubcomposeAsyncImage(
                         model = url,
                         contentDescription = "Launch image for $title",
@@ -184,7 +184,7 @@ fun LiveLaunchCard(
 
                     // Mission name or launch name
                     Text(
-                        text = launch.mission?.name ?: launch.name ?: "Unknown Mission",
+                        text = launch.mission?.name ?: launch.name,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         maxLines = 1,
@@ -240,7 +240,7 @@ fun LiveLaunchCard(
  */
 @Composable
 fun LiveLaunchSection(
-    launch: LaunchNormal?,
+    launch: Launch?,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
@@ -261,7 +261,7 @@ fun LiveLaunchSection(
 
 @Composable
 private fun LiveLaunchCardPreviewContent(
-    launch: LaunchNormal,
+    launch: Launch,
     isWebcastLive: Boolean = false
 ) {
     val title by remember(launch) {
@@ -328,7 +328,7 @@ private fun LiveLaunchCardPreviewContent(
 
                     // Mission name or launch name
                     Text(
-                        text = launch.mission?.name ?: launch.name ?: "Unknown Mission",
+                        text = launch.mission?.name ?: launch.name,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         maxLines = 1,
@@ -384,8 +384,8 @@ private fun LiveLaunchCardPreview() {
     SpaceLaunchNowPreviewTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             LiveLaunchCardPreviewContent(
-                launch = PreviewData.launchNormalSpaceX.copy(
-                    status = PreviewData.statusInFlight
+                launch = PreviewData.domainLaunchSpaceX.copy(
+                    status = PreviewData.domainStatusInFlight
                 ),
                 isWebcastLive = false
             )
@@ -399,8 +399,8 @@ private fun LiveLaunchCardWithWebcastPreview() {
     SpaceLaunchNowPreviewTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             LiveLaunchCardPreviewContent(
-                launch = PreviewData.launchNormalSpaceX.copy(
-                    status = PreviewData.statusInFlight,
+                launch = PreviewData.domainLaunchSpaceX.copy(
+                    status = PreviewData.domainStatusInFlight,
                     webcastLive = true
                 ),
                 isWebcastLive = true
@@ -415,8 +415,8 @@ private fun LiveLaunchCardDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         Surface(color = MaterialTheme.colorScheme.background) {
             LiveLaunchCardPreviewContent(
-                launch = PreviewData.launchNormalSpaceX.copy(
-                    status = PreviewData.statusInFlight
+                launch = PreviewData.domainLaunchSpaceX.copy(
+                    status = PreviewData.domainStatusInFlight
                 ),
                 isWebcastLive = false
             )
@@ -430,8 +430,8 @@ private fun LiveLaunchCardWithWebcastDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         Surface(color = MaterialTheme.colorScheme.background) {
             LiveLaunchCardPreviewContent(
-                launch = PreviewData.launchNormalSpaceX.copy(
-                    status = PreviewData.statusInFlight,
+                launch = PreviewData.domainLaunchSpaceX.copy(
+                    status = PreviewData.domainStatusInFlight,
                     webcastLive = true
                 ),
                 isWebcastLive = true

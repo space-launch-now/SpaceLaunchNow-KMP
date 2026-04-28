@@ -51,16 +51,10 @@ import androidx.navigation.compose.rememberNavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Country
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Mission
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.MissionType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Orbit
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramMini
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.LaunchStatus
+import me.calebjones.spacelaunchnow.domain.model.Mission
+import me.calebjones.spacelaunchnow.domain.model.ProgramSummary
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.ui.compose.EmptyStateCard
@@ -82,7 +76,7 @@ private val CARD_PEEK_AMOUNT = 48.dp // Amount of next card to show peeking
 
 @Composable
 fun LaunchListView(
-    combinedLaunches: List<LaunchNormal>,
+    combinedLaunches: List<Launch>,
     upcomingStartIndex: Int,
     carouselError: String?,
     isCarouselLoading: Boolean,
@@ -186,7 +180,7 @@ fun LaunchListView(
 
 @Composable
 fun LaunchItemView(
-    launch: LaunchNormal,
+    launch: Launch,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
@@ -214,7 +208,7 @@ fun LaunchItemView(
     ) {
         Box {
             // Background Image with proper error, placeholder, and loading states
-            launch.image?.imageUrl?.let { url ->
+            launch.imageUrl?.let { url ->
                 SubcomposeAsyncImage(
                     model = url,
                     contentDescription = "Launch Image",
@@ -394,7 +388,7 @@ fun MissionTypeChip(
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         ) {
             Text(
-                text = mission.type,
+                text = mission.type ?: "Mission",
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Medium
@@ -407,7 +401,7 @@ fun MissionTypeChip(
 
 @Composable
 fun ProgramChip(
-    programs: List<ProgramMini>?,
+    programs: List<ProgramSummary>?,
     modifier: Modifier = Modifier
 ) {
     val program = programs?.firstOrNull()
@@ -485,7 +479,7 @@ fun LaunchListErrorCard(
 private fun LaunchItemViewPreview() {
     SpaceLaunchNowPreviewTheme {
         LaunchItemView(
-            launch = PreviewData.launchNormalSpaceX,
+            launch = PreviewData.domainLaunchSpaceX,
             navController = rememberNavController(),
             modifier = Modifier.size(width = 320.dp, height = CARD_HEIGHT)
         )
@@ -497,7 +491,7 @@ private fun LaunchItemViewPreview() {
 private fun LaunchItemViewDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         LaunchItemView(
-            launch = PreviewData.launchNormalSpaceX,
+            launch = PreviewData.domainLaunchSpaceX,
             navController = rememberNavController(),
             modifier = Modifier.size(width = 320.dp, height = CARD_HEIGHT)
         )
@@ -509,7 +503,7 @@ private fun LaunchItemViewDarkPreview() {
 private fun LaunchItemViewNoImagePreview() {
     SpaceLaunchNowPreviewTheme {
         LaunchItemView(
-            launch = PreviewData.launchNormalULA,
+            launch = PreviewData.domainLaunchULA,
             navController = rememberNavController(),
             modifier = Modifier.size(width = 320.dp, height = CARD_HEIGHT)
         )
@@ -521,7 +515,7 @@ private fun LaunchItemViewNoImagePreview() {
 private fun LaunchItemViewNoImageDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         LaunchItemView(
-            launch = PreviewData.launchNormalULA,
+            launch = PreviewData.domainLaunchULA,
             navController = rememberNavController(),
             modifier = Modifier.size(width = 320.dp, height = CARD_HEIGHT)
         )

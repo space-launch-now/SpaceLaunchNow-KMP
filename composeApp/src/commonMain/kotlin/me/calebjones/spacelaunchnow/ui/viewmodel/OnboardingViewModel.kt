@@ -7,16 +7,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigNormal
+import me.calebjones.spacelaunchnow.domain.model.Agency
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class OnboardingViewModel(
@@ -36,34 +36,34 @@ class OnboardingViewModel(
         analyticsManager.track(AnalyticsEvent.OnboardingStep(step = step, completed = completed))
     }
 
-    private val _upcomingLaunches = MutableStateFlow<List<LaunchBasic>>(emptyList())
-    val upcomingLaunches: StateFlow<List<LaunchBasic>> = _upcomingLaunches
+    private val _upcomingLaunches = MutableStateFlow<List<Launch>>(emptyList())
+    val upcomingLaunches: StateFlow<List<Launch>> = _upcomingLaunches
 
-    private val _previousLaunches = MutableStateFlow<List<LaunchBasic>>(emptyList())
-    val previousLaunches: StateFlow<List<LaunchBasic>> = _previousLaunches
+    private val _previousLaunches = MutableStateFlow<List<Launch>>(emptyList())
+    val previousLaunches: StateFlow<List<Launch>> = _previousLaunches
 
     private val _articles = MutableStateFlow<List<Article>>(emptyList())
     val articles: StateFlow<List<Article>> = _articles
 
-    private val _astronauts = MutableStateFlow<List<AstronautEndpointNormal>>(emptyList())
-    val astronauts: StateFlow<List<AstronautEndpointNormal>> = _astronauts
+    private val _astronauts = MutableStateFlow<List<AstronautListItem>>(emptyList())
+    val astronauts: StateFlow<List<AstronautListItem>> = _astronauts
 
-    private val _rockets = MutableStateFlow<List<LauncherConfigNormal>>(emptyList())
-    val rockets: StateFlow<List<LauncherConfigNormal>> = _rockets
+    private val _rockets = MutableStateFlow<List<VehicleConfig>>(emptyList())
+    val rockets: StateFlow<List<VehicleConfig>> = _rockets
 
-    private val _agencies = MutableStateFlow<List<AgencyNormal>>(emptyList())
-    val agencies: StateFlow<List<AgencyNormal>> = _agencies
+    private val _agencies = MutableStateFlow<List<Agency>>(emptyList())
+    val agencies: StateFlow<List<Agency>> = _agencies
 
     fun fetchScheduleData(limit: Int = 5) {
         viewModelScope.launch {
-            launchRepository.getUpcomingLaunchesList(limit).onSuccess { paginated ->
+            launchRepository.getUpcomingLaunchesDomain(limit).onSuccess { paginated ->
                 _upcomingLaunches.value = paginated.results
                 log.d { "Loaded ${paginated.results.size} upcoming launches for onboarding" }
             }.onFailure { e ->
                 log.e(e) { "Failed to load upcoming launches for onboarding" }
             }
 
-            launchRepository.getPreviousLaunchesList(limit).onSuccess { paginated ->
+            launchRepository.getPreviousLaunchesDomain(limit).onSuccess { paginated ->
                 _previousLaunches.value = paginated.results
                 log.d { "Loaded ${paginated.results.size} previous launches for onboarding" }
             }.onFailure { e ->
@@ -92,14 +92,14 @@ class OnboardingViewModel(
                 log.e(e) { "Failed to load astronauts for onboarding" }
             }
 
-            rocketRepository.getRockets(limit = limit, active = true).onSuccess { paginated ->
+            rocketRepository.getRocketsDomain(limit = limit, active = true).onSuccess { paginated ->
                 _rockets.value = paginated.results
                 log.d { "Loaded ${paginated.results.size} rockets for onboarding" }
             }.onFailure { e ->
                 log.e(e) { "Failed to load rockets for onboarding" }
             }
 
-            agencyRepository.getAgencies(limit = limit, featured = true).onSuccess { paginated ->
+            agencyRepository.getAgenciesDomain(limit = limit, featured = true).onSuccess { paginated ->
                 _agencies.value = paginated.results
                 log.d { "Loaded ${paginated.results.size} agencies for onboarding" }
             }.onFailure { e ->

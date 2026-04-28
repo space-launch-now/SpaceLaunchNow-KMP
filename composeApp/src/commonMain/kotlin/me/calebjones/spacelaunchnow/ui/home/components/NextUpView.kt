@@ -40,23 +40,22 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.ui.compose.EmptyStateCard
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
-import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 
 @Composable
 fun NextLaunchView(
-    state: ViewState<LaunchNormal?>,
+    state: ViewState<Launch?>,
     navController: NavController,
-    onShare: (LaunchNormal) -> Unit = {},
+    onShare: (Launch) -> Unit = {},
 ) {
     Column {
         when {
@@ -91,7 +90,7 @@ fun NextLaunchView(
 
 @Composable
 fun NextLaunchItemView(
-    launch: LaunchNormal,
+    launch: Launch,
     navController: NavController,
     onShare: () -> Unit = {},
 ) {
@@ -129,7 +128,7 @@ fun NextLaunchItemView(
                         .height(250.dp) // Limit image area to 300dp
                 ) {
                     // Background Image covering only the image area with proper error, placeholder, and loading states
-                    launch.image?.imageUrl?.let { url ->
+                    launch.imageUrl?.let { url ->
                         // NOTE: Image loading placeholders should use blurred/shimmer backgrounds,
                     // not circular progress indicators. Circular loaders are jarring for image content.
                     SubcomposeAsyncImage(
@@ -195,7 +194,7 @@ fun NextLaunchItemView(
 
                     // Use the common LaunchCardHeaderOverlay composable
                     LaunchCardHeaderOverlay(
-                        launchData = launch.toLaunchCardData(),
+                        launch = launch,
                         useRelativeTime = true,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -218,7 +217,7 @@ fun NextLaunchItemView(
                     ) {
                         // Mission name
                         Text(
-                            text = mission.name,
+                            text = mission.name ?: "Unknown Mission",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface

@@ -3,22 +3,32 @@ package me.calebjones.spacelaunchnow.data.billing
 import android.content.Context
 import com.revenuecat.purchases.kmp.LogLevel
 import com.revenuecat.purchases.kmp.Purchases
+import com.revenuecat.purchases.kmp.PurchasesDelegate
 import com.revenuecat.purchases.kmp.configure
 import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.models.CustomerInfo
 import com.revenuecat.purchases.kmp.models.PeriodType
+import com.revenuecat.purchases.kmp.models.PurchasesError
+import com.revenuecat.purchases.kmp.models.StoreProduct
+import com.revenuecat.purchases.kmp.models.StoreTransaction
 import com.revenuecat.purchases.kmp.models.freePhase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.BuildConfig
 import me.calebjones.spacelaunchnow.analytics.DatadogRUM
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.sync.PhoneDataLayerSync
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.toDisplayString
 import kotlin.coroutines.resume
@@ -33,10 +43,12 @@ import kotlin.coroutines.resume
  * - Entitlement checking
  */
 class AndroidBillingManager(
-    private val context: Context
+    private val context: Context,
+    private val phoneDataLayerSync: PhoneDataLayerSync? = null,
 ) : BillingManager {
 
     private val log = logger()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _isInitialized = MutableStateFlow(false)
     override val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
@@ -60,6 +72,24 @@ class AndroidBillingManager(
 
             log.d { "RevenueCat configured" }
             _isInitialized.value = true
+
+            // Register delegate for real-time entitlement updates (including Wear OS sync)
+            purchases.delegate = object : PurchasesDelegate {
+                override fun onPurchasePromoProduct(
+                    product: StoreProduct,
+                    startPurchase: (
+                        onError: (PurchasesError, Boolean) -> Unit,
+                        onSuccess: (StoreTransaction, CustomerInfo) -> Unit
+                    ) -> Unit
+                ) {
+                    // No-op on Android; App Store only
+                }
+
+                override fun onCustomerInfoUpdated(customerInfo: CustomerInfo) {
+                    updatePurchaseState(customerInfo)
+                    syncEntitlementToWatch(customerInfo)
+                }
+            }
 
             // Initial sync with store (silent, no UI)
             syncPurchases()
@@ -319,6 +349,32 @@ class AndroidBillingManager(
     }
 
     /**
+     * Sync entitlement state to Wear OS watch via DataLayer
+     */
+    private fun syncEntitlementToWatch(customerInfo: CustomerInfo) {
+        val dataLayerSync = phoneDataLayerSync ?: return
+        val activeEntitlements = customerInfo.entitlements.active
+        val isActive = activeEntitlements.containsKey("premium") ||
+            activeEntitlements.containsKey(SubscriptionProducts.RC_ENTITLEMENT_PRO) ||
+            activeEntitlements.containsKey("lifetime") ||
+            activeEntitlements.containsKey(SubscriptionProducts.RC_ENTITLEMENT_LIFETIME) ||
+            activeEntitlements.containsKey("founder")
+        val expiresAt = activeEntitlements.values.firstOrNull()?.expirationDateMillis?.let {
+            Instant.fromEpochMilliseconds(it)
+        }
+        scope.launch {
+            try {
+                dataLayerSync.syncEntitlementToWatch(
+                    active = isActive,
+                    expiresAt = expiresAt,
+                )
+            } catch (e: Exception) {
+                log.e(e) { "Failed to sync entitlement to watch" }
+            }
+        }
+    }
+
+    /**
      * Determine subscription type from entitlements and product IDs
      */
     private fun determineSubscriptionType(
@@ -409,6 +465,6 @@ class AndroidBillingManager(
 /**
  * Android-specific factory with context
  */
-fun createBillingManager(context: Context): BillingManager {
-    return AndroidBillingManager(context)
+fun createBillingManager(context: Context, phoneDataLayerSync: PhoneDataLayerSync? = null): BillingManager {
+    return AndroidBillingManager(context, phoneDataLayerSync)
 }

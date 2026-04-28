@@ -7,6 +7,10 @@ import me.calebjones.spacelaunchnow.api.extensions.getRocketDetails
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherConfigDetailedList
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.toVehicleDomain
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 
 /**
  * Implementation of LauncherConfigRepository using the generated LauncherConfigurationsApi
@@ -15,47 +19,34 @@ class LauncherConfigRepositoryImpl(
     private val launcherConfigurationsApi: LauncherConfigurationsApi
 ) : LauncherConfigRepository {
 
-    override suspend fun getConfigurationsByProgram(
+    private suspend fun getConfigurationsByProgramRaw(
         programId: Int,
         limit: Int,
         offset: Int
     ): Result<PaginatedLauncherConfigDetailedList> {
         return try {
-            println("=== LauncherConfigRepository.getConfigurationsByProgram ===")
-            println("Parameters: programId=$programId, limit=$limit, offset=$offset")
-
             val response = launcherConfigurationsApi.getConfigurationsByProgram(
                 programIds = listOf(programId),
                 limit = limit,
                 offset = offset,
                 isPlaceholder = false
             )
-
-            val configs = response.body()
-            println("✓ API SUCCESS: Fetched ${configs.results.size} launcher configs for program $programId")
-
-            Result.success(configs)
+            Result.success(response.body())
         } catch (e: ResponseException) {
-            println("LauncherConfigRepository: API error: ${e.message}")
             Result.failure(e)
         } catch (e: IOException) {
-            println("LauncherConfigRepository: Network error: ${e.message}")
             Result.failure(e)
         } catch (e: Exception) {
-            println("LauncherConfigRepository: Unexpected error: ${e.message}")
             Result.failure(e)
         }
     }
 
-    override suspend fun getConfigurations(
+    private suspend fun getConfigurationsRaw(
         limit: Int,
         offset: Int,
         search: String?
     ): Result<PaginatedLauncherConfigDetailedList> {
         return try {
-            println("=== LauncherConfigRepository.getConfigurations ===")
-            println("Parameters: limit=$limit, offset=$offset, search=$search")
-
             val response = launcherConfigurationsApi.getConfigurationsByProgram(
                 programIds = null,
                 limit = limit,
@@ -63,43 +54,44 @@ class LauncherConfigRepositoryImpl(
                 search = search,
                 isPlaceholder = false
             )
-
-            val configs = response.body()
-            println("✓ API SUCCESS: Fetched ${configs.results.size} launcher configs")
-
-            Result.success(configs)
+            Result.success(response.body())
         } catch (e: ResponseException) {
-            println("LauncherConfigRepository: API error: ${e.message}")
             Result.failure(e)
         } catch (e: IOException) {
-            println("LauncherConfigRepository: Network error: ${e.message}")
             Result.failure(e)
         } catch (e: Exception) {
-            println("LauncherConfigRepository: Unexpected error: ${e.message}")
             Result.failure(e)
         }
     }
 
-    override suspend fun getConfigurationDetails(configId: Int): Result<LauncherConfigDetailed> {
+    private suspend fun getConfigurationDetailsRaw(configId: Int): Result<LauncherConfigDetailed> {
         return try {
-            println("=== LauncherConfigRepository.getConfigurationDetails ===")
-            println("Parameters: configId=$configId")
-
             val response = launcherConfigurationsApi.getRocketDetails(id = configId)
-            val config = response.body()
-
-            println("✓ API SUCCESS: Fetched launcher config details for ID $configId")
-
-            Result.success(config)
+            Result.success(response.body())
         } catch (e: ResponseException) {
-            println("LauncherConfigRepository: API error for config $configId: ${e.message}")
             Result.failure(e)
         } catch (e: IOException) {
-            println("LauncherConfigRepository: Network error for config $configId: ${e.message}")
             Result.failure(e)
         } catch (e: Exception) {
-            println("LauncherConfigRepository: Unexpected error for config $configId: ${e.message}")
             Result.failure(e)
         }
     }
+
+    override suspend fun getConfigurationsByProgramDomain(
+        programId: Int,
+        limit: Int,
+        offset: Int
+    ): Result<PaginatedResult<VehicleConfig>> =
+        getConfigurationsByProgramRaw(programId = programId, limit = limit, offset = offset)
+            .map { it.toDomain() }
+
+    override suspend fun getConfigurationsDomain(
+        limit: Int,
+        offset: Int,
+        search: String?
+    ): Result<PaginatedResult<VehicleConfig>> =
+        getConfigurationsRaw(limit = limit, offset = offset, search = search).map { it.toDomain() }
+
+    override suspend fun getConfigurationDetailsDomain(configId: Int): Result<VehicleConfig> =
+        getConfigurationDetailsRaw(configId).map { it.toVehicleDomain() }
 }

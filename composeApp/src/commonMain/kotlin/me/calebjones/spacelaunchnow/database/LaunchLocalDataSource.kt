@@ -9,6 +9,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -73,13 +75,21 @@ class LaunchLocalDataSource(
         launches.forEach { cacheBasicLaunch(it) }
     }
     
-    suspend fun getBasicLaunch(id: String): LaunchBasic? {
+    suspend fun getBasicLaunch(id: String): Launch? {
+        return getBasicLaunchApi(id)?.toDomain()
+    }
+
+    suspend fun getBasicLaunchApi(id: String): LaunchBasic? {
         val now = System.now().toEpochMilliseconds()
         val cached = queries.getBasicById(id, now).executeAsOneOrNull()
         return cached?.let { json.decodeFromString<LaunchBasic>(it.json_data) }
     }
     
-    suspend fun getUpcomingBasicLaunches(limit: Int): List<LaunchBasic> {
+    suspend fun getUpcomingBasicLaunches(limit: Int): List<Launch> {
+        return getUpcomingBasicLaunchesApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getUpcomingBasicLaunchesApi(limit: Int): List<LaunchBasic> {
         val now = System.now().toEpochMilliseconds()
         return queries.getUpcomingBasic(now, now, limit.toLong())
             .executeAsList()
@@ -95,7 +105,11 @@ class LaunchLocalDataSource(
             }
     }
     
-    suspend fun getPreviousBasicLaunches(limit: Int): List<LaunchBasic> {
+    suspend fun getPreviousBasicLaunches(limit: Int): List<Launch> {
+        return getPreviousBasicLaunchesApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getPreviousBasicLaunchesApi(limit: Int): List<LaunchBasic> {
         val now = System.now().toEpochMilliseconds()
         return queries.getPreviousBasic(now, now, limit.toLong())
             .executeAsList()
@@ -144,13 +158,21 @@ class LaunchLocalDataSource(
         launches.forEach { cacheNormalLaunch(it) }
     }
     
-    suspend fun getNormalLaunch(id: String): LaunchNormal? {
+    suspend fun getNormalLaunch(id: String): Launch? {
+        return getNormalLaunchApi(id)?.toDomain()
+    }
+
+    suspend fun getNormalLaunchApi(id: String): LaunchNormal? {
         val now = System.now().toEpochMilliseconds()
         val cached = queries.getNormalById(id, now).executeAsOneOrNull()
         return cached?.let { json.decodeFromString<LaunchNormal>(it.json_data) }
     }
     
-    suspend fun getUpcomingNormalLaunches(limit: Int): List<LaunchNormal> {
+    suspend fun getUpcomingNormalLaunches(limit: Int): List<Launch> {
+        return getUpcomingNormalLaunchesApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getUpcomingNormalLaunchesApi(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
         val results = queries.getUpcomingNormal(now, now, limit.toLong())
             .executeAsList()
@@ -167,7 +189,11 @@ class LaunchLocalDataSource(
         return results
     }
     
-    suspend fun getPreviousNormalLaunches(limit: Int): List<LaunchNormal> {
+    suspend fun getPreviousNormalLaunches(limit: Int): List<Launch> {
+        return getPreviousNormalLaunchesApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getPreviousNormalLaunchesApi(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
         val results = queries.getPreviousNormal(now, now, limit.toLong())
             .executeAsList()
@@ -213,7 +239,11 @@ class LaunchLocalDataSource(
         )
     }
     
-    suspend fun getDetailedLaunch(id: String): LaunchDetailed? {
+    suspend fun getDetailedLaunch(id: String): Launch? {
+        return getDetailedLaunchApi(id)?.toDomain()
+    }
+
+    suspend fun getDetailedLaunchApi(id: String): LaunchDetailed? {
         val now = System.now().toEpochMilliseconds()
         val cached = queries.getDetailedById(id, now).executeAsOneOrNull()
         return cached?.let {
@@ -224,7 +254,11 @@ class LaunchLocalDataSource(
     }
     
     // In-flight launch cache methods (status_id = 6)
-    suspend fun getInFlightNormalLaunches(limit: Int): List<LaunchNormal> {
+    suspend fun getInFlightNormalLaunches(limit: Int): List<Launch> {
+        return getInFlightNormalLaunchesApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getInFlightNormalLaunchesApi(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
         return queries.getInFlightNormal(now, limit.toLong())
             .executeAsList()
@@ -238,7 +272,11 @@ class LaunchLocalDataSource(
             }
     }
 
-    suspend fun getInFlightNormalLaunchesStale(limit: Int): List<LaunchNormal> {
+    suspend fun getInFlightNormalLaunchesStale(limit: Int): List<Launch> {
+        return getInFlightNormalLaunchesStaleApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getInFlightNormalLaunchesStaleApi(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
         return queries.getInFlightNormalStale(now, limit.toLong())
             .executeAsList()
@@ -253,7 +291,11 @@ class LaunchLocalDataSource(
     }
 
     // Stale cache methods - return data regardless of expiration for stale-while-revalidate pattern
-    suspend fun getUpcomingNormalLaunchesStale(limit: Int): List<LaunchNormal> {
+    suspend fun getUpcomingNormalLaunchesStale(limit: Int): List<Launch> {
+        return getUpcomingNormalLaunchesStaleApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getUpcomingNormalLaunchesStaleApi(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
         return queries.getUpcomingNormalStale(now, limit.toLong())
             .executeAsList()
@@ -267,7 +309,11 @@ class LaunchLocalDataSource(
             }
     }
     
-    suspend fun getPreviousNormalLaunchesStale(limit: Int): List<LaunchNormal> {
+    suspend fun getPreviousNormalLaunchesStale(limit: Int): List<Launch> {
+        return getPreviousNormalLaunchesStaleApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getPreviousNormalLaunchesStaleApi(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
         return queries.getPreviousNormalStale(now, limit.toLong())
             .executeAsList()
@@ -281,7 +327,11 @@ class LaunchLocalDataSource(
             }
     }
     
-    suspend fun getDetailedLaunchStale(id: String): LaunchDetailed? {
+    suspend fun getDetailedLaunchStale(id: String): Launch? {
+        return getDetailedLaunchStaleApi(id)?.toDomain()
+    }
+
+    suspend fun getDetailedLaunchStaleApi(id: String): LaunchDetailed? {
         return queries.getDetailedByIdStale(id).executeAsOneOrNull()?.let {
             try {
                 json.decodeFromString<LaunchDetailed>(it.json_data)
@@ -323,7 +373,11 @@ class LaunchLocalDataSource(
         }
     }
     
-    suspend fun getStarshipHistory(limit: Int): List<LaunchNormal> {
+    suspend fun getStarshipHistory(limit: Int): List<Launch> {
+        return getStarshipHistoryApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getStarshipHistoryApi(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
         return queries.getStarshipHistory(now, now, limit.toLong())
             .executeAsList()
@@ -337,7 +391,11 @@ class LaunchLocalDataSource(
             }
     }
     
-    suspend fun getStarshipHistoryStale(limit: Int): List<LaunchNormal> {
+    suspend fun getStarshipHistoryStale(limit: Int): List<Launch> {
+        return getStarshipHistoryStaleApi(limit).map { it.toDomain() }
+    }
+
+    suspend fun getStarshipHistoryStaleApi(limit: Int): List<LaunchNormal> {
         val now = System.now().toEpochMilliseconds()
         return queries.getStarshipHistoryStale(now, limit.toLong())
             .executeAsList()

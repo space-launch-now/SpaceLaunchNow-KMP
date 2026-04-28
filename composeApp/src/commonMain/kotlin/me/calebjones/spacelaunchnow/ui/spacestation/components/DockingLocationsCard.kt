@@ -30,7 +30,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.SpaceShuttle
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.DockingLocationSerializerForSpacestation
+import me.calebjones.spacelaunchnow.domain.model.DockingLocation
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 
@@ -40,7 +40,7 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
  */
 @Composable
 fun DockingLocationsCard(
-    dockingLocations: List<DockingLocationSerializerForSpacestation>,
+    dockingLocations: List<DockingLocation>,
     modifier: Modifier = Modifier,
     isLoading: Boolean = false
 ) {
@@ -78,15 +78,10 @@ fun DockingLocationsCard(
 
 @Composable
 private fun DockedVehicleItem(
-    location: DockingLocationSerializerForSpacestation
+    location: DockingLocation
 ) {
     val dockedEvent = location.currentlyDocked ?: return
-
-    // Get vehicle image URL
-    val imageUrl = dockedEvent.flightVehicleChaser?.spacecraft?.image?.thumbnailUrl
-        ?: dockedEvent.flightVehicleChaser?.spacecraft?.spacecraftConfig?.image?.thumbnailUrl
-        ?: dockedEvent.flightVehicleChaser?.spacecraft?.image?.imageUrl
-        ?: dockedEvent.flightVehicleChaser?.spacecraft?.spacecraftConfig?.image?.imageUrl
+    val imageUrl = dockedEvent.vehicleImageUrl
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -137,9 +132,7 @@ private fun DockedVehicleItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 // Vehicle name
-                val vehicleName = dockedEvent.flightVehicleChaser?.spacecraft?.name
-                    ?: dockedEvent.payloadFlightChaser?.payload?.name
-                    ?: "Unknown Vehicle"
+                val vehicleName = dockedEvent.vehicleName ?: "Unknown Vehicle"
 
                 Text(
                     text = vehicleName,
@@ -149,10 +142,7 @@ private fun DockedVehicleItem(
                 )
 
                 // Vehicle type/config
-                val vehicleConfig =
-                    dockedEvent.flightVehicleChaser?.spacecraft?.spacecraftConfig?.name
-                        ?: dockedEvent.payloadFlightChaser?.payload?.type?.name
-                        ?: ""
+                val vehicleConfig = dockedEvent.vehicleConfigName ?: ""
 
                 if (vehicleConfig.isNotBlank()) {
                     Text(

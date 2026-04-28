@@ -1,40 +1,27 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherConfigDetailedList
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 
 /**
  * Repository interface for launcher configuration (rocket type) data.
- * 
+ *
  * LauncherConfig represents a rocket type/variant (e.g., "Super Heavy", "Falcon 9 Block 5").
  * This is the "category" level - individual launchers (boosters) belong to a configuration.
  */
 interface LauncherConfigRepository {
-    
-    /**
-     * Get launcher configurations filtered by program ID with pagination.
-     * 
-     * @param programId Program ID to filter by (e.g., 1 for Starship)
-     * @param limit Number of results per page
-     * @param offset Pagination offset
-     */
-    suspend fun getConfigurationsByProgram(
+
+    suspend fun getConfigurationsByProgramDomain(
         programId: Int,
         limit: Int = 20,
         offset: Int = 0
-    ): Result<PaginatedLauncherConfigDetailedList>
+    ): Result<PaginatedResult<VehicleConfig>>
 
-    /**
-     * Get all launcher configurations with pagination.
-     */
-    suspend fun getConfigurations(
+    suspend fun getConfigurationsDomain(
         limit: Int = 20,
         offset: Int = 0,
         search: String? = null
-    ): Result<PaginatedLauncherConfigDetailedList>
+    ): Result<PaginatedResult<VehicleConfig>>
 
-    /**
-     * Get launcher configuration details by ID.
-     */
-    suspend fun getConfigurationDetails(configId: Int): Result<LauncherConfigDetailed>
+    suspend fun getConfigurationDetailsDomain(configId: Int): Result<VehicleConfig>
 }

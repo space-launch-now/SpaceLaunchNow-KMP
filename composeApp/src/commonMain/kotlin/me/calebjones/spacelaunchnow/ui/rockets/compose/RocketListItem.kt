@@ -29,14 +29,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigNormal
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 
 /**
  * Individual rocket list item card.
  */
 @Composable
 fun RocketListItem(
-    rocket: LauncherConfigNormal,
+    rocket: VehicleConfig,
     onClick: () -> Unit
 ) {
     Card(
@@ -58,7 +58,7 @@ fun RocketListItem(
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                rocket.image?.imageUrl?.let { imageUrl ->
+                rocket.imageUrl?.let { imageUrl ->
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = "${rocket.name} image",
@@ -89,7 +89,7 @@ fun RocketListItem(
                     fontWeight = FontWeight.Bold
                 )
 
-                rocket.manufacturer?.name?.let { manufacturer ->
+                rocket.manufacturerName?.let { manufacturer ->
                     Text(
                         text = manufacturer,
                         style = MaterialTheme.typography.bodyMedium,

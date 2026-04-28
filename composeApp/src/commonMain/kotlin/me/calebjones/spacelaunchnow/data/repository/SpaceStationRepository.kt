@@ -1,9 +1,9 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import me.calebjones.spacelaunchnow.api.iss.IssTle
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
 import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
+import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 
 /**
  * Repository for space station data including ISS details, expeditions, and TLE data.
@@ -26,7 +26,7 @@ interface SpaceStationRepository {
     suspend fun getSpaceStationDetails(
         stationId: Int,
         forceRefresh: Boolean = false
-    ): Result<DataResult<SpaceStationDetailedEndpoint>>
+    ): Result<DataResult<SpaceStationDetail>>
 
     /**
      * Get detailed expedition data including crew information.
@@ -41,7 +41,7 @@ interface SpaceStationRepository {
         expeditionIds: List<Int>,
         stationId: Int,
         forceRefresh: Boolean = false
-    ): Result<DataResult<List<ExpeditionDetailed>>>
+    ): Result<DataResult<List<ExpeditionDetailItem>>>
 
     /**
      * Get TLE (Two-Line Element) data for ISS orbit calculations.

@@ -5,10 +5,12 @@ import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
 import me.calebjones.spacelaunchnow.api.extensions.getUpdates
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Clock.System
@@ -23,7 +25,7 @@ class UpdatesRepositoryImpl(
     override suspend fun getLatestUpdates(
         limit: Int,
         forceRefresh: Boolean
-    ): Result<DataResult<PaginatedUpdateEndpointList>> {
+    ): Result<DataResult<PaginatedResult<Update>>> {
         return try {
             log.d { "getLatestUpdates called - limit: $limit, forceRefresh: $forceRefresh, cacheAvailable: ${localDataSource != null}" }
 
@@ -38,11 +40,11 @@ class UpdatesRepositoryImpl(
                     log.i { "Cache hit - Returning ${'$'}{cachedUpdates.size} cached updates" }
                     return Result.success(
                         DataResult(
-                            data = PaginatedUpdateEndpointList(
+                            data = PaginatedResult(
                                 count = cachedUpdates.size,
                                 next = null,
                                 previous = null,
-                                results = cachedUpdates
+                                results = cachedUpdates.map { it.toDomain() }
                             ),
                             source = DataSource.CACHE,
                             timestamp = staleTimestamp ?: now
@@ -65,7 +67,12 @@ class UpdatesRepositoryImpl(
 
             Result.success(
                 DataResult(
-                    data = updates,
+                    data = PaginatedResult(
+                        count = updates.count,
+                        next = updates.next,
+                        previous = updates.previous,
+                        results = updates.results.map { it.toDomain() }
+                    ),
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -79,11 +86,11 @@ class UpdatesRepositoryImpl(
                 log.w { "Returning ${'$'}{staleCached.size} stale cached updates due to API error" }
                 return Result.success(
                     DataResult(
-                        data = PaginatedUpdateEndpointList(
+                        data = PaginatedResult(
                             count = staleCached.size,
                             next = null,
                             previous = null,
-                            results = staleCached
+                            results = staleCached.map { it.toDomain() }
                         ),
                         source = DataSource.STALE_CACHE,
                         timestamp = staleTimestamp
@@ -100,11 +107,11 @@ class UpdatesRepositoryImpl(
                 log.w { "Returning ${'$'}{staleCached.size} stale cached updates due to network error" }
                 return Result.success(
                     DataResult(
-                        data = PaginatedUpdateEndpointList(
+                        data = PaginatedResult(
                             count = staleCached.size,
                             next = null,
                             previous = null,
-                            results = staleCached
+                            results = staleCached.map { it.toDomain() }
                         ),
                         source = DataSource.STALE_CACHE,
                         timestamp = staleTimestamp
@@ -122,7 +129,7 @@ class UpdatesRepositoryImpl(
         allProgram: Int,
         limit: Int,
         forceRefresh: Boolean
-    ): Result<DataResult<PaginatedUpdateEndpointList>> {
+    ): Result<DataResult<PaginatedResult<Update>>> {
         return try {
             println("=== UpdatesRepository.getUpdatesByProgram ===")
             println("Parameters: allProgram=$allProgram, limit=$limit, forceRefresh=$forceRefresh")
@@ -144,7 +151,12 @@ class UpdatesRepositoryImpl(
 
             Result.success(
                 DataResult(
-                    data = updates,
+                    data = PaginatedResult(
+                        count = updates.count,
+                        next = updates.next,
+                        previous = updates.previous,
+                        results = updates.results.map { it.toDomain() }
+                    ),
                     source = DataSource.NETWORK,
                     timestamp = now
                 )

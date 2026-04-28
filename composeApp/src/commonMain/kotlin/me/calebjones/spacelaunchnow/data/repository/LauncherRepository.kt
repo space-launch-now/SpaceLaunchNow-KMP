@@ -1,36 +1,27 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherDetailedList
+import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
 /**
  * Repository interface for launcher (booster/first stage) data
  */
 interface LauncherRepository {
 
-    /**
-     * Get launchers with optional search/filter and pagination
-     */
-    suspend fun getLaunchers(
+    suspend fun getLaunchersDomain(
         limit: Int = 20,
         offset: Int = 0,
         search: String? = null,
         ordering: String? = null,
         launcherConfigId: Int? = null,
         isPlaceholder: Boolean? = null
-    ): Result<PaginatedLauncherDetailedList>
+    ): Result<PaginatedResult<LauncherDetail>>
 
-    /**
-     * Get launchers by config ID with pagination
-     */
-    suspend fun getLaunchersByConfig(
+    suspend fun getLaunchersByConfigDomain(
         configId: Int,
         limit: Int = 20,
         offset: Int = 0
-    ): Result<PaginatedLauncherDetailedList>
+    ): Result<PaginatedResult<LauncherDetail>>
 
-    /**
-     * Get launcher details by ID
-     */
-    suspend fun getLauncherDetails(launcherId: Int): Result<LauncherDetailed>
+    suspend fun getLauncherDetailsDomain(launcherId: Int): Result<LauncherDetail>
 }

@@ -15,8 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
@@ -66,12 +66,12 @@ val snackDetailBoundsTransform = BoundsTransform { _, _ ->
 )
 @Composable
 fun LaunchDetailView(
-    launch: LaunchDetailed,
+    launch: Launch,
     videoPlayerState: VideoPlayerState,
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
-    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    relatedEvents: List<Event> = emptyList(),
     isEventsLoading: Boolean = false,
     eventsError: String? = null,
     onSelectVideo: (Int) -> Unit,
@@ -142,12 +142,12 @@ fun LaunchDetailView(
  */
 @Composable
 private fun TabletLaunchDetailView(
-    launch: LaunchDetailed,
+    launch: Launch,
     videoPlayerState: VideoPlayerState,
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
-    relatedEvents: List<EventEndpointNormal>,
+    relatedEvents: List<Event>,
     isEventsLoading: Boolean,
     eventsError: String?,
     onSelectVideo: (Int) -> Unit,
@@ -162,9 +162,9 @@ private fun TabletLaunchDetailView(
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     SharedDetailScaffold(
-        titleText = launch.name ?: "Unknown Launch",
-        taglineText = launch.launchServiceProvider.name,
-        imageUrl = launch.image?.imageUrl,
+        titleText = launch.name,
+        taglineText = launch.provider?.name ?: "",
+        imageUrl = launch.imageUrl,
         onNavigateBack = onNavigateBack,
         scrollEnabled = true, // Tablet uses scrollable layout
         backgroundColors = listOf(
@@ -211,12 +211,12 @@ private fun TabletLaunchDetailView(
  */
 @Composable
 private fun PhoneLaunchDetailView(
-    launch: LaunchDetailed,
+    launch: Launch,
     videoPlayerState: VideoPlayerState,
     relatedNews: List<Article>,
     isNewsLoading: Boolean,
     newsError: String?,
-    relatedEvents: List<EventEndpointNormal>,
+    relatedEvents: List<Event>,
     isEventsLoading: Boolean,
     eventsError: String?,
     onSelectVideo: (Int) -> Unit,
@@ -232,9 +232,9 @@ private fun PhoneLaunchDetailView(
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     SharedDetailScaffold(
-        titleText = launch.name ?: "Unknown Launch",
-        taglineText = launch.launchServiceProvider.name,
-        imageUrl = launch.image?.imageUrl,
+        titleText = launch.name,
+        taglineText = launch.provider?.name ?: "",
+        imageUrl = launch.imageUrl,
         onNavigateBack = onNavigateBack,
         scrollEnabled = true, // Parent scrolling enabled for header collapse
         forcePhoneLayout = forcePhoneLayout,

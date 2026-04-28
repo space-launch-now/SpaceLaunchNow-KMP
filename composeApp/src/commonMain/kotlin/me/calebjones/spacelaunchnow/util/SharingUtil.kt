@@ -1,12 +1,12 @@
 package me.calebjones.spacelaunchnow.util
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 
 /**
  * Common interface for sharing launch information across platforms
  */
 interface LaunchSharingService {
-    suspend fun shareLaunch(launch: LaunchNormal)
+    suspend fun shareLaunch(launch: Launch)
     suspend fun shareUrl(url: String, text: String? = null)
 }
 
@@ -24,7 +24,7 @@ object SharingFormatUtil {
      * Formats launch information for sharing
      * @param useUtc If true, displays time in UTC instead of local timezone
      */
-    fun formatLaunchShareText(launch: LaunchNormal, useUtc: Boolean = false): String {
+    fun formatLaunchShareText(launch: Launch, useUtc: Boolean = false): String {
         val title = LaunchFormatUtil.formatLaunchTitle(launch)
         val launchTime = launch.net?.let { DateTimeUtil.formatLaunchDate(it, useUtc) } ?: "TBD"
 

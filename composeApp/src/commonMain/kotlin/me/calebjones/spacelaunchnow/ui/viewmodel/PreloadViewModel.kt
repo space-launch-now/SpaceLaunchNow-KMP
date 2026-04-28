@@ -184,16 +184,16 @@ class PreloadViewModel(
 
     private fun buildTier1Tasks(): List<PreloadTask> = listOf(
         PreloadTask("Featured launch", PreloadTier.CRITICAL) {
-            launchRepository.getFeaturedLaunch(agencyIds = null, locationIds = null)
+            launchRepository.getFeaturedLaunchDomain(agencyIds = null, locationIds = null)
         },
         PreloadTask("Upcoming normal launches", PreloadTier.CRITICAL) {
-            launchRepository.getUpcomingLaunchesNormal(limit = 8, agencyIds = null, locationIds = null)
+            launchRepository.getUpcomingLaunchesNormalDomain(limit = 8, agencyIds = null, locationIds = null)
         },
         PreloadTask("Articles", PreloadTier.CRITICAL) {
             articlesRepository.getArticles()
         },
         PreloadTask("Upcoming events", PreloadTier.CRITICAL) {
-            eventsRepository.getUpcomingEvents()
+            eventsRepository.getUpcomingEventsDomain()
         }
     )
 
@@ -214,17 +214,17 @@ class PreloadViewModel(
 
         return listOf(
             PreloadTask("Featured launch", PreloadTier.WARM_CACHE) {
-                launchRepository.getFeaturedLaunch(agencyIds = agencyIds, locationIds = locationIds)
+                launchRepository.getFeaturedLaunchDomain(agencyIds = agencyIds, locationIds = locationIds)
             },
             PreloadTask("Upcoming normal launches", PreloadTier.WARM_CACHE) {
-                launchRepository.getUpcomingLaunchesNormal(
+                launchRepository.getUpcomingLaunchesNormalDomain(
                     limit = 8,
                     agencyIds = agencyIds,
                     locationIds = locationIds
                 )
             },
             PreloadTask("Previous normal launches", PreloadTier.WARM_CACHE) {
-                launchRepository.getPreviousLaunchesNormal(
+                launchRepository.getPreviousLaunchesNormalDomain(
                     limit = 8,
                     agencyIds = agencyIds,
                     locationIds = locationIds
@@ -237,7 +237,7 @@ class PreloadViewModel(
                 articlesRepository.getArticles()
             },
             PreloadTask("Upcoming events", PreloadTier.WARM_CACHE) {
-                eventsRepository.getUpcomingEvents()
+                eventsRepository.getUpcomingEventsDomain()
             },
             PreloadTask("History launches", PreloadTier.WARM_CACHE) {
                 launchRepository.getLaunchesByDayAndMonth(today.day, today.month.ordinal)

@@ -49,10 +49,10 @@ import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
 import kotlinx.coroutines.flow.first
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.theme.getWidgetAppearanceBlocking
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.math.abs
@@ -100,7 +100,7 @@ class NextUpWidget : GlanceAppWidget() {
         }
     }
 
-    private suspend fun fetchNextLaunch(): LaunchNormal? {
+    private suspend fun fetchNextLaunch(): Launch? {
         return withContext(Dispatchers.IO) {
             try {
                 val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
@@ -111,7 +111,7 @@ class NextUpWidget : GlanceAppWidget() {
                 val agencyIds = launchFilterService.getAgencyIds(state)
                 val locationIds = launchFilterService.getLocationIds(state)
 
-                val result = launchRepository.getUpcomingLaunchesNormal(
+                val result = launchRepository.getUpcomingLaunchesNormalDomain(
                     limit = 1,
                     agencyIds = agencyIds,
                     locationIds = locationIds
@@ -127,7 +127,7 @@ class NextUpWidget : GlanceAppWidget() {
 
 @Composable
 fun NextUpWidgetContent(
-    launch: LaunchNormal?,
+    launch: Launch?,
     cornerRadius: Int = 16
 ) {
     val context = LocalContext.current
@@ -155,7 +155,7 @@ fun NextUpWidgetContent(
                 modifier = GlanceModifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val launchName = launch.name ?: "Unknown Launch"
+                val launchName = launch.name
                 val parts = launchName.split(" | ")
                 val title = parts[0]
                 val subtitle = if (parts.size > 1) parts[1] else ""
@@ -186,7 +186,7 @@ fun NextUpWidgetContent(
                 Spacer(modifier = GlanceModifier.height(8.dp))
 
                 // Agency
-                launch.launchServiceProvider.name?.let { agencyName ->
+                launch.provider.name.let { agencyName ->
                     Text(
                         text = agencyName,
                         style = TextStyle(
@@ -222,7 +222,7 @@ fun NextUpWidgetContent(
                         text = status,
                         style = TextStyle(
                             fontSize = 10.sp,
-                            color = when (launch.status.id) {
+                            color = when (launch.status?.id) {
                                 1 -> GlanceTheme.colors.secondary // Go
                                 2 -> GlanceTheme.colors.error // TBD
                                 else -> GlanceTheme.colors.onBackground

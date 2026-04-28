@@ -63,7 +63,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.getPlatform
@@ -71,7 +71,6 @@ import me.calebjones.spacelaunchnow.ui.components.AppIconBox
 import me.calebjones.spacelaunchnow.ui.components.FinePrint
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCardHeaderOverlay
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
-import me.calebjones.spacelaunchnow.ui.compose.toLaunchCardData
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
@@ -169,7 +168,7 @@ fun OnboardingPaywallScreen(
 }
 
 // ---------------------------------------------------------------------------
-// Stateless content — previewable
+// Stateless content Ã¢â‚¬â€ previewable
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -181,7 +180,7 @@ fun OnboardingContent(
     isProcessing: Boolean = false,
     errorMessage: String? = null,
     billingUnavailable: Boolean = false,
-    nextLaunch: LaunchNormal? = null,
+    nextLaunch: Launch? = null,
     isSubscribed: Boolean = false,
     onSubscribe: (ProductInfo) -> Unit = {},
     onRestorePurchases: () -> Unit = {},
@@ -211,7 +210,7 @@ fun OnboardingContent(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ── App icon + headline ───────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ App icon + headline Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             AppIconBox(boxSize = 72.dp, iconSize = 56.dp)
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -240,7 +239,7 @@ fun OnboardingContent(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // ── Premium features ──────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Premium features Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -295,7 +294,7 @@ fun OnboardingContent(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ── Primary trial CTA ─────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Primary trial CTA Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             if (!isSubscribed) {
                 if (annualProduct != null) {
                     val trialLabel = annualProduct.freeTrialPeriodDisplay
@@ -361,7 +360,7 @@ fun OnboardingContent(
                         }
                     }
 
-                    // ── Monthly fallback ───────────────────────────────────
+                    // Ã¢â€â‚¬Ã¢â€â‚¬ Monthly fallback Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
                     if (monthlyProduct != null) {
                         Spacer(modifier = Modifier.height(12.dp))
                         val perMonth =
@@ -382,7 +381,7 @@ fun OnboardingContent(
                             Text(
                                 text = buildString {
                                     append("Or go Monthly")
-                                    if (perMonth != null) append(" · $perMonth/mo")
+                                    if (perMonth != null) append(" Ã‚Â· $perMonth/mo")
                                 },
                                 style = MaterialTheme.typography.labelMedium
                             )
@@ -447,7 +446,7 @@ fun OnboardingContent(
                 }
             }
 
-            // ── Continue to App (subscribed users only) ──────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Continue to App (subscribed users only) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             if (isSubscribed) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
@@ -467,7 +466,7 @@ fun OnboardingContent(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // ── Error message ─────────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Error message Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             if (errorMessage != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -481,7 +480,7 @@ fun OnboardingContent(
 
             Spacer(modifier = Modifier.height(64.dp))
 
-            // ── Legal footer ──────────────────────────────────────────────
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Legal footer Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
             FinePrint(
                 dimColor = Color.White.copy(alpha = 0.25f),
                 linkColor = Color.White.copy(alpha = 0.55f)
@@ -672,9 +671,8 @@ private fun OnboardingPricingCard(
 }
 
 @Composable
-internal fun OnboardingNextLaunchCard(launch: LaunchNormal) {
-    val launchCardData = remember(launch) { launch.toLaunchCardData() }
-    val imageUrl = launch.image?.imageUrl ?: launch.image?.thumbnailUrl
+internal fun OnboardingNextLaunchCard(launch: Launch) {
+    val imageUrl = launch.imageUrl ?: launch.thumbnailUrl
 
     Card(
         modifier = Modifier
@@ -754,7 +752,7 @@ internal fun OnboardingNextLaunchCard(launch: LaunchNormal) {
 
             // Launch info overlay (title, agency logo, date)
             LaunchCardHeaderOverlay(
-                launchData = launchCardData,
+                launch = launch,
                 showAgencyLogo = true,
                 logoSize = 56.dp,
                 modifier = Modifier.fillMaxSize()
@@ -834,7 +832,7 @@ private val previewMonthlyProduct = ProductInfo(
     currencyCode = "USD"
 )
 
-// Loading — products not yet fetched
+// Loading Ã¢â‚¬â€ products not yet fetched
 @Preview
 @Composable
 private fun OnboardingLoadingPreview() {
@@ -868,7 +866,7 @@ private fun OnboardingTrialDarkPreview() {
     }
 }
 
-// Existing subscriber — welcome back view
+// Existing subscriber Ã¢â‚¬â€ welcome back view
 @Preview
 @Composable
 private fun OnboardingSubscribedPreview() {

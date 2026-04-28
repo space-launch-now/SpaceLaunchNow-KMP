@@ -79,9 +79,9 @@ fun AstronautDetailView(
             val astronaut = uiState.astronaut!!
             
             SharedDetailScaffold(
-                titleText = astronaut.name ?: "Astronaut",
-                taglineText = astronaut.agency?.abbrev,
-                imageUrl = astronaut.image?.imageUrl,
+                titleText = astronaut.name ?: "Unknown",
+                taglineText = astronaut.agencyAbbrev,
+                imageUrl = astronaut.imageUrl,
                 onNavigateBack = onNavigateBack
             ) {
                 val isCollapsed = LocalDetailScaffoldCollapsed.current
@@ -99,7 +99,7 @@ fun AstronautDetailView(
                     AstronautStatsCard(astronaut = astronaut)
                     
                     // Biography Card
-                    if (astronaut.bio.isNotBlank()) {
+                    if (!astronaut.bio.isNullOrBlank()) {
                         AstronautInfoCard(astronaut = astronaut)
                     }
                     

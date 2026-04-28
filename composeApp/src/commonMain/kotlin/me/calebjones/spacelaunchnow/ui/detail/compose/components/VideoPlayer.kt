@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import chaintech.videoplayer.model.VideoPlayerConfig
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.VideoUtil
@@ -90,7 +90,7 @@ fun VideoPlayer(
 
 @Composable
 private fun VideoPicker(
-    videos: List<VidURL>,
+    videos: List<VideoLink>,
     selectedIndex: Int,
     launchName: String,
     onVideoSelected: (Int) -> Unit,
@@ -116,7 +116,7 @@ private fun VideoPicker(
 
 @Composable
 private fun VideoPickerDropdown(
-    videos: List<VidURL>,
+    videos: List<VideoLink>,
     selectedIndex: Int,
     launchName: String,
     onVideoSelected: (Int) -> Unit

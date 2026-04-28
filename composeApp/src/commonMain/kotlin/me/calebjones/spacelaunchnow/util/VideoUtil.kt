@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.util
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.VidURL
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 
 object VideoUtil {
 
@@ -37,7 +37,7 @@ object VideoUtil {
      * Finds the first YouTube video URL from a list of video URLs
      * The first video in the list has the highest priority
      */
-    fun findBestYouTubeVideo(vidUrls: List<VidURL>): VidURL? {
+    fun findBestYouTubeVideo(vidUrls: List<VideoLink>): VideoLink? {
         if (vidUrls.isEmpty()) return null
 
         // Simply return the first YouTube video in the list
@@ -48,7 +48,7 @@ object VideoUtil {
     /**
      * Gets a human-readable video source name
      */
-    fun getVideoSourceName(vidUrl: VidURL): String {
+    fun getVideoSourceName(vidUrl: VideoLink): String {
         return when {
             vidUrl.publisher != null -> vidUrl.publisher
             vidUrl.source != null -> vidUrl.source
@@ -60,7 +60,7 @@ object VideoUtil {
     /**
      * Gets the appropriate title for a video
      */
-    fun getVideoTitle(vidUrl: VidURL, launchName: String): String {
+    fun getVideoTitle(vidUrl: VideoLink, launchName: String): String {
         val title = if (vidUrl.title.isNullOrBlank()) launchName else vidUrl.title
         val publish =
             if (vidUrl.publisher.isNullOrBlank()) getVideoSourceName(vidUrl) else vidUrl.publisher
@@ -70,4 +70,5 @@ object VideoUtil {
         }
         return "$title - $publish"
     }
+
 }

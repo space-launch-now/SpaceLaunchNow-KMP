@@ -1,11 +1,11 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import kotlinx.datetime.Instant
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.Update
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Instant
 
 /**
  * Tests for UI components related to Updates
@@ -22,16 +22,13 @@ class LatestUpdatesViewTest {
         profileImage: String? = "https://example.com/profile.jpg",
         createdOn: Instant? = null,
         infoUrl: String? = null
-    ): UpdateEndpoint {
-        return UpdateEndpoint(
+    ): Update {
+        return Update(
             id = id,
             profileImage = profileImage,
             comment = comment,
             infoUrl = infoUrl,
             createdBy = createdBy,
-            launch = null,
-            event = null,
-            program = null,
             createdOn = createdOn
         )
     }
@@ -86,7 +83,7 @@ class LatestUpdatesViewTest {
             createMockUpdate(3, "Third update", "User3")
         )
 
-        val paginatedList = PaginatedUpdateEndpointList(
+        val paginatedList = PaginatedResult(
             count = 3,
             next = "https://api.example.com/updates?page=2",
             previous = null,
@@ -103,7 +100,7 @@ class LatestUpdatesViewTest {
 
     @Test
     fun testEmptyUpdatesList() {
-        val paginatedList = PaginatedUpdateEndpointList(
+        val paginatedList = PaginatedResult<Update>(
             count = 0,
             next = null,
             previous = null,

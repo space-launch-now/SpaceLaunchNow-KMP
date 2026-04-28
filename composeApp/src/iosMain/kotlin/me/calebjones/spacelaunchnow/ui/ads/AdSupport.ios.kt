@@ -86,8 +86,18 @@ actual fun AdConsentPopup(
 }
 
 /**
- * Android implementation of WithPreloadedAds.
- * Preloads all ad types and provides them via CompositionLocal.
+ * iOS implementation of WithPreloadedAds.
+ *
+ * Preloads only the banner sizes used by the vast majority of (phone) sessions and
+ * one dedicated banner for the persistent bottom navigation. Larger/rare sizes
+ * (LEADERBOARD, FULL_BANNER, FLUID) and tablet-specific variants are aliased to
+ * the closest preloaded size; SmartBannerAd has fallback logic that picks the
+ * best available preload at render time.
+ *
+ * Interstitial and rewarded ads are NOT preloaded here — they are loaded
+ * on-demand inside their respective handlers only when the gating logic decides
+ * to show one. This keeps AdMob "show rate" healthy by not requesting an ad we
+ * are unlikely to display.
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
@@ -101,59 +111,42 @@ actual fun WithPreloadedAds(
         return
     }
 
-    // 🚀 PERFORMANCE OPTIMIZATION: Only preload the 3 most commonly used banner sizes
-    // This reduces memory usage and loading time by 66% compared to loading 9 sizes
-    // Other sizes will load on-demand when needed
-    
     // Primary banner ad (most common - used in content areas)
     val preloadedBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER
     )
-    
+
     // Large banner for detail pages and featured content
     val preloadedLargeBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.LARGE_BANNER
     )
-    
-    // Medium rectangle for inline list ads
+
+    // Medium rectangle for inline list ads (also phone INTERSTITIAL placement)
     val preloadedMediumRectangleAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.MEDIUM_RECTANGLE
     )
-    
-    // 🔧 FIX: Create DEDICATED navigation banner ad (doesn't share with content ads)
-    // This prevents conflicts when navigating between screens with inline ads
+
+    // Dedicated navigation banner — separate request to avoid recomposition fights
+    // with the content banner when transitioning between screens.
     val preloadedNavigationBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER
     )
-    
-    // Navigation fallbacks still reuse existing ads for efficiency
+
+    // Aliased fallbacks for sizes/placements that produced ~$0 in production.
     val preloadedNavigationLargeBannerAd = preloadedLargeBannerAd
-    val preloadedNavigationLeaderboardAd = preloadedLargeBannerAd // Fallback to large banner
-    
-    // Tablet-specific ads also reuse the preloaded ads (lazy load on demand if needed)
-    val preloadedLeaderboardAd = preloadedLargeBannerAd // Fallback to large banner
-    val preloadedFullBannerAd = preloadedLargeBannerAd  // Fallback to large banner
-    val preloadedFluidAd = preloadedBannerAd            // Fallback to standard banner
-    
-    // Preload interstitial and rewarded ads
-    val preloadedInterstitialAd by rememberInterstitialAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.INTERSTITIAL)
-    )
-    val preloadedRewardedAd by rememberRewardedAd(
-        activity = context,
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.REWARDED)
-    )
-    
-    // Provide all preloaded ads via CompositionLocal
+    val preloadedNavigationLeaderboardAd = preloadedLargeBannerAd
+    val preloadedLeaderboardAd = preloadedLargeBannerAd
+    val preloadedFullBannerAd = preloadedLargeBannerAd
+    val preloadedFluidAd = preloadedBannerAd
+
     CompositionLocalProvider(
         LocalPreloadedBannerAd provides preloadedBannerAd,
         LocalPreloadedLargeBannerAd provides preloadedLargeBannerAd,
@@ -163,9 +156,8 @@ actual fun WithPreloadedAds(
         LocalPreloadedNavigationLeaderboardAd provides preloadedNavigationLeaderboardAd,
         LocalPreloadedLeaderboardAd provides preloadedLeaderboardAd,
         LocalPreloadedFullBannerAd provides preloadedFullBannerAd,
-        LocalPreloadedFluidAd provides preloadedFluidAd,
-        LocalPreloadedInterstitialAd provides preloadedInterstitialAd,
-        LocalPreloadedRewardedAd provides preloadedRewardedAd
+        LocalPreloadedFluidAd provides preloadedFluidAd
+        // Interstitial + rewarded intentionally omitted — loaded on-demand by their handlers.
     ) {
         content()
     }

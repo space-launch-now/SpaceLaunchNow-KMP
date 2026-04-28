@@ -1,7 +1,6 @@
 package me.calebjones.spacelaunchnow
 
 import kotlinx.coroutines.flow.first
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.notifications.IosPushMessagingBridge
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -9,6 +8,8 @@ import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.di.koinConfig
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
@@ -56,16 +57,16 @@ class KoinHelper : KoinComponent {
      * Throws an exception if the API call fails
      */
     @Throws(Exception::class)
-    suspend fun fetchUpcomingLaunches(limit: Int): PaginatedLaunchNormalList {
-        return launchRepository.getUpcomingLaunchesNormal(limit).getOrThrow().data
+    suspend fun fetchUpcomingLaunches(limit: Int): PaginatedResult<Launch> {
+        return launchRepository.getUpcomingLaunchesNormalDomain(limit).getOrThrow().data
     }
 
     /**
      * Fetch upcoming launches and unwrap the Result type
-     * Returns the PaginatedLaunchNormalList directly or null if failed.
+     * Returns paginated domain Launch data directly or null if failed.
      * Applies user filter preferences (agency/location) from NotificationState.
      */
-    suspend fun fetchUpcomingLaunchesOrNull(limit: Int): PaginatedLaunchNormalList? {
+    suspend fun fetchUpcomingLaunchesOrNull(limit: Int): PaginatedResult<Launch>? {
         val notificationStateStorage = getKoin().get<NotificationStateStorage>()
         val launchFilterService = getKoin().get<LaunchFilterService>()
 
@@ -73,7 +74,7 @@ class KoinHelper : KoinComponent {
         val agencyIds = launchFilterService.getAgencyIds(state)
         val locationIds = launchFilterService.getLocationIds(state)
 
-        val result = launchRepository.getUpcomingLaunchesNormal(
+        val result = launchRepository.getUpcomingLaunchesNormalDomain(
             limit,
             forceRefresh = true,
             agencyIds = agencyIds,

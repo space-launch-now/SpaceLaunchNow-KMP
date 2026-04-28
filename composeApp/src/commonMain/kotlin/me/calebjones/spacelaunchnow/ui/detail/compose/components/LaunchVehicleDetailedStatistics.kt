@@ -81,7 +81,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.brands.WikipediaW
 import kotlinx.coroutines.delay
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
+import me.calebjones.spacelaunchnow.domain.model.RocketConfig
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.SpecCard
 import me.calebjones.spacelaunchnow.ui.components.StatCard
@@ -93,7 +93,7 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 
 @Composable
 fun LaunchVehicleDetailsCard(
-    rocketConfig: LauncherConfigDetailed,
+    rocketConfig: RocketConfig,
     openUrl: (String) -> Unit = { /* TODO: Implement for platform */ }
 ) {
     Card(
@@ -107,7 +107,7 @@ fun LaunchVehicleDetailsCard(
             verticalAlignment = Alignment.Top
         ) {
             // Rocket thumbnail image on the left
-            rocketConfig.image?.let { imageUrl ->
+            rocketConfig.imageUrl?.let { imageUrl ->
                 Surface(
                     modifier = Modifier.size(80.dp),
                     shape = CircleShape,
@@ -118,7 +118,7 @@ fun LaunchVehicleDetailsCard(
                     )
                 ) {
                     SubcomposeAsyncImage(
-                        model = imageUrl.thumbnailUrl,
+                        model = imageUrl,
                         contentDescription = "Rocket image",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
@@ -494,7 +494,7 @@ fun LaunchVehicleDetailsCard(
 }
 
 @Composable
-fun LaunchVehicleDetailedStatistics(rocketConfig: LauncherConfigDetailed) {
+fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
 
     Column(
 //        modifier = Modifier.padding(8.dp),

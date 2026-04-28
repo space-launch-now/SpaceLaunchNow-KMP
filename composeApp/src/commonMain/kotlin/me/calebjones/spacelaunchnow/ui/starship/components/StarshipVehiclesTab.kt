@@ -33,10 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
+import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
+import me.calebjones.spacelaunchnow.domain.model.Spacecraft
+import me.calebjones.spacelaunchnow.domain.model.SpacecraftConfig
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.ui.compose.StarshipVehiclesShimmer
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.viewmodel.VehicleNavigationLevel
@@ -54,23 +54,23 @@ fun StarshipVehiclesTab(
     // Navigation state
     navigationLevel: VehicleNavigationLevel,
     selectedVehicleType: VehicleType,
-    selectedLauncherConfig: LauncherConfigDetailed?,
-    selectedSpacecraftConfig: SpacecraftConfigDetailed?,
+    selectedLauncherConfig: VehicleConfig?,
+    selectedSpacecraftConfig: SpacecraftConfig?,
     // Config states
-    launcherConfigsState: ViewState<List<LauncherConfigDetailed>>,
-    spacecraftConfigsState: ViewState<List<SpacecraftConfigDetailed>>,
+    launcherConfigsState: ViewState<List<VehicleConfig>>,
+    spacecraftConfigsState: ViewState<List<SpacecraftConfig>>,
     // Vehicle states (for level 2)
-    spacecraftState: ViewState<List<SpacecraftEndpointDetailed>>,
+    spacecraftState: ViewState<List<Spacecraft>>,
     spacecraftHasMore: Boolean,
     spacecraftLoadingMore: Boolean,
     onLoadMoreSpacecraft: () -> Unit,
-    launchersState: ViewState<List<LauncherDetailed>>,
+    launchersState: ViewState<List<LauncherDetail>>,
     launchersHasMore: Boolean,
     launchersLoadingMore: Boolean,
     onLoadMoreLaunchers: () -> Unit,
     // Navigation callbacks
-    onSelectLauncherConfig: (LauncherConfigDetailed) -> Unit,
-    onSelectSpacecraftConfig: (SpacecraftConfigDetailed) -> Unit,
+    onSelectLauncherConfig: (VehicleConfig) -> Unit,
+    onSelectSpacecraftConfig: (SpacecraftConfig) -> Unit,
     onNavigateBack: () -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -127,10 +127,10 @@ fun StarshipVehiclesTab(
  */
 @Composable
 private fun ConfigurationsView(
-    launcherConfigsState: ViewState<List<LauncherConfigDetailed>>,
-    spacecraftConfigsState: ViewState<List<SpacecraftConfigDetailed>>,
-    onSelectLauncherConfig: (LauncherConfigDetailed) -> Unit,
-    onSelectSpacecraftConfig: (SpacecraftConfigDetailed) -> Unit,
+    launcherConfigsState: ViewState<List<VehicleConfig>>,
+    spacecraftConfigsState: ViewState<List<SpacecraftConfig>>,
+    onSelectLauncherConfig: (VehicleConfig) -> Unit,
+    onSelectSpacecraftConfig: (SpacecraftConfig) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isLoading = launcherConfigsState.isLoading || spacecraftConfigsState.isLoading
@@ -256,13 +256,13 @@ private fun ConfigurationsView(
 @Composable
 private fun VehiclesView(
     vehicleType: VehicleType,
-    selectedLauncherConfig: LauncherConfigDetailed?,
-    selectedSpacecraftConfig: SpacecraftConfigDetailed?,
-    spacecraftState: ViewState<List<SpacecraftEndpointDetailed>>,
+    selectedLauncherConfig: VehicleConfig?,
+    selectedSpacecraftConfig: SpacecraftConfig?,
+    spacecraftState: ViewState<List<Spacecraft>>,
     spacecraftHasMore: Boolean,
     spacecraftLoadingMore: Boolean,
     onLoadMoreSpacecraft: () -> Unit,
-    launchersState: ViewState<List<LauncherDetailed>>,
+    launchersState: ViewState<List<LauncherDetail>>,
     launchersHasMore: Boolean,
     launchersLoadingMore: Boolean,
     onLoadMoreLaunchers: () -> Unit,

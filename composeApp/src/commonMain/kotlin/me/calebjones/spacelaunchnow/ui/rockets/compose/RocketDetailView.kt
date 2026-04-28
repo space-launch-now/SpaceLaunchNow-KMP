@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
@@ -25,13 +25,13 @@ private val TitleHeight = 110.dp
 
 @Composable
 fun RocketDetailView(
-    rocket: LauncherConfigDetailed,
+    rocket: VehicleConfig,
     onNavigateBack: () -> Unit
 ) {
     SharedDetailScaffold(
         titleText = rocket.fullName ?: rocket.name,
-        taglineText = rocket.manufacturer?.name,
-        imageUrl = rocket.image?.imageUrl,
+        taglineText = rocket.manufacturerName,
+        imageUrl = rocket.imageUrl,
         onNavigateBack = onNavigateBack,
         backgroundColors = listOf(
             MaterialTheme.colorScheme.primaryContainer,
@@ -44,7 +44,7 @@ fun RocketDetailView(
 }
 
 @Composable
-private fun RocketDetailContent(rocket: LauncherConfigDetailed) {
+private fun RocketDetailContent(rocket: VehicleConfig) {
     val isCollapsed = LocalDetailScaffoldCollapsed.current
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
@@ -91,7 +91,7 @@ private fun RocketDetailContent(rocket: LauncherConfigDetailed) {
         }
 
         // Landing Statistics (if applicable)
-        if (rocket.attemptedLandings != null && rocket.attemptedLandings!! > 0) {
+        if (rocket.attemptedLandings != null && rocket.attemptedLandings > 0) {
             LandingStatsCard(rocket)
             Spacer(Modifier.height(16.dp))
         }
@@ -102,7 +102,7 @@ private fun RocketDetailContent(rocket: LauncherConfigDetailed) {
 }
 
 @Composable
-private fun RocketInfoCard(rocket: LauncherConfigDetailed) {
+private fun RocketInfoCard(rocket: VehicleConfig) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -122,7 +122,7 @@ private fun RocketInfoCard(rocket: LauncherConfigDetailed) {
 
             InfoRow(label = "Full Name", value = rocket.fullName ?: rocket.name)
             rocket.variant?.let { InfoRow(label = "Variant", value = it) }
-            rocket.manufacturer?.name?.let { InfoRow(label = "Manufacturer", value = it) }
+            rocket.manufacturerName?.let { InfoRow(label = "Manufacturer", value = it) }
             rocket.maidenFlight?.let { InfoRow(label = "Maiden Flight", value = it.toString()) }
             InfoRow(label = "Status", value = if (rocket.active == true) "Active" else "Inactive")
             InfoRow(label = "Reusable", value = if (rocket.reusable == true) "Yes" else "No")
@@ -163,7 +163,7 @@ private fun DescriptionCard(description: String) {
 }
 
 @Composable
-private fun PerformanceCard(rocket: LauncherConfigDetailed) {
+private fun PerformanceCard(rocket: VehicleConfig) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -206,7 +206,7 @@ private fun PerformanceCard(rocket: LauncherConfigDetailed) {
 }
 
 @Composable
-private fun CapacityCard(rocket: LauncherConfigDetailed) {
+private fun CapacityCard(rocket: VehicleConfig) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -233,7 +233,7 @@ private fun CapacityCard(rocket: LauncherConfigDetailed) {
 }
 
 @Composable
-private fun LaunchStatsCard(rocket: LauncherConfigDetailed) {
+private fun LaunchStatsCard(rocket: VehicleConfig) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -271,7 +271,7 @@ private fun LaunchStatsCard(rocket: LauncherConfigDetailed) {
 }
 
 @Composable
-private fun LandingStatsCard(rocket: LauncherConfigDetailed) {
+private fun LandingStatsCard(rocket: VehicleConfig) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

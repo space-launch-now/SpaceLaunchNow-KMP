@@ -15,15 +15,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventType
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsFilterState
 import me.calebjones.spacelaunchnow.util.logging.logger
 
@@ -40,7 +39,6 @@ class NewsEventsViewModel(
     private val articlesRepository: ArticlesRepository,
     private val eventsRepository: EventsRepository,
     private val infoRepository: InfoRepository,
-    private val configApi: ConfigApi,
     private val appPreferences: AppPreferences,
     private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
@@ -253,7 +251,7 @@ class NewsEventsViewModel(
                     )
                 }
 
-                val result = eventsRepository.getEventsPaginated(
+                val result = eventsRepository.getEventsPaginatedDomain(
                     limit = PAGE_SIZE,
                     offset = 0,
                     search = _uiState.value.searchQuery.takeIf { it.isNotBlank() },
@@ -303,7 +301,7 @@ class NewsEventsViewModel(
             val nextPage = _uiState.value.eventsCurrentPage + 1
             val offset = nextPage * PAGE_SIZE
 
-            val result = eventsRepository.getEventsPaginated(
+            val result = eventsRepository.getEventsPaginatedDomain(
                 limit = PAGE_SIZE,
                 offset = offset,
                 search = _uiState.value.searchQuery.takeIf { it.isNotBlank() },
@@ -403,18 +401,18 @@ class NewsEventsViewModel(
     // ========== Filtering ==========
 
     /**
-     * Load available event types from the Config API.
+     * Load available event types from the Config API via repository.
      */
     private fun loadEventTypes() {
         viewModelScope.launch {
-            try {
-                val response = configApi.configEventTypesList()
-                val types = response.body().results
-                log.i { "Loaded ${types.size} event types for filtering" }
-                _uiState.update { it.copy(availableEventTypes = types) }
-            } catch (e: Exception) {
-                log.e { "Failed to load event types: ${e.message}" }
-            }
+            eventsRepository.getEventTypesDomain()
+                .onSuccess { types ->
+                    log.i { "Loaded ${types.size} event types for filtering" }
+                    _uiState.update { it.copy(availableEventTypes = types) }
+                }
+                .onFailure { e ->
+                    log.e { "Failed to load event types: ${e.message}" }
+                }
         }
     }
 
@@ -496,7 +494,7 @@ data class NewsEventsUiState(
     val newsDataSource: DataSource = DataSource.NETWORK,
 
     // Events tab state
-    val events: List<EventEndpointNormal> = emptyList(),
+    val events: List<Event> = emptyList(),
     val isLoadingEvents: Boolean = false,
     val isLoadingMoreEvents: Boolean = false,
     val eventsError: String? = null,

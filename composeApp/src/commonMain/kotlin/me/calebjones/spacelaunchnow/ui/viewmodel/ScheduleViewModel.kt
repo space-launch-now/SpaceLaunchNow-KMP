@@ -9,13 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.data.model.FilterOption
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleFilterState
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
@@ -23,7 +21,7 @@ import kotlin.time.Clock.System
 enum class ScheduleTab { Upcoming, Previous }
 
 data class TabState(
-    val items: List<LaunchBasic> = emptyList(),
+    val items: List<Launch> = emptyList(),
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val error: String? = null,
@@ -58,7 +56,7 @@ data class FilterOptions(
 )
 
 class ScheduleViewModel(
-    private val launchesApi: LaunchesApi,
+    private val launchRepository: LaunchRepository,
     private val appPreferences: AppPreferences,
     private val filterRepository: ScheduleFilterRepository,
     private val analyticsManager: AnalyticsManager
@@ -229,60 +227,48 @@ class ScheduleViewModel(
 
                 log.d { "API call starting - tab: $tab, offset: $offset, limit: $limit, ordering: $ordering, search: ${searchQuery ?: "none"}, filters: ${filterState.activeFilterCount()}" }
 
-                val page: PaginatedLaunchBasicList = if (tab == ScheduleTab.Previous) {
-                    log.d { "Calling launchesApi.getLaunchMiniList for PREVIOUS launches..." }
-                    val response = launchesApi.getLaunchMiniList(
+                val page = if (tab == ScheduleTab.Previous) {
+                    log.d { "Calling launchRepository.getFilteredLaunchesDomain for PREVIOUS launches..." }
+                    launchRepository.getFilteredLaunchesDomain(
                         limit = limit,
                         offset = offset,
                         previous = true,
                         ordering = ordering,
                         search = searchQuery,
-                        lspId = filterState.selectedAgencyIds.takeIf { it.isNotEmpty() }?.toList(),
-                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        program = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        rocketConfigurationId = filterState.selectedRocketIds.firstOrNull(), // API limitation: single ID only
+                        lspIds = filterState.selectedAgencyIds.takeIf { it.isNotEmpty() }?.toList(),
+                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }?.toList(),
+                        programIds = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }?.toList(),
+                        rocketConfigurationId = filterState.selectedRocketIds.firstOrNull(),
                         isCrewed = filterState.isCrewed,
                         includeSuborbital = filterState.includeSuborbital,
-                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        orbitIds = filterState.selectedOrbitIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        missionTypeIds = filterState.selectedMissionTypeIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }
-                            ?.toList()
-                    )
-                    log.v { "API Response received - Status: ${response.status}" }
-                    response.body()
+                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }?.toList(),
+                        orbitIds = filterState.selectedOrbitIds.takeIf { it.isNotEmpty() }?.toList(),
+                        missionTypeIds = filterState.selectedMissionTypeIds.takeIf { it.isNotEmpty() }?.toList(),
+                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }?.toList()
+                    ).getOrThrow().also {
+                        log.v { "Repository response received for PREVIOUS - count: ${it.count}" }
+                    }
                 } else {
-                    log.d { "Calling launchesApi.getLaunchMiniList for UPCOMING launches..." }
-                    val response = launchesApi.getLaunchMiniList(
+                    log.d { "Calling launchRepository.getFilteredLaunchesDomain for UPCOMING launches..." }
+                    launchRepository.getFilteredLaunchesDomain(
                         limit = limit,
                         offset = offset,
                         upcoming = true,
                         ordering = ordering,
                         search = searchQuery,
-                        lspId = filterState.selectedAgencyIds.takeIf { it.isNotEmpty() }?.toList(),
-                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        program = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        rocketConfigurationId = filterState.selectedRocketIds.firstOrNull(), // API limitation: single ID only
+                        lspIds = filterState.selectedAgencyIds.takeIf { it.isNotEmpty() }?.toList(),
+                        locationIds = filterState.selectedLocationIds.takeIf { it.isNotEmpty() }?.toList(),
+                        programIds = filterState.selectedProgramIds.takeIf { it.isNotEmpty() }?.toList(),
+                        rocketConfigurationId = filterState.selectedRocketIds.firstOrNull(),
                         isCrewed = filterState.isCrewed,
                         includeSuborbital = filterState.includeSuborbital,
-                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        orbitIds = filterState.selectedOrbitIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        missionTypeIds = filterState.selectedMissionTypeIds.takeIf { it.isNotEmpty() }
-                            ?.toList(),
-                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }
-                            ?.toList()
-                    )
-                    log.d { "API Response received - Status: ${response.status}" }
-                    response.body()
+                        statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }?.toList(),
+                        orbitIds = filterState.selectedOrbitIds.takeIf { it.isNotEmpty() }?.toList(),
+                        missionTypeIds = filterState.selectedMissionTypeIds.takeIf { it.isNotEmpty() }?.toList(),
+                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }?.toList()
+                    ).getOrThrow().also {
+                        log.d { "Repository response received for UPCOMING - count: ${it.count}" }
+                    }
                 }
 
                 log.i { "Received ${page.results.size} launches for $tab - Total count: ${page.count}, Has next: ${page.next != null}" }

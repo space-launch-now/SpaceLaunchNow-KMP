@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchVehicleDetailedStatistics
@@ -27,12 +27,12 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.SpacecraftDetai
  */
 @Composable
 fun RocketTabContent(
-    launch: LaunchDetailed,
+    launch: Launch,
     openUrl: (String) -> Unit,
     onAstronautClick: ((Int) -> Unit)? = null
 ) {
-    val hasRocket = launch.rocket?.configuration != null
-    val hasSpacecraft = !launch.rocket?.spacecraftStage.isNullOrEmpty()
+    val hasRocket = launch.rocket != null
+    val hasSpacecraft = !launch.rocketDetail?.spacecraftFlights.isNullOrEmpty()
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -52,7 +52,7 @@ fun RocketTabContent(
         }
 
         // Launch Vehicle Details Card
-        launch.rocket?.configuration?.let { rocketConfig ->
+        launch.rocket?.let { rocketConfig ->
             Text(
                 text = "Launch Vehicle Details",
                 style = MaterialTheme.typography.titleLarge,
@@ -78,7 +78,7 @@ fun RocketTabContent(
 
         // Spacecraft Details Card
         if (hasSpacecraft) {
-            launch.rocket?.spacecraftStage?.let { spacecraftStages ->
+            launch.rocketDetail?.spacecraftFlights?.let { spacecraftStages ->
                 Text(
                     text = "Spacecraft Details",
                     style = MaterialTheme.typography.titleLarge,

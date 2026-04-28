@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
@@ -57,7 +57,7 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
  * @param launch The detailed launch information to display
  */
 @Composable
-fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
+fun CombinedLaunchOverviewCard(launch: Launch) {
     var showPrecisionDialog by remember { mutableStateOf(false) }
     val useUtc = LocalUseUtc.current
 
@@ -213,11 +213,11 @@ fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                     }
 
                     // Landing information
-                    val landingStages = launch.rocket?.launcherStage ?: emptyList()
-                    val landingsWithAttempt = landingStages.filter { it.landing != null }
+                    val stages = launch.rocketDetail?.stages ?: emptyList()
+                    val landingsWithAttempt = stages.filter { it.landingAttempt != null }
                     if (landingsWithAttempt.isNotEmpty()) {
                         val successfulLandings =
-                            landingsWithAttempt.count { it.landing?.success == true }
+                            landingsWithAttempt.count { it.landingAttempt?.outcome == "Success" }
                         val totalAttempts = landingsWithAttempt.size
 
                         val landingText = buildString {
@@ -228,9 +228,9 @@ fun CombinedLaunchOverviewCard(launch: LaunchDetailed) {
                             } else {
                                 append("$totalAttempts Attempt${if (totalAttempts != 1) "s" else ""}")
                             }
-                            for (landing in landingsWithAttempt) {
-                                if (landing.landing?.landingLocation?.abbrev != null) {
-                                    append("\n${landing.landing.landingLocation.abbrev}")
+                            for (stage in landingsWithAttempt) {
+                                stage.landingAttempt?.location?.let { location ->
+                                    append("\n$location")
                                 }
                             }
                         }

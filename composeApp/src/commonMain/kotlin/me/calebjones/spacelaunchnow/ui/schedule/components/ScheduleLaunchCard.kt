@@ -28,12 +28,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
-import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
+import me.calebjones.spacelaunchnow.ui.preview.PreviewData
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
@@ -54,7 +51,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun ScheduleLaunchView(
-    launch: LaunchBasic,
+    launch: Launch,
     onClick: () -> Unit
 ) {
     Row(
@@ -65,12 +62,12 @@ fun ScheduleLaunchView(
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val imageUrl = launch.image?.thumbnailUrl ?: launch.image?.imageUrl
+        val imageUrl = launch.thumbnailUrl ?: launch.imageUrl
         val useUtc = LocalUseUtc.current
         val dateText = DateTimeUtil.formatDateWithPrecisionFallback(launch, useUtc)
         val title = launch.name ?: "Unknown Launch"
-        val location = launch.locationName ?: "Unknown Location"
-        val mission = launch.launchServiceProvider.name
+        val location = launch.pad?.location?.name ?: "Unknown Location"
+        val mission = launch.provider.name
 
         if (imageUrl != null) {
             SubcomposeAsyncImage(
@@ -165,46 +162,7 @@ private fun RocketIconPlaceholder() {
 private fun ScheduleLaunchCardPreview() {
     SpaceLaunchNowPreviewTheme {
         ScheduleLaunchView(
-            launch = LaunchBasic(
-                id = "abc-123",
-                url = "https://ll.thespacedevs.com/2.4.0/launch/abc-123/",
-                responseMode = "list",
-                slug = "falcon-9-starlink",
-                launchDesignator = "F9-001",
-                status = null,
-                netPrecision = null,
-                image = Image(
-                    id = 1,
-                    name = "Falcon 9 Launch",
-                    imageUrl = "https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/launcher_images/falcon2520925_image_20230807133459.jpeg",
-                    thumbnailUrl = "https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/launcher_images/falcon2520925_image_20230807133459.jpeg",
-                    credit = null,
-                    license = me.calebjones.spacelaunchnow.api.launchlibrary.models.ImageLicense(
-                        id = 1,
-                        name = "Public Domain",
-                    ),
-                    variants = emptyList(),
-                    singleUse = null,
-                ),
-                launchServiceProvider = AgencyMini(
-                    responseMode = "list",
-                    id = 121,
-                    url = "https://ll.thespacedevs.com/2.4.0/agencies/121/",
-                    name = "SpaceX",
-                    type = AgencyType(
-                        id = 3,
-                        name = "Commercial"
-                    ),
-                    abbrev = "SpX"
-                ),
-                infographic = null,
-                locationName = "Kennedy Space Center, FL, USA",
-                name = "Falcon 9 Block 5 | Starlink Group 6-34",
-                lastUpdated = null,
-                net = Instant.parse("2024-02-15T10:30:00Z"),
-                windowEnd = null,
-                windowStart = null
-            ),
+            launch = PreviewData.domainLaunchSpaceX,
             onClick = {}
         )
     }
@@ -215,34 +173,7 @@ private fun ScheduleLaunchCardPreview() {
 private fun ScheduleLaunchCardNoImagePreview() {
     SpaceLaunchNowPreviewTheme {
         ScheduleLaunchView(
-            launch = LaunchBasic(
-                id = "def-456",
-                url = "https://ll.thespacedevs.com/2.4.0/launch/def-456/",
-                responseMode = "list",
-                slug = "atlas-v-mission",
-                launchDesignator = "AV-095",
-                status = null,
-                netPrecision = null,
-                image = null,
-                launchServiceProvider = AgencyMini(
-                    responseMode = "list",
-                    id = 124,
-                    url = "https://ll.thespacedevs.com/2.4.0/agencies/124/",
-                    name = "United Launch Alliance",
-                    type = AgencyType(
-                        id = 3,
-                        name = "Commercial"
-                    ),
-                    abbrev = "ULA"
-                ),
-                infographic = null,
-                locationName = "Cape Canaveral SFS, FL, USA",
-                name = "Atlas V 541 | GOES-U",
-                lastUpdated = null,
-                net = Instant.parse("2024-06-25T21:26:00Z"),
-                windowEnd = null,
-                windowStart = null
-            ),
+            launch = PreviewData.domainLaunchULA.copy(imageUrl = null, thumbnailUrl = null),
             onClick = {}
         )
     }

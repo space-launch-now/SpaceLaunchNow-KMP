@@ -10,11 +10,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigNormal
 import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -34,8 +33,8 @@ class RocketViewModel(
     private val _uiState = MutableStateFlow(RocketListUiState())
     val uiState: StateFlow<RocketListUiState> = _uiState.asStateFlow()
 
-    private val _rocketDetails = MutableStateFlow<LauncherConfigDetailed?>(null)
-    val rocketDetails: StateFlow<LauncherConfigDetailed?> = _rocketDetails
+    private val _rocketDetails = MutableStateFlow<VehicleConfig?>(null)
+    val rocketDetails: StateFlow<VehicleConfig?> = _rocketDetails
 
     init {
         loadRockets()
@@ -59,7 +58,7 @@ class RocketViewModel(
                         .map { it.id }
                 } else null
                 
-                val result = repository.getRockets(
+                val result = repository.getRocketsDomain(
                     limit = PAGE_SIZE,
                     offset = 0,
                     ordering = currentState.selectedSortOrder.apiValue,
@@ -79,7 +78,7 @@ class RocketViewModel(
                                 isLoading = false,
                                 currentPage = 1,
                                 hasMore = paginatedList.next != null,
-                                totalCount = paginatedList.count ?: 0
+                                totalCount = paginatedList.count
                             )
                         }
                         // Track search analytics when search query is active
@@ -139,7 +138,7 @@ class RocketViewModel(
                         .map { it.id }
                 } else null
                 
-                val result = repository.getRockets(
+                val result = repository.getRocketsDomain(
                     limit = PAGE_SIZE,
                     offset = offset,
                     ordering = currentState.selectedSortOrder.apiValue,
@@ -353,7 +352,7 @@ class RocketViewModel(
             log.d { "Fetching rocket details for id: $id" }
             _uiState.update { it.copy(error = null, isLoading = true) }
 
-            val result = repository.getRocketDetails(id)
+            val result = repository.getRocketDetailsDomain(id)
             result.onSuccess { rocket ->
                 log.i { "Successfully loaded rocket details: ${rocket.name}" }
                 _rocketDetails.value = rocket
@@ -380,7 +379,7 @@ class RocketViewModel(
  * UI state for the rocket list screen.
  */
 data class RocketListUiState(
-    val rockets: List<LauncherConfigNormal> = emptyList(),
+    val rockets: List<VehicleConfig> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val error: String? = null,

@@ -3,10 +3,11 @@ package me.calebjones.spacelaunchnow.data.repository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ProgramsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
+import me.calebjones.spacelaunchnow.domain.mapper.toDomainProgram
+import me.calebjones.spacelaunchnow.domain.model.Program
 import kotlin.time.Clock
 
 class ProgramRepositoryImpl(
@@ -14,17 +15,20 @@ class ProgramRepositoryImpl(
     private val localDataSource: ProgramLocalDataSource? = null
 ) : ProgramRepository {
 
-    override suspend fun getProgram(id: Int, forceRefresh: Boolean): Result<DataResult<ProgramNormal>> {
+    // ============ Domain method (owns the cache) ============
+
+    override suspend fun getProgramDomain(
+        id: Int,
+        forceRefresh: Boolean
+    ): Result<DataResult<Program>> {
         return try {
-            println("=== ProgramRepository.getProgram ===")
+            println("=== ProgramRepository.getProgramDomain ===")
             println("Parameters: id=$id, forceRefresh=$forceRefresh")
 
             val now = Clock.System.now().toEpochMilliseconds()
 
             // STALE-WHILE-REVALIDATE: Check for stale data first (for fallback)
-            val staleCached = localDataSource?.getProgramStale(id)
             val staleTimestamp = localDataSource?.getCacheTimestamp(id)
-            val hasStaleData = staleCached != null
 
             // Try fresh cache if available and not forcing refresh
             if (!forceRefresh) {
@@ -46,13 +50,13 @@ class ProgramRepositoryImpl(
             val response = programsApi.programsRetrieve(id)
             val program = response.body()
 
-            // Cache the result
+            // Cache the raw API payload
             localDataSource?.cacheProgram(program)
             println("✓ API SUCCESS: Fetched and cached program '${program.name}'")
 
             Result.success(
                 DataResult(
-                    data = program,
+                    data = program.toDomainProgram(),
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -72,8 +76,7 @@ class ProgramRepositoryImpl(
     /**
      * Handle errors with stale cache fallback.
      */
-    private suspend fun handleError(e: Exception, id: Int): Result<DataResult<ProgramNormal>> {
-        // Try to return stale cache on error
+    private suspend fun handleError(e: Exception, id: Int): Result<DataResult<Program>> {
         val staleCached = localDataSource?.getProgramStale(id)
         val staleTimestamp = localDataSource?.getCacheTimestamp(id)
 
@@ -91,4 +94,5 @@ class ProgramRepositoryImpl(
             Result.failure(e)
         }
     }
+
 }

@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import chaintech.videoplayer.model.VideoPlayerConfig
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
+import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
@@ -64,8 +64,8 @@ private const val ISS_STATION_ID = 4
  */
 @Composable
 fun SpaceStationDetailView(
-    station: SpaceStationDetailedEndpoint,
-    activeExpeditions: List<ExpeditionDetailed>,
+    station: SpaceStationDetail,
+    activeExpeditions: List<ExpeditionDetailItem>,
     issPosition: LatLng?,
     issPositionData: IssPositionData?,
     orbitPath: List<LatLng>,
@@ -81,7 +81,7 @@ fun SpaceStationDetailView(
     SharedDetailScaffold(
         titleText = station.name,
         taglineText = null,
-        imageUrl = station.image?.imageUrl,
+        imageUrl = station.imageUrl,
         onNavigateBack = onNavigateBack,
         backgroundColors = listOf(
             MaterialTheme.colorScheme.secondary,
@@ -107,8 +107,8 @@ fun SpaceStationDetailView(
 
 @Composable
 private fun SpaceStationDetailContent(
-    station: SpaceStationDetailedEndpoint,
-    activeExpeditions: List<ExpeditionDetailed>,
+    station: SpaceStationDetail,
+    activeExpeditions: List<ExpeditionDetailItem>,
     isIss: Boolean,
     issPosition: LatLng?,
     issPositionData: IssPositionData?,
@@ -375,16 +375,14 @@ private fun SpaceStationDetailContent(
         Spacer(Modifier.height(16.dp))
 
         // Owner agencies
-        station.owners?.let { owners ->
-            if (owners.isNotEmpty()) {
-                OwnerAgenciesCard(agencies = owners)
-                Spacer(Modifier.height(16.dp))
-            }
+        if (station.owners.isNotEmpty()) {
+            OwnerAgenciesCard(agencies = station.owners)
+            Spacer(Modifier.height(16.dp))
         }
 
         // Docking locations - show what's docked and where
-        if (station.dockingLocation.isNotEmpty()) {
-            DockingLocationsCard(dockingLocations = station.dockingLocation)
+        if (station.dockingLocations.isNotEmpty()) {
+            DockingLocationsCard(dockingLocations = station.dockingLocations)
             Spacer(Modifier.height(16.dp))
         }
 

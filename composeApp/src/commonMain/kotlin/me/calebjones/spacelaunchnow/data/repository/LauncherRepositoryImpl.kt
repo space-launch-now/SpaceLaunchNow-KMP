@@ -6,6 +6,9 @@ import me.calebjones.spacelaunchnow.api.extensions.getLaunchers
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchersApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherDetailedList
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
 /**
  * Implementation of LauncherRepository using the generated LaunchersApi
@@ -14,7 +17,7 @@ class LauncherRepositoryImpl(
     private val launchersApi: LaunchersApi
 ) : LauncherRepository {
 
-    override suspend fun getLaunchers(
+    private suspend fun getLaunchersRaw(
         limit: Int,
         offset: Int,
         search: String?,
@@ -36,7 +39,7 @@ class LauncherRepositoryImpl(
             )
 
             val launchers = response.body()
-            println("✓ API SUCCESS: Fetched ${launchers.results.size} launchers (offset: $offset)")
+            println("OK API SUCCESS: Fetched ${launchers.results.size} launchers (offset: $offset)")
 
             Result.success(launchers)
         } catch (e: ResponseException) {
@@ -51,12 +54,12 @@ class LauncherRepositoryImpl(
         }
     }
 
-    override suspend fun getLaunchersByConfig(
+    private suspend fun getLaunchersByConfigRaw(
         configId: Int,
         limit: Int,
         offset: Int
     ): Result<PaginatedLauncherDetailedList> {
-        return getLaunchers(
+        return getLaunchersRaw(
             limit = limit,
             offset = offset,
             search = null,
@@ -66,7 +69,7 @@ class LauncherRepositoryImpl(
         )
     }
 
-    override suspend fun getLauncherDetails(launcherId: Int): Result<LauncherDetailed> {
+    private suspend fun getLauncherDetailsRaw(launcherId: Int): Result<LauncherDetailed> {
         return try {
             println("=== LauncherRepository.getLauncherDetails ===")
             println("Parameters: launcherId=$launcherId")
@@ -74,7 +77,7 @@ class LauncherRepositoryImpl(
             val response = launchersApi.launchersRetrieve(launcherId)
             val launcher = response.body()
 
-            println("✓ API SUCCESS: Fetched launcher details for ID $launcherId")
+            println("OK API SUCCESS: Fetched launcher details for ID $launcherId")
 
             Result.success(launcher)
         } catch (e: ResponseException) {
@@ -88,4 +91,30 @@ class LauncherRepositoryImpl(
             Result.failure(e)
         }
     }
+
+    override suspend fun getLaunchersDomain(
+        limit: Int,
+        offset: Int,
+        search: String?,
+        ordering: String?,
+        launcherConfigId: Int?,
+        isPlaceholder: Boolean?
+    ): Result<PaginatedResult<LauncherDetail>> = getLaunchersRaw(
+        limit = limit,
+        offset = offset,
+        search = search,
+        ordering = ordering,
+        launcherConfigId = launcherConfigId,
+        isPlaceholder = isPlaceholder
+    ).map { it.toDomain() }
+
+    override suspend fun getLaunchersByConfigDomain(
+        configId: Int,
+        limit: Int,
+        offset: Int
+    ): Result<PaginatedResult<LauncherDetail>> =
+        getLaunchersByConfigRaw(configId = configId, limit = limit, offset = offset).map { it.toDomain() }
+
+    override suspend fun getLauncherDetailsDomain(launcherId: Int): Result<LauncherDetail> =
+        getLauncherDetailsRaw(launcherId).map { it.toDomain() }
 }

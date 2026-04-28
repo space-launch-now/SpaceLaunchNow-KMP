@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.domain.model.Event
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
@@ -43,12 +43,12 @@ import org.koin.compose.koinInject
  */
 @Composable
 fun OverviewTabContent(
-    launch: LaunchDetailed,
+    launch: Launch,
     videoPlayerState: VideoPlayerState,
     relatedNews: List<Article> = emptyList(),
     isNewsLoading: Boolean = false,
     newsError: String? = null,
-    relatedEvents: List<EventEndpointNormal> = emptyList(),
+    relatedEvents: List<Event> = emptyList(),
     isEventsLoading: Boolean = false,
     eventsError: String? = null,
     onSetPlayerVisible: (Boolean) -> Unit,

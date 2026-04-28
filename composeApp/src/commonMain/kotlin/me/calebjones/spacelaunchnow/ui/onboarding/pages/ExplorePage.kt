@@ -26,9 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigNormal
+import me.calebjones.spacelaunchnow.domain.model.Agency
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
+import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.ui.agencies.compose.AgencyListItem
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautCard
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPage
@@ -42,9 +42,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ExplorePage(
     modifier: Modifier = Modifier,
-    astronauts: List<AstronautEndpointNormal> = emptyList(),
-    rockets: List<LauncherConfigNormal> = emptyList(),
-    agencies: List<AgencyNormal> = emptyList()
+    astronauts: List<AstronautListItem> = emptyList(),
+    rockets: List<VehicleConfig> = emptyList(),
+    agencies: List<Agency> = emptyList()
 ) {
     OnboardingPage(
         title = "Explore Space",
@@ -62,9 +62,9 @@ fun ExplorePage(
 
 @Composable
 private fun ExplorePreviewContent(
-    astronauts: List<AstronautEndpointNormal>,
-    rockets: List<LauncherConfigNormal>,
-    agencies: List<AgencyNormal>
+    astronauts: List<AstronautListItem>,
+    rockets: List<VehicleConfig>,
+    agencies: List<Agency>
 ) {
     val isLoading = astronauts.isEmpty() && rockets.isEmpty() && agencies.isEmpty()
 

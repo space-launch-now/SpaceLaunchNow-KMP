@@ -147,7 +147,8 @@ enum class PremiumFeature {
     CAL_SYNC,
     ADVANCED_WIDGETS,
     WIDGETS_CUSTOMIZATION,
-    NOTIFICATION_CUSTOMIZATION;
+    NOTIFICATION_CUSTOMIZATION,
+    WEAR_OS;
 
     companion object {
         /**

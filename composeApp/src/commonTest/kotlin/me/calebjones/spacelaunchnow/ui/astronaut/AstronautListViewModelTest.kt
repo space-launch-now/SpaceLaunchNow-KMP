@@ -7,13 +7,12 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautType
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautEndpointNormalList
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
+import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
+import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautListViewModel
 import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 import kotlin.test.AfterTest
@@ -47,11 +46,11 @@ class MockAstronautFilterRepository : me.calebjones.spacelaunchnow.data.reposito
  * Mock implementation of AstronautRepository for testing ViewModels.
  */
 class MockAstronautListRepository : AstronautRepository {
-    private var astronautsResponse: PaginatedAstronautEndpointNormalList? = null
+    private var astronautsResponse: PaginatedResult<AstronautListItem>? = null
     var shouldReturnError = false
     var astronautsCallCount = 0
 
-    fun setAstronautsResponse(response: PaginatedAstronautEndpointNormalList) {
+    fun setAstronautsResponse(response: PaginatedResult<AstronautListItem>) {
         astronautsResponse = response
     }
 
@@ -65,19 +64,19 @@ class MockAstronautListRepository : AstronautRepository {
         hasFlown: Boolean?,
         inSpace: Boolean?,
         isHuman: Boolean?
-    ): Result<PaginatedAstronautEndpointNormalList> {
+    ): Result<PaginatedResult<AstronautListItem>> {
         astronautsCallCount++
 
         return if (shouldReturnError) {
             Result.failure(Exception("Test error"))
         } else {
             val response = astronautsResponse 
-                ?: PaginatedAstronautEndpointNormalList(count = 0, next = null, previous = null, results = emptyList())
+                ?: PaginatedResult(count = 0, next = null, previous = null, results = emptyList())
             Result.success(response)
         }
     }
 
-    override suspend fun getAstronautDetail(id: Int): Result<AstronautEndpointDetailed> {
+    override suspend fun getAstronautDetail(id: Int): Result<AstronautDetail> {
         throw NotImplementedError("Not needed for list view model tests")
     }
 }
@@ -115,7 +114,7 @@ class AstronautListViewModelTest {
     fun `initial state should be correct`() = runTest {
         // Given: Empty response configured
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(count = 0, next = null, previous = null, results = emptyList())
+            PaginatedResult(count = 0, next = null, previous = null, results = emptyList())
         )
         
         // When: ViewModel is created (loads automatically in init)
@@ -139,7 +138,7 @@ class AstronautListViewModelTest {
             createMockAstronaut(id = 2, name = "Buzz Aldrin")
         )
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 2,
                 next = null,
                 previous = null,
@@ -163,7 +162,7 @@ class AstronautListViewModelTest {
     fun `loadAstronauts should set loading state during load`() = runTest {
         // Given: Repository configured
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(count = 0, next = null, previous = null, results = emptyList())
+            PaginatedResult(count = 0, next = null, previous = null, results = emptyList())
         )
         val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
 
@@ -179,7 +178,7 @@ class AstronautListViewModelTest {
     fun `loadAstronauts should handle empty results`() = runTest {
         // Given: Repository returns empty list
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(count = 0, next = null, previous = null, results = emptyList())
+            PaginatedResult(count = 0, next = null, previous = null, results = emptyList())
         )
         val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
 
@@ -218,7 +217,7 @@ class AstronautListViewModelTest {
         // When: Retrying with successful response (using refresh)
         mockRepository.shouldReturnError = false
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 1,
                 next = null,
                 previous = null,
@@ -241,7 +240,7 @@ class AstronautListViewModelTest {
     fun `loadMore should append astronauts to existing list`() = runTest {
         // Given: Initial list loaded
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 4,
                 next = "next_page_url",
                 previous = null,
@@ -256,7 +255,7 @@ class AstronautListViewModelTest {
 
         // When: Loading more
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 4,
                 next = null,
                 previous = "prev_page_url",
@@ -279,7 +278,7 @@ class AstronautListViewModelTest {
     fun `loadMore should set isLoadingMore state`() = runTest {
         // Given: Initial list with next page
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 2,
                 next = "next_page",
                 previous = null,
@@ -291,7 +290,7 @@ class AstronautListViewModelTest {
 
         // When: Loading more
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 2,
                 next = null,
                 previous = null,
@@ -311,7 +310,7 @@ class AstronautListViewModelTest {
     fun `loadMore should not load when already loading`() = runTest {
         // Given: Initial list
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 1,
                 next = "next_page",
                 previous = null,
@@ -348,7 +347,7 @@ class AstronautListViewModelTest {
     fun `loadMore should update hasMore based on next field`() = runTest {
         // Given: Initial list with next page
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 2,
                 next = "next_page_url",
                 previous = null,
@@ -361,7 +360,7 @@ class AstronautListViewModelTest {
 
         // When: Loading last page (no next)
         mockRepository.setAstronautsResponse(
-            PaginatedAstronautEndpointNormalList(
+            PaginatedResult(
                 count = 2,
                 next = null,
                 previous = "prev_page",
@@ -379,18 +378,21 @@ class AstronautListViewModelTest {
     // Helper Methods
     // ========================================
 
-    private fun createMockAstronaut(id: Int, name: String): AstronautEndpointNormal {
-        return AstronautEndpointNormal(
+    private fun createMockAstronaut(id: Int, name: String): AstronautListItem {
+        return AstronautListItem(
             id = id,
-            url = "https://test.example.com/astronaut/$id",
             name = name,
-            status = null,
-            type = AstronautType(id = 1, name = "Government"),
+            statusName = null,
+            statusId = null,
+            agencyName = null,
+            agencyAbbrev = null,
+            agencyId = null,
+            imageUrl = null,
+            thumbnailUrl = null,
             age = 50,
             bio = "Test biography",
-            nationality = emptyList(),
-            agency = null,
-            image = null
+            typeName = "Government",
+            nationality = emptyList()
         )
     }
 }

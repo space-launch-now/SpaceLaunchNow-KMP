@@ -7,24 +7,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class AgencyViewModel(
-    private val repository: LaunchRepository,
     private val agencyRepository: AgencyRepository,
     private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
     private val log = logger()
 
-    private val _agencies = MutableStateFlow<List<AgencyNormal>>(emptyList())
-    val agencies: StateFlow<List<AgencyNormal>> = _agencies
+    private val _agencies = MutableStateFlow<List<Agency>>(emptyList())
+    val agencies: StateFlow<List<Agency>> = _agencies
 
-    private val _agencyDetails = MutableStateFlow<AgencyEndpointDetailed?>(null)
-    val agencyDetails: StateFlow<AgencyEndpointDetailed?> = _agencyDetails
+    private val _agencyDetails = MutableStateFlow<Agency?>(null)
+    val agencyDetails: StateFlow<Agency?> = _agencyDetails
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -38,7 +35,7 @@ class AgencyViewModel(
             _error.value = null
             _isLoading.value = true
 
-            val result = agencyRepository.getAgencies(limit, offset)
+            val result = agencyRepository.getAgenciesDomain(limit, offset)
             result.onSuccess { paginatedList ->
                 log.i { "Successfully loaded ${paginatedList.results.size} agencies" }
                 _agencies.value = paginatedList.results
@@ -56,7 +53,7 @@ class AgencyViewModel(
             _error.value = null
             _isLoading.value = true
 
-            val result = repository.getAgencyDetails(id)
+            val result = agencyRepository.getAgencyDetailDomain(id)
             result.onSuccess { agency ->
                 log.i { "Successfully loaded agency details: ${agency.name}" }
                 _agencyDetails.value = agency
@@ -75,7 +72,7 @@ class AgencyViewModel(
             _error.value = null
             _isLoading.value = true
 
-            val result = agencyRepository.searchAgencies(query, limit)
+            val result = agencyRepository.searchAgenciesDomain(query, limit)
             result.onSuccess { paginatedList ->
                 log.i { "Search returned ${paginatedList.results.size} agencies for query: '$query'" }
                 _agencies.value = paginatedList.results

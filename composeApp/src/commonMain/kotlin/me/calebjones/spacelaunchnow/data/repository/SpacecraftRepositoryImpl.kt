@@ -5,11 +5,12 @@ import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getSpacecraft
 import me.calebjones.spacelaunchnow.api.extensions.getSpacecraftByConfig
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpacecraftApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacecraftEndpointDetailedList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftEndpointDetailed
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
+import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import kotlin.time.Clock
 
 class SpacecraftRepositoryImpl(
@@ -17,14 +18,16 @@ class SpacecraftRepositoryImpl(
     private val localDataSource: SpacecraftLocalDataSource? = null
 ) : SpacecraftRepository {
 
-    override suspend fun getSpacecraftByConfig(
+    // ============ Domain methods (own the cache) ============
+
+    override suspend fun getSpacecraftByConfigDomain(
         configId: Int,
         limit: Int,
         forceRefresh: Boolean,
         isPlaceholder: Boolean?
-    ): Result<DataResult<List<SpacecraftEndpointDetailed>>> {
+    ): Result<DataResult<List<Spacecraft>>> {
         return try {
-            println("=== SpacecraftRepository.getSpacecraftByConfig ===")
+            println("=== SpacecraftRepository.getSpacecraftByConfigDomain ===")
             println("Parameters: configId=$configId, limit=$limit, forceRefresh=$forceRefresh")
 
             val now = Clock.System.now().toEpochMilliseconds()
@@ -57,12 +60,12 @@ class SpacecraftRepositoryImpl(
             val spacecraftList = response.body().results
             println("✓ API SUCCESS: Fetched ${spacecraftList.size} spacecraft for config $configId")
 
-            // Cache the result
+            // Cache the raw API payload
             localDataSource?.cacheSpacecraftList(spacecraftList)
 
             Result.success(
                 DataResult(
-                    data = spacecraftList,
+                    data = spacecraftList.map { it.toDomain() },
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -79,15 +82,11 @@ class SpacecraftRepositoryImpl(
         }
     }
 
-    /**
-     * Handle errors with stale cache fallback for config-based queries.
-     */
     private suspend fun handleConfigError(
         e: Exception,
         configId: Int,
-        limit: Int,
-        isPlaceholder: Boolean? = null
-    ): Result<DataResult<List<SpacecraftEndpointDetailed>>> {
+        limit: Int
+    ): Result<DataResult<List<Spacecraft>>> {
         val staleCached = localDataSource?.getSpacecraftByConfigIdStale(configId, limit)
         val staleTimestamp = localDataSource?.getCacheTimestamp()
 
@@ -106,40 +105,27 @@ class SpacecraftRepositoryImpl(
         }
     }
 
-    override suspend fun getSpacecraftDetails(spacecraftId: Int): Result<SpacecraftEndpointDetailed> {
+    override suspend fun getSpacecraftDetailsDomain(spacecraftId: Int): Result<Spacecraft> {
         return try {
-            println("=== SpacecraftRepository.getSpacecraftDetails ===")
-            println("Parameters: spacecraftId=$spacecraftId")
-
             val response = spacecraftApi.spacecraftRetrieve(spacecraftId)
-            val spacecraft = response.body()
-
-            println("✓ API SUCCESS: Fetched spacecraft details for ID $spacecraftId")
-
-            Result.success(spacecraft)
+            Result.success(response.body().toDomain())
         } catch (e: ResponseException) {
-            println("SpacecraftRepository: API error for spacecraft $spacecraftId: ${e.message}")
             Result.failure(e)
         } catch (e: IOException) {
-            println("SpacecraftRepository: Network error for spacecraft $spacecraftId: ${e.message}")
             Result.failure(e)
         } catch (e: Exception) {
-            println("SpacecraftRepository: Unexpected error for spacecraft $spacecraftId: ${e.message}")
             Result.failure(e)
         }
     }
 
-    override suspend fun getSpacecraft(
+    override suspend fun getSpacecraftDomain(
         limit: Int,
         offset: Int,
         inSpace: Boolean?,
         search: String?,
         isPlaceholder: Boolean?
-    ): Result<PaginatedSpacecraftEndpointDetailedList> {
+    ): Result<PaginatedResult<Spacecraft>> {
         return try {
-            println("=== SpacecraftRepository.getSpacecraft ===")
-            println("Parameters: limit=$limit, offset=$offset, inSpace=$inSpace, search=$search")
-
             val response = spacecraftApi.getSpacecraft(
                 limit = limit,
                 offset = offset,
@@ -148,21 +134,15 @@ class SpacecraftRepositoryImpl(
                 ordering = "-flights_count",
                 isPlaceholder = isPlaceholder
             )
-
-            val spacecraft = response.body()
-            println("✓ API SUCCESS: Fetched ${spacecraft.results.size} spacecraft (offset: $offset)")
-
-            Result.success(spacecraft)
+            Result.success(response.body().toDomain())
         } catch (e: ResponseException) {
-            println("SpacecraftRepository: API error: ${e.message}")
             Result.failure(e)
         } catch (e: IOException) {
-            println("SpacecraftRepository: Network error: ${e.message}")
             Result.failure(e)
         } catch (e: Exception) {
-            println("SpacecraftRepository: Unexpected error: ${e.message}")
             Result.failure(e)
         }
     }
+
 }
 

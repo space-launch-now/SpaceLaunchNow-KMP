@@ -39,7 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.LocalUseUtc
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
@@ -58,7 +58,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun FeaturedLaunchRowCard(
-    launch: LaunchNormal,
+    launch: Launch,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
@@ -87,7 +87,7 @@ fun FeaturedLaunchRowCard(
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
             ) {
-                launch.image?.imageUrl?.let { url ->
+                launch.imageUrl?.let { url ->
                     SubcomposeAsyncImage(
                         model = url,
                         contentDescription = "Launch Image",
@@ -153,7 +153,7 @@ fun FeaturedLaunchRowCard(
             ) {
                 // Top section: Title (split into rocket config and mission)
                 Column {
-                    val launchName = launch.name ?: "Unknown Launch"
+                    val launchName = launch.name
                     val parts = launchName.split(" | ", limit = 2)
 
                     if (parts.size == 2) {
@@ -268,7 +268,7 @@ fun FeaturedLaunchRowCard(
  * Formats location and pad name for display.
  * Shows "Location, Pad" or just location if pad name is similar.
  */
-private fun formatLocationAndPad(launch: LaunchNormal): String {
+private fun formatLocationAndPad(launch: Launch): String {
     val pad = launch.pad
     val location = pad?.location
     val padName = pad?.name
@@ -299,7 +299,7 @@ private fun formatLocationAndPad(launch: LaunchNormal): String {
 private fun FeaturedLaunchRowCardPreview() {
     SpaceLaunchNowPreviewTheme {
         FeaturedLaunchRowCard(
-            launch = PreviewData.launchNormalSpaceX,
+            launch = PreviewData.domainLaunchSpaceX,
             navController = rememberNavController()
         )
     }
@@ -310,7 +310,7 @@ private fun FeaturedLaunchRowCardPreview() {
 private fun FeaturedLaunchRowCardDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         FeaturedLaunchRowCard(
-            launch = PreviewData.launchNormalSpaceX,
+            launch = PreviewData.domainLaunchSpaceX,
             navController = rememberNavController()
         )
     }
@@ -321,7 +321,7 @@ private fun FeaturedLaunchRowCardDarkPreview() {
 private fun FeaturedLaunchRowCardNoImagePreview() {
     SpaceLaunchNowPreviewTheme {
         FeaturedLaunchRowCard(
-            launch = PreviewData.launchNormalULA,
+            launch = PreviewData.domainLaunchULA,
             navController = rememberNavController()
         )
     }
@@ -332,7 +332,7 @@ private fun FeaturedLaunchRowCardNoImagePreview() {
 private fun FeaturedLaunchRowCardNoImageDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         FeaturedLaunchRowCard(
-            launch = PreviewData.launchNormalULA,
+            launch = PreviewData.domainLaunchULA,
             navController = rememberNavController()
         )
     }

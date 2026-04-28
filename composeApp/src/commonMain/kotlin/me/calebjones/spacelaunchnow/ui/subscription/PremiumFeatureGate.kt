@@ -419,6 +419,7 @@ fun PremiumFeature.getDescription(): String {
         PremiumFeature.WIDGETS_CUSTOMIZATION -> "Customize your widgets look and feel"
         PremiumFeature.CAL_SYNC -> "Access to Calendar Sync Link for syncing launches and events"
         PremiumFeature.NOTIFICATION_CUSTOMIZATION -> "Customize your notification preferences"
+        PremiumFeature.WEAR_OS -> "Access Space Launch Now on your Wear OS watch"
     }
 }
 
@@ -431,5 +432,6 @@ fun PremiumFeature.getTitle(): String {
         PremiumFeature.WIDGETS_CUSTOMIZATION -> "Widget Customization"
         PremiumFeature.CAL_SYNC -> "Calendar Sync"
         PremiumFeature.NOTIFICATION_CUSTOMIZATION -> "Notification Customization"
+        PremiumFeature.WEAR_OS -> "Wear OS"
     }
 }

@@ -33,15 +33,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.time.Instant
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEventType
+import me.calebjones.spacelaunchnow.domain.model.TimelineEntry
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun TimelineCard(timeline: List<TimelineEvent>, net: Instant? = null) {
+fun TimelineCard(timeline: List<TimelineEntry>, net: Instant? = null) {
     var expanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -97,7 +96,7 @@ fun TimelineCard(timeline: List<TimelineEvent>, net: Instant? = null) {
 
 @Composable
 fun TimelineEventRow(
-    event: TimelineEvent,
+    event: TimelineEntry,
     isFirst: Boolean,
     isLast: Boolean,
     hasPassed: Boolean = false,
@@ -180,20 +179,10 @@ fun TimelineEventRow(
                 ) {
                     // Title abbreviation/name
                     Text(
-                        text = event.type?.abbrev ?: "Event",
+                        text = event.type ?: "Event",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface
                     )
-
-                    // Description
-                    if (!event.type?.description.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = event.type.description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
                 }
 
                 // Relative time at the end of the line
@@ -211,52 +200,28 @@ fun TimelineEventRow(
 // region Sample Data
 
 private val sampleTimelineEvents = listOf(
-    TimelineEvent(
-        type = TimelineEventType(
-            id = 1,
-            abbrev = "Launch Team On Stations",
-            description = "Launch team arrives at stations"
-        ),
+    TimelineEntry(
+        type = "Launch Team On Stations",
         relativeTime = "-P1DT14H"
     ),
-    TimelineEvent(
-        type = TimelineEventType(
-            id = 2,
-            abbrev = "Countdown Start",
-            description = "Countdown clock begins"
-        ),
+    TimelineEntry(
+        type = "Countdown Start",
         relativeTime = "-PT4H"
     ),
-    TimelineEvent(
-        type = TimelineEventType(
-            id = 3,
-            abbrev = "Prop Load",
-            description = "Propellant loading begins"
-        ),
+    TimelineEntry(
+        type = "Prop Load",
         relativeTime = "-PT2H30M"
     ),
-    TimelineEvent(
-        type = TimelineEventType(
-            id = 4,
-            abbrev = "T-0",
-            description = "Liftoff"
-        ),
+    TimelineEntry(
+        type = "T-0",
         relativeTime = "PT0S"
     ),
-    TimelineEvent(
-        type = TimelineEventType(
-            id = 5,
-            abbrev = "Max-Q",
-            description = "Maximum dynamic pressure"
-        ),
+    TimelineEntry(
+        type = "Max-Q",
         relativeTime = "PT1M12S"
     ),
-    TimelineEvent(
-        type = TimelineEventType(
-            id = 6,
-            abbrev = "MECO",
-            description = "Main engine cutoff"
-        ),
+    TimelineEntry(
+        type = "MECO",
         relativeTime = "PT2M33S"
     )
 )
