@@ -13,6 +13,12 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
 
+        <!-- Declares this watch app is NOT standalone — it requires the paired phone app.
+             Play Console uses this to pair the listing with the phone app on the same package name. -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="false" />
+
         <!-- Main Activity -->
         <activity
             android:name=".WearActivity"

@@ -1,3 +1,27 @@
+import java.util.Properties
+
+// Read version from the root version.properties — same source of truth as composeApp
+val versionProps = Properties().apply {
+    rootProject.file("version.properties").inputStream().use { load(it) }
+}
+
+fun wearVersionCode(): Int {
+    val major = versionProps["versionMajor"].toString().toInt()
+    val minor = versionProps["versionMinor"].toString().toInt()
+    val patch = versionProps["versionPatch"].toString().toInt()
+    val build = versionProps["versionBuildNumber"].toString().toInt()
+    // +1 offset so the wear AAB always has a unique versionCode from the phone AAB
+    // in the same Play Console release (Play requires each AAB to be unique).
+    return (major * 1000000) + (minor * 100000) + (patch * 10000) + build + 1
+}
+
+fun wearVersionName(): String {
+    val major = versionProps["versionMajor"].toString()
+    val minor = versionProps["versionMinor"].toString()
+    val patch = versionProps["versionPatch"].toString()
+    return "$major.$minor.$patch"
+}
+
 plugins {
     alias(libs.plugins.androidApplication)
     id("org.jetbrains.kotlin.android")
@@ -19,13 +43,35 @@ android {
         applicationId = "me.calebjones.spacelaunchnow"
         minSdk = libs.versions.android.wear.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = wearVersionCode()
+        versionName = wearVersionName()
+    }
+
+    signingConfigs {
+        create("release") {
+            // Populated via environment variables in CI (same keystore as composeApp).
+            // Locally, falls back to the debug keystore so release builds still compile.
+            val keystoreFile = System.getenv("KEYSTORE_FILE")
+            if (keystoreFile != null) {
+                storeFile = file(keystoreFile)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         getByName("debug") {
             applicationIdSuffix = ".kmpdebug"
+        }
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
