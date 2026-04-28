@@ -131,17 +131,39 @@ actual fun SmartBannerAd(
         }
     }
 
-    // If the selected ad is not available, try to find any available ad as fallback
+    // If the selected ad is not available, try to find a SIZE-COMPATIBLE fallback.
+    //
+    // Size-aware fallback rules: never substitute an ad that is shorter than the
+    // reserved slot — doing so makes a small 320x50 banner render inside a
+    // 300x250 medium-rectangle box (creative gets stretched/centered with empty
+    // space around it, which looks broken and tanks CTR). We only fall back to
+    // ads that match or exceed the reserved height, otherwise we let the
+    // shimmer placeholder ride until the correctly-sized preload fills.
     val availableAd = bannerAd ?: run {
-        log.w { "Primary ad ($actualAdSize) not available, trying fallbacks" }
-        if (placementType == AdPlacementType.NAVIGATION) {
-            // For navigation, prefer navigation ads or basic banner ads
-            preloadedNavigationBannerAd ?: preloadedNavigationLargeBannerAd ?: preloadedNavigationLeaderboardAd ?: 
-            preloadedBannerAd ?: preloadedLargeBannerAd
-        } else {
-            // For content, try other content ads
-            preloadedBannerAd ?: preloadedLargeBannerAd ?: preloadedMediumRectangleAd ?: 
-            preloadedLeaderboardAd ?: preloadedFullBannerAd ?: preloadedFluidAd
+        log.w { "Primary ad ($actualAdSize) not available, trying size-compatible fallbacks" }
+        when {
+            placementType == AdPlacementType.NAVIGATION -> {
+                // Navigation slots are short (<=90dp); any nav ad or short content banner is OK.
+                preloadedNavigationBannerAd ?: preloadedNavigationLargeBannerAd
+                    ?: preloadedNavigationLeaderboardAd
+                    ?: preloadedBannerAd ?: preloadedLargeBannerAd
+            }
+            // 300x250 MEDIUM_RECTANGLE — only fall back to other tall formats.
+            actualAdSize.height >= 250 -> {
+                preloadedMediumRectangleAd
+            }
+            // 728x90 LEADERBOARD — accept large banner / full banner as visual fallback.
+            actualAdSize.height >= 90 -> {
+                preloadedLeaderboardAd ?: preloadedLargeBannerAd ?: preloadedFullBannerAd
+            }
+            // 320x100 LARGE_BANNER — accept full banner; do NOT downgrade to 320x50.
+            actualAdSize.height >= 100 -> {
+                preloadedLargeBannerAd ?: preloadedFullBannerAd
+            }
+            // 320x50 BANNER and FLUID — small slots, banner-only.
+            else -> {
+                preloadedBannerAd ?: preloadedFluidAd
+            }
         }
     }
 

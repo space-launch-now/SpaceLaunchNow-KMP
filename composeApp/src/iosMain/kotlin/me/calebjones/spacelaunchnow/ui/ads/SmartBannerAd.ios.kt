@@ -129,17 +129,22 @@ actual fun SmartBannerAd(
         }
     }
 
-    // If the selected ad is not available, try to find any available ad as fallback
+    // Size-aware fallback — never substitute a shorter ad into a taller slot
+    // (e.g. a 320x50 banner inside a 300x250 medium-rectangle box would render
+    // empty space around the creative). If a height-compatible ad isn't ready,
+    // let the shimmer ride until the correct preload fills.
     val availableAd = bannerAd ?: run {
-        log.w { "SmartBannerAd: Primary ad ($actualAdSize) not available, trying fallbacks" }
-        if (placementType == AdPlacementType.NAVIGATION) {
-            // For navigation, prefer navigation ads or basic banner ads
-            preloadedNavigationBannerAd ?: preloadedNavigationLargeBannerAd ?: preloadedNavigationLeaderboardAd ?: 
-            preloadedBannerAd ?: preloadedLargeBannerAd
-        } else {
-            // For content, try other content ads
-            preloadedBannerAd ?: preloadedLargeBannerAd ?: preloadedMediumRectangleAd ?: 
-            preloadedLeaderboardAd ?: preloadedFullBannerAd ?: preloadedFluidAd
+        log.w { "SmartBannerAd: Primary ad ($actualAdSize) not available, trying size-compatible fallbacks" }
+        when {
+            placementType == AdPlacementType.NAVIGATION -> {
+                preloadedNavigationBannerAd ?: preloadedNavigationLargeBannerAd
+                    ?: preloadedNavigationLeaderboardAd
+                    ?: preloadedBannerAd ?: preloadedLargeBannerAd
+            }
+            actualAdSize.height >= 250 -> preloadedMediumRectangleAd
+            actualAdSize.height >= 90 -> preloadedLeaderboardAd ?: preloadedLargeBannerAd ?: preloadedFullBannerAd
+            actualAdSize.height >= 100 -> preloadedLargeBannerAd ?: preloadedFullBannerAd
+            else -> preloadedBannerAd ?: preloadedFluidAd
         }
     }
 
