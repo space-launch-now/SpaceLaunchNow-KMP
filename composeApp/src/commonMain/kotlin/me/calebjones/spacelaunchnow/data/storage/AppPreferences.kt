@@ -47,6 +47,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // Live onboarding (feature preview carousel) completed flag
         private val LIVE_ONBOARDING_COMPLETED = booleanPreferencesKey("live_onboarding_completed")
 
+        // Initial pre-warm completed flag — ensures Tier 2 cache pre-warm only runs on first launch
+        private val INITIAL_PREWARM_COMPLETED = booleanPreferencesKey("initial_prewarm_completed")
+
         // Schedule filter state
         private val SCHEDULE_FILTER_STATE = stringPreferencesKey("schedule_filter_state")
 
@@ -194,6 +197,17 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
     suspend fun setLiveOnboardingCompleted(completed: Boolean) {
         dataStore.edit { preferences ->
             preferences[LIVE_ONBOARDING_COMPLETED] = completed
+        }
+    }
+
+    // Initial pre-warm flag methods
+    val initialPrewarmCompletedFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[INITIAL_PREWARM_COMPLETED] ?: false
+    }
+
+    suspend fun setInitialPrewarmCompleted() {
+        dataStore.edit { preferences ->
+            preferences[INITIAL_PREWARM_COMPLETED] = true
         }
     }
 

@@ -197,25 +197,28 @@ class SimpleSubscriptionRepository(
         return try {
             log.d { "SimpleSubscriptionRepository: Restoring purchases..." }
 
-            // Trigger sync which will restore purchases from RevenueCat
-            val syncSuccess = syncer.syncNow()
-
-            if (syncSuccess) {
-                val current = localStorage.get()
-                val state = SubscriptionState(
-                    isSubscribed = current.isSubscribed,
-                    subscriptionType = current.subscriptionType,
-                    features = current.availableFeatures,
-                    lastVerified = current.lastSynced,
-                    needsVerification = false,
-                    isLoading = false
-                )
-                log.i { "✅ Restore complete: $state" }
-                Result.success(state)
-            } else {
-                log.w { "❌ Restore failed" }
-                Result.failure(Exception("Failed to restore purchases"))
+            // Call RevenueCat restorePurchases() which contacts the App Store / Play Store,
+            // fetches all transactions for the current Apple ID / Google account, and syncs
+            // them to RevenueCat. This is the correct entry point for the "Restore Purchases"
+            // button — it prompts for Apple ID credentials on iOS if needed.
+            val restoreResult = billingClient.restorePurchases()
+            if (restoreResult.isFailure) {
+                log.w { "❌ Restore failed: ${restoreResult.exceptionOrNull()?.message}" }
+                return Result.failure(restoreResult.exceptionOrNull() ?: Exception("Failed to restore purchases"))
             }
+
+            // Fetch the latest state from local storage (updated by the restore call above)
+            val current = localStorage.get()
+            val state = SubscriptionState(
+                isSubscribed = current.isSubscribed,
+                subscriptionType = current.subscriptionType,
+                features = current.availableFeatures,
+                lastVerified = current.lastSynced,
+                needsVerification = false,
+                isLoading = false
+            )
+            log.i { "✅ Restore complete: $state" }
+            Result.success(state)
 
         } catch (e: Exception) {
             log.e(e) { "SimpleSubscriptionRepository: ❌ Restore error: ${e.message}" }
