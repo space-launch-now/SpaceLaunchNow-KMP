@@ -46,7 +46,7 @@ fun PremiumGateScreen() {
             verticalArrangement = Arrangement.Center,
         ) {
             Image(
-                painter = painterResource(id = R.mipmap.ic_launcher),
+                painter = painterResource(id = R.mipmap.ic_launcher_foreground),
                 contentDescription = null,
                 modifier = Modifier.size(52.dp).clip(CircleShape),
             )
