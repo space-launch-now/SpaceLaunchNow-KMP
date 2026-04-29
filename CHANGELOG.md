@@ -1,3 +1,12 @@
+## [5.28.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.2...v5.28.3) (2026-04-29)
+
+
+### Bug Fixes
+
+* add deploy to Play Store option in workflow dispatch inputs ([f1dff39](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f1dff39e3e6cf443babf22462cfa6c2c639789ce))
+
+
+
 ## [5.28.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.1...v5.28.2) (2026-04-29)
 
 
@@ -46,15 +55,6 @@
 ### Bug Fixes
 
 * purchase restoration functionality and initial pre-warm logic ([75c3af6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/75c3af65663ef512cfaa6ca07d938c3d16bbda67))
-
-
-
-## [5.27.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.27.0...v5.27.1) (2026-04-19)
-
-
-### Bug Fixes
-
-* update in-flight launch retrieval to filter out stale entries ([e9deff0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9deff0f8f5703745880da95f6e437e66cddd30e))
 
 
 

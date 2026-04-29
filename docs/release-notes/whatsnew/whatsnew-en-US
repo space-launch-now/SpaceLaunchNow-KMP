@@ -1,4 +1,3 @@
 ### Bug Fixes
 
-* disable minification for release build in wear app
-* update release file paths for Google Play deployment
+* add deploy to Play Store option in workflow dispatch inputs
