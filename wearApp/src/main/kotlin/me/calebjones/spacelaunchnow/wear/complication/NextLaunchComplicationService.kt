@@ -89,7 +89,11 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
         } else {
             // Arm a 5-minute wakeup alarm
             val triggerAt = SystemClock.elapsedRealtime() + 5.minutes.inWholeMilliseconds
-            alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pendingIntent)
+            alarmManager.setAndAllowWhileIdle(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                triggerAt,
+                pendingIntent
+            )
             log.d { "Rapid refresh alarm set in 5 min (remaining=${remaining})" }
         }
     }
@@ -111,8 +115,9 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
         val countdownShort = "1D 13H"
         val countdownLong = "T-1D 13H"
         val vehicleText = "Falcon 9"
-        val agencyAbbrev = "SpaceX"
-        val contentDescription = PlainComplicationText.Builder("Next launch: $vehicleText in $countdownLong").build()
+        val agencyAbbrev = "SpX"
+        val contentDescription =
+            PlainComplicationText.Builder("Next launch: $vehicleText in $countdownLong").build()
 
         return when (type) {
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
@@ -204,7 +209,8 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
 
     private fun buildFreeUserData(type: ComplicationType): ComplicationData? {
         val subscribeText = PlainComplicationText.Builder("Subscribe").build()
-        val contentDescription = PlainComplicationText.Builder("Subscribe to see launch countdown").build()
+        val contentDescription =
+            PlainComplicationText.Builder("Subscribe to see launch countdown").build()
 
         return when (type) {
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
@@ -270,9 +276,9 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
 
         return when {
             hours >= 24 -> "T-${hours / 24}D ${hours % 24}H"
-            hours > 0   -> "T-${hours}H ${mins}M"
-            mins > 0    -> "T-${mins}M"
-            else        -> "T-0"
+            hours > 0 -> "T-${hours}H ${mins}M"
+            mins > 0 -> "T-${mins}M"
+            else -> "T-0"
         }
     }
 
@@ -292,9 +298,9 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
 
         return when {
             hours >= 24 -> "${hours / 24}D ${hours % 24}H"
-            hours > 0   -> "${hours}H ${mins}M"
-            mins > 0    -> "${mins}M"
-            else        -> "Now"
+            hours > 0 -> "${hours}H ${mins}M"
+            mins > 0 -> "${mins}M"
+            else -> "Now"
         }
     }
 
@@ -320,6 +326,7 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
         return when {
             lspDisplay != null && launch.rocketConfigName != null ->
                 "$lspDisplay | ${launch.rocketConfigName}"
+
             launch.rocketConfigName != null -> launch.rocketConfigName
             else -> launch.name
         }
@@ -341,7 +348,10 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
         return when {
             elapsed.isNegative() -> 0f
             elapsed > totalDuration -> 1f
-            else -> (elapsed.inWholeMinutes.toFloat() / totalDuration.inWholeMinutes.toFloat()).coerceIn(0f, 1f)
+            else -> (elapsed.inWholeMinutes.toFloat() / totalDuration.inWholeMinutes.toFloat()).coerceIn(
+                0f,
+                1f
+            )
         }
     }
 }

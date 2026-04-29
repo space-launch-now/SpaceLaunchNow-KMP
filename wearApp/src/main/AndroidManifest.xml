@@ -68,6 +68,11 @@
             <meta-data
                 android:name="androidx.wear.tiles.LABEL"
                 android:resource="@string/next_launch_tile_label" />
+            <!-- Preview shown in the tile picker (companion app + watch). PNG screenshot
+                 of the live tile, 480×480, on a black background. -->
+            <meta-data
+                android:name="androidx.wear.tiles.PREVIEW"
+                android:resource="@drawable/tile_preview" />
         </service>
 
         <!-- DataLayer Listener -->

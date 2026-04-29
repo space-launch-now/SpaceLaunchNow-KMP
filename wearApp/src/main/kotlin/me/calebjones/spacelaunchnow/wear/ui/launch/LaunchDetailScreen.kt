@@ -3,24 +3,36 @@ package me.calebjones.spacelaunchnow.wear.ui.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.CircularProgressIndicator
+import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
@@ -28,6 +40,10 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TitleCard
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
+import kotlinx.coroutines.delay
+import me.calebjones.spacelaunchnow.wear.R
+import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchDetailUiState
@@ -96,43 +112,63 @@ private fun LaunchDetailContent(
                     modifier = Modifier.fillMaxSize(),
                 ) {
 
-                    // ── Vehicle / agency title ─────────────────────────────
+                    // ── Launch artwork (circular hero image) ───────────────
+                    launch.imageUrl?.takeIf { it.isNotBlank() }?.let { imageUrl ->
+                        item {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .transformedHeight(this, transformationSpec),
+                            ) {
+                                AsyncImage(
+                                    model = imageUrl,
+                                    contentDescription = launch.missionName ?: uiState.formattedTitle,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(120.dp)
+                                        .clip(CircleShape),
+                                )
+                            }
+                        }
+                    }
+
+                    // ── Vehicle / agency title (with rocket icon) ──────────
                     item {
                         ListHeader(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .transformedHeight(this, transformationSpec),
                         ) {
-                            Text(
-                                text = uiState.formattedTitle,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center,
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                            ) {
+                                Text(
+                                    text = uiState.formattedTitle,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
                         }
                     }
 
-                    // ── Countdown card ─────────────────────────────────────
+                    // ── Countdown card (live-ticking segments) ─────────────
                     item {
                         TitleCard(
                             onClick = {},
                             title = {
-                                Text(
+                                IconLabel(
+                                    iconRes = R.drawable.ic_schedule,
                                     text = "Countdown",
-                                    style = MaterialTheme.typography.labelMedium,
                                 )
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .transformedHeight(this, transformationSpec),
                         ) {
-                            Text(
-                                text = uiState.countdown,
-                                style = MaterialTheme.typography.displaySmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
+                            CountdownSegments(net = launch.net)
                         }
                     }
 
@@ -142,27 +178,27 @@ private fun LaunchDetailContent(
                         TitleCard(
                             onClick = {},
                             title = {
-                                Text(
+                                IconLabel(
+                                    iconRes = R.drawable.ic_rocket_launch,
                                     text = launch.missionName ?: uiState.formattedTitle,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.labelMedium,
                                 )
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .transformedHeight(this, transformationSpec),
                         ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text(
+                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                IconRow(
+                                    iconRes = R.drawable.ic_schedule,
                                     text = netFormatted,
-                                    style = MaterialTheme.typography.bodySmall,
+                                    iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 launch.statusName?.let { status ->
-                                    Text(
+                                    IconRow(
+                                        iconRes = R.drawable.ic_check_circle,
                                         text = status,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.secondary,
+                                        iconTint = MaterialTheme.colorScheme.tertiary,
+                                        textColor = MaterialTheme.colorScheme.tertiary,
                                     )
                                 }
                             }
@@ -175,9 +211,9 @@ private fun LaunchDetailContent(
                             TitleCard(
                                 onClick = {},
                                 title = {
-                                    Text(
+                                    IconLabel(
+                                        iconRes = R.drawable.ic_location_on,
                                         text = "Launch Site",
-                                        style = MaterialTheme.typography.labelMedium,
                                     )
                                 },
                                 modifier = Modifier
@@ -200,9 +236,9 @@ private fun LaunchDetailContent(
                             TitleCard(
                                 onClick = {},
                                 title = {
-                                    Text(
+                                    IconLabel(
+                                        iconRes = R.drawable.ic_rocket_launch,
                                         text = "Mission",
-                                        style = MaterialTheme.typography.labelMedium,
                                     )
                                 },
                                 modifier = Modifier
@@ -255,4 +291,137 @@ private fun formatNetDateTime(net: kotlin.time.Instant): String {
     } catch (_: Exception) {
         net.toString()
     }
+}
+
+/** Small icon next to a label — used as a card title row. */
+@Composable
+private fun IconLabel(
+    iconRes: Int,
+    text: String,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.size(14.dp),
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = text,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.labelMedium,
+        )
+    }
+}
+
+/** Small icon next to body text — used inside cards (date, status, etc). */
+@Composable
+private fun IconRow(
+    iconRes: Int,
+    text: String,
+    iconTint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    textColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Unspecified,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = iconTint,
+            modifier = Modifier.size(12.dp),
+        )
+        Spacer(Modifier.width(6.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = textColor,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/**
+ * Live-ticking segmented countdown — `DD : HH : MM` with small caps labels under each
+ * pair of digits. Mirrors the phone's home-screen format. Recomputes once per second so
+ * the minutes update visibly.
+ */
+@Composable
+private fun CountdownSegments(net: Instant) {
+    var now by remember { mutableStateOf(Clock.System.now()) }
+    LaunchedEffect(net) {
+        while (true) {
+            now = Clock.System.now()
+            delay(1_000)
+        }
+    }
+    val segments = remember(now, net) { computeDetailSegments(net, now) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        CountdownSegment(segments.days, "DAYS")
+        CountdownColon()
+        CountdownSegment(segments.hours, "HOURS")
+        CountdownColon()
+        CountdownSegment(segments.minutes, "MIN")
+    }
+}
+
+@Composable
+private fun CountdownSegment(value: Long, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = value.toString().padStart(2, '0'),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun CountdownColon() {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = ":",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 4.dp),
+        )
+        // Invisible spacer matching the label line so the colon's baseline aligns
+        // with the digit row in the adjacent segments.
+        Text(
+            text = " ",
+            style = MaterialTheme.typography.labelSmall,
+        )
+    }
+}
+
+private data class DetailCountdownSegments(
+    val days: Long,
+    val hours: Long,
+    val minutes: Long,
+)
+
+private fun computeDetailSegments(net: Instant, now: Instant): DetailCountdownSegments {
+    val duration = net - now
+    if (duration.isNegative()) return DetailCountdownSegments(0, 0, 0)
+    val totalMinutes = duration.inWholeMinutes
+    return DetailCountdownSegments(
+        days = totalMinutes / (24 * 60),
+        hours = (totalMinutes / 60) % 24,
+        minutes = totalMinutes % 60,
+    )
 }

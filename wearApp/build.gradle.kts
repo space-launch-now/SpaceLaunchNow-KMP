@@ -117,6 +117,10 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
 
+    // Coil — async image loading for launch artwork on the detail screen.
+    implementation(libs.coil.compose)
+    implementation(libs.coil.compose.ktor)
+
     // DataStore (local cache)
     implementation(libs.androidx.datastore.preferences)
 
