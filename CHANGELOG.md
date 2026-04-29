@@ -1,3 +1,12 @@
+## [5.28.9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.8...v5.28.9) (2026-04-29)
+
+
+### Bug Fixes
+
+* add network logging, fix pull to refresh, adjust viewmodel logic ([f300568](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f3005685924881b77fa3aadf9b960e94659786ea))
+
+
+
 ## [5.28.8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.7...v5.28.8) (2026-04-29)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * enhance Wear OS app build  process and deployment process with ProGuard optimizations and mapping file handling ([6fe6a69](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6fe6a69c39ef23351be8b67ecc75861d323a9b61))
-
-
-
-## [5.28.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.3...v5.28.4) (2026-04-29)
-
-
-### Bug Fixes
-
-* add AD_ID permission to AndroidManifest for both app and wear modules ([39e57ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/39e57ac5ab0515c3295776753d148a450f1ce923))
 
 
 
