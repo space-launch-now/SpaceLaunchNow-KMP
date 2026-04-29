@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       deploy_to_play_store:
-        description: 'Deploy to Google Play Store (Internal track). Disabled by default while Wear OS form factor is being set up manually.'
+        description: 'Deploy to Google Play Store (Internal track).'
         required: false
-        default: false
+        default: true
         type: boolean
       humanize_notes:
         description: 'Run release notes through GitHub Models to humanize them. Disable for raw conventional-commit output.'
@@ -103,7 +103,7 @@ jobs:
             - Hard limit: 480 characters total.
             - Drop chore, refactor, ci, test, docs, build, style, deps commits entirely.
             - Drop commit hashes, scopes (e.g. "feat(ui):"), and the conventional-commit type prefix.
-            - Use short, user-facing language. No technical jargon.
+            - Use short, user-facing language. No technical jargon. Simple sentences.
             - One item per line, prefixed with. Lead with the biggest user-visible win.
             - If nothing meaningful changed, output: "Bug fixes and performance improvements."
           prompt: |
@@ -125,9 +125,9 @@ jobs:
             - Drop chore, refactor, ci, test, docs, build, style, deps commits entirely.
             - Drop commit hashes, scopes, and conventional-commit type prefixes.
             - Use these sections (omit empty ones), each as an H3:
-              ### ✨ New
-              ### 🚀 Improved
-              ### 🐛 Fixed
+              ### New
+              ### Improved
+              ### Fixed
             - Bullet items only. Short, user-facing language. No internal jargon.
             - Lead with the biggest user-visible win.
             - Do NOT add a title, date, or version line — the workflow adds those.
@@ -483,12 +483,12 @@ jobs:
           retention-days: 90
 
   # Job 5: Deploy to Google Play Store (after AAB build completes)
-  # Disabled by default — only runs when manually triggered with deploy_to_play_store=true.
-  # The AABs are always available as the `release-aab` workflow artifact for manual upload.
+  # Runs automatically on push to master/main. Can be disabled on a manual run
+  # by setting deploy_to_play_store=false (e.g. when iterating on CI without burning a Play release).
   deploy-play-store:
     name: Deploy to Play Store
     needs: [ version, build-aab ]
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_play_store == 'true' }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_play_store != 'false') }}
     runs-on: ubuntu-latest-8-core
     
     steps:
