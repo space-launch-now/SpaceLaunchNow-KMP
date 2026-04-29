@@ -1,3 +1,12 @@
+## [5.28.8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.7...v5.28.8) (2026-04-29)
+
+
+### Bug Fixes
+
+* update wear version code calculation to ensure unique versioning ([921a241](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/921a2416bc70244ab413f2047e54ac20a66ae1b5))
+
+
+
 ## [5.28.7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.6...v5.28.7) (2026-04-29)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * add AD_ID permission to AndroidManifest for both app and wear modules ([39e57ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/39e57ac5ab0515c3295776753d148a450f1ce923))
-
-
-
-## [5.28.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.2...v5.28.3) (2026-04-29)
-
-
-### Bug Fixes
-
-* add deploy to Play Store option in workflow dispatch inputs ([f1dff39](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f1dff39e3e6cf443babf22462cfa6c2c639789ce))
 
 
 

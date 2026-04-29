@@ -1,3 +1,3 @@
 ### Bug Fixes
 
-* improve user-facing release notes generation for Play Store
+* update wear version code calculation to ensure unique versioning
