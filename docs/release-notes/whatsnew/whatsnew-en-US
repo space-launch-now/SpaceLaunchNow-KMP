@@ -1,3 +1,3 @@
 ### Bug Fixes
 
-* enhance Wear OS app build  process and deployment process with ProGuard optimizations and mapping file handling
+* **wear:** use ic_launcher_foreground in PremiumGateScreen to avoid adaptive-icon crash

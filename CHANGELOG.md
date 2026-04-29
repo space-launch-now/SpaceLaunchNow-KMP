@@ -1,3 +1,12 @@
+## [5.28.6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.5...v5.28.6) (2026-04-29)
+
+
+### Bug Fixes
+
+* **wear:** use ic_launcher_foreground in PremiumGateScreen to avoid adaptive-icon crash ([ea8a59c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ea8a59cf9038bbe137d8163300cbcb7e6a4c520f))
+
+
+
 ## [5.28.5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.4...v5.28.5) (2026-04-29)
 
 
@@ -32,15 +41,6 @@
 
 * disable minification for release build in wear app ([67ae2c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/67ae2c67136280f655b55c9d1569a340c28015cf))
 * update release file paths for Google Play deployment ([6dff545](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6dff5458361983aaabbd349b724f7e105518d5eb))
-
-
-
-## [5.28.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.0...v5.28.1) (2026-04-28)
-
-
-### Bug Fixes
-
-* Enhance Wear OS app with versioning, ProGuard rules, and manifest updates ([22c83e9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/22c83e93f8f499696157ec320e99775b78202439))
 
 
 
