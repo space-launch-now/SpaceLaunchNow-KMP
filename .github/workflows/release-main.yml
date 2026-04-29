@@ -4,6 +4,12 @@ on:
   push:
     branches: [ master, main ]
   workflow_dispatch:
+    inputs:
+      deploy_to_play_store:
+        description: 'Deploy to Google Play Store (Internal track). Disabled by default while Wear OS form factor is being set up manually.'
+        required: false
+        default: false
+        type: boolean
 
 env:
   CI: true
@@ -391,9 +397,12 @@ jobs:
           retention-days: 90
 
   # Job 5: Deploy to Google Play Store (after AAB build completes)
+  # Disabled by default — only runs when manually triggered with deploy_to_play_store=true.
+  # The AABs are always available as the `release-aab` workflow artifact for manual upload.
   deploy-play-store:
     name: Deploy to Play Store
     needs: [ version, build-aab ]
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_play_store == 'true' }}
     runs-on: ubuntu-latest-8-core
     
     steps:
@@ -510,10 +519,10 @@ jobs:
           echo "**Groups:** vip_testers" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
 
-  # Job 7: Create GitHub Release (after both deployments complete)
+  # Job 7: Create GitHub Release (after Firebase deployment completes)
   create-release:
     name: Create GitHub Release
-    needs: [ version, build-aab, deploy-play-store, deploy-firebase ]
+    needs: [ version, build-aab, deploy-firebase ]
     runs-on: ubuntu-latest-8-core
     
     steps:
