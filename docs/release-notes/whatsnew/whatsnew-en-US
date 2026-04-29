@@ -1,3 +1,4 @@
 ### Bug Fixes
 
 * disable minification for release build in wear app
+* update release file paths for Google Play deployment

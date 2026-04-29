@@ -1,9 +1,10 @@
-## [5.28.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.1...v5.28.2) (2026-04-28)
+## [5.28.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.1...v5.28.2) (2026-04-29)
 
 
 ### Bug Fixes
 
 * disable minification for release build in wear app ([67ae2c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/67ae2c67136280f655b55c9d1569a340c28015cf))
+* update release file paths for Google Play deployment ([6dff545](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6dff5458361983aaabbd349b724f7e105518d5eb))
 
 
 
