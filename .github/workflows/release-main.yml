@@ -10,6 +10,11 @@ on:
         required: false
         default: false
         type: boolean
+      humanize_notes:
+        description: 'Run release notes through GitHub Models to humanize them. Disable for raw conventional-commit output.'
+        required: false
+        default: true
+        type: boolean
 
 env:
   CI: true
@@ -18,6 +23,7 @@ permissions:
   contents: write
   checks: write
   pull-requests: write
+  models: read
 
 jobs:
   # Job 1: Calculate version (no commit yet)
@@ -82,41 +88,120 @@ jobs:
           echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
           echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
 
+      - name: Humanize Play Store notes (GitHub Models)
+        id: ai_playstore
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        uses: actions/ai-inference@v1
+        continue-on-error: true
+        with:
+          model: openai/gpt-4o-mini
+          max-tokens: 400
+          system-prompt: |
+            You write Google Play "What's new" release notes for an Android space-launch tracking app.
+            Rules:
+            - Output PLAIN TEXT only. No markdown, no headings, no asterisks, no backticks, no links.
+            - Hard limit: 480 characters total.
+            - Drop chore, refactor, ci, test, docs, build, style, deps commits entirely.
+            - Drop commit hashes, scopes (e.g. "feat(ui):"), and the conventional-commit type prefix.
+            - Use short, user-facing language. No technical jargon.
+            - One item per line, prefixed with. Lead with the biggest user-visible win.
+            - If nothing meaningful changed, output: "Bug fixes and performance improvements."
+          prompt: |
+            Raw changelog:
+            ${{ steps.changelog.outputs.clean_changelog }}
+
+      - name: Humanize GitHub Release notes (GitHub Models)
+        id: ai_github
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        uses: actions/ai-inference@v1
+        continue-on-error: true
+        with:
+          model: openai/gpt-4o-mini
+          max-tokens: 800
+          system-prompt: |
+            You write GitHub Release notes for an Android/iOS/Wear OS space-launch tracking app.
+            Rules:
+            - Output GitHub-flavored markdown.
+            - Drop chore, refactor, ci, test, docs, build, style, deps commits entirely.
+            - Drop commit hashes, scopes, and conventional-commit type prefixes.
+            - Use these sections (omit empty ones), each as an H3:
+              ### ✨ New
+              ### 🚀 Improved
+              ### 🐛 Fixed
+            - Bullet items only. Short, user-facing language. No internal jargon.
+            - Lead with the biggest user-visible win.
+            - Do NOT add a title, date, or version line — the workflow adds those.
+          prompt: |
+            Raw changelog:
+            ${{ steps.changelog.outputs.clean_changelog }}
+
       - name: Create release notes
+        env:
+          AI_PLAYSTORE: ${{ steps.ai_playstore.outputs.response }}
+          AI_GITHUB: ${{ steps.ai_github.outputs.response }}
+          RAW_CHANGELOG: ${{ steps.changelog.outputs.clean_changelog }}
         run: |
           mkdir -p docs/release-notes
           mkdir -p docs/release-notes/whatsnew
-          
-          # Create full release notes markdown
-          cat > docs/release-notes/v${{ steps.version.outputs.version_name }}.md << 'EOF'
-          ## 🚀 Space Launch Now ${{ steps.version.outputs.version_name }}
-          
-          **Release Date:** $(date +%Y-%m-%d)
-          **Version Code:** ${{ steps.version.outputs.version_code }}
-          
-          ${{ steps.changelog.outputs.clean_changelog }}
-          
-          ---
-          *This release was automatically created by GitHub Actions*
-          EOF
-          
-          # Create temporary changelog file for processing
-          cat > /tmp/changelog-raw.txt << 'EOF'
-          ${{ steps.changelog.outputs.clean_changelog }}
-          EOF
-          
-          # Create Play Store "What's New" file (English US locale)
-          # Process with script to remove URLs and limit to 500 characters
-          chmod +x scripts/prepare-play-store-notes.sh
-          scripts/prepare-play-store-notes.sh /tmp/changelog-raw.txt > docs/release-notes/whatsnew/whatsnew-en-US
-          
-          # Create GitHub release notes
-          echo "## 🚀 Space Launch Now ${{ steps.version.outputs.version_name }}" > release-notes.txt
-          echo "" >> release-notes.txt
-          echo "**Release Date:** $(date +%Y-%m-%d)" >> release-notes.txt
-          echo "**Version Code:** ${{ steps.version.outputs.version_code }}" >> release-notes.txt
-          echo "" >> release-notes.txt
-          echo "${{ steps.changelog.outputs.clean_changelog }}" >> release-notes.txt
+
+          # ---- GitHub Release body ----
+          # Prefer humanized markdown; fall back to raw changelog if the AI step was skipped or failed.
+          if [ -n "$AI_GITHUB" ]; then
+            GITHUB_BODY="$AI_GITHUB"
+            echo "✨ Using humanized GitHub release notes"
+          else
+            GITHUB_BODY="$RAW_CHANGELOG"
+            echo "⚠️ Falling back to raw changelog for GitHub release"
+          fi
+
+          {
+            echo "## 🚀 Space Launch Now ${{ steps.version.outputs.version_name }}"
+            echo ""
+            echo "**Release Date:** $(date +%Y-%m-%d)"
+            echo "**Version Code:** ${{ steps.version.outputs.version_code }}"
+            echo ""
+            echo "$GITHUB_BODY"
+            echo ""
+            echo "---"
+            echo "*This release was automatically created by GitHub Actions*"
+          } > docs/release-notes/v${{ steps.version.outputs.version_name }}.md
+
+          {
+            echo "## 🚀 Space Launch Now ${{ steps.version.outputs.version_name }}"
+            echo ""
+            echo "**Release Date:** $(date +%Y-%m-%d)"
+            echo "**Version Code:** ${{ steps.version.outputs.version_code }}"
+            echo ""
+            echo "$GITHUB_BODY"
+          } > release-notes.txt
+
+          # ---- Play Store "What's new" (≤500 chars, plain text) ----
+          if [ -n "$AI_PLAYSTORE" ]; then
+            # Trim to 500 chars hard cap (Play Store limit)
+            printf '%s' "$AI_PLAYSTORE" | head -c 500 > docs/release-notes/whatsnew/whatsnew-en-US
+            echo "✨ Using humanized Play Store notes"
+          else
+            # Fallback to existing script
+            printf '%s' "$RAW_CHANGELOG" > /tmp/changelog-raw.txt
+            chmod +x scripts/prepare-play-store-notes.sh
+            scripts/prepare-play-store-notes.sh /tmp/changelog-raw.txt > docs/release-notes/whatsnew/whatsnew-en-US
+            echo "⚠️ Falling back to raw changelog for Play Store notes"
+          fi
+
+          # Surface results in the workflow summary for review
+          {
+            echo "## 📝 Release Notes Preview"
+            echo ""
+            echo "### Play Store (whatsnew-en-US)"
+            echo '```'
+            cat docs/release-notes/whatsnew/whatsnew-en-US
+            echo ''
+            echo '```'
+            echo ""
+            echo "### GitHub Release body"
+            echo ""
+            cat release-notes.txt
+          } >> $GITHUB_STEP_SUMMARY
 
       - name: Upload version artifacts (not committed yet)
         uses: actions/upload-artifact@v4
@@ -394,6 +479,7 @@ jobs:
             composeApp/build/outputs/bundle/release/*.aab
             composeApp/build/outputs/mapping/release/mapping.txt
             wearApp/build/outputs/bundle/release/*.aab
+            wearApp/build/outputs/mapping/release/mapping.txt
           retention-days: 90
 
   # Job 5: Deploy to Google Play Store (after AAB build completes)
@@ -424,11 +510,19 @@ jobs:
         id: artifacts
         run: |
           PHONE_AAB=$(find aab/composeApp -name "*.aab" -type f | head -n 1)
-          MAPPING_PATH=$(find aab -name "mapping.txt" -type f | head -n 1)
-          echo "mapping=$MAPPING_PATH" >> $GITHUB_OUTPUT
-          # Only upload phone AAB until Wear OS form factor is enabled in Play Console.
-          # Wear AAB is still available in the release-aab workflow artifact for manual upload.
-          echo "release_files=$PHONE_AAB" >> $GITHUB_OUTPUT
+          WEAR_AAB=$(find aab/wearApp -name "*.aab" -type f | head -n 1)
+          PHONE_MAPPING=$(find aab/composeApp -name "mapping.txt" -type f | head -n 1)
+          WEAR_MAPPING=$(find aab/wearApp -name "mapping.txt" -type f | head -n 1)
+          echo "phone_aab=$PHONE_AAB" >> $GITHUB_OUTPUT
+          echo "wear_aab=$WEAR_AAB" >> $GITHUB_OUTPUT
+          echo "phone_mapping=$PHONE_MAPPING" >> $GITHUB_OUTPUT
+          echo "wear_mapping=$WEAR_MAPPING" >> $GITHUB_OUTPUT
+          if [ -n "$WEAR_AAB" ]; then
+            echo "has_wear=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_wear=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Decode Service Account
         env:
           PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
@@ -439,15 +533,27 @@ jobs:
           mkdir -p docs/release-notes/en-US/
           echo "${{ needs.version.outputs.changelog }}" > docs/release-notes/en-US/default.txt
 
-      - name: Deploy AAB to Google Play Store (Alpha)
+      - name: Deploy Phone AAB to Google Play Store (Internal)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: service-account.json
           packageName: me.calebjones.spacelaunchnow
-          releaseFiles: ${{ steps.artifacts.outputs.release_files }}
+          releaseFiles: ${{ steps.artifacts.outputs.phone_aab }}
           track: internal
           status: completed
-          mappingFile: ${{ steps.artifacts.outputs.mapping }}
+          mappingFile: ${{ steps.artifacts.outputs.phone_mapping }}
+          whatsNewDirectory: docs/release-notes/whatsnew/
+
+      - name: Deploy Wear AAB to Google Play Store (Wear Internal)
+        if: steps.artifacts.outputs.has_wear == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service-account.json
+          packageName: me.calebjones.spacelaunchnow
+          releaseFiles: ${{ steps.artifacts.outputs.wear_aab }}
+          track: wear:internal
+          status: completed
+          mappingFile: ${{ steps.artifacts.outputs.wear_mapping }}
           whatsNewDirectory: docs/release-notes/whatsnew/
 
       - name: Play Store Deployment Summary
@@ -456,7 +562,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** ${{ needs.version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Version Code:** ${{ needs.version.outputs.version_code }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Track:** Internal (Alpha)" >> $GITHUB_STEP_SUMMARY
+          echo "**Phone Track:** internal" >> $GITHUB_STEP_SUMMARY
+          echo "**Wear Track:** wear:internal" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
 
   # Job 6: Deploy to Firebase Distribution (parallel with Play Store)
