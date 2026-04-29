@@ -1,3 +1,12 @@
+## [5.28.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.3...v5.28.4) (2026-04-29)
+
+
+### Bug Fixes
+
+* add AD_ID permission to AndroidManifest for both app and wear modules ([39e57ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/39e57ac5ab0515c3295776753d148a450f1ce923))
+
+
+
 ## [5.28.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.2...v5.28.3) (2026-04-29)
 
 
@@ -46,15 +55,6 @@
 
 * domain model, wear OS and motd ([5878b99](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5878b990bdcbeb5c40dc18cc237fdc38162be45d))
 * Implement filter preferences for launches and enhance Wear UI components ([f395546](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f395546889b8f1ef89cd59801e98c75ae3b1d5e9))
-
-
-
-## [5.27.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.27.1...v5.27.2) (2026-04-24)
-
-
-### Bug Fixes
-
-* purchase restoration functionality and initial pre-warm logic ([75c3af6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/75c3af65663ef512cfaa6ca07d938c3d16bbda67))
 
 
 

@@ -1,3 +1,3 @@
 ### Bug Fixes
 
-* add deploy to Play Store option in workflow dispatch inputs
+* add AD_ID permission to AndroidManifest for both app and wear modules
