@@ -424,15 +424,11 @@ jobs:
         id: artifacts
         run: |
           PHONE_AAB=$(find aab/composeApp -name "*.aab" -type f | head -n 1)
-          WEAR_AAB=$(find aab/wearApp -name "*.aab" -type f | head -n 1)
           MAPPING_PATH=$(find aab -name "mapping.txt" -type f | head -n 1)
           echo "mapping=$MAPPING_PATH" >> $GITHUB_OUTPUT
-          # r0adkll/upload-google-play expects a COMMA-separated list for releaseFiles
-          if [ -n "$WEAR_AAB" ]; then
-            echo "release_files=$PHONE_AAB,$WEAR_AAB" >> $GITHUB_OUTPUT
-          else
-            echo "release_files=$PHONE_AAB" >> $GITHUB_OUTPUT
-          fi
+          # Only upload phone AAB until Wear OS form factor is enabled in Play Console.
+          # Wear AAB is still available in the release-aab workflow artifact for manual upload.
+          echo "release_files=$PHONE_AAB" >> $GITHUB_OUTPUT
       - name: Decode Service Account
         env:
           PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
