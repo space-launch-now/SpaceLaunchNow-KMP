@@ -3,7 +3,9 @@ package me.calebjones.spacelaunchnow.di
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AstronautsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
@@ -22,6 +24,15 @@ import me.calebjones.spacelaunchnow.util.UserAgentUtil
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
+// Routes Ktor's HTTP logging through SpaceLogger so requests/responses appear under
+// a stable tag (KtorHttp) instead of going to System.out / the platform default sink.
+private val ktorHttpLogger = object : Logger {
+    private val log = SpaceLogger.getLogger("KtorHttp")
+    override fun log(message: String) {
+        log.d { message }
+    }
+}
+
 val apiModule = module {
     // Shared HTTP client configuration for all APIs
     val httpClientConfig: io.ktor.client.HttpClientConfig<*>.() -> Unit = {
@@ -31,6 +42,7 @@ val apiModule = module {
 
         // Install Logging plugin to show requests and headers
         install(Logging) {
+            logger = ktorHttpLogger
             level = LogLevel.ALL // Show everything including request/response body
         }
     }

@@ -1,7 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.detail
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,9 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -76,27 +73,24 @@ fun LaunchDetailScreen(
     // Stale-while-revalidate state: shows progress bar when refreshing with stale data
     val isRefreshingWithStaleData by viewModel.isRefreshingWithStaleData.collectAsState()
 
-    // Determine current launch data
-    val currentLaunch = cachedLaunchDetailed ?: launchDetails
+    // Determine current launch data. Prefer the live ViewModel state — it carries
+    // both the initial cached preview (set via setLaunchDetails on entry) and any
+    // fresh data from a network refresh. Falling back to cachedLaunchDetailed only
+    // covers the brief gap before LaunchedEffect(launchId) populates the ViewModel.
+    // The previous order (cachedLaunchDetailed ?: launchDetails) caused pull-to-refresh
+    // to render a stale snapshot frozen by remember(launchId).
+    val currentLaunch = launchDetails ?: cachedLaunchDetailed
 
-    // Pull-to-refresh state
-    var isRefreshing by remember { mutableStateOf(false) }
+    // Pull-to-refresh state — driven by ViewModel.isRefreshing, which spans the full
+    // refreshLaunchDetails+news+events flow and resets in a finally block.
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
-            isRefreshing = true
+            log.i { "👇 Pull-to-refresh gesture fired for launch $launchId" }
             viewModel.refreshLaunchDetails(launchId)
-            viewModel.fetchRelatedNews(launchId)
-            viewModel.fetchRelatedEvents(launchId)
         }
     )
-
-    // Stop refreshing when loading completes
-    LaunchedEffect(isLoading) {
-        if (!isLoading && isRefreshing) {
-            isRefreshing = false
-        }
-    }
 
     // Handle loading logic
     LaunchedEffect(launchId) {
@@ -174,7 +168,10 @@ fun LaunchDetailScreen(
                     forcePhoneLayout = forcePhoneLayout,
                     onOpenUrl = { url ->
                         viewModel.trackLinkOpened(url, launchId)
-                        try { uriHandler.openUri(url) } catch (_: Throwable) {}
+                        try {
+                            uriHandler.openUri(url)
+                        } catch (_: Throwable) {
+                        }
                     },
                     onExternalVideoOpened = { videoUrl, videoSource ->
                         viewModel.trackVideoOpened(videoUrl, videoSource)
@@ -197,11 +194,15 @@ fun LaunchDetailScreen(
             )
         }
 
-        // Pull-to-refresh indicator
+        // Pull-to-refresh indicator — statusBarsPadding keeps the spinner clear of the
+        // iOS Dynamic Island / notch and the Android status bar (the outer Box draws
+        // edge-to-edge, so without this the indicator anchors under the cutout).
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+
         )
 
         // Fullscreen button when embedded in list-detail pane

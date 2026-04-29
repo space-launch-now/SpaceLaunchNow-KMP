@@ -2,6 +2,8 @@ package me.calebjones.spacelaunchnow.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -29,6 +31,8 @@ class LaunchViewModel(
     private val agencyRepository: AgencyRepository,
     private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
+
+    private val log = Logger.withTag("LaunchViewModel")
 
     private val _upcomingLaunches = MutableStateFlow<PaginatedResult<Launch>?>(null)
     val upcomingLaunches: StateFlow<PaginatedResult<Launch>?> = _upcomingLaunches
@@ -76,6 +80,12 @@ class LaunchViewModel(
     private val _isRefreshingWithStaleData = MutableStateFlow(false)
     val isRefreshingWithStaleData: StateFlow<Boolean> = _isRefreshingWithStaleData
 
+    // Drives the pull-to-refresh spinner. Single source of truth for "manual refresh in
+    // progress", spanning details + related news + related events. Don't infer from
+    // _isLoading — that flag stays false during stale-while-revalidate refreshes.
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
     // ========== Analytics ==========
 
     fun trackLinkOpened(url: String, launchId: String) {
@@ -111,58 +121,107 @@ class LaunchViewModel(
     }
 
     fun fetchLaunchDetails(id: String, forceRefresh: Boolean = false) {
-        viewModelScope.launch {
-            _error.value = null
-            _isRefreshingWithStaleData.value = false
+        viewModelScope.launch { fetchLaunchDetailsSuspend(id, forceRefresh) }
+    }
 
-            // Check if we have detailed data in cache first (unless forcing refresh)
-            if (!forceRefresh) {
-                val cachedLaunch = launchCache.getCachedLaunch(id)
-                if (cachedLaunch != null) {
-                    _launchDetails.value = cachedLaunch
-                    updateVideoPlayerState(cachedLaunch)
-                    _isLoading.value = false
-                    return@launch
-                }
-            }
+    private suspend fun fetchLaunchDetailsSuspend(id: String, forceRefresh: Boolean) {
+        _error.value = null
+        _isRefreshingWithStaleData.value = false
 
-            // Stale-while-revalidate: Check for stale data to display while fetching
-            val staleData = repository.getStaleDetailedLaunch(id)?.toDomain()
-            if (staleData != null) {
-                // We have stale data - show it immediately while refreshing
-                _launchDetails.value = staleData
-                updateVideoPlayerState(staleData)
-                _isRefreshingWithStaleData.value = true
-                _isLoading.value = false // Don't show full shimmer, we have data
-            } else {
-                // No data at all - show loading shimmer
-                _isLoading.value = true
+        // Check if we have detailed data in cache first (unless forcing refresh)
+        if (!forceRefresh) {
+            val cachedLaunch = launchCache.getCachedLaunch(id)
+            if (cachedLaunch != null) {
+                _launchDetails.value = cachedLaunch
+                updateVideoPlayerState(cachedLaunch)
+                _isLoading.value = false
+                return
             }
-
-            val result = repository.getLaunchDetailDomain(id, forceRefresh = forceRefresh)
-            result.onSuccess { launch ->
-                _launchDetails.value = launch
-                updateVideoPlayerState(launch)
-                // Cache the detailed data for future use
-                launchCache.cacheLaunch(launch)
-                analyticsManager.track(AnalyticsEvent.LaunchViewed(launch.id, launch.name))
-            }.onFailure { exception ->
-                // Only show error if we don't have any data to display
-                if (_launchDetails.value == null) {
-                    _error.value = exception.message
-                }
-            }
-            _isLoading.value = false
-            _isRefreshingWithStaleData.value = false
         }
+
+        // Stale-while-revalidate: Check for stale data to display while fetching
+        val staleData = repository.getStaleDetailedLaunch(id)?.toDomain()
+        if (staleData != null) {
+            // We have stale data - show it immediately while refreshing
+            _launchDetails.value = staleData
+            updateVideoPlayerState(staleData)
+            _isRefreshingWithStaleData.value = true
+            _isLoading.value = false // Don't show full shimmer, we have data
+        } else {
+            // No data at all - show loading shimmer
+            _isLoading.value = true
+        }
+
+        val previousLaunch = _launchDetails.value
+        val result = repository.getLaunchDetailDomain(id, forceRefresh = forceRefresh)
+        result.onSuccess { launch ->
+            val sameRef = previousLaunch === launch
+            val sameContent = previousLaunch?.let {
+                it.id == launch.id &&
+                    it.name == launch.name &&
+                    it.status == launch.status &&
+                    it.net == launch.net
+            } == true
+            log.i {
+                "fetchLaunchDetailsSuspend (forceRefresh=$forceRefresh) result — " +
+                    "name=${launch.name}, status=${launch.status?.name}, net=${launch.net}, " +
+                    "sameRefAsPrev=$sameRef, sameContentAsPrev=$sameContent"
+            }
+            _launchDetails.value = launch
+            updateVideoPlayerState(launch)
+            // Cache the detailed data for future use
+            launchCache.cacheLaunch(launch)
+            analyticsManager.track(AnalyticsEvent.LaunchViewed(launch.id, launch.name))
+        }.onFailure { exception ->
+            log.w(exception) {
+                "fetchLaunchDetailsSuspend (forceRefresh=$forceRefresh) failed"
+            }
+            // Only show error if we don't have any data to display
+            if (_launchDetails.value == null) {
+                _error.value = exception.message
+            }
+        }
+        _isLoading.value = false
+        _isRefreshingWithStaleData.value = false
     }
 
     /**
-     * Force refresh launch details (bypasses cache)
-     * Useful for pull-to-refresh functionality
+     * Pull-to-refresh entry point: refreshes details, related news, and related events
+     * concurrently. Drives [isRefreshing] for the duration so the spinner reliably
+     * resets when all three fetches finish (success or failure).
      */
     fun refreshLaunchDetails(id: String) {
-        fetchLaunchDetails(id, forceRefresh = true)
+        log.i { "🔄 Pull-to-refresh triggered for launch $id" }
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            log.d { "  → isRefreshing=true, kicking off details + news + events fetches" }
+            try {
+                coroutineScope {
+                    launch {
+                        log.d { "  → fetchLaunchDetailsSuspend started" }
+                        fetchLaunchDetailsSuspend(id, forceRefresh = true)
+                        log.d { "  ← fetchLaunchDetailsSuspend finished" }
+                    }
+                    launch {
+                        log.d { "  → fetchRelatedNewsSuspend started" }
+                        fetchRelatedNewsSuspend(id)
+                        log.d { "  ← fetchRelatedNewsSuspend finished" }
+                    }
+                    launch {
+                        log.d { "  → fetchRelatedEventsSuspend started" }
+                        fetchRelatedEventsSuspend(id)
+                        log.d { "  ← fetchRelatedEventsSuspend finished" }
+                    }
+                }
+                log.i { "✅ Pull-to-refresh completed for launch $id" }
+            } catch (t: Throwable) {
+                log.e(t) { "❌ Pull-to-refresh failed for launch $id" }
+                throw t
+            } finally {
+                _isRefreshing.value = false
+                log.d { "  → isRefreshing=false (spinner should stop)" }
+            }
+        }
     }
 
     /**
@@ -272,25 +331,27 @@ class LaunchViewModel(
      * Fetch related news articles for a launch
      */
     fun fetchRelatedNews(launchId: String, limit: Int = 20) {
-        viewModelScope.launch {
-            _isNewsLoading.value = true
-            _newsError.value = null
+        viewModelScope.launch { fetchRelatedNewsSuspend(launchId, limit) }
+    }
 
-            val result = articlesRepository.getArticlesByLaunch(
-                launchIds = listOf(launchId),
-                limit = limit
-            )
+    private suspend fun fetchRelatedNewsSuspend(launchId: String, limit: Int = 20) {
+        _isNewsLoading.value = true
+        _newsError.value = null
 
-            result.onSuccess { paginatedList ->
-                print("Related news size: ${paginatedList.results.size}")
-                _relatedNews.value = paginatedList.results
-            }.onFailure { exception ->
-                print("Error fetching related news: ${exception.message}")
-                _newsError.value = exception.message
-            }
+        val result = articlesRepository.getArticlesByLaunch(
+            launchIds = listOf(launchId),
+            limit = limit
+        )
 
-            _isNewsLoading.value = false
+        result.onSuccess { paginatedList ->
+            print("Related news size: ${paginatedList.results.size}")
+            _relatedNews.value = paginatedList.results
+        }.onFailure { exception ->
+            print("Error fetching related news: ${exception.message}")
+            _newsError.value = exception.message
         }
+
+        _isNewsLoading.value = false
     }
 
     /**
@@ -308,25 +369,27 @@ class LaunchViewModel(
      * Fetch related events for a launch
      */
     fun fetchRelatedEvents(launchId: String, limit: Int = 20) {
-        viewModelScope.launch {
-            _isEventsLoading.value = true
-            _eventsError.value = null
+        viewModelScope.launch { fetchRelatedEventsSuspend(launchId, limit) }
+    }
 
-            val result = eventsRepository.getEventsByLaunchIdDomain(
-                launchId = launchId,
-                limit = limit
-            )
+    private suspend fun fetchRelatedEventsSuspend(launchId: String, limit: Int = 20) {
+        _isEventsLoading.value = true
+        _eventsError.value = null
 
-            result.onSuccess { paginatedResult ->
-                print("Related events size: ${paginatedResult.results.size}")
-                _relatedEvents.value = paginatedResult.results
-            }.onFailure { exception ->
-                print("Error fetching related events: ${exception.message}")
-                _eventsError.value = exception.message
-            }
+        val result = eventsRepository.getEventsByLaunchIdDomain(
+            launchId = launchId,
+            limit = limit
+        )
 
-            _isEventsLoading.value = false
+        result.onSuccess { paginatedResult ->
+            print("Related events size: ${paginatedResult.results.size}")
+            _relatedEvents.value = paginatedResult.results
+        }.onFailure { exception ->
+            print("Error fetching related events: ${exception.message}")
+            _eventsError.value = exception.message
         }
+
+        _isEventsLoading.value = false
     }
 
     /**
