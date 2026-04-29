@@ -1,3 +1,12 @@
+## [5.28.7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.6...v5.28.7) (2026-04-29)
+
+
+### Bug Fixes
+
+* improve user-facing release notes generation for Play Store ([586d2c1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/586d2c1853cbe051f23611f3d931bbf3e83d18ab))
+
+
+
 ## [5.28.6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.5...v5.28.6) (2026-04-29)
 
 
@@ -31,16 +40,6 @@
 ### Bug Fixes
 
 * add deploy to Play Store option in workflow dispatch inputs ([f1dff39](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f1dff39e3e6cf443babf22462cfa6c2c639789ce))
-
-
-
-## [5.28.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.1...v5.28.2) (2026-04-29)
-
-
-### Bug Fixes
-
-* disable minification for release build in wear app ([67ae2c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/67ae2c67136280f655b55c9d1569a340c28015cf))
-* update release file paths for Google Play deployment ([6dff545](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6dff5458361983aaabbd349b724f7e105518d5eb))
 
 
 
