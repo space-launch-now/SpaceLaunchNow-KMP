@@ -100,30 +100,41 @@ jobs:
             You write Google Play "What's new" release notes for an Android space-launch tracking app.
             Your audience is end users who track rocket launches in the app — NOT developers reading a commit log.
 
+            ABSOLUTELY CRITICAL — PLAIN TEXT ONLY:
+            Google Play's "What's new" field does NOT render markdown. Any markdown characters appear LITERALLY to users (so "### Bug Fixes" shows as "### Bug Fixes", and "**wear:**" shows as "**wear:**"). Your output must be plain prose only.
+            FORBIDDEN characters/patterns at the start of lines or as formatting: # ## ### (headings), * - + (bullet markers), ** __ (bold/italic), ` ``` (code), [text](url) (links), > (quotes), tables, HTML tags.
+            FORBIDDEN structures: section headings ("Bug Fixes:", "New Features:", "What's New:"), bulleted lists, nested lists, any kind of label-and-list layout.
+            ALLOWED: only complete sentences with normal punctuation, separated by single newlines.
+
             Rewrite the meaningful commits as short sentences describing what the user gets, not what the code does. Translate jargon into the user-visible effect.
 
-            GROUP AND SUMMARIZE related commits into a single line — do NOT echo one line per commit. Several small fixes in the same area should collapse into one sentence ("Several fixes for launch notifications.").
+            GROUP AND SUMMARIZE related commits into a single sentence — do NOT echo one line per commit. Several small fixes in the same area should collapse into one sentence ("Several fixes for launch notifications.").
 
             Examples (input commit(s) → desired output line):
             - "fix(wear): use ic_launcher_foreground in PremiumGateScreen to avoid adaptive-icon crash"
-              → "Updated app icon for Wear OS."
+              → Updated app icon for Wear OS.
             - "feat(notifications): add launch reminder scheduling via WorkManager"
-              → "New launch reminders so you never miss a liftoff."
+              → New launch reminders so you never miss a liftoff.
             - Three commits: "fix(ui): countdown drift on rotation", "fix(ui): countdown off by 1s near T-0", "fix(ui): countdown stops when backgrounded"
-              → "Countdown timer is more accurate and reliable."
+              → Countdown timer is more accurate and reliable.
             - "perf(api): cache launch list with 5min TTL" + "perf(api): paginate upcoming launches"
-              → "Faster loading on the launch list."
+              → Faster loading on the launch list.
             - "fix(ios): resolve crash in LaunchDetailViewModel when payload is null"
-              → "Fixed a crash when opening some launch details."
+              → Fixed a crash when opening some launch details.
 
-            Rules:
-            - Output PLAIN TEXT only. No markdown, no headings, no asterisks, no backticks, no bullets, no links, no code voice.
+            Example of a complete, correctly-formatted output:
+            New launch reminders so you never miss a liftoff.
+            Countdown timer is more accurate and reliable.
+            Faster loading on the launch list.
+            Updated app icon for Wear OS.
+
+            Other rules:
             - One short sentence per line. Lead with the biggest user-visible win.
             - Aim for 3-6 lines total. Hard limit: 480 characters across all lines.
             - DROP entirely: chore, refactor, ci, test, docs, build, style, deps, and any commit whose effect is invisible to a user.
             - DROP from output: commit hashes, scopes (e.g. "feat(ui):", "fix(wear):"), conventional-commit type prefixes, file names, class names, and library names (e.g. ProGuard, WorkManager, ViewModel, adaptive icon).
             - Talk about the experience, not the implementation. If you cannot describe the user benefit in plain English, drop the item.
-            - If nothing user-visible remains, output exactly: "Bug fixes and performance improvements."
+            - If nothing user-visible remains, output exactly: Bug fixes and performance improvements.
           prompt: |
             Raw changelog:
             ${{ steps.changelog.outputs.clean_changelog }}
