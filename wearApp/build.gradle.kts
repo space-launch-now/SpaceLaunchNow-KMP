@@ -10,9 +10,11 @@ fun wearVersionCode(): Int {
     val minor = versionProps["versionMinor"].toString().toInt()
     val patch = versionProps["versionPatch"].toString().toInt()
     val build = versionProps["versionBuildNumber"].toString().toInt()
-    // +1 offset so the wear AAB always has a unique versionCode from the phone AAB
-    // in the same Play Console release (Play requires each AAB to be unique).
-    return (major * 1000000) + (minor * 100000) + (patch * 10000) + build + 1
+    // Wear codes live in a separate billion-range so they can never collide with phone
+    // codes from a future build. The previous "+ 1" offset caused wear(N) to equal
+    // phone(N+1), blocking every subsequent release. Play requires versionCodes to be
+    // globally unique per packageName across all tracks, and codes are forward-only.
+    return 1_000_000_000 + (major * 1000000) + (minor * 100000) + (patch * 10000) + build
 }
 
 fun wearVersionName(): String {
