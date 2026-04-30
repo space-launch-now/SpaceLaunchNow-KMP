@@ -61,19 +61,45 @@ jobs:
         run: |
           FROM_TRACK="${{ github.event.inputs.promote_from }}"
           TO_TRACK="${{ github.event.inputs.promote_to }}"
-          
+
           # Validate promotion is moving forward
           if [[ "$FROM_TRACK" == "production" ]]; then
             echo "❌ Cannot promote from production track"
             exit 1
           fi
-          
+
           if [[ "$FROM_TRACK" == "beta" && "$TO_TRACK" == "alpha" ]]; then
             echo "❌ Cannot promote backwards from beta to alpha"
             exit 1
           fi
-          
+
           echo "✅ Valid promotion: $FROM_TRACK → $TO_TRACK"
+
+      - name: Resolve wear tracks
+        id: wear-tracks
+        run: |
+          # Wear has parallel custom tracks (wear:internal / wear:beta / wear:production)
+          # but no wear:alpha. Phone tracks map to wear tracks like this:
+          #   internal,alpha → wear:internal   (alpha doesn't exist for wear; promote from
+          #                                    its closest equivalent, internal)
+          #   beta           → wear:beta
+          #   production     → wear:production (never used as a FROM here — guarded above)
+          PHONE_FROM="${{ github.event.inputs.promote_from }}"
+          PHONE_TO="${{ github.event.inputs.promote_to }}"
+          case "$PHONE_FROM" in
+            internal|alpha) WEAR_FROM="wear:internal" ;;
+            beta)           WEAR_FROM="wear:beta" ;;
+            production)     WEAR_FROM="wear:production" ;;
+            *) echo "❌ Unknown phone FROM track: $PHONE_FROM" && exit 1 ;;
+          esac
+          case "$PHONE_TO" in
+            beta)       WEAR_TO="wear:beta" ;;
+            production) WEAR_TO="wear:production" ;;
+            *) echo "❌ Unknown phone TO track: $PHONE_TO" && exit 1 ;;
+          esac
+          echo "wear_from=$WEAR_FROM" >> $GITHUB_OUTPUT
+          echo "wear_to=$WEAR_TO" >> $GITHUB_OUTPUT
+          echo "✅ Wear promotion: $WEAR_FROM → $WEAR_TO"
 
       - name: Create release notes
         run: |
@@ -94,7 +120,7 @@ jobs:
           FRACTION=$(echo "scale=2; $PERCENTAGE / 100" | bc -l)
           echo "fraction=$FRACTION" >> $GITHUB_OUTPUT
 
-      - name: Promote to Beta
+      - name: Promote Phone to Beta
         if: github.event.inputs.promote_to == 'beta'
         uses: r0adkll/upload-google-play@v1
         with:
@@ -106,7 +132,19 @@ jobs:
           userFraction: 1.0
           whatsNewDirectory: docs/release-notes/whatsnew/
 
-      - name: Promote to Production (Staged)
+      - name: Promote Wear to Beta
+        if: github.event.inputs.promote_to == 'beta'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+          packageName: me.calebjones.spacelaunchnow
+          track: ${{ steps.wear-tracks.outputs.wear_from }}
+          promoteTrack: ${{ steps.wear-tracks.outputs.wear_to }}
+          status: completed
+          userFraction: 1.0
+          whatsNewDirectory: docs/release-notes/whatsnew/
+
+      - name: Promote Phone to Production (Staged)
         if: github.event.inputs.promote_to == 'production'
         uses: r0adkll/upload-google-play@v1
         with:
@@ -114,6 +152,18 @@ jobs:
           packageName: me.calebjones.spacelaunchnow
           track: ${{ github.event.inputs.promote_from }}
           promoteTrack: production
+          status: inProgress
+          userFraction: ${{ steps.rollout.outputs.fraction }}
+          whatsNewDirectory: docs/release-notes/whatsnew/
+
+      - name: Promote Wear to Production (Staged)
+        if: github.event.inputs.promote_to == 'production'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+          packageName: me.calebjones.spacelaunchnow
+          track: ${{ steps.wear-tracks.outputs.wear_from }}
+          promoteTrack: ${{ steps.wear-tracks.outputs.wear_to }}
           status: inProgress
           userFraction: ${{ steps.rollout.outputs.fraction }}
           whatsNewDirectory: docs/release-notes/whatsnew/
@@ -138,19 +188,19 @@ jobs:
           release_name: Production Release ${{ env.VERSION_NAME }}
           body: |
             ## 🚀 Space Launch Now ${{ env.VERSION_NAME }} - Production Release
-            
+
             ### Deployment Info
-            - Promoted from: **${{ github.event.inputs.promote_from }}**
-            - Promoted to: **${{ github.event.inputs.promote_to }}**
+            - Phone: **${{ github.event.inputs.promote_from }}** → **${{ github.event.inputs.promote_to }}**
+            - Wear: **${{ steps.wear-tracks.outputs.wear_from }}** → **${{ steps.wear-tracks.outputs.wear_to }}**
             - Rollout: **${{ github.event.inputs.rollout_percentage }}%**
-            
+
             ### Release Notes
             ${{ github.event.inputs.release_notes }}
-            
+
             ### Version Info
             - Version Code: ${{ env.VERSION_CODE }}
             - Version Name: ${{ env.VERSION_NAME }}
-            
+
             ---
             *This production release was promoted via GitHub Actions*
           draft: false
@@ -163,16 +213,19 @@ jobs:
           script: |
             const status = '${{ job.status }}';
             const version = '${{ env.VERSION_NAME }}';
-            const fromTrack = '${{ github.event.inputs.promote_from }}';
-            const toTrack = '${{ github.event.inputs.promote_to }}';
+            const phoneFrom = '${{ github.event.inputs.promote_from }}';
+            const phoneTo = '${{ github.event.inputs.promote_to }}';
+            const wearFrom = '${{ steps.wear-tracks.outputs.wear_from }}';
+            const wearTo = '${{ steps.wear-tracks.outputs.wear_to }}';
             const rollout = '${{ github.event.inputs.rollout_percentage }}';
             const emoji = status === 'success' ? '✅' : '❌';
-            
+
             let message = `${emoji} Promotion ${status}: Version ${version}\n`;
-            message += `${fromTrack} → ${toTrack}`;
-            
-            if (toTrack === 'production' && status === 'success') {
+            message += `Phone: ${phoneFrom} → ${phoneTo}\n`;
+            message += `Wear:  ${wearFrom} → ${wearTo}`;
+
+            if (phoneTo === 'production' && status === 'success') {
               message += ` (${rollout}% rollout)`;
             }
-            
+
             console.log(message);
