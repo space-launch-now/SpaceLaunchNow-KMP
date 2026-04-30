@@ -6,7 +6,7 @@ import UIKit
 import WidgetKit
 
 // MARK: - Launch Data Models
-struct LaunchEntry: TimelineEntry {
+struct LaunchEntry: WidgetKit.TimelineEntry {
     let date: Date
     let launches: [LaunchData]
     let isPlaceholder: Bool
@@ -118,7 +118,7 @@ struct LaunchData: Identifiable {
 }
 
 // MARK: - Widget Provider
-struct LaunchProvider: TimelineProvider {
+struct LaunchProvider: WidgetKit.TimelineProvider {
     typealias Entry = LaunchEntry
 
     // Placeholder while widget is loading
@@ -188,10 +188,10 @@ struct LaunchProvider: TimelineProvider {
 
             // Fetch launches - this calls the Kotlin wrapper that unwraps Result<T>
             print("🚀 Widget: Calling fetchUpcomingLaunchesOrNull...")
-            let paginatedList = try await helper.fetchUpcomingLaunchesOrNull(limit: 10)
+            let paginatedResult = try await helper.fetchUpcomingLaunchesOrNull(limit: 10)
             print("🚀 Widget: Got result from fetchUpcomingLaunchesOrNull")
 
-            guard let paginatedList = paginatedList else {
+            guard let paginatedResult = paginatedResult else {
                 let errorMsg = "fetchUpcomingLaunchesOrNull returned nil - API call failed"
                 print("🚀 Widget: \(errorMsg)")
                 return LaunchEntry(
@@ -204,10 +204,10 @@ struct LaunchProvider: TimelineProvider {
             }
 
             print(
-                "🚀 Widget: Successfully got PaginatedLaunchNormalList with \(paginatedList.results.count) launches"
+                "🚀 Widget: Successfully got PaginatedResult with \(paginatedResult.results.count) launches"
             )
-            var entry = processPaginatedList(
-                paginatedList,
+            var entry = processPaginatedResult(
+                paginatedResult,
                 hasAccess: accessState.shouldShowUnlocked
             )
 
@@ -302,12 +302,12 @@ struct LaunchProvider: TimelineProvider {
         }
     }
 
-    // Helper to process the paginated list
-    private func processPaginatedList(
-        _ paginatedList: PaginatedLaunchNormalList,
+    // Helper to process the paginated result
+    private func processPaginatedResult(
+        _ paginatedResult: PaginatedResult<Launch>,
         hasAccess: Bool
     ) -> LaunchEntry {
-        let results = paginatedList.results
+        let results = paginatedResult.results.compactMap { $0 as? Launch }
         print("🚀 Widget: Got \(results.count) launches")
 
         let launches = results.compactMap { launch -> LaunchData? in
@@ -316,16 +316,12 @@ struct LaunchProvider: TimelineProvider {
                 return nil
             }
 
-            // name is optional in Kotlin, provide default if nil
-            let name = launch.name ?? "Unknown Launch"
+            let name = launch.name
 
             // Convert Kotlinx_datetimeInstant to Date
             let launchDate = Date(timeIntervalSince1970: TimeInterval(net.epochSeconds))
 
-            // Try multiple image sources in order of preference
-            let primaryImageUrl = launch.image?.imageUrl
-
-            let finalImageUrl = primaryImageUrl
+            let finalImageUrl = launch.imageUrl
 
             print("🚀 Widget: Processing launch: \(name) at \(launchDate)")
             print("🚀 Widget: Final image URL for \(name): \(finalImageUrl ?? "nil")")
@@ -333,8 +329,8 @@ struct LaunchProvider: TimelineProvider {
             return LaunchData(
                 id: launch.id,
                 name: name,
-                agency: launch.launchServiceProvider.name,
-                agencyAbbrev: launch.launchServiceProvider.abbrev,
+                agency: launch.provider.name,
+                agencyAbbrev: launch.provider.abbrev,
                 location: launch.pad?.location?.name ?? "Unknown Location",
                 launchTime: launchDate,
                 status: launch.status?.name ?? "Unknown",
