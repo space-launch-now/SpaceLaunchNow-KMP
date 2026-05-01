@@ -46,22 +46,20 @@ fun setThemeChangeListener(listener: ((Int) -> Unit)?) {
 fun setNavigationDestination(destination: String?) {
     try {
         log.i { "iOS: Setting navigation destination: $destination" }
+        navigationDestinationState.value = destination
     } catch (t: Throwable) {
-        // Catch Throwable (not just Exception) so nothing escapes across the ObjC boundary
-        println("iOS: Setting navigation destination: $destination (logging failed: ${t.message})")
+        println("iOS: Setting navigation destination: $destination (failed: ${t.message})")
     }
-    navigationDestinationState.value = destination
 }
 
 // Public function for iOS to trigger navigation from notification
 fun setNotificationLaunchId(launchId: String?) {
     try {
         log.i { "iOS: Setting notification launch ID: $launchId" }
+        notificationLaunchIdState.value = launchId
     } catch (t: Throwable) {
-        // Catch Throwable (not just Exception) so nothing escapes across the ObjC boundary
-        println("iOS: Setting notification launch ID: $launchId (logging failed: ${t.message})")
+        println("iOS: Setting notification launch ID: $launchId (failed: ${t.message})")
     }
-    notificationLaunchIdState.value = launchId
 }
 
 fun MainViewController() = ComposeUIViewController {
