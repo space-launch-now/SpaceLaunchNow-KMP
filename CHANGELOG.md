@@ -1,3 +1,13 @@
+## [5.28.11](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.10...v5.28.11) (2026-05-01)
+
+
+### Bug Fixes
+
+* improve logging and error handling in navigation functions ([dc33fc7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dc33fc731d2ffaaf8702c7b18acab21b8d76ab93))
+* **widget:** ios build issue [skip ci] ([2eade63](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2eade63f234ff77b86947bcc89f07e1175242d6a))
+
+
+
 ## [5.28.10](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.9...v5.28.10) (2026-04-29)
 
 
@@ -31,15 +41,6 @@
 ### Bug Fixes
 
 * improve user-facing release notes generation for Play Store ([586d2c1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/586d2c1853cbe051f23611f3d931bbf3e83d18ab))
-
-
-
-## [5.28.6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.5...v5.28.6) (2026-04-29)
-
-
-### Bug Fixes
-
-* **wear:** use ic_launcher_foreground in PremiumGateScreen to avoid adaptive-icon crash ([ea8a59c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ea8a59cf9038bbe137d8163300cbcb7e6a4c520f))
 
 
 
