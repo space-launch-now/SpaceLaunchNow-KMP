@@ -1,3 +1,12 @@
+## [5.29.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.29.0...v5.29.1) (2026-05-04)
+
+
+### Bug Fixes
+
+* update versioning scheme for consistency across platforms ([3572926](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3572926838e5471052ca52101553edae5ff3283f))
+
+
+
 # [5.29.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.11...v5.29.0) (2026-05-04)
 
 
@@ -32,15 +41,6 @@
 ### Bug Fixes
 
 * add network logging, fix pull to refresh, adjust viewmodel logic ([f300568](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f3005685924881b77fa3aadf9b960e94659786ea))
-
-
-
-## [5.28.8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.7...v5.28.8) (2026-04-29)
-
-
-### Bug Fixes
-
-* update wear version code calculation to ensure unique versioning ([921a241](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/921a2416bc70244ab413f2047e54ac20a66ae1b5))
 
 
 
