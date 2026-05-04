@@ -71,7 +71,8 @@ jobs:
           VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3 | cut -d'-' -f1)  # Strip any remaining suffixes
           
           VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${NEW_BUILD_NUMBER}"
-          VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + NEW_BUILD_NUMBER))
+          # Monotonic counter — see composeApp/build.gradle.kts computeVersionCode()
+          VERSION_CODE=$((1100000000 + NEW_BUILD_NUMBER * 2))
           
           cat > version.properties << EOF
           # Version configuration for Space Launch Now KMP

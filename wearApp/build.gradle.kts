@@ -6,15 +6,13 @@ val versionProps = Properties().apply {
 }
 
 fun wearVersionCode(): Int {
-    val major = versionProps["versionMajor"].toString().toInt()
-    val minor = versionProps["versionMinor"].toString().toInt()
-    val patch = versionProps["versionPatch"].toString().toInt()
     val build = versionProps["versionBuildNumber"].toString().toInt()
-    // Wear codes live in a separate billion-range so they can never collide with phone
-    // codes from a future build. The previous "+ 1" offset caused wear(N) to equal
-    // phone(N+1), blocking every subsequent release. Play requires versionCodes to be
-    // globally unique per packageName across all tracks, and codes are forward-only.
-    return 1_000_000_000 + (major * 1000000) + (minor * 100000) + (patch * 10000) + build
+    // Sits one above the matching phone code (computeVersionCode in composeApp). Play
+    // requires versionCodes to be globally unique per packageName across all tracks and
+    // forward-only, and phone+wear share applicationId — so wear must always outrank
+    // the phone code from the same release. Bump versionBuildNumber by 1 per release;
+    // phone gets 1.1B + build×2, wear gets 1.1B + build×2 + 1, both monotonic forever.
+    return 1_100_000_000 + (build * 2) + 1
 }
 
 fun wearVersionName(): String {

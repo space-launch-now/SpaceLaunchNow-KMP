@@ -24,11 +24,19 @@ fun computeVersionNameDesktop(): String {
 }
 
 fun computeVersionCode(): Int {
-    val major = versionProps["versionMajor"].toString().toInt()
-    val minor = versionProps["versionMinor"].toString().toInt()
-    val patch = versionProps["versionPatch"].toString().toInt()
     val buildNumber = versionProps["versionBuildNumber"].toString().toInt()
-    return (major * 1000000) + (minor * 100000) + (patch * 10000) + buildNumber
+    // Monotonic counter scheme — the previous semver-encoded formula overflowed slots
+    // when patch hit double digits (5.28.11 outranked 5.29.0). versionCode no longer
+    // encodes major/minor/patch (versionName already does that); it just needs to be a
+    // forward-only integer per applicationId.
+    //
+    // Phone takes the even slot, wear takes the odd slot above it (see wearApp). Bump
+    // versionBuildNumber by 1 per release; both APKs get unique forward-only codes.
+    //
+    // Base 1_100_000_000 sits above the highest previously-published code for this
+    // applicationId (wear 1_007_910_066) so the new scheme stays monotonic across the
+    // package's full release history.
+    return 1_100_000_000 + (buildNumber * 2)
 }
 
 plugins {
