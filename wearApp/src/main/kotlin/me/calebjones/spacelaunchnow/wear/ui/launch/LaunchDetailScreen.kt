@@ -22,12 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Button
@@ -40,14 +42,15 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TitleCard
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.delay
-import me.calebjones.spacelaunchnow.wear.R
-import kotlin.time.Clock
-import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import me.calebjones.spacelaunchnow.wear.R
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchDetailUiState
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchDetailViewModel
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /** Horizontal padding that keeps text clear of the round bezel on all watch sizes. */
 private val HorizontalContentPadding = 14.dp
@@ -123,7 +126,8 @@ private fun LaunchDetailContent(
                             ) {
                                 AsyncImage(
                                     model = imageUrl,
-                                    contentDescription = launch.missionName ?: uiState.formattedTitle,
+                                    contentDescription = launch.missionName
+                                        ?: uiState.formattedTitle,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
                                         .size(120.dp)
@@ -362,16 +366,47 @@ private fun CountdownSegments(net: Instant) {
     }
     val segments = remember(now, net) { computeDetailSegments(net, now) }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        CountdownSegment(segments.days, "DAYS")
-        CountdownColon()
-        CountdownSegment(segments.hours, "HOURS")
-        CountdownColon()
-        CountdownSegment(segments.minutes, "MIN")
+    ScaleToFitHorizontally(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            CountdownSegment(segments.days, "DAYS")
+            CountdownColon()
+            CountdownSegment(segments.hours, "HOURS")
+            CountdownColon()
+            CountdownSegment(segments.minutes, "MIN")
+        }
+    }
+}
+
+/**
+ * Measures [content] at its natural width, then uniformly downscales it (via a graphics
+ * layer) so the result fits within the parent's max width. Lets the countdown digits scale
+ * with the user's system font size while guaranteeing the row never overflows the watch
+ * bezel — required by Wear OS quality guidelines for large-font support.
+ */
+@Composable
+private fun ScaleToFitHorizontally(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
+        val placeable = measurables.first().measure(Constraints())
+        val scale = if (placeable.width > constraints.maxWidth && constraints.maxWidth > 0) {
+            constraints.maxWidth.toFloat() / placeable.width
+        } else 1f
+        val laidOutWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else placeable.width
+        val scaledHeight = (placeable.height * scale).toInt()
+        layout(laidOutWidth, scaledHeight) {
+            val offsetX = (laidOutWidth - placeable.width) / 2
+            val offsetY = (scaledHeight - placeable.height) / 2
+            placeable.placeWithLayer(offsetX, offsetY) {
+                scaleX = scale
+                scaleY = scale
+                transformOrigin = TransformOrigin(0.5f, 0.5f)
+            }
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.wear.tile
 
+import android.provider.Settings
 import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
@@ -72,6 +73,20 @@ class NextLaunchTileService : TileService() {
             TileState.Error
         }
 
+        // Drop the per-segment labels entirely once the user's font scale pushes past
+        // Android's "Default" tier. Tiles are static layout — protolayout can't re-flow at
+        // render time, so we pick a format that always fits both horizontally (no labels
+        // → no third-segment cutoff) and vertically (single-line digits → status/location
+        // row no longer clipped by primaryLayout's main-slot height).
+        //
+        // Read the user's font scale from Settings rather than `deviceConfiguration.fontScale`
+        // — the latter is part of the protolayout API but the Wear OS renderer doesn't
+        // always populate it, so it can read 1.0 even at "Largest".
+        val systemFontScale = runCatching {
+            Settings.System.getFloat(contentResolver, Settings.System.FONT_SCALE)
+        }.getOrDefault(deviceConfiguration.fontScale)
+        val useCompactCountdown = systemFontScale > LARGE_FONT_THRESHOLD
+
         val rootLayout = materialScope(
             context = this@NextLaunchTileService,
             deviceConfiguration = deviceConfiguration,
@@ -80,7 +95,7 @@ class NextLaunchTileService : TileService() {
                 TileState.Free -> buildFreeUserLayout()
                 TileState.NoData -> buildNoDataLayout()
                 TileState.Error -> buildErrorLayout()
-                is TileState.Launch -> buildLaunchLayout(state.launch)
+                is TileState.Launch -> buildLaunchLayout(state.launch, useCompactCountdown)
             }
         }
 
@@ -137,12 +152,17 @@ class NextLaunchTileService : TileService() {
      * Two-row grid: countdown card spans the full width on top; status (small, filled
      * with status color) + location card sit side-by-side below.
      */
-    private fun MaterialScope.buildLaunchLayout(launch: CachedLaunch) = primaryLayout(
+    private fun MaterialScope.buildLaunchLayout(
+        launch: CachedLaunch,
+        useCompactCountdown: Boolean,
+    ) = primaryLayout(
         titleSlot = {
             text(
                 text = formatTileTitle(launch).layoutString,
                 typography = Typography.TITLE_SMALL,
-                maxLines = 2,
+                // Cap at one line at large font so the title doesn't push the
+                // status/location row out of primaryLayout's main slot.
+                maxLines = if (useCompactCountdown) 1 else 2,
             )
         },
         mainSlot = {
@@ -152,7 +172,7 @@ class NextLaunchTileService : TileService() {
                 .setWidth(expand())
 
             // Top row: countdown card, full width.
-            column.addContent(countdownCard(launch, click))
+            column.addContent(countdownCard(launch, click, useCompactCountdown))
 
             // Bottom row: small status pill + wider location card. Only render the row
             // if at least one of the two has data — otherwise the spacer is wasted.
@@ -180,8 +200,9 @@ class NextLaunchTileService : TileService() {
     private fun MaterialScope.countdownCard(
         launch: CachedLaunch,
         onClick: ModifiersBuilders.Clickable,
+        useCompactCountdown: Boolean,
     ): LayoutElementBuilders.LayoutElement =
-        tonalCard(onClick = onClick, content = countdownColumn(launch))
+        tonalCard(onClick = onClick, content = countdownColumn(launch, useCompactCountdown))
 
     /** Bottom row: small status pill on the left, wider location card on the right. */
     private fun MaterialScope.statusLocationRow(
@@ -325,24 +346,35 @@ class NextLaunchTileService : TileService() {
      * 5-minute freshness interval and don't tick live — showing stale seconds would be
      * misleading.
      */
-    private fun MaterialScope.countdownColumn(launch: CachedLaunch): LayoutElementBuilders.LayoutElement {
+    private fun MaterialScope.countdownColumn(
+        launch: CachedLaunch,
+        useCompactCountdown: Boolean,
+    ): LayoutElementBuilders.LayoutElement {
         val segments = computeSegments(launch)
+        // At compact, render labels as null so each segment shrinks to a single digit
+        // line. That collapses the card vertically, freeing room for the status/location
+        // row that primaryLayout otherwise clips at large font.
+        val daysLabel = if (useCompactCountdown) null else "DAYS"
+        val hoursLabel = if (useCompactCountdown) null else "HOURS"
+        val minutesLabel = if (useCompactCountdown) null else "MIN"
         return LayoutElementBuilders.Row.Builder()
             .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
-            .addContent(countdownSegment(twoDigit(segments.days), "DAYS"))
-            .addContent(countdownColon())
-            .addContent(countdownSegment(twoDigit(segments.hours), "HOURS"))
-            .addContent(countdownColon())
-            .addContent(countdownSegment(twoDigit(segments.minutes), "MIN"))
+            .addContent(countdownSegment(twoDigit(segments.days), daysLabel))
+            .addContent(countdownColon(includeBaselineSpacer = !useCompactCountdown))
+            .addContent(countdownSegment(twoDigit(segments.hours), hoursLabel))
+            .addContent(countdownColon(includeBaselineSpacer = !useCompactCountdown))
+            .addContent(countdownSegment(twoDigit(segments.minutes), minutesLabel))
             .build()
     }
 
-    /** One countdown segment: a two-digit numeral on top, a small caps label below. */
+    /** One countdown segment: a two-digit numeral on top, optionally a small caps label
+     *  below. Pass [label] = null to render just the digit (used at large font scales
+     *  where the label row pushes the third segment off the watch face). */
     private fun MaterialScope.countdownSegment(
         value: String,
-        label: String,
-    ): LayoutElementBuilders.LayoutElement =
-        LayoutElementBuilders.Column.Builder()
+        label: String?,
+    ): LayoutElementBuilders.LayoutElement {
+        val column = LayoutElementBuilders.Column.Builder()
             .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
             .addContent(
                 text(
@@ -352,7 +384,8 @@ class NextLaunchTileService : TileService() {
                     maxLines = 1,
                 ),
             )
-            .addContent(
+        if (label != null) {
+            column.addContent(
                 text(
                     text = label.layoutString,
                     typography = Typography.LABEL_SMALL,
@@ -360,13 +393,18 @@ class NextLaunchTileService : TileService() {
                     maxLines = 1,
                 ),
             )
-            .build()
+        }
+        return column.build()
+    }
 
-    /** Colon separator between countdown segments. Wrapped in a Column with an invisible
-     *  trailing spacer so its baseline matches the digit row in the adjacent segments
-     *  (which have a label line below their digit). */
-    private fun MaterialScope.countdownColon(): LayoutElementBuilders.LayoutElement =
-        LayoutElementBuilders.Column.Builder()
+    /** Colon separator between countdown segments. When [includeBaselineSpacer] is true
+     *  (default-font layout), an invisible LABEL_SMALL line is appended so the colon's
+     *  baseline matches the digit row in the adjacent labelled segments. At compact mode
+     *  the segments have no label, so the spacer would just add stray vertical height. */
+    private fun MaterialScope.countdownColon(
+        includeBaselineSpacer: Boolean,
+    ): LayoutElementBuilders.LayoutElement {
+        val column = LayoutElementBuilders.Column.Builder()
             .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
             .setModifiers(
                 ModifiersBuilders.Modifiers.Builder()
@@ -386,14 +424,17 @@ class NextLaunchTileService : TileService() {
                     maxLines = 1,
                 ),
             )
-            .addContent(
+        if (includeBaselineSpacer) {
+            column.addContent(
                 text(
                     text = " ".layoutString,
                     typography = Typography.LABEL_SMALL,
                     maxLines = 1,
                 ),
             )
-            .build()
+        }
+        return column.build()
+    }
 
     private fun twoDigit(value: Long): String = value.toString().padStart(2, '0')
 
@@ -598,5 +639,14 @@ class NextLaunchTileService : TileService() {
         private const val RESOURCES_SCHEMA_VERSION = "6"
         private const val REFRESH_INTERVAL_MS = 300_000L // 5 minutes
         private const val LOCATION_ICON_ID = "location_icon"
+
+        /**
+         * Font scale above which the countdown drops the per-segment labels ("DAYS",
+         * "HOURS", "MIN") and renders just the digits + colons. 1.06f sits between
+         * Android's "Default" (1.0) and "Large" (1.15) tiers — anything beyond Default
+         * already starts pushing the third segment off the watch face and squeezing the
+         * status/location row out of primaryLayout's main slot.
+         */
+        private const val LARGE_FONT_THRESHOLD = 1.06f
     }
 }
