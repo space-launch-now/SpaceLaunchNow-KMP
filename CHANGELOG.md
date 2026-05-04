@@ -1,3 +1,12 @@
+# [5.29.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.11...v5.29.0) (2026-05-04)
+
+
+### Features
+
+* **wear:** fix text layout sizes for large text settings ([c63fec1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c63fec1804aef682fe4aecb384c38e95c7cc1477))
+
+
+
 ## [5.28.11](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.10...v5.28.11) (2026-05-01)
 
 
@@ -32,15 +41,6 @@
 ### Bug Fixes
 
 * update wear version code calculation to ensure unique versioning ([921a241](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/921a2416bc70244ab413f2047e54ac20a66ae1b5))
-
-
-
-## [5.28.7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.6...v5.28.7) (2026-04-29)
-
-
-### Bug Fixes
-
-* improve user-facing release notes generation for Play Store ([586d2c1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/586d2c1853cbe051f23611f3d931bbf3e83d18ab))
 
 
 
