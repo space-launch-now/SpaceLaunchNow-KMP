@@ -20,18 +20,18 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up JDK 23
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '23'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           # Use wrapper version for consistency
           gradle-version: wrapper
@@ -87,7 +87,7 @@ jobs:
 
       - name: Generate test report
         if: always()
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         with:
           name: Unit Test Results
           path: '**/build/test-results/**/TEST-*.xml'
@@ -98,7 +98,7 @@ jobs:
         run: ./gradlew :composeApp:assembleDebug :wearApp:assembleDebug --parallel --build-cache
 
       - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: debug-apk
           path: |
@@ -108,7 +108,7 @@ jobs:
 
       - name: Comment PR
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const message = `✅ **Build Validation Passed**
