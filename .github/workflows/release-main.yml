@@ -4,6 +4,17 @@ on:
   push:
     branches: [ master, main ]
   workflow_dispatch:
+    inputs:
+      deploy_to_play_store:
+        description: 'Deploy to Google Play Store (Internal track).'
+        required: false
+        default: true
+        type: boolean
+      humanize_notes:
+        description: 'Run release notes through GitHub Models to humanize them. Disable for raw conventional-commit output.'
+        required: false
+        default: true
+        type: boolean
 
 env:
   CI: true
@@ -12,6 +23,7 @@ permissions:
   contents: write
   checks: write
   pull-requests: write
+  models: read
 
 jobs:
   # Job 1: Calculate version (no commit yet)
@@ -26,14 +38,14 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Conventional Changelog Action
         id: changelog
-        uses: TriPSs/conventional-changelog-action@v5
+        uses: TriPSs/conventional-changelog-action@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           output-file: "CHANGELOG.md"
@@ -59,7 +71,8 @@ jobs:
           VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3 | cut -d'-' -f1)  # Strip any remaining suffixes
           
           VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${NEW_BUILD_NUMBER}"
-          VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + NEW_BUILD_NUMBER))
+          # Monotonic counter — see composeApp/build.gradle.kts computeVersionCode()
+          VERSION_CODE=$((1100000000 + NEW_BUILD_NUMBER * 2))
           
           cat > version.properties << EOF
           # Version configuration for Space Launch Now KMP
@@ -76,44 +89,152 @@ jobs:
           echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
           echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
 
+      - name: Humanize Play Store notes (GitHub Models)
+        id: ai_playstore
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        uses: actions/ai-inference@v2
+        continue-on-error: true
+        with:
+          model: openai/gpt-4o-mini
+          max-tokens: 400
+          system-prompt: |
+            You write Google Play "What's new" release notes for an Android space-launch tracking app.
+            Your audience is end users who track rocket launches in the app — NOT developers reading a commit log.
+
+            ABSOLUTELY CRITICAL — PLAIN TEXT ONLY:
+            Google Play's "What's new" field does NOT render markdown. Any markdown characters appear LITERALLY to users (so "### Bug Fixes" shows as "### Bug Fixes", and "**wear:**" shows as "**wear:**"). Your output must be plain prose only.
+            FORBIDDEN characters/patterns at the start of lines or as formatting: # ## ### (headings), * - + (bullet markers), ** __ (bold/italic), ` ``` (code), [text](url) (links), > (quotes), tables, HTML tags.
+            FORBIDDEN structures: section headings ("Bug Fixes:", "New Features:", "What's New:"), bulleted lists, nested lists, any kind of label-and-list layout.
+            ALLOWED: only complete sentences with normal punctuation, separated by single newlines.
+
+            Rewrite the meaningful commits as short sentences describing what the user gets, not what the code does. Translate jargon into the user-visible effect.
+
+            GROUP AND SUMMARIZE related commits into a single sentence — do NOT echo one line per commit. Several small fixes in the same area should collapse into one sentence ("Several fixes for launch notifications.").
+
+            Examples (input commit(s) → desired output line):
+            - "fix(wear): use ic_launcher_foreground in PremiumGateScreen to avoid adaptive-icon crash"
+              → Updated app icon for Wear OS.
+            - "feat(notifications): add launch reminder scheduling via WorkManager"
+              → New launch reminders so you never miss a liftoff.
+            - Three commits: "fix(ui): countdown drift on rotation", "fix(ui): countdown off by 1s near T-0", "fix(ui): countdown stops when backgrounded"
+              → Countdown timer is more accurate and reliable.
+            - "perf(api): cache launch list with 5min TTL" + "perf(api): paginate upcoming launches"
+              → Faster loading on the launch list.
+            - "fix(ios): resolve crash in LaunchDetailViewModel when payload is null"
+              → Fixed a crash when opening some launch details.
+
+            Example of a complete, correctly-formatted output:
+            New launch reminders so you never miss a liftoff.
+            Countdown timer is more accurate and reliable.
+            Faster loading on the launch list.
+            Updated app icon for Wear OS.
+
+            Other rules:
+            - One short sentence per line. Lead with the biggest user-visible win.
+            - Aim for 3-6 lines total. Hard limit: 480 characters across all lines.
+            - DROP entirely: chore, refactor, ci, test, docs, build, style, deps, and any commit whose effect is invisible to a user.
+            - DROP from output: commit hashes, scopes (e.g. "feat(ui):", "fix(wear):"), conventional-commit type prefixes, file names, class names, and library names (e.g. ProGuard, WorkManager, ViewModel, adaptive icon).
+            - Talk about the experience, not the implementation. If you cannot describe the user benefit in plain English, drop the item.
+            - If nothing user-visible remains, output exactly: Bug fixes and performance improvements.
+          prompt: |
+            Raw changelog:
+            ${{ steps.changelog.outputs.clean_changelog }}
+
+      - name: Humanize GitHub Release notes (GitHub Models)
+        id: ai_github
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        uses: actions/ai-inference@v2
+        continue-on-error: true
+        with:
+          model: openai/gpt-4o-mini
+          max-tokens: 800
+          system-prompt: |
+            You write GitHub Release notes for an Android/iOS/Wear OS space-launch tracking app.
+            Rules:
+            - Output GitHub-flavored markdown.
+            - Drop chore, refactor, ci, test, docs, build, style, deps commits entirely.
+            - Drop commit hashes, scopes, and conventional-commit type prefixes.
+            - Use these sections (omit empty ones), each as an H3:
+              ### New
+              ### Improved
+              ### Fixed
+            - Bullet items only. Short, user-facing language. No internal jargon.
+            - Lead with the biggest user-visible win.
+            - Do NOT add a title, date, or version line — the workflow adds those.
+          prompt: |
+            Raw changelog:
+            ${{ steps.changelog.outputs.clean_changelog }}
+
       - name: Create release notes
+        env:
+          AI_PLAYSTORE: ${{ steps.ai_playstore.outputs.response }}
+          AI_GITHUB: ${{ steps.ai_github.outputs.response }}
+          RAW_CHANGELOG: ${{ steps.changelog.outputs.clean_changelog }}
         run: |
           mkdir -p docs/release-notes
           mkdir -p docs/release-notes/whatsnew
-          
-          # Create full release notes markdown
-          cat > docs/release-notes/v${{ steps.version.outputs.version_name }}.md << 'EOF'
-          ## 🚀 Space Launch Now ${{ steps.version.outputs.version_name }}
-          
-          **Release Date:** $(date +%Y-%m-%d)
-          **Version Code:** ${{ steps.version.outputs.version_code }}
-          
-          ${{ steps.changelog.outputs.clean_changelog }}
-          
-          ---
-          *This release was automatically created by GitHub Actions*
-          EOF
-          
-          # Create temporary changelog file for processing
-          cat > /tmp/changelog-raw.txt << 'EOF'
-          ${{ steps.changelog.outputs.clean_changelog }}
-          EOF
-          
-          # Create Play Store "What's New" file (English US locale)
-          # Process with script to remove URLs and limit to 500 characters
-          chmod +x scripts/prepare-play-store-notes.sh
-          scripts/prepare-play-store-notes.sh /tmp/changelog-raw.txt > docs/release-notes/whatsnew/whatsnew-en-US
-          
-          # Create GitHub release notes
-          echo "## 🚀 Space Launch Now ${{ steps.version.outputs.version_name }}" > release-notes.txt
-          echo "" >> release-notes.txt
-          echo "**Release Date:** $(date +%Y-%m-%d)" >> release-notes.txt
-          echo "**Version Code:** ${{ steps.version.outputs.version_code }}" >> release-notes.txt
-          echo "" >> release-notes.txt
-          echo "${{ steps.changelog.outputs.clean_changelog }}" >> release-notes.txt
+
+          # ---- GitHub Release body ----
+          # Prefer humanized markdown; fall back to raw changelog if the AI step was skipped or failed.
+          if [ -n "$AI_GITHUB" ]; then
+            GITHUB_BODY="$AI_GITHUB"
+            echo "✨ Using humanized GitHub release notes"
+          else
+            GITHUB_BODY="$RAW_CHANGELOG"
+            echo "⚠️ Falling back to raw changelog for GitHub release"
+          fi
+
+          {
+            echo "## 🚀 Space Launch Now ${{ steps.version.outputs.version_name }}"
+            echo ""
+            echo "**Release Date:** $(date +%Y-%m-%d)"
+            echo "**Version Code:** ${{ steps.version.outputs.version_code }}"
+            echo ""
+            echo "$GITHUB_BODY"
+            echo ""
+            echo "---"
+            echo "*This release was automatically created by GitHub Actions*"
+          } > docs/release-notes/v${{ steps.version.outputs.version_name }}.md
+
+          {
+            echo "## 🚀 Space Launch Now ${{ steps.version.outputs.version_name }}"
+            echo ""
+            echo "**Release Date:** $(date +%Y-%m-%d)"
+            echo "**Version Code:** ${{ steps.version.outputs.version_code }}"
+            echo ""
+            echo "$GITHUB_BODY"
+          } > release-notes.txt
+
+          # ---- Play Store "What's new" (≤500 chars, plain text) ----
+          if [ -n "$AI_PLAYSTORE" ]; then
+            # Trim to 500 chars hard cap (Play Store limit)
+            printf '%s' "$AI_PLAYSTORE" | head -c 500 > docs/release-notes/whatsnew/whatsnew-en-US
+            echo "✨ Using humanized Play Store notes"
+          else
+            # Fallback to existing script
+            printf '%s' "$RAW_CHANGELOG" > /tmp/changelog-raw.txt
+            chmod +x scripts/prepare-play-store-notes.sh
+            scripts/prepare-play-store-notes.sh /tmp/changelog-raw.txt > docs/release-notes/whatsnew/whatsnew-en-US
+            echo "⚠️ Falling back to raw changelog for Play Store notes"
+          fi
+
+          # Surface results in the workflow summary for review
+          {
+            echo "## 📝 Release Notes Preview"
+            echo ""
+            echo "### Play Store (whatsnew-en-US)"
+            echo '```'
+            cat docs/release-notes/whatsnew/whatsnew-en-US
+            echo ''
+            echo '```'
+            echo ""
+            echo "### GitHub Release body"
+            echo ""
+            cat release-notes.txt
+          } >> $GITHUB_STEP_SUMMARY
 
       - name: Upload version artifacts (not committed yet)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: version-files
           path: |
@@ -131,21 +252,21 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download version files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: version-files
 
       - name: Set up JDK 23
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '23'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           # Use wrapper version for consistency
           gradle-version: wrapper
@@ -165,7 +286,7 @@ jobs:
           dependency-graph: generate-and-submit
 
       - name: Cache Android SDK
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.android/sdk
@@ -175,7 +296,7 @@ jobs:
             android-sdk-${{ runner.os }}-
 
       - name: Cache Kotlin/Native
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.konan
@@ -219,7 +340,7 @@ jobs:
 
       - name: Generate test report
         if: always()
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         with:
           name: Test Results
           path: "**/build/test-results/**/TEST-*.xml"
@@ -234,27 +355,34 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download version files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: version-files
 
       - name: Commit version changes
         run: |
+          # Extract semver without build number for git tag
+          SEMVER=$(echo "${{ needs.version.outputs.version_name }}" | sed 's/-b[0-9]*$//')
+
+          # Check if this tag already exists on the remote (e.g. from a previous run attempt)
+          if git ls-remote --tags origin "refs/tags/v${SEMVER}" | grep -q "v${SEMVER}"; then
+            echo "✅ Tag v${SEMVER} already exists on remote — skipping commit, tag and push (idempotent re-run)"
+            exit 0
+          fi
+
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git add version.properties CHANGELOG.md docs/release-notes/
           git commit -m "chore(release): bump version to ${{ needs.version.outputs.version_name }} [skip ci]"
 
-          # Extract semver without build number for git tag
-          SEMVER=$(echo "${{ needs.version.outputs.version_name }}" | sed 's/-b[0-9]*$//')
           git tag -a "v${SEMVER}" -m "Release ${{ needs.version.outputs.version_name }}"
-          
+
           # Push both commit and tag
           git push origin HEAD:${{ github.ref_name }}
           git push origin "v${SEMVER}"
@@ -270,21 +398,21 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download version files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: version-files
 
       - name: Set up JDK 23
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '23'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           # Use wrapper version for consistency
           gradle-version: wrapper
@@ -304,7 +432,7 @@ jobs:
           dependency-graph: generate-and-submit
 
       - name: Cache Android SDK
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.android/sdk
@@ -314,7 +442,7 @@ jobs:
             android-sdk-${{ runner.os }}-
 
       - name: Cache Kotlin/Native
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.konan
@@ -367,38 +495,43 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew :composeApp:bundleRelease \
+          ./gradlew :composeApp:bundleRelease :wearApp:bundleRelease \
             -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
             -Pandroid.injected.signing.key.password=$KEY_PASSWORD
 
       - name: Upload AAB and mapping
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: release-aab
           path: |
             composeApp/build/outputs/bundle/release/*.aab
             composeApp/build/outputs/mapping/release/mapping.txt
+            wearApp/build/outputs/bundle/release/*.aab
+            wearApp/build/outputs/mapping/release/mapping.txt
           retention-days: 90
 
   # Job 5: Deploy to Google Play Store (after AAB build completes)
+  # Runs automatically on push to master/main. Can be disabled on a manual run
+  # by setting deploy_to_play_store=false (e.g. when iterating on CI without burning a Play release).
   deploy-play-store:
     name: Deploy to Play Store
     needs: [ version, build-aab ]
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_play_store != 'false') }}
     runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download version files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: version-files
 
       - name: Download AAB
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: release-aab
           path: aab/
@@ -406,10 +539,19 @@ jobs:
       - name: Resolve artifact paths
         id: artifacts
         run: |
-          AAB_PATH=$(find aab -name "*.aab" -type f | head -n 1)
-          MAPPING_PATH=$(find aab -name "mapping.txt" -type f | head -n 1)
-          echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
-          echo "mapping=$MAPPING_PATH" >> $GITHUB_OUTPUT
+          PHONE_AAB=$(find aab/composeApp -name "*.aab" -type f | head -n 1)
+          WEAR_AAB=$(find aab/wearApp -name "*.aab" -type f | head -n 1)
+          PHONE_MAPPING=$(find aab/composeApp -name "mapping.txt" -type f | head -n 1)
+          WEAR_MAPPING=$(find aab/wearApp -name "mapping.txt" -type f | head -n 1)
+          echo "phone_aab=$PHONE_AAB" >> $GITHUB_OUTPUT
+          echo "wear_aab=$WEAR_AAB" >> $GITHUB_OUTPUT
+          echo "phone_mapping=$PHONE_MAPPING" >> $GITHUB_OUTPUT
+          echo "wear_mapping=$WEAR_MAPPING" >> $GITHUB_OUTPUT
+          if [ -n "$WEAR_AAB" ]; then
+            echo "has_wear=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_wear=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Decode Service Account
         env:
@@ -421,15 +563,27 @@ jobs:
           mkdir -p docs/release-notes/en-US/
           echo "${{ needs.version.outputs.changelog }}" > docs/release-notes/en-US/default.txt
 
-      - name: Deploy AAB to Google Play Store (Alpha)
+      - name: Deploy Phone AAB to Google Play Store (Internal)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: service-account.json
           packageName: me.calebjones.spacelaunchnow
-          releaseFiles: ${{ steps.artifacts.outputs.aab }}
-          track: internal
+          releaseFiles: ${{ steps.artifacts.outputs.phone_aab }}
+          tracks: internal
           status: completed
-          mappingFile: ${{ steps.artifacts.outputs.mapping }}
+          mappingFile: ${{ steps.artifacts.outputs.phone_mapping }}
+          whatsNewDirectory: docs/release-notes/whatsnew/
+
+      - name: Deploy Wear AAB to Google Play Store (Wear Internal)
+        if: steps.artifacts.outputs.has_wear == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service-account.json
+          packageName: me.calebjones.spacelaunchnow
+          releaseFiles: ${{ steps.artifacts.outputs.wear_aab }}
+          tracks: wear:internal
+          status: completed
+          mappingFile: ${{ steps.artifacts.outputs.wear_mapping }}
           whatsNewDirectory: docs/release-notes/whatsnew/
 
       - name: Play Store Deployment Summary
@@ -438,7 +592,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** ${{ needs.version.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Version Code:** ${{ needs.version.outputs.version_code }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Track:** Internal (Alpha)" >> $GITHUB_STEP_SUMMARY
+          echo "**Phone Track:** internal" >> $GITHUB_STEP_SUMMARY
+          echo "**Wear Track:** wear:internal" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
 
   # Job 6: Deploy to Firebase Distribution (parallel with Play Store)
@@ -449,15 +604,15 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download version files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: version-files
 
       - name: Download AAB
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: release-aab
           path: aab/
@@ -465,7 +620,8 @@ jobs:
       - name: Resolve artifact paths
         id: artifacts
         run: |
-          AAB_PATH=$(find aab -name "*.aab" -type f | head -n 1)
+          # Firebase only distributes the phone APK/AAB — find it explicitly
+          AAB_PATH=$(find aab/composeApp -name "*.aab" -type f | head -n 1)
           echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
 
       - name: Decode Service Account
@@ -496,23 +652,23 @@ jobs:
           echo "**Groups:** vip_testers" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
 
-  # Job 7: Create GitHub Release (after both deployments complete)
+  # Job 7: Create GitHub Release (after Firebase deployment completes)
   create-release:
     name: Create GitHub Release
-    needs: [ version, build-aab, deploy-play-store, deploy-firebase ]
+    needs: [ version, build-aab, deploy-firebase ]
     runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download version files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: version-files
 
       - name: Download AAB
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: release-aab
           path: aab/
