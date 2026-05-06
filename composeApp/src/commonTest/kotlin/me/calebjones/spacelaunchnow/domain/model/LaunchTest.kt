@@ -16,7 +16,7 @@ class LaunchTest {
         windowEnd = null,
         lastUpdated = null,
         status = null,
-        provider = Provider(id = 1, name = "SpaceX", abbrev = "SpX", type = null, countryCode = null, logoUrl = null, imageUrl = null),
+        provider = Provider(id = 1, name = "SpaceX", abbrev = "SpX", type = null, countryCode = null, logoUrl = null, socialLogo = null, imageUrl = null),
         imageUrl = null,
         thumbnailUrl = null,
         infographic = null,

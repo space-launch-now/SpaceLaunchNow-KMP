@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
         android:name=".WearApplication"
@@ -12,6 +13,12 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
+
+        <!-- Declares this watch app is NOT standalone — it requires the paired phone app.
+             Play Console uses this to pair the listing with the phone app on the same package name. -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="false" />
 
         <!-- Main Activity -->
         <activity
@@ -61,6 +68,11 @@
             <meta-data
                 android:name="androidx.wear.tiles.LABEL"
                 android:resource="@string/next_launch_tile_label" />
+            <!-- Preview shown in the tile picker (companion app + watch). PNG screenshot
+                 of the live tile, 480×480, on a black background. -->
+            <meta-data
+                android:name="androidx.wear.tiles.PREVIEW"
+                android:resource="@drawable/tile_preview" />
         </service>
 
         <!-- DataLayer Listener -->

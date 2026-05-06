@@ -1,52 +1,46 @@
-## [5.27.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.27.1...v5.27.2) (2026-04-24)
+## [5.29.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.29.0...v5.29.1) (2026-05-04)
 
 
 ### Bug Fixes
 
-* purchase restoration functionality and initial pre-warm logic ([75c3af6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/75c3af65663ef512cfaa6ca07d938c3d16bbda67))
+* update versioning scheme for consistency across platforms ([3572926](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3572926838e5471052ca52101553edae5ff3283f))
 
 
 
-## [5.27.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.27.0...v5.27.1) (2026-04-19)
-
-
-### Bug Fixes
-
-* update in-flight launch retrieval to filter out stale entries ([e9deff0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9deff0f8f5703745880da95f6e437e66cddd30e))
-
-
-
-# [5.27.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.26.1...v5.27.0) (2026-04-14)
-
-
-### Bug Fixes
-
-* change navigation and ad placement ([3c055db](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3c055dbe9048b0522e0245d46f99b76e9a43ff83))
-* enhance analytics tracking for FlightClub referrals ([88acaef](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/88acaef8eae735836ad7f174cb28001b9cc138a2))
+# [5.29.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.11...v5.29.0) (2026-05-04)
 
 
 ### Features
 
-* reduce api calls and increase caching ([e2290ea](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e2290ea42684c39a074e22be38876a1b6be2253a))
+* **wear:** fix text layout sizes for large text settings ([c63fec1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c63fec1804aef682fe4aecb384c38e95c7cc1477))
 
 
 
-## [5.26.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.26.0...v5.26.1) (2026-04-12)
+## [5.28.11](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.10...v5.28.11) (2026-05-01)
 
 
 ### Bug Fixes
 
-* **ios:** prevent crash on cold-start notification tap ([2d4749b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2d4749b459c91121e2fdf35ed6fbbbc0d3e92d1c))
-* **ios:** use static no-op fallback logger and catch Throwable in ObjC-exported functions ([0b07103](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0b0710365d1753fd49c80103f63635b2f4e29ea0))
+* improve logging and error handling in navigation functions ([dc33fc7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dc33fc731d2ffaaf8702c7b18acab21b8d76ab93))
+* **widget:** ios build issue [skip ci] ([2eade63](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2eade63f234ff77b86947bcc89f07e1175242d6a))
 
 
 
-# [5.26.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.25.0...v5.26.0) (2026-04-10)
+## [5.28.10](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.9...v5.28.10) (2026-04-29)
 
 
-### Features
+### Bug Fixes
 
-* add event notification handling and payload structure ([bab857f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bab857f03b50580a12680db59ec42c643fbb195f))
+* **wear:** redesign tile detail screen with M3 cards ([76e63bb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/76e63bb23436e3123576fbf50c5deea9a291182c))
+
+
+
+## [5.28.9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.8...v5.28.9) (2026-04-29)
+
+
+### Bug Fixes
+
+* add network logging, fix pull to refresh, adjust viewmodel logic ([f300568](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f3005685924881b77fa3aadf9b960e94659786ea))
 
 
 

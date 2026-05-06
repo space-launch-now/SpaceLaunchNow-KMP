@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.wear.viewmodel
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
@@ -64,7 +64,7 @@ class LaunchDetailViewModel(
                 val remoteActivityHelper = RemoteActivityHelper(context)
                 val intent = Intent(Intent.ACTION_VIEW)
                     .addCategory(Intent.CATEGORY_BROWSABLE)
-                    .setData(Uri.parse("spacelaunchnow://launch/$launchId"))
+                    .setData("spacelaunchnow://launch/$launchId".toUri())
                 remoteActivityHelper.startRemoteActivity(intent).await()
                 log.i { "Opened launch $launchId on phone" }
             } catch (e: Exception) {
@@ -95,6 +95,7 @@ class LaunchDetailViewModel(
         return when {
             lspDisplay != null && launch.rocketConfigName != null ->
                 "$lspDisplay | ${launch.rocketConfigName}"
+
             launch.rocketConfigName != null -> launch.rocketConfigName
             else -> launch.name
         }

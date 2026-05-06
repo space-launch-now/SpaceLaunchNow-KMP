@@ -48,9 +48,13 @@ VERSION_MINOR=$(grep "^versionMinor=" "$VERSION_PROPS" | cut -d '=' -f2)
 VERSION_PATCH=$(grep "^versionPatch=" "$VERSION_PROPS" | cut -d '=' -f2)
 VERSION_BUILD_NUMBER=$(grep "^versionBuildNumber=" "$VERSION_PROPS" | cut -d '=' -f2)
 
-# Compute version name and code (matching build.gradle.kts logic)
+# Compute version name and code
+# On iOS, VERSION_CODE feeds the in-app about-screen display via Secrets.plist. The
+# value Apple actually checks (CFBundleVersion in iosApp/iosApp/Info.plist) is set
+# separately by Fastfile from the same versionBuildNumber, so we keep this matched
+# to that — the about screen and TestFlight/App Store Connect show the same number.
 VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${VERSION_BUILD_NUMBER}"
-VERSION_CODE=$((VERSION_MAJOR * 1000000 + VERSION_MINOR * 100000 + VERSION_PATCH * 10000 + VERSION_BUILD_NUMBER))
+VERSION_CODE=$VERSION_BUILD_NUMBER
 
 if [ -z "$API_KEY" ]; then
     echo "❌ Error: API_KEY not found in .env file"

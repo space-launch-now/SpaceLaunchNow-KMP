@@ -167,8 +167,11 @@ class FakeLaunchRepository : LaunchRepository {
         orbitIds: List<Int>?,
         missionTypeIds: List<Int>?,
         launcherConfigFamilyIds: List<Int>?
-    ): Result<PaginatedResult<Launch>> =
-        Result.failure(NotImplementedError("Not wired in fake"))
+    ): Result<PaginatedResult<Launch>> {
+        if (shouldFail) return Result.failure(failureException)
+        // Default to an empty page so ViewModels under test reach their success path.
+        return Result.success(PaginatedResult(count = 0, next = null, previous = null))
+    }
 
     // -- Non-deprecated legacy passthroughs (API types kept on interface) --
 

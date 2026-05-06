@@ -31,6 +31,7 @@ class SpacecraftTest {
             type = "Commercial",
             countryCode = "US",
             logoUrl = null,
+            socialLogo = null,
             imageUrl = null
         )
         val config = SpacecraftConfig(

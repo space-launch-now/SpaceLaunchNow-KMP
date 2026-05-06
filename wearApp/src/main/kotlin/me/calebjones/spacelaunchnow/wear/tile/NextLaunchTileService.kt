@@ -1,30 +1,50 @@
 package me.calebjones.spacelaunchnow.wear.tile
 
+import android.provider.Settings
 import androidx.wear.protolayout.ActionBuilders
-import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DimensionBuilders.dp
-import androidx.wear.protolayout.DimensionBuilders.sp
+import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.wrap
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ResourceBuilders
 import androidx.wear.protolayout.TimelineBuilders
+import androidx.wear.protolayout.material3.MaterialScope
+import androidx.wear.protolayout.material3.Typography
+import androidx.wear.protolayout.material3.materialScope
+import androidx.wear.protolayout.material3.primaryLayout
+import androidx.wear.protolayout.material3.text
+import androidx.wear.protolayout.material3.textEdgeButton
+import androidx.wear.protolayout.types.LayoutColor
+import androidx.wear.protolayout.types.layoutString
 import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
 import co.touchlab.kermit.Logger
-import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.guava.future
+import me.calebjones.spacelaunchnow.wear.R
+import me.calebjones.spacelaunchnow.wear.WearActivity
 import me.calebjones.spacelaunchnow.wear.data.EntitlementSyncManager
 import me.calebjones.spacelaunchnow.wear.data.WatchLaunchRepository
 import me.calebjones.spacelaunchnow.wear.data.model.CachedLaunch
 import org.koin.android.ext.android.inject
 import kotlin.time.Clock
 
+/**
+ * Next-launch Tile rendered with ProtoLayout Material 3.
+ *
+ * Layout uses [primaryLayout]'s three slots directly (no card wrapper):
+ * - titleSlot: mission name (small, top — like "Sugar Hill" in the M3 weather sample)
+ * - mainSlot: T-minus countdown numeral + status abbreviation (color-coded by status)
+ * - bottomSlot: "Details" edge button
+ *
+ * The whole tile is tappable (via the bottomSlot edge button) and deep-links to the
+ * launch detail screen via [WearActivity.EXTRA_LAUNCH_ID].
+ */
 class NextLaunchTileService : TileService() {
 
     private val watchLaunchRepository: WatchLaunchRepository by inject()
@@ -32,244 +52,601 @@ class NextLaunchTileService : TileService() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val log = Logger.withTag("NextLaunchTile")
 
-    override fun onTileRequest(requestParams: RequestBuilders.TileRequest): ListenableFuture<TileBuilders.Tile> {
-        return serviceScope.future {
-            try {
-                // Always refresh data on tile request (handles caching internally)
-                watchLaunchRepository.refreshLaunches()
+    override fun onTileRequest(
+        requestParams: RequestBuilders.TileRequest,
+    ): ListenableFuture<TileBuilders.Tile> = serviceScope.future {
+        val deviceConfiguration = requestParams.deviceConfiguration
 
-                val isPremium = entitlementSyncManager.isWearOsPremium()
-                val layout = if (!isPremium) {
-                    buildFreeUserLayout()
-                } else {
-                    val nextLaunch = watchLaunchRepository.getNextLaunch()
-                    if (nextLaunch != null) {
-                        buildLaunchLayout(nextLaunch)
-                    } else {
-                        buildNoDataLayout()
-                    }
-                }
+        // Resolve all suspending data fetches BEFORE entering materialScope (which is
+        // not a suspend context). State drives layout selection inside the scope.
+        val state: TileState = try {
+            watchLaunchRepository.refreshLaunches()
+            val isPremium = entitlementSyncManager.isWearOsPremium()
+            if (!isPremium) {
+                TileState.Free
+            } else {
+                val nextLaunch = watchLaunchRepository.getNextLaunch()
+                if (nextLaunch != null) TileState.Launch(nextLaunch) else TileState.NoData
+            }
+        } catch (e: Exception) {
+            log.e(e) { "Failed to build tile" }
+            TileState.Error
+        }
 
-                TileBuilders.Tile.Builder()
-                    .setResourcesVersion(RESOURCES_VERSION)
-                    .setTileTimeline(
-                        TimelineBuilders.Timeline.Builder()
-                            .addTimelineEntry(
-                                TimelineBuilders.TimelineEntry.Builder()
-                                    .setLayout(
-                                        LayoutElementBuilders.Layout.Builder()
-                                            .setRoot(layout)
-                                            .build()
-                                    )
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .setFreshnessIntervalMillis(REFRESH_INTERVAL_MS)
-                    .build()
-            } catch (e: Exception) {
-                log.e(e) { "Failed to build tile" }
-                buildErrorTile()
+        // Drop the per-segment labels entirely once the user's font scale pushes past
+        // Android's "Default" tier. Tiles are static layout — protolayout can't re-flow at
+        // render time, so we pick a format that always fits both horizontally (no labels
+        // → no third-segment cutoff) and vertically (single-line digits → status/location
+        // row no longer clipped by primaryLayout's main-slot height).
+        //
+        // Read the user's font scale from Settings rather than `deviceConfiguration.fontScale`
+        // — the latter is part of the protolayout API but the Wear OS renderer doesn't
+        // always populate it, so it can read 1.0 even at "Largest".
+        val systemFontScale = runCatching {
+            Settings.System.getFloat(contentResolver, Settings.System.FONT_SCALE)
+        }.getOrDefault(deviceConfiguration.fontScale)
+        val useCompactCountdown = systemFontScale > LARGE_FONT_THRESHOLD
+
+        val rootLayout = materialScope(
+            context = this@NextLaunchTileService,
+            deviceConfiguration = deviceConfiguration,
+        ) {
+            when (state) {
+                TileState.Free -> buildFreeUserLayout()
+                TileState.NoData -> buildNoDataLayout()
+                TileState.Error -> buildErrorLayout()
+                is TileState.Launch -> buildLaunchLayout(state.launch, useCompactCountdown)
             }
         }
-    }
 
-    override fun onTileResourcesRequest(requestParams: RequestBuilders.ResourcesRequest): ListenableFuture<ResourceBuilders.Resources> {
-        return Futures.immediateFuture(
-            ResourceBuilders.Resources.Builder()
-                .setVersion(RESOURCES_VERSION)
-                .build()
-        )
-    }
-
-    private fun buildLaunchLayout(launch: CachedLaunch): LayoutElementBuilders.LayoutElement {
-        val agencyText = launch.lspAbbrev ?: launch.lspName ?: ""
-        val vehicleName = formatVehicleName(launch)
-        val missionName = launch.missionName ?: launch.name
-        val countdownText = formatCountdown(launch)
-        val locationText = launch.padLocationName ?: ""
-
-        return LayoutElementBuilders.Column.Builder()
-            .setWidth(wrap())
-            .setHeight(wrap())
-            .setModifiers(
-                ModifiersBuilders.Modifiers.Builder()
-                    .setPadding(
-                        ModifiersBuilders.Padding.Builder()
-                            .setAll(dp(12f))
-                            .build()
-                    )
-                    .build()
-            )
-            .addContent(buildText(agencyText, 12f, TEXT_COLOR_SECONDARY))
-            .addContent(buildSpacer(4f))
-            .addContent(buildText(missionName, 16f, TEXT_COLOR_PRIMARY))
-            .addContent(buildSpacer(4f))
-            .addContent(buildText(vehicleName, 12f, TEXT_COLOR_SECONDARY))
-            .addContent(buildSpacer(8f))
-            .addContent(buildText(countdownText, 20f, TEXT_COLOR_ACCENT))
-            .addContent(buildSpacer(4f))
-            .addContent(buildText(locationText, 10f, TEXT_COLOR_SECONDARY))
-            .addContent(buildSpacer(8f))
-            .addContent(buildRefreshButton())
-            .build()
-    }
-
-    private fun buildFreeUserLayout(): LayoutElementBuilders.LayoutElement {
-        return LayoutElementBuilders.Column.Builder()
-            .setWidth(wrap())
-            .setHeight(wrap())
-            .setModifiers(
-                ModifiersBuilders.Modifiers.Builder()
-                    .setPadding(
-                        ModifiersBuilders.Padding.Builder()
-                            .setAll(dp(16f))
-                            .build()
-                    )
-                    .build()
-            )
-            .addContent(buildText("Space Launch Now", 14f, TEXT_COLOR_PRIMARY))
-            .addContent(buildSpacer(8f))
-            .addContent(buildText("Upgrade on phone", 16f, TEXT_COLOR_ACCENT))
-            .addContent(buildSpacer(4f))
-            .addContent(buildText("to see launch info", 12f, TEXT_COLOR_SECONDARY))
-            .build()
-    }
-
-    private fun buildNoDataLayout(): LayoutElementBuilders.LayoutElement {
-        return LayoutElementBuilders.Column.Builder()
-            .setWidth(wrap())
-            .setHeight(wrap())
-            .setModifiers(
-                ModifiersBuilders.Modifiers.Builder()
-                    .setPadding(
-                        ModifiersBuilders.Padding.Builder()
-                            .setAll(dp(16f))
-                            .build()
-                    )
-                    .build()
-            )
-            .addContent(buildText("Space Launch Now", 14f, TEXT_COLOR_PRIMARY))
-            .addContent(buildSpacer(8f))
-            .addContent(buildText("No upcoming launches", 14f, TEXT_COLOR_SECONDARY))
-            .addContent(buildSpacer(8f))
-            .addContent(buildRefreshButton())
-            .build()
-    }
-
-    private fun buildRefreshButton(): LayoutElementBuilders.LayoutElement {
-        return LayoutElementBuilders.Box.Builder()
-            .setWidth(wrap())
-            .setHeight(wrap())
-            .setModifiers(
-                ModifiersBuilders.Modifiers.Builder()
-                    .setClickable(
-                        ModifiersBuilders.Clickable.Builder()
-                            .setId(ACTION_REFRESH)
-                            .setOnClick(ActionBuilders.LoadAction.Builder().build())
-                            .build()
-                    )
-                    .setPadding(
-                        ModifiersBuilders.Padding.Builder()
-                            .setTop(dp(4f))
-                            .setBottom(dp(4f))
-                            .setStart(dp(12f))
-                            .setEnd(dp(12f))
-                            .build()
-                    )
-                    .build()
-            )
-            .addContent(buildText("↻ Refresh", 11f, TEXT_COLOR_SECONDARY))
-            .build()
-    }
-
-    private fun buildText(
-        text: String,
-        fontSize: Float,
-        color: Int,
-    ): LayoutElementBuilders.Text {
-        return LayoutElementBuilders.Text.Builder()
-            .setText(text)
-            .setFontStyle(
-                LayoutElementBuilders.FontStyle.Builder()
-                    .setSize(sp(fontSize))
-                    .setColor(argb(color))
-                    .build()
-            )
-            .setMaxLines(2)
-            .build()
-    }
-
-    private fun buildSpacer(heightDp: Float): LayoutElementBuilders.Spacer {
-        return LayoutElementBuilders.Spacer.Builder()
-            .setHeight(dp(heightDp))
-            .build()
-    }
-
-    private fun buildErrorTile(): TileBuilders.Tile {
-        val errorLayout = LayoutElementBuilders.Column.Builder()
-            .setWidth(wrap())
-            .setHeight(wrap())
-            .addContent(buildText("Error loading tile", 14f, TEXT_COLOR_SECONDARY))
-            .build()
-
-        return TileBuilders.Tile.Builder()
-            .setResourcesVersion(RESOURCES_VERSION)
+        TileBuilders.Tile.Builder()
+            .setResourcesVersion(resourcesVersionFor(state))
             .setTileTimeline(
                 TimelineBuilders.Timeline.Builder()
                     .addTimelineEntry(
                         TimelineBuilders.TimelineEntry.Builder()
                             .setLayout(
                                 LayoutElementBuilders.Layout.Builder()
-                                    .setRoot(errorLayout)
-                                    .build()
+                                    .setRoot(rootLayout)
+                                    .build(),
                             )
-                            .build()
+                            .build(),
                     )
-                    .build()
+                    .build(),
+            )
+            .setFreshnessIntervalMillis(REFRESH_INTERVAL_MS)
+            .build()
+    }
+
+    override fun onTileResourcesRequest(
+        requestParams: RequestBuilders.ResourcesRequest,
+    ): ListenableFuture<ResourceBuilders.Resources> = serviceScope.future {
+        ResourceBuilders.Resources.Builder()
+            .setVersion(requestParams.version)
+            // Map-pin icon for the Location card. Static drawable — no network fetch.
+            .addIdToImageMapping(
+                LOCATION_ICON_ID,
+                ResourceBuilders.ImageResource.Builder()
+                    .setAndroidResourceByResId(
+                        ResourceBuilders.AndroidImageResourceByResId.Builder()
+                            .setResourceId(R.drawable.ic_location_on)
+                            .build(),
+                    )
+                    .build(),
             )
             .build()
     }
 
-    private fun formatVehicleName(launch: CachedLaunch): String {
-        val lspDisplay = launch.lspName?.let { name ->
-            if (name.length > 15 && !launch.lspAbbrev.isNullOrEmpty()) {
-                launch.lspAbbrev
-            } else {
-                name
-            }
-        }
-        return when {
-            lspDisplay != null && launch.rocketConfigName != null ->
-                "$lspDisplay | ${launch.rocketConfigName}"
-            launch.rocketConfigName != null -> launch.rocketConfigName
-            else -> launch.name
-        }
+    /**
+     * Resources are versioned per-launch so the system refetches the image whenever the
+     * next launch changes. For non-Launch states we use a static suffix so resources
+     * stay cached.
+     */
+    private fun resourcesVersionFor(state: TileState): String = when (state) {
+        is TileState.Launch -> "v${RESOURCES_SCHEMA_VERSION}-${state.launch.id}"
+        else -> "v${RESOURCES_SCHEMA_VERSION}-static"
     }
 
-    private fun formatCountdown(launch: CachedLaunch): String {
+    /**
+     * Premium user with at least one upcoming launch — the happy path.
+     * Two-row grid: countdown card spans the full width on top; status (small, filled
+     * with status color) + location card sit side-by-side below.
+     */
+    private fun MaterialScope.buildLaunchLayout(
+        launch: CachedLaunch,
+        useCompactCountdown: Boolean,
+    ) = primaryLayout(
+        titleSlot = {
+            text(
+                text = formatTileTitle(launch).layoutString,
+                typography = Typography.TITLE_SMALL,
+                // Cap at one line at large font so the title doesn't push the
+                // status/location row out of primaryLayout's main slot.
+                maxLines = if (useCompactCountdown) 1 else 2,
+            )
+        },
+        mainSlot = {
+            val click = launchDetailClickable(launch.id)
+            val column = LayoutElementBuilders.Column.Builder()
+                .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+                .setWidth(expand())
+
+            // Top row: countdown card, full width.
+            column.addContent(countdownCard(launch, click, useCompactCountdown))
+
+            // Bottom row: small status pill + wider location card. Only render the row
+            // if at least one of the two has data — otherwise the spacer is wasted.
+            val abbrev = launch.statusAbbrev?.takeIf { it.isNotBlank() }
+            val location = launch.padLocationName?.takeIf { it.isNotBlank() }
+            if (abbrev != null || location != null) {
+                column.addContent(rowSpacer())
+                column.addContent(statusLocationRow(abbrev, location, click))
+            }
+
+            column.build()
+        },
+        bottomSlot = {
+            textEdgeButton(
+                onClick = launchDetailClickable(launch.id),
+                labelContent = { text("Details".layoutString) },
+            )
+        },
+    )
+
+    private fun rowSpacer() =
+        LayoutElementBuilders.Spacer.Builder().setHeight(dp(4f)).build()
+
+    /** Card 1 — phone-style segmented `DD : HH : MM` countdown, full width. */
+    private fun MaterialScope.countdownCard(
+        launch: CachedLaunch,
+        onClick: ModifiersBuilders.Clickable,
+        useCompactCountdown: Boolean,
+    ): LayoutElementBuilders.LayoutElement =
+        tonalCard(onClick = onClick, content = countdownColumn(launch, useCompactCountdown))
+
+    /** Bottom row: small status pill on the left, wider location card on the right. */
+    private fun MaterialScope.statusLocationRow(
+        statusAbbrev: String?,
+        location: String?,
+        onClick: ModifiersBuilders.Clickable,
+    ): LayoutElementBuilders.LayoutElement {
+        val row = LayoutElementBuilders.Row.Builder()
+            .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+            .setWidth(expand())
+
+        if (statusAbbrev != null) {
+            row.addContent(statusCard(statusAbbrev, onClick))
+        }
+        if (statusAbbrev != null && location != null) {
+            row.addContent(LayoutElementBuilders.Spacer.Builder().setWidth(dp(4f)).build())
+        }
+        if (location != null) {
+            row.addContent(locationCard(location, onClick))
+        }
+        return row.build()
+    }
+
+    /**
+     * Card 2 — small status pill, filled with the status's color role. Shows the
+     * abbreviation only ("Go", "TBD", etc.) since the wider location card sits next to
+     * it on the same row.
+     */
+    private fun MaterialScope.statusCard(
+        statusAbbrev: String,
+        onClick: ModifiersBuilders.Clickable,
+    ): LayoutElementBuilders.LayoutElement {
+        val (bgColor, textColor) = statusColors(statusAbbrev)
+        return LayoutElementBuilders.Box.Builder()
+            .setWidth(wrap())
+            .setHeight(wrap())
+            .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+            .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+            .setModifiers(
+                ModifiersBuilders.Modifiers.Builder()
+                    .setClickable(onClick)
+                    .setBackground(
+                        ModifiersBuilders.Background.Builder()
+                            .setColor(bgColor.prop)
+                            .setCorner(
+                                ModifiersBuilders.Corner.Builder()
+                                    .setRadius(dp(16f))
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                    .setPadding(
+                        ModifiersBuilders.Padding.Builder()
+                            .setStart(dp(12f))
+                            .setEnd(dp(12f))
+                            .setTop(dp(6f))
+                            .setBottom(dp(6f))
+                            .build(),
+                    )
+                    .build(),
+            )
+            .addContent(
+                text(
+                    text = statusAbbrev.layoutString,
+                    typography = Typography.LABEL_SMALL,
+                    color = textColor,
+                    maxLines = 1,
+                ),
+            )
+            .build()
+    }
+
+    /** Card 3 — pad location: small map-pin icon + location name (small caps body). */
+    private fun MaterialScope.locationCard(
+        location: String,
+        onClick: ModifiersBuilders.Clickable,
+    ): LayoutElementBuilders.LayoutElement =
+        LayoutElementBuilders.Box.Builder()
+            .setWidth(expand())
+            .setHeight(wrap())
+            .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_START)
+            .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+            .setModifiers(
+                ModifiersBuilders.Modifiers.Builder()
+                    .setClickable(onClick)
+                    .setBackground(
+                        ModifiersBuilders.Background.Builder()
+                            .setColor(colorScheme.surfaceContainer.prop)
+                            .setCorner(
+                                ModifiersBuilders.Corner.Builder()
+                                    .setRadius(dp(16f))
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                    .setPadding(
+                        ModifiersBuilders.Padding.Builder()
+                            .setStart(dp(10f))
+                            .setEnd(dp(10f))
+                            .setTop(dp(6f))
+                            .setBottom(dp(6f))
+                            .build(),
+                    )
+                    .build(),
+            )
+            .addContent(
+                LayoutElementBuilders.Row.Builder()
+                    .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+                    .addContent(
+                        LayoutElementBuilders.Image.Builder()
+                            .setResourceId(LOCATION_ICON_ID)
+                            .setWidth(dp(12f))
+                            .setHeight(dp(12f))
+                            .setColorFilter(
+                                LayoutElementBuilders.ColorFilter.Builder()
+                                    .setTint(colorScheme.onSurfaceVariant.prop)
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                    .addContent(
+                        LayoutElementBuilders.Spacer.Builder().setWidth(dp(4f)).build(),
+                    )
+                    .addContent(
+                        text(
+                            text = location.layoutString,
+                            typography = Typography.LABEL_SMALL,
+                            color = colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                        ),
+                    )
+                    .build(),
+            )
+            .build()
+
+    /**
+     * Phone-style segmented countdown row: `DD : HH : MM` with small labels under each
+     * pair of digits. Status moved out to its own card.
+     *
+     * Seconds are intentionally dropped vs. the phone version because tiles refresh on a
+     * 5-minute freshness interval and don't tick live — showing stale seconds would be
+     * misleading.
+     */
+    private fun MaterialScope.countdownColumn(
+        launch: CachedLaunch,
+        useCompactCountdown: Boolean,
+    ): LayoutElementBuilders.LayoutElement {
+        val segments = computeSegments(launch)
+        // At compact, render labels as null so each segment shrinks to a single digit
+        // line. That collapses the card vertically, freeing room for the status/location
+        // row that primaryLayout otherwise clips at large font.
+        val daysLabel = if (useCompactCountdown) null else "DAYS"
+        val hoursLabel = if (useCompactCountdown) null else "HOURS"
+        val minutesLabel = if (useCompactCountdown) null else "MIN"
+        return LayoutElementBuilders.Row.Builder()
+            .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+            .addContent(countdownSegment(twoDigit(segments.days), daysLabel))
+            .addContent(countdownColon(includeBaselineSpacer = !useCompactCountdown))
+            .addContent(countdownSegment(twoDigit(segments.hours), hoursLabel))
+            .addContent(countdownColon(includeBaselineSpacer = !useCompactCountdown))
+            .addContent(countdownSegment(twoDigit(segments.minutes), minutesLabel))
+            .build()
+    }
+
+    /** One countdown segment: a two-digit numeral on top, optionally a small caps label
+     *  below. Pass [label] = null to render just the digit (used at large font scales
+     *  where the label row pushes the third segment off the watch face). */
+    private fun MaterialScope.countdownSegment(
+        value: String,
+        label: String?,
+    ): LayoutElementBuilders.LayoutElement {
+        val column = LayoutElementBuilders.Column.Builder()
+            .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+            .addContent(
+                text(
+                    text = value.layoutString,
+                    typography = Typography.NUMERAL_EXTRA_SMALL,
+                    color = colorScheme.onSurface,
+                    maxLines = 1,
+                ),
+            )
+        if (label != null) {
+            column.addContent(
+                text(
+                    text = label.layoutString,
+                    typography = Typography.LABEL_SMALL,
+                    color = colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                ),
+            )
+        }
+        return column.build()
+    }
+
+    /** Colon separator between countdown segments. When [includeBaselineSpacer] is true
+     *  (default-font layout), an invisible LABEL_SMALL line is appended so the colon's
+     *  baseline matches the digit row in the adjacent labelled segments. At compact mode
+     *  the segments have no label, so the spacer would just add stray vertical height. */
+    private fun MaterialScope.countdownColon(
+        includeBaselineSpacer: Boolean,
+    ): LayoutElementBuilders.LayoutElement {
+        val column = LayoutElementBuilders.Column.Builder()
+            .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+            .setModifiers(
+                ModifiersBuilders.Modifiers.Builder()
+                    .setPadding(
+                        ModifiersBuilders.Padding.Builder()
+                            .setStart(dp(3f))
+                            .setEnd(dp(3f))
+                            .build(),
+                    )
+                    .build(),
+            )
+            .addContent(
+                text(
+                    text = ":".layoutString,
+                    typography = Typography.NUMERAL_EXTRA_SMALL,
+                    color = colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                ),
+            )
+        if (includeBaselineSpacer) {
+            column.addContent(
+                text(
+                    text = " ".layoutString,
+                    typography = Typography.LABEL_SMALL,
+                    maxLines = 1,
+                ),
+            )
+        }
+        return column.build()
+    }
+
+    private fun twoDigit(value: Long): String = value.toString().padStart(2, '0')
+
+    /**
+     * (background, on-background) color pair for a status abbreviation, picked to match
+     * the API status taxonomy in §7.4 of the findings doc.
+     */
+    private fun MaterialScope.statusColors(abbrev: String): Pair<LayoutColor, LayoutColor> = when (abbrev) {
+        "Go", "Success", "Deployed" -> colorScheme.tertiary to colorScheme.onTertiary
+        "Hold" -> colorScheme.secondary to colorScheme.onSecondary
+        "Failure", "Partial Failure" -> colorScheme.error to colorScheme.onError
+        "In Flight" -> colorScheme.primary to colorScheme.onPrimary
+        "TBD", "TBC" -> colorScheme.surfaceContainerHigh to colorScheme.onSurface
+        else -> colorScheme.surfaceContainer to colorScheme.onSurface
+    }
+
+    /**
+     * Tonal card container: rounded background + padding + tappable.
+     * Built as a Box rather than via [titleCard] / [textDataCard] because those M3
+     * components apply opinionated text styling to their slots that doesn't compose
+     * with arbitrary Column children.
+     */
+    private fun MaterialScope.tonalCard(
+        onClick: ModifiersBuilders.Clickable,
+        content: LayoutElementBuilders.LayoutElement,
+    ): LayoutElementBuilders.LayoutElement =
+        LayoutElementBuilders.Box.Builder()
+            .setWidth(expand())
+            .setHeight(wrap())
+            .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+            .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+            .setModifiers(
+                ModifiersBuilders.Modifiers.Builder()
+                    .setClickable(onClick)
+                    .setBackground(
+                        ModifiersBuilders.Background.Builder()
+                            .setColor(colorScheme.surfaceContainer.prop)
+                            .setCorner(
+                                ModifiersBuilders.Corner.Builder()
+                                    .setRadius(dp(24f))
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                    .setPadding(
+                        ModifiersBuilders.Padding.Builder()
+                            .setStart(dp(10f))
+                            .setEnd(dp(10f))
+                            .setTop(dp(6f))
+                            .setBottom(dp(6f))
+                            .build(),
+                    )
+                    .build(),
+            )
+            .addContent(content)
+            .build()
+
+    /** Premium user but no upcoming launches cached. Edge button opens the app. */
+    private fun MaterialScope.buildNoDataLayout() = primaryLayout(
+        titleSlot = {
+            text(
+                text = "Space Launch Now".layoutString,
+                typography = Typography.TITLE_SMALL,
+                maxLines = 1,
+            )
+        },
+        mainSlot = {
+            text(
+                text = "No upcoming launches".layoutString,
+                typography = Typography.BODY_LARGE,
+                color = colorScheme.onSurfaceVariant,
+                maxLines = 2,
+            )
+        },
+        bottomSlot = {
+            textEdgeButton(
+                onClick = openAppClickable(),
+                labelContent = { text("Open".layoutString) },
+            )
+        },
+    )
+
+    /** Free (non-premium) user — the upgrade prompt. */
+    private fun MaterialScope.buildFreeUserLayout() = primaryLayout(
+        titleSlot = {
+            text(
+                text = "Space Launch Now".layoutString,
+                typography = Typography.TITLE_SMALL,
+                maxLines = 1,
+            )
+        },
+        mainSlot = {
+            text(
+                text = "Upgrade on phone\nto see launches".layoutString,
+                typography = Typography.BODY_LARGE,
+                color = colorScheme.onSurfaceVariant,
+                maxLines = 2,
+            )
+        },
+        bottomSlot = {
+            textEdgeButton(
+                onClick = openAppClickable(),
+                labelContent = { text("Open".layoutString) },
+            )
+        },
+    )
+
+    /** Last-resort layout shown when refresh/build threw. */
+    private fun MaterialScope.buildErrorLayout() = primaryLayout(
+        titleSlot = {
+            text(
+                text = "Couldn't load".layoutString,
+                typography = Typography.TITLE_SMALL,
+                maxLines = 1,
+            )
+        },
+        mainSlot = {
+            text(
+                text = "Tap to retry".layoutString,
+                typography = Typography.BODY_LARGE,
+                color = colorScheme.onSurfaceVariant,
+            )
+        },
+        bottomSlot = {
+            textEdgeButton(
+                onClick = openAppClickable(),
+                labelContent = { text("Open".layoutString) },
+            )
+        },
+    )
+
+    /** Click action that opens the launch detail screen for [launchId]. */
+    private fun launchDetailClickable(launchId: String): ModifiersBuilders.Clickable =
+        ModifiersBuilders.Clickable.Builder()
+            .setId("launch_detail_$launchId")
+            .setOnClick(
+                ActionBuilders.LaunchAction.Builder()
+                    .setAndroidActivity(
+                        ActionBuilders.AndroidActivity.Builder()
+                            .setClassName(WearActivity::class.java.name)
+                            .setPackageName(packageName)
+                            .addKeyToExtraMapping(
+                                WearActivity.EXTRA_LAUNCH_ID,
+                                ActionBuilders.AndroidStringExtra.Builder()
+                                    .setValue(launchId)
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                    .build(),
+            )
+            .build()
+
+    /** Click action that opens the app to its default destination (list or premium gate). */
+    private fun openAppClickable(): ModifiersBuilders.Clickable =
+        ModifiersBuilders.Clickable.Builder()
+            .setId("open_app")
+            .setOnClick(
+                ActionBuilders.LaunchAction.Builder()
+                    .setAndroidActivity(
+                        ActionBuilders.AndroidActivity.Builder()
+                            .setClassName(WearActivity::class.java.name)
+                            .setPackageName(packageName)
+                            .build(),
+                    )
+                    .build(),
+            )
+            .build()
+
+    /**
+     * Tile title is mission name when present, otherwise the API-provided launch name
+     * (which usually already encodes the mission, e.g. "Falcon 9 Block 5 | Starlink
+     * Group 17-36"). Agency/vehicle are intentionally dropped — image-forward direction
+     * (see docs/wear-os/CURRENT_STATE_FINDINGS.md §7.1).
+     */
+    private fun formatTileTitle(launch: CachedLaunch): String =
+        launch.missionName?.takeIf { it.isNotBlank() } ?: launch.name
+
+    private data class CountdownSegments(val days: Long, val hours: Long, val minutes: Long)
+
+    private fun computeSegments(launch: CachedLaunch): CountdownSegments {
         val now = Clock.System.now()
         val duration = launch.net - now
-        if (duration.isNegative()) return "Launched"
+        if (duration.isNegative()) return CountdownSegments(0, 0, 0)
 
         val totalMinutes = duration.inWholeMinutes
-        val hours = totalMinutes / 60
+        val days = totalMinutes / (24 * 60)
+        val hours = (totalMinutes / 60) % 24
         val minutes = totalMinutes % 60
+        return CountdownSegments(days = days, hours = hours, minutes = minutes)
+    }
 
-        return when {
-            hours >= 24 -> "T-${hours / 24}D ${hours % 24}H"
-            hours > 0   -> "T-${hours}H ${minutes}M"
-            minutes > 0 -> "T-${minutes}M"
-            else        -> "T-0"
-        }
+    private sealed interface TileState {
+        data object Free : TileState
+        data object NoData : TileState
+        data object Error : TileState
+        data class Launch(val launch: CachedLaunch) : TileState
     }
 
     companion object {
-        private const val RESOURCES_VERSION = "1"
+        /** Bumps any time the resource schema changes (image format, ids, etc). */
+        private const val RESOURCES_SCHEMA_VERSION = "6"
         private const val REFRESH_INTERVAL_MS = 300_000L // 5 minutes
-        private const val TEXT_COLOR_PRIMARY = 0xFFFFFFFF.toInt()
-        private const val TEXT_COLOR_SECONDARY = 0xB3FFFFFF.toInt()
-        private const val TEXT_COLOR_ACCENT = 0xFF80CBFF.toInt()
-        private const val ACTION_REFRESH = "action_refresh"
+        private const val LOCATION_ICON_ID = "location_icon"
+
+        /**
+         * Font scale above which the countdown drops the per-segment labels ("DAYS",
+         * "HOURS", "MIN") and renders just the digits + colons. 1.06f sits between
+         * Android's "Default" (1.0) and "Large" (1.15) tiers — anything beyond Default
+         * already starts pushing the third segment off the watch face and squeezing the
+         * status/location row out of primaryLayout's main slot.
+         */
+        private const val LARGE_FONT_THRESHOLD = 1.06f
     }
 }

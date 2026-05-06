@@ -1,3 +1,27 @@
+import java.util.Properties
+
+// Read version from the root version.properties — same source of truth as composeApp
+val versionProps = Properties().apply {
+    rootProject.file("version.properties").inputStream().use { load(it) }
+}
+
+fun wearVersionCode(): Int {
+    val build = versionProps["versionBuildNumber"].toString().toInt()
+    // Sits one above the matching phone code (computeVersionCode in composeApp). Play
+    // requires versionCodes to be globally unique per packageName across all tracks and
+    // forward-only, and phone+wear share applicationId — so wear must always outrank
+    // the phone code from the same release. Bump versionBuildNumber by 1 per release;
+    // phone gets 1.1B + build×2, wear gets 1.1B + build×2 + 1, both monotonic forever.
+    return 1_100_000_000 + (build * 2) + 1
+}
+
+fun wearVersionName(): String {
+    val major = versionProps["versionMajor"].toString()
+    val minor = versionProps["versionMinor"].toString()
+    val patch = versionProps["versionPatch"].toString()
+    return "$major.$minor.$patch"
+}
+
 plugins {
     alias(libs.plugins.androidApplication)
     id("org.jetbrains.kotlin.android")
@@ -19,13 +43,36 @@ android {
         applicationId = "me.calebjones.spacelaunchnow"
         minSdk = libs.versions.android.wear.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = wearVersionCode()
+        versionName = wearVersionName()
+    }
+
+    signingConfigs {
+        create("release") {
+            // Populated via environment variables in CI (same keystore as composeApp).
+            // Locally, falls back to the debug keystore so release builds still compile.
+            val keystoreFile = System.getenv("KEYSTORE_FILE")
+            if (keystoreFile != null) {
+                storeFile = file(keystoreFile)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         getByName("debug") {
             applicationIdSuffix = ".kmpdebug"
+        }
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -67,6 +114,10 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+
+    // Coil — async image loading for launch artwork on the detail screen.
+    implementation(libs.coil.compose)
+    implementation(libs.coil.compose.ktor)
 
     // DataStore (local cache)
     implementation(libs.androidx.datastore.preferences)

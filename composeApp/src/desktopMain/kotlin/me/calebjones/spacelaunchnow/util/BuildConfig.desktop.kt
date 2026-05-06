@@ -17,7 +17,9 @@ actual fun initializeBuildConfig() {
             val buildNumber = props.getProperty("versionBuildNumber", "0").toInt()
             
             BuildConfig.VERSION_NAME = String.format("%d.%d.%d-b%d", major, minor, patch, buildNumber)
-            BuildConfig.VERSION_CODE = (major * 1000000) + (minor * 100000) + (patch * 10000) + buildNumber
+            // Desktop has no app store, so VERSION_CODE is purely informational. Use
+            // the raw build counter so the about screen matches versionName's "-bN".
+            BuildConfig.VERSION_CODE = buildNumber
         } else {
             // Fallback if version.properties not found
             BuildConfig.VERSION_NAME = "unknown"
