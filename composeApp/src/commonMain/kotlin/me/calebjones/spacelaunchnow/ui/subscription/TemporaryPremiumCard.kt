@@ -37,8 +37,11 @@ import kotlinx.datetime.DateTimePeriod
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.storage.TemporaryAccessStatus
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.ui.ads.RewardedAdHandler
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import org.koin.compose.koinInject
 
 /**
  * Card component for temporary premium access via rewarded ads.
@@ -47,6 +50,7 @@ import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 @Composable
 fun TemporaryPremiumCard(
     temporaryPremiumAccess: TemporaryPremiumAccess,
+    source: String,
     features: List<PremiumFeature> = listOf(
         PremiumFeature.CUSTOM_THEMES,
         PremiumFeature.ADVANCED_WIDGETS,
@@ -55,7 +59,7 @@ fun TemporaryPremiumCard(
     title: String = "24h Premium Access",
     description: String = "Watch an ad to unlock all premium features for 24 hours",
     icon: ImageVector,
-    hasPermanentPremium: Boolean = false,  // New parameter to check permanent premium status
+    hasPermanentPremium: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     var temporaryAccess by remember {
@@ -66,6 +70,8 @@ fun TemporaryPremiumCard(
     var showRewardedAd by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val log = SpaceLogger.getLogger("TemporaryPremiumCard")
+    val analyticsManager = koinInject<AnalyticsManager>()
+    var wasExtensionAtClick by remember { mutableStateOf(false) }
 
     // Check temporary access status for all features
     LaunchedEffect(features) {
@@ -179,7 +185,16 @@ fun TemporaryPremiumCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedButton(
-                    onClick = { showRewardedAd = true },
+                    onClick = {
+                        wasExtensionAtClick = true
+                        analyticsManager.track(
+                            AnalyticsEvent.RewardedAdRequested(
+                                source = source,
+                                isExtension = true
+                            )
+                        )
+                        showRewardedAd = true
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
@@ -196,7 +211,16 @@ fun TemporaryPremiumCard(
             } else {
                 // User doesn't have temporary access - show option to get it
                 Button(
-                    onClick = { showRewardedAd = true },
+                    onClick = {
+                        wasExtensionAtClick = false
+                        analyticsManager.track(
+                            AnalyticsEvent.RewardedAdRequested(
+                                source = source,
+                                isExtension = false
+                            )
+                        )
+                        showRewardedAd = true
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
@@ -216,12 +240,18 @@ fun TemporaryPremiumCard(
         RewardedAdHandler(
             shouldShow = true,
             onRewardEarned = { rewardAmount, rewardType ->
-                // Grant temporary access to all features when ad is completed
                 coroutineScope.launch {
+                    val isExtensionSnapshot = wasExtensionAtClick
                     features.forEach { feature ->
                         temporaryPremiumAccess.grantTemporaryAccess(feature)
+                        analyticsManager.track(
+                            AnalyticsEvent.TemporaryAccessGranted(
+                                feature = feature.name,
+                                source = source,
+                                isExtension = isExtensionSnapshot
+                            )
+                        )
                     }
-                    // Refresh the temporary access info
                     val accessMap = features.associateWith { feature ->
                         temporaryPremiumAccess.getTemporaryAccessInfo(feature)
                     }
@@ -230,11 +260,13 @@ fun TemporaryPremiumCard(
                 showRewardedAd = false
             },
             onAdShown = {
-                // Ad started showing successfully
+                analyticsManager.track(AnalyticsEvent.RewardedAdShown(source = source))
                 log.i { "✅ Rewarded ad shown for temporary premium access" }
             },
             onAdFailed = { error ->
-                // Ad failed to show
+                analyticsManager.track(
+                    AnalyticsEvent.RewardedAdFailed(source = source, error = error)
+                )
                 log.e { "❌ Failed to show rewarded ad: $error" }
                 showRewardedAd = false
             }
