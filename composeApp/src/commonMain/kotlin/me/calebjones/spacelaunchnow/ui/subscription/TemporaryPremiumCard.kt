@@ -261,6 +261,9 @@ fun TemporaryPremiumCard(
             },
             onAdShown = {
                 analyticsManager.track(AnalyticsEvent.RewardedAdShown(source = source))
+                coroutineScope.launch {
+                    temporaryPremiumAccess.incrementAdsShownTotal()
+                }
                 log.i { "✅ Rewarded ad shown for temporary premium access" }
             },
             onAdFailed = { error ->
