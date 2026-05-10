@@ -193,6 +193,47 @@ class MainApplication : Application() {
                 syncer.syncNow()
                 log.d { "✅ Initial subscription sync complete" }
 
+                // Step 4b: Start RevenueCat attributes syncer
+                val rcSyncer =
+                    getKoin().get<me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributesSyncer>()
+                val tempAccess =
+                    getKoin().get<me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess>()
+                val appPrefs =
+                    getKoin().get<me.calebjones.spacelaunchnow.data.storage.AppPreferences>()
+                val themePrefs =
+                    getKoin().get<me.calebjones.spacelaunchnow.data.storage.ThemePreferences>()
+
+                rcSyncer.start(
+                    scope = kotlinx.coroutines.GlobalScope,
+                    subscriptionStateFlow = kotlinx.coroutines.flow.flow {
+                        repository.state.collect {
+                            emit(it.subscriptionType.name.lowercase())
+                        }
+                    },
+                    themeModeFlow = kotlinx.coroutines.flow.flow {
+                        appPrefs.themeFlow.collect { emit(it.name.lowercase()) }
+                    },
+                    hasCustomThemeFlow = kotlinx.coroutines.flow.flow {
+                        themePrefs.customPrimaryColorFlow.collect { emit(it != null) }
+                    },
+                    grantsTotalFlow = tempAccess.grantsTotalFlow,
+                    adsShownTotalFlow = tempAccess.adsShownTotalFlow,
+                    tempAccessActiveFlow = kotlinx.coroutines.flow.flow {
+                        tempAccess.accessChangeTrigger.collect {
+                            val active =
+                                tempAccess.hasTemporaryAccess(
+                                    me.calebjones.spacelaunchnow.data.model.PremiumFeature.CUSTOM_THEMES
+                                ) || tempAccess.hasTemporaryAccess(
+                                    me.calebjones.spacelaunchnow.data.model.PremiumFeature.ADVANCED_WIDGETS
+                                ) || tempAccess.hasTemporaryAccess(
+                                    me.calebjones.spacelaunchnow.data.model.PremiumFeature.WIDGETS_CUSTOMIZATION
+                                )
+                            emit(active)
+                        }
+                    },
+                )
+                log.d { "✅ RevenueCatAttributesSyncer started" }
+
                 // Step 5: Start Wear OS entitlement pusher (observes state changes)
                 val wearPusher = getKoin().get<me.calebjones.spacelaunchnow.sync.WearEntitlementPusher>()
                 wearPusher.start()
