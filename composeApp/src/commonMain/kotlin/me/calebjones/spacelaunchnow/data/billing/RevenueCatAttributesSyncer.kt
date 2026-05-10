@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.PlatformType
+import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.platform.AppEnvironmentInfo
 import me.calebjones.spacelaunchnow.util.logging.logger
 
@@ -39,10 +42,6 @@ class RevenueCatAttributesSyncer(
         log.i { "RC snapshot pushed (${map.size} attrs)" }
     }
 
-    fun setPushToken(token: String) {
-        attributes.setPushToken(token)
-    }
-
     @OptIn(FlowPreview::class)
     fun start(
         scope: CoroutineScope,
@@ -53,8 +52,10 @@ class RevenueCatAttributesSyncer(
         adsShownTotalFlow: Flow<Long>,
         tempAccessActiveFlow: Flow<Boolean>,
     ) {
-        // Initial push at startup.
-        pushSnapshot()
+        // Initial push runs on the scope's dispatcher so providers that
+        // block (e.g., runBlocking { flow.first() } from the Koin wiring)
+        // never stall the caller's thread (matters for iOS main-thread).
+        scope.launch { pushSnapshot() }
 
         // Debounced delta pusher.
         combine(
@@ -87,12 +88,9 @@ class RevenueCatAttributesSyncer(
         "rewarded_ads_shown_total" to adsShownTotalProvider().toString(),
     )
 
-    private fun platformString(): String =
-        envInfo.osVersion.substringBefore(' ').lowercase().let {
-            when {
-                it.contains("android") -> "android"
-                it.contains("ios") -> "ios"
-                else -> "desktop"
-            }
-        }
+    private fun platformString(): String = when (getPlatform().type) {
+        PlatformType.ANDROID -> "android"
+        PlatformType.IOS -> "ios"
+        PlatformType.DESKTOP -> "desktop"
+    }
 }
