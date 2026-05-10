@@ -27,6 +27,8 @@ iosApp/iosApp/GoogleService-Info.plist
 **google-services.json
 keystore.properties
 .vscode/
+.claude/settings.local.json
+.worktrees/
 
 # Signing & certificates
 *.jks

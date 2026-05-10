@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git ls-remote *)",
+      "Bash(xargs grep *)",
+      "Bash(android docs *)",
+      "WebFetch(domain:spacelaunchnow.app)",
+      "Bash(./gradlew :wearApp:compileDebugKotlin)",
+      "Bash(./gradlew :wearApp:assembleDebug)",
+      "Bash(android emulator *)",
+      "Bash(adb devices *)",
+      "Read(//c/Users/cajon/.gradle/caches/**)",
+      "WebFetch(domain:cs.android.com)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/scripts/bootstrap-worktree.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
