@@ -15,7 +15,7 @@ class DefaultRevenueCatAttributes : RevenueCatAttributes {
         try {
             platformSetAttributes(attributes)
             log.d { "RC attributes pushed: ${attributes.keys}" }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             log.w(e) { "Failed to push RC attributes" }
         }
     }
@@ -24,7 +24,7 @@ class DefaultRevenueCatAttributes : RevenueCatAttributes {
         try {
             platformSetPushToken(token)
             log.d { "RC push token set (length=${token.length})" }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             log.w(e) { "Failed to set RC push token" }
         }
     }
