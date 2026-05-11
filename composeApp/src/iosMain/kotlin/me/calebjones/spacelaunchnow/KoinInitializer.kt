@@ -100,3 +100,51 @@ class KoinHelper : KoinComponent {
         fun instance(): KoinHelper = KoinHelper()
     }
 }
+
+/**
+ * Called from Swift (e.g. `AppDelegate.application(_:didFinishLaunchingWithOptions:)`)
+ * after `initKoin()` and after RevenueCat has been configured by `IosBillingManager`.
+ */
+fun startRevenueCatAttributesSyncer() {
+    val koin = getKoin()
+    val rcSyncer =
+        koin.get<me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributesSyncer>()
+    val tempAccess =
+        koin.get<me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess>()
+    val appPrefs =
+        koin.get<me.calebjones.spacelaunchnow.data.storage.AppPreferences>()
+    val themePrefs =
+        koin.get<me.calebjones.spacelaunchnow.data.storage.ThemePreferences>()
+    val repository =
+        koin.get<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
+
+    @Suppress("OPT_IN_USAGE")
+    val scope = kotlinx.coroutines.GlobalScope
+
+    rcSyncer.start(
+        scope = scope,
+        subscriptionStateFlow = kotlinx.coroutines.flow.flow {
+            repository.state.collect { emit(it.subscriptionType.name.lowercase()) }
+        },
+        themeModeFlow = kotlinx.coroutines.flow.flow {
+            appPrefs.themeFlow.collect { emit(it.name.lowercase()) }
+        },
+        hasCustomThemeFlow = kotlinx.coroutines.flow.flow {
+            themePrefs.customPrimaryColorFlow.collect { emit(it != null) }
+        },
+        grantsTotalFlow = tempAccess.grantsTotalFlow,
+        adsShownTotalFlow = tempAccess.adsShownTotalFlow,
+        tempAccessActiveFlow = kotlinx.coroutines.flow.flow {
+            tempAccess.accessChangeTrigger.collect {
+                val active = tempAccess.hasTemporaryAccess(
+                    me.calebjones.spacelaunchnow.data.model.PremiumFeature.CUSTOM_THEMES
+                ) || tempAccess.hasTemporaryAccess(
+                    me.calebjones.spacelaunchnow.data.model.PremiumFeature.ADVANCED_WIDGETS
+                ) || tempAccess.hasTemporaryAccess(
+                    me.calebjones.spacelaunchnow.data.model.PremiumFeature.WIDGETS_CUSTOMIZATION
+                )
+                emit(active)
+            }
+        },
+    )
+}

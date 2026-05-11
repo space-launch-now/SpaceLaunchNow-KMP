@@ -95,6 +95,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         print("🚀 App launch complete - monitoring for notifications...\n")
 
+        // Start RC attributes syncer once the billing manager has had a chance
+        // to initialize. We dispatch with a short delay to let the Koin-driven
+        // billing init coroutine register the user before we push the snapshot.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            KoinInitializerKt.startRevenueCatAttributesSyncer()
+        }
+
         return true
     }
 
