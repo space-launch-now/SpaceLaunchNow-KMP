@@ -89,12 +89,12 @@ class TemporaryPremiumAccess(
         }
         
         log.i { "✅ Granted 24h access to $feature until $expiresAt" }
+        incrementGrantsTotal()  // Increment before notifying so RC snapshot sees the updated count.
         notifyAccessChanged()  // Notify listeners that access has changed
-        
+
         // Verify it was saved
         val savedExpiresAt = getExpirationTime(feature)
         log.d { "🔍 Verification read for $feature = $savedExpiresAt" }
-        incrementGrantsTotal()
     }
 
     /**

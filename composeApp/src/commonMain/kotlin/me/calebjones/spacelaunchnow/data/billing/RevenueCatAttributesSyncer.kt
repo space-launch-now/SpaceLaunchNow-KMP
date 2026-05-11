@@ -35,6 +35,7 @@ class RevenueCatAttributesSyncer(
     private val tempAccessActiveProvider: () -> Boolean,
 ) {
     private val log = logger()
+    @Volatile private var started = false
 
     fun pushSnapshot() {
         val map = buildMap()
@@ -52,6 +53,12 @@ class RevenueCatAttributesSyncer(
         adsShownTotalFlow: Flow<Long>,
         tempAccessActiveFlow: Flow<Boolean>,
     ) {
+        if (started) {
+            log.w { "RC syncer already started — ignoring duplicate start() call" }
+            return
+        }
+        started = true
+
         // Initial push runs on the scope's dispatcher so providers that
         // block (e.g., runBlocking { flow.first() } from the Koin wiring)
         // never stall the caller's thread (matters for iOS main-thread).
