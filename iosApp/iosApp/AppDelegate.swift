@@ -3,6 +3,7 @@ import FirebaseCore
 import FirebaseCrashlytics
 import FirebaseMessaging
 import GoogleMaps
+import RevenueCat
 import UIKit
 import UserNotifications
 import WidgetKit
@@ -148,6 +149,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         // Process any pending Kotlin FCM requests now that we have APNs token
         FCMBridge.shared.processPendingKotlinRequests()
+
+        Purchases.shared.attribution.setPushToken(deviceToken)
+        print("✅ APNS token forwarded to RevenueCat (length=\(deviceToken.count))")
     }
 
     func application(
