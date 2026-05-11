@@ -234,6 +234,23 @@ class MainApplication : Application() {
                 )
                 log.d { "✅ RevenueCatAttributesSyncer started" }
 
+                // Step 4c: Forward FCM token to RevenueCat for re-engagement campaigns.
+                try {
+                    val pushMessaging =
+                        getKoin().get<me.calebjones.spacelaunchnow.data.notifications.PushMessaging>()
+                    val fcmToken = pushMessaging.getToken().getOrNull()
+                    if (!fcmToken.isNullOrBlank()) {
+                        val rcAttrs =
+                            getKoin().get<me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes>()
+                        rcAttrs.setPushToken(fcmToken)
+                        log.d { "✅ FCM token forwarded to RevenueCat" }
+                    } else {
+                        log.d { "FCM token not available yet; skipping RC push token set" }
+                    }
+                } catch (e: Exception) {
+                    log.w(e) { "Failed to forward FCM token to RevenueCat" }
+                }
+
                 // Step 5: Start Wear OS entitlement pusher (observes state changes)
                 val wearPusher = getKoin().get<me.calebjones.spacelaunchnow.sync.WearEntitlementPusher>()
                 wearPusher.start()
