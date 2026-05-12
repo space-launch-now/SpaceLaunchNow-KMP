@@ -6,16 +6,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,7 +39,7 @@ import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LaunchDetailScreen(
     launchId: String,
@@ -84,13 +84,7 @@ fun LaunchDetailScreen(
     // Pull-to-refresh state — driven by ViewModel.isRefreshing, which spans the full
     // refreshLaunchDetails+news+events flow and resets in a finally block.
     val isRefreshing by viewModel.isRefreshing.collectAsState()
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = isRefreshing,
-        onRefresh = {
-            log.i { "👇 Pull-to-refresh gesture fired for launch $launchId" }
-            viewModel.refreshLaunchDetails(launchId)
-        }
-    )
+    val pullRefreshState = rememberPullToRefreshState()
 
     // Handle loading logic
     LaunchedEffect(launchId) {
@@ -116,10 +110,21 @@ fun LaunchDetailScreen(
     // Only render the view when we have launch data, show loading/error states otherwise
     val errorMessage = error
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pullRefresh(pullRefreshState)
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            log.i { "👇 Pull-to-refresh gesture fired for launch $launchId" }
+            viewModel.refreshLaunchDetails(launchId)
+        },
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize(),
+        indicator = {
+            PullToRefreshDefaults.LoadingIndicator(
+                state = pullRefreshState,
+                isRefreshing = isRefreshing,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
+        },
     ) {
         when {
             errorMessage != null -> {
@@ -187,23 +192,12 @@ fun LaunchDetailScreen(
 
         // Show progress bar when refreshing with stale data displayed
         if (isRefreshingWithStaleData) {
-            LinearProgressIndicator(
+            LinearWavyProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
             )
         }
-
-        // Pull-to-refresh indicator — statusBarsPadding keeps the spinner clear of the
-        // iOS Dynamic Island / notch and the Android status bar (the outer Box draws
-        // edge-to-edge, so without this the indicator anchors under the cutout).
-        PullRefreshIndicator(
-            refreshing = isRefreshing,
-            state = pullRefreshState,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-
-        )
 
         // Fullscreen button when embedded in list-detail pane
         if (onOpenFullscreen != null) {

@@ -20,8 +20,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -229,22 +231,23 @@ fun AgencyFilterSheet(
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FilterChip(
+                        SingleChoiceSegmentedButtonRow {
+                            SegmentedButton(
                                 selected = featuredFilter == null,
                                 onClick = { onFeaturedChange(null) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
                                 label = { Text("All") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = featuredFilter == true,
                                 onClick = { onFeaturedChange(true) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
                                 label = { Text("Featured Only") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = featuredFilter == false,
                                 onClick = { onFeaturedChange(false) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
                                 label = { Text("Non-Featured") }
                             )
                         }

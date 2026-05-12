@@ -18,16 +18,17 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Surface
@@ -107,6 +108,7 @@ fun NewsEventsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun NewsEventsContent(
     uiState: NewsEventsUiState,
@@ -183,16 +185,17 @@ private fun NewsEventsContent(
         }
     }
 
-    // Pull-to-refresh states
-    val newsRefreshState = rememberPullRefreshState(
-        refreshing = uiState.isLoadingNews && uiState.news.isNotEmpty(),
-        onRefresh = onRefreshNews
-    )
-
-    val eventsRefreshState = rememberPullRefreshState(
-        refreshing = uiState.isLoadingEvents && uiState.events.isNotEmpty(),
-        onRefresh = onRefreshEvents
-    )
+    // Pull-to-refresh states (one per tab — swapped based on the selected tab below)
+    val newsRefreshState = rememberPullToRefreshState()
+    val eventsRefreshState = rememberPullToRefreshState()
+    val isNewsTab = uiState.selectedTab == NewsEventsTab.NEWS
+    val activeRefreshState = if (isNewsTab) newsRefreshState else eventsRefreshState
+    val isActiveRefreshing = if (isNewsTab) {
+        uiState.isLoadingNews && uiState.news.isNotEmpty()
+    } else {
+        uiState.isLoadingEvents && uiState.events.isNotEmpty()
+    }
+    val onActiveRefresh: () -> Unit = if (isNewsTab) onRefreshNews else onRefreshEvents
 
     // Filter bottom sheet state
     var showFilterSheet by remember { mutableStateOf(false) }
@@ -211,12 +214,18 @@ private fun NewsEventsContent(
         onDismiss = { showFilterSheet = false }
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pullRefresh(
-                state = if (uiState.selectedTab == NewsEventsTab.NEWS) newsRefreshState else eventsRefreshState
+    PullToRefreshBox(
+        isRefreshing = isActiveRefreshing,
+        onRefresh = onActiveRefresh,
+        state = activeRefreshState,
+        modifier = Modifier.fillMaxSize(),
+        indicator = {
+            PullToRefreshDefaults.LoadingIndicator(
+                state = activeRefreshState,
+                isRefreshing = isActiveRefreshing,
+                modifier = Modifier.align(Alignment.TopCenter),
             )
+        },
     ) {
         Column(
             modifier = Modifier
@@ -284,9 +293,9 @@ private fun NewsEventsContent(
 
             // Loading indicator for refreshing
             if (uiState.selectedTab == NewsEventsTab.NEWS && uiState.isLoadingNews && uiState.news.isNotEmpty()) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                LinearWavyProgressIndicator(modifier = Modifier.fillMaxWidth())
             } else if (uiState.selectedTab == NewsEventsTab.EVENTS && uiState.isLoadingEvents && uiState.events.isNotEmpty()) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                LinearWavyProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
 
             // Pager with both tabs
@@ -317,19 +326,10 @@ private fun NewsEventsContent(
             }
         }
 
-        // Pull-to-refresh indicator
-        PullRefreshIndicator(
-            refreshing = if (uiState.selectedTab == NewsEventsTab.NEWS) {
-                uiState.isLoadingNews && uiState.news.isNotEmpty()
-            } else {
-                uiState.isLoadingEvents && uiState.events.isNotEmpty()
-            },
-            state = if (uiState.selectedTab == NewsEventsTab.NEWS) newsRefreshState else eventsRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun NewsTabContent(
     news: List<me.calebjones.spacelaunchnow.api.snapi.models.Article>,
@@ -380,7 +380,7 @@ private fun NewsTabContent(
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    LoadingIndicator()
                 }
             }
         }
@@ -399,6 +399,7 @@ private fun NewsTabContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun EventsTabContent(
     events: List<me.calebjones.spacelaunchnow.domain.model.Event>,
@@ -452,7 +453,7 @@ private fun EventsTabContent(
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    LoadingIndicator()
                 }
             }
         }
@@ -471,6 +472,7 @@ private fun EventsTabContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LoadingState() {
     Box(
@@ -479,7 +481,7 @@ private fun LoadingState() {
             .padding(48.dp),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator()
+        LoadingIndicator()
     }
 }
 

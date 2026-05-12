@@ -26,6 +26,9 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -270,22 +273,23 @@ fun AstronautFilterSheet(
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FilterChip(
+                        SingleChoiceSegmentedButtonRow {
+                            SegmentedButton(
                                 selected = hasFlownFilter == null,
                                 onClick = { onHasFlownChange(null) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
                                 label = { Text("All") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = hasFlownFilter == true,
                                 onClick = { onHasFlownChange(true) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
                                 label = { Text("Yes") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = hasFlownFilter == false,
                                 onClick = { onHasFlownChange(false) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
                                 label = { Text("No") }
                             )
                         }
@@ -298,22 +302,23 @@ fun AstronautFilterSheet(
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FilterChip(
+                        SingleChoiceSegmentedButtonRow {
+                            SegmentedButton(
                                 selected = inSpaceFilter == null,
                                 onClick = { onInSpaceChange(null) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
                                 label = { Text("All") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = inSpaceFilter == true,
                                 onClick = { onInSpaceChange(true) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
                                 label = { Text("Yes") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = inSpaceFilter == false,
                                 onClick = { onInSpaceChange(false) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
                                 label = { Text("No") }
                             )
                         }
@@ -326,22 +331,23 @@ fun AstronautFilterSheet(
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FilterChip(
+                        SingleChoiceSegmentedButtonRow {
+                            SegmentedButton(
                                 selected = isHumanFilter == null,
                                 onClick = { onIsHumanChange(null) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
                                 label = { Text("All") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = isHumanFilter == true,
                                 onClick = { onIsHumanChange(true) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
                                 label = { Text("Human") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = isHumanFilter == false,
                                 onClick = { onIsHumanChange(false) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
                                 label = { Text("Non-Human") }
                             )
                         }

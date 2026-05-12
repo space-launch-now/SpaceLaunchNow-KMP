@@ -19,7 +19,6 @@ repositories {
 
 kotlin {
     jvm()
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
     js {
@@ -85,10 +84,10 @@ kotlin {
 tasks {
     register<Exec>("iosTest") {
         val device = project.findProperty("device")?.toString() ?: "iPhone 8"
-        dependsOn("linkDebugTestIosX64")
+        dependsOn("linkDebugTestIosSimulatorArm64")
         group = JavaBasePlugin.VERIFICATION_GROUP
         description = "Execute unit tests on ${device} simulator"
-        val binary = kotlin.targets.getByName<KotlinNativeTarget>("iosX64").binaries.getTest("DEBUG")
+        val binary = kotlin.targets.getByName<KotlinNativeTarget>("iosSimulatorArm64").binaries.getTest("DEBUG")
         commandLine("xcrun", "simctl", "spawn", device, binary.outputFile)
     }
     register("test") {

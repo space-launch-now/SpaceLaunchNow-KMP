@@ -18,8 +18,9 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,7 +62,7 @@ import org.koin.compose.viewmodel.koinViewModel
  * - Filter by: has flown to space, currently in space, human/non-human
  * - Error and empty states
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AstronautListScreen(
     onNavigateToAstronautDetail: (Int) -> Unit,
@@ -207,7 +208,7 @@ fun AstronautListScreen(
                                         .padding(16.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    CircularProgressIndicator()
+                                    LoadingIndicator()
                                 }
                             }
                         }
@@ -266,6 +267,7 @@ fun AstronautListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LoadingContent() {
     Box(
@@ -276,7 +278,7 @@ private fun LoadingContent() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            CircularProgressIndicator()
+            LoadingIndicator()
             Text(
                 text = "Loading astronauts...",
                 style = MaterialTheme.typography.bodyLarge,

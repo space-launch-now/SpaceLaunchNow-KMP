@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.onboarding
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,14 +14,18 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,6 +71,7 @@ private const val PAGE_COUNT = 7
  * On completion or skip, persists the completed state via [AppPreferences] and
  * invokes [onComplete].
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LiveOnboardingScreen(
     onComplete: () -> Unit,
@@ -116,10 +122,11 @@ fun LiveOnboardingScreen(
             .fillMaxSize()
             .background(spaceGradient)
     ) {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
         ) {
             // Skip button row
             if (!isLastPage && !isFirstPage) {
@@ -155,25 +162,30 @@ fun LiveOnboardingScreen(
                         modifier = Modifier.fillMaxSize(),
                         nextLaunch = nextLaunch
                     )
+
                     1 -> LaunchCardPage(
                         modifier = Modifier.fillMaxSize(),
                         nextLaunch = nextLaunch
                     )
+
                     2 -> SchedulePage(
                         modifier = Modifier.fillMaxSize(),
                         upcomingLaunches = upcomingLaunches,
                         previousLaunches = previousLaunches
                     )
+
                     3 -> NewsEventsPage(
                         modifier = Modifier.fillMaxSize(),
                         articles = articles
                     )
+
                     4 -> ExplorePage(
                         modifier = Modifier.fillMaxSize(),
                         astronauts = astronauts,
                         rockets = rockets,
                         agencies = agencies
                     )
+
                     5 -> WidgetsPage(modifier = Modifier.fillMaxSize())
                     6 -> NotificationPermissionPage(
                         onPermissionResult = { granted ->
@@ -188,7 +200,7 @@ fun LiveOnboardingScreen(
             // Progress indicator & navigation — hidden on the notification page
             // so the user must choose "Enable Notifications" or "Maybe Later"
             if (!isLastPage) {
-                LinearProgressIndicator(
+                LinearWavyProgressIndicator(
                     progress = {
                         ((pagerState.currentPage + pagerState.currentPageOffsetFraction) / (PAGE_COUNT - 1).toFloat()).coerceIn(
                             0f,
@@ -200,6 +212,7 @@ fun LiveOnboardingScreen(
                         .padding(horizontal = 32.dp),
                     color = Color.White,
                     trackColor = Color.White.copy(alpha = 0.3f),
+                    amplitude = { 1f },
                 )
 
                 // Next button
@@ -234,9 +247,15 @@ fun LiveOnboardingScreen(
 // Previews (stateless content only — no AppPreferences injection in preview)
 // ---------------------------------------------------------------------------
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LiveOnboardingScreenPreviewContent() {
     val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
+    val animatedProgress by animateFloatAsState(
+        targetValue = ((pagerState.currentPage + pagerState.currentPageOffsetFraction) /
+            (PAGE_COUNT - 1).toFloat()).coerceIn(0f, 1f),
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+    )
 
     Box(
         modifier = Modifier
@@ -266,27 +285,21 @@ private fun LiveOnboardingScreenPreviewContent() {
                 when (page) {
                     0 -> WelcomePage(modifier = Modifier.fillMaxSize())
                     1 -> LaunchCardPage(modifier = Modifier.fillMaxSize())
-                    2 -> SchedulePage(modifier = Modifier.fillMaxSize())
-                    3 -> NewsEventsPage(modifier = Modifier.fillMaxSize())
-                    4 -> ExplorePage(modifier = Modifier.fillMaxSize())
-                    5 -> WidgetsPage(modifier = Modifier.fillMaxSize())
-                    6 -> NotificationPermissionPage(
+                    2 -> NewsEventsPage(modifier = Modifier.fillMaxSize())
+                    3 -> WidgetsPage(modifier = Modifier.fillMaxSize())
+                    4 -> NotificationPermissionPage(
                         onPermissionResult = {},
                         modifier = Modifier.fillMaxSize()
                     )
                 }
             }
 
-            LinearProgressIndicator(
-                progress = {
-                    ((pagerState.currentPage + pagerState.currentPageOffsetFraction) / (PAGE_COUNT - 1).toFloat()).coerceIn(
-                        0f,
-                        1f
-                    )
-                },
+            LinearWavyProgressIndicator(
+                progress = { animatedProgress },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
                 color = Color.White,
                 trackColor = Color.White.copy(alpha = 0.3f),
+                amplitude = { 1f },
             )
 
             Button(
