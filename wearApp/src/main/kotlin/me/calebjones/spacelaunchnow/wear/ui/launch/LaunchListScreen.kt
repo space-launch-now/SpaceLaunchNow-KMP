@@ -2,11 +2,13 @@ package me.calebjones.spacelaunchnow.wear.ui.launch
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,6 +33,8 @@ import me.calebjones.spacelaunchnow.wear.data.model.CachedLaunch
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchListUiState
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchListViewModel
 import kotlin.time.Clock
+
+private val HorizontalContentPadding = 14.dp
 
 @Composable
 fun LaunchListScreen(
@@ -81,7 +85,12 @@ private fun LaunchListContent(
         } else {
             TransformingLazyColumn(
                 state = columnState,
-                contentPadding = contentPadding,
+                contentPadding = PaddingValues(
+                    top = contentPadding.calculateTopPadding(),
+                    bottom = contentPadding.calculateBottomPadding(),
+                    start = HorizontalContentPadding,
+                    end = HorizontalContentPadding,
+                ),
                 modifier = Modifier.fillMaxSize(),
             ) {
                 item {
@@ -99,6 +108,7 @@ private fun LaunchListContent(
                         onClick = { onLaunchClick(launch.id) },
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(vertical = 8.dp)
                             .transformedHeight(this, transformationSpec),
                     )
                 }
@@ -121,7 +131,7 @@ private fun LaunchCard(
         title = {
             Text(
                 text = title,
-                maxLines = 2,
+                maxLines = 1,
                 style = MaterialTheme.typography.titleSmall,
                 overflow = TextOverflow.Ellipsis,
             )

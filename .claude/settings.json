@@ -10,7 +10,9 @@
       "Bash(android emulator *)",
       "Bash(adb devices *)",
       "Read(//c/Users/cajon/.gradle/caches/**)",
-      "WebFetch(domain:cs.android.com)"
+      "WebFetch(domain:cs.android.com)",
+      "Bash(./gradlew *)",
+      "Bash(cd *)"
     ]
   },
   "hooks": {
