@@ -2,6 +2,8 @@ package me.calebjones.spacelaunchnow.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import me.calebjones.spacelaunchnow.UserViewModel
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepositoryImpl
@@ -9,6 +11,9 @@ import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.UserRepository
 import me.calebjones.spacelaunchnow.data.UserRepositoryImpl
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
+import me.calebjones.spacelaunchnow.data.billing.DefaultRevenueCatAttributes
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes
+import me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributesSyncer
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
@@ -73,6 +78,7 @@ import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceStationLocalDataSource
 import me.calebjones.spacelaunchnow.database.StatsLocalDataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
+import me.calebjones.spacelaunchnow.platform.AppEnvironmentInfo
 import me.calebjones.spacelaunchnow.platform.ContextFactory
 import me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapViewModel
@@ -317,6 +323,49 @@ val appModule = module {
             dataStore = appDataStore,
             themePreferences = get<ThemePreferences>(),
             widgetPreferences = get<WidgetPreferences>()
+        )
+    }
+
+    // RevenueCat subscriber-attribute plumbing
+    single<RevenueCatAttributes> { DefaultRevenueCatAttributes() }
+
+    single { AppEnvironmentInfo() }
+
+    single {
+        val tempAccess = get<TemporaryPremiumAccess>()
+        val themePrefs = get<ThemePreferences>()
+        val appPrefs = get<AppPreferences>()
+        val subscriptionRepo =
+            get<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
+        RevenueCatAttributesSyncer(
+            attributes = get(),
+            envInfo = get(),
+            subscriptionStateProvider = {
+                subscriptionRepo.state.value.subscriptionType.name.lowercase()
+            },
+            themeModeProvider = {
+                runBlocking { appPrefs.themeFlow.first().name.lowercase() }
+            },
+            hasCustomThemeProvider = {
+                runBlocking { themePrefs.customPrimaryColorFlow.first() != null }
+            },
+            grantsTotalProvider = {
+                runBlocking { tempAccess.grantsTotalFlow.first() }
+            },
+            adsShownTotalProvider = {
+                runBlocking { tempAccess.adsShownTotalFlow.first() }
+            },
+            tempAccessActiveProvider = {
+                runBlocking {
+                    tempAccess.hasTemporaryAccess(
+                        me.calebjones.spacelaunchnow.data.model.PremiumFeature.CUSTOM_THEMES
+                    ) || tempAccess.hasTemporaryAccess(
+                        me.calebjones.spacelaunchnow.data.model.PremiumFeature.ADVANCED_WIDGETS
+                    ) || tempAccess.hasTemporaryAccess(
+                        me.calebjones.spacelaunchnow.data.model.PremiumFeature.WIDGETS_CUSTOMIZATION
+                    )
+                }
+            },
         )
     }
 

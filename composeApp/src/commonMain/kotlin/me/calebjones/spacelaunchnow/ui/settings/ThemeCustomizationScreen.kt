@@ -179,6 +179,7 @@ fun ThemeCustomizationScreen(
             item {
                 TemporaryPremiumCard(
                     temporaryPremiumAccess = viewModel.temporaryPremiumAccess,
+                    source = "theme_settings",
                     features = listOf(
                         PremiumFeature.CUSTOM_THEMES,
                         PremiumFeature.ADVANCED_WIDGETS,
