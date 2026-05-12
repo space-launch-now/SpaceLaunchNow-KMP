@@ -31,7 +31,9 @@ class TemporaryPremiumAccess(
         private val TEMP_CUSTOM_THEMES_EXPIRES_AT = longPreferencesKey("temp_custom_themes_expires_at")
         private val TEMP_ADVANCED_WIDGETS_EXPIRES_AT = longPreferencesKey("temp_advanced_widgets_expires_at")
         private val TEMP_WIDGETS_CUSTOMIZATION_EXPIRES_AT = longPreferencesKey("temp_widgets_customization_expires_at")
-        
+        private val TEMP_GRANTS_TOTAL = longPreferencesKey("temp_grants_total")
+        private val REWARDED_ADS_SHOWN_TOTAL = longPreferencesKey("rewarded_ads_shown_total")
+
         // Duration of temporary access (24 hours)
         private val ACCESS_DURATION = 1.days
     }
@@ -87,8 +89,9 @@ class TemporaryPremiumAccess(
         }
         
         log.i { "✅ Granted 24h access to $feature until $expiresAt" }
+        incrementGrantsTotal()  // Increment before notifying so RC snapshot sees the updated count.
         notifyAccessChanged()  // Notify listeners that access has changed
-        
+
         // Verify it was saved
         val savedExpiresAt = getExpirationTime(feature)
         log.d { "🔍 Verification read for $feature = $savedExpiresAt" }
@@ -252,6 +255,27 @@ class TemporaryPremiumAccess(
         }
         log.i { "Cleared all temporary access" }
         notifyAccessChanged()  // Notify listeners that access has changed
+    }
+
+    val grantsTotalFlow: kotlinx.coroutines.flow.Flow<Long> = dataStore.data.map { preferences ->
+        preferences[TEMP_GRANTS_TOTAL] ?: 0L
+    }
+
+    val adsShownTotalFlow: kotlinx.coroutines.flow.Flow<Long> = dataStore.data.map { preferences ->
+        preferences[REWARDED_ADS_SHOWN_TOTAL] ?: 0L
+    }
+
+    suspend fun incrementGrantsTotal() {
+        dataStore.edit { preferences ->
+            preferences[TEMP_GRANTS_TOTAL] = (preferences[TEMP_GRANTS_TOTAL] ?: 0L) + 1L
+        }
+    }
+
+    suspend fun incrementAdsShownTotal() {
+        dataStore.edit { preferences ->
+            preferences[REWARDED_ADS_SHOWN_TOTAL] =
+                (preferences[REWARDED_ADS_SHOWN_TOTAL] ?: 0L) + 1L
+        }
     }
 
     /**

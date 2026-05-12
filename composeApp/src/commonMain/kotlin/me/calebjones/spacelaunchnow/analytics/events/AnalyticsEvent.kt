@@ -231,4 +231,41 @@ sealed class AnalyticsEvent(val name: String) {
             screenClass?.let { put("screen_class", it) }
         }
     }
+
+    // ── Rewarded Ad / Temp Access Events ─────────────────────────────────────
+
+    data class RewardedAdRequested(
+        val source: String,
+        val isExtension: Boolean
+    ) : AnalyticsEvent("rewarded_ad_requested") {
+        override fun toParameters() = mapOf(
+            "source" to source,
+            "is_extension" to isExtension
+        )
+    }
+
+    data class RewardedAdShown(val source: String) :
+        AnalyticsEvent("rewarded_ad_shown") {
+        override fun toParameters() = mapOf("source" to source)
+    }
+
+    data class RewardedAdFailed(val source: String, val error: String) :
+        AnalyticsEvent("rewarded_ad_failed") {
+        override fun toParameters() = mapOf(
+            "source" to source,
+            "error" to error
+        )
+    }
+
+    data class TemporaryAccessGranted(
+        val feature: String,
+        val source: String,
+        val isExtension: Boolean
+    ) : AnalyticsEvent("temporary_access_granted") {
+        override fun toParameters() = mapOf(
+            "feature" to feature,
+            "source" to source,
+            "is_extension" to isExtension
+        )
+    }
 }
