@@ -168,26 +168,15 @@ fun LiveOnboardingScreen(
                         nextLaunch = nextLaunch
                     )
 
-                    2 -> SchedulePage(
-                        modifier = Modifier.fillMaxSize(),
-                        upcomingLaunches = upcomingLaunches,
-                        previousLaunches = previousLaunches
-                    )
-
-                    3 -> NewsEventsPage(
+                    2 -> NewsEventsPage(
                         modifier = Modifier.fillMaxSize(),
                         articles = articles
                     )
 
-                    4 -> ExplorePage(
-                        modifier = Modifier.fillMaxSize(),
-                        astronauts = astronauts,
-                        rockets = rockets,
-                        agencies = agencies
-                    )
 
-                    5 -> WidgetsPage(modifier = Modifier.fillMaxSize())
-                    6 -> NotificationPermissionPage(
+                    3 -> WidgetsPage(modifier = Modifier.fillMaxSize())
+                    
+                    4 -> NotificationPermissionPage(
                         onPermissionResult = { granted ->
                             if (granted) completeOnboarding()
                         },
