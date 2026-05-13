@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -42,17 +43,29 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -179,6 +192,7 @@ fun ThemeCustomizationScreen(
             item {
                 TemporaryPremiumCard(
                     temporaryPremiumAccess = viewModel.temporaryPremiumAccess,
+                    source = "theme_settings",
                     features = listOf(
                         PremiumFeature.CUSTOM_THEMES,
                         PremiumFeature.ADVANCED_WIDGETS,
@@ -191,6 +205,18 @@ fun ThemeCustomizationScreen(
                 )
             }
 
+            // Live preview — renders Primary/Secondary/Tertiary swatches derived from
+            // the current MaterialTheme. Because SpaceLaunchNowTheme reactively reads
+            // the saved primary color + palette style, this preview updates the moment
+            // the user picks a different swatch or palette.
+            item {
+                SectionHeaderText("Live preview")
+                SectionSubHeaderText("See how your selected color and palette style look together.")
+                SettingsCardRow {
+                    LiveThemePreview(modifier = Modifier.fillMaxWidth())
+                }
+            }
+
             // Color Customization (PREMIUM - Disabled for free users)
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -198,26 +224,35 @@ fun ThemeCustomizationScreen(
                         modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        SectionHeaderText("Primary Color")
+                        SectionHeaderText("Seed Color")
                         Spacer(Modifier.weight(1f))
                         Spacer(Modifier.width(4.dp))
                         if (!hasCustomTheme) {
                             PremiumBadge()
                         }
                     }
-                    SectionSubHeaderText("Choose the primary color for your theme.")
+                    SectionSubHeaderText("Choose the seed color for your theme.")
                 }
                 SettingsCardRow {
-                    ColorPalette(
-                        selectedColor = selectedPrimaryColor,
-                        onColorSelected = if (hasCustomTheme) {
-                            { viewModel.updatePrimaryColor(it) }
-                        } else {
-                            { /* Disabled */ }
-                        },
-                        enabled = hasCustomTheme,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        SeedColorPicker(
+                            initialColor = selectedPrimaryColor ?: Primary,
+                            onColorChange = { if (hasCustomTheme) viewModel.updatePrimaryColor(it) },
+                            enabled = hasCustomTheme,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        ColorPalette(
+                            selectedColor = selectedPrimaryColor,
+                            onColorSelected = if (hasCustomTheme) {
+                                { viewModel.updatePrimaryColor(it) }
+                            } else {
+                                { /* Disabled */ }
+                            },
+                            enabled = hasCustomTheme,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
 
@@ -660,6 +695,312 @@ private fun ColorPalette(
         }
     }
 }
+
+/**
+ * Renders three swatches showing the current MaterialTheme's primary, secondary, and
+ * tertiary colors. Updates live as the user changes the primary color or palette style,
+ * because `SpaceLaunchNowTheme` collects those preferences from a Flow and rebuilds
+ * `MaterialTheme.colorScheme` reactively.
+ */
+@Composable
+private fun LiveThemePreview(modifier: Modifier = Modifier) {
+    val cs = MaterialTheme.colorScheme
+    Column(modifier = modifier.padding(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ThemeRoleSwatch(label = "Primary", color = cs.primary, modifier = Modifier.weight(1f))
+            ThemeRoleSwatch(label = "Secondary", color = cs.secondary, modifier = Modifier.weight(1f))
+            ThemeRoleSwatch(label = "Tertiary", color = cs.tertiary, modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun ThemeRoleSwatch(
+    label: String,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(color)
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * Rectangular saturation x value plane + hue slider + hex readout, modelled after
+ * the standard Material seed-colour picker UI. Built on Compose Canvas (no extra
+ * dependency, fully commonMain). Updates [onColorChange] every time the user
+ * touches or drags the SV plane or hue track. When [enabled] is false the controls
+ * stop responding to touch and the current colour renders dimmed.
+ */
+@Composable
+private fun SeedColorPicker(
+    initialColor: Color,
+    onColorChange: (Color) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    val initial = remember(initialColor) { initialColor.toHsv() }
+    var hue by remember { mutableStateOf(initial.h) }
+    var saturation by remember { mutableStateOf(initial.s) }
+    var value by remember { mutableStateOf(initial.v) }
+    var isDragging by remember { mutableStateOf(false) }
+    var userTouched by remember { mutableStateOf(false) }
+
+    val currentColor = Color.hsv(hue, saturation, value)
+
+    // Commit only on pointer release. During a drag the gesture handlers update
+    // local hue/saturation/value (cheap), but we never push the color up to the
+    // ViewModel/DataStore/MaterialTheme until the user lifts their finger —
+    // otherwise every drag frame triggers a full app-wide theme rebuild and
+    // recomposes the whole screen, which causes the flicker.
+    LaunchedEffect(isDragging) {
+        if (userTouched && !isDragging) onColorChange(Color.hsv(hue, saturation, value))
+    }
+
+    val contentAlpha = if (enabled) 1f else 0.4f
+    Column(modifier = modifier.alpha(contentAlpha)) {
+        SatValPlane(
+            hue = hue,
+            saturation = saturation,
+            value = value,
+            enabled = enabled,
+            onDragStart = {
+                isDragging = true
+                userTouched = true
+            },
+            onChange = { s, v ->
+                saturation = s
+                value = v
+            },
+            onDragEnd = { isDragging = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+        )
+
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "Hue",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(6.dp))
+        HueSlider(
+            hue = hue,
+            enabled = enabled,
+            onDragStart = {
+                isDragging = true
+                userTouched = true
+            },
+            onHueChange = { hue = it },
+            onDragEnd = { isDragging = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(32.dp)
+        )
+
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "Hex",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(4.dp))
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = currentColor.toHexString(),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun SatValPlane(
+    hue: Float,
+    saturation: Float,
+    value: Float,
+    onChange: (sat: Float, value: Float) -> Unit,
+    onDragStart: () -> Unit,
+    onDragEnd: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    val pureHue = Color.hsv(hue, 1f, 1f)
+    Canvas(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .then(
+                if (enabled) {
+                    Modifier.pointerInput(Unit) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown()
+                            onDragStart()
+                            try {
+                                fun update(pos: Offset) {
+                                    val s = (pos.x / size.width).coerceIn(0f, 1f)
+                                    val v = (1f - pos.y / size.height).coerceIn(0f, 1f)
+                                    onChange(s, v)
+                                }
+                                update(down.position)
+                                drag(down.id) { change ->
+                                    update(change.position)
+                                    change.consume()
+                                }
+                            } finally {
+                                onDragEnd()
+                            }
+                        }
+                    }
+                } else Modifier
+            )
+    ) {
+        // White-to-pure-hue horizontal gradient (saturation 0 → 1 at value=1)
+        drawRect(
+            brush = Brush.horizontalGradient(listOf(Color.White, pureHue)),
+            size = Size(size.width, size.height)
+        )
+        // Transparent-to-black vertical overlay (value 1 → 0)
+        drawRect(
+            brush = Brush.verticalGradient(listOf(Color.Transparent, Color.Black)),
+            size = Size(size.width, size.height)
+        )
+        // Indicator
+        val ix = saturation * size.width
+        val iy = (1f - value) * size.height
+        val ringRadius = 10.dp.toPx()
+        drawCircle(
+            color = Color.White,
+            radius = ringRadius,
+            center = Offset(ix, iy),
+            style = Stroke(width = 3.dp.toPx())
+        )
+        drawCircle(
+            color = Color.Black.copy(alpha = 0.5f),
+            radius = ringRadius,
+            center = Offset(ix, iy),
+            style = Stroke(width = 1.dp.toPx())
+        )
+    }
+}
+
+@Composable
+private fun HueSlider(
+    hue: Float,
+    onHueChange: (Float) -> Unit,
+    onDragStart: () -> Unit,
+    onDragEnd: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    val hueColors = remember {
+        listOf(0f, 60f, 120f, 180f, 240f, 300f, 360f).map { Color.hsv(it, 1f, 1f) }
+    }
+    Canvas(
+        modifier = modifier.then(
+            if (enabled) {
+                Modifier.pointerInput(Unit) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        onDragStart()
+                        try {
+                            fun update(pos: Offset) {
+                                val frac = (pos.x / size.width).coerceIn(0f, 1f)
+                                onHueChange(frac * 360f)
+                            }
+                            update(down.position)
+                            drag(down.id) { change ->
+                                update(change.position)
+                                change.consume()
+                            }
+                        } finally {
+                            onDragEnd()
+                        }
+                    }
+                }
+            } else Modifier
+        )
+    ) {
+        val trackHeight = size.height * 0.5f
+        val trackTop = (size.height - trackHeight) / 2f
+        val corner = CornerRadius(trackHeight / 2f, trackHeight / 2f)
+        drawRoundRect(
+            brush = Brush.horizontalGradient(hueColors),
+            topLeft = Offset(0f, trackTop),
+            size = Size(size.width, trackHeight),
+            cornerRadius = corner
+        )
+        // Thumb
+        val thumbX = ((hue / 360f) * size.width).coerceIn(size.height / 2f, size.width - size.height / 2f)
+        val thumbY = size.height / 2f
+        val thumbRadius = size.height / 2f
+        drawCircle(
+            color = Color.hsv(hue, 1f, 1f),
+            radius = thumbRadius,
+            center = Offset(thumbX, thumbY)
+        )
+        drawCircle(
+            color = Color.White,
+            radius = thumbRadius,
+            center = Offset(thumbX, thumbY),
+            style = Stroke(width = 3.dp.toPx())
+        )
+    }
+}
+
+private data class Hsv(val h: Float, val s: Float, val v: Float)
+
+private fun Color.toHsv(): Hsv {
+    val r = red
+    val g = green
+    val b = blue
+    val max = maxOf(r, g, b)
+    val min = minOf(r, g, b)
+    val delta = max - min
+    val v = max
+    val s = if (max == 0f) 0f else delta / max
+    var h = when {
+        delta == 0f -> 0f
+        max == r -> 60f * (((g - b) / delta) % 6f)
+        max == g -> 60f * (((b - r) / delta) + 2f)
+        else -> 60f * (((r - g) / delta) + 4f)
+    }
+    if (h < 0f) h += 360f
+    return Hsv(h, s, v)
+}
+
+private fun Color.toHexString(): String {
+    val r = (red * 255f).toInt().coerceIn(0, 255)
+    val g = (green * 255f).toInt().coerceIn(0, 255)
+    val b = (blue * 255f).toInt().coerceIn(0, 255)
+    return "#" + r.toHex2() + g.toHex2() + b.toHex2()
+}
+
+private fun Int.toHex2(): String = toString(16).padStart(2, '0').uppercase()
 
 @Composable
 private fun ColorCircle(

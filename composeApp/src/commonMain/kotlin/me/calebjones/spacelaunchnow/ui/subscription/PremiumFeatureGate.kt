@@ -19,7 +19,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -60,6 +62,7 @@ import org.koin.compose.koinInject
  * @param paywallContent Custom paywall content (optional)
  * @param content The premium content to show when user has access
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PremiumFeatureGate(
     feature: PremiumFeature,
@@ -93,7 +96,7 @@ fun PremiumFeatureGate(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    LoadingIndicator()
                 }
             }
 

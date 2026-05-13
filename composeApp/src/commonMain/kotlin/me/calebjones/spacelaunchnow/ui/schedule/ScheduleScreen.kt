@@ -26,16 +26,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -125,7 +126,7 @@ fun ScheduleScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ScheduleContent(
     viewModel: ScheduleViewModel,
@@ -139,12 +140,7 @@ private fun ScheduleContent(
     val upcomingListState = rememberLazyListState()
     val previousListState = rememberLazyListState()
 
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = uiState.isRefreshing,
-        onRefresh = {
-            viewModel.refresh()
-        }
-    )
+    val pullRefreshState = rememberPullToRefreshState()
 
     val pagerState = rememberPagerState(
         initialPage = if (uiState.selectedTab == ScheduleTab.Upcoming) 0 else 1,
@@ -208,7 +204,19 @@ private fun ScheduleContent(
             }
     }
 
-    Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
+    PullToRefreshBox(
+        isRefreshing = uiState.isRefreshing,
+        onRefresh = { viewModel.refresh() },
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize(),
+        indicator = {
+            PullToRefreshDefaults.LoadingIndicator(
+                state = pullRefreshState,
+                isRefreshing = uiState.isRefreshing,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
+        },
+    ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Title bar with expandable search
             Box(
@@ -333,9 +341,9 @@ private fun ScheduleContent(
 
             // Loading indicator for refreshing (filter changes, pull-to-refresh)
             if (uiState.selectedTab == ScheduleTab.Upcoming && uiState.upcomingTab.isRefreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                LinearWavyProgressIndicator(modifier = Modifier.fillMaxWidth())
             } else if (uiState.selectedTab == ScheduleTab.Previous && uiState.previousTab.isRefreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                LinearWavyProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
 
             HorizontalPager(
@@ -385,7 +393,7 @@ private fun ScheduleContent(
                                 Modifier.fillMaxWidth().padding(24.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator()
+                                LoadingIndicator()
                             }
                         }
                     }
@@ -414,7 +422,7 @@ private fun ScheduleContent(
                                 Modifier.fillMaxWidth().padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator()
+                                LoadingIndicator()
                             }
                         }
                     }
@@ -432,12 +440,6 @@ private fun ScheduleContent(
                 }
             }
         }
-
-        PullRefreshIndicator(
-            refreshing = uiState.isRefreshing,
-            state = pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
 
         // Filter UI - responsive: bottom sheet for phone, side sheet for tablet/desktop
         if (isTablet) {

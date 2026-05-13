@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
@@ -33,7 +34,11 @@ import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 fun AppIconBox(
     modifier: Modifier = Modifier,
     boxSize: Dp = 112.dp,
-    iconSize: Dp = 90.dp
+    iconSize: Dp = 90.dp,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    secondaryColor: Color = MaterialTheme.colorScheme.secondary,
+    tertiaryColor: Color = MaterialTheme.colorScheme.tertiary,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
 ) {
     val outerSize = boxSize + 13.dp
     val middleSize = boxSize + 9.dp
@@ -52,10 +57,10 @@ fun AppIconBox(
                 .background(
                     Brush.sweepGradient(
                         listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.secondary,
-                            MaterialTheme.colorScheme.tertiary,
-                            MaterialTheme.colorScheme.primary,
+                            primaryColor,
+                            secondaryColor,
+                            tertiaryColor,
+                            primaryColor,
                         )
                     )
                 )
@@ -65,14 +70,14 @@ fun AppIconBox(
             modifier = Modifier
                 .size(middleSize)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(containerColor)
         ) {}
         // Inner circle with app icon
         Box(
             modifier = Modifier
                 .size(boxSize)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
+                .background(primaryColor),
             contentAlignment = Alignment.Center
         ) {
             Image(

@@ -29,6 +29,9 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -230,22 +233,23 @@ fun RocketFilterSheet(
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FilterChip(
+                        SingleChoiceSegmentedButtonRow {
+                            SegmentedButton(
                                 selected = activeFilter == null,
                                 onClick = { onActiveChange(null) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
                                 label = { Text("All") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = activeFilter == true,
                                 onClick = { onActiveChange(true) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
                                 label = { Text("Active Only") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = activeFilter == false,
                                 onClick = { onActiveChange(false) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
                                 label = { Text("Retired") }
                             )
                         }
@@ -258,22 +262,23 @@ fun RocketFilterSheet(
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FilterChip(
+                        SingleChoiceSegmentedButtonRow {
+                            SegmentedButton(
                                 selected = reusableFilter == null,
                                 onClick = { onReusableChange(null) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
                                 label = { Text("All") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = reusableFilter == true,
                                 onClick = { onReusableChange(true) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
                                 label = { Text("Reusable") }
                             )
-                            FilterChip(
+                            SegmentedButton(
                                 selected = reusableFilter == false,
                                 onClick = { onReusableChange(false) },
+                                shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
                                 label = { Text("Expendable") }
                             )
                         }

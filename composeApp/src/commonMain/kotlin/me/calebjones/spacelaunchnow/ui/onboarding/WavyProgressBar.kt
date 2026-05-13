@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -122,6 +124,7 @@ private fun WavyProgressBarPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview
 @Composable
 private fun WavyProgressBarDarkPreview() {
@@ -133,10 +136,7 @@ private fun WavyProgressBarDarkPreview() {
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
-            WavyProgressBar(
-                currentPage = 2,
-                pageCount = 4,
-                pageOffsetFraction = 0f
+            LinearWavyProgressIndicator(
             )
         }
     }

@@ -18,7 +18,8 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -53,6 +54,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedLaunchContent
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResponsiveHomeContent(
     navController: NavController,
@@ -155,7 +157,7 @@ fun ResponsiveHomeContent(
         // Show loading indicator when any view is loading
         if (isAnyViewLoading) {
             item(key = "loading_indicator") {
-                LinearProgressIndicator(
+                LinearWavyProgressIndicator(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 )
             }

@@ -74,7 +74,7 @@ import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsScreen(
     navController: NavController,
@@ -157,7 +157,7 @@ fun SettingsScreen(
             }
         )
         if (uiState.isLoading) {
-            androidx.compose.material3.LinearProgressIndicator(
+            androidx.compose.material3.LinearWavyProgressIndicator(
                 modifier = Modifier.fillMaxWidth()
             )
         }

@@ -126,6 +126,12 @@ actual fun IssMapView(
     // Track if camera has been initialized to avoid forcing zoom level
     var cameraInitialized by remember { mutableStateOf(false) }
 
+    // Tracks whether GoogleMap has finished its first load. The Maps SDK lazily
+    // initializes `CameraUpdateFactory` during the first render — calling it before
+    // then throws "CameraUpdateFactory is not initialized" (regression surfaced in
+    // maps-compose 6.12.2; was silently tolerated in 6.1.0).
+    var mapLoaded by remember { mutableStateOf(false) }
+
     // Camera state - center on current position if available with lower initial zoom
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -134,9 +140,11 @@ actual fun IssMapView(
         )
     }
 
-    // Update camera position whenever ISS position changes to keep it centered
-    LaunchedEffect(googleCurrentPosition) {
-        if (googleCurrentPosition != null) {
+    // Update camera position whenever ISS position changes to keep it centered.
+    // Gated on `mapLoaded` so CameraUpdateFactory is only invoked after the SDK
+    // has initialized it.
+    LaunchedEffect(googleCurrentPosition, mapLoaded) {
+        if (mapLoaded && googleCurrentPosition != null) {
             if (!cameraInitialized) {
                 // First load: set camera with animation
                 cameraPositionState.animate(
@@ -162,6 +170,7 @@ actual fun IssMapView(
     GoogleMap(
         modifier = modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
+        onMapLoaded = { mapLoaded = true },
         properties = MapProperties(
             mapType = MapType.SATELLITE,
             isMyLocationEnabled = false,

@@ -19,7 +19,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +48,7 @@ import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
  * Timeline view displaying the complete Starship program history
  * Shows next launch (highlighted) at top, then previous launches in reverse chronological order
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StarshipHistoryTimeline(
     nextLaunch: Launch?,
@@ -102,7 +104,7 @@ fun StarshipHistoryTimeline(
                     .padding(32.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                LoadingIndicator()
             }
         }
 

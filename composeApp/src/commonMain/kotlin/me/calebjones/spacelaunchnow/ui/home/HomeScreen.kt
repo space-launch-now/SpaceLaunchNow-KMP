@@ -1,12 +1,11 @@
 package me.calebjones.spacelaunchnow.ui.home
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +37,7 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     // Inject domain-specific ViewModels
@@ -130,21 +129,19 @@ fun HomeScreen(navController: NavController) {
     val currentDay = currentDate.day
     val currentMonth = currentDate.month.number
 
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = isRefreshing,
-        onRefresh = {
-            isRefreshing = true
-            // Refresh all ViewModels
-            featuredLaunchViewModel.refresh()
-            featuredLaunchViewModel.loadPinnedContent(forceRefresh = true)
-            launchesViewModel.refresh()
-            feedViewModel.refreshAll()
-            eventsViewModel.refresh()
-            statsViewModel.refresh()
-            historyViewModel.refresh(day = currentDay, month = currentMonth)
-            isRefreshing = false
-        }
-    )
+    val pullRefreshState = rememberPullToRefreshState()
+    val onPullToRefresh: () -> Unit = {
+        isRefreshing = true
+        // Refresh all ViewModels
+        featuredLaunchViewModel.refresh()
+        featuredLaunchViewModel.loadPinnedContent(forceRefresh = true)
+        launchesViewModel.refresh()
+        feedViewModel.refreshAll()
+        eventsViewModel.refresh()
+        statsViewModel.refresh()
+        historyViewModel.refresh(day = currentDay, month = currentMonth)
+        isRefreshing = false
+    }
 
     // Initial load of all sections
     LaunchedEffect(Unit) {
@@ -179,10 +176,18 @@ fun HomeScreen(navController: NavController) {
     }
 
     // Simplified UI - single offline banner at top of content, each view handles its own loading/error states
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pullRefresh(pullRefreshState)
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onPullToRefresh,
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize(),
+        indicator = {
+            PullToRefreshDefaults.LoadingIndicator(
+                state = pullRefreshState,
+                isRefreshing = isRefreshing,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
+        },
     ) {
         ResponsiveHomeContent(
             navController = navController,
@@ -219,13 +224,6 @@ fun HomeScreen(navController: NavController) {
             onRetry = onRetry,
             onStatsVisible = { statsViewModel.loadAllStats() },
             onPreviousLaunchesVisible = { launchesViewModel.loadPreviousLaunches() }
-        )
-
-        // Pull-to-refresh indicator
-        PullRefreshIndicator(
-            refreshing = isRefreshing,
-            state = pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 }

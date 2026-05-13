@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
  * - Pull-to-refresh support
  * - Stale data indicators
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StarshipScreen(
     navController: NavController,
@@ -96,16 +96,8 @@ fun StarshipScreen(
     val pagerState = rememberPagerState(pageCount = { 3 })
     val coroutineScope = rememberCoroutineScope()
 
-    // Pull-to-refresh state (using Material, not Material3)
     var isRefreshing by remember { mutableStateOf(false) }
-
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = isRefreshing,
-        onRefresh = {
-            isRefreshing = true
-            viewModel.refresh()
-        }
-    )
+    val pullRefreshState = rememberPullToRefreshState()
 
     // End refresh when loading completes
     LaunchedEffect(isAnyLoading) {
@@ -152,11 +144,23 @@ fun StarshipScreen(
         // Don't add extra content padding - PhoneLayout already handles bottom bar padding
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
-        Box(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                isRefreshing = true
+                viewModel.refresh()
+            },
+            state = pullRefreshState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .pullRefresh(pullRefreshState)
+                .padding(paddingValues),
+            indicator = {
+                PullToRefreshDefaults.LoadingIndicator(
+                    state = pullRefreshState,
+                    isRefreshing = isRefreshing,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                )
+            },
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Tab Row
@@ -249,12 +253,6 @@ fun StarshipScreen(
                 }
             }
 
-            // Pull-to-refresh indicator
-            PullRefreshIndicator(
-                refreshing = isRefreshing,
-                state = pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
         }
     }
 }

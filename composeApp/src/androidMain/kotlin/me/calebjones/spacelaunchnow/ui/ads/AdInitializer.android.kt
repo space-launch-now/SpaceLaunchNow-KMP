@@ -37,7 +37,7 @@ actual object AdInitializer {
     actual fun configure(isDebug: Boolean, testDeviceIds: List<String>) {
         try {
             BasicAds.configuration = RequestConfiguration(
-                maxAdContentRating = RequestConfiguration.MAX_AD_CONTENT_RATING_PG,
+                maxAdContentRating = RequestConfiguration.MAX_AD_CONTENT_RATING_G,
                 publisherPrivacyPersonalizationState = RequestConfiguration.PublisherPrivacyPersonalizationState.ENABLED,
                 tagForChildDirectedTreatment = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE,
                 tagForUnderAgeOfConsent = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE,
