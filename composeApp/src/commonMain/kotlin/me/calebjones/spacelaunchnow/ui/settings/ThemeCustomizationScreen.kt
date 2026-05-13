@@ -761,14 +761,18 @@ private fun SeedColorPicker(
     var hue by remember { mutableStateOf(initial.h) }
     var saturation by remember { mutableStateOf(initial.s) }
     var value by remember { mutableStateOf(initial.v) }
+    var isDragging by remember { mutableStateOf(false) }
+    var userTouched by remember { mutableStateOf(false) }
 
     val currentColor = Color.hsv(hue, saturation, value)
 
-    // Emit on user-driven changes only (not on initial composition, which would
-    // overwrite the saved selection with the same value).
-    var userTouched by remember { mutableStateOf(false) }
-    LaunchedEffect(hue, saturation, value) {
-        if (userTouched) onColorChange(currentColor)
+    // Commit only on pointer release. During a drag the gesture handlers update
+    // local hue/saturation/value (cheap), but we never push the color up to the
+    // ViewModel/DataStore/MaterialTheme until the user lifts their finger —
+    // otherwise every drag frame triggers a full app-wide theme rebuild and
+    // recomposes the whole screen, which causes the flicker.
+    LaunchedEffect(isDragging) {
+        if (userTouched && !isDragging) onColorChange(Color.hsv(hue, saturation, value))
     }
 
     val contentAlpha = if (enabled) 1f else 0.4f
@@ -778,11 +782,15 @@ private fun SeedColorPicker(
             saturation = saturation,
             value = value,
             enabled = enabled,
+            onDragStart = {
+                isDragging = true
+                userTouched = true
+            },
             onChange = { s, v ->
                 saturation = s
                 value = v
-                userTouched = true
             },
+            onDragEnd = { isDragging = false },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(180.dp)
@@ -798,10 +806,12 @@ private fun SeedColorPicker(
         HueSlider(
             hue = hue,
             enabled = enabled,
-            onHueChange = {
-                hue = it
+            onDragStart = {
+                isDragging = true
                 userTouched = true
             },
+            onHueChange = { hue = it },
+            onDragEnd = { isDragging = false },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(32.dp)
@@ -835,6 +845,8 @@ private fun SatValPlane(
     saturation: Float,
     value: Float,
     onChange: (sat: Float, value: Float) -> Unit,
+    onDragStart: () -> Unit,
+    onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
@@ -847,15 +859,20 @@ private fun SatValPlane(
                     Modifier.pointerInput(Unit) {
                         awaitEachGesture {
                             val down = awaitFirstDown()
-                            fun update(pos: Offset) {
-                                val s = (pos.x / size.width).coerceIn(0f, 1f)
-                                val v = (1f - pos.y / size.height).coerceIn(0f, 1f)
-                                onChange(s, v)
-                            }
-                            update(down.position)
-                            drag(down.id) { change ->
-                                update(change.position)
-                                change.consume()
+                            onDragStart()
+                            try {
+                                fun update(pos: Offset) {
+                                    val s = (pos.x / size.width).coerceIn(0f, 1f)
+                                    val v = (1f - pos.y / size.height).coerceIn(0f, 1f)
+                                    onChange(s, v)
+                                }
+                                update(down.position)
+                                drag(down.id) { change ->
+                                    update(change.position)
+                                    change.consume()
+                                }
+                            } finally {
+                                onDragEnd()
                             }
                         }
                     }
@@ -895,6 +912,8 @@ private fun SatValPlane(
 private fun HueSlider(
     hue: Float,
     onHueChange: (Float) -> Unit,
+    onDragStart: () -> Unit,
+    onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
@@ -907,14 +926,19 @@ private fun HueSlider(
                 Modifier.pointerInput(Unit) {
                     awaitEachGesture {
                         val down = awaitFirstDown()
-                        fun update(pos: Offset) {
-                            val frac = (pos.x / size.width).coerceIn(0f, 1f)
-                            onHueChange(frac * 360f)
-                        }
-                        update(down.position)
-                        drag(down.id) { change ->
-                            update(change.position)
-                            change.consume()
+                        onDragStart()
+                        try {
+                            fun update(pos: Offset) {
+                                val frac = (pos.x / size.width).coerceIn(0f, 1f)
+                                onHueChange(frac * 360f)
+                            }
+                            update(down.position)
+                            drag(down.id) { change ->
+                                update(change.position)
+                                change.consume()
+                            }
+                        } finally {
+                            onDragEnd()
                         }
                     }
                 }
