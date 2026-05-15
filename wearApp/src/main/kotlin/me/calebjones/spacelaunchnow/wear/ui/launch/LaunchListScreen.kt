@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.wear.ui.launch
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,20 +22,22 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.TitleCard
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import me.calebjones.spacelaunchnow.wear.data.model.CachedLaunch
+import me.calebjones.spacelaunchnow.wear.ui.theme.wearHorizontalPadding
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchListUiState
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchListViewModel
 import kotlin.time.Clock
-
-private val HorizontalContentPadding = 14.dp
 
 @Composable
 fun LaunchListScreen(
@@ -56,6 +59,7 @@ private fun LaunchListContent(
 ) {
     val columnState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
+    val hPadding = wearHorizontalPadding()
     ScreenScaffold(scrollState = columnState) { contentPadding ->
         if (uiState.isLoading && uiState.launches.isEmpty()) {
             Column(
@@ -85,13 +89,14 @@ private fun LaunchListContent(
         } else {
             TransformingLazyColumn(
                 state = columnState,
-                contentPadding = PaddingValues(
-                    top = contentPadding.calculateTopPadding(),
-                    bottom = contentPadding.calculateBottomPadding(),
-                    start = HorizontalContentPadding,
-                    end = HorizontalContentPadding,
-                ),
-                modifier = Modifier.fillMaxSize(),
+                contentPadding = contentPadding,
+//                contentPadding = PaddingValues(
+//                    top = contentPadding.calculateTopPadding(),
+//                    bottom = contentPadding.calculateBottomPadding(),
+//                    start = hPadding,
+//                    end = hPadding,
+//                ),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 item {
                     ListHeader(
@@ -108,8 +113,9 @@ private fun LaunchListContent(
                         onClick = { onLaunchClick(launch.id) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .transformedHeight(this, transformationSpec),
+                            .transformedHeight(this, transformationSpec)
+                            .minimumVerticalContentPadding(ButtonDefaults.minimumVerticalListContentPadding),
+                        transformation = SurfaceTransformation(transformationSpec)
                     )
                 }
             }
@@ -122,49 +128,55 @@ private fun LaunchCard(
     launch: CachedLaunch,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    transformation: SurfaceTransformation,
 ) {
     val title = remember(launch) { formatWearTitle(launch) }
     val countdown = remember(launch) { formatWearCountdown(launch.net) }
 
-    TitleCard(
+    Card(
         onClick = onClick,
-        title = {
-            Text(
-                text = title,
-                maxLines = 1,
-                style = MaterialTheme.typography.titleSmall,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
         modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+        transformation = transformation
     ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
+        Text(
+            text = title,
+            maxLines = 2,
+            style = MaterialTheme.typography.bodySmall,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(2.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end=12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = countdown,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            launch.statusAbbrev?.let { status ->
                 Text(
-                    text = countdown,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                launch.statusAbbrev?.let { status ->
-                    Text(
-                        text = status,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.tertiary,
-                    )
-                }
-            }
-            launch.padLocationName?.let { location ->
-                Text(
-                    text = location,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    text = status,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            shape = MaterialTheme.shapes.small,
+                        )
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
                 )
             }
+        }
+        launch.padLocationName?.let { location ->
+            Text(
+                text = location,
+                maxLines = 1,
+                style = MaterialTheme.typography.bodyExtraSmall,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

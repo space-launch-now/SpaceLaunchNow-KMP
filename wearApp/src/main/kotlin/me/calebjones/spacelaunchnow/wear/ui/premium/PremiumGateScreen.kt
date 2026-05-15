@@ -34,8 +34,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.wear.R
-
-private val HorizontalContentPadding = 14.dp
+import me.calebjones.spacelaunchnow.wear.ui.theme.wearHorizontalPadding
 
 @Composable
 fun PremiumGateScreen() {
@@ -43,6 +42,7 @@ fun PremiumGateScreen() {
     val scope = rememberCoroutineScope()
     val columnState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
+    val hPadding = wearHorizontalPadding()
 
     ScreenScaffold(scrollState = columnState) { contentPadding ->
         TransformingLazyColumn(
@@ -50,8 +50,8 @@ fun PremiumGateScreen() {
             contentPadding = PaddingValues(
                 top = contentPadding.calculateTopPadding(),
                 bottom = contentPadding.calculateBottomPadding(),
-                start = HorizontalContentPadding,
-                end = HorizontalContentPadding,
+                start = hPadding,
+                end = hPadding,
             ),
             modifier = Modifier.fillMaxSize(),
         ) {

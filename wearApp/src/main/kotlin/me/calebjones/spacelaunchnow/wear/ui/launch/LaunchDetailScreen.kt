@@ -1,6 +1,8 @@
 package me.calebjones.spacelaunchnow.wear.ui.launch
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,7 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
@@ -32,14 +36,16 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
-import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.CircularProgressIndicator
+import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.TitleCard
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import coil3.compose.AsyncImage
@@ -47,13 +53,11 @@ import kotlinx.coroutines.delay
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.wear.R
+import me.calebjones.spacelaunchnow.wear.ui.theme.wearHorizontalPadding
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchDetailUiState
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchDetailViewModel
 import kotlin.time.Clock
 import kotlin.time.Instant
-
-/** Horizontal padding that keeps text clear of the round bezel on all watch sizes. */
-private val HorizontalContentPadding = 14.dp
 
 @Composable
 fun LaunchDetailScreen(
@@ -76,8 +80,16 @@ private fun LaunchDetailContent(
 ) {
     val columnState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
+    val hPadding = wearHorizontalPadding()
 
-    ScreenScaffold(scrollState = columnState) { contentPadding ->
+    ScreenScaffold(
+        scrollState = columnState,
+        edgeButton = {
+            EdgeButton(onClick = onOpenOnPhone) {
+                Text("Open on Phone")
+            }
+        },
+    ) { contentPadding ->
         when {
             uiState.isLoading -> {
                 Column(
@@ -97,188 +109,158 @@ private fun LaunchDetailContent(
                         text = uiState.error,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = HorizontalContentPadding),
+                        modifier = Modifier.padding(horizontal = hPadding),
                     )
                 }
             }
 
             uiState.launch != null -> {
                 val launch = uiState.launch
+                val (title, subtitle) = uiState.formattedTitle
+                    .split("|", limit = 2)
+                    .map { it.trim() }
+                    .let { parts -> parts.getOrElse(0) { "" } to parts.getOrElse(1) { "" } }
                 TransformingLazyColumn(
                     state = columnState,
                     contentPadding = PaddingValues(
                         top = contentPadding.calculateTopPadding(),
                         bottom = contentPadding.calculateBottomPadding(),
-                        start = HorizontalContentPadding,
-                        end = HorizontalContentPadding,
+                        start = hPadding,
+                        end = hPadding,
                     ),
                     modifier = Modifier.fillMaxSize(),
                 ) {
 
-                    // ── Launch artwork (circular hero image) ───────────────
-                    launch.imageUrl?.takeIf { it.isNotBlank() }?.let { imageUrl ->
+                    // ── Launch artwork with title overlay ─────────────────
+                    if (!launch.imageUrl.isNullOrBlank()) {
                         item {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp)
+                                    .padding(top = 12.dp)
+                                    .height(100.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .transformedHeight(this, transformationSpec),
+                            ) {
+                                AsyncImage(
+                                    model = launch.imageUrl,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color.Transparent,
+                                                    Color.Black.copy(alpha = 0.75f),
+                                                ),
+                                            )
+                                        ),
+                                )
+                                Column(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                                ) {
+                                    Text(
+                                        text = title,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        textAlign = TextAlign.Start,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = Color.White,
+                                    )
+                                    Text(
+                                        text = subtitle,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        textAlign = TextAlign.Start,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White,
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        item {
+                            ListHeader(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .transformedHeight(this, transformationSpec),
                             ) {
-                                AsyncImage(
-                                    model = imageUrl,
-                                    contentDescription = launch.missionName
-                                        ?: uiState.formattedTitle,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(120.dp)
-                                        .clip(CircleShape),
-                                )
-                            }
-                        }
-                    }
-
-                    // ── Vehicle / agency title (with rocket icon) ──────────
-                    item {
-                        ListHeader(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .transformedHeight(this, transformationSpec),
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center,
-                            ) {
-                                Text(
-                                    text = uiState.formattedTitle,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                    textAlign = TextAlign.Center,
-                                )
-                            }
-                        }
-                    }
-
-                    // ── Countdown card (live-ticking segments) ─────────────
-                    item {
-                        TitleCard(
-                            onClick = {},
-                            title = {
-                                IconLabel(
-                                    iconRes = R.drawable.ic_schedule,
-                                    text = "Countdown",
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .transformedHeight(this, transformationSpec),
-                        ) {
-                            CountdownSegments(net = launch.net)
-                        }
-                    }
-
-                    // ── Mission / date / status card ───────────────────────
-                    item {
-                        val netFormatted = formatNetDateTime(launch.net)
-                        TitleCard(
-                            onClick = {},
-                            title = {
-                                IconLabel(
-                                    iconRes = R.drawable.ic_rocket_launch,
-                                    text = launch.missionName ?: uiState.formattedTitle,
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .transformedHeight(this, transformationSpec),
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                IconRow(
-                                    iconRes = R.drawable.ic_schedule,
-                                    text = netFormatted,
-                                    iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                launch.statusName?.let { status ->
-                                    IconRow(
-                                        iconRes = R.drawable.ic_check_circle,
-                                        text = status,
-                                        iconTint = MaterialTheme.colorScheme.tertiary,
-                                        textColor = MaterialTheme.colorScheme.tertiary,
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                ) {
+                                    Text(
+                                        text = uiState.formattedTitle,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
+                                        textAlign = TextAlign.Center,
                                     )
                                 }
                             }
                         }
                     }
 
-                    // ── Launch site card ───────────────────────────────────
-                    launch.padLocationName?.let { location ->
-                        item {
-                            TitleCard(
-                                onClick = {},
-                                title = {
-                                    IconLabel(
-                                        iconRes = R.drawable.ic_location_on,
-                                        text = "Launch Site",
-                                    )
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .transformedHeight(this, transformationSpec),
-                            ) {
-                                Text(
-                                    text = location,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
-                        }
-                    }
-
-                    // ── Mission description card ───────────────────────────
-                    launch.missionDescription?.let { description ->
-                        item {
-                            TitleCard(
-                                onClick = {},
-                                title = {
-                                    IconLabel(
-                                        iconRes = R.drawable.ic_rocket_launch,
-                                        text = "Mission",
-                                    )
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .transformedHeight(this, transformationSpec),
-                            ) {
-                                Text(
-                                    text = description,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    maxLines = 5,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
-                        }
-                    }
-
-                    // ── Open on phone ──────────────────────────────────────
+                    // ── Countdown card (live-ticking segments) ─────────────
                     item {
-                        Spacer(Modifier.height(8.dp))
-                        Button(
-                            onClick = onOpenOnPhone,
+                        Card(
+                            onClick = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .transformedHeight(this, transformationSpec)
+                                .minimumVerticalContentPadding(ButtonDefaults.minimumVerticalListContentPadding),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
+                            transformation = SurfaceTransformation(transformationSpec),
+                        ) {
+                            CountdownSegments(net = launch.net)
+                        }
+                    }
+
+                    // ── Mission / date / status ────────────────────────────
+                    item {
+                        val netFormatted = formatNetDateTime(launch.net)
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .transformedHeight(this, transformationSpec),
-                            label = {
-                                Text(
-                                    text = "Open on Phone",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center,
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            IconRow(
+                                iconRes = R.drawable.ic_schedule,
+                                text = netFormatted,
+                                iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            launch.statusName?.let { status ->
+                                IconRow(
+                                    iconRes = R.drawable.ic_check_circle,
+                                    text = status,
+                                    iconTint = MaterialTheme.colorScheme.tertiary,
+                                    textColor = MaterialTheme.colorScheme.tertiary,
                                 )
-                            },
-                        )
+                            }
+                        }
                     }
 
-                    // Breathing room so button scrolls clear of bezel
-                    item { Spacer(Modifier.height(32.dp)) }
+                    // ── Launch site ────────────────────────────────────────
+                    launch.padLocationName?.let { location ->
+                        item {
+                            IconRow(
+                                iconRes = R.drawable.ic_location_on,
+                                text = location,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .transformedHeight(this, transformationSpec),
+                            )
+                        }
+                    }
+
                 }
             }
         }
@@ -297,41 +279,17 @@ private fun formatNetDateTime(net: kotlin.time.Instant): String {
     }
 }
 
-/** Small icon next to a label — used as a card title row. */
-@Composable
-private fun IconLabel(
-    iconRes: Int,
-    text: String,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(14.dp),
-        )
-        Spacer(Modifier.width(4.dp))
-        Text(
-            text = text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelMedium,
-        )
-    }
-}
-
-/** Small icon next to body text — used inside cards (date, status, etc). */
 @Composable
 private fun IconRow(
     iconRes: Int,
     text: String,
     iconTint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant,
     textColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Unspecified,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
     ) {
         Icon(
             painter = painterResource(iconRes),
@@ -396,7 +354,8 @@ private fun ScaleToFitHorizontally(
         val scale = if (placeable.width > constraints.maxWidth && constraints.maxWidth > 0) {
             constraints.maxWidth.toFloat() / placeable.width
         } else 1f
-        val laidOutWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else placeable.width
+        val laidOutWidth =
+            if (constraints.hasBoundedWidth) constraints.maxWidth else placeable.width
         val scaledHeight = (placeable.height * scale).toInt()
         layout(laidOutWidth, scaledHeight) {
             val offsetX = (laidOutWidth - placeable.width) / 2

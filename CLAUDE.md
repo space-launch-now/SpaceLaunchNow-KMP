@@ -152,3 +152,6 @@ Subagents that need an isolated workspace use `isolation: "worktree"` in the Age
 - Notifications & widgets: `data/notifications/`, `widgets/` (commonMain) + platform implementations under `androidMain/widgets/`, `iosApp/LaunchWidget/`.
 - Wear OS app: `wearApp/src/main/` — uses Wear Compose M3, ProtoLayout tiles, complications, and DataLayer for phone↔watch sync.
 - Specs in flight: `specs/<feature>/` — check tasks.md before starting work in that area.
+
+
+DO NOT ADD Claude as a co-author in commits.

@@ -1,12 +1,11 @@
 package me.calebjones.spacelaunchnow.wear.ui.settings
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.ListHeader
@@ -15,15 +14,22 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
+import me.calebjones.spacelaunchnow.wear.ui.theme.wearHorizontalPadding
 
 @Composable
 fun SettingsScreen() {
     val columnState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
+    val hPadding = wearHorizontalPadding()
     ScreenScaffold(scrollState = columnState) { contentPadding ->
         TransformingLazyColumn(
             state = columnState,
-            contentPadding = contentPadding,
+            contentPadding = PaddingValues(
+                top = contentPadding.calculateTopPadding(),
+                bottom = contentPadding.calculateBottomPadding(),
+                start = hPadding,
+                end = hPadding,
+            ),
             modifier = Modifier.fillMaxSize(),
         ) {
             item {
@@ -65,7 +71,6 @@ fun SettingsScreen() {
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
                         .transformedHeight(this, transformationSpec),
                 )
             }

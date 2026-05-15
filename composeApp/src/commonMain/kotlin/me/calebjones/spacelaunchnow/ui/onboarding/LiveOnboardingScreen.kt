@@ -53,7 +53,7 @@ private val spaceGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFF0A0E2A), Color(0xFF1A1040), Color(0xFF2A1060))
 )
 
-private const val PAGE_COUNT = 7
+private const val PAGE_COUNT = 5
 
 /**
  * The main live-composable onboarding carousel.
