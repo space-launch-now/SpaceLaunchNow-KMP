@@ -47,6 +47,16 @@ class PurchaseStateTest {
     }
 
     @Test
+    fun `LEGACY subscription has basic features`() {
+        val state = PurchaseState(
+            isSubscribed = true,
+            subscriptionType = SubscriptionType.LEGACY,
+            lastRefreshed = 1000L
+        )
+        assertEquals(PremiumFeature.getBasicFeatures(), state.features)
+    }
+
+    @Test
     fun `features is derived from subscriptionType on copy`() {
         val original = PurchaseState(isSubscribed = true, subscriptionType = SubscriptionType.PREMIUM)
         val downgraded = original.copy(subscriptionType = SubscriptionType.FREE)

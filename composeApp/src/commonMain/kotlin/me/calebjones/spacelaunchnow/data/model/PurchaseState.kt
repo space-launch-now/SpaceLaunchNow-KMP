@@ -1,5 +1,12 @@
 package me.calebjones.spacelaunchnow.data.model
 
+/**
+ * Comprehensive purchase state from the billing system.
+ * Platform-agnostic representation of subscription status from RevenueCat or other billing providers.
+ *
+ * This is different from SubscriptionState — PurchaseState represents raw billing data,
+ * while SubscriptionState represents cached/processed subscription info for UI.
+ */
 data class PurchaseState(
     val isSubscribed: Boolean = false,
     val subscriptionType: SubscriptionType = SubscriptionType.FREE,

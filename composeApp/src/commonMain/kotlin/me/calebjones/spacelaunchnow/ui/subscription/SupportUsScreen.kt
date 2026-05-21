@@ -968,8 +968,6 @@ private fun SuccessCard(message: String) {
 
 @Composable
 private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
-    val billingManager = koinInject<me.calebjones.spacelaunchnow.data.billing.BillingManager>()
-    val purchaseState by billingManager.purchaseState.collectAsState()
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
 
     val userId = "Not available"
@@ -978,6 +976,7 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
+            // TODO: restore copy behavior when userId is available from BillingManager directly
             .clickable(enabled = userId != "Not available") {
                 clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(userId))
             },
@@ -1006,6 +1005,7 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
                 )
             }
 
+            // TODO: restore copy behavior when userId is available from BillingManager directly
             if (userId != "Not available") {
                 Icon(
                     imageVector = Icons.Default.ContentCopy,
