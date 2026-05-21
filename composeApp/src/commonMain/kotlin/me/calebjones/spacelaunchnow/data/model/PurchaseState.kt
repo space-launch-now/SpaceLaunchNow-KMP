@@ -19,6 +19,9 @@ data class PurchaseState(
     val trialExpiresAt: Long? = null,
     val subscriptionExpiryMs: Long? = null // Unix ms when subscription expires; null for lifetime
 ) {
+    // False until RevenueCat has responded at least once this session.
+    val hasLoaded: Boolean get() = lastRefreshed != 0L
+
     /**
      * Convert to SubscriptionState for UI/caching
      */

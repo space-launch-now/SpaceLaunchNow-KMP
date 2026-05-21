@@ -81,7 +81,15 @@ class LocalSubscriptionStorage {
         store.updates
             .map { it ?: LocalSubscriptionData.DEFAULT }
             .catch { e ->
-                log.e(e) { "Error reading subscription data stream, recovering with defaults" }
+                // CRITICAL: wasEverPremium cannot be recovered from a corrupt file.
+                // needsSync=true (set in DEFAULT) ensures RC re-syncs on next session
+                // and restores the subscription state for currently-active subscribers.
+                // Formerly-premium-but-now-lapsed users will lose the wasEverPremium flag.
+                log.e(e) {
+                    "CRITICAL: Subscription data file corrupted — recovering with FREE defaults. " +
+                    "wasEverPremium will be lost if user is no longer actively subscribed. " +
+                    "File: $filePath"
+                }
                 tryDeleteCorruptedFile()
                 emit(LocalSubscriptionData.DEFAULT)
             }
@@ -94,12 +102,13 @@ class LocalSubscriptionStorage {
         return try {
             store.get() ?: LocalSubscriptionData.DEFAULT
         } catch (e: Exception) {
+            // CRITICAL: wasEverPremium cannot be recovered from a corrupt file.
+            // needsSync=true (set in DEFAULT) ensures RC re-syncs and restores
+            // active subscribers. Formerly-premium-but-lapsed users will lose the flag.
             log.e(e) {
-                buildString {
-                    appendLine("❌ Error reading subscription data file, recovering with defaults")
-                    appendLine("File path: $filePath")
-                    appendLine("Error: ${e.message}")
-                }
+                "CRITICAL: Subscription data file unreadable — recovering with FREE defaults. " +
+                "wasEverPremium will be lost if user is no longer actively subscribed. " +
+                "File: $filePath | Error: ${e.message}"
             }
             tryDeleteCorruptedFile()
             LocalSubscriptionData.DEFAULT
@@ -229,7 +238,10 @@ class LocalSubscriptionStorage {
      * @return true if clear was successful, false if it failed
      */
     suspend fun clear(): Boolean {
-        return update(LocalSubscriptionData.FREE)
+        val current = get()
+        // wasEverPremium is sticky — preserve it even when clearing so a
+        // logout + re-login doesn't permanently erase the user's premium history.
+        return update(LocalSubscriptionData.FREE.copy(wasEverPremium = current.wasEverPremium))
     }
 
     /**
@@ -269,7 +281,10 @@ class LocalSubscriptionStorage {
      * Use this to exit debug mode and return to real state
      */
     suspend fun clearDebugState() {
-        update(LocalSubscriptionData.FREE.copy(needsSync = true, isDebugMode = false)) // Force sync to get real state
+        val current = get()
+        // wasEverPremium is sticky — preserve it so exiting debug mode on a real premium
+        // account doesn't permanently erase the user's premium history before RC re-syncs.
+        update(LocalSubscriptionData.FREE.copy(needsSync = true, isDebugMode = false, wasEverPremium = current.wasEverPremium))
     }
 
     /**

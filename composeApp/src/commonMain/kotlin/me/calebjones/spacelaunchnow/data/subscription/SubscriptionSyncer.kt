@@ -40,6 +40,14 @@ class SubscriptionSyncer(
                     return@collect
                 }
 
+                // Guard: skip until RevenueCat has responded at least once this session.
+                // Writing the initial default PurchaseState (FREE) would overwrite persisted
+                // premium state — the exact symptom of "premium lost until restore purchases".
+                if (!purchaseState.hasLoaded) {
+                    log.d { "Skipping sync: RevenueCat has not responded yet (lastRefreshed=0)" }
+                    return@collect
+                }
+
                 if (currentTime - lastSyncTime > syncCooldownMs) {
                     log.d { "Purchase state updated, syncing - isSubscribed=${purchaseState.isSubscribed}, type=${purchaseState.subscriptionType}, products=${purchaseState.activeProductIds}" }
                     lastSyncTime = currentTime
