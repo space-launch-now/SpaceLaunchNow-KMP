@@ -9,6 +9,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
@@ -56,6 +57,22 @@ data class LocalSubscriptionData(
             subscriptionType = SubscriptionType.FREE,
             needsSync = false,
             isDebugMode = false
+        )
+
+        fun fromPurchaseState(
+            purchase: PurchaseState,
+            existing: LocalSubscriptionData
+        ): LocalSubscriptionData = existing.copy(
+            isSubscribed = purchase.isSubscribed,
+            subscriptionType = purchase.subscriptionType,
+            productIds = purchase.activeProductIds,
+            lastSynced = System.now().toEpochMilliseconds(),
+            needsSync = false,
+            isDebugMode = false,
+            subscriptionExpiryMs = purchase.subscriptionExpiryMs,
+            wasEverPremium = existing.wasEverPremium || purchase.isSubscribed,
+            isInTrialPeriod = purchase.isInTrialPeriod,
+            trialExpiresAt = purchase.trialExpiresAt
         )
     }
 }

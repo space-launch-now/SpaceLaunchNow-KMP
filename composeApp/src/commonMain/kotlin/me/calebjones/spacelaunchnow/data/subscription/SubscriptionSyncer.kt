@@ -53,19 +53,7 @@ class SubscriptionSyncer(
                     lastSyncTime = currentTime
 
                     // Update local storage with new purchase state
-                    val newData = LocalSubscriptionData(
-                        isSubscribed = purchaseState.isSubscribed,
-                        subscriptionType = purchaseState.subscriptionType,
-                        productIds = purchaseState.activeProductIds,
-                        lastSynced = currentTime,
-                        needsSync = false,
-                        isDebugMode = false, // Real sync, not debug mode
-                        subscriptionExpiryMs = purchaseState.subscriptionExpiryMs,
-                        // wasEverPremium is sticky — never revert to false once set
-                        wasEverPremium = currentData.wasEverPremium || purchaseState.isSubscribed,
-                        isInTrialPeriod = purchaseState.isInTrialPeriod,
-                        trialExpiresAt = purchaseState.trialExpiresAt
-                    )
+                    val newData = LocalSubscriptionData.fromPurchaseState(purchaseState, currentData)
                     
                     val success = localStorage.update(newData)
 
