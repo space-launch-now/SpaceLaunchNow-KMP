@@ -27,7 +27,9 @@ data class LocalSubscriptionData(
     val needsSync: Boolean = true,              // Whether we need to sync with RevenueCat
     val isDebugMode: Boolean = false,           // Whether we're in debug/simulation mode (blocks sync)
     val subscriptionExpiryMs: Long? = null,     // Unix ms when subscription expires; null for lifetime
-    val wasEverPremium: Boolean = false         // Sticky flag: true once user has ever been premium
+    val wasEverPremium: Boolean = false,        // Sticky flag: true once user has ever been premium
+    val isInTrialPeriod: Boolean = false,       // Whether user is currently in a free trial
+    val trialExpiresAt: Long? = null            // Unix ms when the trial expires; null if not in trial
 ) {
     /**
      * Check if user has a specific feature based on subscription type

@@ -84,7 +84,9 @@ class SimpleSubscriptionRepository(
                 features = local.availableFeatures,
                 lastVerified = local.lastSynced,
                 needsVerification = local.needsSync,
-                isLoading = false
+                isLoading = false,
+                isInTrialPeriod = local.isInTrialPeriod,
+                trialExpiresAt = local.trialExpiresAt
             )
         }.stateIn(
             scope = repositoryScope,
@@ -99,7 +101,9 @@ class SimpleSubscriptionRepository(
                     features = initialData.availableFeatures,
                     lastVerified = initialData.lastSynced,
                     needsVerification = initialData.needsSync,
-                    isLoading = false
+                    isLoading = false,
+                    isInTrialPeriod = initialData.isInTrialPeriod,
+                    trialExpiresAt = initialData.trialExpiresAt
                 )
             }
         )
