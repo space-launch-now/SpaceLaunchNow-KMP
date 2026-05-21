@@ -81,21 +81,23 @@ data class LocalSubscriptionData(
  * Local storage for subscription data using KStore
  * This provides immediate, synchronous access to subscription status
  */
-class LocalSubscriptionStorage {
+open class LocalSubscriptionStorage {
     private val log = logger()
 
-    private val filePath = Path("${AppDirectories.getAppDataDir()}/subscription_data.json")
+    private val filePath by lazy { Path("${AppDirectories.getAppDataDir()}/subscription_data.json") }
 
-    private val store: KStore<LocalSubscriptionData> = storeOf(
-        file = filePath,
-        default = LocalSubscriptionData.DEFAULT
-    )
+    private val store: KStore<LocalSubscriptionData> by lazy {
+        storeOf(
+            file = filePath,
+            default = LocalSubscriptionData.DEFAULT
+        )
+    }
 
     /**
      * Flow of current subscription data - UI observes this
      * Recovers gracefully from corrupted files by emitting default data
      */
-    val subscriptionData: Flow<LocalSubscriptionData> =
+    open val subscriptionData: Flow<LocalSubscriptionData> by lazy {
         store.updates
             .map { it ?: LocalSubscriptionData.DEFAULT }
             .catch { e ->
@@ -111,12 +113,13 @@ class LocalSubscriptionStorage {
                 tryDeleteCorruptedFile()
                 emit(LocalSubscriptionData.DEFAULT)
             }
+    }
 
     /**
      * Get current subscription data immediately (synchronous)
      * Returns default data if file is corrupted or unreadable
      */
-    suspend fun get(): LocalSubscriptionData {
+    open suspend fun get(): LocalSubscriptionData {
         return try {
             store.get() ?: LocalSubscriptionData.DEFAULT
         } catch (e: Exception) {
@@ -152,7 +155,7 @@ class LocalSubscriptionStorage {
      * Update subscription data with error handling and verification
      * @return true if update was successful, false if it failed
      */
-    suspend fun update(data: LocalSubscriptionData): Boolean {
+    open suspend fun update(data: LocalSubscriptionData): Boolean {
         return try {
             log.d { "Saving subscription data - type=${data.subscriptionType}, subscribed=${data.isSubscribed}, products=${data.productIds}" }
 
@@ -237,7 +240,7 @@ class LocalSubscriptionStorage {
      * Mark that we need to sync with RevenueCat
      * @return true if update was successful, false if it failed
      */
-    suspend fun markNeedsSync(): Boolean {
+    open suspend fun markNeedsSync(): Boolean {
         val current = get()
         return update(current.copy(needsSync = true))
     }

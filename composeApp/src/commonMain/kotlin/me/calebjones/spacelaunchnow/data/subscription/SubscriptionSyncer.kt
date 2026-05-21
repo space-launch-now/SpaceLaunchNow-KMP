@@ -11,7 +11,7 @@ import kotlin.time.Clock
  * Handles syncing subscription data between local storage and billing system
  * This runs in the background and updates local storage when purchase state changes
  */
-class SubscriptionSyncer(
+open class SubscriptionSyncer(
     private val localStorage: LocalSubscriptionStorage,
     private val billingManager: BillingManager
 ) {
@@ -25,7 +25,7 @@ class SubscriptionSyncer(
      * Start background syncing
      * Call this once during app initialization
      */
-    fun startSyncing() {
+    open fun startSyncing() {
         log.i { "Starting background sync" }
 
         // Listen for billing manager purchase state changes
@@ -103,7 +103,7 @@ class SubscriptionSyncer(
      * Manually trigger a sync with billing system
      * Call this when user restores purchases or after a purchase
      */
-    suspend fun syncNow(): Boolean {
+    open suspend fun syncNow(): Boolean {
         log.i { "Manual sync requested" }
         return billingManager.refreshPurchaseState()
     }
