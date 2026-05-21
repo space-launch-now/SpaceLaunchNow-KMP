@@ -17,31 +17,16 @@ private val log by lazy { SpaceLogger.getLogger("SubscriptionState") }
  */
 @Serializable
 data class SubscriptionState(
-    // Subscription status
     val isSubscribed: Boolean = false,
     val subscriptionType: SubscriptionType = SubscriptionType.FREE,
-
-    // Subscription details
-    val subscriptionId: String? = null,
     val productId: String? = null,
-    val expiresAt: Long? = null, // Epoch milliseconds
-    val purchasedAt: Long? = null, // Epoch milliseconds
-
-    // Verification state
-    val lastVerified: Long = 0L, // Epoch milliseconds
+    val expiresAt: Long? = null,
+    val lastVerified: Long = 0L,
     val needsVerification: Boolean = false,
-    val verificationError: String? = null,
-
-    // Features
     val features: Set<PremiumFeature> = emptySet(),
-
-    // Trial status
     val isInTrialPeriod: Boolean = false,
-    val trialExpiresAt: Long? = null, // Epoch milliseconds, null if not in trial
-
-    // UI state
-    val isLoading: Boolean = false,
-    val isCached: Boolean = false
+    val trialExpiresAt: Long? = null,
+    val isLoading: Boolean = false
 ) {
     
     /**
@@ -89,11 +74,10 @@ data class SubscriptionState(
         /**
          * Create an error state when verification fails
          */
-        fun error(message: String) = SubscriptionState(
+        fun error() = SubscriptionState(
             isSubscribed = false,
             subscriptionType = SubscriptionType.FREE,
             needsVerification = true,
-            verificationError = message,
             features = PremiumFeature.getFreeFeatures()
         )
     }
