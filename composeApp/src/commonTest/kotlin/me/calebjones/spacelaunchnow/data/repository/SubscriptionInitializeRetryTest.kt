@@ -101,4 +101,28 @@ class SubscriptionInitializeRetryTest {
 
         assertFalse(syncNowCalled, "syncNow must NOT be called when needsSync=false")
     }
+
+    @Test
+    fun `initialize completes silently when needsSync is true but syncNow fails`() = runTest {
+        var syncNowCalled = false
+        val mockBilling = MockBillingManager()
+        val fakeStorage = FakeLocalSubscriptionStorage(LocalSubscriptionData(needsSync = true))
+        val fakeSyncer = FakeSubscriptionSyncer(fakeStorage, mockBilling) {
+            syncNowCalled = true; false // syncNow fails
+        }
+        val dataStore = InMemoryDataStore()
+
+        val repo = SimpleSubscriptionRepository(
+            localStorage = fakeStorage,
+            syncer = fakeSyncer,
+            billingClient = BillingClient(mockBilling),
+            widgetPreferences = WidgetPreferences(dataStore),
+            temporaryPremiumAccess = TemporaryPremiumAccess(dataStore)
+        )
+
+        // Should complete without throwing
+        repo.initialize()
+
+        assertTrue(syncNowCalled, "syncNow must still be attempted when needsSync=true, even if it fails")
+    }
 }

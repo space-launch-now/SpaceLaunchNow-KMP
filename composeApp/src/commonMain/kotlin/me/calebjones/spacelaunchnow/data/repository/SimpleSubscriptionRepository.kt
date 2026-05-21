@@ -117,11 +117,16 @@ class SimpleSubscriptionRepository(
         log.d { "SimpleSubscriptionRepository: Initializing..." }
 
         billingClient.initialize()
+
+        // Read needsSync before startSyncing() to avoid a potential race where the
+        // background coroutine clears needsSync before we can check it.
+        val shouldRetrySync = localStorage.get().needsSync
+
         syncer.startSyncing()
 
         // If a previous sync failed (write error or corruption recovery), the needsSync flag
         // was set on disk. Retry immediately rather than waiting for the next RC state update.
-        if (localStorage.get().needsSync) {
+        if (shouldRetrySync) {
             log.i { "needsSync=true on cold start — triggering immediate sync" }
             syncer.syncNow()
         }

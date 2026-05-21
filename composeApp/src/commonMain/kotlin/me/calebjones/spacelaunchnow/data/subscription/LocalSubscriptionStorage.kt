@@ -84,9 +84,9 @@ data class LocalSubscriptionData(
 open class LocalSubscriptionStorage {
     private val log = logger()
 
-    private val filePath by lazy { Path("${AppDirectories.getAppDataDir()}/subscription_data.json") }
+    private val filePath by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { Path("${AppDirectories.getAppDataDir()}/subscription_data.json") }
 
-    private val store: KStore<LocalSubscriptionData> by lazy {
+    private val store: KStore<LocalSubscriptionData> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         storeOf(
             file = filePath,
             default = LocalSubscriptionData.DEFAULT
@@ -97,7 +97,7 @@ open class LocalSubscriptionStorage {
      * Flow of current subscription data - UI observes this
      * Recovers gracefully from corrupted files by emitting default data
      */
-    open val subscriptionData: Flow<LocalSubscriptionData> by lazy {
+    open val subscriptionData: Flow<LocalSubscriptionData> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         store.updates
             .map { it ?: LocalSubscriptionData.DEFAULT }
             .catch { e ->
