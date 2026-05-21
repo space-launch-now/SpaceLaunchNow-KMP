@@ -1476,8 +1476,7 @@ private fun BillingTabContent(
                                     log.d { "Setting debug subscription to FREE" }
                                     (subscriptionRepo as? SimpleSubscriptionRepository)?.setDebugSubscription(
                                         subscriptionType = SubscriptionType.FREE,
-                                        productId = "",
-                                        entitlements = emptySet()
+                                        productId = ""
                                     )
                                 } catch (e: Exception) {
                                     log.e(e) { "Failed to set FREE subscription: ${e.message}" }
@@ -1511,8 +1510,7 @@ private fun BillingTabContent(
                                     log.d { "Setting debug subscription to PREMIUM" }
                                     (subscriptionRepo as? SimpleSubscriptionRepository)?.setDebugSubscription(
                                         subscriptionType = SubscriptionType.PREMIUM,
-                                        productId = "debug_monthly",
-                                        entitlements = setOf("premium")
+                                        productId = "debug_monthly"
                                     )
                                 } catch (e: Exception) {
                                     log.e(e) { "Failed to set PREMIUM subscription: ${e.message}" }
@@ -1548,8 +1546,7 @@ private fun BillingTabContent(
                                     log.d { "Setting debug subscription to LIFETIME" }
                                     (subscriptionRepo as? SimpleSubscriptionRepository)?.setDebugSubscription(
                                         subscriptionType = SubscriptionType.LIFETIME,
-                                        productId = "debug_lifetime",
-                                        entitlements = setOf("premium", "lifetime")
+                                        productId = "debug_lifetime"
                                     )
                                 } catch (e: Exception) {
                                     log.e(e) { "Failed to set LIFETIME subscription: ${e.message}" }
@@ -1585,8 +1582,7 @@ private fun BillingTabContent(
                                     log.d { "Setting debug subscription to LEGACY" }
                                     (subscriptionRepo as? SimpleSubscriptionRepository)?.setDebugSubscription(
                                         subscriptionType = SubscriptionType.LEGACY,
-                                        productId = "2018_founder",
-                                        entitlements = setOf("legacy")
+                                        productId = "2018_founder"
                                     )
                                 } catch (e: Exception) {
                                     log.e(e) { "Failed to set LEGACY subscription: ${e.message}" }

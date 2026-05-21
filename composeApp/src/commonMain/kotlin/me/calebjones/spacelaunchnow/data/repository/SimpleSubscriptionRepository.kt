@@ -337,11 +337,10 @@ class SimpleSubscriptionRepository(
      */
     suspend fun setDebugSubscription(
         subscriptionType: SubscriptionType,
-        productId: String = "",
-        entitlements: Set<String> = emptySet()
+        productId: String = ""
     ) {
         log.d { "SimpleSubscriptionRepository: Setting debug subscription: $subscriptionType" }
-        localStorage.setDebugSubscription(subscriptionType, productId, entitlements)
+        localStorage.setDebugSubscription(subscriptionType, productId)
     }
 
     /**

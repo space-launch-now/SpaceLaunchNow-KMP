@@ -21,7 +21,6 @@ import kotlin.time.Clock.System
 data class LocalSubscriptionData(
     val isSubscribed: Boolean = false,
     val subscriptionType: SubscriptionType = SubscriptionType.FREE,
-    val entitlements: Set<String> = emptySet(), // RevenueCat entitlement IDs
     val productIds: Set<String> = emptySet(),   // Product IDs user owns
     val lastSynced: Long = 0L,                  // Last time we synced with RevenueCat
     val needsSync: Boolean = true,              // Whether we need to sync with RevenueCat
@@ -138,7 +137,7 @@ class LocalSubscriptionStorage {
      */
     suspend fun update(data: LocalSubscriptionData): Boolean {
         return try {
-            log.d { "Saving subscription data - Type: ${data.subscriptionType}, Subscribed: ${data.isSubscribed}, Entitlements: ${data.entitlements}" }
+            log.d { "Saving subscription data - type=${data.subscriptionType}, subscribed=${data.isSubscribed}, products=${data.productIds}" }
 
             store.set(data)
 
@@ -158,18 +157,11 @@ class LocalSubscriptionStorage {
                     "read_back_subscribed" to (readBack?.isSubscribed ?: false),
                     "types_match" to (data.subscriptionType == readBack?.subscriptionType),
                     "subscribed_match" to (data.isSubscribed == readBack?.isSubscribed),
-                    "entitlements_match" to (data.entitlements == readBack?.entitlements),
                     "product_ids_match" to (data.productIds == readBack?.productIds),
                     "read_back_null" to (readBack == null),
                     "store_file_path" to "${AppDirectories.getAppDataDir()}/subscription_data.json"
                 )
-                
-                // Add entitlement comparison if they differ
-                if (data.entitlements != readBack?.entitlements) {
-                    diagnostics["expected_entitlements"] = data.entitlements.joinToString(",")
-                    diagnostics["read_back_entitlements"] = (readBack?.entitlements?.joinToString(",") ?: "")
-                }
-                
+
                 // Add product ID comparison if they differ
                 if (data.productIds != readBack?.productIds) {
                     diagnostics["expected_product_ids"] = data.productIds.joinToString(",")
@@ -210,7 +202,6 @@ class LocalSubscriptionStorage {
     suspend fun updateSubscription(
         isSubscribed: Boolean,
         subscriptionType: SubscriptionType,
-        entitlements: Set<String> = emptySet(),
         productIds: Set<String> = emptySet()
     ): Boolean {
         val current = get()
@@ -218,7 +209,6 @@ class LocalSubscriptionStorage {
             current.copy(
                 isSubscribed = isSubscribed,
                 subscriptionType = subscriptionType,
-                entitlements = entitlements,
                 productIds = productIds,
                 lastSynced = System.now().toEpochMilliseconds(),
                 needsSync = false
@@ -261,15 +251,13 @@ class LocalSubscriptionStorage {
      */
     suspend fun setDebugSubscription(
         subscriptionType: SubscriptionType,
-        productId: String = "",
-        entitlements: Set<String> = emptySet()
+        productId: String = ""
     ) {
         val productIds = if (productId.isNotEmpty()) setOf(productId) else emptySet()
         update(
             LocalSubscriptionData(
                 isSubscribed = subscriptionType != SubscriptionType.FREE,
                 subscriptionType = subscriptionType,
-                entitlements = entitlements,
                 productIds = productIds,
                 lastSynced = System.now().toEpochMilliseconds(),
                 needsSync = false, // Don't sync when in debug mode

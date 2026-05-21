@@ -57,7 +57,6 @@ class SubscriptionSyncer(
                         isSubscribed = purchaseState.isSubscribed,
                         subscriptionType = purchaseState.subscriptionType,
                         productIds = purchaseState.activeProductIds,
-                        entitlements = purchaseState.activeEntitlements,
                         lastSynced = currentTime,
                         needsSync = false,
                         isDebugMode = false, // Real sync, not debug mode
