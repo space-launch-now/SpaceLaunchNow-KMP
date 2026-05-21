@@ -3,7 +3,6 @@ package me.calebjones.spacelaunchnow.data.billing
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
@@ -26,7 +25,6 @@ class DesktopBillingManager : BillingManager {
             subscriptionType = SubscriptionType.LIFETIME,
             activeEntitlements = setOf("pro"),
             activeProductIds = setOf("desktop_premium"),
-            features = PremiumFeature.getPremiumFeatures(),
             lastRefreshed = System.currentTimeMillis()
         )
     )

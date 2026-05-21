@@ -24,7 +24,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.BuildConfig
 import me.calebjones.spacelaunchnow.analytics.DatadogRUM
-import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
@@ -312,7 +311,6 @@ class AndroidBillingManager(
         }
 
         val subscriptionType = determineSubscriptionType(activeEntitlements, productIds)
-        val features = determineFeatures(subscriptionType)
 
         // Detect if any active entitlement is in a trial period
         val trialEntitlement = customerInfo.entitlements.active.values.firstOrNull {
@@ -321,16 +319,14 @@ class AndroidBillingManager(
         val isInTrial = trialEntitlement != null
         val trialExpires = trialEntitlement?.expirationDateMillis
 
-        log.i { "Purchase state updated - type: $subscriptionType, entitlements: $activeEntitlements, products: $productIds, features: ${features.size}, inTrial: $isInTrial" }
+        log.i { "Purchase state updated - type: $subscriptionType, entitlements: $activeEntitlements, products: $productIds, inTrial: $isInTrial" }
 
         _purchaseState.value = PurchaseState(
             isSubscribed = subscriptionType != SubscriptionType.FREE,
             subscriptionType = subscriptionType,
             activeEntitlements = activeEntitlements,
             activeProductIds = productIds,
-            features = features,
             lastRefreshed = System.currentTimeMillis(),
-            userId = customerInfo.originalAppUserId,
             isInTrialPeriod = isInTrial,
             trialExpiresAt = trialExpires
         )
@@ -454,12 +450,6 @@ class AndroidBillingManager(
         return result
     }
 
-    /**
-     * Determine available features based on subscription type
-     */
-    private fun determineFeatures(type: SubscriptionType): Set<PremiumFeature> {
-        return PremiumFeature.getFeaturesForType(type)
-    }
 }
 
 /**

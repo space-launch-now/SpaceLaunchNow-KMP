@@ -277,7 +277,7 @@ class DebugSettingsViewModel(
                             billingManager.getActiveEntitlements().joinToString()
                         }"
                     )
-                    appendLine("• User ID: ${purchaseState.userId ?: "Anonymous"}")
+                    appendLine("• User ID: Anonymous")
                 }
                 _detailedMessage.value = message
                 _statusMessage.value = "Billing Status Check"
@@ -360,7 +360,7 @@ class DebugSettingsViewModel(
                     appendLine("\n💳 Purchase Info:")
                     appendLine("  • Is Subscribed: ${purchaseState.isSubscribed}")
                     appendLine("  • Subscription Type: ${purchaseState.subscriptionType.name}")
-                    appendLine("  • User ID: ${purchaseState.userId ?: "Anonymous"}")
+                    appendLine("  • User ID: Anonymous")
                     appendLine("  • Last Refreshed: ${purchaseState.lastRefreshed}")
                 }
                 _detailedMessage.value = message

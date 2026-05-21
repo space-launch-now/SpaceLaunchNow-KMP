@@ -3,7 +3,6 @@ package me.calebjones.spacelaunchnow.data.billing
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
@@ -101,9 +100,7 @@ class MockBillingManager : BillingManager {
                 subscriptionType = SubscriptionType.PREMIUM,
                 activeEntitlements = setOf("premium"),
                 activeProductIds = setOf(productId),
-                features = PremiumFeature.getPremiumFeatures(),
-                lastRefreshed = System.currentTimeMillis(),
-                userId = lastAppUserId
+                lastRefreshed = System.currentTimeMillis()
             )
             Result.success(Unit)
         }
@@ -161,7 +158,6 @@ class MockBillingManager : BillingManager {
             subscriptionType = type,
             activeEntitlements = entitlements,
             activeProductIds = setOf(productId),
-            features = PremiumFeature.getFeaturesForType(type),
             lastRefreshed = System.currentTimeMillis()
         )
     }
@@ -172,7 +168,6 @@ class MockBillingManager : BillingManager {
             subscriptionType = SubscriptionType.FREE,
             activeEntitlements = emptySet(),
             activeProductIds = emptySet(),
-            features = emptySet(),
             lastRefreshed = System.currentTimeMillis()
         )
     }

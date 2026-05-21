@@ -972,7 +972,7 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
     val purchaseState by billingManager.purchaseState.collectAsState()
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
 
-    val userId = purchaseState.userId ?: "Not available"
+    val userId = "Not available"
 
     Card(
         modifier = Modifier
