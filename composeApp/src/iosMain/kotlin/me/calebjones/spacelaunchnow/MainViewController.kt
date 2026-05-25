@@ -128,6 +128,19 @@ fun MainViewController() = ComposeUIViewController {
                 log.e(e) { "iOS: ❌ Failed to initialize billing/subscription system" }
             }
         }
+
+        // Sync notification filter prefs to the App Group on every launch so the Notification
+        // Service Extension always filters against current settings — even when the app is
+        // killed and the bridge would otherwise never have been written. Then log the live
+        // state alongside the synced NSE prefs for confirmation.
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                me.calebjones.spacelaunchnow.data.notifications.IosNotificationBridge.refreshState()
+                me.calebjones.spacelaunchnow.data.notifications.IosNotificationBridge.logStartupState()
+            } catch (e: Exception) {
+                log.e(e) { "iOS: ❌ Failed to sync/log notification startup state" }
+            }
+        }
     }
 
     val navigationDestination by navigationDestinationState

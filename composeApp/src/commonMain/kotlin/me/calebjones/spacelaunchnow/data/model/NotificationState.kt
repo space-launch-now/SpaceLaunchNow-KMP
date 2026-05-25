@@ -6,7 +6,9 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 @Serializable
 data class NotificationState(
     val enableNotifications: Boolean = true,
-    val followAllLaunches: Boolean = true,
+    // Default OFF so new users receive only the curated default agencies/locations
+    // (see getDefaultAgencyIds/getDefaultLocationIds) in flexible (OR) matching mode.
+    val followAllLaunches: Boolean = false,
     val useStrictMatching: Boolean = false,
     val hideTbdLaunches: Boolean = false,
 
@@ -37,17 +39,29 @@ data class NotificationState(
         private val log by lazy { logger() }
         
         /**
-         * Get default agency IDs for all available agencies (using numeric IDs for v4 filtering)
+         * Get default agency IDs subscribed for new users (using numeric IDs for v4 filtering).
+         * Curated subset rather than all agencies: SpaceX, NASA, Blue Origin, Rocket Lab.
          */
         fun getDefaultAgencyIds(): Set<String> {
-            return NotificationAgency.getAll().map { it.id.toString() }.toSet()
+            return listOf(
+                NotificationAgency.SPACEX,
+                NotificationAgency.NASA,
+                NotificationAgency.BLUE_ORIGIN,
+                NotificationAgency.ROCKET_LAB
+            ).map { it.id.toString() }.toSet()
         }
 
         /**
-         * Get default location IDs for all available launch sites (using numeric IDs for v4 filtering)
+         * Get default location IDs subscribed for new users (using numeric IDs for v4 filtering).
+         * Curated subset rather than all locations: California, Florida, Texas, Misc. USA.
          */
         fun getDefaultLocationIds(): Set<String> {
-            return NotificationLocation.getAll().map { it.id.toString() }.toSet()
+            return listOf(
+                NotificationLocation.VANDENBERG, // California
+                NotificationLocation.FLORIDA,
+                NotificationLocation.TEXAS,
+                NotificationLocation.OTHER_USA   // Misc. USA
+            ).map { it.id.toString() }.toSet()
         }
 
         val DEFAULT = NotificationState()

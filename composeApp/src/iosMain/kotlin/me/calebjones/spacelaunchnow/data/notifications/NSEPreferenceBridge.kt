@@ -69,6 +69,48 @@ object NSEPreferenceBridge {
         }
     }
 
+    /**
+     * Read back and log the preferences currently stored in the shared App Group
+     * UserDefaults — i.e. exactly what the Notification Service Extension reads when
+     * the app is force-quit.
+     *
+     * Crucially logs whether each key is PRESENT or MISSING. When a key is missing the
+     * NSE falls back to its allow-all defaults (followAllLaunches=true, useStrictMatching=
+     * false), which silently shows every launch — including ones the user filtered out —
+     * whenever the app is killed. Use this to diagnose live-state vs NSE-state drift.
+     */
+    fun logStoredPrefs() {
+        val userDefaults = NSUserDefaults(suiteName = APP_GROUP)
+        if (userDefaults == null) {
+            log.e { "🟥 [NSE-PREFS] App group '$APP_GROUP' unavailable — NSE cannot read prefs" }
+            return
+        }
+
+        fun presence(key: String) =
+            if (userDefaults.objectForKey(key) != null) "present" else "MISSING → NSE uses default"
+
+        val followAllPresent = userDefaults.objectForKey(KEY_FOLLOW_ALL_LAUNCHES) != null
+        val strictPresent = userDefaults.objectForKey(KEY_USE_STRICT_MATCHING) != null
+        val agencies = userDefaults.arrayForKey(KEY_SUBSCRIBED_AGENCIES)
+        val locations = userDefaults.arrayForKey(KEY_SUBSCRIBED_LOCATIONS)
+
+        log.i { "========================================" }
+        log.i { "📦 [NSE-PREFS] App Group prefs the NSE reads when app is KILLED:" }
+        log.i { "   - app group: $APP_GROUP" }
+        log.i { "   - enableNotifications: ${userDefaults.boolForKey(KEY_ENABLE_NOTIFICATIONS)} (${presence(KEY_ENABLE_NOTIFICATIONS)})" }
+        log.i { "   - followAllLaunches: ${userDefaults.boolForKey(KEY_FOLLOW_ALL_LAUNCHES)} (${presence(KEY_FOLLOW_ALL_LAUNCHES)})" }
+        log.i { "   - useStrictMatching: ${userDefaults.boolForKey(KEY_USE_STRICT_MATCHING)} (${presence(KEY_USE_STRICT_MATCHING)})" }
+        log.i { "   - subscribedAgencies (expanded): ${agencies?.size ?: 0} ids ${agencies?.take(15)}" }
+        log.i { "   - subscribedLocations (expanded): ${locations?.size ?: 0} ids ${locations?.take(15)}" }
+        if (!followAllPresent || !strictPresent || agencies == null || locations == null) {
+            log.w {
+                "⚠️ [NSE-PREFS] One or more keys MISSING → NSE falls back to ALLOW-ALL " +
+                    "(followAllLaunches defaults to true). Killed-app pushes will bypass the user's filters!"
+            }
+        }
+        log.i { "========================================" }
+    }
+
     // Expand set of primary agency IDs to include all additionalIds.
     private fun expandAgencyIds(subscribedIds: Set<String>): List<String> {
         val allAgencies = NotificationAgency.getAll()

@@ -32,8 +32,11 @@ struct NSEFilterPreferences {
 
     /// Load current preferences from shared App Group UserDefaults.
     ///
-    /// Defaults to allow-all when keys are missing (fresh install or bridge not yet written by
-    /// the Kotlin side). This is the safe default — new users see all notifications.
+    /// Fail-closed when keys are missing: `followAllLaunches` defaults to `false` and the
+    /// subscription sets default to empty, so the filter suppresses everything rather than
+    /// flooding the user with launches it can't evaluate. The Kotlin bridge writes these keys
+    /// on every settings change and at app launch (NSEPreferenceBridge.syncToUserDefaults),
+    /// so a missing-key state should only occur before the app has ever run.
     static func load() -> NSEFilterPreferences {
         let defaults = UserDefaults(suiteName: appGroup)
 
@@ -42,10 +45,11 @@ struct NSEFilterPreferences {
             ? defaults!.bool(forKey: Keys.enableNotifications)
             : true
 
-        // followAllLaunches defaults to true — allow all when bridge hasn't written yet.
+        // followAllLaunches defaults to FALSE — fail closed when the bridge hasn't written yet,
+        // so unevaluable pushes are suppressed rather than shown.
         let followAllLaunches: Bool = defaults?.object(forKey: Keys.followAllLaunches) != nil
             ? defaults!.bool(forKey: Keys.followAllLaunches)
-            : true
+            : false
 
         let useStrictMatching: Bool = defaults?.object(forKey: Keys.useStrictMatching) != nil
             ? defaults!.bool(forKey: Keys.useStrictMatching)
