@@ -20,7 +20,6 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import kotlin.random.Random
 
-private const val ANONYMOUS_USER_LABEL = "Anonymous"
 
 expect fun resetNotificationPermissionAskedFlag()
 
@@ -279,7 +278,7 @@ class DebugSettingsViewModel(
                             billingManager.getActiveEntitlements().joinToString()
                         }"
                     )
-                    appendLine("• User ID: $ANONYMOUS_USER_LABEL")
+                    appendLine("• User ID: ${billingManager.getAppUserId() ?: "N/A"}")
                 }
                 _detailedMessage.value = message
                 _statusMessage.value = "Billing Status Check"
@@ -362,7 +361,7 @@ class DebugSettingsViewModel(
                     appendLine("\n💳 Purchase Info:")
                     appendLine("  • Is Subscribed: ${purchaseState.isSubscribed}")
                     appendLine("  • Subscription Type: ${purchaseState.subscriptionType.name}")
-                    appendLine("  • User ID: $ANONYMOUS_USER_LABEL")
+                    appendLine("  • User ID: ${billingManager.getAppUserId() ?: "N/A"}")
                     appendLine("  • Last Refreshed: ${purchaseState.lastRefreshed}")
                 }
                 _detailedMessage.value = message

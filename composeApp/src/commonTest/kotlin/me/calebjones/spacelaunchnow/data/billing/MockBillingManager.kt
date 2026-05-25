@@ -123,6 +123,8 @@ class MockBillingManager : BillingManager {
     override fun getActiveEntitlements(): Set<String> {
         return _purchaseState.value.activeEntitlements
     }
+
+    override fun getAppUserId(): String? = null
     
     override suspend fun syncPurchases() {
         syncPurchasesCalled = true

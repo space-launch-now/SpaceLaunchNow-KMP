@@ -52,6 +52,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -968,15 +969,15 @@ private fun SuccessCard(message: String) {
 
 @Composable
 private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
+    val billingManager = koinInject<me.calebjones.spacelaunchnow.data.billing.BillingManager>()
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
 
-    val userId = "Not available"
+    val userId = remember { billingManager.getAppUserId() } ?: "Not available"
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            // TODO: restore copy behavior when userId is available from BillingManager directly
             .clickable(enabled = userId != "Not available") {
                 clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(userId))
             },
@@ -1005,7 +1006,6 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
                 )
             }
 
-            // TODO: restore copy behavior when userId is available from BillingManager directly
             if (userId != "Not available") {
                 Icon(
                     imageVector = Icons.Default.ContentCopy,

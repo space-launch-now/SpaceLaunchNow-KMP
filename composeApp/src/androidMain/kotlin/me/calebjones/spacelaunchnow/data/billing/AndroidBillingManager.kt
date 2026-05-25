@@ -290,6 +290,9 @@ class AndroidBillingManager(
         return _purchaseState.value.activeEntitlements
     }
 
+    override fun getAppUserId(): String? =
+        if (_isInitialized.value) purchases.appUserID else null
+
     /**
      * Update purchase state from RevenueCat CustomerInfo
      */

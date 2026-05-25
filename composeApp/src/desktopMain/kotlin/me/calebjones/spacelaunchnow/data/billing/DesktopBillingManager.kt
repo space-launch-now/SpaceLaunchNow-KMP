@@ -68,4 +68,6 @@ class DesktopBillingManager : BillingManager {
     override fun getActiveEntitlements(): Set<String> {
         return setOf("pro")
     }
+
+    override fun getAppUserId(): String? = null
 }

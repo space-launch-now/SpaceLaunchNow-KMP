@@ -210,7 +210,10 @@ class IosBillingManager : BillingManager {
         log.d { "📋 Active entitlements: $entitlements" }
         return entitlements
     }
-    
+
+    override fun getAppUserId(): String? =
+        if (_isInitialized.value) purchases.appUserID else null
+
     private fun updatePurchaseState(customerInfo: com.revenuecat.purchases.kmp.models.CustomerInfo) {
         log.i { "📊 Updating purchase state..." }
         
