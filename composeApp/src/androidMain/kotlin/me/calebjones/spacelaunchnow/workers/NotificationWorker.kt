@@ -5,10 +5,13 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.calebjones.spacelaunchnow.data.model.CustomNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.EventNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.FilterResult
+import me.calebjones.spacelaunchnow.data.model.NewsNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.V5NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.V5NotificationPayload
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
@@ -48,13 +51,27 @@ class NotificationWorker(
             // Extract notification data from input
             val notificationDataMap = inputData.keyValueMap.mapValues { it.value.toString() }
 
-            // Check for event notification first (before V5/V4 launch detection)
+            // Detection order (shared with iOS): custom → event → news → V5 launch → V4.
+            // Custom is checked FIRST because a custom notification may carry an event_id-like
+            // target and must not be mis-detected as an event.
+            if (CustomNotificationPayload.isCustomPayload(notificationDataMap)) {
+                log.d { "🔔 NotificationWorker: Custom notification detected" }
+                return@withContext processCustomNotification(notificationDataMap)
+            }
+
+            // Check for event notification (before news/V5/V4 launch detection)
             val isEvent = EventNotificationPayload.isEventPayload(notificationDataMap)
             if (isEvent) {
                 log.d { "🔔 NotificationWorker: Event notification detected" }
                 return@withContext processEventNotification(notificationDataMap)
             }
-            
+
+            // Check for news notification (article_id present, no event_id/lsp_id)
+            if (NewsNotificationPayload.isNewsPayload(notificationDataMap)) {
+                log.d { "🔔 NotificationWorker: News notification detected" }
+                return@withContext processNewsNotification(notificationDataMap)
+            }
+
             // Detect V5 vs V4 payload
             val isV5 = V5NotificationPayload.isV5Payload(notificationDataMap)
             log.d { "🔔 NotificationWorker: Payload version detected: ${if (isV5) "V5" else "V4"}" }
@@ -90,6 +107,12 @@ class NotificationWorker(
             return Result.success()
         }
 
+        // Per-type toggle (bug fix): previously the EVENTS toggle was ignored here.
+        if (!state.isTopicEnabled(NotificationTopic.EVENTS)) {
+            log.i { "🔇 Event notification filtered - Events toggle disabled" }
+            return Result.success()
+        }
+
         val title = eventPayload.title
         val body = eventPayload.body
 
@@ -117,6 +140,116 @@ class NotificationWorker(
             locationId = "",
             displayedTitle = title,
             displayedBody = body,
+            rawData = dataMap,
+            wasFiltered = false
+        )
+
+        return Result.success()
+    }
+
+    /**
+     * Process news notification (featured news articles).
+     *
+     * News is a broadcast type: not agency/location filtered. Gated only by the global kill
+     * switch AND the FEATURED_NEWS per-type toggle. Tapping opens the article URL externally.
+     */
+    private suspend fun processNewsNotification(dataMap: Map<String, String>): Result {
+        val newsPayload = NewsNotificationPayload.fromMap(dataMap)
+        if (newsPayload == null) {
+            log.w { "⚠️ Failed to parse news notification data - keys: ${dataMap.keys.joinToString(",")}" }
+            return Result.failure()
+        }
+
+        log.d { "🔔 News Parsed: ${newsPayload.toDebugString()}" }
+
+        val state = notificationStateStorage.getState()
+        if (!state.enableNotifications) {
+            log.i { "🔇 News notification filtered - notifications disabled globally" }
+            return Result.success()
+        }
+        if (!state.isTopicEnabled(NotificationTopic.FEATURED_NEWS)) {
+            log.i { "🔇 News notification filtered - Featured News toggle disabled" }
+            return Result.success()
+        }
+
+        log.i { "✅ Displaying news notification - ${newsPayload.articleTitle}" }
+
+        NotificationDisplayHelper.showNewsNotification(
+            context = applicationContext,
+            payload = newsPayload,
+            title = newsPayload.title,
+            body = newsPayload.body
+        )
+
+        saveToHistory(
+            notificationType = newsPayload.notificationType,
+            launchId = newsPayload.articleId,
+            launchUuid = newsPayload.articleId,
+            launchName = newsPayload.articleTitle,
+            launchImage = newsPayload.articleImage.ifBlank { null },
+            launchNet = "",
+            launchLocation = newsPayload.newsSite,
+            webcast = "false",
+            webcastLive = null,
+            agencyId = "",
+            locationId = "",
+            displayedTitle = newsPayload.title,
+            displayedBody = newsPayload.body,
+            rawData = dataMap,
+            wasFiltered = false
+        )
+
+        return Result.success()
+    }
+
+    /**
+     * Process custom admin notification (broadcast announcements).
+     *
+     * Custom is a broadcast type: not agency/location filtered. Gated only by the global kill
+     * switch AND the ANNOUNCEMENTS per-type toggle. Tap routing is driven by target_type.
+     */
+    private suspend fun processCustomNotification(dataMap: Map<String, String>): Result {
+        val customPayload = CustomNotificationPayload.fromMap(dataMap)
+        if (customPayload == null) {
+            log.w { "⚠️ Failed to parse custom notification data - keys: ${dataMap.keys.joinToString(",")}" }
+            return Result.failure()
+        }
+
+        log.d { "🔔 Custom Parsed: ${customPayload.toDebugString()}" }
+
+        val state = notificationStateStorage.getState()
+        if (!state.enableNotifications) {
+            log.i { "🔇 Custom notification filtered - notifications disabled globally" }
+            return Result.success()
+        }
+        if (!state.isTopicEnabled(NotificationTopic.ANNOUNCEMENTS)) {
+            log.i { "🔇 Custom notification filtered - Announcements toggle disabled" }
+            return Result.success()
+        }
+
+        log.i { "✅ Displaying custom notification - ${customPayload.title}" }
+
+        NotificationDisplayHelper.showCustomNotification(
+            context = applicationContext,
+            payload = customPayload,
+            title = customPayload.title,
+            body = customPayload.body
+        )
+
+        saveToHistory(
+            notificationType = customPayload.notificationType,
+            launchId = customPayload.customId,
+            launchUuid = customPayload.targetId,
+            launchName = customPayload.title,
+            launchImage = customPayload.customImage.ifBlank { null },
+            launchNet = "",
+            launchLocation = "",
+            webcast = "false",
+            webcastLive = null,
+            agencyId = "",
+            locationId = "",
+            displayedTitle = customPayload.title,
+            displayedBody = customPayload.body,
             rawData = dataMap,
             wasFiltered = false
         )

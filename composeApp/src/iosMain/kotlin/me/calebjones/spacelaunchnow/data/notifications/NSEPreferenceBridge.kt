@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.data.notifications
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import platform.Foundation.NSMutableArray
 import platform.Foundation.NSUserDefaults
@@ -23,6 +24,9 @@ import platform.Foundation.NSUserDefaults
  *   nse_use_strict_matching   — Bool
  *   nse_subscribed_agencies   — [String], expanded IDs
  *   nse_subscribed_locations  — [String], expanded IDs
+ *   nse_topic_events          — Bool, EVENTS per-type toggle
+ *   nse_topic_featured_news   — Bool, FEATURED_NEWS per-type toggle
+ *   nse_topic_announcements   — Bool, ANNOUNCEMENTS per-type toggle
  */
 object NSEPreferenceBridge {
 
@@ -35,6 +39,9 @@ object NSEPreferenceBridge {
     private const val KEY_USE_STRICT_MATCHING = "nse_use_strict_matching"
     private const val KEY_SUBSCRIBED_AGENCIES = "nse_subscribed_agencies"
     private const val KEY_SUBSCRIBED_LOCATIONS = "nse_subscribed_locations"
+    private const val KEY_TOPIC_EVENTS = "nse_topic_events"
+    private const val KEY_TOPIC_FEATURED_NEWS = "nse_topic_featured_news"
+    private const val KEY_TOPIC_ANNOUNCEMENTS = "nse_topic_announcements"
 
     /**
      * Sync current [NotificationState] to shared UserDefaults for NSE access.
@@ -59,13 +66,28 @@ object NSEPreferenceBridge {
         val expandedLocations = expandLocationIds(state.subscribedLocations)
         userDefaults.setObject(expandedLocations.toNSArray(), forKey = KEY_SUBSCRIBED_LOCATIONS)
 
+        // Broadcast-type per-type toggles (event/news/custom). The NSE applies these in its
+        // non-V5 branch so killed-app pushes honor the user's per-type preferences.
+        userDefaults.setBool(state.isTopicEnabled(NotificationTopic.EVENTS), forKey = KEY_TOPIC_EVENTS)
+        userDefaults.setBool(
+            state.isTopicEnabled(NotificationTopic.FEATURED_NEWS),
+            forKey = KEY_TOPIC_FEATURED_NEWS
+        )
+        userDefaults.setBool(
+            state.isTopicEnabled(NotificationTopic.ANNOUNCEMENTS),
+            forKey = KEY_TOPIC_ANNOUNCEMENTS
+        )
+
         userDefaults.synchronize()
 
         log.d {
             "Synced NSE prefs: enabled=${state.enableNotifications}, " +
                 "followAll=${state.followAllLaunches}, " +
                 "agencies(expanded)=${expandedAgencies.size}, " +
-                "locations(expanded)=${expandedLocations.size}"
+                "locations(expanded)=${expandedLocations.size}, " +
+                "events=${state.isTopicEnabled(NotificationTopic.EVENTS)}, " +
+                "news=${state.isTopicEnabled(NotificationTopic.FEATURED_NEWS)}, " +
+                "announcements=${state.isTopicEnabled(NotificationTopic.ANNOUNCEMENTS)}"
         }
     }
 

@@ -19,6 +19,10 @@ struct NSEFilterPreferences {
     let subscribedAgencies: Set<String>
     /// Pre-expanded location IDs (primary + additionalIds) — use Set.contains() directly.
     let subscribedLocations: Set<String>
+    /// Broadcast-type per-type toggles (not agency/location filtered).
+    let topicEvents: Bool
+    let topicFeaturedNews: Bool
+    let topicAnnouncements: Bool
 
     private static let appGroup = "group.me.spacelaunchnow.spacelaunchnow"
 
@@ -28,6 +32,9 @@ struct NSEFilterPreferences {
         static let useStrictMatching = "nse_use_strict_matching"
         static let subscribedAgencies = "nse_subscribed_agencies"
         static let subscribedLocations = "nse_subscribed_locations"
+        static let topicEvents = "nse_topic_events"
+        static let topicFeaturedNews = "nse_topic_featured_news"
+        static let topicAnnouncements = "nse_topic_announcements"
     }
 
     /// Load current preferences from shared App Group UserDefaults.
@@ -58,12 +65,27 @@ struct NSEFilterPreferences {
         let agencies = Set(defaults?.stringArray(forKey: Keys.subscribedAgencies) ?? [])
         let locations = Set(defaults?.stringArray(forKey: Keys.subscribedLocations) ?? [])
 
+        // Per-type broadcast toggles default to TRUE when missing — these topics are
+        // defaultEnabled in Kotlin, so a missing key (app never ran) should not suppress them.
+        let topicEvents: Bool = defaults?.object(forKey: Keys.topicEvents) != nil
+            ? defaults!.bool(forKey: Keys.topicEvents)
+            : true
+        let topicFeaturedNews: Bool = defaults?.object(forKey: Keys.topicFeaturedNews) != nil
+            ? defaults!.bool(forKey: Keys.topicFeaturedNews)
+            : true
+        let topicAnnouncements: Bool = defaults?.object(forKey: Keys.topicAnnouncements) != nil
+            ? defaults!.bool(forKey: Keys.topicAnnouncements)
+            : true
+
         return NSEFilterPreferences(
             enableNotifications: enableNotifications,
             followAllLaunches: followAllLaunches,
             useStrictMatching: useStrictMatching,
             subscribedAgencies: agencies,
-            subscribedLocations: locations
+            subscribedLocations: locations,
+            topicEvents: topicEvents,
+            topicFeaturedNews: topicFeaturedNews,
+            topicAnnouncements: topicAnnouncements
         )
     }
 }

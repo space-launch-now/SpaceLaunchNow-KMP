@@ -77,6 +77,20 @@ object NotificationTopicConfig {
         const val EVENT_VIDEO_URL = "event_video_url"
         const val EVENT_WEBCAST_LIVE = "event_webcast_live"
         const val EVENT_FEATURE_IMAGE = "event_feature_image"
+
+        // News notification fields (V5 featured news)
+        const val ARTICLE_ID = "article_id"
+        const val ARTICLE_TITLE = "article_title"
+        const val ARTICLE_NEWS_SITE = "article_news_site"
+        const val ARTICLE_URL = "article_url"
+        const val ARTICLE_IMAGE = "article_image"
+
+        // Custom admin notification fields (V5 custom broadcasts)
+        const val CUSTOM_ID = "custom_id"
+        const val TARGET_TYPE = "target_type"
+        const val TARGET_ID = "target_id"
+        const val TARGET_URL = "target_url"
+        const val CUSTOM_IMAGE = "custom_image"
     }
 
     /**

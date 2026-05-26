@@ -225,6 +225,8 @@ data class NotificationTopic(
         val EVENTS = NotificationTopic("events", "Events", defaultEnabled = true)
         val FEATURED_NEWS =
             NotificationTopic("featured_news", "Featured News", defaultEnabled = true)
+        val ANNOUNCEMENTS =
+            NotificationTopic("announcements", "Announcements", defaultEnabled = true)
 
         // Version topics (automatically managed)
         val PROD_V3 = NotificationTopic("prod_v3", "Production v3", defaultEnabled = true)
@@ -341,7 +343,11 @@ data class NotificationTopic(
             return listOf(
                 NETSTAMP_CHANGED, WEBCAST_ONLY, TWENTY_FOUR_HOUR, ONE_HOUR,
                 TEN_MINUTES, ONE_MINUTE, IN_FLIGHT, SUCCESS, FAILURE,
-                PARTIAL_FAILURE, WEBCAST_LIVE
+                PARTIAL_FAILURE, WEBCAST_LIVE,
+                // Broadcast-type per-type toggles (event/news/custom). These are not
+                // agency/location filtered — each is gated only by the global kill switch
+                // AND its own toggle. Including them here persists them in topic_settings.
+                EVENTS, FEATURED_NEWS, ANNOUNCEMENTS
             )
         }
 

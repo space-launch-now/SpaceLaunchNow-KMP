@@ -12,6 +12,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import coil3.ImageLoader
@@ -24,7 +25,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.data.model.CustomNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.EventNotificationPayload
+import me.calebjones.spacelaunchnow.data.model.NewsNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.SpaceLaunchNotificationChannel
@@ -119,6 +122,10 @@ object NotificationDisplayHelper {
             notificationType.equals("news", ignoreCase = true) ||
                     notificationType.contains("featured_news", ignoreCase = true) ->
                 SpaceLaunchNotificationChannel.NEWS_UPDATES.id
+
+            // Custom admin announcements / broadcasts
+            notificationType.equals("custom", ignoreCase = true) ->
+                SpaceLaunchNotificationChannel.ANNOUNCEMENTS.id
 
             // Default fallback to standard launch reminders
             else -> SpaceLaunchNotificationChannel.LAUNCH_REMINDERS.id
@@ -900,5 +907,196 @@ object NotificationDisplayHelper {
             notification
         )
         log.i("📱 [Event Notification] ✅ Event notification shown successfully!")
+    }
+
+    /**
+     * Display a news notification using NewsNotificationPayload.
+     *
+     * Shown on the NEWS_UPDATES channel. Tapping opens the article URL externally in the
+     * browser (direct ACTION_VIEW PendingIntent — no MainActivity routing), matching the
+     * news-list behavior.
+     *
+     * @param context Android context
+     * @param payload News notification payload with all data
+     * @param title Server-provided title
+     * @param body Server-provided body text
+     */
+    fun showNewsNotification(
+        context: Context,
+        payload: NewsNotificationPayload,
+        title: String,
+        body: String
+    ) {
+        log.d("📱 [News Notification] Starting news notification display...")
+        log.d("📱 [News Notification] Title: $title")
+        log.d("📱 [News Notification] Article: ${payload.articleTitle} (URL: ${payload.articleUrl})")
+
+        // Ensure channels exist
+        createNotificationChannels(context)
+
+        val channelId = getChannelId(payload.notificationType)
+        log.d("📱 [News Notification] Channel: $channelId")
+
+        // Tap opens the article URL externally (matches news-list behavior).
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(payload.articleUrl)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            payload.articleId.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notificationBuilder = NotificationCompat.Builder(context, channelId)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setSmallIcon(R.drawable.ic_rocket_notification)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setOnlyAlertOnce(true)
+
+        log.d("📱 [News Notification] Image URL: ${payload.articleImage}")
+        val imageBitmap = loadImageFromUrlSync(context, payload.articleImage.ifBlank { null })
+
+        if (imageBitmap != null) {
+            log.d("📱 [News Notification] ✅ Setting large icon and BigPictureStyle")
+            notificationBuilder
+                .setLargeIcon(imageBitmap)
+                .setStyle(
+                    NotificationCompat.BigPictureStyle()
+                        .bigPicture(imageBitmap)
+                        .bigLargeIcon(null as Bitmap?)
+                )
+        } else {
+            log.d("📱 [News Notification] Using BigTextStyle (no image)")
+            notificationBuilder.setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(body)
+            )
+        }
+
+        val notification = notificationBuilder.build()
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val notificationTag = "news_${payload.articleId}"
+        log.i("📱 [News Notification] Showing notification - Tag: $notificationTag, ID: ${payload.articleId.hashCode()}")
+
+        notificationManager.notify(
+            notificationTag,
+            payload.articleId.hashCode(),
+            notification
+        )
+        log.i("📱 [News Notification] ✅ News notification shown successfully!")
+    }
+
+    /**
+     * Display a custom admin notification using CustomNotificationPayload.
+     *
+     * Shown on the ANNOUNCEMENTS channel. Tap routing is driven by [CustomNotificationPayload.targetType]:
+     *  - "launch" -> MainActivity launch deep-link (launch_id/launch_uuid = targetId, is_v5 = true)
+     *  - "event"  -> MainActivity event deep-link (event_id = targetId.toInt())
+     *  - "news"   -> ACTION_VIEW targetUrl (external browser)
+     *  - "none"   -> plain MainActivity launch (app home)
+     *
+     * @param context Android context
+     * @param payload Custom notification payload with all data
+     * @param title Server-provided title
+     * @param body Server-provided body text
+     */
+    fun showCustomNotification(
+        context: Context,
+        payload: CustomNotificationPayload,
+        title: String,
+        body: String
+    ) {
+        log.d("📱 [Custom Notification] Starting custom notification display...")
+        log.d("📱 [Custom Notification] Title: $title")
+        log.d("📱 [Custom Notification] Target: ${payload.targetType} (${payload.targetId})")
+
+        // Ensure channels exist
+        createNotificationChannels(context)
+
+        val channelId = getChannelId(payload.notificationType)
+        log.d("📱 [Custom Notification] Channel: $channelId")
+
+        // Build tap intent by target type, reusing existing deep-link mechanisms.
+        val tapIntent = when (payload.targetType.lowercase()) {
+            CustomNotificationPayload.TARGET_LAUNCH -> Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                putExtra("launch_id", payload.targetId)
+                putExtra("launch_uuid", payload.targetId)
+                putExtra("is_v5", true)
+                putExtra("notification_type", payload.notificationType)
+            }
+
+            CustomNotificationPayload.TARGET_EVENT -> Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                payload.targetId.toIntOrNull()?.let { putExtra("event_id", it) }
+                putExtra("notification_type", payload.notificationType)
+            }
+
+            CustomNotificationPayload.TARGET_NEWS -> Intent(Intent.ACTION_VIEW, Uri.parse(payload.targetUrl)).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            else -> Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                putExtra("notification_type", payload.notificationType)
+            }
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            payload.customId.hashCode(),
+            tapIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notificationBuilder = NotificationCompat.Builder(context, channelId)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setSmallIcon(R.drawable.ic_rocket_notification)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setOnlyAlertOnce(true)
+
+        log.d("📱 [Custom Notification] Image URL: ${payload.customImage}")
+        val imageBitmap = loadImageFromUrlSync(context, payload.customImage.ifBlank { null })
+
+        if (imageBitmap != null) {
+            log.d("📱 [Custom Notification] ✅ Setting large icon and BigPictureStyle")
+            notificationBuilder
+                .setLargeIcon(imageBitmap)
+                .setStyle(
+                    NotificationCompat.BigPictureStyle()
+                        .bigPicture(imageBitmap)
+                        .bigLargeIcon(null as Bitmap?)
+                )
+        } else {
+            log.d("📱 [Custom Notification] Using BigTextStyle (no image)")
+            notificationBuilder.setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(body)
+            )
+        }
+
+        val notification = notificationBuilder.build()
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val notificationTag = "custom_${payload.customId}"
+        log.i("📱 [Custom Notification] Showing notification - Tag: $notificationTag, ID: ${payload.customId.hashCode()}")
+
+        notificationManager.notify(
+            notificationTag,
+            payload.customId.hashCode(),
+            notification
+        )
+        log.i("📱 [Custom Notification] ✅ Custom notification shown successfully!")
     }
 }

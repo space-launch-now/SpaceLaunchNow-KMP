@@ -62,8 +62,15 @@ class NotificationService: UNNotificationServiceExtension {
             }
 
         } else {
-            // Non-V5 payload: apply kill switch only.
+            // Non-V5 payload (event / news / custom): apply kill switch first.
             guard preferences.enableNotifications else {
+                deliverEmptyNotification(contentHandler: contentHandler)
+                return
+            }
+
+            // Apply the relevant broadcast-type per-type toggle. These types are NOT
+            // agency/location filtered — each is gated only by its own toggle.
+            if !isBroadcastTypeAllowed(userInfo: userInfo, preferences: preferences) {
                 deliverEmptyNotification(contentHandler: contentHandler)
                 return
             }
@@ -80,6 +87,32 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     // MARK: - Private
+
+    /// Decide whether a non-V5 broadcast-type notification (event / news / custom) is allowed
+    /// by its per-type toggle. Mirrors the Kotlin worker's per-type filtering for killed-app
+    /// delivery. Detection order matches the worker: custom → event → news.
+    ///
+    /// - `notification_type == "custom"` → ANNOUNCEMENTS toggle
+    /// - `event_id` present              → EVENTS toggle
+    /// - `article_id` present            → FEATURED_NEWS toggle
+    /// - anything else                   → allowed (no per-type toggle governs it)
+    private func isBroadcastTypeAllowed(
+        userInfo: [AnyHashable: Any],
+        preferences: NSEFilterPreferences
+    ) -> Bool {
+        let notificationType = userInfo["notification_type"] as? String
+
+        if notificationType == "custom" {
+            return preferences.topicAnnouncements
+        }
+        if userInfo["event_id"] != nil {
+            return preferences.topicEvents
+        }
+        if userInfo["article_id"] != nil {
+            return preferences.topicFeaturedNews
+        }
+        return true
+    }
 
     /// Deliver empty content to suppress notification display.
     /// iOS will not show a notification that has no title, no body, and no sound.

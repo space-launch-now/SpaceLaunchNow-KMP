@@ -30,6 +30,9 @@ private val navigationDestinationState = mutableStateOf<String?>(null)
 // Shared state for notification-based navigation
 private val notificationLaunchIdState = mutableStateOf<String?>(null)
 
+// Shared state for notification-based event navigation (events + custom event targets)
+private val notificationEventIdState = mutableStateOf<Int?>(null)
+
 // Callback for theme changes — set from Swift to receive updates
 private var themeChangeListener: ((Int) -> Unit)? = null
 
@@ -59,6 +62,22 @@ fun setNotificationLaunchId(launchId: String?) {
         notificationLaunchIdState.value = launchId
     } catch (t: Throwable) {
         println("iOS: Setting notification launch ID: $launchId (failed: ${t.message})")
+    }
+}
+
+// Public function for iOS to trigger event-detail navigation from a notification tap.
+// Accepts a String to keep the Swift call site simple; non-numeric values are ignored.
+fun setNotificationEventId(eventId: String?) {
+    try {
+        val id = eventId?.toIntOrNull()
+        if (id == null) {
+            log.w { "iOS: Ignoring notification event ID (not an Int): $eventId" }
+            return
+        }
+        log.i { "iOS: Setting notification event ID: $id" }
+        notificationEventIdState.value = id
+    } catch (t: Throwable) {
+        println("iOS: Setting notification event ID: $eventId (failed: ${t.message})")
     }
 }
 
@@ -145,6 +164,7 @@ fun MainViewController() = ComposeUIViewController {
 
     val navigationDestination by navigationDestinationState
     val notificationLaunchId by notificationLaunchIdState
+    val notificationEventId by notificationEventIdState
 
     // Collect useUtc and theme preferences for reactive updates
     val appPreferences = getKoin().get<AppPreferences>()
@@ -172,6 +192,10 @@ fun MainViewController() = ComposeUIViewController {
         notificationLaunchId = notificationLaunchId,
         onNotificationLaunchIdConsumed = {
             notificationLaunchIdState.value = null
+        },
+        notificationEventId = notificationEventId,
+        onNotificationEventIdConsumed = {
+            notificationEventIdState.value = null
         }
     )
 }
