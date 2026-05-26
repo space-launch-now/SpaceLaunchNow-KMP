@@ -534,9 +534,23 @@ fun NotificationSettingsScreen(
 
                         NotificationTopicToggle(
                             title = "Event Notifications",
-                            description = "Space events and featured news updates",
+                            description = "Space events like spacewalks and dockings",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.EVENTS),
                             onCheckedChange = viewModel::updateEventNotifications
+                        )
+
+                        NotificationTopicToggle(
+                            title = "Featured News",
+                            description = "Curated space news articles",
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.FEATURED_NEWS),
+                            onCheckedChange = viewModel::updateFeaturedNews
+                        )
+
+                        NotificationTopicToggle(
+                            title = "Announcements",
+                            description = "Announcements and special messages from Space Launch Now",
+                            checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ANNOUNCEMENTS),
+                            onCheckedChange = viewModel::updateAnnouncements
                         )
                     }
                 }

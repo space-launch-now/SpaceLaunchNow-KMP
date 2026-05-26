@@ -5,10 +5,15 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
+import me.calebjones.spacelaunchnow.data.model.CustomNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.EventNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.FilterResult
+import me.calebjones.spacelaunchnow.data.model.NewsNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.V5NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.V5NotificationPayload
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
@@ -40,6 +45,29 @@ class NotificationWorker(
     private val log = logger()
     private val notificationStateStorage: NotificationStateStorage by inject()
     private val notificationHistoryStorage: NotificationHistoryStorage? by inject()
+    private val analyticsManager: AnalyticsManager by inject()
+
+    /**
+     * Fire a notification_received analytics event recording the delivery outcome.
+     *
+     * outcome = "displayed" | "suppressed". reason is set only when suppressed (kill switch /
+     * per-type toggle / launch filter miss). platform is always "android" here.
+     */
+    private fun trackReceipt(type: String, outcome: String, reason: String? = null) {
+        try {
+            analyticsManager.track(
+                AnalyticsEvent.NotificationReceived(
+                    type = type,
+                    outcome = outcome,
+                    reason = reason,
+                    platform = "android"
+                )
+            )
+        } catch (e: Exception) {
+            // Analytics must never break notification processing.
+            log.w(e) { "Failed to track notification receipt analytics: ${e.message}" }
+        }
+    }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
@@ -48,13 +76,27 @@ class NotificationWorker(
             // Extract notification data from input
             val notificationDataMap = inputData.keyValueMap.mapValues { it.value.toString() }
 
-            // Check for event notification first (before V5/V4 launch detection)
+            // Detection order (shared with iOS): custom → event → news → V5 launch → V4.
+            // Custom is checked FIRST because a custom notification may carry an event_id-like
+            // target and must not be mis-detected as an event.
+            if (CustomNotificationPayload.isCustomPayload(notificationDataMap)) {
+                log.d { "🔔 NotificationWorker: Custom notification detected" }
+                return@withContext processCustomNotification(notificationDataMap)
+            }
+
+            // Check for event notification (before news/V5/V4 launch detection)
             val isEvent = EventNotificationPayload.isEventPayload(notificationDataMap)
             if (isEvent) {
                 log.d { "🔔 NotificationWorker: Event notification detected" }
                 return@withContext processEventNotification(notificationDataMap)
             }
-            
+
+            // Check for news notification (article_id present, no event_id/lsp_id)
+            if (NewsNotificationPayload.isNewsPayload(notificationDataMap)) {
+                log.d { "🔔 NotificationWorker: News notification detected" }
+                return@withContext processNewsNotification(notificationDataMap)
+            }
+
             // Detect V5 vs V4 payload
             val isV5 = V5NotificationPayload.isV5Payload(notificationDataMap)
             log.d { "🔔 NotificationWorker: Payload version detected: ${if (isV5) "V5" else "V4"}" }
@@ -87,6 +129,14 @@ class NotificationWorker(
         val state = notificationStateStorage.getState()
         if (!state.enableNotifications) {
             log.i { "🔇 Event notification filtered - notifications disabled globally" }
+            trackReceipt(eventPayload.notificationType, "suppressed", "kill_switch")
+            return Result.success()
+        }
+
+        // Per-type toggle (bug fix): previously the EVENTS toggle was ignored here.
+        if (!state.isTopicEnabled(NotificationTopic.EVENTS)) {
+            log.i { "🔇 Event notification filtered - Events toggle disabled" }
+            trackReceipt(eventPayload.notificationType, "suppressed", "events_toggle_off")
             return Result.success()
         }
 
@@ -94,6 +144,7 @@ class NotificationWorker(
         val body = eventPayload.body
 
         log.i { "✅ Displaying event notification - ${eventPayload.eventName}" }
+        trackReceipt(eventPayload.notificationType, "displayed")
 
         NotificationDisplayHelper.showEventNotification(
             context = applicationContext,
@@ -125,6 +176,148 @@ class NotificationWorker(
     }
 
     /**
+     * Process news notification (featured news articles).
+     *
+     * News is a broadcast type: not agency/location filtered. Gated only by the global kill
+     * switch AND the FEATURED_NEWS per-type toggle. Tapping opens the article URL externally.
+     */
+    private suspend fun processNewsNotification(dataMap: Map<String, String>): Result {
+        val newsPayload = NewsNotificationPayload.fromMap(dataMap)
+        if (newsPayload == null) {
+            log.w { "⚠️ Failed to parse news notification data - keys: ${dataMap.keys.joinToString(",")}" }
+            return Result.failure()
+        }
+
+        log.d { "🔔 News Parsed: ${newsPayload.toDebugString()}" }
+
+        val state = notificationStateStorage.getState()
+        if (!state.enableNotifications) {
+            log.i { "🔇 News notification filtered - notifications disabled globally" }
+            trackReceipt(newsPayload.notificationType, "suppressed", "kill_switch")
+            saveNewsToHistory(newsPayload, dataMap, wasFiltered = true, filterReason = "Notifications disabled globally")
+            return Result.success()
+        }
+        if (!state.isTopicEnabled(NotificationTopic.FEATURED_NEWS)) {
+            log.i { "🔇 News notification filtered - Featured News toggle disabled" }
+            trackReceipt(newsPayload.notificationType, "suppressed", "featured_news_toggle_off")
+            saveNewsToHistory(newsPayload, dataMap, wasFiltered = true, filterReason = "Featured News toggle disabled")
+            return Result.success()
+        }
+
+        log.i { "✅ Displaying news notification - ${newsPayload.articleTitle}" }
+        trackReceipt(newsPayload.notificationType, "displayed")
+
+        NotificationDisplayHelper.showNewsNotification(
+            context = applicationContext,
+            payload = newsPayload,
+            title = newsPayload.title,
+            body = newsPayload.body
+        )
+
+        saveNewsToHistory(newsPayload, dataMap, wasFiltered = false)
+
+        return Result.success()
+    }
+
+    /** Persist a news notification to history (displayed or suppressed). */
+    private suspend fun saveNewsToHistory(
+        newsPayload: NewsNotificationPayload,
+        dataMap: Map<String, String>,
+        wasFiltered: Boolean,
+        filterReason: String? = null
+    ) {
+        saveToHistory(
+            notificationType = newsPayload.notificationType,
+            launchId = newsPayload.articleId,
+            launchUuid = newsPayload.articleId,
+            launchName = newsPayload.articleTitle,
+            launchImage = newsPayload.articleImage.ifBlank { null },
+            launchNet = "",
+            launchLocation = newsPayload.newsSite,
+            webcast = "false",
+            webcastLive = null,
+            agencyId = "",
+            locationId = "",
+            displayedTitle = newsPayload.title,
+            displayedBody = newsPayload.body,
+            rawData = dataMap,
+            wasFiltered = wasFiltered,
+            filterReason = filterReason
+        )
+    }
+
+    /**
+     * Process custom admin notification (broadcast announcements).
+     *
+     * Custom is a broadcast type: not agency/location filtered. Gated only by the global kill
+     * switch AND the ANNOUNCEMENTS per-type toggle. Tap routing is driven by target_type.
+     */
+    private suspend fun processCustomNotification(dataMap: Map<String, String>): Result {
+        val customPayload = CustomNotificationPayload.fromMap(dataMap)
+        if (customPayload == null) {
+            log.w { "⚠️ Failed to parse custom notification data - keys: ${dataMap.keys.joinToString(",")}" }
+            return Result.failure()
+        }
+
+        log.d { "🔔 Custom Parsed: ${customPayload.toDebugString()}" }
+
+        val state = notificationStateStorage.getState()
+        if (!state.enableNotifications) {
+            log.i { "🔇 Custom notification filtered - notifications disabled globally" }
+            trackReceipt(customPayload.notificationType, "suppressed", "kill_switch")
+            saveCustomToHistory(customPayload, dataMap, wasFiltered = true, filterReason = "Notifications disabled globally")
+            return Result.success()
+        }
+        if (!state.isTopicEnabled(NotificationTopic.ANNOUNCEMENTS)) {
+            log.i { "🔇 Custom notification filtered - Announcements toggle disabled" }
+            trackReceipt(customPayload.notificationType, "suppressed", "announcements_toggle_off")
+            saveCustomToHistory(customPayload, dataMap, wasFiltered = true, filterReason = "Announcements toggle disabled")
+            return Result.success()
+        }
+
+        log.i { "✅ Displaying custom notification - ${customPayload.title}" }
+        trackReceipt(customPayload.notificationType, "displayed")
+
+        NotificationDisplayHelper.showCustomNotification(
+            context = applicationContext,
+            payload = customPayload,
+            title = customPayload.title,
+            body = customPayload.body
+        )
+
+        saveCustomToHistory(customPayload, dataMap, wasFiltered = false)
+
+        return Result.success()
+    }
+
+    /** Persist a custom notification to history (displayed or suppressed). */
+    private suspend fun saveCustomToHistory(
+        customPayload: CustomNotificationPayload,
+        dataMap: Map<String, String>,
+        wasFiltered: Boolean,
+        filterReason: String? = null
+    ) {
+        saveToHistory(
+            notificationType = customPayload.notificationType,
+            launchId = customPayload.customId,
+            launchUuid = customPayload.targetId,
+            launchName = customPayload.title,
+            launchImage = customPayload.customImage.ifBlank { null },
+            launchNet = "",
+            launchLocation = "",
+            webcast = "false",
+            webcastLive = null,
+            agencyId = "",
+            locationId = "",
+            displayedTitle = customPayload.title,
+            displayedBody = customPayload.body,
+            rawData = dataMap,
+            wasFiltered = wasFiltered,
+            filterReason = filterReason
+        )
+    }
+
+    /**
      * Process V5 notification with extended filtering
      */
     private suspend fun processV5Notification(dataMap: Map<String, String>): Result {
@@ -149,6 +342,7 @@ class NotificationWorker(
         if (!filterResult.shouldShow()) {
             val reason = filterResult.getBlockReason() ?: "Unknown filter reason"
             log.i { "🔇 V5 Notification filtered out - ${v5Payload.launchName}: $reason" }
+            trackReceipt(v5Payload.notificationType, "suppressed", reason)
 
             // Save to history even if filtered (for debugging)
             saveToHistory(
@@ -175,6 +369,7 @@ class NotificationWorker(
 
         // Show notification using server-provided title and body
         log.i { "✅ V5 Displaying notification - ${v5Payload.launchName}" }
+        trackReceipt(v5Payload.notificationType, "displayed")
 
         NotificationDisplayHelper.showV5Notification(
             context = applicationContext,
@@ -233,6 +428,7 @@ class NotificationWorker(
 
         if (!shouldShow) {
             log.i { "🔇 V4 Notification filtered out - ${notificationData.launchName}" }
+            trackReceipt(notificationData.notificationType, "suppressed", "v4_user_settings")
 
             // Save to history even if filtered
             saveToHistory(
@@ -259,6 +455,7 @@ class NotificationWorker(
 
         // Show notification
         log.i { "✅ V4 Displaying notification - ${notificationData.launchName}" }
+        trackReceipt(notificationData.notificationType, "displayed")
 
         NotificationDisplayHelper.showNotification(
             context = applicationContext,

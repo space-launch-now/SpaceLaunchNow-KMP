@@ -6,7 +6,9 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 @Serializable
 data class NotificationState(
     val enableNotifications: Boolean = true,
-    val followAllLaunches: Boolean = true,
+    // Default OFF so new users receive only the curated default agencies/locations
+    // (see getDefaultAgencyIds/getDefaultLocationIds) in flexible (OR) matching mode.
+    val followAllLaunches: Boolean = false,
     val useStrictMatching: Boolean = false,
     val hideTbdLaunches: Boolean = false,
 
@@ -37,17 +39,29 @@ data class NotificationState(
         private val log by lazy { logger() }
         
         /**
-         * Get default agency IDs for all available agencies (using numeric IDs for v4 filtering)
+         * Get default agency IDs subscribed for new users (using numeric IDs for v4 filtering).
+         * Curated subset rather than all agencies: SpaceX, NASA, Blue Origin, Rocket Lab.
          */
         fun getDefaultAgencyIds(): Set<String> {
-            return NotificationAgency.getAll().map { it.id.toString() }.toSet()
+            return listOf(
+                NotificationAgency.SPACEX,
+                NotificationAgency.NASA,
+                NotificationAgency.BLUE_ORIGIN,
+                NotificationAgency.ROCKET_LAB
+            ).map { it.id.toString() }.toSet()
         }
 
         /**
-         * Get default location IDs for all available launch sites (using numeric IDs for v4 filtering)
+         * Get default location IDs subscribed for new users (using numeric IDs for v4 filtering).
+         * Curated subset rather than all locations: California, Florida, Texas, Misc. USA.
          */
         fun getDefaultLocationIds(): Set<String> {
-            return NotificationLocation.getAll().map { it.id.toString() }.toSet()
+            return listOf(
+                NotificationLocation.VANDENBERG, // California
+                NotificationLocation.FLORIDA,
+                NotificationLocation.TEXAS,
+                NotificationLocation.OTHER_USA   // Misc. USA
+            ).map { it.id.toString() }.toSet()
         }
 
         val DEFAULT = NotificationState()
@@ -211,6 +225,8 @@ data class NotificationTopic(
         val EVENTS = NotificationTopic("events", "Events", defaultEnabled = true)
         val FEATURED_NEWS =
             NotificationTopic("featured_news", "Featured News", defaultEnabled = true)
+        val ANNOUNCEMENTS =
+            NotificationTopic("announcements", "Announcements", defaultEnabled = true)
 
         // Version topics (automatically managed)
         val PROD_V3 = NotificationTopic("prod_v3", "Production v3", defaultEnabled = true)
@@ -327,7 +343,11 @@ data class NotificationTopic(
             return listOf(
                 NETSTAMP_CHANGED, WEBCAST_ONLY, TWENTY_FOUR_HOUR, ONE_HOUR,
                 TEN_MINUTES, ONE_MINUTE, IN_FLIGHT, SUCCESS, FAILURE,
-                PARTIAL_FAILURE, WEBCAST_LIVE
+                PARTIAL_FAILURE, WEBCAST_LIVE,
+                // Broadcast-type per-type toggles (event/news/custom). These are not
+                // agency/location filtered — each is gated only by the global kill switch
+                // AND its own toggle. Including them here persists them in topic_settings.
+                EVENTS, FEATURED_NEWS, ANNOUNCEMENTS
             )
         }
 

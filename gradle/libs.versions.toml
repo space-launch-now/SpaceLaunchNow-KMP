@@ -61,7 +61,7 @@ media3CommonKtx = "1.8.0"
 slf4j = "1.7.36"
 koin-logger-slf4j = "3.4.0"
 dotenv = "6.5.1"
-compose-shimmer = "1.3.3"
+compose-shimmer = "1.5.0-beta02"
 
 materialKolor = "3.0.1"
 cryptography-kotlin = "0.6.0"

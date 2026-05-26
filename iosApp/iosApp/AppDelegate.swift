@@ -7,6 +7,17 @@ import RevenueCat
 import UIKit
 import UserNotifications
 import WidgetKit
+import os
+
+/// os.Logger for app-side notification handling. Replaces print() on the notification
+/// receipt/display/suppress/tap paths so they are capturable in the field via Console.app /
+/// `log stream` / sysdiagnose (print() only reaches the Xcode debug console). Verbose
+/// diagnostic banners elsewhere remain print() by design.
+private enum NotifLog {
+    private static let subsystem = "me.spacelaunchnow.app"
+    static let receipt = Logger(subsystem: subsystem, category: "notification.receipt")
+    static let tap = Logger(subsystem: subsystem, category: "notification.tap")
+}
 
 // MARK: - WidgetKit Bridge Implementation
 class SwiftWidgetTimelineReloader: WidgetTimelineReloader {
@@ -122,6 +133,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             UNUserNotificationCenter.current().setBadgeCount(0)
         } else {
             UIApplication.shared.applicationIconBadgeNumber = 0
+        }
+
+        // Drain NSE delivery breadcrumbs (accumulated while killed/backgrounded) into Datadog.
+        // Clears itself after draining, so repeated foregrounds are cheap no-ops when empty.
+        // Off the main thread — it does UserDefaults I/O + logging.
+        DispatchQueue.global(qos: .utility).async {
+            IosNotificationBridge.shared.drainNseEventLog()
         }
     }
 
@@ -270,6 +288,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         if shouldShow {
             print("✅ Notification passed filters, displaying")
+            NotifLog.receipt.log("notification displayed (background path): type=\(notificationData.notificationType, privacy: .public)")
 
             // ALWAYS create and display local notification regardless of app state
             // This ensures notifications show when app is:
@@ -290,6 +309,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             completionHandler(.newData)
         } else {
             print("🔇 Notification filtered out by user preferences")
+            NotifLog.receipt.log("notification suppressed (background path): type=\(notificationData.notificationType, privacy: .public) reason=user_preferences")
 
             // Save to history (filtered and not shown)
             saveNotificationToHistory(
@@ -321,6 +341,45 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("Body: \(notification.request.content.body)")
         print("UserInfo: \(userInfo)")
 
+        // Broadcast types (custom / news / event) carry no launch fields, so
+        // parseNotificationData would return nil and suppress them. Recognize them here and
+        // present using the server-provided title/body the NSE already enriched. These types
+        // are NOT agency/location filtered — each is gated only by its own per-type toggle,
+        // which the NSE applies when the app is killed and the Kotlin worker applies on
+        // Android. In the foreground we mirror that: honor the per-type toggle (read from the
+        // same App Group prefs the Kotlin NSEPreferenceBridge writes) and present if enabled.
+        //
+        // NOTE: we read the App Group UserDefaults directly here rather than via
+        // NSEFilterPreferences, which lives in the NotificationServiceExtension target only and
+        // is not compiled into the app target. Keys match NSEFilterPreferences.Keys exactly.
+        if isCustomNotification(userInfo) || isNewsNotification(userInfo) || isEventNotification(userInfo) {
+            let kind: String
+            let toggleKey: String
+            if isCustomNotification(userInfo) {
+                kind = "custom"; toggleKey = "nse_topic_announcements"
+            } else if isEventNotification(userInfo) {
+                kind = "event"; toggleKey = "nse_topic_events"
+            } else {
+                kind = "news"; toggleKey = "nse_topic_featured_news"
+            }
+
+            guard broadcastForegroundAllowed(toggleKey: toggleKey) else {
+                print("🔇 \(kind) notification suppressed in foreground (kill switch or per-type toggle off)")
+                NotifLog.receipt.log("notification suppressed (foreground): type=\(kind, privacy: .public) reason=kill_switch_or_per_type_toggle")
+                completionHandler([])
+                return
+            }
+
+            print("✅ Recognized \(kind) notification — presenting")
+            NotifLog.receipt.log("notification displayed (foreground): type=\(kind, privacy: .public)")
+            if #available(iOS 14.0, *) {
+                completionHandler([.banner, .badge, .sound])
+            } else {
+                completionHandler([.alert, .badge, .sound])
+            }
+            return
+        }
+
         // Parse notification data for history
         if let notificationData = parseNotificationData(from: userInfo) {
             // Apply client-side filtering
@@ -328,6 +387,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
             if shouldShow {
                 print("✅ Notification passed filters, showing to user")
+                NotifLog.receipt.log("notification displayed (foreground): type=\(notificationData.notificationType, privacy: .public)")
 
                 // Note: History is saved in didReceiveRemoteNotification handler
                 // to avoid duplicates when app is in foreground
@@ -340,6 +400,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 }
             } else {
                 print("🔇 Notification filtered out by user preferences")
+                NotifLog.receipt.log("notification suppressed (foreground): type=\(notificationData.notificationType, privacy: .public) reason=user_preferences")
 
                 // Note: History is saved in didReceiveRemoteNotification handler
                 // to avoid duplicates when app is in foreground
@@ -348,6 +409,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         } else {
             print("⚠️ Failed to parse notification data for history")
+            NotifLog.receipt.log("notification parse failed (foreground) — not presented")
             completionHandler([])
         }
     }
@@ -359,6 +421,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) {
         let userInfo = response.notification.request.content.userInfo
         print("User tapped notification: \(userInfo)")
+        let tappedType = (userInfo["notification_type"] as? String) ?? "unknown"
+        NotifLog.tap.log("notification tapped: type=\(tappedType, privacy: .public)")
 
         handleNotificationTap(userInfo: userInfo)
 
@@ -725,6 +789,25 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Deep Linking
 
     private func handleNotificationTap(userInfo: [AnyHashable: Any]) {
+        // Custom admin notification: route by target_type.
+        if isCustomNotification(userInfo) {
+            handleCustomNotificationTap(userInfo: userInfo)
+            return
+        }
+
+        // News notification: open the article URL externally.
+        if isNewsNotification(userInfo) {
+            if let urlString = userInfo["article_url"] as? String, let url = URL(string: urlString) {
+                print("📰 Opening news article URL: \(urlString)")
+                DispatchQueue.main.async {
+                    UIApplication.shared.open(url)
+                }
+            } else {
+                print("⚠️ News notification tapped but no valid article_url")
+            }
+            return
+        }
+
         // Navigate to launch detail screen when notification is tapped
         guard let launchId = userInfo["launch_id"] as? String else {
             print("⚠️ No launch_id found in notification userInfo")
@@ -739,6 +822,85 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         DispatchQueue.main.async {
             MainViewControllerKt.setNotificationLaunchId(launchId: launchId)
         }
+    }
+
+    /// Route a tapped custom notification by its target_type.
+    ///  - "launch" → launch detail (target_id is the launch UUID)
+    ///  - "event"  → event navigation with target_id
+    ///  - "news"   → open target_url externally
+    ///  - "none"   → bring app to foreground, no navigation
+    private func handleCustomNotificationTap(userInfo: [AnyHashable: Any]) {
+        let targetType = (userInfo["target_type"] as? String) ?? "none"
+        let targetId = (userInfo["target_id"] as? String) ?? ""
+        let targetUrl = userInfo["target_url"] as? String
+
+        print("📢 Custom notification tapped — target_type=\(targetType), target_id=\(targetId)")
+
+        switch targetType.lowercased() {
+        case "launch":
+            guard !targetId.isEmpty else {
+                print("⚠️ Custom launch target missing target_id")
+                return
+            }
+            DispatchQueue.main.async {
+                MainViewControllerKt.setNotificationLaunchId(launchId: targetId)
+            }
+        case "event":
+            guard !targetId.isEmpty else {
+                print("⚠️ Custom event target missing target_id")
+                return
+            }
+            DispatchQueue.main.async {
+                MainViewControllerKt.setNotificationEventId(eventId: targetId)
+            }
+        case "news":
+            if let urlString = targetUrl, let url = URL(string: urlString) {
+                DispatchQueue.main.async {
+                    UIApplication.shared.open(url)
+                }
+            } else {
+                print("⚠️ Custom news target missing/invalid target_url")
+            }
+        default:
+            // "none" — just bring app to foreground; no navigation.
+            print("📢 Custom notification with no deep-link target — opening app home")
+        }
+    }
+
+    // MARK: - Broadcast-type Recognition
+
+    private func isCustomNotification(_ userInfo: [AnyHashable: Any]) -> Bool {
+        return (userInfo["notification_type"] as? String) == "custom"
+    }
+
+    private func isNewsNotification(_ userInfo: [AnyHashable: Any]) -> Bool {
+        // Custom is checked first elsewhere; news is marked by article_id.
+        return userInfo["article_id"] != nil
+    }
+
+    private func isEventNotification(_ userInfo: [AnyHashable: Any]) -> Bool {
+        // Custom is checked first elsewhere (a custom-with-event-target carries event-like
+        // fields but must read as custom). Plain events are marked by event_id.
+        return userInfo["event_id"] != nil
+    }
+
+    /// Whether a broadcast-type notification (event / news / custom) may present a foreground
+    /// banner: gated by the global kill switch AND its own per-type toggle. Reads the shared
+    /// App Group UserDefaults the Kotlin NSEPreferenceBridge writes (keys mirror
+    /// NSEFilterPreferences.Keys). Missing keys default to TRUE — these topics are
+    /// defaultEnabled in Kotlin, so a never-written key should not suppress them.
+    private func broadcastForegroundAllowed(toggleKey: String) -> Bool {
+        let defaults = UserDefaults(suiteName: "group.me.spacelaunchnow.spacelaunchnow")
+
+        let enabled = defaults?.object(forKey: "nse_enable_notifications") != nil
+            ? defaults!.bool(forKey: "nse_enable_notifications")
+            : true
+        guard enabled else { return false }
+
+        let toggleOn = defaults?.object(forKey: toggleKey) != nil
+            ? defaults!.bool(forKey: toggleKey)
+            : true
+        return toggleOn
     }
 
     // MARK: - Helper Methods

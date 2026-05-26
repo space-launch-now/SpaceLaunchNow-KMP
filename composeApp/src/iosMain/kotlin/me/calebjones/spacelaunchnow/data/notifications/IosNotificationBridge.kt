@@ -96,6 +96,50 @@ object IosNotificationBridge : KoinComponent {
     }
     
     /**
+     * Log the live notification state alongside the prefs the NSE will read from the
+     * shared App Group. Call at app startup to diagnose why killed-app notifications
+     * bypass the user's filters: if the live state and NSE prefs disagree (or the NSE
+     * keys are missing), the extension is filtering against stale/default values.
+     */
+    fun logStartupState() {
+        log.i { "========================================" }
+        log.i { "🚀 [STARTUP] Notification state at app launch" }
+        runBlocking {
+            try {
+                val state = notificationStateStorage.getState()
+                log.i { "🧭 [STARTUP] Live Kotlin state (used while app is ALIVE):" }
+                log.i { "   - enableNotifications: ${state.enableNotifications}" }
+                log.i { "   - followAllLaunches: ${state.followAllLaunches}" }
+                log.i { "   - useStrictMatching: ${state.useStrictMatching}" }
+                log.i { "   - subscribedAgencies: ${state.subscribedAgencies.size} ${state.subscribedAgencies.take(15)}" }
+                log.i { "   - subscribedLocations: ${state.subscribedLocations.size} ${state.subscribedLocations.take(15)}" }
+            } catch (e: Exception) {
+                log.e { "Failed to read live notification state at startup: ${e.message}" }
+            }
+        }
+        // Dump what the NSE actually reads when the app is killed — this is the value
+        // that decides whether filtered-out launches (e.g. China) slip through.
+        NSEPreferenceBridge.logStoredPrefs()
+        // Drain any NSE delivery breadcrumbs accumulated while the app was killed/backgrounded
+        // into Datadog (see NSEPreferenceBridge.drainNseEventLog).
+        NSEPreferenceBridge.drainNseEventLog()
+        log.i { "========================================" }
+    }
+
+    /**
+     * Drain the NSE breadcrumb buffer into Datadog. Safe to call on every app foreground
+     * (applicationDidBecomeActive) as well as at startup — it clears the buffer after draining,
+     * so repeat calls are cheap no-ops when empty. Exposed for Swift (AppDelegate) to call.
+     */
+    fun drainNseEventLog() {
+        try {
+            NSEPreferenceBridge.drainNseEventLog()
+        } catch (e: Exception) {
+            log.e { "Failed to drain NSE event log: ${e.message}" }
+        }
+    }
+
+    /**
      * Get the current notification state, using cache if available.
      * This is called synchronously from the notification handler, so we use
      * a cached value when possible and refresh it asynchronously.

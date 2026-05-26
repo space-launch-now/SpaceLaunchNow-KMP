@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
-import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import com.revenuecat.purchases.kmp.models.DiscountPaymentMode
 import com.revenuecat.purchases.kmp.models.PeriodType
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
@@ -211,7 +210,10 @@ class IosBillingManager : BillingManager {
         log.d { "📋 Active entitlements: $entitlements" }
         return entitlements
     }
-    
+
+    override fun getAppUserId(): String? =
+        if (_isInitialized.value) purchases.appUserID else null
+
     private fun updatePurchaseState(customerInfo: com.revenuecat.purchases.kmp.models.CustomerInfo) {
         log.i { "📊 Updating purchase state..." }
         
@@ -227,7 +229,6 @@ class IosBillingManager : BillingManager {
         }
         
         val subscriptionType = determineSubscriptionType(activeEntitlements, productIds)
-        val features = determineFeatures(subscriptionType)
 
         // Detect if any active entitlement is in a trial period
         val trialEntitlement = customerInfo.entitlements.active.values.firstOrNull {
@@ -242,16 +243,14 @@ class IosBillingManager : BillingManager {
             .mapNotNull { it.expirationDateMillis }
             .maxOrNull()
 
-        log.d { "📊 Purchase state: Type=$subscriptionType, Entitlements=$activeEntitlements, Products=$productIds, Features=${features.size}, inTrial=$isInTrial, expiry=$subscriptionExpiryMs" }
-        
+        log.d { "📊 Purchase state: Type=$subscriptionType, Entitlements=$activeEntitlements, Products=$productIds, inTrial=$isInTrial, expiry=$subscriptionExpiryMs" }
+
         _purchaseState.value = PurchaseState(
             isSubscribed = subscriptionType != SubscriptionType.FREE,
             subscriptionType = subscriptionType,
             activeEntitlements = activeEntitlements,
             activeProductIds = productIds,
-            features = features,
             lastRefreshed = kotlin.time.Clock.System.now().toEpochMilliseconds(),
-            userId = customerInfo.originalAppUserId,
             isInTrialPeriod = isInTrial,
             trialExpiresAt = trialExpires,
             subscriptionExpiryMs = subscriptionExpiryMs
@@ -288,7 +287,4 @@ class IosBillingManager : BillingManager {
         }
     }
     
-    private fun determineFeatures(type: SubscriptionType): Set<PremiumFeature> {
-        return PremiumFeature.getFeaturesForType(type)
-    }
 }

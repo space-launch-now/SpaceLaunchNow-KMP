@@ -4,6 +4,7 @@ import platform.Foundation.NSBundle
 import platform.Foundation.NSLocale
 import platform.Foundation.countryCode
 import platform.Foundation.currentLocale
+import platform.Foundation.localeIdentifier
 import platform.UIKit.UIDevice
 import platform.UIKit.UIUserInterfaceIdiomPad
 

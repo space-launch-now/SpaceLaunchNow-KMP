@@ -251,6 +251,8 @@ class SettingsViewModel(
 
     // Convenience methods for backward compatibility with UI
     fun updateEventNotifications(enabled: Boolean) = updateTopic(NotificationTopic.EVENTS, enabled)
+    fun updateFeaturedNews(enabled: Boolean) = updateTopic(NotificationTopic.FEATURED_NEWS, enabled)
+    fun updateAnnouncements(enabled: Boolean) = updateTopic(NotificationTopic.ANNOUNCEMENTS, enabled)
     fun updateNetstampChanged(enabled: Boolean) =
         updateTopic(NotificationTopic.NETSTAMP_CHANGED, enabled)
 

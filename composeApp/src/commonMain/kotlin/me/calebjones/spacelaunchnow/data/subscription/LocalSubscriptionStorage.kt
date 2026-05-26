@@ -9,6 +9,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
@@ -21,13 +22,14 @@ import kotlin.time.Clock.System
 data class LocalSubscriptionData(
     val isSubscribed: Boolean = false,
     val subscriptionType: SubscriptionType = SubscriptionType.FREE,
-    val entitlements: Set<String> = emptySet(), // RevenueCat entitlement IDs
     val productIds: Set<String> = emptySet(),   // Product IDs user owns
     val lastSynced: Long = 0L,                  // Last time we synced with RevenueCat
     val needsSync: Boolean = true,              // Whether we need to sync with RevenueCat
     val isDebugMode: Boolean = false,           // Whether we're in debug/simulation mode (blocks sync)
     val subscriptionExpiryMs: Long? = null,     // Unix ms when subscription expires; null for lifetime
-    val wasEverPremium: Boolean = false         // Sticky flag: true once user has ever been premium
+    val wasEverPremium: Boolean = false,        // Sticky flag: true once user has ever been premium
+    val isInTrialPeriod: Boolean = false,       // Whether user is currently in a free trial
+    val trialExpiresAt: Long? = null            // Unix ms when the trial expires; null if not in trial
 ) {
     /**
      * Check if user has a specific feature based on subscription type
@@ -56,6 +58,22 @@ data class LocalSubscriptionData(
             needsSync = false,
             isDebugMode = false
         )
+
+        fun fromPurchaseState(
+            purchase: PurchaseState,
+            existing: LocalSubscriptionData
+        ): LocalSubscriptionData = existing.copy(
+            isSubscribed = purchase.isSubscribed,
+            subscriptionType = purchase.subscriptionType,
+            productIds = purchase.activeProductIds,
+            lastSynced = System.now().toEpochMilliseconds(),
+            needsSync = false,
+            isDebugMode = false,
+            subscriptionExpiryMs = purchase.subscriptionExpiryMs,
+            wasEverPremium = existing.wasEverPremium || purchase.isSubscribed,
+            isInTrialPeriod = purchase.isInTrialPeriod,
+            trialExpiresAt = purchase.trialExpiresAt
+        )
     }
 }
 
@@ -63,43 +81,55 @@ data class LocalSubscriptionData(
  * Local storage for subscription data using KStore
  * This provides immediate, synchronous access to subscription status
  */
-class LocalSubscriptionStorage {
+open class LocalSubscriptionStorage {
     private val log = logger()
 
-    private val filePath = Path("${AppDirectories.getAppDataDir()}/subscription_data.json")
+    private val filePath by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { Path("${AppDirectories.getAppDataDir()}/subscription_data.json") }
 
-    private val store: KStore<LocalSubscriptionData> = storeOf(
-        file = filePath,
-        default = LocalSubscriptionData.DEFAULT
-    )
+    private val store: KStore<LocalSubscriptionData> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        storeOf(
+            file = filePath,
+            default = LocalSubscriptionData.DEFAULT
+        )
+    }
 
     /**
      * Flow of current subscription data - UI observes this
      * Recovers gracefully from corrupted files by emitting default data
      */
-    val subscriptionData: Flow<LocalSubscriptionData> =
+    open val subscriptionData: Flow<LocalSubscriptionData> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         store.updates
             .map { it ?: LocalSubscriptionData.DEFAULT }
             .catch { e ->
-                log.e(e) { "Error reading subscription data stream, recovering with defaults" }
+                // CRITICAL: wasEverPremium cannot be recovered from a corrupt file.
+                // needsSync=true (set in DEFAULT) ensures RC re-syncs on next session
+                // and restores the subscription state for currently-active subscribers.
+                // Formerly-premium-but-now-lapsed users will lose the wasEverPremium flag.
+                log.e(e) {
+                    "CRITICAL: Subscription data file corrupted — recovering with FREE defaults. " +
+                    "wasEverPremium will be lost if user is no longer actively subscribed. " +
+                    "File: $filePath"
+                }
                 tryDeleteCorruptedFile()
                 emit(LocalSubscriptionData.DEFAULT)
             }
+    }
 
     /**
      * Get current subscription data immediately (synchronous)
      * Returns default data if file is corrupted or unreadable
      */
-    suspend fun get(): LocalSubscriptionData {
+    open suspend fun get(): LocalSubscriptionData {
         return try {
             store.get() ?: LocalSubscriptionData.DEFAULT
         } catch (e: Exception) {
+            // CRITICAL: wasEverPremium cannot be recovered from a corrupt file.
+            // needsSync=true (set in DEFAULT) ensures RC re-syncs and restores
+            // active subscribers. Formerly-premium-but-lapsed users will lose the flag.
             log.e(e) {
-                buildString {
-                    appendLine("❌ Error reading subscription data file, recovering with defaults")
-                    appendLine("File path: $filePath")
-                    appendLine("Error: ${e.message}")
-                }
+                "CRITICAL: Subscription data file unreadable — recovering with FREE defaults. " +
+                "wasEverPremium will be lost if user is no longer actively subscribed. " +
+                "File: $filePath | Error: ${e.message}"
             }
             tryDeleteCorruptedFile()
             LocalSubscriptionData.DEFAULT
@@ -125,9 +155,9 @@ class LocalSubscriptionStorage {
      * Update subscription data with error handling and verification
      * @return true if update was successful, false if it failed
      */
-    suspend fun update(data: LocalSubscriptionData): Boolean {
+    open suspend fun update(data: LocalSubscriptionData): Boolean {
         return try {
-            log.d { "Saving subscription data - Type: ${data.subscriptionType}, Subscribed: ${data.isSubscribed}, Entitlements: ${data.entitlements}" }
+            log.d { "Saving subscription data - type=${data.subscriptionType}, subscribed=${data.isSubscribed}, products=${data.productIds}" }
 
             store.set(data)
 
@@ -147,18 +177,11 @@ class LocalSubscriptionStorage {
                     "read_back_subscribed" to (readBack?.isSubscribed ?: false),
                     "types_match" to (data.subscriptionType == readBack?.subscriptionType),
                     "subscribed_match" to (data.isSubscribed == readBack?.isSubscribed),
-                    "entitlements_match" to (data.entitlements == readBack?.entitlements),
                     "product_ids_match" to (data.productIds == readBack?.productIds),
                     "read_back_null" to (readBack == null),
                     "store_file_path" to "${AppDirectories.getAppDataDir()}/subscription_data.json"
                 )
-                
-                // Add entitlement comparison if they differ
-                if (data.entitlements != readBack?.entitlements) {
-                    diagnostics["expected_entitlements"] = data.entitlements.joinToString(",")
-                    diagnostics["read_back_entitlements"] = (readBack?.entitlements?.joinToString(",") ?: "")
-                }
-                
+
                 // Add product ID comparison if they differ
                 if (data.productIds != readBack?.productIds) {
                     diagnostics["expected_product_ids"] = data.productIds.joinToString(",")
@@ -199,7 +222,6 @@ class LocalSubscriptionStorage {
     suspend fun updateSubscription(
         isSubscribed: Boolean,
         subscriptionType: SubscriptionType,
-        entitlements: Set<String> = emptySet(),
         productIds: Set<String> = emptySet()
     ): Boolean {
         val current = get()
@@ -207,7 +229,6 @@ class LocalSubscriptionStorage {
             current.copy(
                 isSubscribed = isSubscribed,
                 subscriptionType = subscriptionType,
-                entitlements = entitlements,
                 productIds = productIds,
                 lastSynced = System.now().toEpochMilliseconds(),
                 needsSync = false
@@ -219,7 +240,7 @@ class LocalSubscriptionStorage {
      * Mark that we need to sync with RevenueCat
      * @return true if update was successful, false if it failed
      */
-    suspend fun markNeedsSync(): Boolean {
+    open suspend fun markNeedsSync(): Boolean {
         val current = get()
         return update(current.copy(needsSync = true))
     }
@@ -229,7 +250,10 @@ class LocalSubscriptionStorage {
      * @return true if clear was successful, false if it failed
      */
     suspend fun clear(): Boolean {
-        return update(LocalSubscriptionData.FREE)
+        val current = get()
+        // wasEverPremium is sticky — preserve it even when clearing so a
+        // logout + re-login doesn't permanently erase the user's premium history.
+        return update(LocalSubscriptionData.FREE.copy(wasEverPremium = current.wasEverPremium))
     }
 
     /**
@@ -247,15 +271,13 @@ class LocalSubscriptionStorage {
      */
     suspend fun setDebugSubscription(
         subscriptionType: SubscriptionType,
-        productId: String = "",
-        entitlements: Set<String> = emptySet()
+        productId: String = ""
     ) {
         val productIds = if (productId.isNotEmpty()) setOf(productId) else emptySet()
         update(
             LocalSubscriptionData(
                 isSubscribed = subscriptionType != SubscriptionType.FREE,
                 subscriptionType = subscriptionType,
-                entitlements = entitlements,
                 productIds = productIds,
                 lastSynced = System.now().toEpochMilliseconds(),
                 needsSync = false, // Don't sync when in debug mode
@@ -269,7 +291,10 @@ class LocalSubscriptionStorage {
      * Use this to exit debug mode and return to real state
      */
     suspend fun clearDebugState() {
-        update(LocalSubscriptionData.FREE.copy(needsSync = true, isDebugMode = false)) // Force sync to get real state
+        val current = get()
+        // wasEverPremium is sticky — preserve it so exiting debug mode on a real premium
+        // account doesn't permanently erase the user's premium history before RC re-syncs.
+        update(LocalSubscriptionData.FREE.copy(needsSync = true, isDebugMode = false, wasEverPremium = current.wasEverPremium))
     }
 
     /**

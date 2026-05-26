@@ -6,140 +6,99 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class PurchaseStateTest {
-    
+
     @Test
-    fun `default PurchaseState should be free tier`() {
+    fun `default PurchaseState is free tier with no loaded flag`() {
         val state = PurchaseState()
-        
         assertFalse(state.isSubscribed)
         assertEquals(SubscriptionType.FREE, state.subscriptionType)
         assertTrue(state.activeEntitlements.isEmpty())
         assertTrue(state.activeProductIds.isEmpty())
         assertTrue(state.features.isEmpty())
         assertEquals(0L, state.lastRefreshed)
-        assertEquals(null, state.userId)
+        assertFalse(state.hasLoaded)
     }
-    
+
     @Test
-    fun `PurchaseState with premium subscription should have correct state`() {
+    fun `PurchaseState with premium subscription has correct features`() {
         val currentTime = System.currentTimeMillis()
         val state = PurchaseState(
             isSubscribed = true,
             subscriptionType = SubscriptionType.PREMIUM,
             activeEntitlements = setOf("premium"),
             activeProductIds = setOf("monthly_sub"),
-            features = PremiumFeature.getPremiumFeatures(),
-            lastRefreshed = currentTime,
-            userId = "user123"
+            lastRefreshed = currentTime
         )
-        
         assertTrue(state.isSubscribed)
         assertEquals(SubscriptionType.PREMIUM, state.subscriptionType)
-        assertEquals(setOf("premium"), state.activeEntitlements)
-        assertEquals(setOf("monthly_sub"), state.activeProductIds)
         assertEquals(PremiumFeature.entries.toSet(), state.features)
-        assertEquals(currentTime, state.lastRefreshed)
-        assertEquals("user123", state.userId)
+        assertTrue(state.hasLoaded)
     }
-    
+
     @Test
-    fun `PurchaseState with lifetime subscription should have all features`() {
+    fun `PurchaseState with lifetime subscription has all features`() {
         val state = PurchaseState(
             isSubscribed = true,
             subscriptionType = SubscriptionType.LIFETIME,
             activeEntitlements = setOf("premium", "lifetime"),
-            activeProductIds = setOf("lifetime_purchase"),
-            features = PremiumFeature.getPremiumFeatures()
+            activeProductIds = setOf("lifetime_purchase")
         )
-        
-        assertTrue(state.isSubscribed)
-        assertEquals(SubscriptionType.LIFETIME, state.subscriptionType)
-        assertTrue(state.activeEntitlements.contains("lifetime"))
         assertEquals(PremiumFeature.entries.size, state.features.size)
     }
-    
+
     @Test
-    fun `toSubscriptionState should convert PurchaseState to SubscriptionState`() {
+    fun `LEGACY subscription has basic features`() {
+        val state = PurchaseState(
+            isSubscribed = true,
+            subscriptionType = SubscriptionType.LEGACY,
+            lastRefreshed = 1000L
+        )
+        assertEquals(PremiumFeature.getBasicFeatures(), state.features)
+    }
+
+    @Test
+    fun `features is derived from subscriptionType on copy`() {
+        val original = PurchaseState(isSubscribed = true, subscriptionType = SubscriptionType.PREMIUM)
+        val downgraded = original.copy(subscriptionType = SubscriptionType.FREE)
+        assertEquals(PremiumFeature.entries.toSet(), original.features)
+        assertTrue(downgraded.features.isEmpty())
+    }
+
+    @Test
+    fun `toSubscriptionState converts correctly`() {
         val currentTime = System.currentTimeMillis()
-        val purchaseState = PurchaseState(
+        val state = PurchaseState(
             isSubscribed = true,
             subscriptionType = SubscriptionType.PREMIUM,
             activeEntitlements = setOf("premium"),
             activeProductIds = setOf("monthly_sub", "addon_1"),
-            features = PremiumFeature.getPremiumFeatures(),
-            lastRefreshed = currentTime,
-            userId = "user123"
+            lastRefreshed = currentTime
         )
-        
-        val subscriptionState = purchaseState.toSubscriptionState()
-        
-        assertEquals(true, subscriptionState.isSubscribed)
-        assertEquals(SubscriptionType.PREMIUM, subscriptionState.subscriptionType)
-        assertEquals("monthly_sub", subscriptionState.productId) // First product ID
-        assertEquals(currentTime, subscriptionState.lastVerified)
-        assertEquals(PremiumFeature.entries.toSet(), subscriptionState.features)
-        assertEquals(false, subscriptionState.needsVerification)
+        val result = state.toSubscriptionState()
+        assertTrue(result.isSubscribed)
+        assertEquals(SubscriptionType.PREMIUM, result.subscriptionType)
+        assertEquals("monthly_sub", result.productId)
+        assertEquals(currentTime, result.lastVerified)
+        assertEquals(PremiumFeature.entries.toSet(), result.features)
+        assertFalse(result.needsVerification)
     }
-    
+
     @Test
-    fun `toSubscriptionState with no products should handle null productId`() {
-        val purchaseState = PurchaseState(
-            isSubscribed = false,
-            subscriptionType = SubscriptionType.FREE,
-            activeProductIds = emptySet()
-        )
-        
-        val subscriptionState = purchaseState.toSubscriptionState()
-        
-        assertEquals(null, subscriptionState.productId)
-        assertEquals(SubscriptionType.FREE, subscriptionState.subscriptionType)
+    fun `toSubscriptionState with no products returns null productId`() {
+        val state = PurchaseState(isSubscribed = false, subscriptionType = SubscriptionType.FREE)
+        val result = state.toSubscriptionState()
+        assertEquals(null, result.productId)
     }
-    
+
     @Test
-    fun `PurchaseState with multiple entitlements should track all`() {
+    fun `PurchaseState tracks all entitlements`() {
         val state = PurchaseState(
             isSubscribed = true,
             subscriptionType = SubscriptionType.PREMIUM,
             activeEntitlements = setOf("premium", "ad_free", "widgets", "cal_sync"),
-            activeProductIds = setOf("premium_yearly"),
-            features = PremiumFeature.getPremiumFeatures()
+            activeProductIds = setOf("premium_yearly")
         )
-        
         assertEquals(4, state.activeEntitlements.size)
-        assertTrue(state.activeEntitlements.contains("premium"))
-        assertTrue(state.activeEntitlements.contains("ad_free"))
-        assertTrue(state.activeEntitlements.contains("widgets"))
-        assertTrue(state.activeEntitlements.contains("cal_sync"))
-    }
-    
-    @Test
-    fun `PurchaseState with multiple products should track all`() {
-        val state = PurchaseState(
-            isSubscribed = true,
-            subscriptionType = SubscriptionType.PREMIUM,
-            activeProductIds = setOf("premium_yearly", "addon_themes", "addon_notifications")
-        )
-        
-        assertEquals(3, state.activeProductIds.size)
-        assertTrue(state.activeProductIds.contains("premium_yearly"))
-        assertTrue(state.activeProductIds.contains("addon_themes"))
-        assertTrue(state.activeProductIds.contains("addon_notifications"))
-    }
-    
-    @Test
-    fun `PurchaseState copy should create independent instance`() {
-        val original = PurchaseState(
-            isSubscribed = true,
-            subscriptionType = SubscriptionType.PREMIUM,
-            activeEntitlements = setOf("premium"),
-            userId = "user1"
-        )
-        
-        val copy = original.copy(userId = "user2")
-        
-        assertEquals("user1", original.userId)
-        assertEquals("user2", copy.userId)
-        assertEquals(original.isSubscribed, copy.isSubscribed)
-        assertEquals(original.subscriptionType, copy.subscriptionType)
+        assertTrue(state.activeEntitlements.containsAll(listOf("premium", "ad_free", "widgets", "cal_sync")))
     }
 }

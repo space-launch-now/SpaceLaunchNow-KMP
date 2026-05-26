@@ -2,6 +2,22 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Start ADB Server",
+            "detail": "Starts the adb server if it isn't already running (idempotent).",
+            "type": "shell",
+            "command": "adb",
+            "args": [
+                "start-server"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Run Desktop App",
             "type": "shell",
             "command": "./gradlew",

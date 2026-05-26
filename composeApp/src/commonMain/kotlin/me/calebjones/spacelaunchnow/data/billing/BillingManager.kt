@@ -58,7 +58,13 @@ interface BillingManager {
      * Get all active entitlements
      */
     fun getActiveEntitlements(): Set<String>
-    
+
+    /**
+     * Get the current RevenueCat app user ID.
+     * Returns null if billing has not been initialized yet.
+     */
+    fun getAppUserId(): String?
+
     /**
      * Sync purchases from store (silent, no UI)
      */

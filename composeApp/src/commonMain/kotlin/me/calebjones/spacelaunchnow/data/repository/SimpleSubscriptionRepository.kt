@@ -84,7 +84,9 @@ class SimpleSubscriptionRepository(
                 features = local.availableFeatures,
                 lastVerified = local.lastSynced,
                 needsVerification = local.needsSync,
-                isLoading = false
+                isLoading = false,
+                isInTrialPeriod = local.isInTrialPeriod,
+                trialExpiresAt = local.trialExpiresAt
             )
         }.stateIn(
             scope = repositoryScope,
@@ -99,7 +101,9 @@ class SimpleSubscriptionRepository(
                     features = initialData.availableFeatures,
                     lastVerified = initialData.lastSynced,
                     needsVerification = initialData.needsSync,
-                    isLoading = false
+                    isLoading = false,
+                    isInTrialPeriod = initialData.isInTrialPeriod,
+                    trialExpiresAt = initialData.trialExpiresAt
                 )
             }
         )
@@ -112,11 +116,20 @@ class SimpleSubscriptionRepository(
     override suspend fun initialize() {
         log.d { "SimpleSubscriptionRepository: Initializing..." }
 
-        // Initialize billing client
         billingClient.initialize()
 
-        // Start background syncing with RevenueCat
+        // Read needsSync before startSyncing() to avoid a potential race where the
+        // background coroutine clears needsSync before we can check it.
+        val shouldRetrySync = localStorage.get().needsSync
+
         syncer.startSyncing()
+
+        // If a previous sync failed (write error or corruption recovery), the needsSync flag
+        // was set on disk. Retry immediately rather than waiting for the next RC state update.
+        if (shouldRetrySync) {
+            log.i { "needsSync=true on cold start — triggering immediate sync" }
+            syncer.syncNow()
+        }
 
         log.i { "SimpleSubscriptionRepository: ✅ Initialized" }
     }
@@ -333,11 +346,10 @@ class SimpleSubscriptionRepository(
      */
     suspend fun setDebugSubscription(
         subscriptionType: SubscriptionType,
-        productId: String = "",
-        entitlements: Set<String> = emptySet()
+        productId: String = ""
     ) {
         log.d { "SimpleSubscriptionRepository: Setting debug subscription: $subscriptionType" }
-        localStorage.setDebugSubscription(subscriptionType, productId, entitlements)
+        localStorage.setDebugSubscription(subscriptionType, productId)
     }
 
     /**

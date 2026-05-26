@@ -78,6 +78,15 @@ enum class SpaceLaunchNotificationChannel(
         "News and general updates about space missions",
         NotificationManager.IMPORTANCE_LOW,
         listOf(NotificationTopic.FEATURED_NEWS)
+    ),
+
+    // Default Priority - Admin announcements / custom broadcasts
+    ANNOUNCEMENTS(
+        "announcements_default",
+        "Announcements",
+        "Announcements and special messages from Space Launch Now",
+        NotificationManager.IMPORTANCE_DEFAULT,
+        listOf(NotificationTopic.ANNOUNCEMENTS)
     );
 
     companion object {
