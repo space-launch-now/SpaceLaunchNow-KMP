@@ -1,19 +1,30 @@
 package me.calebjones.spacelaunchnow.data.model
 
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import me.calebjones.spacelaunchnow.util.TestSpaceLoggerInit
 
 /**
- * Unit tests for V5 notification payload parsing
+ * Unit tests for V5 notification payload parsing.
+ *
+ * Note: V5NotificationPayload uses String-based filtering IDs (matching the server format),
+ * and `programId` is a single String (not a parsed List<Int>). See V5NotificationFilterSimplifiedTest
+ * for the filtering behavior that replaced the old Int/V5FilterPreferences design.
  */
 class V5NotificationPayloadTest {
 
+    @BeforeTest
+    fun setup() {
+        TestSpaceLoggerInit.ensureInitialized()
+    }
+
     // MARK: - Test Data
-    
+
     private val validV5Payload = mapOf(
         "notification_type" to "tenMinutes",
         "title" to "Launch in 10 minutes!",
@@ -50,7 +61,7 @@ class V5NotificationPayloadTest {
     )
 
     // MARK: - V5 Detection Tests
-    
+
     @Test
     fun testIsV5Payload_withLspId_returnsTrue() {
         val payload = mapOf("lsp_id" to "121", "notification_type" to "test")
@@ -69,11 +80,11 @@ class V5NotificationPayloadTest {
     }
 
     // MARK: - V5 Parsing Tests
-    
+
     @Test
     fun testFromMap_validV5Payload_parsesSuccessfully() {
         val result = V5NotificationPayload.fromMap(validV5Payload)
-        
+
         assertNotNull(result)
         assertEquals("tenMinutes", result.notificationType)
         assertEquals("Launch in 10 minutes!", result.title)
@@ -86,13 +97,14 @@ class V5NotificationPayloadTest {
         assertEquals("Kennedy Space Center, FL", result.launchLocation)
         assertTrue(result.webcast)
         assertFalse(result.webcastLive)
-        assertEquals(121, result.lspId)
-        assertEquals(27, result.locationId)
-        assertEquals(listOf(1, 2, 3), result.programIds)
-        assertEquals(1, result.statusId)
-        assertEquals(8, result.orbitId)
-        assertEquals(10, result.missionTypeId)
-        assertEquals(5, result.launcherFamilyId)
+        // V5 filtering IDs are String-based (match the server format).
+        assertEquals("121", result.lspId)
+        assertEquals("27", result.locationId)
+        assertEquals("1,2,3", result.programId)
+        assertEquals("1", result.statusId)
+        assertEquals("8", result.orbitId)
+        assertEquals("10", result.missionTypeId)
+        assertEquals("5", result.launcherFamilyId)
     }
 
     @Test
@@ -123,7 +135,7 @@ class V5NotificationPayloadTest {
     fun testFromMap_titleFallsBackToLaunchName() {
         val payload = validV5Payload.toMutableMap().apply { remove("title") }
         val result = V5NotificationPayload.fromMap(payload)
-        
+
         assertNotNull(result)
         assertEquals("Falcon 9 Block 5 | Starlink Group 6-22", result.title)
     }
@@ -132,7 +144,7 @@ class V5NotificationPayloadTest {
     fun testFromMap_emptyBody_parsesSuccessfully() {
         val payload = validV5Payload.toMutableMap().apply { remove("body") }
         val result = V5NotificationPayload.fromMap(payload)
-        
+
         assertNotNull(result)
         assertEquals("", result.body)
     }
@@ -148,11 +160,11 @@ class V5NotificationPayloadTest {
             "lsp_id" to "121"
         )
         val result = V5NotificationPayload.fromMap(payload)
-        
+
         assertNotNull(result)
-        assertEquals(121, result.lspId)
+        assertEquals("121", result.lspId)
         assertNull(result.locationId)
-        assertTrue(result.programIds.isEmpty())
+        assertNull(result.programId)
         assertNull(result.statusId)
         assertNull(result.orbitId)
         assertNull(result.missionTypeId)
@@ -160,36 +172,26 @@ class V5NotificationPayloadTest {
     }
 
     @Test
-    fun testFromMap_programIds_parsesSingleId() {
+    fun testFromMap_programId_singleValue() {
         val payload = validV5Payload.toMutableMap().apply {
             this["program_ids"] = "42"
         }
         val result = V5NotificationPayload.fromMap(payload)
-        
+
         assertNotNull(result)
-        assertEquals(listOf(42), result.programIds)
+        assertEquals("42", result.programId)
     }
 
     @Test
-    fun testFromMap_programIds_handlesSpaces() {
+    fun testFromMap_programId_keptAsRawString() {
+        // V5 stores the program field as the raw server string; it is not parsed into a list.
         val payload = validV5Payload.toMutableMap().apply {
-            this["program_ids"] = "1, 2, 3"
+            this["program_ids"] = "1,2,3"
         }
         val result = V5NotificationPayload.fromMap(payload)
-        
-        assertNotNull(result)
-        assertEquals(listOf(1, 2, 3), result.programIds)
-    }
 
-    @Test
-    fun testFromMap_programIds_ignoresInvalidEntries() {
-        val payload = validV5Payload.toMutableMap().apply {
-            this["program_ids"] = "1,invalid,3"
-        }
-        val result = V5NotificationPayload.fromMap(payload)
-        
         assertNotNull(result)
-        assertEquals(listOf(1, 3), result.programIds)
+        assertEquals("1,2,3", result.programId)
     }
 
     @Test
@@ -213,13 +215,13 @@ class V5NotificationPayloadTest {
     fun testFromMap_webcast_defaultsFalse() {
         val payload = validV5Payload.toMutableMap().apply { remove("webcast") }
         val result = V5NotificationPayload.fromMap(payload)
-        
+
         assertNotNull(result)
         assertFalse(result.webcast)
     }
 
     // MARK: - Helper Method Tests
-    
+
     @Test
     fun testHasFilteringIds_withLspId_returnsTrue() {
         val result = V5NotificationPayload.fromMap(validV5Payload)
@@ -237,7 +239,7 @@ class V5NotificationPayloadTest {
             "launch_net" to "2025-01-26T12:00:00Z"
         )
         val result = V5NotificationPayload.fromMap(payload)
-        
+
         assertNotNull(result)
         assertFalse(result.hasFilteringIds())
     }
@@ -246,7 +248,7 @@ class V5NotificationPayloadTest {
     fun testToDebugString_containsEssentialInfo() {
         val result = V5NotificationPayload.fromMap(validV5Payload)
         assertNotNull(result)
-        
+
         val debugString = result.toDebugString()
         assertTrue(debugString.contains("tenMinutes"))
         assertTrue(debugString.contains("Falcon 9"))
@@ -264,7 +266,7 @@ class V5NotificationPayloadTest {
     @Test
     fun testNotificationData_parseAny_parsesV5() {
         val result = NotificationData.parseAny(validV5Payload)
-        
+
         assertNotNull(result)
         assertTrue(result is ParsedNotification.V5)
         assertEquals("tenMinutes", result.notificationType)
@@ -274,7 +276,7 @@ class V5NotificationPayloadTest {
     @Test
     fun testNotificationData_parseAny_parsesV4() {
         val result = NotificationData.parseAny(validV4Payload)
-        
+
         assertNotNull(result)
         assertTrue(result is ParsedNotification.V4)
         assertEquals("tenMinutes", result.notificationType)
@@ -284,7 +286,7 @@ class V5NotificationPayloadTest {
     @Test
     fun testParsedNotification_asV5_returnsPayloadForV5() {
         val result = NotificationData.parseAny(validV5Payload)
-        
+
         assertNotNull(result)
         assertTrue(result.isV5())
         assertNotNull(result.asV5())
@@ -294,7 +296,7 @@ class V5NotificationPayloadTest {
     @Test
     fun testParsedNotification_asV4_returnsDataForV4() {
         val result = NotificationData.parseAny(validV4Payload)
-        
+
         assertNotNull(result)
         assertFalse(result.isV5())
         assertNull(result.asV5())
