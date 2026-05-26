@@ -120,7 +120,23 @@ object IosNotificationBridge : KoinComponent {
         // Dump what the NSE actually reads when the app is killed — this is the value
         // that decides whether filtered-out launches (e.g. China) slip through.
         NSEPreferenceBridge.logStoredPrefs()
+        // Drain any NSE delivery breadcrumbs accumulated while the app was killed/backgrounded
+        // into Datadog (see NSEPreferenceBridge.drainNseEventLog).
+        NSEPreferenceBridge.drainNseEventLog()
         log.i { "========================================" }
+    }
+
+    /**
+     * Drain the NSE breadcrumb buffer into Datadog. Safe to call on every app foreground
+     * (applicationDidBecomeActive) as well as at startup — it clears the buffer after draining,
+     * so repeat calls are cheap no-ops when empty. Exposed for Swift (AppDelegate) to call.
+     */
+    fun drainNseEventLog() {
+        try {
+            NSEPreferenceBridge.drainNseEventLog()
+        } catch (e: Exception) {
+            log.e { "Failed to drain NSE event log: ${e.message}" }
+        }
     }
 
     /**

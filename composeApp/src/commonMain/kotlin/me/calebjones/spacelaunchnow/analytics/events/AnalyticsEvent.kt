@@ -164,9 +164,21 @@ sealed class AnalyticsEvent(val name: String) {
 
     // ── Notification Events ──────────────────────────────────────────────────
 
-    data class NotificationReceived(val type: String) :
-        AnalyticsEvent("notification_received") {
-        override fun toParameters() = mapOf("type" to type)
+    data class NotificationReceived(
+        val type: String,
+        /** "displayed" or "suppressed". Null when only the bare type is known (legacy callers). */
+        val outcome: String? = null,
+        /** When outcome == "suppressed": why (kill switch / per-type toggle / agency-location / etc.). */
+        val reason: String? = null,
+        /** "android" or "ios". */
+        val platform: String? = null
+    ) : AnalyticsEvent("notification_received") {
+        override fun toParameters() = buildMap {
+            put("type", type)
+            outcome?.let { put("outcome", it) }
+            reason?.let { put("reason", it) }
+            platform?.let { put("platform", it) }
+        }
     }
 
     data class NotificationTapped(val type: String, val launchId: String? = null) :

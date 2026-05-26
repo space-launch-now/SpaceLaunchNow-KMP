@@ -7,6 +7,17 @@ import RevenueCat
 import UIKit
 import UserNotifications
 import WidgetKit
+import os
+
+/// os.Logger for app-side notification handling. Replaces print() on the notification
+/// receipt/display/suppress/tap paths so they are capturable in the field via Console.app /
+/// `log stream` / sysdiagnose (print() only reaches the Xcode debug console). Verbose
+/// diagnostic banners elsewhere remain print() by design.
+private enum NotifLog {
+    private static let subsystem = "me.spacelaunchnow.app"
+    static let receipt = Logger(subsystem: subsystem, category: "notification.receipt")
+    static let tap = Logger(subsystem: subsystem, category: "notification.tap")
+}
 
 // MARK: - WidgetKit Bridge Implementation
 class SwiftWidgetTimelineReloader: WidgetTimelineReloader {
@@ -122,6 +133,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             UNUserNotificationCenter.current().setBadgeCount(0)
         } else {
             UIApplication.shared.applicationIconBadgeNumber = 0
+        }
+
+        // Drain NSE delivery breadcrumbs (accumulated while killed/backgrounded) into Datadog.
+        // Clears itself after draining, so repeated foregrounds are cheap no-ops when empty.
+        // Off the main thread — it does UserDefaults I/O + logging.
+        DispatchQueue.global(qos: .utility).async {
+            IosNotificationBridge.shared.drainNseEventLog()
         }
     }
 
@@ -270,6 +288,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         if shouldShow {
             print("✅ Notification passed filters, displaying")
+            NotifLog.receipt.log("notification displayed (background path): type=\(notificationData.notificationType, privacy: .public)")
 
             // ALWAYS create and display local notification regardless of app state
             // This ensures notifications show when app is:
@@ -290,6 +309,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             completionHandler(.newData)
         } else {
             print("🔇 Notification filtered out by user preferences")
+            NotifLog.receipt.log("notification suppressed (background path): type=\(notificationData.notificationType, privacy: .public) reason=user_preferences")
 
             // Save to history (filtered and not shown)
             saveNotificationToHistory(
@@ -345,11 +365,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
             guard broadcastForegroundAllowed(toggleKey: toggleKey) else {
                 print("🔇 \(kind) notification suppressed in foreground (kill switch or per-type toggle off)")
+                NotifLog.receipt.log("notification suppressed (foreground): type=\(kind, privacy: .public) reason=kill_switch_or_per_type_toggle")
                 completionHandler([])
                 return
             }
 
             print("✅ Recognized \(kind) notification — presenting")
+            NotifLog.receipt.log("notification displayed (foreground): type=\(kind, privacy: .public)")
             if #available(iOS 14.0, *) {
                 completionHandler([.banner, .badge, .sound])
             } else {
@@ -365,6 +387,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
             if shouldShow {
                 print("✅ Notification passed filters, showing to user")
+                NotifLog.receipt.log("notification displayed (foreground): type=\(notificationData.notificationType, privacy: .public)")
 
                 // Note: History is saved in didReceiveRemoteNotification handler
                 // to avoid duplicates when app is in foreground
@@ -377,6 +400,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 }
             } else {
                 print("🔇 Notification filtered out by user preferences")
+                NotifLog.receipt.log("notification suppressed (foreground): type=\(notificationData.notificationType, privacy: .public) reason=user_preferences")
 
                 // Note: History is saved in didReceiveRemoteNotification handler
                 // to avoid duplicates when app is in foreground
@@ -385,6 +409,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         } else {
             print("⚠️ Failed to parse notification data for history")
+            NotifLog.receipt.log("notification parse failed (foreground) — not presented")
             completionHandler([])
         }
     }
@@ -396,6 +421,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) {
         let userInfo = response.notification.request.content.userInfo
         print("User tapped notification: \(userInfo)")
+        let tappedType = (userInfo["notification_type"] as? String) ?? "unknown"
+        NotifLog.tap.log("notification tapped: type=\(tappedType, privacy: .public)")
 
         handleNotificationTap(userInfo: userInfo)
 
