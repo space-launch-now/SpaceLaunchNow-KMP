@@ -1,3 +1,12 @@
+## [5.31.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.31.0...v5.31.1) (2026-05-26)
+
+
+### Bug Fixes
+
+* **version:** update build number to 73 ([1925540](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/192554040721fa9b95feebe2a9b0777faa74b8ec))
+
+
+
 # [5.31.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.30.1...v5.31.0) (2026-05-26)
 
 
@@ -65,15 +74,6 @@
 ### Bug Fixes
 
 * update versioning scheme for consistency across platforms ([3572926](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3572926838e5471052ca52101553edae5ff3283f))
-
-
-
-# [5.29.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.28.11...v5.29.0) (2026-05-04)
-
-
-### Features
-
-* **wear:** fix text layout sizes for large text settings ([c63fec1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c63fec1804aef682fe4aecb384c38e95c7cc1477))
 
 
 
