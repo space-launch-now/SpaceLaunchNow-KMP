@@ -46,7 +46,7 @@ open class ProgramsApi : ApiClient {
 
     /**
      * 
-     * #### Search Fields searched - &#x60;description&#x60;, &#x60;name&#x60;  Example - [/programs/detailed/?search&#x3D;Apollo](./?search&#x3D;Apollo)  #### Ordering Fields - &#x60;end_date&#x60;, &#x60;id&#x60;, &#x60;name&#x60;, &#x60;start_date&#x60;  Example - [/programs/detailed/?ordering&#x3D;-start_date](./?ordering&#x3D;-start_date)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/programs/detailed/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/programs/detailed/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Search Fields searched - &#x60;description&#x60;, &#x60;name&#x60;  Example - [/programs/detailed/?search&#x3D;Apollo](./?search&#x3D;Apollo)  #### Ordering Fields - &#x60;end_date&#x60;, &#x60;id&#x60;, &#x60;name&#x60;, &#x60;start_date&#x60;  Example - [/programs/detailed/?ordering&#x3D;-start_date](./?ordering&#x3D;-start_date)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/programs/detailed/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/programs/detailed/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -86,7 +86,7 @@ open class ProgramsApi : ApiClient {
 
     /**
      * 
-     * #### Search Fields searched - &#x60;description&#x60;, &#x60;name&#x60;  Example - [/programs/?search&#x3D;Apollo](./?search&#x3D;Apollo)  #### Ordering Fields - &#x60;end_date&#x60;, &#x60;id&#x60;, &#x60;name&#x60;, &#x60;start_date&#x60;  Example - [/programs/?ordering&#x3D;-start_date](./?ordering&#x3D;-start_date)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/programs/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/programs/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Search Fields searched - &#x60;description&#x60;, &#x60;name&#x60;  Example - [/programs/?search&#x3D;Apollo](./?search&#x3D;Apollo)  #### Ordering Fields - &#x60;end_date&#x60;, &#x60;id&#x60;, &#x60;name&#x60;, &#x60;start_date&#x60;  Example - [/programs/?ordering&#x3D;-start_date](./?ordering&#x3D;-start_date)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/programs/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/programs/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -126,7 +126,7 @@ open class ProgramsApi : ApiClient {
 
     /**
      * 
-     * #### Search Fields searched - &#x60;description&#x60;, &#x60;name&#x60;  Example - [/programs/mini/?search&#x3D;Apollo](./?search&#x3D;Apollo)  #### Ordering Fields - &#x60;end_date&#x60;, &#x60;id&#x60;, &#x60;name&#x60;, &#x60;start_date&#x60;  Example - [/programs/mini/?ordering&#x3D;-start_date](./?ordering&#x3D;-start_date)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/programs/mini/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/programs/mini/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Search Fields searched - &#x60;description&#x60;, &#x60;name&#x60;  Example - [/programs/mini/?search&#x3D;Apollo](./?search&#x3D;Apollo)  #### Ordering Fields - &#x60;end_date&#x60;, &#x60;id&#x60;, &#x60;name&#x60;, &#x60;start_date&#x60;  Example - [/programs/mini/?ordering&#x3D;-start_date](./?ordering&#x3D;-start_date)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/programs/mini/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/programs/mini/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -166,7 +166,7 @@ open class ProgramsApi : ApiClient {
 
     /**
      * 
-     * #### Search Fields searched - &#x60;description&#x60;, &#x60;name&#x60;  Example - [/programs/?search&#x3D;Apollo](./?search&#x3D;Apollo)  #### Ordering Fields - &#x60;end_date&#x60;, &#x60;id&#x60;, &#x60;name&#x60;, &#x60;start_date&#x60;  Example - [/programs/?ordering&#x3D;-start_date](./?ordering&#x3D;-start_date)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/programs/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/programs/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Search Fields searched - &#x60;description&#x60;, &#x60;name&#x60;  Example - [/programs/?search&#x3D;Apollo](./?search&#x3D;Apollo)  #### Ordering Fields - &#x60;end_date&#x60;, &#x60;id&#x60;, &#x60;name&#x60;, &#x60;start_date&#x60;  Example - [/programs/?ordering&#x3D;-start_date](./?ordering&#x3D;-start_date)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/programs/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/programs/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Program.
      * @return ProgramNormal
      */

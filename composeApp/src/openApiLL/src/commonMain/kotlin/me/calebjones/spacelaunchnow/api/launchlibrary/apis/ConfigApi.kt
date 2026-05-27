@@ -97,7 +97,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/agency_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/agency_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/agency_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/agency_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -137,7 +137,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/agency_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/agency_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/agency_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/agency_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this agency type.
      * @return AgencyType
      */
@@ -170,7 +170,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_roles/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_roles/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_roles/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_roles/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -210,7 +210,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_roles/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_roles/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_roles/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_roles/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Astronaut Role.
      * @return AstronautRole
      */
@@ -243,7 +243,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -283,7 +283,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Astronaut Status.
      * @return AstronautStatus
      */
@@ -316,7 +316,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -356,7 +356,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Astronaut Type.
      * @return AstronautType
      */
@@ -389,7 +389,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/celestial_body_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/celestial_body_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/celestial_body_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/celestial_body_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -429,7 +429,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/celestial_body_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/celestial_body_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/celestial_body_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/celestial_body_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this celestial body type.
      * @return CelestialBodyType
      */
@@ -462,7 +462,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/countries/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/countries/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/countries/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/countries/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -502,7 +502,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/countries/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/countries/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/countries/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/countries/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Country.
      * @return Country
      */
@@ -535,7 +535,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/docking_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/docking_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/docking_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/docking_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -575,7 +575,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/docking_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/docking_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/docking_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/docking_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Docking Location.
      * @return DockingLocation
      */
@@ -608,7 +608,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -648,7 +648,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this event type.
      * @return EventType
      */
@@ -681,7 +681,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/first_stage_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/first_stage_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/first_stage_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/first_stage_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -721,7 +721,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/first_stage_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/first_stage_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/first_stage_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/first_stage_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this first stage type.
      * @return FirstStageType
      */
@@ -754,7 +754,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_licenses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_licenses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_licenses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_licenses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -794,7 +794,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_licenses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_licenses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_licenses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_licenses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this image license.
      * @return ImageLicense
      */
@@ -827,7 +827,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_variant_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_variant_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_variant_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_variant_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -867,7 +867,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_variant_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_variant_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_variant_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_variant_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this image variant type.
      * @return ImageVariantType
      */
@@ -900,7 +900,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/infourl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/infourl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/infourl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/infourl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -940,7 +940,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/infourl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/infourl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/infourl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/infourl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Info URL Type.
      * @return InfoURLType
      */
@@ -973,7 +973,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1013,7 +1013,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this landing location.
      * @return LandingLocation
      */
@@ -1046,7 +1046,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1086,7 +1086,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this landing type.
      * @return LandingType
      */
@@ -1119,7 +1119,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/languages/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/languages/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/languages/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/languages/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1159,7 +1159,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/languages/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/languages/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/languages/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/languages/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Language.
      * @return Language
      */
@@ -1192,7 +1192,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launch_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launch_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launch_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launch_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1232,7 +1232,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launch_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launch_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launch_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launch_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this Launch Status.
      * @return LaunchStatus
      */
@@ -1265,7 +1265,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launcher_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launcher_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launcher_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launcher_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1305,7 +1305,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launcher_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launcher_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launcher_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launcher_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Launcher Status.
      * @return LauncherStatus
      */
@@ -1338,7 +1338,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/mission_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/mission_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/mission_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/mission_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1378,7 +1378,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/mission_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/mission_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/mission_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/mission_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this mission type.
      * @return MissionType
      */
@@ -1411,7 +1411,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/net_precisions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/net_precisions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/net_precisions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/net_precisions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1451,7 +1451,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/net_precisions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/net_precisions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/net_precisions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/net_precisions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this Net Precision.
      * @return NetPrecision
      */
@@ -1484,7 +1484,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1524,7 +1524,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Orbit.
      * @return Orbit
      */
@@ -1557,7 +1557,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/payload_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/payload_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/payload_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/payload_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1597,7 +1597,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/payload_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/payload_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/payload_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/payload_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this payload type.
      * @return PayloadType
      */
@@ -1630,7 +1630,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/program_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/program_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/program_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/program_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1670,7 +1670,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/program_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/program_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/program_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/program_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique value identifying this program type.
      * @return ProgramType
      */
@@ -1703,7 +1703,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/space_station_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/space_station_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/space_station_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/space_station_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1743,7 +1743,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/space_station_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/space_station_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/space_station_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/space_station_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Space Station Status.
      * @return SpaceStationStatus
      */
@@ -1776,7 +1776,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_configuration_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_configuration_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_configuration_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_configuration_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1816,7 +1816,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_configuration_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_configuration_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_configuration_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_configuration_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Spacecraft Configuration Type.
      * @return SpacecraftConfigType
      */
@@ -1849,7 +1849,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1889,7 +1889,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Spacecraft Status.
      * @return SpacecraftStatus
      */
@@ -1922,7 +1922,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/timeline_event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/timeline_event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/timeline_event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/timeline_event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -1962,7 +1962,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/timeline_event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/timeline_event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/timeline_event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/timeline_event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Timeline Event Type.
      * @return TimelineEventType
      */
@@ -1995,7 +1995,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/vidurl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/vidurl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/vidurl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/vidurl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param limit Number of results to return per page. (optional)
      * @param offset The initial index from which to return the results. (optional)
      * @param ordering Which field to use when ordering the results. (optional)
@@ -2035,7 +2035,7 @@ open class ConfigApi : ApiClient {
 
     /**
      * 
-     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/vidurl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/vidurl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+     * #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/vidurl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/vidurl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
      * @param id A unique integer value identifying this Video URL Type.
      * @return VidURLType
      */

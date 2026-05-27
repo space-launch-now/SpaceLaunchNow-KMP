@@ -9,7 +9,7 @@
 | **url** | **kotlin.String** |  |  [readonly] |
 | **name** | **kotlin.String** |  |  |
 | **families** | [**kotlin.collections.List&lt;LauncherConfigFamilyNormal&gt;**](LauncherConfigFamilyNormal.md) |  |  |
-| **manufacturer** | [**AgencyNormal**](AgencyNormal.md) |  |  |
+| **manufacturer** | [**AgencyMini**](AgencyMini.md) |  |  |
 | **program** | [**kotlin.collections.List&lt;ProgramNormal&gt;**](ProgramNormal.md) |  |  |
 | **image** | [**Image**](Image.md) |  |  |
 | **infoUrl** | **kotlin.String** |  |  |

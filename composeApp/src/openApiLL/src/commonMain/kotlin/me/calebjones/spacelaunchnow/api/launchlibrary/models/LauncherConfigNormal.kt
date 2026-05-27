@@ -15,7 +15,7 @@
 
 package me.calebjones.spacelaunchnow.api.launchlibrary.models
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigFamilyNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
@@ -57,7 +57,7 @@ data class LauncherConfigNormal (
 
     @SerialName(value = "families") @Required val families: kotlin.collections.List<LauncherConfigFamilyNormal>?,
 
-    @SerialName(value = "manufacturer") @Required val manufacturer: AgencyNormal?,
+    @SerialName(value = "manufacturer") @Required val manufacturer: AgencyMini?,
 
     @SerialName(value = "program") @Required val program: kotlin.collections.List<ProgramNormal>,
 

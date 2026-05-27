@@ -7,7 +7,7 @@
 | **responseMode** | **kotlin.String** |  |  [readonly] |
 | **id** | **kotlin.Int** |  |  [readonly] |
 | **name** | **kotlin.String** |  |  |
-| **manufacturer** | [**kotlin.collections.List&lt;AgencyNormal&gt;**](AgencyNormal.md) |  |  |
+| **manufacturer** | [**kotlin.collections.List&lt;AgencyMini&gt;**](AgencyMini.md) |  |  |
 | **parent** | [**LauncherConfigFamilyMini**](LauncherConfigFamilyMini.md) |  |  |
 
 

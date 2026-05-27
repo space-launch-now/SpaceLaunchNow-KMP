@@ -188,6 +188,8 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 | *ProgramsApi* | [**programsList**](docs/ProgramsApi.md#programslist) | **GET** /api/ll/2.4.0/programs/ |  |
 | *ProgramsApi* | [**programsMiniList**](docs/ProgramsApi.md#programsminilist) | **GET** /api/ll/2.4.0/programs/mini/ |  |
 | *ProgramsApi* | [**programsRetrieve**](docs/ProgramsApi.md#programsretrieve) | **GET** /api/ll/2.4.0/programs/{id}/ |  |
+| *RocketsApi* | [**rocketsList**](docs/RocketsApi.md#rocketslist) | **GET** /api/ll/2.4.0/rockets/ |  |
+| *RocketsApi* | [**rocketsRetrieve**](docs/RocketsApi.md#rocketsretrieve) | **GET** /api/ll/2.4.0/rockets/{id}/ |  |
 | *SpaceStationsApi* | [**spaceStationsDetailedList**](docs/SpaceStationsApi.md#spacestationsdetailedlist) | **GET** /api/ll/2.4.0/space_stations/detailed/ |  |
 | *SpaceStationsApi* | [**spaceStationsList**](docs/SpaceStationsApi.md#spacestationslist) | **GET** /api/ll/2.4.0/space_stations/ |  |
 | *SpaceStationsApi* | [**spaceStationsRetrieve**](docs/SpaceStationsApi.md#spacestationsretrieve) | **GET** /api/ll/2.4.0/space_stations/{id}/ |  |
@@ -210,6 +212,8 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 | *SpacewalksApi* | [**spacewalksList**](docs/SpacewalksApi.md#spacewalkslist) | **GET** /api/ll/2.4.0/spacewalks/ |  |
 | *SpacewalksApi* | [**spacewalksMiniList**](docs/SpacewalksApi.md#spacewalksminilist) | **GET** /api/ll/2.4.0/spacewalks/mini/ |  |
 | *SpacewalksApi* | [**spacewalksRetrieve**](docs/SpacewalksApi.md#spacewalksretrieve) | **GET** /api/ll/2.4.0/spacewalks/{id}/ |  |
+| *StagesApi* | [**stagesList**](docs/StagesApi.md#stageslist) | **GET** /api/ll/2.4.0/stages/ |  |
+| *StagesApi* | [**stagesRetrieve**](docs/StagesApi.md#stagesretrieve) | **GET** /api/ll/2.4.0/stages/{id}/ |  |
 | *UpdatesApi* | [**updatesList**](docs/UpdatesApi.md#updateslist) | **GET** /api/ll/2.4.0/updates/ |  |
 | *UpdatesApi* | [**updatesRetrieve**](docs/UpdatesApi.md#updatesretrieve) | **GET** /api/ll/2.4.0/updates/{id}/ |  |
 
@@ -359,6 +363,7 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedProgramMiniList](docs/PaginatedProgramMiniList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedProgramNormalList](docs/PaginatedProgramNormalList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedProgramTypeList](docs/PaginatedProgramTypeList.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedRocketStandaloneNormalList](docs/PaginatedRocketStandaloneNormalList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpaceStationDetailedEndpointList](docs/PaginatedSpaceStationDetailedEndpointList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpaceStationEndpointList](docs/PaginatedSpaceStationEndpointList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpaceStationStatusList](docs/PaginatedSpaceStationStatusList.md)
@@ -377,15 +382,18 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacewalkEndpointDetailedList](docs/PaginatedSpacewalkEndpointDetailedList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacewalkEndpointNormalList](docs/PaginatedSpacewalkEndpointNormalList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacewalkListList](docs/PaginatedSpacewalkListList.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedStageStandaloneNormalList](docs/PaginatedStageStandaloneNormalList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedTimelineEventTypeList](docs/PaginatedTimelineEventTypeList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedUpdateEndpointList](docs/PaginatedUpdateEndpointList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedVidURLTypeList](docs/PaginatedVidURLTypeList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadDetailed](docs/PayloadDetailed.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightDetailed](docs/PayloadFlightDetailed.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightDetailedSerializerNoLanding](docs/PayloadFlightDetailedSerializerNoLanding.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightMini](docs/PayloadFlightMini.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightMiniSerializerNoLanding](docs/PayloadFlightMiniSerializerNoLanding.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightNormal](docs/PayloadFlightNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightNormalSerializerNoLanding](docs/PayloadFlightNormalSerializerNoLanding.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightRef](docs/PayloadFlightRef.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadFlightSerializerNoLaunch](docs/PayloadFlightSerializerNoLaunch.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadMini](docs/PayloadMini.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.PayloadNormal](docs/PayloadNormal.md)
@@ -395,6 +403,8 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramType](docs/ProgramType.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.RocketDetailed](docs/RocketDetailed.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.RocketNormal](docs/RocketNormal.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.RocketStandaloneDetailed](docs/RocketStandaloneDetailed.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.RocketStandaloneNormal](docs/RocketStandaloneNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SocialMedia](docs/SocialMedia.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SocialMediaLink](docs/SocialMediaLink.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailed](docs/SpaceStationDetailed.md)
@@ -421,12 +431,16 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightMiniSerializerNoLanding](docs/SpacecraftFlightMiniSerializerNoLanding.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightNormal](docs/SpacecraftFlightNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightNormalSerializerNoLanding](docs/SpacecraftFlightNormalSerializerNoLanding.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightRef](docs/SpacecraftFlightRef.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftNormal](docs/SpacecraftNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftStatus](docs/SpacecraftStatus.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkEndpointDetailed](docs/SpacewalkEndpointDetailed.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkEndpointNormal](docs/SpacewalkEndpointNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkList](docs/SpacewalkList.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkNormal](docs/SpacewalkNormal.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.StageRef](docs/StageRef.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.StageStandaloneDetailed](docs/StageStandaloneDetailed.md)
+ - [me.calebjones.spacelaunchnow.api.launchlibrary.models.StageStandaloneNormal](docs/StageStandaloneNormal.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEvent](docs/TimelineEvent.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.TimelineEventType](docs/TimelineEventType.md)
  - [me.calebjones.spacelaunchnow.api.launchlibrary.models.Update](docs/Update.md)

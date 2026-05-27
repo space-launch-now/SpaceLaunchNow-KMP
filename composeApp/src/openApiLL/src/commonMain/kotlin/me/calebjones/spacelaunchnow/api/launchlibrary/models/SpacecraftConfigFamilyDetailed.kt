@@ -16,7 +16,7 @@
 package me.calebjones.spacelaunchnow.api.launchlibrary.models
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigFamilyNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigFamilyMini
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -52,7 +52,7 @@ data class SpacecraftConfigFamilyDetailed (
 
     @SerialName(value = "manufacturer") @Required val manufacturer: AgencyNormal?,
 
-    @SerialName(value = "parent") @Required val parent: SpacecraftConfigFamilyNormal?,
+    @SerialName(value = "parent") @Required val parent: SpacecraftConfigFamilyMini?,
 
     @SerialName(value = "maiden_flight") @Required val maidenFlight: kotlinx.datetime.LocalDate?,
 

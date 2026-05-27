@@ -16,7 +16,7 @@
 package me.calebjones.spacelaunchnow.api.launchlibrary.models
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.Image
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigFamilyDetailed
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigFamilyNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
 
 import kotlinx.serialization.*
@@ -78,7 +78,7 @@ data class LauncherConfigDetailedSerializerNoManufacturer (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "families") @Required val families: kotlin.collections.List<LauncherConfigFamilyDetailed>?,
+    @SerialName(value = "families") @Required val families: kotlin.collections.List<LauncherConfigFamilyNormal>?,
 
     @SerialName(value = "program") @Required val program: kotlin.collections.List<ProgramNormal>,
 

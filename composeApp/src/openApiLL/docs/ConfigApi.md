@@ -66,7 +66,7 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/agency_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/agency_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/agency_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/agency_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -127,7 +127,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/agency_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/agency_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/agency_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/agency_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -182,7 +182,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_roles/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_roles/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_roles/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_roles/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -243,7 +243,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_roles/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_roles/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_roles/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_roles/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -298,7 +298,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -359,7 +359,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -414,7 +414,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -475,7 +475,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/astronaut_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/astronaut_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -530,7 +530,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/celestial_body_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/celestial_body_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/celestial_body_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/celestial_body_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -591,7 +591,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/celestial_body_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/celestial_body_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/celestial_body_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/celestial_body_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -646,7 +646,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/countries/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/countries/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/countries/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/countries/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -707,7 +707,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/countries/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/countries/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/countries/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/countries/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -762,7 +762,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/docking_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/docking_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/docking_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/docking_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -823,7 +823,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/docking_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/docking_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/docking_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/docking_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -878,7 +878,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -939,7 +939,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -994,7 +994,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/first_stage_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/first_stage_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/first_stage_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/first_stage_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1055,7 +1055,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/first_stage_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/first_stage_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/first_stage_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/first_stage_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1110,7 +1110,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_licenses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_licenses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_licenses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_licenses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1171,7 +1171,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_licenses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_licenses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_licenses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_licenses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1226,7 +1226,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_variant_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_variant_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_variant_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_variant_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1287,7 +1287,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_variant_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_variant_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/image_variant_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/image_variant_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1342,7 +1342,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/infourl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/infourl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/infourl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/infourl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1403,7 +1403,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/infourl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/infourl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/infourl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/infourl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1458,7 +1458,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1519,7 +1519,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_locations/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_locations/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1574,7 +1574,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1635,7 +1635,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/landing_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/landing_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1690,7 +1690,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/languages/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/languages/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/languages/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/languages/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1751,7 +1751,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/languages/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/languages/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/languages/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/languages/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1806,7 +1806,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launch_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launch_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launch_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launch_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1867,7 +1867,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launch_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launch_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launch_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launch_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1922,7 +1922,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launcher_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launcher_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launcher_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launcher_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -1983,7 +1983,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launcher_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launcher_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/launcher_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/launcher_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2038,7 +2038,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/mission_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/mission_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/mission_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/mission_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2099,7 +2099,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/mission_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/mission_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/mission_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/mission_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2154,7 +2154,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/net_precisions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/net_precisions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/net_precisions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/net_precisions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2215,7 +2215,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/net_precisions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/net_precisions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/net_precisions/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/net_precisions/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2270,7 +2270,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2331,7 +2331,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/orbits/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/orbits/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2386,7 +2386,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/payload_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/payload_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/payload_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/payload_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2447,7 +2447,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/payload_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/payload_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/payload_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/payload_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2502,7 +2502,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/program_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/program_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/program_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/program_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2563,7 +2563,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/program_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/program_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/program_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/program_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2618,7 +2618,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/space_station_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/space_station_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/space_station_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/space_station_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2679,7 +2679,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/space_station_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/space_station_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/space_station_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/space_station_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2734,7 +2734,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_configuration_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_configuration_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_configuration_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_configuration_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2795,7 +2795,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_configuration_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_configuration_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_configuration_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_configuration_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2850,7 +2850,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2911,7 +2911,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/spacecraft_statuses/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/spacecraft_statuses/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -2966,7 +2966,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/timeline_event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/timeline_event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/timeline_event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/timeline_event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -3027,7 +3027,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/timeline_event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/timeline_event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/timeline_event_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/timeline_event_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -3082,7 +3082,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/vidurl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/vidurl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/vidurl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/vidurl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -3143,7 +3143,7 @@ Configure cookieAuth:
 
 
 
-#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/vidurl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/vidurl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/config/vidurl_types/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/config/vidurl_types/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin

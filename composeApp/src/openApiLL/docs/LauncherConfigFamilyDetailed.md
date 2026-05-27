@@ -7,8 +7,8 @@
 | **responseMode** | **kotlin.String** |  |  [readonly] |
 | **id** | **kotlin.Int** |  |  [readonly] |
 | **name** | **kotlin.String** |  |  |
-| **manufacturer** | [**kotlin.collections.List&lt;AgencyDetailed&gt;**](AgencyDetailed.md) |  |  |
-| **parent** | [**LauncherConfigFamilyNormal**](LauncherConfigFamilyNormal.md) |  |  |
+| **manufacturer** | [**kotlin.collections.List&lt;AgencyMini&gt;**](AgencyMini.md) |  |  |
+| **parent** | [**LauncherConfigFamilyMini**](LauncherConfigFamilyMini.md) |  |  |
 | **totalLaunchCount** | **kotlin.Int** |  |  |
 | **successfulLaunches** | **kotlin.Int** |  |  |
 | **failedLaunches** | **kotlin.Int** |  |  |

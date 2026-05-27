@@ -58,7 +58,7 @@ data class LaunchBasic (
 
     @SerialName(value = "launch_designator") @Required val launchDesignator: kotlin.String?,
 
-    @SerialName(value = "status") @Required val status: LaunchStatus?,
+    @SerialName(value = "status") @Required val status: LaunchStatus,
 
     @SerialName(value = "net_precision") @Required val netPrecision: NetPrecision?,
 

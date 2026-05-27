@@ -90,7 +90,7 @@ data class LaunchDetailed (
 
     @SerialName(value = "launch_designator") @Required val launchDesignator: kotlin.String?,
 
-    @SerialName(value = "status") @Required val status: LaunchStatus?,
+    @SerialName(value = "status") @Required val status: LaunchStatus,
 
     @SerialName(value = "net_precision") @Required val netPrecision: NetPrecision?,
 
@@ -112,7 +112,7 @@ data class LaunchDetailed (
 
     @SerialName(value = "mission") @Required val mission: Mission?,
 
-    @SerialName(value = "pad") @Required val pad: PadDetailed?,
+    @SerialName(value = "pad") @Required val pad: PadDetailed,
 
     @SerialName(value = "program") @Required val program: kotlin.collections.List<ProgramNormal>?,
 

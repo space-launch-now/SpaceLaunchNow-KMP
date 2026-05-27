@@ -15,7 +15,7 @@
 
 package me.calebjones.spacelaunchnow.api.launchlibrary.models
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyMini
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigFamilyMini
 
 import kotlinx.serialization.*
@@ -41,7 +41,7 @@ data class LauncherConfigFamilyNormal (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "manufacturer") @Required val manufacturer: kotlin.collections.List<AgencyNormal>?,
+    @SerialName(value = "manufacturer") @Required val manufacturer: kotlin.collections.List<AgencyMini>?,
 
     @SerialName(value = "parent") @Required val parent: LauncherConfigFamilyMini?
 

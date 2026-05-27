@@ -16,7 +16,7 @@ All URIs are relative to *https://spacelaunchnow.me/api/ll/2.4.0*
 
 
 
-#### Filters Parameters - &#x60;mission_end&#x60;, &#x60;mission_end__day&#x60;, &#x60;mission_end__gt&#x60;, &#x60;mission_end__gte&#x60;, &#x60;mission_end__lt&#x60;, &#x60;mission_end__lte&#x60;, &#x60;mission_end__month&#x60;, &#x60;mission_end__year&#x60;, &#x60;spacecraft&#x60;  Example - [/spacecraft_flights/detailed/?spacecraft&#x3D;289](./?spacecraft&#x3D;289)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/spacecraft_flights/detailed/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/spacecraft_flights/detailed/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Filters Parameters - &#x60;mission_end&#x60;, &#x60;mission_end__day&#x60;, &#x60;mission_end__gt&#x60;, &#x60;mission_end__gte&#x60;, &#x60;mission_end__lt&#x60;, &#x60;mission_end__lte&#x60;, &#x60;mission_end__month&#x60;, &#x60;mission_end__year&#x60;, &#x60;spacecraft&#x60;  Example - [/spacecraft_flights/detailed/?spacecraft&#x3D;289](./?spacecraft&#x3D;289)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/spacecraft_flights/detailed/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/spacecraft_flights/detailed/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -95,7 +95,7 @@ Configure cookieAuth:
 
 
 
-#### Filters Parameters - &#x60;mission_end&#x60;, &#x60;mission_end__day&#x60;, &#x60;mission_end__gt&#x60;, &#x60;mission_end__gte&#x60;, &#x60;mission_end__lt&#x60;, &#x60;mission_end__lte&#x60;, &#x60;mission_end__month&#x60;, &#x60;mission_end__year&#x60;, &#x60;spacecraft&#x60;  Example - [/spacecraft_flights/?spacecraft&#x3D;289](./?spacecraft&#x3D;289)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/spacecraft_flights/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/spacecraft_flights/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Filters Parameters - &#x60;mission_end&#x60;, &#x60;mission_end__day&#x60;, &#x60;mission_end__gt&#x60;, &#x60;mission_end__gte&#x60;, &#x60;mission_end__lt&#x60;, &#x60;mission_end__lte&#x60;, &#x60;mission_end__month&#x60;, &#x60;mission_end__year&#x60;, &#x60;spacecraft&#x60;  Example - [/spacecraft_flights/?spacecraft&#x3D;289](./?spacecraft&#x3D;289)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/spacecraft_flights/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/spacecraft_flights/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -174,7 +174,7 @@ Configure cookieAuth:
 
 
 
-#### Filters Parameters - &#x60;mission_end&#x60;, &#x60;mission_end__day&#x60;, &#x60;mission_end__gt&#x60;, &#x60;mission_end__gte&#x60;, &#x60;mission_end__lt&#x60;, &#x60;mission_end__lte&#x60;, &#x60;mission_end__month&#x60;, &#x60;mission_end__year&#x60;, &#x60;spacecraft&#x60;  Example - [/spacecraft_flights/mini/?spacecraft&#x3D;289](./?spacecraft&#x3D;289)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/spacecraft_flights/mini/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/spacecraft_flights/mini/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Filters Parameters - &#x60;mission_end&#x60;, &#x60;mission_end__day&#x60;, &#x60;mission_end__gt&#x60;, &#x60;mission_end__gte&#x60;, &#x60;mission_end__lt&#x60;, &#x60;mission_end__lte&#x60;, &#x60;mission_end__month&#x60;, &#x60;mission_end__year&#x60;, &#x60;spacecraft&#x60;  Example - [/spacecraft_flights/mini/?spacecraft&#x3D;289](./?spacecraft&#x3D;289)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/spacecraft_flights/mini/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/spacecraft_flights/mini/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin
@@ -253,7 +253,7 @@ Configure cookieAuth:
 
 
 
-#### Filters Parameters - &#x60;mission_end&#x60;, &#x60;mission_end__day&#x60;, &#x60;mission_end__gt&#x60;, &#x60;mission_end__gte&#x60;, &#x60;mission_end__lt&#x60;, &#x60;mission_end__lte&#x60;, &#x60;mission_end__month&#x60;, &#x60;mission_end__year&#x60;, &#x60;spacecraft&#x60;  Example - [/spacecraft_flights/?spacecraft&#x3D;289](./?spacecraft&#x3D;289)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/spacecraft_flights/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/spacecraft_flights/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [spacelaunchnow.app/docs](https://spacelaunchnow.app/docs/)
+#### Filters Parameters - &#x60;mission_end&#x60;, &#x60;mission_end__day&#x60;, &#x60;mission_end__gt&#x60;, &#x60;mission_end__gte&#x60;, &#x60;mission_end__lt&#x60;, &#x60;mission_end__lte&#x60;, &#x60;mission_end__month&#x60;, &#x60;mission_end__year&#x60;, &#x60;spacecraft&#x60;  Example - [/spacecraft_flights/?spacecraft&#x3D;289](./?spacecraft&#x3D;289)  #### Number of results Use &#x60;limit&#x60; to control the number of objects in the response (max 100)  Example - [/spacecraft_flights/?limit&#x3D;2](./?limit&#x3D;2)  #### Format Switch to JSON output - [/spacecraft_flights/?format&#x3D;json](./?format&#x3D;json)  #### Help Find all the FAQs and support links on the documentation homepage - [staging.spacelaunchnow.app/docs](https://staging.spacelaunchnow.app/docs/)
 
 ### Example
 ```kotlin

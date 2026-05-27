@@ -8,7 +8,7 @@
 | **id** | **kotlin.Int** |  |  [readonly] |
 | **name** | **kotlin.String** |  |  |
 | **manufacturer** | [**AgencyNormal**](AgencyNormal.md) |  |  |
-| **parent** | [**SpacecraftConfigFamilyNormal**](SpacecraftConfigFamilyNormal.md) |  |  |
+| **parent** | [**SpacecraftConfigFamilyMini**](SpacecraftConfigFamilyMini.md) |  |  |
 | **maidenFlight** | [**kotlinx.datetime.LocalDate**](kotlinx.datetime.LocalDate.md) |  |  |
 | **spacecraftFlown** | **kotlin.Int** |  |  |
 | **totalLaunchCount** | **kotlin.Int** |  |  |

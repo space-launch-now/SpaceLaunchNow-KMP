@@ -8,7 +8,7 @@
 | **id** | **kotlin.Int** |  |  [readonly] |
 | **url** | **kotlin.String** |  |  [readonly] |
 | **name** | **kotlin.String** |  |  |
-| **families** | [**kotlin.collections.List&lt;LauncherConfigFamilyDetailed&gt;**](LauncherConfigFamilyDetailed.md) |  |  |
+| **families** | [**kotlin.collections.List&lt;LauncherConfigFamilyNormal&gt;**](LauncherConfigFamilyNormal.md) |  |  |
 | **manufacturer** | [**AgencyDetailed**](AgencyDetailed.md) |  |  |
 | **program** | [**kotlin.collections.List&lt;ProgramNormal&gt;**](ProgramNormal.md) |  |  |
 | **image** | [**Image**](Image.md) |  |  |
