@@ -1,3 +1,13 @@
+## [5.31.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.31.1...v5.31.2) (2026-05-28)
+
+
+### Bug Fixes
+
+* **api:** update datamodels from ll schema change ([886e4ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/886e4acabec7a266a2ac0485d4bdc134298e26fa))
+* **tests:** update LaunchMappersTest to use testPadDetailed for pad field ([37f2fbd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/37f2fbdf8a56aa571f57c72a1f67d09edae4fc6f))
+
+
+
 ## [5.31.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.31.0...v5.31.1) (2026-05-26)
 
 
@@ -65,15 +75,6 @@
 * **ios:** forward APNS token to RevenueCat ([a723eb2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a723eb21cc107aee7997f516e0298dfbb7c189be))
 * **ios:** start RevenueCatAttributesSyncer from AppDelegate ([2d01b92](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2d01b92e84d956776fde2fc9004ce9391e3b2926))
 * **platform:** add AppEnvironmentInfo for analytics/RC attrs ([fc0f442](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fc0f442b187b7be6b285b1e5d96009a585fe7e5b))
-
-
-
-## [5.29.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.29.0...v5.29.1) (2026-05-04)
-
-
-### Bug Fixes
-
-* update versioning scheme for consistency across platforms ([3572926](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3572926838e5471052ca52101553edae5ff3283f))
 
 
 
