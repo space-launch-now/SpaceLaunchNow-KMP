@@ -1,3 +1,12 @@
+# [5.32.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.31.2...v5.32.0) (2026-06-02)
+
+
+### Features
+
+* **notifications:** open news notifications in an in-app NewsDetail WebView ([57a4699](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/57a4699e532a10b617c23ecd30ab20a2d462dc69))
+
+
+
 ## [5.31.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.31.1...v5.31.2) (2026-05-28)
 
 
@@ -44,37 +53,6 @@
 ### Bug Fixes
 
 * update onboarding page count and improve padding for wear screens ([bb2ebfc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb2ebfc2447cd2ac4de0de8f6294fe4b8a3be4ce))
-
-
-
-# [5.30.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.29.1...v5.30.0) (2026-05-13)
-
-
-### Bug Fixes
-
-* add AlternateVideosCard component for displaying alternative video links ([9a96cd6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9a96cd6091f86ede0dc169e1999e2f0a146f5609))
-* add live theme preview and seed color picker ([32b8446](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/32b8446ce1e0f88a58709e9d36086a6d36fbfaea))
-* add support button with to home page ([dc90230](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dc90230f3debf95d9060c85186642ccf4cc1a9a6))
-* enhance map loading handling and update dependencies ([392f94e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/392f94effe7632ad4d297ee55ada8789a2a87d0b))
-* optimize color picker interaction to reduce flicker during dragging ([76ff7d5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/76ff7d5c088aa1c35959b948135d091f710b6147))
-* reorder onboarding pages for improved flow ([99dc56f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/99dc56fc9d917df3b452dc298fd867ee59243480))
-* **ui:** add horizontal padding to LaunchListContent for improved layout ([3f95ee7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f95ee7d4b7208e0f3a9a7e5429b2ae226c8b4dd))
-* update ad content rating to MAX_AD_CONTENT_RATING_G for Android and iOS configurations ([9d7e274](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9d7e274a72b6307b37191e9997f35aadb67b2e9f))
-* update to latest m3 expressive animations ([ec87bef](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ec87bef410143863f5aaaf7e793c80221d929249))
-
-
-### Features
-
-* **analytics:** add rewarded-ad / temp-access events ([b3066d7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b3066d7f1a666d547c0c7da7e7a24bd2c8dc99e9))
-* **analytics:** instrument rewarded-ad / temp-access flow ([a91d24e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a91d24eb8e27363bacb82d9f941cfacb9e4e4895))
-* **android:** forward FCM token to RevenueCat on startup ([ef3f372](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ef3f372e4e313cd2ff54d7226ba4395989b64602))
-* **android:** start RevenueCatAttributesSyncer after billing init ([09175b3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/09175b33b898efe13ec5804e9ededc2fa96b6f13))
-* **billing:** add RevenueCatAttributes wrapper ([f4915b6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f4915b64c3fdc21515760411e865782078c139c9))
-* **billing:** add RevenueCatAttributesSyncer with debounced flow push ([cb72a56](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cb72a56909e0035c18d56da04c4734222fac68c6))
-* **billing:** add temp-access + ad-shown counters in DataStore ([327dc9b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/327dc9bec7ac83df94c39b15b2b6bcc990fc8ce0))
-* **ios:** forward APNS token to RevenueCat ([a723eb2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a723eb21cc107aee7997f516e0298dfbb7c189be))
-* **ios:** start RevenueCatAttributesSyncer from AppDelegate ([2d01b92](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2d01b92e84d956776fde2fc9004ce9391e3b2926))
-* **platform:** add AppEnvironmentInfo for analytics/RC attrs ([fc0f442](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fc0f442b187b7be6b285b1e5d96009a585fe7e5b))
 
 
 
