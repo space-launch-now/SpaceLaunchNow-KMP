@@ -38,6 +38,7 @@ import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
+import me.calebjones.spacelaunchnow.navigation.NewsDetail
 import me.calebjones.spacelaunchnow.navigation.NewsEvents
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.Onboarding
@@ -65,6 +66,7 @@ import me.calebjones.spacelaunchnow.ui.event.EventDetailScreen
 import me.calebjones.spacelaunchnow.ui.explore.ExploreScreen
 import me.calebjones.spacelaunchnow.ui.home.HomeScreen
 import me.calebjones.spacelaunchnow.ui.layout.AdaptiveAppScaffold
+import me.calebjones.spacelaunchnow.ui.newsevents.NewsDetailScreen
 import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
 import me.calebjones.spacelaunchnow.ui.onboarding.LiveOnboardingScreen
@@ -145,6 +147,9 @@ fun SpaceLaunchNowApp(
     onNotificationLaunchIdConsumed: () -> Unit = {},
     notificationEventId: Int? = null,
     onNotificationEventIdConsumed: () -> Unit = {},
+    notificationNewsUrl: String? = null,
+    notificationNewsTitle: String? = null,
+    onNotificationNewsConsumed: () -> Unit = {},
     navigationDestination: String? = null,
     onNavigationDestinationConsumed: () -> Unit = {}
 ) {
@@ -271,7 +276,7 @@ fun SpaceLaunchNowApp(
             val startRoute: Any? = remember(liveOnboardingCompleted, onboardingPaywallShown) {
                 when {
                     liveOnboardingCompleted == null || onboardingPaywallShown == null -> null
-                    notificationLaunchId != null || notificationEventId != null || navigationDestination != null -> Home
+                    notificationLaunchId != null || notificationEventId != null || notificationNewsUrl != null || navigationDestination != null -> Home
                     else -> Preload
                 }
             }
@@ -592,6 +597,15 @@ fun SpaceLaunchNowApp(
                                     }
                                 )
                             }
+                            composableWithCompositionLocal<NewsDetail> { backStackEntry ->
+                                val newsDetail = backStackEntry.toRoute<NewsDetail>()
+                                NewsDetailScreen(
+                                    url = newsDetail.url,
+                                    title = newsDetail.title,
+                                    onNavigateBack = { navController.popBackStack() },
+                                    navController = navController
+                                )
+                            }
                         }
 
                         // Analytics screen tracking — fires a screen-view event on each navigation change.
@@ -615,6 +629,23 @@ fun SpaceLaunchNowApp(
                                 log.d { "Navigating to event detail for ID: $notificationEventId" }
                                 navController.navigate(EventDetail(notificationEventId))
                                 onNotificationEventIdConsumed()
+                            }
+                        }
+                        LaunchedEffect(notificationNewsUrl) {
+                            if (notificationNewsUrl != null) {
+                                log.d { "Navigating to news detail for URL: $notificationNewsUrl" }
+                                // Root the back stack at the News section so backing out of the
+                                // article lands on the News list (not Home). Resulting stack:
+                                // Home -> NewsEvents -> NewsDetail. Back from the article goes to
+                                // News, a second back goes Home — never bouncing into the article.
+                                navController.navigate(NewsEvents)
+                                navController.navigate(
+                                    NewsDetail(
+                                        url = notificationNewsUrl,
+                                        title = notificationNewsTitle.orEmpty()
+                                    )
+                                )
+                                onNotificationNewsConsumed()
                             }
                         }
                         LaunchedEffect(navigationDestination) {

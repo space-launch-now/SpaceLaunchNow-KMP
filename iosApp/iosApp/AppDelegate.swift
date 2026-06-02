@@ -795,12 +795,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             return
         }
 
-        // News notification: open the article URL externally.
+        // News notification: open the article IN-APP via the Compose NewsDetail screen
+        // (internal WKWebView), mirroring the Android news_url/news_title deep link. This keeps
+        // the user inside the app — back from the article returns into the app, not to Safari.
         if isNewsNotification(userInfo) {
-            if let urlString = userInfo["article_url"] as? String, let url = URL(string: urlString) {
-                print("📰 Opening news article URL: \(urlString)")
+            if let urlString = userInfo["article_url"] as? String, !urlString.isEmpty {
+                let title = (userInfo["article_title"] as? String) ?? ""
+                print("📰 Opening news article in-app: \(urlString)")
                 DispatchQueue.main.async {
-                    UIApplication.shared.open(url)
+                    MainViewControllerKt.setNotificationNews(url: urlString, title: title)
                 }
             } else {
                 print("⚠️ News notification tapped but no valid article_url")
@@ -854,9 +857,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 MainViewControllerKt.setNotificationEventId(eventId: targetId)
             }
         case "news":
-            if let urlString = targetUrl, let url = URL(string: urlString) {
+            // Open custom-admin news in-app via NewsDetail (mirrors Android + the plain-news path).
+            // Custom payloads carry no dedicated article title, so fall back to the notification
+            // title if present.
+            if let urlString = targetUrl, !urlString.isEmpty {
+                let title = (userInfo["title"] as? String) ?? ""
                 DispatchQueue.main.async {
-                    UIApplication.shared.open(url)
+                    MainViewControllerKt.setNotificationNews(url: urlString, title: title)
                 }
             } else {
                 print("⚠️ Custom news target missing/invalid target_url")

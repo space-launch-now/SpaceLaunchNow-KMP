@@ -33,6 +33,10 @@ private val notificationLaunchIdState = mutableStateOf<String?>(null)
 // Shared state for notification-based event navigation (events + custom event targets)
 private val notificationEventIdState = mutableStateOf<Int?>(null)
 
+// Shared state for news-notification navigation (opens the article in-app via NewsDetail)
+private val notificationNewsUrlState = mutableStateOf<String?>(null)
+private val notificationNewsTitleState = mutableStateOf<String?>(null)
+
 // Callback for theme changes — set from Swift to receive updates
 private var themeChangeListener: ((Int) -> Unit)? = null
 
@@ -78,6 +82,23 @@ fun setNotificationEventId(eventId: String?) {
         notificationEventIdState.value = id
     } catch (t: Throwable) {
         println("iOS: Setting notification event ID: $eventId (failed: ${t.message})")
+    }
+}
+
+// Public function for iOS to open a news article in-app from a notification tap.
+// Mirrors the Android news_url/news_title deep link: drives the in-app NewsDetail screen
+// (internal WKWebView) instead of opening the URL in Safari. Blank/missing url is ignored.
+fun setNotificationNews(url: String?, title: String?) {
+    try {
+        if (url.isNullOrBlank()) {
+            log.w { "iOS: Ignoring notification news (blank url)" }
+            return
+        }
+        log.i { "iOS: Setting notification news url: $url" }
+        notificationNewsUrlState.value = url
+        notificationNewsTitleState.value = title
+    } catch (t: Throwable) {
+        println("iOS: Setting notification news url: $url (failed: ${t.message})")
     }
 }
 
@@ -165,6 +186,8 @@ fun MainViewController() = ComposeUIViewController {
     val navigationDestination by navigationDestinationState
     val notificationLaunchId by notificationLaunchIdState
     val notificationEventId by notificationEventIdState
+    val notificationNewsUrl by notificationNewsUrlState
+    val notificationNewsTitle by notificationNewsTitleState
 
     // Collect useUtc and theme preferences for reactive updates
     val appPreferences = getKoin().get<AppPreferences>()
@@ -196,6 +219,12 @@ fun MainViewController() = ComposeUIViewController {
         notificationEventId = notificationEventId,
         onNotificationEventIdConsumed = {
             notificationEventIdState.value = null
+        },
+        notificationNewsUrl = notificationNewsUrl,
+        notificationNewsTitle = notificationNewsTitle,
+        onNotificationNewsConsumed = {
+            notificationNewsUrlState.value = null
+            notificationNewsTitleState.value = null
         }
     )
 }

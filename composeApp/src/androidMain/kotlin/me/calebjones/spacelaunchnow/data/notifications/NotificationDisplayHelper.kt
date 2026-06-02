@@ -912,9 +912,9 @@ object NotificationDisplayHelper {
     /**
      * Display a news notification using NewsNotificationPayload.
      *
-     * Shown on the NEWS_UPDATES channel. Tapping opens the article URL externally in the
-     * browser (direct ACTION_VIEW PendingIntent — no MainActivity routing), matching the
-     * news-list behavior.
+     * Shown on the NEWS_UPDATES channel. Tapping deep-links into MainActivity, which routes to
+     * the in-app NewsDetail screen (internal WebView) carrying news_url/news_title extras, so the
+     * article opens inside the app rather than the external browser.
      *
      * @param context Android context
      * @param payload News notification payload with all data
@@ -937,9 +937,14 @@ object NotificationDisplayHelper {
         val channelId = getChannelId(payload.notificationType)
         log.d("📱 [News Notification] Channel: $channelId")
 
-        // Tap opens the article URL externally (matches news-list behavior).
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(payload.articleUrl)).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        // Tap opens the article in-app via MainActivity -> NewsDetail (internal WebView),
+        // so the user lands inside the app and back navigation returns into it rather than
+        // bouncing out to the external browser.
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("news_url", payload.articleUrl)
+            putExtra("news_title", payload.articleTitle)
+            putExtra("notification_type", payload.notificationType)
         }
 
         val pendingIntent = PendingIntent.getActivity(

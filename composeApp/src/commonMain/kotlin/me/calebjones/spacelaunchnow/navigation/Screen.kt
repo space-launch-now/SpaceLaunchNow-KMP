@@ -51,6 +51,9 @@ data class LaunchDetail(val launchId: String)
 data class EventDetail(val eventId: Int)
 
 @Serializable
+data class NewsDetail(val url: String, val title: String = "")
+
+@Serializable
 data object Onboarding
 
 @Serializable
