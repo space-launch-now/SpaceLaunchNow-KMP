@@ -24,7 +24,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SpaceStationDetailScreen(
     stationId: Int,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
 ) {
     val log = SpaceLogger.getLogger("SpaceStationDetailScreen")
     val viewModel = koinViewModel<SpaceStationViewModel>()
@@ -92,9 +93,10 @@ fun SpaceStationDetailScreen(
                 onSetPlayerVisible = viewModel::setPlayerVisible,
                 onVideoSelected = viewModel::selectVideo,
                 onNavigateBack = onNavigateBack,
-                onNavigateToFullscreen = { url, title -> 
+                onNavigateToFullscreen = { url, title ->
                     // TODO: Navigate to fullscreen video screen
-                }
+                },
+                onArticleClick = onArticleClick
             )
         }
 

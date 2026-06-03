@@ -74,7 +74,8 @@ fun SpaceStationDetailView(
     onSetPlayerVisible: (Boolean) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateBack: () -> Unit,
-    onNavigateToFullscreen: (String, String) -> Unit
+    onNavigateToFullscreen: (String, String) -> Unit,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
 ) {
     val isIss = station.id == ISS_STATION_ID
 
@@ -100,7 +101,8 @@ fun SpaceStationDetailView(
             videoPlayerState = videoPlayerState,
             onSetPlayerVisible = onSetPlayerVisible,
             onVideoSelected = onVideoSelected,
-            onNavigateToFullscreen = onNavigateToFullscreen
+            onNavigateToFullscreen = onNavigateToFullscreen,
+            onArticleClick = onArticleClick
         )
     }
 }
@@ -117,7 +119,8 @@ private fun SpaceStationDetailContent(
     videoPlayerState: VideoPlayerState,
     onSetPlayerVisible: (Boolean) -> Unit,
     onVideoSelected: (Int) -> Unit,
-    onNavigateToFullscreen: (String, String) -> Unit
+    onNavigateToFullscreen: (String, String) -> Unit,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
 ) {
     val isCollapsed = LocalDetailScaffoldCollapsed.current
     val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger
@@ -395,7 +398,7 @@ private fun SpaceStationDetailContent(
 
         // Related news articles
         if (articles.isNotEmpty()) {
-            StationReportsCard(articles = articles)
+            StationReportsCard(articles = articles, onArticleClick = onArticleClick)
             Spacer(Modifier.height(16.dp))
         }
 

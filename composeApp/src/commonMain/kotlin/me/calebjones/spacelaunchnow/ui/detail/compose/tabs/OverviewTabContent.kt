@@ -55,7 +55,8 @@ fun OverviewTabContent(
     onNavigateToFullscreen: (String, String) -> Unit,
     onVideoSelected: (Int) -> Unit,
     onNavigateToSettings: (() -> Unit)? = null,
-    onEventClick: ((Int) -> Unit)? = null
+    onEventClick: ((Int) -> Unit)? = null,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -133,7 +134,8 @@ fun OverviewTabContent(
             RelatedNewsCard(
                 articles = relatedNews,
                 isLoading = isNewsLoading,
-                error = newsError
+                error = newsError,
+                onArticleClick = onArticleClick
             )
             Spacer(Modifier.height(16.dp))
         }

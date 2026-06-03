@@ -30,6 +30,7 @@ import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.navigation.AstronautDetail
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
+import me.calebjones.spacelaunchnow.navigation.NewsDetail
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialAdHandler
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailErrorView
 import me.calebjones.spacelaunchnow.ui.detail.compose.LaunchDetailLoadingView
@@ -169,6 +170,9 @@ fun LaunchDetailScreen(
                     },
                     onAstronautClick = { astronautId ->
                         navController?.navigate(AstronautDetail(astronautId = astronautId))
+                    },
+                    onArticleClick = { url, title ->
+                        navController?.navigate(NewsDetail(url = url, title = title))
                     },
                     forcePhoneLayout = forcePhoneLayout,
                     onOpenUrl = { url ->

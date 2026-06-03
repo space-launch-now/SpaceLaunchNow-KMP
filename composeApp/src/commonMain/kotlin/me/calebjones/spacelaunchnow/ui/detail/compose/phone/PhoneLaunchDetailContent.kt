@@ -65,6 +65,7 @@ fun PhoneLaunchDetailContent(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null,
     openUrl: (String) -> Unit,
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
@@ -168,7 +169,8 @@ fun PhoneLaunchDetailContent(
                     onNavigateToFullscreen = onNavigateToFullscreen,
                     onVideoSelected = onVideoSelected,
                     onNavigateToSettings = onNavigateToSettings,
-                    onEventClick = onEventClick
+                    onEventClick = onEventClick,
+                    onArticleClick = onArticleClick
                 )
             }
 

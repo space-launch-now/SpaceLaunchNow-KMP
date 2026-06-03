@@ -475,7 +475,10 @@ fun SpaceLaunchNowApp(
                                 val stationDetail = backStackEntry.toRoute<SpaceStationDetail>()
                                 me.calebjones.spacelaunchnow.ui.spacestation.SpaceStationDetailScreen(
                                     stationId = stationDetail.stationId,
-                                    onNavigateBack = { navController.popBackStack() }
+                                    onNavigateBack = { navController.popBackStack() },
+                                    onArticleClick = { url, title ->
+                                        navController.navigate(NewsDetail(url, title))
+                                    }
                                 )
                             }
                             composableWithCompositionLocal<FullscreenVideo> { backStackEntry ->
@@ -584,7 +587,10 @@ fun SpaceLaunchNowApp(
                                 val stationDetail = backStackEntry.toRoute<SpaceStationDetail>()
                                 me.calebjones.spacelaunchnow.ui.spacestation.SpaceStationDetailScreen(
                                     stationId = stationDetail.stationId,
-                                    onNavigateBack = { navController.popBackStack() }
+                                    onNavigateBack = { navController.popBackStack() },
+                                    onArticleClick = { url, title ->
+                                        navController.navigate(NewsDetail(url, title))
+                                    }
                                 )
                             }
                             composableWithCompositionLocal<Starship> {
@@ -594,6 +600,9 @@ fun SpaceLaunchNowApp(
                                 NewsEventsScreen(
                                     onEventClick = { eventId ->
                                         navController.navigate(EventDetail(eventId))
+                                    },
+                                    onArticleClick = { url, title ->
+                                        navController.navigate(NewsDetail(url, title))
                                     }
                                 )
                             }

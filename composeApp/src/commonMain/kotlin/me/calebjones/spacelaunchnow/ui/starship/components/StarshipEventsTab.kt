@@ -34,6 +34,7 @@ import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.navigation.EventDetail
+import me.calebjones.spacelaunchnow.navigation.NewsDetail
 import me.calebjones.spacelaunchnow.ui.compose.StarshipEventsShimmer
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsCard
 import me.calebjones.spacelaunchnow.ui.home.components.SectionTitle
@@ -128,7 +129,10 @@ fun StarshipEventsTab(
                                 RelatedNewsCard(
                                     articles = news,
                                     isLoading = newsState.isLoading,
-                                    error = null
+                                    error = null,
+                                    onArticleClick = { url, title ->
+                                        navController.navigate(NewsDetail(url, title))
+                                    }
                                 )
                             }
                         }

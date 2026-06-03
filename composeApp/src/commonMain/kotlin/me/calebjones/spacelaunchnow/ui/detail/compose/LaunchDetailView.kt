@@ -82,6 +82,7 @@ fun LaunchDetailView(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null,
     forcePhoneLayout: Boolean = false,
     onOpenUrl: (String) -> Unit = {},
     onExternalVideoOpened: ((String, String) -> Unit)? = null
@@ -108,6 +109,7 @@ fun LaunchDetailView(
             onNavigateToSettings = onNavigateToSettings,
             onEventClick = onEventClick,
             onAstronautClick = onAstronautClick,
+            onArticleClick = onArticleClick,
             onOpenUrl = onOpenUrl,
             onExternalVideoOpened = onExternalVideoOpened
         )
@@ -130,6 +132,7 @@ fun LaunchDetailView(
             onNavigateToSettings = onNavigateToSettings,
             onEventClick = onEventClick,
             onAstronautClick = onAstronautClick,
+            onArticleClick = onArticleClick,
             forcePhoneLayout = forcePhoneLayout,
             onOpenUrl = onOpenUrl,
             onExternalVideoOpened = onExternalVideoOpened
@@ -158,6 +161,7 @@ private fun TabletLaunchDetailView(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null,
     onOpenUrl: (String) -> Unit = {},
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
@@ -196,6 +200,7 @@ private fun TabletLaunchDetailView(
                 onNavigateToSettings = onNavigateToSettings,
                 onEventClick = onEventClick,
                 onAstronautClick = onAstronautClick,
+                onArticleClick = onArticleClick,
                 openUrl = onOpenUrl,
                 onExternalVideoOpened = onExternalVideoOpened
             )
@@ -227,6 +232,7 @@ private fun PhoneLaunchDetailView(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null,
     forcePhoneLayout: Boolean = false,
     onOpenUrl: (String) -> Unit = {},
     onExternalVideoOpened: ((String, String) -> Unit)? = null
@@ -268,6 +274,7 @@ private fun PhoneLaunchDetailView(
                 onNavigateToSettings = onNavigateToSettings,
                 onEventClick = onEventClick,
                 onAstronautClick = onAstronautClick,
+                onArticleClick = onArticleClick,
                 openUrl = onOpenUrl,
                 onExternalVideoOpened = onExternalVideoOpened
             )

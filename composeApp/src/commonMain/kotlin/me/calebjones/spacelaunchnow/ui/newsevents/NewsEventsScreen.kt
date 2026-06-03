@@ -73,15 +73,16 @@ import org.koin.compose.viewmodel.koinViewModel
  * Supports pagination, pull-to-refresh, and will support search and filtering.
  * 
  * @param onEventClick Callback when an event is clicked (navigates to event detail)
+ * @param onArticleClick Callback when an article is clicked (navigates to in-app news detail)
  * @param viewModel The ViewModel managing the screen state
  */
 @Composable
 fun NewsEventsScreen(
     onEventClick: (Int) -> Unit = {},
+    onArticleClick: (url: String, title: String) -> Unit = { _, _ -> },
     viewModel: NewsEventsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -97,7 +98,7 @@ fun NewsEventsScreen(
             onEventClick = onEventClick,
             onArticleClick = { article ->
                 viewModel.trackArticleClicked(article.id.toString(), article.newsSite, article.url)
-                uriHandler.openUri(article.url)
+                onArticleClick(article.url, article.title)
             },
             onSearchQueryChange = viewModel::updateSearchQuery,
             onClearSearch = viewModel::clearSearch,

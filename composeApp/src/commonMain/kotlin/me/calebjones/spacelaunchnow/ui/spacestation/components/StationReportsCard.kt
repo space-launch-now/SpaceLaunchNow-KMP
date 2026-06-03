@@ -30,7 +30,8 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsItem
 @Composable
 fun StationReportsCard(
     articles: List<Article>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
 ) {
     if (articles.isEmpty()) return
 
@@ -55,7 +56,7 @@ fun StationReportsCard(
 
             Column {
                 displayedArticles.forEach { article ->
-                    RelatedNewsItem(article = article)
+                    RelatedNewsItem(article = article, onArticleClick = onArticleClick)
                 }
             }
 

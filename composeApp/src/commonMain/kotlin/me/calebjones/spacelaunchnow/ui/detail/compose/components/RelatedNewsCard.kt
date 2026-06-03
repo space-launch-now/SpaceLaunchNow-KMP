@@ -48,7 +48,8 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
 fun RelatedNewsCard(
     articles: List<Article>,
     isLoading: Boolean,
-    error: String?
+    error: String?,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
 ) {
     var showAll by remember { mutableStateOf(false) }
 
@@ -66,7 +67,7 @@ fun RelatedNewsCard(
                 val displayedArticles = if (showAll) articles else articles.take(5)
 
                 displayedArticles.forEach { article ->
-                    RelatedNewsItem(article = article)
+                    RelatedNewsItem(article = article, onArticleClick = onArticleClick)
                 }
 
                 // Show "Load More" button if there are more than 5 articles
@@ -105,10 +106,19 @@ fun RelatedNewsCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RelatedNewsItem(article: Article) {
+fun RelatedNewsItem(
+    article: Article,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
+) {
     val uriHandler = LocalUriHandler.current
     Card(
-        onClick = { uriHandler.openUri(article.url) },
+        onClick = {
+            if (onArticleClick != null) {
+                onArticleClick(article.url, article.title)
+            } else {
+                uriHandler.openUri(article.url)
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),

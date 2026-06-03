@@ -67,6 +67,7 @@ fun TabletLaunchDetailContent(
     onNavigateToSettings: (() -> Unit)? = null,
     onEventClick: ((Int) -> Unit)? = null,
     onAstronautClick: ((Int) -> Unit)? = null,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null,
     openUrl: (String) -> Unit,
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
@@ -166,7 +167,8 @@ fun TabletLaunchDetailContent(
                 RelatedNewsCard(
                     articles = relatedNews,
                     isLoading = isNewsLoading,
-                    error = newsError
+                    error = newsError,
+                    onArticleClick = onArticleClick
                 )
             }
 
