@@ -15,7 +15,7 @@ actual object ExternalLinkHandler {
         
         NSURL.URLWithString(urlString)?.let { url ->
             if (UIApplication.sharedApplication.canOpenURL(url)) {
-                UIApplication.sharedApplication.openURL(url)
+                UIApplication.sharedApplication.openURL(url, emptyMap<Any?, Any?>()) { }
             }
         }
     }
@@ -23,7 +23,7 @@ actual object ExternalLinkHandler {
     actual fun openUrl(url: String) {
         NSURL.URLWithString(url)?.let { nsUrl ->
             if (UIApplication.sharedApplication.canOpenURL(nsUrl)) {
-                UIApplication.sharedApplication.openURL(nsUrl)
+                UIApplication.sharedApplication.openURL(nsUrl, emptyMap<Any?, Any?>()) { }
             }
         }
     }

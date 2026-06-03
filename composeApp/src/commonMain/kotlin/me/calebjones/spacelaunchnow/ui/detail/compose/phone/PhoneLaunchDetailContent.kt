@@ -78,6 +78,15 @@ fun PhoneLaunchDetailContent(
         CombinedLaunchOverviewCard(launch = launch)
         Spacer(Modifier.height(16.dp))
 
+        // Ad Banner above video
+        SmartBannerAd(
+            modifier = Modifier.fillMaxWidth(),
+            placementType = AdPlacementType.INTERSTITIAL,
+            showRemoveAdsButton = true,
+            onRemoveAdsClick = onNavigateToSettings
+        )
+        Spacer(Modifier.height(16.dp))
+
         // Video Player Card (above tabs, only shown if videos are available)
         if (videoPlayerState.availableVideos.isNotEmpty()) {
             val videoTitle = launch.net?.let { net ->
@@ -126,15 +135,6 @@ fun PhoneLaunchDetailContent(
             onboardCrew = launch.rocketDetail?.spacecraftFlights?.flatMap { it.onboardCrew } ?: emptyList(),
             landingCrew = launch.rocketDetail?.spacecraftFlights?.flatMap { it.landingCrew } ?: emptyList(),
             onAstronautClick = onAstronautClick
-        )
-        Spacer(Modifier.height(16.dp))
-
-        // Ad Banner above tabs
-        SmartBannerAd(
-            modifier = Modifier.fillMaxWidth(),
-            placementType = AdPlacementType.INTERSTITIAL,
-            showRemoveAdsButton = true,
-            onRemoveAdsClick = onNavigateToSettings
         )
         Spacer(Modifier.height(16.dp))
 
