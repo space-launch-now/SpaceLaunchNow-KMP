@@ -1,3 +1,12 @@
+# [5.33.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.32.0...v5.33.0) (2026-06-03)
+
+
+### Features
+
+* **navigation:** add article click handling to navigate to NewsDetail ([5dc8510](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5dc8510fc410af6ed0d3b76f1174fd9272077b25))
+
+
+
 # [5.32.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.31.2...v5.32.0) (2026-06-02)
 
 
@@ -44,15 +53,6 @@
 * Implement V5 Custom and News Notifications for KMP App ([78353fa](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/78353fa705c91635ec1102fcea5ab9fdb7bf6149))
 * **notification:** enhance analytics tracking for notification delivery outcomes ([d21ae44](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d21ae444b5d1fad9658bd0f0baa5b251d2eb1afe))
 * **tasks:** add task to start ADB server with detailed presentation options ([e8c2b3b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e8c2b3bafe30c7599bf9d6a48671f4e63e845a57))
-
-
-
-## [5.30.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.30.0...v5.30.1) (2026-05-15)
-
-
-### Bug Fixes
-
-* update onboarding page count and improve padding for wear screens ([bb2ebfc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb2ebfc2447cd2ac4de0de8f6294fe4b8a3be4ce))
 
 
 
