@@ -25,6 +25,7 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
         private val CONSOLE_SEVERITY = stringPreferencesKey("console_severity")
         private val DATADOG_SEVERITY = stringPreferencesKey("datadog_severity")
         private val DATADOG_ENABLED = booleanPreferencesKey("datadog_enabled")
+        private val DIAGNOSTIC_LEVEL = stringPreferencesKey("diagnostic_level")
     }
 
     /**
@@ -86,6 +87,28 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
     suspend fun setDataDogEnabled(enabled: Boolean) {
         dataStore.edit { prefs ->
             prefs[DATADOG_ENABLED] = enabled
+        }
+    }
+
+    /**
+     * Single diagnostic control. Migrates from the legacy datadog_enabled boolean
+     * when the new key is absent (old toggle ON -> STANDARD).
+     */
+    fun getDiagnosticLevel(): Flow<DiagnosticLevel> = dataStore.data.map { prefs ->
+        DiagnosticLevel.fromStorage(prefs[DIAGNOSTIC_LEVEL], prefs[DATADOG_ENABLED])
+    }
+
+    /**
+     * Set the diagnostic level and keep the legacy keys coherent so any remaining
+     * reader of the old knobs observes the same effective configuration.
+     */
+    suspend fun setDiagnosticLevel(level: DiagnosticLevel) {
+        val policy = level.policy()
+        dataStore.edit { prefs ->
+            prefs[DIAGNOSTIC_LEVEL] = level.name
+            prefs[DATADOG_ENABLED] = level != DiagnosticLevel.OFF
+            prefs[CONSOLE_SEVERITY] = policy.consoleSeverity.name
+            prefs[DATADOG_SEVERITY] = policy.remoteSeverity.name
         }
     }
 }
