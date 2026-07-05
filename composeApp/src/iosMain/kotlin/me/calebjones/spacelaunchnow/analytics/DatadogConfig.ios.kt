@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.concurrent.Volatile
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -81,7 +82,7 @@ actual object DatadogRUM {
 }
 
 actual object DatadogRuntime {
-    private var consentGranted: Boolean = false
+    @Volatile private var consentGranted: Boolean = false
 
     actual fun setConsentGranted(granted: Boolean) {
         consentGranted = granted
