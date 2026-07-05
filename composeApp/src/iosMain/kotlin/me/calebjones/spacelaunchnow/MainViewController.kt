@@ -109,6 +109,10 @@ fun MainViewController() = ComposeUIViewController {
         // Register CrashKiOS unhandled exception hook so Kotlin crashes on iOS
         // produce readable stack traces in Crashlytics
         setupCrashlyticsExceptionHook()
+        // Initialize diagnostics file store before SpaceLogger so the writer is included
+        me.calebjones.spacelaunchnow.util.logging.DiagnosticsLog.initialize(
+            me.calebjones.spacelaunchnow.util.logging.IosDiagnosticsFileStore()
+        )
         // Initialize SpaceLogger before any logging calls
         SpaceLogger.initialize()
         startKoin(koinConfig)

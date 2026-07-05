@@ -39,6 +39,9 @@ class MainApplication : Application() {
         instance = this
 
         // Initialize logging FIRST - before any other initialization
+        me.calebjones.spacelaunchnow.util.logging.DiagnosticsLog.initialize(
+            me.calebjones.spacelaunchnow.util.logging.AndroidDiagnosticsFileStore(this)
+        )
         SpaceLogger.initialize()
         log.i { "=== Starting Application onCreate ===" }
 

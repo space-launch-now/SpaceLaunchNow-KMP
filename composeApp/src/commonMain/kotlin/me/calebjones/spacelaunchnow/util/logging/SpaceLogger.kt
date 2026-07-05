@@ -53,16 +53,21 @@ object SpaceLogger {
         logConfig: LogConfig = platformLogConfig(),
         loggingPreferences: LoggingPreferences? = null
     ) {
-        // Separate writers by type
-        consoleWriters = logConfig.writers.filter { it !is DataDogLogWriter }
-        dataDogWriter = logConfig.writers.filterIsInstance<DataDogLogWriter>().firstOrNull()
+        // Merge platform writers with the optional diagnostics file writer.
+        val allWriters: List<LogWriter> = logConfig.writers + listOfNotNull(DiagnosticsLog.writer)
+
+        // Console writers exclude both DataDog and the file writer — the file writer
+        // manages its own severity independently and must NOT be clobbered by the
+        // console severity fan-out in setConsoleSeverity().
+        consoleWriters = allWriters.filter { it !is DataDogLogWriter && it !is FileLogWriter }
+        dataDogWriter = allWriters.filterIsInstance<DataDogLogWriter>().firstOrNull()
 
         // CRITICAL FIX: Create a custom Logger instance with StaticConfig
         // This prevents Kermit's default platform writers from being used
         // Initialize with Severity.Verbose to allow individual writers to control filtering
         val staticConfig = StaticConfig(
             minSeverity = Severity.Verbose,
-            logWriterList = logConfig.writers
+            logWriterList = allWriters
         )
         baseLogger = Logger(staticConfig, BASE_TAG)
 
