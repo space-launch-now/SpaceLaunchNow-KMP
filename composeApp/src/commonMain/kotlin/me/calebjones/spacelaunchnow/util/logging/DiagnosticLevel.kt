@@ -5,6 +5,8 @@ import co.touchlab.kermit.Severity
 /**
  * Single user-facing diagnostic control. Replaces the previous four independent
  * knobs (console severity, Datadog severity, Datadog toggle, sample rate).
+ *
+ * Persisted by name; do not rename constants.
  */
 enum class DiagnosticLevel {
     OFF, STANDARD, VERBOSE;
@@ -13,6 +15,8 @@ enum class DiagnosticLevel {
         /**
          * Resolve level from storage. Falls back to the legacy `datadog_enabled`
          * boolean for users upgrading from the old toggle (true -> STANDARD).
+         *
+         * Unrecognized stored values are discarded and fall through to the legacy fallback.
          */
         fun fromStorage(stored: String?, legacyDatadogEnabled: Boolean?): DiagnosticLevel {
             stored?.let { name -> entries.firstOrNull { it.name == name }?.let { return it } }

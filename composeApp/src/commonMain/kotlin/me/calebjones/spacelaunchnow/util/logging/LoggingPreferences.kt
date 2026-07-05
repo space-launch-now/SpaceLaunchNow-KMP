@@ -10,9 +10,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * Manages logging severity preferences with DataStore
+ * Manages logging severity preferences with DataStore.
  *
- * Stores severity levels directly - no boolean flag mapping needed!
+ * [diagnostic_level] is the primary control: calling [setDiagnosticLevel] atomically
+ * writes the new [DiagnosticLevel] name AND overwrites the legacy keys
+ * ([console_severity], [datadog_severity], [datadog_enabled]) so that any remaining
+ * reader of those old knobs observes the same effective configuration.
+ *
+ * The legacy per-sink setters ([setConsoleSeverity], [setDataDogSeverity],
+ * [setDataDogEnabled]) do NOT update [diagnostic_level]; callers that still use them
+ * should migrate to [setDiagnosticLevel].
  *
  * Default behavior:
  * - Console: WARN (always shows critical issues in production)
@@ -101,6 +108,8 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
     /**
      * Set the diagnostic level and keep the legacy keys coherent so any remaining
      * reader of the old knobs observes the same effective configuration.
+     *
+     * Coherence is one-directional: legacy setters do not update diagnostic_level.
      */
     suspend fun setDiagnosticLevel(level: DiagnosticLevel) {
         val policy = level.policy()

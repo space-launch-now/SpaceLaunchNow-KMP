@@ -40,7 +40,13 @@ class DiagnosticLevelTest {
         val p = DiagnosticLevel.STANDARD.policy()
         assertTrue(p.remoteConsentGranted)
         assertEquals(Severity.Warn, p.remoteSeverity)
+        assertEquals(Severity.Warn, p.consoleSeverity)
         assertEquals(Severity.Info, p.fileSeverity)
+    }
+
+    @Test
+    fun fromStorage_garbageWithLegacyEnabledFallsToStandard() {
+        assertEquals(DiagnosticLevel.STANDARD, DiagnosticLevel.fromStorage("garbage", legacyDatadogEnabled = true))
     }
 
     @Test
