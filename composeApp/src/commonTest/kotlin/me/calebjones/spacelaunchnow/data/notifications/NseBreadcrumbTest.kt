@@ -27,4 +27,27 @@ class NseBreadcrumbTest {
         val b = NseBreadcrumb.parse("123|t|d|reason/with/slashes")
         assertEquals("reason/with/slashes", b?.reason)
     }
+
+    @Test
+    fun parse_emptyReasonIsValid() {
+        val b = NseBreadcrumb.parse("123|t|d|")
+        assertEquals("", b?.reason)
+    }
+
+    @Test
+    fun parse_rawPipeInReasonIsPreserved() {
+        val b = NseBreadcrumb.parse("1|t|d|r|x")
+        assertEquals("r|x", b?.reason)
+    }
+
+    @Test
+    fun parse_negativeTimestampAccepted() {
+        // Parser does not editorialize on values; writer guarantees sanity.
+        assertEquals(-5L, NseBreadcrumb.parse("-5|t|d|r")?.timestampEpochSeconds)
+    }
+
+    @Test
+    fun parse_emptyStringRejected() {
+        assertNull(NseBreadcrumb.parse(""))
+    }
 }

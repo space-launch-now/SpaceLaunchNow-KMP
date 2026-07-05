@@ -171,6 +171,7 @@ object NSEPreferenceBridge {
      * Datadog minSeverity. UserContext attributes (RevenueCat user id) are attached manually
      * since we are not going through DataDogLogWriter (which would otherwise add them).
      * Call once on app foreground/startup (see IosNotificationBridge).
+     * No-op (buffer preserved) when DatadogRuntime.isRemoteLoggingActive() is false.
      */
     @OptIn(ExperimentalAtomicApi::class)
     fun drainNseEventLog() {

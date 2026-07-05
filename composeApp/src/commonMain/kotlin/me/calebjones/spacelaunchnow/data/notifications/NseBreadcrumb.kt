@@ -12,7 +12,7 @@ data class NseBreadcrumb(
 ) {
     companion object {
         fun parse(entry: String): NseBreadcrumb? {
-            val parts = entry.split("|")
+            val parts = entry.split("|", limit = 4)
             if (parts.size < 4) return null
             val ts = parts[0].toLongOrNull() ?: return null
             return NseBreadcrumb(ts, parts[1], parts[2], parts[3])
