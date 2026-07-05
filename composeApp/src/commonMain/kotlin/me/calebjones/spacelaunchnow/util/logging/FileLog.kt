@@ -43,7 +43,7 @@ class LogRingBuffer(private val maxChars: Int) {
 
 /**
  * Pure synchronous core of the diagnostics file log: capped buffer + flush policy.
- * Warn+ lines flush immediately (crash durability); Info/Debug batch.
+ * Warn+ lines flush immediately (best-effort durability; the flush still hops through the async shell); Info/Debug batch.
  */
 class FileLogCore(
     private val store: DiagnosticsFileStore,

@@ -49,7 +49,7 @@ actual fun initializeDatadog(
         .trackCrashes(true)
         .build()
 
-    Datadog.initialize(context, configuration, TrackingConsent.GRANTED)
+    Datadog.initialize(context, configuration, TrackingConsent.PENDING)
 
     val applicationId = EnvironmentManager.getEnv("DATADOG_APPLICATION_ID", "")
     if (applicationId.isNotEmpty()) {
@@ -66,7 +66,7 @@ actual fun initializeDatadog(
     val logsConfig = LogsConfiguration.Builder().build()
     Logs.enable(logsConfig)
 
-    val effectiveSampleRate = sampleRate ?: 1f
+    val effectiveSampleRate = sampleRate ?: 100f
     DatadogLogger.initialize(effectiveSampleRate, debugPreferences)
 }
 
@@ -85,6 +85,24 @@ actual object DatadogRUM {
         Datadog.clearAllData()
         log.i { "Datadog User Cleared" }
     }
+}
+
+actual object DatadogRuntime {
+    private var consentGranted: Boolean = false
+
+    actual fun setConsentGranted(granted: Boolean) {
+        consentGranted = granted
+        if (Datadog.isInitialized()) {
+            Datadog.setTrackingConsent(
+                if (granted) TrackingConsent.GRANTED else TrackingConsent.NOT_GRANTED
+            )
+        }
+        log.i { "Datadog consent set: granted=$granted (sdkInitialized=${Datadog.isInitialized()})" }
+    }
+
+    actual fun isRemoteLoggingActive(): Boolean = Datadog.isInitialized() && consentGranted
+
+    actual fun isSdkInitialized(): Boolean = Datadog.isInitialized()
 }
 
 actual object DatadogLogger {
