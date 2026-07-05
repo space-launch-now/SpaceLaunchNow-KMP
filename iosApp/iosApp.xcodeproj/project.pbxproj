@@ -59,6 +59,8 @@
 		F907BC652EC38A4800C05E19 /* DatadogWebViewTracking in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC642EC38A4800C05E19 /* DatadogWebViewTracking */; };
 		F99496BC2F2A9B75009EACA3 /* V5NotificationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99496B82F2A9B75009EACA3 /* V5NotificationData.swift */; };
 		F99496C02F2A9B75009EACA3 /* V5NotificationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99496B82F2A9B75009EACA3 /* V5NotificationData.swift */; };
+		AA00CAFE00000000000000B1 /* NotificationAlertPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00CAFE00000000000000A1 /* NotificationAlertPolicy.swift */; };
+		AA00CAFE00000000000000B2 /* NotificationAlertPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00CAFE00000000000000A1 /* NotificationAlertPolicy.swift */; };
 		F9AF025D2F29DD7B00E31B3C /* NotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F9AF02562F29DD7B00E31B3C /* NotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F9B127162F0C36A5005426E1 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = F9B127152F0C36A5005426E1 /* GoogleMaps */; };
 /* End PBXBuildFile section */
@@ -119,6 +121,7 @@
 		E00001012F4A000100010001 /* LaunchWidgetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LaunchWidgetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F90569C52F0889DC009D885A /* ShareHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareHelper.swift; sourceTree = "<group>"; };
 		F99496B82F2A9B75009EACA3 /* V5NotificationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V5NotificationData.swift; sourceTree = "<group>"; };
+		AA00CAFE00000000000000A1 /* NotificationAlertPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationAlertPolicy.swift; sourceTree = "<group>"; };
 		F9AF02562F29DD7B00E31B3C /* NotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -270,6 +273,7 @@
 			isa = PBXGroup;
 			children = (
 				F99496B82F2A9B75009EACA3 /* V5NotificationData.swift */,
+				AA00CAFE00000000000000A1 /* NotificationAlertPolicy.swift */,
 				F90569C52F0889DC009D885A /* ShareHelper.swift */,
 				3C7AFD372EADC588002FEDEE /* GoogleService-Info.plist */,
 				3CC6E4CE2EAD9BBF002F6FE9 /* AppDelegate.swift */,
@@ -593,6 +597,7 @@
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				3CC6E4D02EAD9BBF002F6FE9 /* AppDelegate.swift in Sources */,
 				F99496BC2F2A9B75009EACA3 /* V5NotificationData.swift in Sources */,
+				AA00CAFE00000000000000B1 /* NotificationAlertPolicy.swift in Sources */,
 				F90569C72F0889DC009D885A /* ShareHelper.swift in Sources */,
 				3CC6E4D12EAD9BBF002F6FE9 /* FCMBridge.swift in Sources */,
 			);
@@ -610,6 +615,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F99496C02F2A9B75009EACA3 /* V5NotificationData.swift in Sources */,
+				AA00CAFE00000000000000B2 /* NotificationAlertPolicy.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

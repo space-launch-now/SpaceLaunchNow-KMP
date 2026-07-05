@@ -108,7 +108,7 @@ class NotificationService: UNNotificationServiceExtension {
             // Enrich with server-provided title and body.
             bestAttemptContent.title = v5Data.title
             bestAttemptContent.body = v5Data.body
-            bestAttemptContent.sound = .default
+            NotificationAlertPolicy.applySound(to: bestAttemptContent, notificationType: notificationType)
 
             // Download and attach launch image if available.
             if let imageUrlString = v5Data.launchImage,
