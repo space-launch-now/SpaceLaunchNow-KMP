@@ -137,22 +137,6 @@ object NSEPreferenceBridge {
     }
 
     /**
-     * Log a compact summary of the App Group prefs the NSE reads when the app is
-     * killed. Missing keys mean the NSE fails CLOSED (suppresses launch pushes).
-     */
-    fun logStoredPrefs() {
-        val snap = readStoredPrefs()
-        log.i {
-            "[NSE-PREFS] appGroup=${snap.appGroupAvailable} keysMissing=${snap.anyKeyMissing} " +
-                "followAll=${snap.followAllLaunches} strict=${snap.useStrictMatching} " +
-                "agencies=${snap.subscribedAgencies?.size} locations=${snap.subscribedLocations?.size}"
-        }
-        if (snap.anyKeyMissing) {
-            log.w { "[NSE-PREFS] keys MISSING — NSE fails closed and will SUPPRESS launch pushes until synced" }
-        }
-    }
-
-    /**
      * Drain the NSE breadcrumb buffer into Datadog.
      *
      * The Notification Service Extension runs in a separate sandboxed process and cannot reach

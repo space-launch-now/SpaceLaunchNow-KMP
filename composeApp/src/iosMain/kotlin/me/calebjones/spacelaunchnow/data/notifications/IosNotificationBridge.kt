@@ -109,6 +109,7 @@ object IosNotificationBridge : KoinComponent {
             try {
                 val state = notificationStateStorage.getState()
                 val nse = NSEPreferenceBridge.readStoredPrefs()
+                // Sentinel conventions: missing NSE keys -> null for booleans (nse_keys_missing covers querying), -1 for counts (keeps the facet numeric).
                 val attributes = UserContext.getLogAttributes() + mapOf(
                     "log_kind" to "startup_state",
                     "platform" to "ios",
@@ -126,7 +127,7 @@ object IosNotificationBridge : KoinComponent {
                     "nse_location_count" to (nse.subscribedLocations?.size ?: -1),
                 )
                 DatadogLogger.info("[STARTUP] notification_state", attributes)
-                log.d {
+                log.i {
                     "startup_state live(followAll=${state.followAllLaunches}, strict=${state.useStrictMatching}, " +
                         "agencies=${state.subscribedAgencies.size}, locations=${state.subscribedLocations.size}) " +
                         "nse(keysMissing=${nse.anyKeyMissing})"

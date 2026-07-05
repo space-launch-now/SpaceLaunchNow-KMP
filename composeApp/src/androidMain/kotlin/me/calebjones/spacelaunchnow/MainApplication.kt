@@ -35,6 +35,7 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        me.calebjones.spacelaunchnow.util.ShareContextHolder.appContext = applicationContext
         instance = this
 
         // Initialize logging FIRST - before any other initialization
