@@ -11,19 +11,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -181,126 +175,3 @@ fun TestLoggingButtons() {
     SnackbarHost(hostState = snackbarHostState)
 }
 
-/**
- * Datadog Sample Rate Control
- * Allows adjusting the percentage of logs sent to Datadog servers
- */
-@Composable
-fun DatadogSampleRateControl(
-    currentRate: Float,
-    onRateChange: (Float) -> Unit
-) {
-    var sliderPosition by remember(currentRate) { mutableStateOf(currentRate) }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = "Control what percentage of logs are sent to Datadog remote servers. Lower values reduce costs.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Sample Rate:",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = "${sliderPosition.toInt()}%",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = when {
-                        sliderPosition <= 5f -> MaterialTheme.colorScheme.primary
-                        sliderPosition <= 25f -> MaterialTheme.colorScheme.tertiary
-                        else -> MaterialTheme.colorScheme.error
-                    }
-                )
-            }
-
-            Slider(
-                value = sliderPosition,
-                onValueChange = { sliderPosition = it },
-                onValueChangeFinished = {
-                    onRateChange(sliderPosition)
-                },
-                valueRange = 0f..100f,
-                steps = 19, // 0, 5, 10, 15, ..., 100
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Quick preset buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = {
-                        sliderPosition = 1f
-                        onRateChange(1f)
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("1%", fontSize = 10.sp, maxLines = 1)
-                }
-                OutlinedButton(
-                    onClick = {
-                        sliderPosition = 5f
-                        onRateChange(5f)
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("5%", fontSize = 10.sp, maxLines = 1)
-                }
-                OutlinedButton(
-                    onClick = {
-                        sliderPosition = 10f
-                        onRateChange(10f)
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("10%", fontSize = 10.sp, maxLines = 1)
-                }
-                OutlinedButton(
-                    onClick = {
-                        sliderPosition = 25f
-                        onRateChange(25f)
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("25%", fontSize = 10.sp, maxLines = 1)
-                }
-                OutlinedButton(
-                    onClick = {
-                        sliderPosition = 100f
-                        onRateChange(100f)
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("100%", fontSize = 10.sp, maxLines = 1)
-                }
-            }
-
-            Text(
-                text = "⚠️ Changes require app restart to take effect",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
-}

@@ -393,6 +393,7 @@ fun SettingsScreen(
                 Spacer(Modifier.height(2.dp))
                 LoggingSettingsSection(
                     loggingPreferences = loggingPreferences,
+                    onOpenDiagnostics = {}, // Wired to Diagnostics route in the diagnostics-screen task
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
             }

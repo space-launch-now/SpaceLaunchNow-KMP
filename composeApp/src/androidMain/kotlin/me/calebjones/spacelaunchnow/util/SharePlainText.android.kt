@@ -11,7 +11,11 @@ object ShareContextHolder {
 }
 
 actual fun sharePlainText(text: String, subject: String) {
-    val context = ShareContextHolder.appContext ?: return
+    val context = ShareContextHolder.appContext ?: run {
+        me.calebjones.spacelaunchnow.util.logging.SpaceLogger.getLogger("SharePlainText")
+            .w { "sharePlainText dropped — ShareContextHolder not initialized" }
+        return
+    }
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, text)

@@ -4,10 +4,6 @@ import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 
 /**
  * Interface for log writers that support dynamic severity configuration
@@ -48,7 +44,12 @@ object SpaceLogger {
     /**
      * Initialize logging with platform-specific configuration
      * Should be called in Application.onCreate() / main()
+     *
+     * @param logConfig Platform-specific writer configuration.
+     * @param loggingPreferences Retained for call-site compatibility; severity is now driven
+     *   solely by DiagnosticLevelController.
      */
+    @Suppress("UNUSED_PARAMETER")
     fun initialize(
         logConfig: LogConfig = platformLogConfig(),
         loggingPreferences: LoggingPreferences? = null
@@ -70,30 +71,6 @@ object SpaceLogger {
             logWriterList = allWriters
         )
         baseLogger = Logger(staticConfig, BASE_TAG)
-
-        // Observe preferences if provided
-        loggingPreferences?.let { prefs ->
-            observePreferences(prefs)
-        }
-    }
-
-    /**
-     * Observe logging preferences and update severity dynamically
-     */
-    private fun observePreferences(prefs: LoggingPreferences) {
-        CoroutineScope(Dispatchers.Default).launch {
-            combine(
-                prefs.getConsoleSeverity(),
-                prefs.getDataDogSeverity(),
-                prefs.isDataDogEnabled()
-            ) { consoleSev, dataDogSev, dataDogEnabled ->
-                Triple(consoleSev, dataDogSev, dataDogEnabled)
-            }.collect { (consoleSev, dataDogSev, dataDogEnabled) ->
-                setConsoleSeverity(consoleSev)
-                // If DataDog is disabled, set severity to Assert (no logs)
-                setDataDogSeverity(if (dataDogEnabled) dataDogSev else Severity.Assert)
-            }
-        }
     }
 
     /**
