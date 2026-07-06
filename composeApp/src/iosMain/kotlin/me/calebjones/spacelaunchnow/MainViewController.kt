@@ -117,19 +117,9 @@ fun MainViewController() = ComposeUIViewController {
         startKoin(koinConfig)
         koinInitialized = true
 
-        // Re-initialize SpaceLogger with LoggingPreferences to enable dynamic severity updates
-        try {
-            val loggingPrefs =
-                getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
-            SpaceLogger.initialize(loggingPreferences = loggingPrefs)
-            log.d { "✅ SpaceLogger re-initialized (severity driven by DiagnosticLevelController)" }
-        } catch (e: Exception) {
-            log.w(e) { "Failed to re-initialize SpaceLogger" }
-        }
-
         // Always initialize Datadog; whether logs UPLOAD is governed by TrackingConsent,
         // which DiagnosticLevelController derives from the user's Diagnostic Logging setting.
-        try {
+        val loggingPrefsForController = try {
             val loggingPrefs =
                 getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
             val debugPrefs =
@@ -144,10 +134,18 @@ fun MainViewController() = ComposeUIViewController {
                 sampleRate = sampleRate,
                 debugPreferences = debugPrefs
             )
-            me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController.start(loggingPrefs)
-            log.d { "✅ Datadog initialized; consent controller started" }
+            log.d { "✅ Datadog initialized" }
+            loggingPrefs
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to initialize Datadog" }
+            null
+        }
+        try {
+            val prefs = loggingPrefsForController
+                ?: getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
+            me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController.start(prefs)
+        } catch (e: Exception) {
+            log.e(e) { "❌ Failed to start DiagnosticLevelController" }
         }
 
         // Initialize Billing and Subscription system on background thread

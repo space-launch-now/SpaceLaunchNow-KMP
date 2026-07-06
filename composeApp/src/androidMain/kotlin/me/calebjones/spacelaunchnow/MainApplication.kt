@@ -105,20 +105,10 @@ class MainApplication : Application() {
             throw e
         }
 
-        // Re-initialize SpaceLogger with LoggingPreferences to enable dynamic severity updates
-        log.d { "Re-initializing SpaceLogger with LoggingPreferences..." }
-        try {
-            val loggingPrefs = getKoin().get<LoggingPreferences>()
-            SpaceLogger.initialize(loggingPreferences = loggingPrefs)
-            log.d { "✅ SpaceLogger re-initialized (severity driven by DiagnosticLevelController)" }
-        } catch (e: Exception) {
-            log.w(e) { "Failed to re-initialize SpaceLogger" }
-        }
-
         // Always initialize Datadog; upload is governed by TrackingConsent applied by
         // DiagnosticLevelController from the user's Diagnostic Logging setting.
         log.d { "Initializing Datadog (consent-based)..." }
-        try {
+        val loggingPrefsForController = try {
             val loggingPrefs = getKoin().get<LoggingPreferences>()
             val debugPrefs =
                 getKoin().get<me.calebjones.spacelaunchnow.data.storage.DebugPreferences>()
@@ -128,11 +118,18 @@ class MainApplication : Application() {
                 sampleRate = null, // resolves to 100f default inside; debug slider overrides via observer
                 debugPreferences = debugPrefs
             )
-            me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController.start(loggingPrefs)
             log.d { "✅ Datadog initialized (consent-based)" }
+            loggingPrefs
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to initialize Datadog" }
             // Don't crash the app if Datadog fails
+            null
+        }
+        try {
+            val prefs = loggingPrefsForController ?: getKoin().get<LoggingPreferences>()
+            me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController.start(prefs)
+        } catch (e: Exception) {
+            log.e(e) { "❌ Failed to start DiagnosticLevelController" }
         }
 
         // Initialize Billing and Subscription system after Koin is ready

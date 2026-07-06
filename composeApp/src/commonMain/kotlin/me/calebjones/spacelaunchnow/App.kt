@@ -207,9 +207,9 @@ fun SpaceLaunchNowApp(
                 }
 
                 try {
-                    // Get and print FCM token
-                    val token = pushMessaging.getToken()
-                    log.d { "FCM Token: $token" }
+                    // Get and print FCM token (last 6 chars only — token is sensitive)
+                    val token = pushMessaging.getToken().getOrNull() ?: "<unavailable>"
+                    log.d { "FCM Token: …${token.takeLast(6)}" }
                 } catch (e: Exception) {
                     log.w(e) { "Failed to get FCM token" }
                 }

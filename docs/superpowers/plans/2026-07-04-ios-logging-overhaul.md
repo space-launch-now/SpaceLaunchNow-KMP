@@ -1,5 +1,7 @@
 # iOS Logging Overhaul Implementation Plan
 
+> **STATUS: IMPLEMENTED** (July 2026) — all 10 tasks landed on `feat/ios-logging-overhaul`. Deviations from plan: kotlin.time.Clock instead of kotlinx.datetime; Dispatchers.Default retained (Dispatchers.IO unavailable in this commonMain); SpaceLogger.observePreferences retired entirely (DiagnosticLevelController is sole severity authority); legacy LoggingPreferences accessors deleted in final sweep; FCM token log redacted.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make diagnostic logging actually work for real users: Datadog governed by SDK consent instead of an init gate, one user-facing control, a local log file with share/export, a diagnostics screen showing NSE App Group truth, non-destructive breadcrumb draining, and a single structured startup event.

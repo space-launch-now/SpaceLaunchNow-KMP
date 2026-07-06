@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import co.touchlab.kermit.Severity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -15,11 +14,11 @@ import kotlinx.coroutines.flow.map
  * [diagnostic_level] is the primary control: calling [setDiagnosticLevel] atomically
  * writes the new [DiagnosticLevel] name AND overwrites the legacy keys
  * ([console_severity], [datadog_severity], [datadog_enabled]) so that any remaining
- * reader of those old knobs observes the same effective configuration.
+ * reader of those old knobs observes the same effective configuration (downgrade coherence).
  *
- * The legacy per-sink setters ([setConsoleSeverity], [setDataDogSeverity],
- * [setDataDogEnabled]) do NOT update [diagnostic_level]; callers that still use them
- * should migrate to [setDiagnosticLevel].
+ * The legacy keys are write-only coherence targets — they are written by [setDiagnosticLevel]
+ * and read by [DiagnosticLevel.fromStorage] during migration, but have no public setters
+ * or getters. [DiagnosticLevelController] is the sole authority for applying severity changes.
  *
  * Default behavior:
  * - Console: WARN (always shows critical issues in production)
@@ -36,68 +35,6 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     /**
-     * Get current console logging severity
-     * Default: WARN
-     */
-    fun getConsoleSeverity(): Flow<Severity> = dataStore.data.map { prefs ->
-        val severityName = prefs[CONSOLE_SEVERITY] ?: Severity.Warn.name
-        try {
-            Severity.valueOf(severityName)
-        } catch (e: IllegalArgumentException) {
-            Severity.Warn // Fallback if corrupted
-        }
-    }
-
-    /**
-     * Get current DataDog logging severity
-     * Default: WARN
-     * Note: This is only used if DataDog is enabled
-     */
-    fun getDataDogSeverity(): Flow<Severity> = dataStore.data.map { prefs ->
-        val severityName = prefs[DATADOG_SEVERITY] ?: Severity.Warn.name
-        try {
-            Severity.valueOf(severityName)
-        } catch (e: IllegalArgumentException) {
-            Severity.Warn // Fallback if corrupted
-        }
-    }
-
-    /**
-     * Check if DataDog is enabled
-     * Default: false (disabled)
-     */
-    fun isDataDogEnabled(): Flow<Boolean> = dataStore.data.map { prefs ->
-        prefs[DATADOG_ENABLED] ?: false
-    }
-
-    /**
-     * Set console logging severity directly
-     */
-    suspend fun setConsoleSeverity(severity: Severity) {
-        dataStore.edit { prefs ->
-            prefs[CONSOLE_SEVERITY] = severity.name
-        }
-    }
-
-    /**
-     * Set DataDog logging severity directly
-     */
-    suspend fun setDataDogSeverity(severity: Severity) {
-        dataStore.edit { prefs ->
-            prefs[DATADOG_SEVERITY] = severity.name
-        }
-    }
-
-    /**
-     * Enable or disable DataDog completely
-     */
-    suspend fun setDataDogEnabled(enabled: Boolean) {
-        dataStore.edit { prefs ->
-            prefs[DATADOG_ENABLED] = enabled
-        }
-    }
-
-    /**
      * Single diagnostic control. Migrates from the legacy datadog_enabled boolean
      * when the new key is absent (old toggle ON -> STANDARD).
      */
@@ -109,7 +46,7 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
      * Set the diagnostic level and keep the legacy keys coherent so any remaining
      * reader of the old knobs observes the same effective configuration.
      *
-     * Coherence is one-directional: legacy setters do not update diagnostic_level.
+     * Coherence is one-directional: only [setDiagnosticLevel] updates all keys atomically.
      */
     suspend fun setDiagnosticLevel(level: DiagnosticLevel) {
         val policy = level.policy()
@@ -121,6 +58,3 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
         }
     }
 }
-
-
-

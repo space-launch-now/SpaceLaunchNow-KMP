@@ -141,23 +141,6 @@ class DebugSettingsViewModel(
         }
     }
 
-    fun setDatadogSampleRate(rate: Float) {
-        if (debugPreferences == null) return
-
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                debugPreferences.setDatadogSampleRate(rate)
-                _statusMessage.value =
-                    "Datadog sample rate updated to ${rate.toInt()}% (requires restart)"
-            } catch (e: Exception) {
-                _statusMessage.value = "Failed to update sample rate: ${e.message}"
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
     fun switchToProdUrl() {
         if (debugPreferences == null) return
 

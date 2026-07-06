@@ -158,7 +158,7 @@ fun DiagnosticsScreen(
                                 appendLine("Live: enabled=${s.enableNotifications} followAll=${s.followAllLaunches} strict=${s.useStrictMatching} agencies=${s.subscribedAgencies.size} locations=${s.subscribedLocations.size}")
                                 appendLine("Live agencies: ${s.subscribedAgencies.joinToString(",")}")
                                 appendLine("Live locations: ${s.subscribedLocations.joinToString(",")}")
-                            }
+                            } ?: appendLine("Live: (still loading)")
                             platformRows.forEach { (l, v) -> appendLine("$l: $v") }
                             breadcrumbs.forEach { c ->
                                 appendLine("NSE ${c.timestampEpochSeconds} ${c.type} ${c.decision} ${c.reason}")

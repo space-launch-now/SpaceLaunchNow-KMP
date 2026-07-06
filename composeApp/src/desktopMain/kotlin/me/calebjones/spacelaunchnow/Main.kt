@@ -25,10 +25,10 @@ fun main() {
     startKoin(koinConfig)
 
     // Initialize SpaceLogger; severity is driven by DiagnosticLevelController below.
+    me.calebjones.spacelaunchnow.util.logging.SpaceLogger.initialize()
     try {
         val loggingPrefs =
             getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
-        me.calebjones.spacelaunchnow.util.logging.SpaceLogger.initialize(loggingPreferences = loggingPrefs)
         // Apply the persisted diagnostic level (and keep applying on changes).
         me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController.start(loggingPrefs)
     } catch (e: Exception) {

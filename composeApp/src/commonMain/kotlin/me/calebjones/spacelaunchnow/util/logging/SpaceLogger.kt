@@ -42,17 +42,14 @@ object SpaceLogger {
     )
 
     /**
-     * Initialize logging with platform-specific configuration
-     * Should be called in Application.onCreate() / main()
+     * Initialize logging with platform-specific configuration.
+     * Should be called in Application.onCreate() / main() before any logging calls.
+     * Severity is driven solely by DiagnosticLevelController after initialization.
      *
      * @param logConfig Platform-specific writer configuration.
-     * @param loggingPreferences Retained for call-site compatibility; severity is now driven
-     *   solely by DiagnosticLevelController.
      */
-    @Suppress("UNUSED_PARAMETER")
     fun initialize(
-        logConfig: LogConfig = platformLogConfig(),
-        loggingPreferences: LoggingPreferences? = null
+        logConfig: LogConfig = platformLogConfig()
     ) {
         // Merge platform writers with the optional diagnostics file writer.
         val allWriters: List<LogWriter> = logConfig.writers + listOfNotNull(DiagnosticsLog.writer)
