@@ -24,11 +24,13 @@ fun main() {
     // Initialize Koin before starting the app (similar to Android)
     startKoin(koinConfig)
 
-    // Initialize SpaceLogger with LoggingPreferences to enable dynamic severity updates
+    // Initialize SpaceLogger; severity is driven by DiagnosticLevelController below.
     try {
         val loggingPrefs =
             getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
         me.calebjones.spacelaunchnow.util.logging.SpaceLogger.initialize(loggingPreferences = loggingPrefs)
+        // Apply the persisted diagnostic level (and keep applying on changes).
+        me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController.start(loggingPrefs)
     } catch (e: Exception) {
         // Logging not critical for Desktop
     }

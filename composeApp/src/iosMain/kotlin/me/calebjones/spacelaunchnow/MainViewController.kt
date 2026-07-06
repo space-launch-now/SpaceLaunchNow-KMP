@@ -122,9 +122,9 @@ fun MainViewController() = ComposeUIViewController {
             val loggingPrefs =
                 getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
             SpaceLogger.initialize(loggingPreferences = loggingPrefs)
-            log.d { "✅ SpaceLogger preferences observer configured" }
+            log.d { "✅ SpaceLogger re-initialized (severity driven by DiagnosticLevelController)" }
         } catch (e: Exception) {
-            log.w(e) { "Failed to configure SpaceLogger preferences observer" }
+            log.w(e) { "Failed to re-initialize SpaceLogger" }
         }
 
         // Always initialize Datadog; whether logs UPLOAD is governed by TrackingConsent,

@@ -53,7 +53,8 @@ fun LoggingSettingsSection(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "Help us debug issues by sharing diagnostic logs. Standard sends warnings " +
-                    "and notification delivery decisions; Verbose sends detailed logs.",
+                    "and notification delivery decisions; Verbose sends detailed logs. " +
+                    "Off keeps logs on this device only.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
