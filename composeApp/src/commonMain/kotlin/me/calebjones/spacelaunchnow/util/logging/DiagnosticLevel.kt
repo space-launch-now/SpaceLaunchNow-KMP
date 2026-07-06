@@ -64,3 +64,29 @@ fun DiagnosticLevel.displayLabel(): String = when (this) {
     DiagnosticLevel.STANDARD -> "Standard"
     DiagnosticLevel.VERBOSE -> "Verbose"
 }
+
+/** How long a VERBOSE selection lasts before auto-reverting (72 hours). */
+const val VERBOSE_AUTO_REVERT_SECONDS: Long = 72L * 60 * 60
+
+/** Result of applying the verbose-expiry rule to a stored level. */
+data class EffectiveDiagnosticLevel(val level: DiagnosticLevel, val expired: Boolean)
+
+/**
+ * Pure verbose-expiry rule. VERBOSE past its expiry resolves to [revertLevel]
+ * (STANDARD when the revert target is missing/corrupt). A VERBOSE with no
+ * expiry recorded (persisted by an older build) stays VERBOSE — callers stamp
+ * an expiry via LoggingPreferences.enforceVerboseExpiry().
+ */
+fun resolveVerboseExpiry(
+    stored: DiagnosticLevel,
+    verboseExpiresAtEpochSeconds: Long?,
+    revertLevel: DiagnosticLevel?,
+    nowEpochSeconds: Long,
+): EffectiveDiagnosticLevel {
+    if (stored != DiagnosticLevel.VERBOSE) return EffectiveDiagnosticLevel(stored, expired = false)
+    if (verboseExpiresAtEpochSeconds == null) return EffectiveDiagnosticLevel(stored, expired = false)
+    if (nowEpochSeconds >= verboseExpiresAtEpochSeconds) {
+        return EffectiveDiagnosticLevel(revertLevel ?: DiagnosticLevel.STANDARD, expired = true)
+    }
+    return EffectiveDiagnosticLevel(DiagnosticLevel.VERBOSE, expired = false)
+}

@@ -1,8 +1,10 @@
 package me.calebjones.spacelaunchnow.util.logging
 
+import kotlin.time.Clock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.DatadogRuntime
 
@@ -18,7 +20,24 @@ object DiagnosticLevelController {
     fun start(prefs: LoggingPreferences, scope: CoroutineScope = CoroutineScope(Dispatchers.Default)) {
         job?.cancel()
         job = scope.launch {
-            prefs.getDiagnosticLevel().collect { level -> apply(level) }
+            // Persist any lapsed verbose window (or stamp a legacy one) before observing.
+            prefs.enforceVerboseExpiry()
+            val controllerScope = this
+            var expiryTimer: Job? = null
+            prefs.getDiagnosticSettings().collect { settings ->
+                apply(settings.level)
+                // Running-session auto-revert: fire at the expiry instant. Relaunches
+                // are covered by enforceVerboseExpiry() above and read-time resolution.
+                expiryTimer?.cancel()
+                val expiresAt = settings.verboseExpiresAtEpochSeconds
+                if (settings.level == DiagnosticLevel.VERBOSE && expiresAt != null) {
+                    expiryTimer = controllerScope.launch {
+                        val waitMs = (expiresAt - Clock.System.now().epochSeconds) * 1000
+                        if (waitMs > 0) delay(waitMs)
+                        prefs.enforceVerboseExpiry() // DataStore write re-emits the flow -> apply() runs with the reverted level
+                    }
+                }
+            }
         }
     }
 

@@ -54,7 +54,8 @@ fun LoggingSettingsSection(
             Text(
                 "Help us debug issues by sharing diagnostic logs. Standard sends warnings " +
                     "and notification delivery decisions; Verbose sends detailed logs. " +
-                    "Off keeps logs on this device only.",
+                    "Off keeps logs on this device only." +
+                    " Verbose switches back automatically after 72 hours.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -36,6 +36,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.DiagnosticLevel
+import me.calebjones.spacelaunchnow.util.logging.DiagnosticSettings
 import me.calebjones.spacelaunchnow.util.logging.DiagnosticsLog
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import me.calebjones.spacelaunchnow.util.logging.platformNotificationDiagnostics
@@ -57,8 +58,9 @@ fun DiagnosticsScreen(
     val notificationStateStorage: NotificationStateStorage = koinInject()
     val scope = rememberCoroutineScope()
 
-    val level by loggingPreferences.getDiagnosticLevel()
-        .collectAsState(initial = DiagnosticLevel.OFF)
+    val diagnosticSettings by loggingPreferences.getDiagnosticSettings()
+        .collectAsState(initial = DiagnosticSettings(DiagnosticLevel.OFF, null))
+    val level = diagnosticSettings.level
     val liveState by produceState<NotificationState?>(initialValue = null) {
         value = notificationStateStorage.getState()
     }
@@ -92,6 +94,9 @@ fun DiagnosticsScreen(
                     DiagRow("Diagnostic level", level.name)
                     DiagRow("Datadog SDK initialized", DatadogRuntime.isSdkInitialized().toString())
                     DiagRow("Remote upload active", DatadogRuntime.isRemoteLoggingActive().toString())
+                    diagnosticSettings.verboseExpiresAtEpochSeconds?.let { expiry ->
+                        DiagRow("Verbose expires (epoch s)", expiry.toString())
+                    }
                 }
             }
             item {
