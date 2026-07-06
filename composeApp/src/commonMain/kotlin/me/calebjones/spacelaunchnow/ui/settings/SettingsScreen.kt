@@ -62,6 +62,7 @@ import me.calebjones.spacelaunchnow.data.repository.hasPlatformNotificationPermi
 import me.calebjones.spacelaunchnow.data.repository.openPlatformNotificationSettings
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
+import me.calebjones.spacelaunchnow.navigation.Diagnostics
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
@@ -393,7 +394,7 @@ fun SettingsScreen(
                 Spacer(Modifier.height(2.dp))
                 LoggingSettingsSection(
                     loggingPreferences = loggingPreferences,
-                    onOpenDiagnostics = {}, // Wired to Diagnostics route in the diagnostics-screen task
+                    onOpenDiagnostics = { navController.navigate(Diagnostics) },
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
             }

@@ -30,6 +30,9 @@ data object NotificationSettings
 data object DebugSettings
 
 @Serializable
+data object Diagnostics
+
+@Serializable
 data object AboutLibraries
 
 @Serializable
