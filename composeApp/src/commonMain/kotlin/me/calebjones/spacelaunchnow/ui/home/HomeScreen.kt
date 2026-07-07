@@ -24,6 +24,7 @@ import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.api.extensions.launchUrl
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.navigation.NewsDetail
 import me.calebjones.spacelaunchnow.ui.home.components.ResponsiveHomeContent
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import me.calebjones.spacelaunchnow.ui.viewmodel.EventsViewModel
@@ -213,7 +214,7 @@ fun HomeScreen(navController: NavController) {
             },
             onArticleClick = { article ->
                 feedViewModel.trackArticleClicked(article.id.toString(), article.newsSite)
-                uriHandler.openUri(article.url)
+                navController.navigate(NewsDetail(article.url, article.title))
             },
             onDismissPinnedContent = {
                 featuredLaunchViewModel.dismissPinnedContent()

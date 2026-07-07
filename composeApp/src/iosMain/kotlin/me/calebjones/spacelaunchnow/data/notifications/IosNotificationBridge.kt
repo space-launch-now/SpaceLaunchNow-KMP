@@ -1,10 +1,12 @@
 package me.calebjones.spacelaunchnow.data.notifications
 
 import kotlinx.coroutines.runBlocking
+import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import me.calebjones.spacelaunchnow.util.logging.UserContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -96,34 +98,46 @@ object IosNotificationBridge : KoinComponent {
     }
     
     /**
-     * Log the live notification state alongside the prefs the NSE will read from the
-     * shared App Group. Call at app startup to diagnose why killed-app notifications
-     * bypass the user's filters: if the live state and NSE prefs disagree (or the NSE
-     * keys are missing), the extension is filtering against stale/default values.
+     * Emit ONE structured startup event comparing live Kotlin filter state with the
+     * App Group prefs the NSE reads when the app is killed. Replaces the previous
+     * ~15-line prose dump. Queryable in Datadog via log_kind:startup_state.
+     * DatadogLogger buffers under PENDING consent and no-ops when uninitialized,
+     * so this is always safe to call.
      */
     fun logStartupState() {
-        log.i { "========================================" }
-        log.i { "🚀 [STARTUP] Notification state at app launch" }
         runBlocking {
             try {
                 val state = notificationStateStorage.getState()
-                log.i { "🧭 [STARTUP] Live Kotlin state (used while app is ALIVE):" }
-                log.i { "   - enableNotifications: ${state.enableNotifications}" }
-                log.i { "   - followAllLaunches: ${state.followAllLaunches}" }
-                log.i { "   - useStrictMatching: ${state.useStrictMatching}" }
-                log.i { "   - subscribedAgencies: ${state.subscribedAgencies.size} ${state.subscribedAgencies.take(15)}" }
-                log.i { "   - subscribedLocations: ${state.subscribedLocations.size} ${state.subscribedLocations.take(15)}" }
+                val nse = NSEPreferenceBridge.readStoredPrefs()
+                // Sentinel conventions: missing NSE keys -> null for booleans (nse_keys_missing covers querying), -1 for counts (keeps the facet numeric).
+                val attributes = UserContext.getLogAttributes() + mapOf(
+                    "log_kind" to "startup_state",
+                    "platform" to "ios",
+                    "live_enable_notifications" to state.enableNotifications,
+                    "live_follow_all" to state.followAllLaunches,
+                    "live_strict" to state.useStrictMatching,
+                    "live_agency_count" to state.subscribedAgencies.size,
+                    "live_location_count" to state.subscribedLocations.size,
+                    "nse_app_group_available" to nse.appGroupAvailable,
+                    "nse_keys_missing" to nse.anyKeyMissing,
+                    "nse_enable_notifications" to nse.enableNotifications,
+                    "nse_follow_all" to nse.followAllLaunches,
+                    "nse_strict" to nse.useStrictMatching,
+                    "nse_agency_count" to (nse.subscribedAgencies?.size ?: -1),
+                    "nse_location_count" to (nse.subscribedLocations?.size ?: -1),
+                )
+                DatadogLogger.info("[STARTUP] notification_state", attributes)
+                log.i {
+                    "startup_state live(followAll=${state.followAllLaunches}, strict=${state.useStrictMatching}, " +
+                        "agencies=${state.subscribedAgencies.size}, locations=${state.subscribedLocations.size}) " +
+                        "nse(keysMissing=${nse.anyKeyMissing})"
+                }
             } catch (e: Exception) {
-                log.e { "Failed to read live notification state at startup: ${e.message}" }
+                log.e { "Failed to emit startup state: ${e.message}" }
             }
         }
-        // Dump what the NSE actually reads when the app is killed — this is the value
-        // that decides whether filtered-out launches (e.g. China) slip through.
-        NSEPreferenceBridge.logStoredPrefs()
-        // Drain any NSE delivery breadcrumbs accumulated while the app was killed/backgrounded
-        // into Datadog (see NSEPreferenceBridge.drainNseEventLog).
+        // Drain NSE breadcrumbs (no-op preserve when remote logging inactive).
         NSEPreferenceBridge.drainNseEventLog()
-        log.i { "========================================" }
     }
 
     /**

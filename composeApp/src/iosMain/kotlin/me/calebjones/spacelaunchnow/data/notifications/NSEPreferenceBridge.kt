@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.data.notifications
 
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
+import me.calebjones.spacelaunchnow.analytics.DatadogRuntime
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
@@ -107,46 +108,32 @@ object NSEPreferenceBridge {
         }
     }
 
-    /**
-     * Read back and log the preferences currently stored in the shared App Group
-     * UserDefaults — i.e. exactly what the Notification Service Extension reads when
-     * the app is force-quit.
-     *
-     * Crucially logs whether each key is PRESENT or MISSING. When a key is missing the
-     * NSE falls back to its allow-all defaults (followAllLaunches=true, useStrictMatching=
-     * false), which silently shows every launch — including ones the user filtered out —
-     * whenever the app is killed. Use this to diagnose live-state vs NSE-state drift.
-     */
-    fun logStoredPrefs() {
+    fun readStoredPrefs(): NsePrefsSnapshot {
         val userDefaults = NSUserDefaults(suiteName = APP_GROUP)
-        if (userDefaults == null) {
-            log.e { "🟥 [NSE-PREFS] App group '$APP_GROUP' unavailable — NSE cannot read prefs" }
-            return
-        }
+            ?: return NsePrefsSnapshot(false, null, null, null, null, null)
 
-        fun presence(key: String) =
-            if (userDefaults.objectForKey(key) != null) "present" else "MISSING → NSE uses default"
+        fun boolOrNull(key: String): Boolean? =
+            if (userDefaults.objectForKey(key) != null) userDefaults.boolForKey(key) else null
 
-        val followAllPresent = userDefaults.objectForKey(KEY_FOLLOW_ALL_LAUNCHES) != null
-        val strictPresent = userDefaults.objectForKey(KEY_USE_STRICT_MATCHING) != null
-        val agencies = userDefaults.arrayForKey(KEY_SUBSCRIBED_AGENCIES)
-        val locations = userDefaults.arrayForKey(KEY_SUBSCRIBED_LOCATIONS)
+        @Suppress("UNCHECKED_CAST")
+        fun listOrNull(key: String): List<String>? = userDefaults.arrayForKey(key) as? List<String>
 
-        log.i { "========================================" }
-        log.i { "📦 [NSE-PREFS] App Group prefs the NSE reads when app is KILLED:" }
-        log.i { "   - app group: $APP_GROUP" }
-        log.i { "   - enableNotifications: ${userDefaults.boolForKey(KEY_ENABLE_NOTIFICATIONS)} (${presence(KEY_ENABLE_NOTIFICATIONS)})" }
-        log.i { "   - followAllLaunches: ${userDefaults.boolForKey(KEY_FOLLOW_ALL_LAUNCHES)} (${presence(KEY_FOLLOW_ALL_LAUNCHES)})" }
-        log.i { "   - useStrictMatching: ${userDefaults.boolForKey(KEY_USE_STRICT_MATCHING)} (${presence(KEY_USE_STRICT_MATCHING)})" }
-        log.i { "   - subscribedAgencies (expanded): ${agencies?.size ?: 0} ids ${agencies?.take(15)}" }
-        log.i { "   - subscribedLocations (expanded): ${locations?.size ?: 0} ids ${locations?.take(15)}" }
-        if (!followAllPresent || !strictPresent || agencies == null || locations == null) {
-            log.w {
-                "⚠️ [NSE-PREFS] One or more keys MISSING → NSE falls back to ALLOW-ALL " +
-                    "(followAllLaunches defaults to true). Killed-app pushes will bypass the user's filters!"
-            }
-        }
-        log.i { "========================================" }
+        return NsePrefsSnapshot(
+            appGroupAvailable = true,
+            enableNotifications = boolOrNull(KEY_ENABLE_NOTIFICATIONS),
+            followAllLaunches = boolOrNull(KEY_FOLLOW_ALL_LAUNCHES),
+            useStrictMatching = boolOrNull(KEY_USE_STRICT_MATCHING),
+            subscribedAgencies = listOrNull(KEY_SUBSCRIBED_AGENCIES),
+            subscribedLocations = listOrNull(KEY_SUBSCRIBED_LOCATIONS),
+        )
+    }
+
+    /** Read breadcrumbs WITHOUT clearing them — for the Diagnostics screen. */
+    fun peekNseEventLog(): List<NseBreadcrumb> {
+        val userDefaults = NSUserDefaults(suiteName = APP_GROUP) ?: return emptyList()
+        @Suppress("UNCHECKED_CAST")
+        val entries = userDefaults.arrayForKey(KEY_NSE_EVENT_LOG) as? List<String> ?: return emptyList()
+        return entries.mapNotNull { NseBreadcrumb.parse(it) }
     }
 
     /**
@@ -168,9 +155,18 @@ object NSEPreferenceBridge {
      * Datadog minSeverity. UserContext attributes (RevenueCat user id) are attached manually
      * since we are not going through DataDogLogWriter (which would otherwise add them).
      * Call once on app foreground/startup (see IosNotificationBridge).
+     * No-op (buffer preserved) when DatadogRuntime.isRemoteLoggingActive() is false.
      */
     @OptIn(ExperimentalAtomicApi::class)
     fun drainNseEventLog() {
+        // CRITICAL: never read-then-clear the buffer unless the logs will actually
+        // upload. Draining into an uninitialized/non-consented logger DESTROYS the
+        // only evidence of killed-app delivery decisions.
+        if (!DatadogRuntime.isRemoteLoggingActive()) {
+            log.d { "NSE drain skipped — remote logging inactive; breadcrumbs preserved" }
+            return
+        }
+
         // Serialize our two callers: if a drain is already in progress, skip (the in-flight one
         // is clearing the buffer anyway). Prevents the startup coroutine and the first
         // applicationDidBecomeActive from interleaving their read-then-clear.
@@ -200,11 +196,11 @@ object NSEPreferenceBridge {
             log.i { "Draining ${entries.size} NSE breadcrumb(s) to Datadog" }
             val baseAttributes = UserContext.getLogAttributes()
             entries.forEach { entry ->
-                val parts = entry.split("|")
-                val ts = parts.getOrNull(0) ?: ""
-                val type = parts.getOrNull(1) ?: "unknown"
-                val decision = parts.getOrNull(2) ?: "unknown"
-                val reason = parts.getOrNull(3) ?: ""
+                val crumb = NseBreadcrumb.parse(entry)
+                val ts = crumb?.timestampEpochSeconds?.toString() ?: ""
+                val type = crumb?.type ?: "unknown"
+                val decision = crumb?.decision ?: "unknown"
+                val reason = crumb?.reason ?: ""
 
                 val message = "[NSE-DELIVERY] type=$type decision=$decision reason=$reason ts=$ts platform=ios"
                 val attributes = baseAttributes + mapOf(
@@ -272,4 +268,18 @@ object NSEPreferenceBridge {
         forEach { item -> array.addObject(item) }
         return array
     }
+}
+
+/** Snapshot of what the NSE reads from the App Group. null field = key MISSING. */
+data class NsePrefsSnapshot(
+    val appGroupAvailable: Boolean,
+    val enableNotifications: Boolean?,
+    val followAllLaunches: Boolean?,
+    val useStrictMatching: Boolean?,
+    val subscribedAgencies: List<String>?,
+    val subscribedLocations: List<String>?,
+) {
+    val anyKeyMissing: Boolean
+        get() = !appGroupAvailable || enableNotifications == null || followAllLaunches == null ||
+            useStrictMatching == null || subscribedAgencies == null || subscribedLocations == null
 }
