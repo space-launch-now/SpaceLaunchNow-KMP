@@ -6,7 +6,6 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.initializeDatadog
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
@@ -36,9 +35,13 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        me.calebjones.spacelaunchnow.util.ShareContextHolder.appContext = applicationContext
         instance = this
 
         // Initialize logging FIRST - before any other initialization
+        me.calebjones.spacelaunchnow.util.logging.DiagnosticsLog.initialize(
+            me.calebjones.spacelaunchnow.util.logging.AndroidDiagnosticsFileStore(this)
+        )
         SpaceLogger.initialize()
         log.i { "=== Starting Application onCreate ===" }
 
@@ -102,66 +105,31 @@ class MainApplication : Application() {
             throw e
         }
 
-        // Re-initialize SpaceLogger with LoggingPreferences to enable dynamic severity updates
-        log.d { "Re-initializing SpaceLogger with LoggingPreferences..." }
-        try {
-            val loggingPrefs = getKoin().get<LoggingPreferences>()
-            SpaceLogger.initialize(loggingPreferences = loggingPrefs)
-            log.d { "✅ SpaceLogger preferences observer configured" }
-        } catch (e: Exception) {
-            log.w(e) { "Failed to configure SpaceLogger preferences observer" }
-        }
-
-        // Initialize Datadog analytics using KMP SDK
-        // Use safe defaults during startup to avoid blocking main thread, then reconfigure in background
-        log.d { "Initializing Datadog with safe startup defaults..." }
-        try {
+        // Always initialize Datadog; upload is governed by TrackingConsent applied by
+        // DiagnosticLevelController from the user's Diagnostic Logging setting.
+        log.d { "Initializing Datadog (consent-based)..." }
+        val loggingPrefsForController = try {
             val loggingPrefs = getKoin().get<LoggingPreferences>()
             val debugPrefs =
                 getKoin().get<me.calebjones.spacelaunchnow.data.storage.DebugPreferences>()
 
-            // Use safe defaults during startup to avoid runBlocking calls
-            // These will be reconfigured in background if user preferences differ
-            val defaultSeverity = co.touchlab.kermit.Severity.Warn
-            val defaultSampleRate = 75f
-
-            // Initialize Datadog with conservative defaults (always initialize in debug builds)
-            if (BuildConfig.IS_DEBUG) {
-                log.d { "Debug build - initializing Datadog with ${defaultSampleRate.toInt()}% sample rate..." }
-                initializeDatadog(
-                    context = this,
-                    sampleRate = defaultSampleRate,
-                    debugPreferences = debugPrefs
-                )
-                log.d { "✅ Datadog initialized (debug mode)" }
-            } else {
-                // For release builds: defer Datadog initialization to background to avoid startup blocking
-                // This checks actual user preferences asynchronously
-                @Suppress("OPT_IN_USAGE")
-                kotlinx.coroutines.GlobalScope.launch {
-                    try {
-                        val consoleSeverity = loggingPrefs.getConsoleSeverity().first()
-                        val sampleRate = debugPrefs.debugSettingsFlow.first().datadogSampleRate
-                        
-                        if (consoleSeverity <= co.touchlab.kermit.Severity.Debug) {
-                            log.d { "User has diagnostic logging enabled - initializing Datadog deferred with ${sampleRate.toInt()}% sample rate" }
-                            initializeDatadog(
-                                context = this@MainApplication,
-                                sampleRate = sampleRate,
-                                debugPreferences = debugPrefs
-                            )
-                            log.d { "✅ Datadog initialized (deferred)" }
-                        } else {
-                            log.i { "⏭️ Datadog skipped (diagnostic logging disabled - saves costs)" }
-                        }
-                    } catch (e: Exception) {
-                        log.w(e) { "Failed to check Datadog initialization preferences" }
-                    }
-                }
-            }
+            initializeDatadog(
+                context = this,
+                sampleRate = null, // resolves to 100f default inside; debug slider overrides via observer
+                debugPreferences = debugPrefs
+            )
+            log.d { "✅ Datadog initialized (consent-based)" }
+            loggingPrefs
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to initialize Datadog" }
             // Don't crash the app if Datadog fails
+            null
+        }
+        try {
+            val prefs = loggingPrefsForController ?: getKoin().get<LoggingPreferences>()
+            me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController.start(prefs)
+        } catch (e: Exception) {
+            log.e(e) { "❌ Failed to start DiagnosticLevelController" }
         }
 
         // Initialize Billing and Subscription system after Koin is ready

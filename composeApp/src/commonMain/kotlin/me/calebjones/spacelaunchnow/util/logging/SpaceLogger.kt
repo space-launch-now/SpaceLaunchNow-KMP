@@ -4,10 +4,6 @@ import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 
 /**
  * Interface for log writers that support dynamic severity configuration
@@ -46,49 +42,32 @@ object SpaceLogger {
     )
 
     /**
-     * Initialize logging with platform-specific configuration
-     * Should be called in Application.onCreate() / main()
+     * Initialize logging with platform-specific configuration.
+     * Should be called in Application.onCreate() / main() before any logging calls.
+     * Severity is driven solely by DiagnosticLevelController after initialization.
+     *
+     * @param logConfig Platform-specific writer configuration.
      */
     fun initialize(
-        logConfig: LogConfig = platformLogConfig(),
-        loggingPreferences: LoggingPreferences? = null
+        logConfig: LogConfig = platformLogConfig()
     ) {
-        // Separate writers by type
-        consoleWriters = logConfig.writers.filter { it !is DataDogLogWriter }
-        dataDogWriter = logConfig.writers.filterIsInstance<DataDogLogWriter>().firstOrNull()
+        // Merge platform writers with the optional diagnostics file writer.
+        val allWriters: List<LogWriter> = logConfig.writers + listOfNotNull(DiagnosticsLog.writer)
+
+        // Console writers exclude both DataDog and the file writer — the file writer
+        // manages its own severity independently and must NOT be clobbered by the
+        // console severity fan-out in setConsoleSeverity().
+        consoleWriters = allWriters.filter { it !is DataDogLogWriter && it !is FileLogWriter }
+        dataDogWriter = allWriters.filterIsInstance<DataDogLogWriter>().firstOrNull()
 
         // CRITICAL FIX: Create a custom Logger instance with StaticConfig
         // This prevents Kermit's default platform writers from being used
         // Initialize with Severity.Verbose to allow individual writers to control filtering
         val staticConfig = StaticConfig(
             minSeverity = Severity.Verbose,
-            logWriterList = logConfig.writers
+            logWriterList = allWriters
         )
         baseLogger = Logger(staticConfig, BASE_TAG)
-
-        // Observe preferences if provided
-        loggingPreferences?.let { prefs ->
-            observePreferences(prefs)
-        }
-    }
-
-    /**
-     * Observe logging preferences and update severity dynamically
-     */
-    private fun observePreferences(prefs: LoggingPreferences) {
-        CoroutineScope(Dispatchers.Default).launch {
-            combine(
-                prefs.getConsoleSeverity(),
-                prefs.getDataDogSeverity(),
-                prefs.isDataDogEnabled()
-            ) { consoleSev, dataDogSev, dataDogEnabled ->
-                Triple(consoleSev, dataDogSev, dataDogEnabled)
-            }.collect { (consoleSev, dataDogSev, dataDogEnabled) ->
-                setConsoleSeverity(consoleSev)
-                // If DataDog is disabled, set severity to Assert (no logs)
-                setDataDogSeverity(if (dataDogEnabled) dataDogSev else Severity.Assert)
-            }
-        }
     }
 
     /**

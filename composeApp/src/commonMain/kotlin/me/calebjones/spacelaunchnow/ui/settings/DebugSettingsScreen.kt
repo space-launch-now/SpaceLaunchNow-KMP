@@ -71,7 +71,6 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.DebugSettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.util.BuildConfig
-import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
@@ -303,7 +302,6 @@ private fun SystemTabContent(
     onCustomUrlTextChange: (String) -> Unit,
     onNavigateToLiveOnboarding: () -> Unit = {}
 ) {
-    val loggingPreferences = koinInject<LoggingPreferences>()
     val appPreferences = koinInject<me.calebjones.spacelaunchnow.data.storage.AppPreferences>()
     val debugShortCacheTtl by appPreferences.debugShortCacheTtlFlow.collectAsState(initial = false)
     val scope = rememberCoroutineScope()
@@ -359,38 +357,7 @@ private fun SystemTabContent(
             }
         }
 
-        // Section 1: Logging Configuration
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "Logging Configuration",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                DebugLoggingSettings(
-                    loggingPreferences = loggingPreferences
-                )
-            }
-        }
-        
-        // Section 2: Datadog Sample Rate
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "Datadog Sample Rate",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                DatadogSampleRateControl(
-                    currentRate = debugSettings.datadogSampleRate,
-                    onRateChange = { rate ->
-                        debugViewModel.setDatadogSampleRate(rate)
-                    }
-                )
-            }
-        }
-        
-        // Section 3: Test Logging
+        // Section: Test Logging
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(

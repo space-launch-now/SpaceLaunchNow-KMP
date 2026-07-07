@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import co.touchlab.kermit.Severity
 import me.calebjones.spacelaunchnow.analytics.initializeDatadog
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -109,48 +108,44 @@ fun MainViewController() = ComposeUIViewController {
         // Register CrashKiOS unhandled exception hook so Kotlin crashes on iOS
         // produce readable stack traces in Crashlytics
         setupCrashlyticsExceptionHook()
+        // Initialize diagnostics file store before SpaceLogger so the writer is included
+        me.calebjones.spacelaunchnow.util.logging.DiagnosticsLog.initialize(
+            me.calebjones.spacelaunchnow.util.logging.IosDiagnosticsFileStore()
+        )
         // Initialize SpaceLogger before any logging calls
         SpaceLogger.initialize()
         startKoin(koinConfig)
         koinInitialized = true
 
-        // Re-initialize SpaceLogger with LoggingPreferences to enable dynamic severity updates
-        try {
-            val loggingPrefs =
-                getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
-            SpaceLogger.initialize(loggingPreferences = loggingPrefs)
-            log.d { "✅ SpaceLogger preferences observer configured" }
-        } catch (e: Exception) {
-            log.w(e) { "Failed to configure SpaceLogger preferences observer" }
-        }
-
-        // Initialize Datadog analytics (matching Android pattern)
-        try {
+        // Always initialize Datadog; whether logs UPLOAD is governed by TrackingConsent,
+        // which DiagnosticLevelController derives from the user's Diagnostic Logging setting.
+        val loggingPrefsForController = try {
             val loggingPrefs =
                 getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
             val debugPrefs =
                 getKoin().get<me.calebjones.spacelaunchnow.data.storage.DebugPreferences>()
 
-            val consoleSeverity = runBlocking {
-                loggingPrefs.getConsoleSeverity().first()
-            }
             val sampleRate = runBlocking {
                 debugPrefs.debugSettingsFlow.first().datadogSampleRate
             }
-
-            if (consoleSeverity <= Severity.Debug || me.calebjones.spacelaunchnow.util.BuildConfig.IS_DEBUG) {
-                log.d { "Initializing Datadog (diagnostic logging enabled) with ${sampleRate.toInt()}% sample rate..." }
-                initializeDatadog(
-                    context = null,
-                    sampleRate = sampleRate,
-                    debugPreferences = debugPrefs
-                )
-                log.d { "✅ Datadog initialized successfully" }
-            } else {
-                log.i { "⏭️ Datadog initialization skipped (diagnostic logging disabled)" }
-            }
+            log.d { "Initializing Datadog (consent-based) with ${sampleRate.toInt()}% sample rate..." }
+            initializeDatadog(
+                context = null,
+                sampleRate = sampleRate,
+                debugPreferences = debugPrefs
+            )
+            log.d { "✅ Datadog initialized" }
+            loggingPrefs
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to initialize Datadog" }
+            null
+        }
+        try {
+            val prefs = loggingPrefsForController
+                ?: getKoin().get<me.calebjones.spacelaunchnow.util.logging.LoggingPreferences>()
+            me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController.start(prefs)
+        } catch (e: Exception) {
+            log.e(e) { "❌ Failed to start DiagnosticLevelController" }
         }
 
         // Initialize Billing and Subscription system on background thread

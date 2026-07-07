@@ -32,6 +32,7 @@ import me.calebjones.spacelaunchnow.navigation.AstronautDetail
 import me.calebjones.spacelaunchnow.navigation.Astronauts
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.DebugSettings
+import me.calebjones.spacelaunchnow.navigation.Diagnostics
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.FullscreenVideo
@@ -78,6 +79,7 @@ import me.calebjones.spacelaunchnow.ui.rockets.RocketListScreen
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleScreen
 import me.calebjones.spacelaunchnow.ui.settings.CalendarSyncScreen
 import me.calebjones.spacelaunchnow.ui.settings.DebugSettingsScreen
+import me.calebjones.spacelaunchnow.ui.settings.DiagnosticsScreen
 import me.calebjones.spacelaunchnow.ui.settings.NotificationSettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.SettingsScreen
 import me.calebjones.spacelaunchnow.ui.settings.ThemeCustomizationScreen
@@ -205,9 +207,9 @@ fun SpaceLaunchNowApp(
                 }
 
                 try {
-                    // Get and print FCM token
-                    val token = pushMessaging.getToken()
-                    log.d { "FCM Token: $token" }
+                    // Get and print FCM token (last 6 chars only — token is sensitive)
+                    val token = pushMessaging.getToken().getOrNull() ?: "<unavailable>"
+                    log.d { "FCM Token: …${token.takeLast(6)}" }
                 } catch (e: Exception) {
                     log.w(e) { "Failed to get FCM token" }
                 }
@@ -499,6 +501,11 @@ fun SpaceLaunchNowApp(
                                 DebugSettingsScreen(
                                     onNavigateBack = { navController.popBackStack() },
                                     onNavigateToLiveOnboarding = { navController.navigate(LiveOnboarding) }
+                                )
+                            }
+                            composableWithCompositionLocal<Diagnostics> {
+                                DiagnosticsScreen(
+                                    onNavigateBack = { navController.popBackStack() }
                                 )
                             }
                             composableWithCompositionLocal<AboutLibraries> {
