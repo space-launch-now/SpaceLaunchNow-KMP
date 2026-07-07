@@ -1,1 +1,1 @@
-Ad banner placement is improved for a better user experience. Links open more smoothly on iOS.
+New ground-truth diagnostics screen allows you to export logs for better tracking. You can now manage logging levels more easily with a single control for Off, Standard, and Verbose settings. We've improved the app's logging capabilities with automatic reversion of diagnostic levels and on-device diagnostics storage. Bug fixes enhance overall stability and performance.
