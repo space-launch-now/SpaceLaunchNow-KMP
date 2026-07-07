@@ -2,11 +2,13 @@
 
 ## Live Data Access
 
-Query live RevenueCat data via the `revenuecat-mvp` MCP server (configured in `.vscode/mcp.json`).
+Query live RevenueCat data via the RevenueCat MCP integration (`mcp__claude_ai_RC_MCP__*`
+tools). Tool schemas are loaded on demand — run `ToolSearch` with `select:<tool>` (or a
+keyword query) before invoking a tool.
 
 ### Quick Revenue Snapshot
 
-Call `RC_get_overview_metrics` with `project_id=projbe17841f` to get:
+Call `mcp__claude_ai_RC_MCP__get-overview-metrics` with `project_id=projbe17841f` to get:
 - **MRR**: Monthly recurring revenue
 - **Revenue (28d)**: Total revenue last 28 days (includes one-time purchases)
 - **Active Subscriptions**: Current paying subscribers
@@ -31,16 +33,16 @@ Call `RC_get_overview_metrics` with `project_id=projbe17841f` to get:
 
 | Tool | Use For |
 |------|---------|
-| `RC_get_overview_metrics` | Revenue snapshot (MRR, subs, users) |
-| `RC_list_apps` | Platform breakdown |
-| `RC_list_entitlements` | Entitlement audit |
-| `RC_list_offerings` | Offering structure (current + 8 legacy) |
-| `RC_list_products` | Full product catalog (20+ products) |
-| `RC_list_packages` | Packages within a specific offering |
-| `RC_get_chart_data` | Historical trends |
-| `RC_get_chart_options` | Available chart types |
-| `RC_get_entitlement` | Single entitlement detail |
-| `RC_get_app` | Single app detail |
+| `mcp__claude_ai_RC_MCP__get-overview-metrics` | Revenue snapshot (MRR, subs, users) |
+| `mcp__claude_ai_RC_MCP__list-apps` | Platform breakdown |
+| `mcp__claude_ai_RC_MCP__list-entitlements` | Entitlement audit |
+| `mcp__claude_ai_RC_MCP__list-offerings` | Offering structure (current + 8 legacy) |
+| `mcp__claude_ai_RC_MCP__list-products` | Full product catalog (20+ products) |
+| `mcp__claude_ai_RC_MCP__list-packages` | Packages within a specific offering |
+| `mcp__claude_ai_RC_MCP__get-chart-data` | Historical trends |
+| `mcp__claude_ai_RC_MCP__get-chart-options-schema` | Available chart types |
+| `mcp__claude_ai_RC_MCP__get-entitlement` | Single entitlement detail |
+| `mcp__claude_ai_RC_MCP__get-app` | Single app detail |
 
 ## Revenue Model
 

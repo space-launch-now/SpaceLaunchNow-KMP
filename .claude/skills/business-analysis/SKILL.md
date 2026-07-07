@@ -20,7 +20,7 @@ description: "Analyze SpaceLaunchNow business environment, monetization, costs, 
 
 SpaceLaunchNow uses a **freemium model** with three revenue streams:
 
-1. **Subscriptions** (RevenueCat) — Monthly, Annual, Lifetime plans granting `premium` entitlement
+1. **Subscriptions** (RevenueCat) — Monthly, Annual, Lifetime plans granting the `premium` entitlement
 2. **Advertising** (AdMob) — Banner, interstitial, and rewarded ads for free-tier users
 3. **Premium Features** — Ad removal, premium widgets, premium themes gated behind subscription
 
@@ -38,25 +38,28 @@ Determine which business area the question covers:
 
 ### 2. Gather Live Data (RevenueCat MCP)
 
-The `revenuecat-mvp` MCP server provides live access to subscription data. Use these tools:
+The RevenueCat MCP integration (`RC_MCP`, exposed as `mcp__claude_ai_RC_MCP__*` tools)
+provides live access to subscription data. Tool schemas are loaded on demand — use
+`ToolSearch` with `select:<tool>` (or a keyword query like `revenuecat overview`) before
+calling, then invoke the tool.
 
 | Tool | Purpose | When to Use |
 |------|---------|-------------|
-| `RC_get_overview_metrics` | MRR, revenue, active subs, trials, active users, new customers | Start here for any revenue question |
-| `RC_get_project` | Project ID (`projbe17841f`) and metadata | Needed as input to other calls |
-| `RC_list_apps` | List apps (iOS: `app70aaf33046`, Android: `appb9bf4f1820`) | Platform-specific analysis |
-| `RC_list_entitlements` | Active entitlements (Pro, Lifetime, Legacy) | Feature gating audit |
-| `RC_list_offerings` | Current + legacy offerings | Offering structure review |
-| `RC_list_products` | All products across both stores | Product catalog audit |
-| `RC_list_packages` | Packages within an offering | Package structure review |
-| `RC_get_chart_data` | Historical chart data for trends | Trend/churn analysis |
-| `RC_get_chart_options` | Available chart types | Discover what trends are available |
+| `mcp__claude_ai_RC_MCP__get-overview-metrics` | MRR, revenue, active subs, trials, active users, new customers | Start here for any revenue question |
+| `mcp__claude_ai_RC_MCP__list-projects` | Confirm the project ID (`projbe17841f`) and metadata | Needed as input to other calls |
+| `mcp__claude_ai_RC_MCP__list-apps` | List apps (iOS: `app70aaf33046`, Android: `appb9bf4f1820`) | Platform-specific analysis |
+| `mcp__claude_ai_RC_MCP__list-entitlements` | Active entitlements (Pro, Lifetime, Legacy) | Feature gating audit |
+| `mcp__claude_ai_RC_MCP__list-offerings` | Current + legacy offerings | Offering structure review |
+| `mcp__claude_ai_RC_MCP__list-products` | All products across both stores | Product catalog audit |
+| `mcp__claude_ai_RC_MCP__list-packages` | Packages within an offering | Package structure review |
+| `mcp__claude_ai_RC_MCP__get-chart-data` | Historical chart data for trends | Trend/churn analysis |
+| `mcp__claude_ai_RC_MCP__get-chart-options-schema` | Available chart types | Discover what trends are available |
 
 **Project ID:** `projbe17841f` (required for most calls)
 
 **Quick start for any revenue question:**
 ```
-1. Call RC_get_overview_metrics with project_id=projbe17841f
+1. Call mcp__claude_ai_RC_MCP__get-overview-metrics with project_id=projbe17841f
 2. Parse: MRR, revenue (28d), active_subscriptions, active_trials, active_users, new_customers
 3. Calculate conversion rate: active_subscriptions / active_users
 ```
@@ -68,6 +71,9 @@ The `revenuecat-mvp` MCP server provides live access to subscription data. Use t
 - Review `docs/cicd/` for pipeline cost data and optimization history
 - Review `docs/premium/` for feature gating and premium feature definitions
 - Check the source files listed in each reference for code-level details
+
+For broad code sweeps ("where is every premium gate?"), delegate to the **Explore** agent
+rather than reading files one at a time.
 
 ### 4. Analyze
 
@@ -92,17 +98,17 @@ Provide actionable recommendations grounded in the codebase and live data. Refer
 
 ## Live Data Access
 
-**RevenueCat MCP** (`revenuecat-mvp`) is configured in `.vscode/mcp.json` and provides real-time access to:
+**RevenueCat MCP** (`mcp__claude_ai_RC_MCP__*`) provides real-time access to:
 - Revenue metrics (MRR, 28-day revenue, transaction counts)
 - Subscriber counts (active subscriptions, trials)
 - User metrics (active users, new customers)
 - Product catalog, entitlements, offerings, packages
 - Chart data for historical trends
 
-**GitHub MCP** (`mcp_github`) provides access to:
-- Repository issues and pull requests
-- Workflow runs (for CI/CD cost estimation)
-- Release history and tags
+**GitHub data** — use the `gh` CLI (this repo's primary GitHub interface) for:
+- Repository issues and pull requests (`gh pr list`, `gh issue list`)
+- Workflow runs for CI/CD cost estimation (`gh run list`)
+- Release history and tags (`gh release list`, `git tag --list 'v*'`)
 
 ## Important Context
 
