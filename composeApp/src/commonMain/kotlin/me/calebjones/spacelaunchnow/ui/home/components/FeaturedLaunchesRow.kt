@@ -4,12 +4,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 
@@ -54,6 +58,24 @@ fun FeaturedLaunchesRow(
                     navController = navController,
                     modifier = Modifier.fillMaxWidth()
                 )
+            }
+
+            // Link to the full Schedule tab
+            TextButton(
+                onClick = {
+                    navController.navigate(Schedule) {
+                        // Behave like tapping the Schedule tab: reuse it if it's already
+                        // on the back stack and preserve/restore its state.
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("View more")
             }
         }
     }

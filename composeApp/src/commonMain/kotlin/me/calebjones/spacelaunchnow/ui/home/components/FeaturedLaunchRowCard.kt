@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,7 +41,9 @@ import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.domain.model.Launch
+import me.calebjones.spacelaunchnow.domain.model.NetPrecision
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
+import me.calebjones.spacelaunchnow.ui.compose.CompactLaunchCountdown
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
@@ -48,13 +51,16 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.Clock.System
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 /**
  * A compact, wide card for displaying featured launches in a horizontal row.
- * Shows: thumbnail image, launch title, full date/time with day of week,
- * location + pad, and launch status chip.
+ * Shows: thumbnail image, launch title, a live countdown (falling back to the
+ * date/time for far-out or imprecise launches), location + pad, and status chip.
  *
- * Height: 130dp, width adapts to available space (use with Modifier.weight(1f))
+ * Height: 120dp, width adapts to available space (use with Modifier.weight(1f))
  */
 @Composable
 fun FeaturedLaunchRowCard(
@@ -66,7 +72,7 @@ fun FeaturedLaunchRowCard(
 
     Card(
         modifier = modifier
-            .height(130.dp)
+            .height(120.dp)
             .clickable {
                 navController.navigate(LaunchDetail(launch.id))
             },
@@ -209,33 +215,30 @@ fun FeaturedLaunchRowCard(
                         }
                     }
 
-                    // Middle section: Date/Time with day of week
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                    // Middle section: live countdown, falling back to the date/time
+                    // for launches that are far out or have an imprecise net time.
+                    val net = launch.net
+                    if (net != null) {
+                        CompactLaunchCountdown(
+                            launchTime = net,
+                            precision = launch.netPrecision,
+                            fallback = {
+                                LaunchDateRow(
+                                    text = DateTimeUtil.formatLaunchDateTime(net, useUtc)
+                                )
+                            }
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = launch.net?.let {
-                                DateTimeUtil.formatLaunchDateTime(it, useUtc)
-                            } ?: "TBD",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                    } else {
+                        LaunchDateRow(text = "TBD")
                     }
 
                 }
 
-                // Bottom section: Location + Pad and Status
+                // Bottom section: Status chip pinned to the bottom-right.
+                // Uses fillMaxWidth (not fillMaxSize) so it only claims its own height
+                // and won't overlap the countdown/date above it.
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.Bottom
                 ) {
@@ -261,6 +264,32 @@ fun FeaturedLaunchRowCard(
                 }
             }
         }
+    }
+}
+
+/**
+ * The date/time row shown on the card: a Schedule clock icon followed by [text].
+ * Used as the fallback when a live countdown isn't shown (far-out or imprecise launches).
+ */
+@Composable
+private fun LaunchDateRow(text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Schedule,
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -335,5 +364,65 @@ private fun FeaturedLaunchRowCardNoImageDarkPreview() {
             launch = PreviewData.domainLaunchULA,
             navController = rememberNavController()
         )
+    }
+}
+
+/**
+ * Three small cards with live countdowns, mirroring the home page. The preview data
+ * launches ([PreviewData]) have fixed past NET dates, so here we copy in near-future,
+ * precise NET times to exercise the countdown path rather than the date fallback.
+ */
+@Composable
+private fun FeaturedLaunchesCountdownStack() {
+    val now = System.now()
+    // precision id 0..4 is required for the live countdown to show (see CompactLaunchCountdown)
+    val precise = NetPrecision(id = 0, name = "Second", abbrev = null, description = null)
+
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        FeaturedLaunchRowCard(
+            launch = PreviewData.domainLaunchSpaceX.copy(
+                net = now.plus(1.days).plus(7.hours),
+                netPrecision = precise
+            ),
+            navController = rememberNavController(),
+            modifier = Modifier.fillMaxWidth()
+        )
+        FeaturedLaunchRowCard(
+            launch = PreviewData.domainLaunchCrewMission.copy(
+                net = now.plus(2.days).plus(3.hours),
+                netPrecision = precise
+            ),
+            navController = rememberNavController(),
+            modifier = Modifier.fillMaxWidth()
+        )
+        // No image + a further-out NET, still within the 30-day countdown window
+        FeaturedLaunchRowCard(
+            launch = PreviewData.domainLaunchULA.copy(
+                net = now.plus(12.days),
+                netPrecision = precise,
+                status = PreviewData.domainStatusGo
+            ),
+            navController = rememberNavController(),
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeaturedLaunchesCountdownStackPreview() {
+    SpaceLaunchNowPreviewTheme {
+        FeaturedLaunchesCountdownStack()
+    }
+}
+
+@Preview
+@Composable
+private fun FeaturedLaunchesCountdownStackDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        FeaturedLaunchesCountdownStack()
     }
 }
