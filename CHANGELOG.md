@@ -1,3 +1,18 @@
+# [5.35.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.34.0...v5.35.0) (2026-07-08)
+
+
+### Bug Fixes
+
+* remove outdated templates and add new documentation for monetization and analytics setup ([d62e39f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d62e39f5cc8b02dc58c476f6aa4eede2df7c99ad))
+
+
+### Features
+
+* add business analysis skill and references for monetization, analytics, and app store strategies ([2de719c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2de719c114f0eb80cb21dd23b1ed5344fca57ccb))
+* add compact countdown display and link to full schedule in featured launches row ([46c9756](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/46c9756fc46aea903190ce15142aa9753a7c8c6d))
+
+
+
 # [5.34.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.33.1...v5.34.0) (2026-07-07)
 
 
@@ -46,16 +61,6 @@
 ### Features
 
 * **notifications:** open news notifications in an in-app NewsDetail WebView ([57a4699](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/57a4699e532a10b617c23ecd30ab20a2d462dc69))
-
-
-
-## [5.31.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.31.1...v5.31.2) (2026-05-28)
-
-
-### Bug Fixes
-
-* **api:** update datamodels from ll schema change ([886e4ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/886e4acabec7a266a2ac0485d4bdc134298e26fa))
-* **tests:** update LaunchMappersTest to use testPadDetailed for pad field ([37f2fbd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/37f2fbdf8a56aa571f57c72a1f67d09edae4fc6f))
 
 
 
