@@ -15,6 +15,8 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         private val CUSTOM_API_BASE_URL = stringPreferencesKey("debug_custom_api_base_url")
         private val USE_CUSTOM_API_URL = booleanPreferencesKey("debug_use_custom_api_url")
         private val USE_FCM_DEBUG_TOPICS = booleanPreferencesKey("debug_use_fcm_debug_topics")
+        // Sampling is a debug-only cost knob now; user-facing cost control is the
+        // DiagnosticLevel consent (OFF = NOT_GRANTED = nothing uploads).
         private val DATADOG_SAMPLE_RATE = floatPreferencesKey("debug_datadog_sample_rate")
 
         // Debug subscription simulation keys
@@ -37,7 +39,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
             useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
-            datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 1f,
+            datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 100f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
             debugSubscriptionType = preferences[DEBUG_SUBSCRIPTION_TYPE],
             debugSubscriptionProductId = preferences[DEBUG_SUBSCRIPTION_PRODUCT_ID]
@@ -164,7 +166,7 @@ data class DebugSettings(
     val useCustomApiUrl: Boolean = false,
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
     val useDebugTopics: Boolean = false,
-    val datadogSampleRate: Float = 1f,
+    val datadogSampleRate: Float = 100f,
     val debugSubscriptionActive: Boolean = false,
     val debugSubscriptionType: String? = null,
     val debugSubscriptionProductId: String? = null

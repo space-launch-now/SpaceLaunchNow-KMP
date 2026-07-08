@@ -32,6 +32,7 @@ fun initKoin() {
     if (koinInstance == null) {
         // SpaceLogger must be initialized before any Kotlin code that calls logger()
         initializeBuildConfig()
+        // Intentionally no DiagnosticsLog store here: extension runs in a separate process; sharing the snapshot file would clobber the main app's log.
         SpaceLogger.initialize()
 
         val app = startKoin(koinConfig)

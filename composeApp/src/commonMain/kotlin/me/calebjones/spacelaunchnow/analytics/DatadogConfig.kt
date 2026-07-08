@@ -30,6 +30,20 @@ expect object DatadogRUM {
 }
 
 /**
+ * Runtime consent + status for Datadog. Upload is governed by TrackingConsent,
+ * not by whether the SDK was initialized — the SDK is ALWAYS initialized at
+ * startup (with PENDING consent) so log calls are never silent no-ops.
+ */
+expect object DatadogRuntime {
+    /** Apply user consent for remote upload. Safe to call before initialize. */
+    fun setConsentGranted(granted: Boolean)
+    /** True when SDK is initialized AND consent granted — logs will actually upload. */
+    fun isRemoteLoggingActive(): Boolean
+    /** True when the underlying SDK instance is initialized. */
+    fun isSdkInitialized(): Boolean
+}
+
+/**
  * Global Datadog Logger.
  * Desktop actual is a no-op; Android/iOS forward to Datadog SDK Logger.
  */

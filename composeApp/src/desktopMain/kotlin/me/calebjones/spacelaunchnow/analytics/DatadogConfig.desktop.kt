@@ -56,3 +56,9 @@ actual object DatadogLogger {
         // No-op on desktop
     }
 }
+
+actual object DatadogRuntime {
+    actual fun setConsentGranted(granted: Boolean) = Unit
+    actual fun isRemoteLoggingActive(): Boolean = false
+    actual fun isSdkInitialized(): Boolean = false
+}

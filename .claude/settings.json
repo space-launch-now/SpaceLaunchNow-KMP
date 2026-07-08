@@ -9,7 +9,7 @@
       "Bash(./gradlew :wearApp:assembleDebug)",
       "Bash(android emulator *)",
       "Bash(adb devices *)",
-      "Read(//c/Users/cajon/.gradle/caches/**)",
+      "Read(.gradle/caches/**)",
       "WebFetch(domain:cs.android.com)",
       "Bash(./gradlew *)",
       "Bash(cd *)"

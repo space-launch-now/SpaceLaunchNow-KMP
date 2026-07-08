@@ -392,12 +392,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 // Note: History is saved in didReceiveRemoteNotification handler
                 // to avoid duplicates when app is in foreground
 
-                // Show notification even when app is in foreground
-                if #available(iOS 14.0, *) {
-                    completionHandler([.banner, .badge, .sound])
-                } else {
-                    completionHandler([.alert, .badge, .sound])
-                }
+                // Show notification even when app is in foreground; sound per re-alert policy
+                completionHandler(
+                    NotificationAlertPolicy.foregroundOptions(notificationType: notificationData.notificationType)
+                )
             } else {
                 print("🔇 Notification filtered out by user preferences")
                 NotifLog.receipt.log("notification suppressed (foreground): type=\(notificationData.notificationType, privacy: .public) reason=user_preferences")
@@ -535,8 +533,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Add badge
         content.badge = 1
 
-        // Add sound
-        content.sound = .default
+        // Sound + prominence per re-alert policy
+        NotificationAlertPolicy.applySound(to: content, notificationType: data.notificationType)
 
         // Add custom data for handling taps (includes launch UUID for navigation)
         var extendedUserInfo = userInfo
