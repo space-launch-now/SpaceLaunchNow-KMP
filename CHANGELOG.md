@@ -1,3 +1,12 @@
+# [5.36.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.35.0...v5.36.0) (2026-07-09)
+
+
+### Features
+
+* enhance News & Events navigation with initial tab support and update dependencies ([df122c8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/df122c839c27fd5b7e09594c61b6e9431abce3ad))
+
+
+
 # [5.35.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.34.0...v5.35.0) (2026-07-08)
 
 
@@ -52,15 +61,6 @@
 ### Features
 
 * **navigation:** add article click handling to navigate to NewsDetail ([5dc8510](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5dc8510fc410af6ed0d3b76f1174fd9272077b25))
-
-
-
-# [5.32.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.31.2...v5.32.0) (2026-06-02)
-
-
-### Features
-
-* **notifications:** open news notifications in an in-app NewsDetail WebView ([57a4699](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/57a4699e532a10b617c23ecd30ab20a2d462dc69))
 
 
 
