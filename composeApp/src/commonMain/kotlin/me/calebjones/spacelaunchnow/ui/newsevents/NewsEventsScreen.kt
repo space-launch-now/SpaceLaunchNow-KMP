@@ -72,17 +72,30 @@ import org.koin.compose.viewmodel.koinViewModel
  * 
  * Supports pagination, pull-to-refresh, and will support search and filtering.
  * 
+ * @param initialTab Index of the tab to open on entry (0 = News, 1 = Events).
  * @param onEventClick Callback when an event is clicked (navigates to event detail)
  * @param onArticleClick Callback when an article is clicked (navigates to in-app news detail)
  * @param viewModel The ViewModel managing the screen state
  */
 @Composable
 fun NewsEventsScreen(
+    initialTab: Int = 0,
     onEventClick: (Int) -> Unit = {},
     onArticleClick: (url: String, title: String) -> Unit = { _, _ -> },
     viewModel: NewsEventsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Deep-link entry (e.g. "See All" on Home) can request a specific tab.
+    // Re-fires only when the requested tab index changes, so it never fights a
+    // manual tab switch made within the screen.
+    LaunchedEffect(initialTab) {
+        val tabs = NewsEventsTab.entries
+        val requested = tabs[initialTab.coerceIn(0, tabs.lastIndex)]
+        if (requested != viewModel.uiState.value.selectedTab) {
+            viewModel.selectTab(requested)
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),

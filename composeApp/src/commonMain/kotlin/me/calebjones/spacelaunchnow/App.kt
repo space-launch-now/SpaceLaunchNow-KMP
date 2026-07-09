@@ -603,8 +603,10 @@ fun SpaceLaunchNowApp(
                             composableWithCompositionLocal<Starship> {
                                 StarshipScreen(navController = navController)
                             }
-                            composableWithCompositionLocal<NewsEvents> {
+                            composableWithCompositionLocal<NewsEvents> { backStackEntry ->
+                                val newsEvents = backStackEntry.toRoute<NewsEvents>()
                                 NewsEventsScreen(
+                                    initialTab = newsEvents.initialTab,
                                     onEventClick = { eventId ->
                                         navController.navigate(EventDetail(eventId))
                                     },
@@ -654,7 +656,7 @@ fun SpaceLaunchNowApp(
                                 // article lands on the News list (not Home). Resulting stack:
                                 // Home -> NewsEvents -> NewsDetail. Back from the article goes to
                                 // News, a second back goes Home — never bouncing into the article.
-                                navController.navigate(NewsEvents)
+                                navController.navigate(NewsEvents())
                                 navController.navigate(
                                     NewsDetail(
                                         url = notificationNewsUrl,

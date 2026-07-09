@@ -164,6 +164,10 @@ compose-material3-adaptive = { group = "org.jetbrains.compose.material3.adaptive
 compose-material3-adaptive-layout = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive-layout", version.ref = "compose-material3-adaptive" }
 compose-material3-adaptive-navigation = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "compose-material3-adaptive" }
 compose-material3-navigation-suite = { group = "org.jetbrains.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "compose-material3-navigation-suite" }
+# JetBrains multiplatform Material3 pinned for the desktop target. The compose plugin resolves
+# desktop Material3 to 1.9.0 (expressive APIs internal); align it with the version the other
+# targets use (via navigation-suite) so commonMain's expressive-API usage compiles on desktop.
+compose-material3-jb-desktop = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "compose-material3-navigation-suite" }
 androidx-palette = { group = "androidx.palette", name = "palette", version.ref = "androidx-palette" }
 
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }

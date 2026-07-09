@@ -90,7 +90,10 @@ data class SpaceStationDetail(val stationId: Int)
 data object Starship
 
 @Serializable
-data object NewsEvents
+data class NewsEvents(
+    /** Index of the tab to open: 0 = News, 1 = Events. Defaults to News. */
+    val initialTab: Int = 0
+)
 
 @Serializable
 data class FullscreenVideo(

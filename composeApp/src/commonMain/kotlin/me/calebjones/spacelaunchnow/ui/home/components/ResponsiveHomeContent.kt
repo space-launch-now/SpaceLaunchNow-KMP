@@ -41,6 +41,7 @@ import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.navigation.NewsEvents
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
@@ -53,6 +54,25 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedContentData
 import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedLaunchContent
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+// Tab indices for the News & Events screen (mirrors NewsEventsTab ordinals).
+private const val NEWS_TAB_INDEX = 0
+private const val EVENTS_TAB_INDEX = 1
+
+/**
+ * Navigates to the News & Events screen on the requested tab, behaving like
+ * tapping the News tab: it reuses the destination if already on the back stack
+ * and preserves/restores its state.
+ */
+private fun NavController.navigateToNewsEventsTab(tabIndex: Int) {
+    navigate(NewsEvents(initialTab = tabIndex)) {
+        popUpTo(graph.startDestinationId) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -323,9 +343,21 @@ fun ResponsiveHomeContent(
                 navController = navController
             )
         }
-        item(key = "news_title") { SectionTitle(title = "Latest News", hasAction = false) }
+        item(key = "news_title") {
+            SectionTitle(
+                title = "Latest News",
+                hasAction = true,
+                onActionClick = { navController.navigateToNewsEventsTab(NEWS_TAB_INDEX) }
+            )
+        }
         item(key = "news_view") { ArticlesView(state = articlesState, onArticleClick = onArticleClick) }
-        item(key = "events_title") { SectionTitle(title = "Upcoming Events", hasAction = false) }
+        item(key = "events_title") {
+            SectionTitle(
+                title = "Upcoming Events",
+                hasAction = true,
+                onActionClick = { navController.navigateToNewsEventsTab(EVENTS_TAB_INDEX) }
+            )
+        }
         item(key = "events_view") { EventsView(state = eventsState, navController = navController) }
         item(key = "bottom_spacer") {
             Spacer(modifier = Modifier.height(if (isTabletOrDesktop) 64.dp else 32.dp))

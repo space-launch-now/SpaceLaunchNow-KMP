@@ -61,7 +61,7 @@ object ExploreSections {
             title = "News & Events",
             description = "Space news and upcoming events",
             icon = Icons.Filled.Newspaper,
-            route = NewsEvents,
+            route = NewsEvents(),
             contentDescription = "Navigate to News and Events to browse articles and upcoming space events"
         )
     )

@@ -96,6 +96,12 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material3)
+                // The compose plugin pins the desktop Material3 to 1.9.0, which keeps the
+                // Material3 Expressive APIs (LoadingIndicator, LinearWavyProgressIndicator,
+                // ExperimentalMaterial3ExpressiveApi) internal. Android/iOS/common resolve
+                // 1.10.0-alpha05 (via material3-adaptive-navigation-suite) where they are public,
+                // so align desktop to the same version to keep commonMain buildable on desktop.
+                implementation(libs.compose.material3.jb.desktop)
                 implementation(compose.ui)
 
                 implementation(compose.materialIconsExtended)

@@ -36,7 +36,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         Screen.Settings
     )
 
-    val routes = listOf(Home, Schedule, Explore, NewsEvents, Settings)
+    val routes = listOf(Home, Schedule, Explore, NewsEvents(), Settings)
 
     // Column to stack banner ad above navigation bar
     Column(

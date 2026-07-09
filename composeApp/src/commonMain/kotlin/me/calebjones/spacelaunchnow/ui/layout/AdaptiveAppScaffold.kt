@@ -76,6 +76,9 @@ fun AdaptiveAppScaffold(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    // Base route with any type-safe nav arguments stripped (e.g. NewsEvents?initialTab={..}),
+    // so arg-carrying main tabs still match their tab item for selection highlighting.
+    val currentBaseRoute = currentRoute?.substringBefore('/')?.substringBefore('?')
     val showNavigation = NavigationRouteConfig.shouldShowNavigation(currentRoute)
     val showAds = NavigationRouteConfig.shouldShowAds(currentRoute)
 
@@ -132,7 +135,7 @@ fun AdaptiveAppScaffold(
                                     ) {
                                         mainNavigationItems.forEach { tab ->
                                             WideNavigationRailItem(
-                                                selected = currentRoute == tab.route::class.qualifiedName,
+                                                selected = currentBaseRoute == tab.route::class.qualifiedName,
                                                 onClick = {
                                                     onTabSelected?.invoke(tab.label)
                                                     navController.navigate(tab.route) {

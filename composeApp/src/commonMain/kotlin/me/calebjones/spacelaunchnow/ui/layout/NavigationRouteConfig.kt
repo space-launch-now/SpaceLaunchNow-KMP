@@ -51,7 +51,7 @@ val mainNavigationItems = listOf(
         contentDescription = "Explore tab"
     ),
     NavigationTabItem(
-        route = NewsEvents,
+        route = NewsEvents(),
         label = "News",
         icon = Icons.Filled.Newspaper,
         contentDescription = "News and Events tab"
@@ -92,12 +92,22 @@ object NavigationRouteConfig {
     )
 
     /**
+     * Strips type-safe navigation arguments from a route string so it can be
+     * matched against a destination's [KClass.qualifiedName]. Routes carrying
+     * arguments look like `com.foo.Bar/{id}` (required) or
+     * `com.foo.Bar?tab={tab}` (optional) — we only care about the base class.
+     */
+    private fun baseRoute(route: String): String =
+        route.substringBefore('/').substringBefore('?')
+
+    /**
      * Returns true if navigation should be shown for the given route.
      * @param route The qualified route name from NavBackStackEntry.destination.route
      */
     fun shouldShowNavigation(route: String?): Boolean {
         if (route == null) return false
-        return mainTabRoutes.any { it.qualifiedName == route }
+        val base = baseRoute(route)
+        return mainTabRoutes.any { it.qualifiedName == base }
     }
 
     /**
@@ -106,6 +116,7 @@ object NavigationRouteConfig {
      */
     fun shouldShowAds(route: String?): Boolean {
         if (route == null) return false
-        return adFreeRoutes.none { it.qualifiedName == route }
+        val base = baseRoute(route)
+        return adFreeRoutes.none { it.qualifiedName == base }
     }
 }
