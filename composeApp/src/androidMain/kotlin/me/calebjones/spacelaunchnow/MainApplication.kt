@@ -131,6 +131,11 @@ class MainApplication : Application() {
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to start DiagnosticLevelController" }
         }
+        try {
+            getKoin().get<me.calebjones.spacelaunchnow.util.logging.RemoteDiagnosticsController>().start()
+        } catch (e: Exception) {
+            log.e(e) { "❌ Failed to start RemoteDiagnosticsController" }
+        }
 
         // Initialize Billing and Subscription system after Koin is ready
         log.d { "Initializing Billing and Subscription system..." }

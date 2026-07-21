@@ -13,6 +13,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     var failureException = Exception("Mock failure")
     var mockRoadmapData: RoadmapData? = null
     var mockPinnedContent: PinnedContent? = null
+    var mockDiagnosticsConfigJson: String? = null
     var fetchAndActivateCalled = false
     var setDefaultsCalled = false
     var lastForceRefresh: Boolean? = null
@@ -50,11 +51,14 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
         }
     }
     
+    override suspend fun getDiagnosticsConfigJson(): String? = mockDiagnosticsConfigJson
+
     fun reset() {
         shouldFail = false
         failureException = Exception("Mock failure")
         mockRoadmapData = null
         mockPinnedContent = null
+        mockDiagnosticsConfigJson = null
         fetchAndActivateCalled = false
         setDefaultsCalled = false
         lastForceRefresh = null
