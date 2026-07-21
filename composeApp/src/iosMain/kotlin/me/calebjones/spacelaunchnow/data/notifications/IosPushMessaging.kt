@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import me.calebjones.spacelaunchnow.data.model.PushMessage
+import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -49,8 +50,10 @@ actual class PushMessaging actual constructor() {
         
         IosPushMessagingBridge.requestToken { result ->
             result.onSuccess { token ->
-                log.i { "SUCCESS - Got FCM token: ${token.take(20)}..." }
+                PushDiagnostics.recordTokenSuccess(token)
+                log.i { "SUCCESS - Got FCM token (len=${token.length}, …${token.takeLast(6)})" }
             }.onFailure { error ->
+                PushDiagnostics.recordTokenUnavailable(error.message ?: "exception")
                 log.e { "ERROR - Failed to get FCM token: ${error.message}" }
             }
             continuation.resume(result)

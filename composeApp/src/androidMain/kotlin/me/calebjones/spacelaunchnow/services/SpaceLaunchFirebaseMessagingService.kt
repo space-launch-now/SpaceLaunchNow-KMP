@@ -6,6 +6,7 @@ import androidx.work.WorkManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
+import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.workers.NotificationWorker
 
@@ -59,7 +60,8 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        log.i { "New FCM token generated - length: ${token.length}, prefix: ${token.take(10)}" }
+        log.i { "New FCM token generated (len=${token.length}, …${token.takeLast(6)})" }
+        PushDiagnostics.recordTokenSuccess(token)
 
         // TODO: Send token to backend if needed
     }

@@ -23,7 +23,7 @@ class DefaultRevenueCatAttributes : RevenueCatAttributes {
     override fun setPushToken(token: String) {
         try {
             platformSetPushToken(token)
-            log.d { "RC push token set (length=${token.length})" }
+            log.i { "RC push token set (length=${token.length})" }
         } catch (e: Exception) {
             log.w(e) { "Failed to set RC push token" }
         }
