@@ -47,23 +47,23 @@ DatadogLogger observer (android/ios):     effective = remoteOverride ?: userLeve
 
 **Produces:** `DiagnosticsConfig` / `DiagnosticsOverride` / `DiagnosticsMatch` (kotlinx-serialization), `ResolvedDiagnostics(sampleRate: Float?, diagnosticLevel: DiagnosticLevel?)`, `parseDiagnosticsConfig(jsonString: String?): DiagnosticsConfig?`, `resolveDiagnostics(config, rcUserId, nowEpochSeconds): ResolvedDiagnostics`, `resolveRemoteLevelOverride(remoteName: String?, remoteExpiresAtEpochSeconds: Long?, nowEpochSeconds: Long): DiagnosticLevel?`.
 
-- [ ] Test cases: valid config parses; blank/malformed/unknown-version → null; match by rc_user_id wins with coerced rates and parsed level; unknown level name → null level; expired/malformed `expires_at` entry ignored; first-match-wins; no match → default_sample_rate + null level; null config/user → (null, null); `resolveRemoteLevelOverride` honors expiry.
-- [ ] Run test → RED → implement → GREEN.
-- [ ] Commit: `feat(logging): add remote diagnostics config parsing and resolver`
+- [x] Test cases: valid config parses; blank/malformed/unknown-version → null; match by rc_user_id wins with coerced rates and parsed level; unknown level name → null level; expired/malformed `expires_at` entry ignored; first-match-wins; no match → default_sample_rate + null level; null config/user → (null, null); `resolveRemoteLevelOverride` honors expiry.
+- [x] Run test → RED → implement → GREEN.
+- [x] Commit: `feat(logging): add remote diagnostics config parsing and resolver`
 
 ### Task 2: Persisted overrides + effective-value plumbing
 
 **Files:** Modify `data/storage/DebugPreferences.kt` (key `remote_datadog_sample_rate_override`, `DebugSettings.remoteDatadogSampleRateOverride: Float? = null` appended last, `setRemoteDatadogSampleRateOverride(rate: Float?)`); `util/logging/LoggingPreferences.kt` (keys `remote_diagnostic_level_override`, `remote_diagnostic_level_expires_at`; `setRemoteDiagnosticLevelOverride(level: DiagnosticLevel?)` stamping now+72h; `getDiagnosticSettings()` overlays `resolveRemoteLevelOverride(...) ?: userLevel`); `analytics/DatadogConfig.android.kt` + `.ios.kt` observers (`newRate = (settings.remoteDatadogSampleRateOverride ?: settings.datadogSampleRate).coerceIn(0f,100f)`).
 
-- [ ] Implement; compile Android + desktop; full desktopTest green (existing DiagnosticLevel/VerboseExpiry tests must not regress).
-- [ ] Commit: `feat(logging): apply remote sample-rate and diagnostic-level overrides`
+- [x] Implement; compile Android + desktop; full desktopTest green (existing DiagnosticLevel/VerboseExpiry tests must not regress).
+- [x] Commit: `feat(logging): apply remote sample-rate and diagnostic-level overrides`
 
 ### Task 3: Remote Config read + controller + startup wiring
 
 **Files:** Modify `data/repository/RemoteConfigRepository.kt` + `Impl` (`getDiagnosticsConfigJson(): String?`, key `diagnostics_config`, default `""` in `setDefaults`); `commonTest/.../MockRemoteConfigRepository.kt` (override → null). Create `util/logging/RemoteDiagnosticsController.kt` (observe `UserContext.revenueCatUserId` via `collectLatest`; first refresh force=true; 6h re-assert loop; fetch-failure keeps state; writes both overrides). Modify `di/AppModule.kt` (`single { RemoteDiagnosticsController(get(), get(), get()) }`), `MainApplication.kt` (start after `DiagnosticLevelController.start`), `MainViewController.kt` (same, iOS).
 
-- [ ] Implement; compile Android + desktop; desktopTest green.
-- [ ] Commit: `feat(logging): remotely control per-user diagnostics via Firebase Remote Config`
+- [x] Implement; compile Android + desktop; desktopTest green.
+- [x] Commit: `feat(logging): remotely control per-user diagnostics via Firebase Remote Config`
 
 ### Ops (post-merge, from spec §6)
 Publish `diagnostics_config` in Firebase console, e.g. `{"version":1,"default_sample_rate":100,"overrides":[{"match":{"rc_user_id":"$RCAnonymousID:..."},"sample_rate":100,"diagnostic_level":"VERBOSE","expires_at":"2026-08-01T00:00:00Z"}]}` — device picks it up on next launch (force-refresh) or ≤6h re-assert; remove the entry (or let it expire) to revert.
