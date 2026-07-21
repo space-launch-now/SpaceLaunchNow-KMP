@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.update
 import kotlin.time.Clock
 import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
+import me.calebjones.spacelaunchnow.analytics.DatadogRuntime
 
 /**
  * Runtime cache of the startup push-registration outcomes (spec 015 §3.4).
@@ -126,13 +127,16 @@ object PushDiagnostics {
     /**
      * Emit the once-per-cold-start summary. The Kermit line covers console/file (and
      * Datadog at VERBOSE). At STANDARD the DataDogLogWriter threshold is Warn and would
-     * drop Info, so the structured copy goes directly to DatadogLogger — consent still
-     * blocks it entirely at OFF. The severity gate prevents double upload at VERBOSE.
+     * drop Info, so the structured copy goes directly to DatadogLogger. The direct copy
+     * uploads ONLY when the user opted into diagnostics: isRemoteLoggingActive() is true
+     * only with the SDK initialized and consent granted (STANDARD/VERBOSE), which also
+     * avoids the PENDING-consent buffer. The severity gate prevents double upload at
+     * VERBOSE, where the Kermit line already reaches Datadog through the writer.
      */
     fun logSummary(diagnosticLevelName: String?) {
         val attrs = summaryAttributes(snapshot, diagnosticLevelName)
         log.i { "Push registration summary " + attrs.entries.joinToString(" ") { "${it.key}=${it.value}" } }
-        if (SpaceLogger.getDataDogSeverity() > Severity.Info) {
+        if (DatadogRuntime.isRemoteLoggingActive() && SpaceLogger.getDataDogSeverity() > Severity.Info) {
             DatadogLogger.info(
                 "Push registration summary",
                 attrs + mapOf("tag" to "SLN-PushDiagnostics") + UserContext.getLogAttributes(),
