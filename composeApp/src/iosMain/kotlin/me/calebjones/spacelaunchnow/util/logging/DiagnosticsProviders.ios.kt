@@ -6,6 +6,7 @@ import me.calebjones.spacelaunchnow.data.notifications.NseBreadcrumb
 actual fun platformNotificationDiagnostics(): List<Pair<String, String>> {
     val snap = NSEPreferenceBridge.readStoredPrefs()
     fun present(v: Any?): String = v?.toString() ?: "MISSING"
+    val pushSnap = PushDiagnostics.snapshot
     return listOf(
         "App Group available" to snap.appGroupAvailable.toString(),
         "Any key missing" to snap.anyKeyMissing.toString(),
@@ -14,7 +15,7 @@ actual fun platformNotificationDiagnostics(): List<Pair<String, String>> {
         "NSE useStrictMatching" to present(snap.useStrictMatching),
         "NSE agencies (expanded)" to (snap.subscribedAgencies?.let { "${it.size}: ${it.take(12).joinToString(",")}" } ?: "MISSING"),
         "NSE locations (expanded)" to (snap.subscribedLocations?.let { "${it.size}: ${it.take(12).joinToString(",")}" } ?: "MISSING"),
-    )
+    ) + PushDiagnostics.reportRows(pushSnap, pushSnap.notificationsEnabled, PlayServicesAvailability.NOT_APPLICABLE)
 }
 
 actual fun recentNseBreadcrumbs(): List<NseBreadcrumb> =
