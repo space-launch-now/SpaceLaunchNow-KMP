@@ -43,6 +43,15 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
         private val DIAGNOSTIC_LEVEL = stringPreferencesKey("diagnostic_level")
         private val VERBOSE_EXPIRES_AT = longPreferencesKey("verbose_expires_at_epoch_seconds")
         private val VERBOSE_REVERT_LEVEL = stringPreferencesKey("verbose_revert_level")
+
+        // Server-driven level override (REMOTE_LOG_SAMPLING_SPEC §4.3). Stored apart
+        // from the user's own diagnostic_level so their choice is never clobbered and
+        // restores automatically when the override is cleared or its backstop lapses.
+        private val REMOTE_LEVEL_OVERRIDE = stringPreferencesKey("remote_diagnostic_level_override")
+        private val REMOTE_LEVEL_EXPIRES_AT = longPreferencesKey("remote_diagnostic_level_expires_at")
+
+        /** Safety backstop: a remote override dies after 72h unless re-asserted. */
+        const val REMOTE_OVERRIDE_BACKSTOP_SECONDS: Long = VERBOSE_AUTO_REVERT_SECONDS
     }
 
     private fun readRevertLevel(prefs: Preferences): DiagnosticLevel? =
@@ -58,16 +67,28 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     fun getDiagnosticSettings(): Flow<DiagnosticSettings> = dataStore.data.map { prefs ->
+        val now = Clock.System.now().epochSeconds
         val stored = DiagnosticLevel.fromStorage(prefs[DIAGNOSTIC_LEVEL], prefs[DATADOG_ENABLED])
         val resolved = resolveVerboseExpiry(
             stored = stored,
             verboseExpiresAtEpochSeconds = prefs[VERBOSE_EXPIRES_AT],
             revertLevel = readRevertLevel(prefs),
-            nowEpochSeconds = Clock.System.now().epochSeconds,
+            nowEpochSeconds = now,
+        )
+        // A live remote override wins over the user's own level; expiry is checked at
+        // read time so a stale override can never outlive its backstop across launches.
+        val remote = resolveRemoteLevelOverride(
+            remoteName = prefs[REMOTE_LEVEL_OVERRIDE],
+            remoteExpiresAtEpochSeconds = prefs[REMOTE_LEVEL_EXPIRES_AT],
+            nowEpochSeconds = now,
         )
         DiagnosticSettings(
-            level = resolved.level,
-            verboseExpiresAtEpochSeconds = if (resolved.level == DiagnosticLevel.VERBOSE) prefs[VERBOSE_EXPIRES_AT] else null,
+            level = remote ?: resolved.level,
+            verboseExpiresAtEpochSeconds = when {
+                remote == DiagnosticLevel.VERBOSE -> prefs[REMOTE_LEVEL_EXPIRES_AT]
+                remote == null && resolved.level == DiagnosticLevel.VERBOSE -> prefs[VERBOSE_EXPIRES_AT]
+                else -> null
+            },
         )
     }
 
@@ -103,6 +124,26 @@ class LoggingPreferences(private val dataStore: DataStore<Preferences>) {
                 prefs.remove(VERBOSE_REVERT_LEVEL)
             }
             writeLevel(prefs, level)
+        }
+    }
+
+    /**
+     * Set (or clear, with null) the server-driven level override. Writing stamps a
+     * fresh 72h backstop; RemoteDiagnosticsController re-asserts periodically while
+     * the remote config keeps the override active, so a forgotten config entry can
+     * never leave a device verbose forever. The user's own diagnostic_level keys
+     * are untouched.
+     */
+    suspend fun setRemoteDiagnosticLevelOverride(level: DiagnosticLevel?) {
+        dataStore.edit { prefs ->
+            if (level == null) {
+                prefs.remove(REMOTE_LEVEL_OVERRIDE)
+                prefs.remove(REMOTE_LEVEL_EXPIRES_AT)
+            } else {
+                prefs[REMOTE_LEVEL_OVERRIDE] = level.name
+                prefs[REMOTE_LEVEL_EXPIRES_AT] =
+                    Clock.System.now().epochSeconds + REMOTE_OVERRIDE_BACKSTOP_SECONDS
+            }
         }
     }
 
