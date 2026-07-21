@@ -43,7 +43,7 @@
   - `fun logSummary(diagnosticLevelName: String?)`
   - `fun reset()` (test hook)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `composeApp/src/commonTest/kotlin/me/calebjones/spacelaunchnow/util/logging/PushDiagnosticsTest.kt`:
 
@@ -165,12 +165,12 @@ class PushDiagnosticsTest {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `./gradlew :composeApp:jvmTest --tests "me.calebjones.spacelaunchnow.util.logging.PushDiagnosticsTest"`
 Expected: FAIL to compile — `PushDiagnostics` / `PlayServicesAvailability` unresolved.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/util/logging/PlayServices.kt`:
 
@@ -336,12 +336,12 @@ private fun PlayServicesAvailability.label(): String = when (this) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `./gradlew :composeApp:jvmTest --tests "me.calebjones.spacelaunchnow.util.logging.PushDiagnosticsTest"`
 Expected: PASS (7 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/util/logging/PushDiagnostics.kt \
@@ -364,7 +364,7 @@ git commit -m "feat(logging): add PushDiagnostics runtime snapshot with summary 
 - Consumes: `PlayServicesAvailability` (Task 1), `PermissionHelper.context` (existing, `me.calebjones.spacelaunchnow.data.repository.PermissionHelper`).
 - Produces: `expect fun checkPlayServicesAvailability(): PlayServicesAvailability` — called by Task 3 (App.kt) and Task 4 (Android report provider).
 
-- [ ] **Step 1: Add the expect declaration**
+- [x] **Step 1: Add the expect declaration**
 
 Append to `PlayServices.kt` (commonMain):
 
@@ -373,7 +373,7 @@ Append to `PlayServices.kt` (commonMain):
 expect fun checkPlayServicesAvailability(): PlayServicesAvailability
 ```
 
-- [ ] **Step 2: Android actual**
+- [x] **Step 2: Android actual**
 
 `composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/util/logging/PlayServices.android.kt`:
 
@@ -401,7 +401,7 @@ actual fun checkPlayServicesAvailability(): PlayServicesAvailability = try {
 
 `GoogleApiAvailabilityLight` and `ConnectionResult` live in `play-services-basement`, already on the classpath transitively via `firebase-messaging`. **Fallback if unresolved at compile:** add to `gradle/libs.versions.toml` under `[libraries]`: `play-services-base = { module = "com.google.android.gms:play-services-base", version = "18.5.0" }`, add `implementation(libs.play.services.base)` to the `androidMain` dependencies block in `composeApp/build.gradle.kts`, and use `GoogleApiAvailability` instead of the Light variant.
 
-- [ ] **Step 3: iOS and Desktop actuals**
+- [x] **Step 3: iOS and Desktop actuals**
 
 `composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/util/logging/PlayServices.ios.kt`:
 
@@ -419,12 +419,12 @@ package me.calebjones.spacelaunchnow.util.logging
 actual fun checkPlayServicesAvailability(): PlayServicesAvailability = PlayServicesAvailability.NOT_APPLICABLE
 ```
 
-- [ ] **Step 4: Compile check**
+- [x] **Step 4: Compile check**
 
 Run: `./gradlew :composeApp:compileKotlinDesktop :composeApp:compileDebugKotlinAndroid`
 Expected: BUILD SUCCESSFUL.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/util/logging/PlayServices.kt \
@@ -450,7 +450,7 @@ git commit -m "feat(logging): add Play Services availability expect/actual"
 - Consumes: `PushDiagnostics.record*` / `logSummary` (Task 1), `checkPlayServicesAvailability()` (Task 2), existing `NotificationRepository.hasNotificationPermission()`, `LoggingPreferences.getDiagnosticSettings(): Flow<DiagnosticSettings>` (`.level: DiagnosticLevel`).
 - Produces: nothing new for later tasks (Task 4 reads only the snapshot).
 
-- [ ] **Step 1: `AndroidPushMessaging.getToken()` — success → info, redact, record**
+- [x] **Step 1: `AndroidPushMessaging.getToken()` — success → info, redact, record**
 
 Replace the `getToken` body (`AndroidPushMessaging.kt:42-52`):
 
@@ -473,7 +473,7 @@ Replace the `getToken` body (`AndroidPushMessaging.kt:42-52`):
 Add import: `me.calebjones.spacelaunchnow.util.logging.PushDiagnostics`.
 (Note: this also fixes the existing raw `token.take(20)` prefix leak.)
 
-- [ ] **Step 2: `IosPushMessaging.getToken()` — redact + record (levels already info/error)**
+- [x] **Step 2: `IosPushMessaging.getToken()` — redact + record (levels already info/error)**
 
 Replace the result callback body (`IosPushMessaging.kt:50-57`):
 
@@ -492,7 +492,7 @@ Replace the result callback body (`IosPushMessaging.kt:50-57`):
 
 Add import: `me.calebjones.spacelaunchnow.util.logging.PushDiagnostics`.
 
-- [ ] **Step 3: `SpaceLaunchFirebaseMessagingService.onNewToken` — redact + record refresh**
+- [x] **Step 3: `SpaceLaunchFirebaseMessagingService.onNewToken` — redact + record refresh**
 
 Replace (`SpaceLaunchFirebaseMessagingService.kt:60-65`):
 
@@ -509,7 +509,7 @@ Replace (`SpaceLaunchFirebaseMessagingService.kt:60-65`):
 Add import: `me.calebjones.spacelaunchnow.util.logging.PushDiagnostics`.
 (Fixes the existing raw `token.take(10)` prefix leak.)
 
-- [ ] **Step 4: `App.kt` — token fetch block + precondition checks + summary**
+- [x] **Step 4: `App.kt` — token fetch block + precondition checks + summary**
 
 Replace the token-fetch `try` block (`App.kt:209-215`) with:
 
@@ -572,7 +572,7 @@ import me.calebjones.spacelaunchnow.util.logging.checkPlayServicesAvailability
 
 (Check for existing imports first — `kotlinx.coroutines.flow.first` may already be present. If `LoggingPreferences.getDiagnosticSettings()` has a different accessor name, mirror whatever `DiagnosticsScreen.kt:61` uses.)
 
-- [ ] **Step 5: `MainApplication.kt` Step 4c — promote to info/warn + record**
+- [x] **Step 5: `MainApplication.kt` Step 4c — promote to info/warn + record**
 
 Replace (`MainApplication.kt:205-220`):
 
@@ -602,7 +602,7 @@ Replace (`MainApplication.kt:205-220`):
 
 (Fully-qualified names match the file's existing style — see Steps 4b/5/6 around it.)
 
-- [ ] **Step 6: `DefaultRevenueCatAttributes.setPushToken` — success debug → info**
+- [x] **Step 6: `DefaultRevenueCatAttributes.setPushToken` — success debug → info**
 
 In `DefaultRevenueCatAttributes.kt:26`, change:
 
@@ -616,12 +616,12 @@ to:
             log.i { "RC push token set (length=${token.length})" }
 ```
 
-- [ ] **Step 7: Compile + full test check**
+- [x] **Step 7: Compile + full test check**
 
 Run: `./gradlew :composeApp:compileKotlinDesktop :composeApp:compileDebugKotlinAndroid :composeApp:jvmTest`
 Expected: BUILD SUCCESSFUL, all tests pass. (iOS edits verified by CI/Xcode — not compilable on this host.)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/App.kt \
@@ -646,7 +646,7 @@ git commit -m "feat(notifications): make startup push registration observable at
 - Consumes: `PushDiagnostics.reportRows(snapshot, notificationsEnabled, playServices)` (Task 1), `checkPlayServicesAvailability()` (Task 2), `AndroidNotificationPermissionHandler`, `PermissionHelper.context`.
 - The report builder (`DiagnosticsScreen.kt:167` `platformRows.forEach { (l, v) -> appendLine("$l: $v") }`) is **not** modified — rows appear automatically.
 
-- [ ] **Step 1: Android provider**
+- [x] **Step 1: Android provider**
 
 Replace `DiagnosticsProviders.android.kt` entirely:
 
@@ -670,7 +670,7 @@ actual fun recentNseBreadcrumbs(): List<NseBreadcrumb> = emptyList()
 actual fun shareCopiesToClipboard(): Boolean = false
 ```
 
-- [ ] **Step 2: iOS provider — append push rows, keep NSE rows**
+- [x] **Step 2: iOS provider — append push rows, keep NSE rows**
 
 In `DiagnosticsProviders.ios.kt`, change the `platformNotificationDiagnostics` return from `return listOf(...)` to `return listOf(...) + pushRows` by replacing the function with:
 
@@ -693,7 +693,7 @@ actual fun platformNotificationDiagnostics(): List<Pair<String, String>> {
 
 (iOS reads notifications-enabled from the snapshot — recorded by the common startup sequence in Task 3; there is no synchronous share-time permission API on iOS.)
 
-- [ ] **Step 3: Fix the debug-screen card title**
+- [x] **Step 3: Fix the debug-screen card title**
 
 `platformRows` now render on Android too, inside a card titled for iOS. In `DiagnosticsScreen.kt:118`, change:
 
@@ -709,12 +709,12 @@ to:
 
 (The shareable report text builder is untouched, per spec §4.)
 
-- [ ] **Step 4: Compile + test**
+- [x] **Step 4: Compile + test**
 
 Run: `./gradlew :composeApp:compileKotlinDesktop :composeApp:compileDebugKotlinAndroid :composeApp:jvmTest`
 Expected: BUILD SUCCESSFUL, tests pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/util/logging/DiagnosticsProviders.android.kt \
@@ -733,7 +733,7 @@ git commit -m "feat(logging): add FCM/push health rows to diagnostics report"
 **Interfaces:**
 - Consumes: `SpaceLogger.initialize(LogConfig)`, `PushDiagnostics.logSummary`, Kermit `LogWriter`.
 
-- [ ] **Step 1: Write the test (summary logs at Info, message carries attrs, no raw token)**
+- [x] **Step 1: Write the test (summary logs at Info, message carries attrs, no raw token)**
 
 ```kotlin
 package me.calebjones.spacelaunchnow.util.logging
@@ -791,17 +791,17 @@ class PushSummaryLoggingTest {
 
 Note: `PushDiagnostics.log` is `lazy` — if a previous test initialized SpaceLogger first, the cached logger still fans out to writers registered at *its* creation. If the capture misses, restructure `PushDiagnostics` to use `private val log get() = SpaceLogger.getLogger("PushDiagnostics")` (computed property, no caching) rather than `by lazy` — that is the acceptable fix, not weakening the test.
 
-- [ ] **Step 2: Run the new test**
+- [x] **Step 2: Run the new test**
 
 Run: `./gradlew :composeApp:jvmTest --tests "me.calebjones.spacelaunchnow.util.logging.PushSummaryLoggingTest"`
 Expected: PASS.
 
-- [ ] **Step 3: Full verification**
+- [x] **Step 3: Full verification**
 
 Run: `./gradlew :composeApp:jvmTest ktlintCheck :composeApp:compileDebugKotlinAndroid :composeApp:compileKotlinDesktop`
 Expected: jvmTest + compiles green. ktlint is soft-fail in CI; fix any violations in files this plan touched.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add composeApp/src/commonTest/kotlin/me/calebjones/spacelaunchnow/util/logging/PushSummaryLoggingTest.kt
