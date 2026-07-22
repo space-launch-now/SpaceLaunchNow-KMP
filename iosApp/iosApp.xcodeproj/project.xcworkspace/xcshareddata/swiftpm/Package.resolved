@@ -155,24 +155,6 @@
       }
     },
     {
-      "identity" : "purchases-hybrid-common",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/RevenueCat/purchases-hybrid-common",
-      "state" : {
-        "revision" : "c0706c7ced7f5cec92fc15ad1384169f09e5fc73",
-        "version" : "14.3.0"
-      }
-    },
-    {
-      "identity" : "purchases-ios-spm",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/RevenueCat/purchases-ios-spm",
-      "state" : {
-        "revision" : "9cb74af9c5e9b4e9c22a511d8df4481fa7e3de16",
-        "version" : "5.32.0"
-      }
-    },
-    {
       "identity" : "swift-atomics",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-atomics.git",
