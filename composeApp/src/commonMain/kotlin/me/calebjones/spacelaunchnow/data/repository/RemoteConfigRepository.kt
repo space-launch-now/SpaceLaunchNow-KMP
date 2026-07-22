@@ -51,11 +51,18 @@ interface RemoteConfigRepository {
     
     /**
      * Set default values for remote config parameters
-     * 
+     *
      * Should be called during app initialization to ensure
      * the app functions before first remote fetch completes.
-     * 
+     *
      * Defaults are embedded JSON matching the RoadmapData structure.
      */
     suspend fun setDefaults()
+
+    /**
+     * Raw JSON of the 'diagnostics_config' parameter (remote diagnostics control),
+     * or null when unset/blank/unavailable. Parsing lives in
+     * util/logging/RemoteDiagnostics.kt so it stays pure and unit-testable.
+     */
+    suspend fun getDiagnosticsConfigJson(): String?
 }

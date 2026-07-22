@@ -408,6 +408,15 @@ val appModule = module {
     // Remote Config Repository for Firebase Remote Config
     single<RemoteConfigRepository> { RemoteConfigRepositoryImpl() }
 
+    // Remote diagnostics control (fetch → resolve → apply); started at platform init
+    single {
+        me.calebjones.spacelaunchnow.util.logging.RemoteDiagnosticsController(
+            remoteConfigRepository = get(),
+            loggingPreferences = get(),
+            debugPreferences = getOrNull(),
+        )
+    }
+
     viewModelOf(::RoadmapViewModel)
 }
 

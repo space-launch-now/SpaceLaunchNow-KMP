@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.tasks.await
 import me.calebjones.spacelaunchnow.data.model.PushMessage
+import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 actual class PushMessaging actual constructor() {
@@ -43,9 +44,11 @@ actual class PushMessaging actual constructor() {
         log.d { "Getting FCM token" }
         return try {
             val token = FirebaseMessaging.getInstance().token.await()
-            log.d { "SUCCESS - Got FCM token: ${token.take(20)}..." }
+            PushDiagnostics.recordTokenSuccess(token)
+            log.i { "SUCCESS - Got FCM token (len=${token.length}, …${token.takeLast(6)})" }
             Result.success(token)
         } catch (e: Exception) {
+            PushDiagnostics.recordTokenUnavailable(e.message ?: "exception")
             log.e { "ERROR - Failed to get FCM token: ${e.message}" }
             Result.failure(e)
         }

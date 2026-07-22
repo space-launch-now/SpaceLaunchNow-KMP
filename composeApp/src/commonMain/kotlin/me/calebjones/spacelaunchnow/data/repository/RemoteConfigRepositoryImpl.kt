@@ -43,6 +43,7 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
     companion object {
         private const val ROADMAP_DATA_KEY = "roadmap_data"
         private const val PINNED_CONTENT_KEY = "pinned_content"
+        private const val DIAGNOSTICS_CONFIG_KEY = "diagnostics_config"
         private val DEFAULT_FETCH_INTERVAL: Duration = 1.hours
         private val FORCE_REFRESH_INTERVAL: Duration = 0.seconds
         
@@ -128,15 +129,26 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
     
     override suspend fun setDefaults() {
         val config = remoteConfig ?: return // No-op when Firebase unavailable
-        
+
         try {
             config.setDefaults(
                 ROADMAP_DATA_KEY to DEFAULT_ROADMAP_JSON,
-                PINNED_CONTENT_KEY to DEFAULT_PINNED_CONTENT_JSON
+                PINNED_CONTENT_KEY to DEFAULT_PINNED_CONTENT_JSON,
+                DIAGNOSTICS_CONFIG_KEY to ""
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
             log.w(e) { "Failed to set remote config defaults" }
+        }
+    }
+
+    override suspend fun getDiagnosticsConfigJson(): String? {
+        val config = remoteConfig ?: return null
+        return try {
+            config.getValue(DIAGNOSTICS_CONFIG_KEY).asString().takeIf { it.isNotBlank() }
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read diagnostics config" }
+            null
         }
     }
 }

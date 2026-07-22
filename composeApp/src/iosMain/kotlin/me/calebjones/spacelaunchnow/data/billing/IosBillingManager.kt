@@ -16,8 +16,10 @@ import com.revenuecat.purchases.kmp.models.PeriodType
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
+import me.calebjones.spacelaunchnow.analytics.DatadogRUM
 import me.calebjones.spacelaunchnow.data.config.RevenueCatConfig
 import me.calebjones.spacelaunchnow.util.AppSecrets
+import me.calebjones.spacelaunchnow.util.logging.UserContext
 import me.calebjones.spacelaunchnow.util.toDisplayString
 import kotlin.coroutines.resume
 
@@ -254,6 +256,23 @@ class IosBillingManager : BillingManager {
             isInTrialPeriod = isInTrial,
             trialExpiresAt = trialExpires,
             subscriptionExpiryMs = subscriptionExpiryMs
+        )
+
+        // Attach rc_user_id/is_premium to every log line (REMOTE_LOG_SAMPLING_SPEC Phase 0).
+        // Must run BEFORE the richer DatadogRUM.setUser below so that call wins on extraInfo.
+        UserContext.setPremiumStatus(subscriptionType != SubscriptionType.FREE)
+        UserContext.setRevenueCatUserId(customerInfo.originalAppUserId)
+
+        // Update Datadog RUM with user subscription info (parity with AndroidBillingManager)
+        DatadogRUM.setUser(
+            id = customerInfo.originalAppUserId,
+            extraInfo = mapOf(
+                "platform" to "iOS",
+                "active_entitlements" to activeEntitlements.joinToString(","),
+                "active_subscriptions" to customerInfo.activeSubscriptions.joinToString(","),
+                "subscription_type" to subscriptionType.name,
+                "has_premium" to (subscriptionType != SubscriptionType.FREE)
+            )
         )
     }
     

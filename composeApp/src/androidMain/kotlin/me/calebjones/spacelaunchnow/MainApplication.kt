@@ -131,6 +131,11 @@ class MainApplication : Application() {
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to start DiagnosticLevelController" }
         }
+        try {
+            getKoin().get<me.calebjones.spacelaunchnow.util.logging.RemoteDiagnosticsController>().start()
+        } catch (e: Exception) {
+            log.e(e) { "❌ Failed to start RemoteDiagnosticsController" }
+        }
 
         // Initialize Billing and Subscription system after Koin is ready
         log.d { "Initializing Billing and Subscription system..." }
@@ -211,11 +216,16 @@ class MainApplication : Application() {
                         val rcAttrs =
                             getKoin().get<me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes>()
                         rcAttrs.setPushToken(fcmToken)
-                        log.d { "✅ FCM token forwarded to RevenueCat" }
+                        me.calebjones.spacelaunchnow.util.logging.PushDiagnostics.recordForwardedToRc()
+                        log.i { "✅ FCM token forwarded to RevenueCat" }
                     } else {
-                        log.d { "FCM token not available yet; skipping RC push token set" }
+                        me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
+                            .recordForwardSkipped("token_unavailable")
+                        log.w { "FCM token not available yet; skipping RC push token set" }
                     }
                 } catch (e: Exception) {
+                    me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
+                        .recordForwardSkipped("exception: ${e.message}")
                     log.w(e) { "Failed to forward FCM token to RevenueCat" }
                 }
 

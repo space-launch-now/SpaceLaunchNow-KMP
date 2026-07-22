@@ -147,6 +147,11 @@ fun MainViewController() = ComposeUIViewController {
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to start DiagnosticLevelController" }
         }
+        try {
+            getKoin().get<me.calebjones.spacelaunchnow.util.logging.RemoteDiagnosticsController>().start()
+        } catch (e: Exception) {
+            log.e(e) { "❌ Failed to start RemoteDiagnosticsController" }
+        }
 
         // Initialize Billing and Subscription system on background thread
         // NOTE: repository.initialize() handles billingClient.initialize() and syncer.startSyncing()

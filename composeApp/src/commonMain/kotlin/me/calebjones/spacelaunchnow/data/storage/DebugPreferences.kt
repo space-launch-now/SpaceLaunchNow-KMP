@@ -18,6 +18,10 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         // Sampling is a debug-only cost knob now; user-facing cost control is the
         // DiagnosticLevel consent (OFF = NOT_GRANTED = nothing uploads).
         private val DATADOG_SAMPLE_RATE = floatPreferencesKey("debug_datadog_sample_rate")
+        // Server-driven override (REMOTE_LOG_SAMPLING_SPEC §4.3). Takes precedence over
+        // the local slider when present; cleared when the remote config drops the override.
+        private val REMOTE_DATADOG_SAMPLE_RATE =
+            floatPreferencesKey("remote_datadog_sample_rate_override")
 
         // Debug subscription simulation keys
         private val DEBUG_SUBSCRIPTION_ACTIVE = booleanPreferencesKey("debug_subscription_active")
@@ -42,7 +46,8 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
             datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 100f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
             debugSubscriptionType = preferences[DEBUG_SUBSCRIPTION_TYPE],
-            debugSubscriptionProductId = preferences[DEBUG_SUBSCRIPTION_PRODUCT_ID]
+            debugSubscriptionProductId = preferences[DEBUG_SUBSCRIPTION_PRODUCT_ID],
+            remoteDatadogSampleRateOverride = preferences[REMOTE_DATADOG_SAMPLE_RATE]
         )
     }
 
@@ -88,6 +93,20 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     suspend fun setDatadogSampleRate(rate: Float) {
         dataStore.edit { preferences ->
             preferences[DATADOG_SAMPLE_RATE] = rate.coerceIn(0f, 100f)
+        }
+    }
+
+    /**
+     * Set (or clear, with null) the server-driven sample-rate override.
+     * The local slider value is preserved and becomes effective again on clear.
+     */
+    suspend fun setRemoteDatadogSampleRateOverride(rate: Float?) {
+        dataStore.edit { preferences ->
+            if (rate == null) {
+                preferences.remove(REMOTE_DATADOG_SAMPLE_RATE)
+            } else {
+                preferences[REMOTE_DATADOG_SAMPLE_RATE] = rate.coerceIn(0f, 100f)
+            }
         }
     }
 
@@ -169,5 +188,7 @@ data class DebugSettings(
     val datadogSampleRate: Float = 100f,
     val debugSubscriptionActive: Boolean = false,
     val debugSubscriptionType: String? = null,
-    val debugSubscriptionProductId: String? = null
+    val debugSubscriptionProductId: String? = null,
+    /** Server-driven override; null when no remote override is active. */
+    val remoteDatadogSampleRateOverride: Float? = null
 )

@@ -115,7 +115,7 @@ fun DiagnosticsScreen(
             }
             if (platformRows.isNotEmpty()) {
                 item {
-                    DiagnosticsCard("NSE App Group (used when app is killed)") {
+                    DiagnosticsCard("Push & notification state") {
                         platformRows.forEach { (label, value) -> DiagRow(label, value) }
                     }
                 }

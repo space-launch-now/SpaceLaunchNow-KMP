@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
@@ -91,7 +92,11 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.AppRatingViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
+import me.calebjones.spacelaunchnow.util.logging.PlayServicesAvailability
+import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import me.calebjones.spacelaunchnow.util.logging.checkPlayServicesAvailability
 import org.koin.compose.koinInject
 
 
@@ -207,9 +212,16 @@ fun SpaceLaunchNowApp(
                 }
 
                 try {
-                    // Get and print FCM token (last 6 chars only — token is sensitive)
-                    val token = pushMessaging.getToken().getOrNull() ?: "<unavailable>"
-                    log.d { "FCM Token: …${token.takeLast(6)}" }
+                    // Startup FCM token check (last 6 chars only — token is sensitive)
+                    val tokenResult = pushMessaging.getToken()
+                    val token = tokenResult.getOrNull()
+                    if (token.isNullOrBlank()) {
+                        val reason = tokenResult.exceptionOrNull()?.message ?: "null_or_blank"
+                        PushDiagnostics.recordTokenUnavailable(reason)
+                        log.w { "FCM token unavailable at startup: $reason" }
+                    } else {
+                        log.i { "FCM token present (len=${token.length}, …${token.takeLast(6)})" }
+                    }
                 } catch (e: Exception) {
                     log.w(e) { "Failed to get FCM token" }
                 }
@@ -230,6 +242,32 @@ fun SpaceLaunchNowApp(
                     log.d { "  - Subscribed FCM topics: ${currentState.subscribedTopics.size}" }
 
                     log.i { "Settings loaded - state management handled by repository" }
+
+                    // Push-registration preconditions (spec 015 §3.3) + summary (§3.2)
+                    val notificationsEnabled = notificationRepository.hasNotificationPermission()
+                    PushDiagnostics.recordNotificationsEnabled(notificationsEnabled)
+                    if (notificationsEnabled) {
+                        log.i { "OS notifications enabled" }
+                    } else {
+                        log.w { "OS notifications disabled (permission not granted)" }
+                    }
+
+                    val playServices = checkPlayServicesAvailability()
+                    PushDiagnostics.recordPlayServices(playServices)
+                    when (playServices) {
+                        PlayServicesAvailability.MISSING,
+                        PlayServicesAvailability.UPDATE_REQUIRED,
+                        PlayServicesAvailability.UNKNOWN ->
+                            log.w { "Google Play Services not available: $playServices" }
+                        else -> log.i { "Google Play Services: $playServices" }
+                    }
+
+                    PushDiagnostics.recordSubscribedTopicCount(currentState.subscribedTopics.size)
+
+                    val diagnosticLevelName = runCatching {
+                        koin.get<LoggingPreferences>().getDiagnosticSettings().first().level.name
+                    }.getOrNull()
+                    PushDiagnostics.logSummary(diagnosticLevelName)
                 } catch (e: Exception) {
                     log.e(e) { "Failed to initialize notifications" }
                 }

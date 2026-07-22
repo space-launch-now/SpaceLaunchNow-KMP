@@ -28,6 +28,7 @@ import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.sync.PhoneDataLayerSync
+import me.calebjones.spacelaunchnow.util.logging.UserContext
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.toDisplayString
 import kotlin.coroutines.resume
@@ -333,6 +334,11 @@ class AndroidBillingManager(
             isInTrialPeriod = isInTrial,
             trialExpiresAt = trialExpires
         )
+
+        // Attach rc_user_id/is_premium to every log line (REMOTE_LOG_SAMPLING_SPEC Phase 0).
+        // Must run BEFORE the richer DatadogRUM.setUser below so that call wins on extraInfo.
+        UserContext.setPremiumStatus(subscriptionType != SubscriptionType.FREE)
+        UserContext.setRevenueCatUserId(customerInfo.originalAppUserId)
 
         // Update Datadog RUM with user subscription info
         DatadogRUM.setUser(

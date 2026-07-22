@@ -120,7 +120,9 @@ actual object DatadogLogger {
         debugPreferences?.let { prefs ->
             observerJob = CoroutineScope(Dispatchers.Default).launch {
                 prefs.debugSettingsFlow.collect { settings ->
-                    val newRate = settings.datadogSampleRate.coerceIn(0f, 100f)
+                    // Remote override wins; local debug slider is the fallback (spec §4.3).
+                    val newRate = (settings.remoteDatadogSampleRateOverride ?: settings.datadogSampleRate)
+                        .coerceIn(0f, 100f)
                     if (newRate != currentSampleRate) {
                         log.i { "Sample rate changed from $currentSampleRate% to $newRate%, rebuilding logger..." }
                         buildLogger(newRate)
