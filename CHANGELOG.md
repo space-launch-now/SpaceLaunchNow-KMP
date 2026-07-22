@@ -1,3 +1,12 @@
+## [5.37.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.37.0...v5.37.1) (2026-07-22)
+
+
+### Bug Fixes
+
+* **deps:** update purchases-kmp to 3.3.0 for Play Billing 8 ([5230a55](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5230a557e9e0711de593e78b961382e863d07de8))
+
+
+
 # [5.37.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.36.0...v5.37.0) (2026-07-22)
 
 
@@ -64,15 +73,6 @@
 * **logging:** structured single-event startup state for Datadog ([acf6e4a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/acf6e4a2259d57fdbbccd2cbf5e36e4838b925da))
 * **settings:** collapse logging knobs into single Off/Standard/Verbose control ([fcef82e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fcef82e8ebcc1c0ed8ed956bdbb584fcf7420007))
 * **share:** platform sharePlainText for diagnostics export ([b5b2a20](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b5b2a20267925fbabcfb17c53c9f0f5ff8473799))
-
-
-
-## [5.33.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.33.0...v5.33.1) (2026-06-03)
-
-
-### Bug Fixes
-
-* update ad banner placement and improve URL opening logic on iOS ([e747d22](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e747d2267dcac9a909d07883632fe673b61cb7f9))
 
 
 
