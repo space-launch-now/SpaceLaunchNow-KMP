@@ -149,3 +149,14 @@ fun startRevenueCatAttributesSyncer() {
         },
     )
 }
+
+/**
+ * Called from Swift (`AppDelegate.didRegisterForRemoteNotificationsWithDeviceToken`)
+ * with the hex-encoded APNS token. Routes through the KMP SDK so the iOS app no
+ * longer needs to link the native RevenueCat framework directly.
+ */
+fun setRevenueCatPushToken(tokenHex: String) {
+    getKoin()
+        .get<me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes>()
+        .setPushToken(tokenHex)
+}

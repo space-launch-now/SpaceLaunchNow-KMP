@@ -16,8 +16,6 @@
 		3C2F71672E9379750026D5CD /* ComposeApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2F71662E9379750026D5CD /* ComposeApp.framework */; };
 		3C35B95B2EA97E1B00E28A01 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 3C35B95A2EA97E1B00E28A01 /* GoogleMobileAds */; };
 		3C35B95E2EA97ED900E28A01 /* GoogleUserMessagingPlatform in Frameworks */ = {isa = PBXBuildFile; productRef = 3C35B95D2EA97ED900E28A01 /* GoogleUserMessagingPlatform */; };
-		3C35B9602EA9816900E28A01 /* PurchasesHybridCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 3C35B95F2EA9816900E28A01 /* PurchasesHybridCommon */; };
-		3C35B9622EA9816900E28A01 /* PurchasesHybridCommonUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3C35B9612EA9816900E28A01 /* PurchasesHybridCommonUI */; };
 		3C4393F12E956CDF005E97B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C4393F02E956CDF005E97B3 /* LaunchScreen.storyboard */; };
 		3C5462FC2E9446F60032E227 /* LaunchWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3C2F71412E936FBD0026D5CD /* LaunchWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3C5463142E946EBF0032E227 /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C9137E42E9008320095D5AB /* Secrets.plist */; };
@@ -39,8 +37,6 @@
 		3CC6E4CD2EAC8A84002F6FE9 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 3CC6E4CC2EAC8A84002F6FE9 /* FirebaseAppCheck */; };
 		3CC6E4D02EAD9BBF002F6FE9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC6E4CE2EAD9BBF002F6FE9 /* AppDelegate.swift */; };
 		3CC6E4D12EAD9BBF002F6FE9 /* FCMBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC6E4CF2EAD9BBF002F6FE9 /* FCMBridge.swift */; };
-		3CE6841E2E9D513C00AA177C /* PurchasesHybridCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 3CE6841D2E9D513C00AA177C /* PurchasesHybridCommon */; };
-		3CE684202E9D513C00AA177C /* PurchasesHybridCommonUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3CE6841F2E9D513C00AA177C /* PurchasesHybridCommonUI */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		F90569C72F0889DC009D885A /* ShareHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90569C52F0889DC009D885A /* ShareHelper.swift */; };
 		F907BC472EC389C800C05E19 /* DatadogCore in Frameworks */ = {isa = PBXBuildFile; productRef = F907BC462EC389C800C05E19 /* DatadogCore */; };
@@ -173,8 +169,6 @@
 				F907BC5F2EC38A4800C05E19 /* DatadogRUM in Frameworks */,
 				F907BC592EC38A4800C05E19 /* DatadogCrashReporting in Frameworks */,
 
-				3C35B9622EA9816900E28A01 /* PurchasesHybridCommonUI in Frameworks */,
-				3C35B9602EA9816900E28A01 /* PurchasesHybridCommon in Frameworks */,
 				F907BC5D2EC38A4800C05E19 /* DatadogLogs in Frameworks */,
 				3C2F71422E936FBD0026D5CD /* WidgetKit.framework in Frameworks */,
 			);
@@ -196,14 +190,12 @@
 				F9FC00072F0E000700000007 /* FirebaseRemoteConfig in Frameworks */,
 				3C35B95B2EA97E1B00E28A01 /* GoogleMobileAds in Frameworks */,
 				3CC6E4C72EAC8A84002F6FE9 /* FirebaseAnalytics in Frameworks */,
-				3CE684202E9D513C00AA177C /* PurchasesHybridCommonUI in Frameworks */,
 				F907BC512EC38A3F00C05E19 /* DatadogSessionReplay in Frameworks */,
 				F907BC472EC389C800C05E19 /* DatadogCore in Frameworks */,
 				3C35B95E2EA97ED900E28A01 /* GoogleUserMessagingPlatform in Frameworks */,
 				3CC6E4C92EAC8A84002F6FE9 /* FirebaseAnalyticsCore in Frameworks */,
 				3CC6E4CD2EAC8A84002F6FE9 /* FirebaseAppCheck in Frameworks */,
 				F9B127162F0C36A5005426E1 /* GoogleMaps in Frameworks */,
-				3CE6841E2E9D513C00AA177C /* PurchasesHybridCommon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,8 +308,6 @@
 			);
 			name = LaunchWidgetExtension;
 			packageProductDependencies = (
-				3C35B95F2EA9816900E28A01 /* PurchasesHybridCommon */,
-				3C35B9612EA9816900E28A01 /* PurchasesHybridCommonUI */,
 				3C2B8C832EB3C13800CB87C4 /* GoogleMobileAds */,
 				F907BC562EC38A4800C05E19 /* DatadogCore */,
 				F907BC582EC38A4800C05E19 /* DatadogCrashReporting */,
@@ -355,8 +345,6 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
-				3CE6841D2E9D513C00AA177C /* PurchasesHybridCommon */,
-				3CE6841F2E9D513C00AA177C /* PurchasesHybridCommonUI */,
 				3C35B95A2EA97E1B00E28A01 /* GoogleMobileAds */,
 				3C35B95D2EA97ED900E28A01 /* GoogleUserMessagingPlatform */,
 				3CC6E4C42EAC8A84002F6FE9 /* FirebaseAI */,
@@ -460,7 +448,6 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				3CE6841C2E9D513C00AA177C /* XCRemoteSwiftPackageReference "purchases-hybrid-common" */,
 				3C35B9592EA97E1B00E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 				3C35B95C2EA97ED900E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */,
 				3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
@@ -1109,14 +1096,6 @@
 				minimumVersion = 12.4.0;
 			};
 		};
-		3CE6841C2E9D513C00AA177C /* XCRemoteSwiftPackageReference "purchases-hybrid-common" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RevenueCat/purchases-hybrid-common";
-			requirement = {
-				kind = exactVersion;
-				version = 14.3.0;
-			};
-		};
 		F907BC452EC389C800C05E19 /* XCRemoteSwiftPackageReference "dd-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/DataDog/dd-sdk-ios.git";
@@ -1159,16 +1138,6 @@
 			package = 3C35B95C2EA97ED900E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */;
 			productName = GoogleUserMessagingPlatform;
 		};
-		3C35B95F2EA9816900E28A01 /* PurchasesHybridCommon */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3CE6841C2E9D513C00AA177C /* XCRemoteSwiftPackageReference "purchases-hybrid-common" */;
-			productName = PurchasesHybridCommon;
-		};
-		3C35B9612EA9816900E28A01 /* PurchasesHybridCommonUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3CE6841C2E9D513C00AA177C /* XCRemoteSwiftPackageReference "purchases-hybrid-common" */;
-			productName = PurchasesHybridCommonUI;
-		};
 		3C7AFD332EADADF0002FEDEE /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -1209,16 +1178,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAppCheck;
-		};
-		3CE6841D2E9D513C00AA177C /* PurchasesHybridCommon */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3CE6841C2E9D513C00AA177C /* XCRemoteSwiftPackageReference "purchases-hybrid-common" */;
-			productName = PurchasesHybridCommon;
-		};
-		3CE6841F2E9D513C00AA177C /* PurchasesHybridCommonUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3CE6841C2E9D513C00AA177C /* XCRemoteSwiftPackageReference "purchases-hybrid-common" */;
-			productName = PurchasesHybridCommonUI;
 		};
 		F907BC462EC389C800C05E19 /* DatadogCore */ = {
 			isa = XCSwiftPackageProductDependency;
