@@ -249,6 +249,28 @@ class SettingsViewModel(
         _snackbarMessage.value = null
     }
 
+    // V6: FCM reconciliation is save-triggered. A class switch is ~20 FCM
+    // operations, so per-toggle reconciling would fire a full rewrite on every
+    // debounce expiry while a user explores; Save batches everything into one.
+    private val _isSavingNotifications = MutableStateFlow(false)
+    val isSavingNotifications: StateFlow<Boolean> = _isSavingNotifications.asStateFlow()
+
+    fun saveNotificationSettings() {
+        viewModelScope.launch {
+            _isSavingNotifications.value = true
+            try {
+                val result = notificationRepository.reconcileSubscriptions()
+                _snackbarMessage.value = when {
+                    result.skipped -> "Push subscriptions are not available on this platform"
+                    result.failed == 0 -> "Notification subscriptions updated"
+                    else -> "Some subscriptions failed — they will retry at next app start"
+                }
+            } finally {
+                _isSavingNotifications.value = false
+            }
+        }
+    }
+
     // Convenience methods for backward compatibility with UI
     fun updateEventNotifications(enabled: Boolean) = updateTopic(NotificationTopic.EVENTS, enabled)
     fun updateFeaturedNews(enabled: Boolean) = updateTopic(NotificationTopic.FEATURED_NEWS, enabled)
