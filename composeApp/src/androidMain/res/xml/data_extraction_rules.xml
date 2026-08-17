@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" path="spacelaunchnow.db" />
+        <exclude domain="database" path="spacelaunchnow.db-journal" />
+        <exclude domain="database" path="spacelaunchnow.db-wal" />
+        <exclude domain="database" path="spacelaunchnow.db-shm" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="database" path="spacelaunchnow.db" />
+        <exclude domain="database" path="spacelaunchnow.db-journal" />
+        <exclude domain="database" path="spacelaunchnow.db-wal" />
+        <exclude domain="database" path="spacelaunchnow.db-shm" />
+    </device-transfer>
+</data-extraction-rules>
