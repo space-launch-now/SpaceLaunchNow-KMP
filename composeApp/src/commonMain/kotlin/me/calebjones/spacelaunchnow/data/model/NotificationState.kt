@@ -31,6 +31,10 @@ data class NotificationState(
     // V5 Migration State
     val hasCompletedV5Migration: Boolean = false,
 
+    // V6 changeover: set once the legacy V5/V4 topic unsubscribes have all
+    // succeeded. Until then every reconcile retries them first.
+    val hasCompletedV6Changeover: Boolean = false,
+
     // UI state
     val isLoading: Boolean = false,
     val lastError: String? = null
