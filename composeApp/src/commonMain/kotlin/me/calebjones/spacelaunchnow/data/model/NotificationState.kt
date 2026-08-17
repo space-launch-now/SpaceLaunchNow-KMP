@@ -331,7 +331,7 @@ data class NotificationTopic(
         val LOCATION_NEW_ZEALAND =
             NotificationTopic("newZealand", "New Zealand", defaultEnabled = true)
         val LOCATION_JAPAN = NotificationTopic("japan", "Japan", defaultEnabled = true)
-        val LOCATION_ISRO = NotificationTopic("isro", "India (ISRO)", defaultEnabled = true)
+        val LOCATION_INDIA = NotificationTopic("india", "India", defaultEnabled = true)
         val LOCATION_CHINA = NotificationTopic("china", "China", defaultEnabled = true)
         val LOCATION_KODIAK = NotificationTopic("kodiak", "Kodiak", defaultEnabled = true)
         val LOCATION_OTHER = NotificationTopic("other", "Other Locations", defaultEnabled = true)
@@ -390,7 +390,14 @@ data class NotificationAgency(
         val NORTHROP_GRUMMAN = NotificationAgency(257, "northrop", "Northrop Grumman")
         val CHINA =
             NotificationAgency(88, "casc", "Chinese Space Agencies", additionalIds = listOf(194))
-        val ISRO = NotificationAgency(31, "isro", "Indian Space Research Organisation")
+        // Keeps the "Agency" suffix even though NotificationLocation.INDIA is now
+        // "india" and nothing collides any more. V6 attribute topics are a single
+        // flat namespace shared by agencies and locations, and a bare "isro" reads
+        // as either -- the suffix makes it unmistakable. Do not simplify it back:
+        // these two reaching for one name would make anyone following
+        // India-the-location also match ISRO launches worldwide. Renaming is safe
+        // without a migration -- selections persist by numeric id, not topicName.
+        val ISRO = NotificationAgency(31, "isroAgency", "Indian Space Research Organisation")
 
         /**
          * Get all available agencies
@@ -449,15 +456,23 @@ data class NotificationLocation(
         val NEW_ZEALAND = NotificationLocation(10, "newZealand", "New Zealand", "NZ")
         val JAPAN =
             NotificationLocation(24, "japan", "Japan", "JP", additionalIds = listOf(26, 32, 166))
-        val INDIA = NotificationLocation(14, "isro", "India", "IN")
+        // topicName is the place ("india"), not the agency acronym. Naming a
+        // location after an agency is what let this and NotificationAgency.ISRO
+        // reach for the same attribute topic. Safe to rename without a
+        // migration: location selections persist by numeric id.
+        val INDIA = NotificationLocation(14, "india", "India", "IN")
         val CHINA =
             NotificationLocation(17, "china", "China", "CN", additionalIds = listOf(8, 16, 19))
+        // additionalIds excludes 20: it is already the primary id, and listing it
+        // twice made getAllIds() return a duplicate. This whole client-side id table
+        // is V5-only -- under V6 the server owns id-to-group mapping -- so it should
+        // be deleted at V5 retirement rather than maintained.
         val OTHER = NotificationLocation(
             20,
             "other",
             "Misc. (Sea, Air, etc)",
             null,
-            additionalIds = listOf(3, 20, 144)
+            additionalIds = listOf(3, 144)
         )
 
         /**
