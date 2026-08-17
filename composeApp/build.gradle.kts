@@ -601,7 +601,8 @@ sqldelight {
             // Version 8 adds FilterableRocket abbreviation (7.sqm)
             // Version 9 adds SpaceStationCache, ExpeditionCache, IssTleCache tables (8.sqm)
             // Version 10 adds StatsCache table (9.sqm)
-            version = 10
+            // Version 11 adds TopicSubscription table for V6 FCM subscriptions (10.sqm)
+            version = 11
         }
     }
 }

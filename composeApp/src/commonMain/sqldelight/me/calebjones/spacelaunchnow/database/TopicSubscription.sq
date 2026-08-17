@@ -1,0 +1,68 @@
+-- One row per FCM topic this device has an opinion about. This table is the
+-- ONLY record of what the device is subscribed to: FCM offers clients no way
+-- to read a token's subscriptions, so this is correctness-critical state, not
+-- a cache. `confirmed` changes ONLY on an FCM success callback -- it records
+-- what FCM acknowledged, never what we intended. desired/confirmed are 0/1.
+
+CREATE TABLE TopicSubscription (
+    topic        TEXT NOT NULL PRIMARY KEY,
+    desired      INTEGER NOT NULL,
+    confirmed    INTEGER NOT NULL,
+    last_attempt INTEGER,
+    last_error   TEXT,
+    attempts     INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX idx_topic_pending ON TopicSubscription(desired, confirmed);
+
+-- INSERT OR IGNORE + UPDATE pair rather than ON CONFLICT DO UPDATE: the
+-- project's SQLDelight dialect predates upsert syntax.
+insertDesired:
+INSERT OR IGNORE INTO TopicSubscription(topic, desired, confirmed)
+VALUES (?, 1, 0);
+
+markDesired:
+UPDATE TopicSubscription SET desired = 1 WHERE topic = ?;
+
+clearDesiredExcept:
+UPDATE TopicSubscription SET desired = 0 WHERE topic NOT IN ?;
+
+clearAllDesired:
+UPDATE TopicSubscription SET desired = 0;
+
+pendingUnsubscribes:
+SELECT topic FROM TopicSubscription WHERE desired = 0 AND confirmed = 1;
+
+pendingSubscribes:
+SELECT topic FROM TopicSubscription WHERE desired = 1 AND confirmed = 0;
+
+confirm:
+UPDATE TopicSubscription
+SET confirmed = ?, last_error = NULL, attempts = 0, last_attempt = ?
+WHERE topic = ?;
+
+recordFailure:
+UPDATE TopicSubscription
+SET last_error = ?, last_attempt = ?, attempts = attempts + 1
+WHERE topic = ?;
+
+deleteSettled:
+DELETE FROM TopicSubscription WHERE desired = 0 AND confirmed = 0;
+
+confirmedTopics:
+SELECT topic FROM TopicSubscription WHERE confirmed = 1;
+
+deleteRow:
+DELETE FROM TopicSubscription WHERE topic = ?;
+
+mismatchedRows:
+SELECT * FROM TopicSubscription WHERE desired != confirmed;
+
+countConfirmed:
+SELECT COUNT(*) FROM TopicSubscription WHERE confirmed = 1;
+
+countPendingSubscribes:
+SELECT COUNT(*) FROM TopicSubscription WHERE desired = 1 AND confirmed = 0;
+
+countPendingUnsubscribes:
+SELECT COUNT(*) FROM TopicSubscription WHERE desired = 0 AND confirmed = 1;
