@@ -262,8 +262,6 @@ fun SpaceLaunchNowApp(
                         else -> log.i { "Google Play Services: $playServices" }
                     }
 
-                    PushDiagnostics.recordSubscribedTopicCount(currentState.subscribedTopics.size)
-
                     val diagnosticLevelName = runCatching {
                         koin.get<LoggingPreferences>().getDiagnosticSettings().first().level.name
                     }.getOrNull()
