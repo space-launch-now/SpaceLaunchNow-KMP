@@ -1,6 +1,6 @@
 # V6 Notification Subscriptions — KMP Client
 
-**Status:** design, not yet implemented
+**Status:** implemented on feat/v6-notification-subscriptions — device-matrix verification pending; V5 path removal is a follow-up gated on that matrix
 **Supersedes:** the uncommitted draft `2026-08-13-v6-topic-targeted-notifications-kmp-design.md`
 **Server side:** shipped on `feat/v6-topic-targeted-notifications` (PR #327) — **no server change required**
 **Contract:** `contracts/notification-topics.v6.json`
