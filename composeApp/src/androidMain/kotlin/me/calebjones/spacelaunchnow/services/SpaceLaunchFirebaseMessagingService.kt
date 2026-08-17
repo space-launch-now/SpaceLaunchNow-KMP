@@ -5,10 +5,17 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
+import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.workers.NotificationWorker
+import org.koin.mp.KoinPlatform
 
 /**
  * Firebase Cloud Messaging service for handling push notifications
@@ -20,6 +27,7 @@ import me.calebjones.spacelaunchnow.workers.NotificationWorker
 class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
 
     private val log = logger()
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override fun onCreate() {
         super.onCreate()
@@ -63,6 +71,22 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         log.i { "New FCM token generated (len=${token.length}, …${token.takeLast(6)})" }
         PushDiagnostics.recordTokenSuccess(token)
 
-        // TODO: Send token to backend if needed
+        // Topic subscriptions bind to the Firebase installation, not the token
+        // (firebase-android-sdk#5824), so a refresh changes nothing about what
+        // this device receives. Reconcile and nothing more -- never clear the
+        // subscription table here: we can only unsubscribe from topics we can
+        // name, and wiping the record would orphan every stale subscription.
+        serviceScope.launch {
+            runCatching {
+                KoinPlatform.getKoin().get<NotificationRepository>().reconcileSubscriptions()
+            }.onFailure {
+                log.w(it) { "Reconcile after token refresh failed; app-start pass will retry" }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
     }
 }
