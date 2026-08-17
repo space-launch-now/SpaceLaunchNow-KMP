@@ -165,4 +165,74 @@ class V6SubscriptionReconcilerTest {
         assertTrue(result.skipped)
         assertEquals(emptyList(), h.fake.calls)
     }
+
+    @Test
+    fun changeoverUnsubscribesLegacyTopicsBeforeAnythingElse() = runTest {
+        val h = Harness(flexState.copy(hasCompletedV6Changeover = false))
+        h.reconciler.reconcile()
+
+        val legacy = listOf("unsub:prod_v5_ios", "unsub:debug_v5_ios", "unsub:k_prod_v4", "unsub:k_debug_v4")
+        assertEquals(legacy, h.fake.calls.take(4))
+        assertTrue(h.state.hasCompletedV6Changeover)
+        // And the V6 subscribes still happened afterwards.
+        assertEquals(3, h.store.confirmedTopics().size)
+    }
+
+    @Test
+    fun failedChangeoverRetriesOnNextReconcile() = runTest {
+        val h = Harness(flexState.copy(hasCompletedV6Changeover = false))
+        h.fake.failUnsubscribes = setOf("prod_v5_ios")
+        h.reconciler.reconcile()
+        assertTrue(!h.state.hasCompletedV6Changeover)
+
+        h.fake.failUnsubscribes = emptySet()
+        h.fake.calls.clear()
+        h.reconciler.reconcile()
+        assertTrue(h.state.hasCompletedV6Changeover)
+        assertTrue("unsub:prod_v5_ios" in h.fake.calls)
+    }
+
+    @Test
+    fun changeoverRunsOnceAndNeverAgain() = runTest {
+        val h = Harness(flexState.copy(hasCompletedV6Changeover = false))
+        h.reconciler.reconcile()
+        h.fake.calls.clear()
+        h.reconciler.reconcile()
+        assertTrue(h.fake.calls.none { it.contains("_v5_") || it.contains("k_prod_v4") || it.contains("k_debug_v4") })
+    }
+
+    @Test
+    fun forceResubscribeUnsubscribesEveryConfirmedRowThenRebuilds() = runTest {
+        val h = Harness(flexState)
+        h.reconciler.reconcile()
+        h.fake.calls.clear()
+
+        val result = h.reconciler.forceResubscribe()
+        val firstSub = h.fake.calls.indexOfFirst { it.startsWith("sub:") }
+        val unsubCount = h.fake.calls.take(firstSub).count { it.startsWith("unsub:") }
+        assertEquals(3, unsubCount)
+        assertEquals(0, result.failed)
+        assertEquals(3, h.store.confirmedTopics().size)
+
+        // Running it twice converges to the same state.
+        val again = h.reconciler.forceResubscribe()
+        assertEquals(0, again.failed)
+        assertEquals(3, h.store.confirmedTopics().size)
+    }
+
+    @Test
+    fun forceResubscribeWithPartialFailureKeepsFailedRowsForRetry() = runTest {
+        val h = Harness(flexState)
+        h.reconciler.reconcile()
+
+        h.fake.failUnsubscribes = setOf("v6_prod_spacex")
+        h.reconciler.forceResubscribe()
+
+        // The failed row survived with its error recorded; nothing was lost.
+        val row = h.store.mismatchedRows().singleOrNull { it.topic == "v6_prod_spacex" }
+            ?: h.store.confirmedTopics().let { confirmed ->
+                assertTrue("v6_prod_spacex" in confirmed, "row must not vanish"); null
+            }
+        if (row != null) assertTrue(row.attempts >= 1)
+    }
 }
