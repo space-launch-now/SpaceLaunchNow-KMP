@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
@@ -60,7 +62,20 @@ class NotificationRepositoryImpl(
         },
         envProvider = { if (useDebugTopics()) "debug" else "prod" },
         stateProvider = { storage.getState() },
-        markChangeoverComplete = { updateState { it.copy(hasCompletedV6Changeover = true) } },
+        markChangeoverComplete = {
+            // Persist from storage, not _state: this can run (via onNewToken's
+            // reconcile) before initialize() has loaded persisted state, when
+            // _state is still DEFAULT -- basing the write on _state would
+            // persist a settings wipe. updateState is wrong here for the same
+            // reason.
+            stateMutex.withLock {
+                val persisted = storage.getState()
+                val result = storage.saveState(persisted.copy(hasCompletedV6Changeover = true))
+                if (result.isSuccess && !_state.value.isLoading) {
+                    _state.value = _state.value.copy(hasCompletedV6Changeover = true)
+                }
+            }
+        },
         nowMillis = { Clock.System.now().toEpochMilliseconds() },
     )
 
@@ -75,16 +90,16 @@ class NotificationRepositoryImpl(
         }
     }
 
-    override suspend fun reconcileSubscriptions(): V6ReconcileResult {
+    override suspend fun reconcileSubscriptions(): V6ReconcileResult = withContext(Dispatchers.Default) {
         val result = reconciler.reconcile()
         recordReconcileDiagnostics(result)
-        return result
+        result
     }
 
-    override suspend fun forceResubscribe(): V6ReconcileResult {
+    override suspend fun forceResubscribe(): V6ReconcileResult = withContext(Dispatchers.Default) {
         val result = reconciler.forceResubscribe()
         recordReconcileDiagnostics(result)
-        return result
+        result
     }
 
     private fun recordReconcileDiagnostics(result: V6ReconcileResult) {
