@@ -5,6 +5,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Clock
@@ -110,9 +111,15 @@ class NotificationRepositoryImpl(
             log.i { "notification_state_loaded agency_count=${persistedState.subscribedAgencies.size} location_count=${persistedState.subscribedLocations.size} enable_notifications=${persistedState.enableNotifications} follow_all=${persistedState.followAllLaunches}" }
 
             // App-start reconcile: the retry path for anything that failed at
-            // save time, and the iOS token-refresh cover (iOS has no Kotlin-side
-            // onNewToken hook).
-            reconcileSubscriptions()
+            // save time, and the iOS token-refresh cover. Detached: it must
+            // neither gate cold start behind up to ~40 sequential FCM calls nor
+            // let a reconcile failure reach the catch below, which would reset
+            // loaded state to DEFAULT and hand the next toggle a wiped state to
+            // persist.
+            repositoryScope.launch {
+                runCatching { reconcileSubscriptions() }
+                    .onFailure { log.e(it) { "App-start V6 reconcile failed; next start or save retries" } }
+            }
 
             log.i { "NotificationRepository initialized successfully" }
         } catch (e: Exception) {
