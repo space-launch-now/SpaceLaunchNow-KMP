@@ -127,14 +127,15 @@ class V6TopicContractTest {
     }
 
     @Test
-    fun `the only subscribable group the app does not offer yet is otherAgency`() {
-        // otherAgency is pending a settings row and product sign-off. Anything
-        // else going missing is an accident, and this is what catches it.
+    fun `every subscribable group has a settings row that reaches it`() {
+        // otherAgency gained its row when the spec was approved (2026-08-16).
+        // From here on, any subscribable group with no row is an accident: a
+        // group the server sends to that no user can select.
         val offered = (NotificationAgency.getAll().map { it.topicName } +
             NotificationLocation.getAll().map { it.topicName }).toSet()
-        val expected = (subscribableGroups("agencyGroups") + subscribableGroups("locationGroups"))
+        val missing = (subscribableGroups("agencyGroups") + subscribableGroups("locationGroups"))
             .filterNot { it in offered }
-        assertEquals(listOf("otherAgency"), expected)
+        assertEquals(emptyList(), missing)
     }
 
     @Test

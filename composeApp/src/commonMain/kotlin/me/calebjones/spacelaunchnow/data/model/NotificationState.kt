@@ -399,13 +399,21 @@ data class NotificationAgency(
         // without a migration -- selections persist by numeric id, not topicName.
         val ISRO = NotificationAgency(31, "isroAgency", "Indian Space Research Organisation")
 
+        // Catch-all row approved 2026-08-16. The server maps every agency ID
+        // absent from its curated table to the "otherAgency" group; without
+        // this row, strict-matching users can never reach a LandSpace or
+        // Firefly launch no matter what they select. The -1 id exists only to
+        // satisfy the model shape — it is never sent anywhere; the server owns
+        // ID-to-group mapping and only the topicName goes over the wire.
+        val OTHER_AGENCY = NotificationAgency(-1, "otherAgency", "Other Agencies")
+
         /**
          * Get all available agencies
          */
         fun getAll(): List<NotificationAgency> {
             return listOf(
                 SPACEX, NASA, BLUE_ORIGIN, ROCKET_LAB, VIRGIN_GALACTIC, NORTHROP_GRUMMAN,
-                ULA, ARIANESPACE, RUSSIA, CHINA, ISRO
+                ULA, ARIANESPACE, RUSSIA, CHINA, ISRO, OTHER_AGENCY
             )
         }
     }
