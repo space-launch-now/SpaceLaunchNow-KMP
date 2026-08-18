@@ -9,6 +9,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.data.billing.MockBillingManager
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
+import me.calebjones.spacelaunchnow.data.repository.FakeNotificationRepository
+import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import kotlin.test.AfterTest
@@ -90,6 +92,53 @@ class DebugSettingsViewModelTest {
         assertTrue(detailedMessage.contains("Subscription Type: PREMIUM"))
     }
     
+    @Test
+    fun `setUseDebugTopics reconciles V6 subscriptions so the env swap takes effect immediately`() = runTest {
+        // The env ("prod"/"debug") is baked into every v6_* topic name, so
+        // flipping the toggle is a full resubscribe -- and it must happen at
+        // toggle time, not at next app start: this switch is how a staging
+        // device reaches the v6_debug_* topics at all.
+        val prefs = DebugPreferences(InMemoryPreferencesDataStore())
+        val notificationRepository = FakeNotificationRepository()
+        val vm = DebugSettingsViewModel(
+            debugPreferences = prefs,
+            billingManager = billingManager,
+            launchRepository = null,
+            notificationRepository = notificationRepository
+        )
+
+        vm.setUseDebugTopics(true)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(prefs.getDebugSettings().useDebugTopics)
+        assertEquals(1, notificationRepository.reconcileCalls)
+        val message = vm.statusMessage.first()
+        assertNotNull(message)
+        assertTrue(message!!.contains("v6_debug"), "status should name the V6 env, was: $message")
+    }
+
+    @Test
+    fun `setUseDebugTopics reports partial reconcile failure instead of claiming success`() = runTest {
+        val prefs = DebugPreferences(InMemoryPreferencesDataStore())
+        val notificationRepository = FakeNotificationRepository()
+        notificationRepository.nextReconcileResult =
+            me.calebjones.spacelaunchnow.data.notifications.v6.V6ReconcileResult(attempted = 10, failed = 2)
+        val vm = DebugSettingsViewModel(
+            debugPreferences = prefs,
+            billingManager = billingManager,
+            launchRepository = null,
+            notificationRepository = notificationRepository
+        )
+
+        vm.setUseDebugTopics(false)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val message = vm.statusMessage.first()
+        assertNotNull(message)
+        assertTrue(message!!.contains("v6_prod"), "status should name the V6 env, was: $message")
+        assertTrue(message.contains("failed"), "status must surface the failure, was: $message")
+    }
+
     @Test
     fun `checkBillingInitialization should handle null billing manager`() = runTest {
         // Given: ViewModel with no billing manager
