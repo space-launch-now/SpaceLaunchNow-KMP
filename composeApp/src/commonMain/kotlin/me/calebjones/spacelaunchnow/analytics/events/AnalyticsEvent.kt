@@ -194,6 +194,18 @@ sealed class AnalyticsEvent(val name: String) {
         override fun toParameters() = mapOf("type" to type, "enabled" to enabled)
     }
 
+    /**
+     * Fired once per installation, when the V5-to-V6 topic changeover completes
+     * (every legacy topic unsubscribe acknowledged by FCM). Counts devices
+     * actually off the V5 broadcast — the quantity the V5 retirement decision
+     * needs. Build-version adoption is only a proxy for this: a build can be
+     * V6-capable while its changeover is stuck retrying.
+     */
+    data class V6ChangeoverCompleted(val audienceClass: String) :
+        AnalyticsEvent("v6_changeover_completed") {
+        override fun toParameters() = mapOf("audience_class" to audienceClass)
+    }
+
     // ── App Lifecycle Events ─────────────────────────────────────────────────
 
     data class AppOpened(val source: String = "direct") :

@@ -5,6 +5,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import me.calebjones.spacelaunchnow.data.notifications.v6.V6ReconcileResult
 
 interface NotificationRepository {
 
@@ -27,6 +28,12 @@ interface NotificationRepository {
     // Data access
     suspend fun getAvailableAgencies(): List<NotificationAgency>
     suspend fun getAvailableLocations(): List<NotificationLocation>
+
+    // V6 subscription reconciliation. Triggered by explicit Save, once per app
+    // start (inside initialize()), on Android token refresh, and immediately on
+    // the master kill switch.
+    suspend fun reconcileSubscriptions(): V6ReconcileResult
+    suspend fun forceResubscribe(): V6ReconcileResult
 
     // Permission handling
     suspend fun requestNotificationPermission(): Boolean

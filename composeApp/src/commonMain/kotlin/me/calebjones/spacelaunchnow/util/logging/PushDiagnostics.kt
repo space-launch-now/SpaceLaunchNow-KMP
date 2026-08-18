@@ -26,6 +26,7 @@ data class PushDiagnosticsSnapshot(
     val notificationsEnabled: Boolean? = null,
     val playServices: PlayServicesAvailability? = null,
     val subscribedTopicCount: Int? = null,
+    val lastCleanReconcileEpochSeconds: Long? = null,
 )
 
 object PushDiagnostics {
@@ -75,6 +76,10 @@ object PushDiagnostics {
         _snapshot.update { it.copy(subscribedTopicCount = count) }
     }
 
+    fun recordCleanReconcile(nowEpochSeconds: Long = Clock.System.now().epochSeconds) {
+        _snapshot.update { it.copy(lastCleanReconcileEpochSeconds = nowEpochSeconds) }
+    }
+
     fun reset() {
         _snapshot.value = PushDiagnosticsSnapshot()
     }
@@ -122,6 +127,11 @@ object PushDiagnostics {
             }
         )
         add("Subscribed topics" to (snapshot.subscribedTopicCount?.toString() ?: "unknown"))
+        add(
+            "Last clean reconcile (V6)" to (
+                snapshot.lastCleanReconcileEpochSeconds?.toString() ?: "never this session"
+                )
+        )
     }
 
     /**

@@ -24,21 +24,33 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.analytics.DatadogRuntime
 import me.calebjones.spacelaunchnow.data.model.NotificationState
+import me.calebjones.spacelaunchnow.data.notifications.v6.SubscriptionCounts
+import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
+import me.calebjones.spacelaunchnow.data.notifications.v6.V6Topics
+import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.database.TopicSubscription
+import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.DiagnosticLevel
 import me.calebjones.spacelaunchnow.util.logging.DiagnosticSettings
 import me.calebjones.spacelaunchnow.util.logging.DiagnosticsLog
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
+import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.platformNotificationDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.recentNseBreadcrumbs
 import me.calebjones.spacelaunchnow.util.logging.shareCopiesToClipboard
@@ -56,6 +68,8 @@ fun DiagnosticsScreen(
 ) {
     val loggingPreferences: LoggingPreferences = koinInject()
     val notificationStateStorage: NotificationStateStorage = koinInject()
+    val topicStore: TopicSubscriptionStore = koinInject()
+    val notificationRepository: NotificationRepository = koinInject()
     val scope = rememberCoroutineScope()
 
     val diagnosticSettings by loggingPreferences.getDiagnosticSettings()
@@ -63,6 +77,13 @@ fun DiagnosticsScreen(
     val level = diagnosticSettings.level
     val liveState by produceState<NotificationState?>(initialValue = null) {
         value = notificationStateStorage.getState()
+    }
+    var subsRefresh by remember { mutableStateOf(0) }
+    val subscriptionCounts by produceState<SubscriptionCounts?>(initialValue = null, subsRefresh) {
+        value = withContext(Dispatchers.Default) { topicStore.counts() }
+    }
+    val mismatchedRows by produceState<List<TopicSubscription>?>(initialValue = null, subsRefresh) {
+        value = withContext(Dispatchers.Default) { topicStore.mismatchedRows() }
     }
     val platformRows = remember { platformNotificationDiagnostics() }
     val breadcrumbs = remember { recentNseBreadcrumbs() }
@@ -110,6 +131,43 @@ fun DiagnosticsScreen(
                         DiagRow("Strict matching", s.useStrictMatching.toString())
                         DiagRow("Agencies", "${s.subscribedAgencies.size}: ${s.subscribedAgencies.take(12).joinToString(",")}")
                         DiagRow("Locations", "${s.subscribedLocations.size}: ${s.subscribedLocations.take(12).joinToString(",")}")
+                    }
+                }
+            }
+            item {
+                DiagnosticsCard("Push subscriptions (V6)") {
+                    val s = liveState
+                    val counts = subscriptionCounts
+                    if (s == null || counts == null) {
+                        DiagRow("State", "loading…")
+                    } else {
+                        val platformName = when (getPlatform().type) {
+                            PlatformType.ANDROID -> "android"
+                            PlatformType.IOS -> "ios"
+                            PlatformType.DESKTOP -> null
+                        }
+                        // "pending" means the device is still on the V5 broadcast:
+                        // one or more legacy unsubscribes has not been acknowledged
+                        // and the changeover retries on every reconcile.
+                        DiagRow("V5 → V6 changeover", if (s.hasCompletedV6Changeover) "complete" else "pending")
+                        DiagRow("Audience class", V6Topics.audienceClass(s))
+                        // Set size is env/platform independent; "prod"/"android"
+                        // stand in when the real values are irrelevant or absent.
+                        DiagRow("Required topics", V6Topics.requiredTopics(s, "prod", platformName ?: "android").size.toString())
+                        DiagRow("Confirmed", counts.confirmed.toString())
+                        DiagRow("Pending subscribe", counts.pendingSubscribe.toString())
+                        DiagRow("Pending unsubscribe", counts.pendingUnsubscribe.toString())
+                        DiagRow(
+                            "Last clean reconcile",
+                            PushDiagnostics.snapshot.lastCleanReconcileEpochSeconds?.toString() ?: "never this session"
+                        )
+                        (mismatchedRows ?: emptyList()).forEach { row ->
+                            Text(
+                                "${row.topic} desired=${row.desired} confirmed=${row.confirmed} attempts=${row.attempts} lastAttempt=${row.last_attempt ?: "-"} error=${row.last_error ?: "-"}",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = FontFamily.Monospace
+                            )
+                        }
                     }
                 }
             }
@@ -164,6 +222,12 @@ fun DiagnosticsScreen(
                                 appendLine("Live agencies: ${s.subscribedAgencies.joinToString(",")}")
                                 appendLine("Live locations: ${s.subscribedLocations.joinToString(",")}")
                             } ?: appendLine("Live: (still loading)")
+                            subscriptionCounts?.let { c ->
+                                appendLine("V6 subs: changeover=${if (liveState?.hasCompletedV6Changeover == true) "complete" else "pending"} confirmed=${c.confirmed} pendingSub=${c.pendingSubscribe} pendingUnsub=${c.pendingUnsubscribe} lastClean=${PushDiagnostics.snapshot.lastCleanReconcileEpochSeconds ?: "never"}")
+                            }
+                            (mismatchedRows ?: emptyList()).forEach { r ->
+                                appendLine("V6 mismatch ${r.topic} desired=${r.desired} confirmed=${r.confirmed} attempts=${r.attempts} err=${r.last_error ?: "-"}")
+                            }
                             platformRows.forEach { (l, v) -> appendLine("$l: $v") }
                             breadcrumbs.forEach { c ->
                                 appendLine("NSE ${c.timestampEpochSeconds} ${c.type} ${c.decision} ${c.reason}")
@@ -172,6 +236,24 @@ fun DiagnosticsScreen(
                         sharePlainText(report, "SpaceLaunchNow Diagnostics Report")
                     }
                 ) { Text(if (copyNotShare) "Copy diagnostics report" else "Share diagnostics report") }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        scope.launch {
+                            withContext(Dispatchers.Default) { notificationRepository.forceResubscribe() }
+                            subsRefresh++
+                        }
+                    }
+                ) { Text("Reset push subscriptions (resubscribe from scratch)") }
+                Text(
+                    // "Resubscribe from scratch", NOT "fix all subscriptions": it
+                    // repairs only what the ledger knows about, and nothing on the
+                    // FCM side can repair what it doesn't.
+                    "Unsubscribes every push topic this install has a record of, then resubscribes from your settings. Notifications may pause briefly while it runs.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(Modifier.height(24.dp))
             }
         }

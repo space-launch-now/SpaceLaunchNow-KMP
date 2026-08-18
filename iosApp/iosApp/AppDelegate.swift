@@ -214,17 +214,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             // Process any pending Kotlin requests (e.g., getToken() calls)
             FCMBridge.shared.processPendingKotlinRequests()
             print("✅ Processed pending Kotlin FCM requests")
-
-            // Auto-subscribe to debug topic for testing
-            print("\n🔧 DEBUG: Auto-subscribing to k_debug_v4 topic...")
-            Messaging.messaging().subscribe(toTopic: "k_debug_v4") { error in
-                if let error = error {
-                    print("❌ Failed to subscribe to k_debug_v4: \(error.localizedDescription)")
-                } else {
-                    print("✅ Successfully subscribed to k_debug_v4 topic")
-                    print("📱 Device will now receive notifications sent to this topic")
-                }
-            }
         } else {
             print("❌ FCM token is nil - notifications will NOT work")
         }

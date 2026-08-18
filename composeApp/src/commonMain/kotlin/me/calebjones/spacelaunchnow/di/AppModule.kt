@@ -15,6 +15,7 @@ import me.calebjones.spacelaunchnow.data.billing.DefaultRevenueCatAttributes
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributesSyncer
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
+import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
@@ -146,6 +147,7 @@ val appModule = module {
     single { SpaceStationLocalDataSource(get(), get()) }
     single { FilterOptionsLocalDataSource(get(), get()) }
     single { StatsLocalDataSource(get(), get()) }
+    single { TopicSubscriptionStore(get()) }
 
     single<LaunchRepository> {
         LaunchRepositoryImpl(
@@ -311,7 +313,9 @@ val appModule = module {
         NotificationRepositoryImpl(
             pushMessaging = get(),
             storage = get<NotificationStateStorage>(),
-            debugPreferences = getOrNull<DebugPreferences>()
+            topicSubscriptionStore = get(),
+            debugPreferences = getOrNull<DebugPreferences>(),
+            analyticsManager = getOrNull()
         )
     }
 

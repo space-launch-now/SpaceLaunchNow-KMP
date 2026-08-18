@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- spacelaunchnow.db is TTL'd cache plus the TopicSubscription ledger. The
+     ledger records THIS installation's FCM subscriptions; restored onto a new
+     install it would claim subscriptions the install does not have and the
+     reconciler would never subscribe. Excluded so restores start empty and
+     rebuild correctly. -->
+<full-backup-content>
+    <exclude domain="database" path="spacelaunchnow.db" />
+    <exclude domain="database" path="spacelaunchnow.db-journal" />
+    <exclude domain="database" path="spacelaunchnow.db-wal" />
+    <exclude domain="database" path="spacelaunchnow.db-shm" />
+</full-backup-content>

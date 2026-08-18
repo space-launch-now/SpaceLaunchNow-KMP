@@ -32,6 +32,7 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
         private val SUBSCRIBED_AGENCIES = stringSetPreferencesKey("subscribed_agencies")
         private val SUBSCRIBED_LOCATIONS = stringSetPreferencesKey("subscribed_locations")
         private val SUBSCRIBED_TOPICS = stringSetPreferencesKey("subscribed_topics")
+        private val HAS_COMPLETED_V6_CHANGEOVER = booleanPreferencesKey("has_completed_v6_changeover")
     }
 
     val stateFlow: Flow<NotificationState> = dataStore.data.map { preferences ->
@@ -73,7 +74,8 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
                 storedLocations.contains("__EMPTY__") -> emptySet()     // Explicitly empty
                 else -> storedLocations.map { it }.toSet()               // Has values
             },
-            subscribedTopics = preferences[SUBSCRIBED_TOPICS] ?: default.subscribedTopics
+            subscribedTopics = preferences[SUBSCRIBED_TOPICS] ?: default.subscribedTopics,
+            hasCompletedV6Changeover = preferences[HAS_COMPLETED_V6_CHANGEOVER] ?: false
         )
 
         // Detect suspicious state: notifications enabled but no filters and not following all
@@ -114,6 +116,7 @@ class NotificationStateStorage(private val dataStore: DataStore<Preferences>) {
                     }
 
                     preferences[SUBSCRIBED_TOPICS] = state.subscribedTopics
+                    preferences[HAS_COMPLETED_V6_CHANGEOVER] = state.hasCompletedV6Changeover
                 }
             }
             // Sync to App Group UserDefaults so the NSE can read filter prefs when app is killed.

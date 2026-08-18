@@ -19,17 +19,12 @@ object NotificationTopicConfig {
     const val PROD_V4 = "k_prod_v4"
     const val DEBUG_V4 = "k_debug_v4"
 
-    // Notification Type Topics (user-selectable timing preferences)
-    val NOTIFICATION_TYPE_TOPICS = setOf(
-        "tenMinutes",
-        "oneHour",
-        "twentyFourHour",
-        "netstampChanged",
-        "inFlight",
-        "success",
-        "failure",
-        "webcastLive"
-    )
+    // NOTE: the notification-type list deliberately does not live here. It is
+    // NotificationTopic.getUserConfigurableTopics(), which is the one the app
+    // actually reads. A second copy used to sit here, had no consumers, and had
+    // silently fallen two types behind -- it read as authoritative during review
+    // and produced a false "the client is missing oneMinute/partial_failure"
+    // finding. One list, not two.
 
     /**
      * V5 Payload Field Constants
