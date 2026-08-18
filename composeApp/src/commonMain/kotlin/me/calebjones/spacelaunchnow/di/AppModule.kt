@@ -314,7 +314,8 @@ val appModule = module {
             pushMessaging = get(),
             storage = get<NotificationStateStorage>(),
             topicSubscriptionStore = get(),
-            debugPreferences = getOrNull<DebugPreferences>()
+            debugPreferences = getOrNull<DebugPreferences>(),
+            analyticsManager = getOrNull()
         )
     }
 

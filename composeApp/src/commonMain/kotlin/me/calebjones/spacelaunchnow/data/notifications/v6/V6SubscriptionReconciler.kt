@@ -84,13 +84,14 @@ class V6SubscriptionReconciler(
      */
     private suspend fun runChangeover(platform: String) {
         val legacy = listOf("prod_v5_$platform", "debug_v5_$platform", "k_prod_v4", "k_debug_v4")
-        // map-then-all: every topic must be attempted; .all{} would short-circuit.
-        val outcomes = legacy.map { topic -> messaging.unsubscribe(topic).isSuccess }
-        if (outcomes.all { it }) {
+        // filter evaluates every element: every topic must be attempted; a
+        // short-circuiting all{} over the unsubscribe calls would not be.
+        val failedTopics = legacy.filter { topic -> messaging.unsubscribe(topic).isFailure }
+        if (failedTopics.isEmpty()) {
             markChangeoverComplete()
             log.i { "V6 changeover complete: legacy topics unsubscribed ($legacy)" }
         } else {
-            log.w { "V6 changeover incomplete; will retry next reconcile" }
+            log.w { "V6 changeover incomplete; failed to unsubscribe $failedTopics; will retry next reconcile" }
         }
     }
 

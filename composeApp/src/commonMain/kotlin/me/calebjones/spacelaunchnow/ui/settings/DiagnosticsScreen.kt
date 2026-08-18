@@ -146,6 +146,10 @@ fun DiagnosticsScreen(
                             PlatformType.IOS -> "ios"
                             PlatformType.DESKTOP -> null
                         }
+                        // "pending" means the device is still on the V5 broadcast:
+                        // one or more legacy unsubscribes has not been acknowledged
+                        // and the changeover retries on every reconcile.
+                        DiagRow("V5 → V6 changeover", if (s.hasCompletedV6Changeover) "complete" else "pending")
                         DiagRow("Audience class", V6Topics.audienceClass(s))
                         // Set size is env/platform independent; "prod"/"android"
                         // stand in when the real values are irrelevant or absent.
@@ -219,7 +223,7 @@ fun DiagnosticsScreen(
                                 appendLine("Live locations: ${s.subscribedLocations.joinToString(",")}")
                             } ?: appendLine("Live: (still loading)")
                             subscriptionCounts?.let { c ->
-                                appendLine("V6 subs: confirmed=${c.confirmed} pendingSub=${c.pendingSubscribe} pendingUnsub=${c.pendingUnsubscribe} lastClean=${PushDiagnostics.snapshot.lastCleanReconcileEpochSeconds ?: "never"}")
+                                appendLine("V6 subs: changeover=${if (liveState?.hasCompletedV6Changeover == true) "complete" else "pending"} confirmed=${c.confirmed} pendingSub=${c.pendingSubscribe} pendingUnsub=${c.pendingUnsubscribe} lastClean=${PushDiagnostics.snapshot.lastCleanReconcileEpochSeconds ?: "never"}")
                             }
                             (mismatchedRows ?: emptyList()).forEach { r ->
                                 appendLine("V6 mismatch ${r.topic} desired=${r.desired} confirmed=${r.confirmed} attempts=${r.attempts} err=${r.last_error ?: "-"}")

@@ -12,6 +12,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.PlatformType
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
@@ -21,6 +23,7 @@ import me.calebjones.spacelaunchnow.data.notifications.v6.PushTopicMessaging
 import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.notifications.v6.V6ReconcileResult
 import me.calebjones.spacelaunchnow.data.notifications.v6.V6SubscriptionReconciler
+import me.calebjones.spacelaunchnow.data.notifications.v6.V6Topics
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.getPlatform
@@ -36,7 +39,8 @@ class NotificationRepositoryImpl(
     private val pushMessaging: PushMessaging,
     private val storage: NotificationStateStorage,
     private val topicSubscriptionStore: TopicSubscriptionStore,
-    private val debugPreferences: DebugPreferences? = null
+    private val debugPreferences: DebugPreferences? = null,
+    private val analyticsManager: AnalyticsManager? = null
 ) : NotificationRepository {
 
     private val log = logger()
@@ -71,8 +75,16 @@ class NotificationRepositoryImpl(
             stateMutex.withLock {
                 val persisted = storage.getState()
                 val result = storage.saveState(persisted.copy(hasCompletedV6Changeover = true))
-                if (result.isSuccess && !_state.value.isLoading) {
-                    _state.value = _state.value.copy(hasCompletedV6Changeover = true)
+                if (result.isSuccess) {
+                    // Once per install, only after the flag is durably persisted
+                    // (an unpersisted changeover re-runs, and must be allowed to
+                    // re-fire this rather than under-count stuck devices).
+                    analyticsManager?.track(
+                        AnalyticsEvent.V6ChangeoverCompleted(V6Topics.audienceClass(persisted))
+                    )
+                    if (!_state.value.isLoading) {
+                        _state.value = _state.value.copy(hasCompletedV6Changeover = true)
+                    }
                 }
             }
         },
