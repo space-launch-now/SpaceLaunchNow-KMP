@@ -1,1 +1,9 @@
-Bug fixes and performance improvements.
+### Bug Fixes
+
+* **notifications:** align topic names with the V6 contract (isroAgency, india, dedupe other IDs, drop the stale type list)
+* **notifications:** detach the app-start reconcile so it cannot block startup or wipe loaded state
+* **notifications:** persist the changeover flag from storage and move reconcile I/O off the main dispatcher
+
+### Features
+
+* **notifications:** add the Other Agencies settings row for the otherAgency catch-all...

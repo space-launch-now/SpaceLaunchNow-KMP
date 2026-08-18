@@ -1,3 +1,30 @@
+# [5.38.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.37.1...v5.38.0) (2026-08-18)
+
+
+### Bug Fixes
+
+* **notifications:** align topic names with the V6 contract (isroAgency, india, dedupe other IDs, drop the stale type list) ([2783ad2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2783ad29596b9361d30b2b520b2a33e87131a3d0))
+* **notifications:** detach the app-start reconcile so it cannot block startup or wipe loaded state ([cc73336](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cc73336b15b51e4e13e183cfece8fcba2e844f5a))
+* **notifications:** persist the changeover flag from storage and move reconcile I/O off the main dispatcher ([3f97dd3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f97dd368ecd290be02e4148d343edde0bb0234e))
+
+
+### Features
+
+* **notifications:** add the Other Agencies settings row for the otherAgency catch-all ([2a7fd1a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2a7fd1adce55f268855d8fdadf625c3d8b0147bc))
+* **notifications:** add the TopicSubscription ledger table and store (schema v11) ([5f1d577](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5f1d5778781dccb2330b7a6b1e0cb4101326c855))
+* **notifications:** add the V6 reconciler with unsubscribe-first ordering and per-row FCM outcomes ([3a7f8dd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3a7f8dd94733fc822ea15f715b68a2165a319a1a))
+* **notifications:** derive the V6 topic set as a pure function ([9e8dca5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9e8dca5d4183cbc8837211093688225b68b6cfa9))
+* **notifications:** exclude the subscription ledger database from platform backup on both platforms ([04800e1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/04800e159e44a026e13a4434340309b6388d06af))
+* **notifications:** log the V5-to-V6 changeover durably - analytics event, diagnostics row, named failing topics ([d4a1177](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d4a1177768eb9fb4ed8d1526fb314d5320b7c6fc))
+* **notifications:** make the notification filters screen save-based with a single reconcile per save ([89cdacc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/89cdacc8f78d8e7476f97a9535bd6007d2fb8f9f))
+* **notifications:** persist the V6 changeover flag and pin changeover and reset behaviour ([fd5ec5a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fd5ec5a4c66fb3eabc37cbca3eefec3249dc0399))
+* **notifications:** reconcile on Android token refresh and drop the iOS k_debug_v4 auto-subscribe ([53cc828](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/53cc828a74d64eec28cfb9d18fd09ade7fbf050d))
+* **notifications:** surface the V6 subscription ledger and a resubscribe-from-scratch action in diagnostics ([6998703](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/69987031c51876df33d769d2e5c11e314290edbb))
+* **notifications:** vendor the V6 topic contract with a desktop conformance test ([bec2aaa](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bec2aaa4427473263bcb9edf503d9bc5ed307fc5))
+* **notifications:** wire the V6 reconciler through the repository and retire the V5 subscribe trigger ([5067b13](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5067b13b4fe5223211e9159d967cdc17abc20800))
+
+
+
 ## [5.37.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.37.0...v5.37.1) (2026-07-22)
 
 
@@ -49,30 +76,6 @@
 
 * add business analysis skill and references for monetization, analytics, and app store strategies ([2de719c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2de719c114f0eb80cb21dd23b1ed5344fca57ccb))
 * add compact countdown display and link to full schedule in featured launches row ([46c9756](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/46c9756fc46aea903190ce15142aa9753a7c8c6d))
-
-
-
-# [5.34.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.33.1...v5.34.0) (2026-07-07)
-
-
-### Bug Fixes
-
-* implement iOS Notification Re-Alert Policy ([1ca9844](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1ca984435853e7591545d7fb7d8b37947852f7d5))
-* **logging:** apply diagnostic level at desktop startup; correct stale startup logs ([e9c8a5d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9c8a5dc1c3d5b609646ecdf3e0640d79cbd033b))
-* **logging:** non-destructive NSE breadcrumb drain + peek + prefs snapshot ([54d4a4c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/54d4a4c5eae714f2e8153ad1c690e915053e36e3))
-
-
-### Features
-
-* **diagnostics:** ground-truth diagnostics screen with log export ([dbdcdef](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dbdcdefc5c31d6bccf72efb1ee2f51ceea74a6a8))
-* **logging:** add DiagnosticLevel with per-sink policy mapping ([16f9ab4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/16f9ab42247ac054813eca1b06a1d492d12b9730))
-* **logging:** auto-revert Verbose diagnostic level after 72 hours ([5f9484c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5f9484c83a154cad62e10d252b8fccb5dce39978))
-* **logging:** on-device diagnostics file log with capped ring buffer ([fe388e5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fe388e5904b3421a2df76b3666d104ddae768098))
-* **logging:** persist DiagnosticLevel with legacy-key migration ([41378b8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/41378b888f9bfc600ae0569845df65f6728bcff1))
-* **logging:** replace Datadog init gate with SDK TrackingConsent flow ([e1c7e07](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e1c7e07c0119b6a1039a83c79f807dc320be5cbe))
-* **logging:** structured single-event startup state for Datadog ([acf6e4a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/acf6e4a2259d57fdbbccd2cbf5e36e4838b925da))
-* **settings:** collapse logging knobs into single Off/Standard/Verbose control ([fcef82e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fcef82e8ebcc1c0ed8ed956bdbb584fcf7420007))
-* **share:** platform sharePlainText for diagnostics export ([b5b2a20](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b5b2a20267925fbabcfb17c53c9f0f5ff8473799))
 
 
 
