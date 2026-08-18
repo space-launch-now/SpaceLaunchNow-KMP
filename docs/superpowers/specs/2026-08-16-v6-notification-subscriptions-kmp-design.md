@@ -489,8 +489,11 @@ matrix is the gate.
 
 Related server-side work, agreed but outside this spec (tracked for the cutover window):
 
-- **Tracker fan-out goes async** — V6's up-to-12 sends currently run sequentially (30s timeout each)
-  on the single-threaded `LaunchEventTracker` loop; to be parallelised server-side.
+- **Tracker fan-out goes async** — ~~V6's up-to-12 sends currently run sequentially (30s timeout
+  each) on the single-threaded `LaunchEventTracker` loop; to be parallelised server-side.~~
+  **Done 2026-08-18** on the server branch (`feat/v6-topic-targeted-notifications`): launch sends
+  fan out on a bounded thread pool (`v6.MAX_CONCURRENT_SENDS = 6`; pyfcm keeps per-thread
+  sessions), pinned by a concurrency test. Worst case drops from ~6 min to ~60 s per launch.
 - **GitOps dashboard panels** for `sln_v6_notifications_sent_total`,
   `sln_notification_sends_skipped_total`, and `sln_notification_group_fallbacks_total` — until they
   exist, V6 dispatch is unobservable in Grafana.
