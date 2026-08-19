@@ -1,9 +1,54 @@
 # V6 Notification Subscriptions — KMP Client
 
-**Status:** implemented on feat/v6-notification-subscriptions — device-matrix verification pending; V5 path removal is a follow-up gated on that matrix
+**Status:** implemented on feat/v6-notification-subscriptions; Android toggle→reconcile→FCM slice
+device-verified 2026-08-19. Remaining work is consolidated in the section directly below — the iOS
+device matrix is the acceptance gate, and V5 path removal stays gated on it.
 **Supersedes:** the uncommitted draft `2026-08-13-v6-topic-targeted-notifications-kmp-design.md`
 **Server side:** shipped on `feat/v6-topic-targeted-notifications` (PR #327) — **no server change required**
 **Contract:** `contracts/notification-topics.v6.json`
+
+## Remaining work
+
+The one list to check before calling V6 done. Later sections carry the rationale; this section only
+tracks state.
+
+**1. Device matrix — the acceptance gate. Everything in §2 stays blocked until this passes.**
+
+- [x] Android: filter toggle → debounced auto-reconcile → correct FCM operations, both directions.
+      Verified on a Pixel 10 Pro 2026-08-19: strict-matching class switch unsubscribed all five
+      enabled `flex` type topics before subscribing their `strict` equivalents (unsubscribe-first
+      ordering), one reconcile pass per toggle, 10/10 operations confirmed; toggling back produced
+      the clean mirror image.
+- [ ] Android: remaining matrix cases from the server spec — kill switch on/off, follow-all
+      transitions, agency/location changes, token refresh, and changeover from a genuine V5 install.
+- [ ] iOS: full matrix. The **force-quit delivery cases are the primary acceptance criteria** —
+      they are what is broken in the field today. Requires a Mac; no iOS build has run this branch.
+- [ ] iOS: NSE forced to crash → notification still renders, unenriched.
+- [ ] iOS: NSE forced to time out → original content delivered.
+- [ ] iOS: App Group deliberately emptied → **no effect** on delivery (the precise condition
+      believed to cause today's field failures).
+- [ ] Debug env toggle end-to-end: a device on `v6_debug_*` receives test sends, and flipping back
+      restores `v6_prod_*` (the switch itself reconciles immediately — verified; the *delivery* leg
+      needs a test send).
+
+**2. Teardown — lands only after §1 passes.** Full list with rationale in "Build fresh, delete the
+old paths" below: V5 `SubscriptionProcessor`, `NotificationState.subscribedTopics`,
+`V5NotificationFilter` + the `NotificationData` filter block, V4/V5 topic constants,
+`LAUNCHES_ALL`, the iOS NSE filter files + `NSEPreferenceBridge` filter keys, and the Android
+worker filter calls. Until then local filtering still runs everywhere — safe during dual-send,
+since subscriptions and filters implement the same preferences.
+
+**3. Observability.**
+
+- [ ] Server: Grafana panels for `sln_v6_notifications_sent_total`,
+      `sln_notification_sends_skipped_total`, `sln_notification_group_fallbacks_total` — until they
+      exist, V6 dispatch volume is invisible outside logs (agreed 2026-08-16, tracked server-side).
+- [ ] Client: one `log.i` summary line on a *successful* reconcile pass (e.g. "reconciled: +3 −2,
+      21 confirmed"). A clean pass is currently silent, which made a working system
+      indistinguishable from a dead one during the 2026-08-19 device session.
+
+**4. Release train.** Staged rollout per the Rollout section once §1 passes; iOS release is manual
+and ~12× Android cost, so it rides with the next iOS train.
 
 ## Problem
 
@@ -178,13 +223,19 @@ suspend fun reconcile() {
 disagreeing, so the next reconciliation picks it up automatically. There is no retry queue, no
 backoff bookkeeping, and no way for an intended change to be mistaken for an achieved one.
 
-**Reconciliation is triggered by an explicit Save, and once on every app start.** The notification
-settings screen becomes save-based rather than reconciling per toggle. Decided over debouncing
-because a class switch is ~20 FCM operations under the shipped topic shape: a user exploring the
-toggles would fire a full class rewrite on every debounce expiry, while a Save button batches any
-number of changes into exactly one reconciliation — and gives a natural place to surface "some
-subscriptions failed, will retry" feedback. The app-start reconcile is the retry path for anything
-that failed at save time, so a failed save self-heals without the user doing anything.
+**Reconciliation is triggered automatically after every filter change (debounced), immediately by
+the master kill switch and the debug env toggle, and once on every app start.** Every filter setter
+queues `AutoReconcileTrigger` — a conflated channel plus a 750ms debounce — so a burst of toggles
+collapses into one reconcile pass once the user pauses. The app-start reconcile is the retry path
+for anything that failed at sync time, so a failed pass self-heals without the user doing anything.
+
+*Revised 2026-08-19 — this was originally save-based* ("an explicit Save batches any number of
+changes into one reconciliation"), chosen over debouncing because a class switch is ~20 FCM
+operations. Field testing killed it twice in one day: the Save button lived at the bottom of a
+700-line scroll and went unfound, and toggles persisted immediately anyway, so settings looked
+applied while nothing had subscribed. A debounce addresses the original burst concern without a
+save step, and matches how every other toggle in the app behaves — including the kill switch on the
+same screen. The debounce collapse and failure-survival are pinned by `AutoReconcileTriggerTest`.
 
 #### Why unsubscribes go first
 
@@ -277,8 +328,9 @@ device silently under-subscribed, which is the dangerous direction.
 backup exclusion), so a restored install starts empty and rebuilds correctly. That is a
 configuration line, and it achieves what FID tracking would have without adding a dependency.
 
-**TODO:** confirm the app's current backup rules and whether the SQLDelight database is included. If
-excluding it is impractical, the fallback is the reset action above, surfaced in Diagnostics.
+**Done 2026-08-17** (`04800e15`): the ledger database is excluded from platform backup on both
+platforms (Android `backup_rules.xml` + `data_extraction_rules.xml`; iOS
+`NSURLIsExcludedFromBackupKey` set on the database file in `DatabaseDriverFactory.ios.kt`).
 
 #### If the table is ever lost
 
@@ -441,7 +493,9 @@ Reconciliation, against an in-memory driver and a fake FCM:
    converges to the same state.
 10. A `forceResubscribe()` whose unsubscribes partly fail leaves those rows present with their error
     recorded, so the next pass retries them rather than losing them.
-11. Save with no effective change reconciles to zero FCM operations — repeated saves are free.
+11. A reconcile with no effective change issues zero FCM operations — redundant passes are free.
+    `AutoReconcileTriggerTest` additionally pins that a burst of toggles collapses into a single
+    pass and that a throwing pass does not kill the trigger.
 
 **Device testing is the gate**, per the matrix in the server spec, on both platforms — with the iOS
 force-quit cases as primary acceptance criteria, since they are what is broken today. Also: NSE
@@ -466,7 +520,7 @@ replacement is in place and the device matrix passes; verify call sites are dead
 in the spirit of `SubscriptionProcessor.kt`, `NotificationRepositoryImpl.kt:47,183`):
 
 - [ ] `SubscriptionProcessor` V5/V4 topic computation and its 300ms debounce trigger — replaced by
-      derivation + save-triggered reconciliation
+      derivation + debounced auto-reconciliation (`AutoReconcileTrigger`)
 - [ ] `NotificationState.subscribedTopics` field — superseded by the `TopicSubscription` table
 - [ ] `V5NotificationFilter.kt` and the filter block in `NotificationData.kt` (keep whatever
       `LaunchFilterService` genuinely shares)
