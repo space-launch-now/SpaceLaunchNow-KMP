@@ -193,14 +193,12 @@ class SettingsViewModel(
     }
 
     fun updateFollowAllLaunches(enabled: Boolean) {
-        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setFollowAllLaunches(enabled)
         }
     }
 
     fun updateStrictMatching(enabled: Boolean) {
-        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setUseStrictMatching(enabled)
         }
@@ -216,7 +214,6 @@ class SettingsViewModel(
             return
         }
 
-        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setAgencyEnabled(agency, !isCurrentlyEnabled)
         }
@@ -232,7 +229,6 @@ class SettingsViewModel(
             return
         }
 
-        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setLocationEnabled(location, !isCurrentlyEnabled)
         }
@@ -243,7 +239,6 @@ class SettingsViewModel(
         analyticsManager.track(
             AnalyticsEvent.NotificationSettingChanged(type = topic.name, enabled = enabled)
         )
-        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setTopicEnabled(topic, enabled)
         }
@@ -254,40 +249,9 @@ class SettingsViewModel(
         _snackbarMessage.value = null
     }
 
-    // V6: FCM reconciliation is save-triggered. A class switch is ~20 FCM
-    // operations, so per-toggle reconciling would fire a full rewrite on every
-    // debounce expiry while a user explores; Save batches everything into one.
-    private val _isSavingNotifications = MutableStateFlow(false)
-    val isSavingNotifications: StateFlow<Boolean> = _isSavingNotifications.asStateFlow()
-
-    // Drives the anchored Save & apply bar. Set by every filter mutation, cleared when a
-    // save leaves nothing to apply. The master kill switch never sets it — that reconciles
-    // inline in the repository and must not wait for Save.
-    private val _hasUnsavedNotificationChanges = MutableStateFlow(false)
-    val hasUnsavedNotificationChanges: StateFlow<Boolean> =
-        _hasUnsavedNotificationChanges.asStateFlow()
-
-    fun saveNotificationSettings() {
-        viewModelScope.launch {
-            _isSavingNotifications.value = true
-            try {
-                val result = notificationRepository.reconcileSubscriptions()
-                _snackbarMessage.value = when {
-                    result.skipped -> "Push subscriptions are not available on this platform"
-                    result.failed == 0 -> "Notification subscriptions updated"
-                    else -> "Some subscriptions failed — tap Save to retry, or they retry at next app start"
-                }
-                // A partial failure keeps the bar visible: tapping Save again retries the
-                // disagreeing ledger rows. Skipped (no FCM on this platform) clears it —
-                // there is nothing a retry could ever apply.
-                if (result.skipped || result.failed == 0) {
-                    _hasUnsavedNotificationChanges.value = false
-                }
-            } finally {
-                _isSavingNotifications.value = false
-            }
-        }
-    }
+    // V6 note: there is no explicit save step. Every filter mutation applies immediately
+    // and the repository queues a debounced FCM reconcile (AutoReconcileTrigger), so
+    // subscriptions follow settings the same way the rest of the app's toggles behave.
 
     // Convenience methods for backward compatibility with UI
     fun updateEventNotifications(enabled: Boolean) = updateTopic(NotificationTopic.EVENTS, enabled)

@@ -19,6 +19,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
+import me.calebjones.spacelaunchnow.data.notifications.v6.AutoReconcileTrigger
 import me.calebjones.spacelaunchnow.data.notifications.v6.PushTopicMessaging
 import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.notifications.v6.V6ReconcileResult
@@ -90,6 +91,18 @@ class NotificationRepositoryImpl(
         },
         nowMillis = { Clock.System.now().toEpochMilliseconds() },
     )
+
+    // Filter mutations apply immediately: every setter queues a debounced reconcile so
+    // FCM subscriptions follow settings without an explicit save step. The debounce
+    // collapses a burst of toggles (a class switch rewrites ~20 topics) into one pass;
+    // a failed pass is retried by the app-start reconcile.
+    private val autoReconcile = AutoReconcileTrigger(
+        scope = repositoryScope,
+        debounceMs = 750L
+    ) {
+        runCatching { reconcileSubscriptions() }
+            .onFailure { log.e(it) { "Auto reconcile failed; app-start reconcile retries" } }
+    }
 
     // Same env decision the V5 path used: debug topics only in debug builds,
     // and only when the debug setting asks for them.
@@ -172,24 +185,28 @@ class NotificationRepositoryImpl(
         updateState { currentState ->
             currentState.withFollowAllLaunches(enabled, agencies, locations)
         }
+        autoReconcile.request()
     }
 
     override suspend fun setUseStrictMatching(enabled: Boolean) {
         updateState { currentState ->
             currentState.copy(useStrictMatching = enabled)
         }
+        autoReconcile.request()
     }
 
     override suspend fun setTopicEnabled(topic: NotificationTopic, enabled: Boolean) {
         updateState { currentState ->
             currentState.withTopicEnabled(topic, enabled)
         }
+        autoReconcile.request()
     }
 
     override suspend fun setAgencyEnabled(agency: NotificationAgency, enabled: Boolean) {
         updateState { currentState ->
             currentState.withAgencyEnabled(agency, enabled)
         }
+        autoReconcile.request()
     }
 
     override suspend fun setAgencyEnabled(topicName: String, enabled: Boolean) {
@@ -197,12 +214,14 @@ class NotificationRepositoryImpl(
         updateState { currentState ->
             currentState.withAgencyEnabled(topicName, enabled)
         }
+        autoReconcile.request()
     }
 
     override suspend fun setLocationEnabled(location: NotificationLocation, enabled: Boolean) {
         updateState { currentState ->
             currentState.withLocationEnabled(location, enabled)
         }
+        autoReconcile.request()
     }
 
     override suspend fun setLocationEnabled(topicName: String, enabled: Boolean) {
@@ -210,6 +229,7 @@ class NotificationRepositoryImpl(
         updateState { currentState ->
             currentState.withLocationEnabled(topicName, enabled)
         }
+        autoReconcile.request()
     }
 
     override suspend fun getAvailableAgencies(): List<NotificationAgency> {
