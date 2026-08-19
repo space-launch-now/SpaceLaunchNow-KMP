@@ -193,12 +193,14 @@ class SettingsViewModel(
     }
 
     fun updateFollowAllLaunches(enabled: Boolean) {
+        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setFollowAllLaunches(enabled)
         }
     }
 
     fun updateStrictMatching(enabled: Boolean) {
+        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setUseStrictMatching(enabled)
         }
@@ -214,6 +216,7 @@ class SettingsViewModel(
             return
         }
 
+        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setAgencyEnabled(agency, !isCurrentlyEnabled)
         }
@@ -229,6 +232,7 @@ class SettingsViewModel(
             return
         }
 
+        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setLocationEnabled(location, !isCurrentlyEnabled)
         }
@@ -239,6 +243,7 @@ class SettingsViewModel(
         analyticsManager.track(
             AnalyticsEvent.NotificationSettingChanged(type = topic.name, enabled = enabled)
         )
+        _hasUnsavedNotificationChanges.value = true
         viewModelScope.launch {
             notificationRepository.setTopicEnabled(topic, enabled)
         }
@@ -255,6 +260,13 @@ class SettingsViewModel(
     private val _isSavingNotifications = MutableStateFlow(false)
     val isSavingNotifications: StateFlow<Boolean> = _isSavingNotifications.asStateFlow()
 
+    // Drives the anchored Save & apply bar. Set by every filter mutation, cleared when a
+    // save leaves nothing to apply. The master kill switch never sets it — that reconciles
+    // inline in the repository and must not wait for Save.
+    private val _hasUnsavedNotificationChanges = MutableStateFlow(false)
+    val hasUnsavedNotificationChanges: StateFlow<Boolean> =
+        _hasUnsavedNotificationChanges.asStateFlow()
+
     fun saveNotificationSettings() {
         viewModelScope.launch {
             _isSavingNotifications.value = true
@@ -263,7 +275,13 @@ class SettingsViewModel(
                 _snackbarMessage.value = when {
                     result.skipped -> "Push subscriptions are not available on this platform"
                     result.failed == 0 -> "Notification subscriptions updated"
-                    else -> "Some subscriptions failed — they will retry at next app start"
+                    else -> "Some subscriptions failed — tap Save to retry, or they retry at next app start"
+                }
+                // A partial failure keeps the bar visible: tapping Save again retries the
+                // disagreeing ledger rows. Skipped (no FCM on this platform) clears it —
+                // there is nothing a retry could ever apply.
+                if (result.skipped || result.failed == 0) {
+                    _hasUnsavedNotificationChanges.value = false
                 }
             } finally {
                 _isSavingNotifications.value = false

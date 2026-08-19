@@ -1,5 +1,10 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -62,7 +69,9 @@ import me.calebjones.spacelaunchnow.data.repository.requestPlatformNotificationP
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
+import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -132,7 +141,19 @@ fun NotificationSettingsScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            // Anchored to the viewport, not buried at the end of the list: FCM
+            // reconciliation is save-triggered, so an invisible Save button means
+            // changes silently wait until the next app start.
+            val isSaving by viewModel.isSavingNotifications.collectAsStateWithLifecycle()
+            val hasUnsaved by viewModel.hasUnsavedNotificationChanges.collectAsStateWithLifecycle()
+            SaveApplyBar(
+                visible = hasUnsaved || isSaving,
+                isSaving = isSaving,
+                onSave = viewModel::saveNotificationSettings
+            )
+        }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -701,23 +722,69 @@ fun NotificationSettingsScreen(
                 }
             }
 
-            item {
-                val isSaving by viewModel.isSavingNotifications.collectAsStateWithLifecycle()
+        }
+    }
+}
+
+/**
+ * Bottom-anchored save bar for the notification filters. Slides in on the first unsaved
+ * change and stays until a save leaves nothing to apply (a partial reconcile failure keeps
+ * it up — tapping again retries the failed rows).
+ */
+@Composable
+private fun SaveApplyBar(
+    visible: Boolean,
+    isSaving: Boolean,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+        exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
+        modifier = modifier
+    ) {
+        Surface(
+            tonalElevation = 3.dp,
+            shadowElevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = viewModel::saveNotificationSettings,
+                    onClick = onSave,
                     enabled = !isSaving
                 ) {
                     Text(if (isSaving) "Applying…" else "Save & apply")
                 }
                 Text(
-                    text = "Changes take effect when you save. If you leave without saving, they are applied automatically the next time the app starts.",
+                    text = "Changes take effect when you save. Left unsaved, they apply at the next app start.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SaveApplyBarPreview() {
+    SpaceLaunchNowPreviewTheme {
+        SaveApplyBar(visible = true, isSaving = false, onSave = {})
+    }
+}
+
+@Preview
+@Composable
+private fun SaveApplyBarDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        SaveApplyBar(visible = true, isSaving = true, onSave = {})
     }
 }
 
