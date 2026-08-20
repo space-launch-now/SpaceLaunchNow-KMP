@@ -53,6 +53,41 @@ class AnalyticsEventTest {
         assertEquals("NetworkError", params["error_code"])
     }
 
+    @Test fun `PaywallTierSelected has correct name`() =
+        assertEquals("paywall_tier_selected", AnalyticsEvent.PaywallTierSelected("annual", "prod_1", "support_us").name)
+
+    @Test
+    fun `PaywallTierSelected exposes tier product and source params`() {
+        val params = AnalyticsEvent.PaywallTierSelected("annual", "yearly_sub", "support_us").toParameters()
+        assertEquals("annual", params["tier"])
+        assertEquals("yearly_sub", params["product_id"])
+        assertEquals("support_us", params["source"])
+        assertFalse(params.containsKey("subscription_type"))
+    }
+
+    @Test
+    fun `funnel dimensions merge into event params when present`() {
+        val dims = AnalyticsEvent.FunnelDimensions(
+            subscriptionType = "free", isTrial = false,
+            activeEntitlements = "", platform = "android"
+        )
+        val params = AnalyticsEvent.PaywallViewed("support_us", dims).toParameters()
+        assertEquals("support_us", params["source"])
+        assertEquals("free", params["subscription_type"])
+        assertEquals(false, params["is_trial"])
+        assertEquals("", params["active_entitlements"])
+        assertEquals("android", params["platform"])
+    }
+
+    @Test
+    fun `purchase events carry dimensions when provided`() {
+        val dims = AnalyticsEvent.FunnelDimensions("premium", true, "premium", "ios")
+        assertEquals("premium", AnalyticsEvent.PurchaseCompleted("p", 39.99, dims).toParameters()["subscription_type"])
+        assertEquals("ios", AnalyticsEvent.PurchaseFailed("p", "store_purchase", "NetworkError", dims).toParameters()["platform"])
+        assertEquals(true, AnalyticsEvent.PurchaseRestored(true, dims).toParameters()["is_trial"])
+        assertEquals("premium", AnalyticsEvent.PurchaseStarted("p", dims).toParameters()["active_entitlements"])
+    }
+
     @Test
     fun `NotificationShown includes platform only when set`() {
         assertEquals(mapOf<String, Any>("type" to "launch"), AnalyticsEvent.NotificationShown("launch").toParameters())

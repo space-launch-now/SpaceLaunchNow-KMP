@@ -139,21 +139,73 @@ sealed class AnalyticsEvent(val name: String) {
 
     // ── Subscription Events ──────────────────────────────────────────────────
 
-    data class PaywallViewed(val source: String) :
-        AnalyticsEvent("paywall_viewed") {
-        override fun toParameters() = mapOf("source" to source)
+    /**
+     * Subscriber-context dimensions stamped on every conversion-funnel event so the
+     * funnel is sliceable in both Firebase and Datadog (spec 014 FR-4). Values of
+     * [subscriptionType] match the RevenueCat `subscription_state` attribute
+     * (SubscriptionType.name.lowercase()).
+     */
+    data class FunnelDimensions(
+        val subscriptionType: String,
+        val isTrial: Boolean,
+        val activeEntitlements: String,
+        val platform: String
+    ) {
+        fun toParameters(): Map<String, Any> = mapOf(
+            "subscription_type" to subscriptionType,
+            "is_trial" to isTrial,
+            "active_entitlements" to activeEntitlements,
+            "platform" to platform
+        )
     }
 
-    data class PurchaseStarted(val productId: String) :
-        AnalyticsEvent("purchase_started") {
-        override fun toParameters() = mapOf("product_id" to productId)
+    data class PaywallViewed(
+        val source: String,
+        val dimensions: FunnelDimensions? = null
+    ) : AnalyticsEvent("paywall_viewed") {
+        override fun toParameters() = buildMap {
+            put("source", source)
+            dimensions?.let { putAll(it.toParameters()) }
+        }
     }
 
-    data class PurchaseCompleted(val productId: String, val revenue: Double? = null) :
-        AnalyticsEvent("purchase_completed") {
+    /**
+     * User tapped a specific tier card on a paywall, before the system purchase
+     * sheet launches — the missing middle of the conversion funnel (spec 014 FR-2).
+     */
+    data class PaywallTierSelected(
+        val tier: String,
+        val productId: String,
+        val source: String,
+        val dimensions: FunnelDimensions? = null
+    ) : AnalyticsEvent("paywall_tier_selected") {
+        override fun toParameters() = buildMap {
+            put("tier", tier)
+            put("product_id", productId)
+            put("source", source)
+            dimensions?.let { putAll(it.toParameters()) }
+        }
+    }
+
+    data class PurchaseStarted(
+        val productId: String,
+        val dimensions: FunnelDimensions? = null
+    ) : AnalyticsEvent("purchase_started") {
+        override fun toParameters() = buildMap {
+            put("product_id", productId)
+            dimensions?.let { putAll(it.toParameters()) }
+        }
+    }
+
+    data class PurchaseCompleted(
+        val productId: String,
+        val revenue: Double? = null,
+        val dimensions: FunnelDimensions? = null
+    ) : AnalyticsEvent("purchase_completed") {
         override fun toParameters() = buildMap {
             put("product_id", productId)
             revenue?.let { put("revenue", it) }
+            dimensions?.let { putAll(it.toParameters()) }
         }
     }
 
@@ -166,18 +218,25 @@ sealed class AnalyticsEvent(val name: String) {
     data class PurchaseFailed(
         val productId: String,
         val step: String,
-        val errorCode: String
+        val errorCode: String,
+        val dimensions: FunnelDimensions? = null
     ) : AnalyticsEvent("purchase_failed") {
-        override fun toParameters() = mapOf(
-            "product_id" to productId,
-            "step" to step,
-            "error_code" to errorCode
-        )
+        override fun toParameters() = buildMap {
+            put("product_id", productId)
+            put("step", step)
+            put("error_code", errorCode)
+            dimensions?.let { putAll(it.toParameters()) }
+        }
     }
 
-    data class PurchaseRestored(val success: Boolean) :
-        AnalyticsEvent("purchase_restored") {
-        override fun toParameters() = mapOf("success" to success)
+    data class PurchaseRestored(
+        val success: Boolean,
+        val dimensions: FunnelDimensions? = null
+    ) : AnalyticsEvent("purchase_restored") {
+        override fun toParameters() = buildMap {
+            put("success", success)
+            dimensions?.let { putAll(it.toParameters()) }
+        }
     }
 
     // ── Notification Events ──────────────────────────────────────────────────
