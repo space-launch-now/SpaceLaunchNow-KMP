@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.PlatformType
+import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
@@ -15,6 +17,7 @@ import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.ProductPricing
 import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
+import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -30,10 +33,49 @@ class SubscriptionViewModel(
 
     private val log = logger()
 
-    // ========== Analytics ==========
+    // ========== Analytics (spec 014 conversion funnel) ==========
+
+    private fun platformName(): String = when (getPlatform().type) {
+        PlatformType.ANDROID -> "android"
+        PlatformType.IOS -> "ios"
+        PlatformType.DESKTOP -> "desktop"
+    }
+
+    /** Single source for the FR-4 subscriber-context dimensions — do not read state at call sites. */
+    private fun funnelDimensions(): AnalyticsEvent.FunnelDimensions {
+        val state = subscriptionState.value
+        return AnalyticsEvent.FunnelDimensions(
+            subscriptionType = state.subscriptionType.name.lowercase(),
+            isTrial = state.isInTrialPeriod,
+            activeEntitlements = billingManager.getActiveEntitlements().sorted().joinToString(","),
+            platform = platformName()
+        )
+    }
+
+    /** Dual-pipeline emission: Firebase via AnalyticsManager, Datadog explicitly (spec 014 FR-6). */
+    private fun trackFunnelStep(event: AnalyticsEvent) {
+        analyticsManager.track(event)
+        DatadogLogger.info(event.name, event.toParameters())
+    }
 
     fun trackPaywallViewed(source: String) {
-        analyticsManager.track(AnalyticsEvent.PaywallViewed(source = source))
+        trackFunnelStep(AnalyticsEvent.PaywallViewed(source = source, dimensions = funnelDimensions()))
+    }
+
+    fun trackTierSelected(type: ProductType, productId: String, source: String = "support_us") {
+        val tier = when (type) {
+            ProductType.MONTHLY -> "monthly"
+            ProductType.ANNUAL -> "annual"
+            ProductType.LIFETIME -> "lifetime"
+        }
+        trackFunnelStep(
+            AnalyticsEvent.PaywallTierSelected(
+                tier = tier,
+                productId = productId,
+                source = source,
+                dimensions = funnelDimensions()
+            )
+        )
     }
 
     // Subscription state from repository
@@ -53,6 +95,23 @@ class SubscriptionViewModel(
             repository.initialize()
             // Load available products from BillingManager
             loadAvailableProducts()
+        }
+
+        // Mirror funnel dimensions to Firebase user properties so ALL events are
+        // segmentable, not just funnel steps (spec 014 FR-4, Q1 recommended approach).
+        analyticsManager.setUserProperty("platform", platformName())
+        viewModelScope.launch {
+            subscriptionState.collect { state ->
+                analyticsManager.setUserProperty(
+                    "subscription_type",
+                    state.subscriptionType.name.lowercase()
+                )
+                analyticsManager.setUserProperty("is_trial", state.isInTrialPeriod.toString())
+                analyticsManager.setUserProperty(
+                    "active_entitlements",
+                    billingManager.getActiveEntitlements().sorted().joinToString(",")
+                )
+            }
         }
     }
 
@@ -183,7 +242,9 @@ class SubscriptionViewModel(
     fun purchaseProduct(productId: String, basePlanId: String? = null, priceAmountMicros: Long? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
-            analyticsManager.track(AnalyticsEvent.PurchaseStarted(productId = productId))
+            analyticsManager.track(
+                AnalyticsEvent.PurchaseStarted(productId = productId, dimensions = funnelDimensions())
+            )
 
             billingManager.launchPurchaseFlow(productId, basePlanId).fold(
                 onSuccess = { _ ->
@@ -191,10 +252,11 @@ class SubscriptionViewModel(
                         isProcessing = false,
                         successMessage = "Purchase completed successfully!"
                     )
-                    analyticsManager.track(
+                    trackFunnelStep(
                         AnalyticsEvent.PurchaseCompleted(
                             productId = productId,
-                            revenue = priceAmountMicros?.let { it / 1_000_000.0 }
+                            revenue = priceAmountMicros?.let { it / 1_000_000.0 },
+                            dimensions = funnelDimensions()
                         )
                     )
                     log.i { "Purchase successful for $productId" }
@@ -212,11 +274,12 @@ class SubscriptionViewModel(
                         is IllegalStateException -> "setup" to "not_initialized"
                         else -> "unknown" to "unknown"
                     }
-                    analyticsManager.track(
+                    trackFunnelStep(
                         AnalyticsEvent.PurchaseFailed(
                             productId = productId,
                             step = step,
-                            errorCode = errorCode
+                            errorCode = errorCode,
+                            dimensions = funnelDimensions()
                         )
                     )
                     log.e(error) { "Purchase failed for $productId ($step/$errorCode)" }
@@ -281,7 +344,12 @@ class SubscriptionViewModel(
 
             repository.restorePurchases().fold(
                 onSuccess = { state ->
-                    analyticsManager.track(AnalyticsEvent.PurchaseRestored(success = state.isSubscribed))
+                    analyticsManager.track(
+                        AnalyticsEvent.PurchaseRestored(
+                            success = state.isSubscribed,
+                            dimensions = funnelDimensions()
+                        )
+                    )
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
                         successMessage = if (state.isSubscribed) {
@@ -292,7 +360,9 @@ class SubscriptionViewModel(
                     )
                 },
                 onFailure = { error ->
-                    analyticsManager.track(AnalyticsEvent.PurchaseRestored(success = false))
+                    analyticsManager.track(
+                        AnalyticsEvent.PurchaseRestored(success = false, dimensions = funnelDimensions())
+                    )
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
                         errorMessage = error.message ?: "Restore failed"

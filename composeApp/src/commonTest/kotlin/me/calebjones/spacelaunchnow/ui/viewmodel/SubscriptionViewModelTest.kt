@@ -503,4 +503,64 @@ class SubscriptionViewModelTest {
 
         assertTrue(fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().isEmpty())
     }
+
+    // ========================================
+    // Conversion Funnel Tests (spec 014)
+    // ========================================
+
+    @Test
+    fun `trackTierSelected emits paywall_tier_selected with dimensions`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.trackTierSelected(ProductType.ANNUAL, "yearly_sub")
+        advanceUntilIdle()
+
+        val event = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PaywallTierSelected>().single()
+        assertEquals("annual", event.tier)
+        assertEquals("yearly_sub", event.productId)
+        assertEquals("support_us", event.source)
+        assertNotNull(event.dimensions)
+        assertEquals("desktop", event.dimensions!!.platform) // tests run on the desktop JVM target
+    }
+
+    @Test
+    fun `trackPaywallViewed carries dimensions`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.trackPaywallViewed("support_us")
+        advanceUntilIdle()
+
+        val event = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PaywallViewed>().single()
+        assertEquals("support_us", event.source)
+        assertNotNull(event.dimensions)
+    }
+
+    @Test
+    fun `purchase outcome events carry dimensions`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        billingManager.shouldLaunchPurchaseFail = true
+        billingManager.purchaseFailureException =
+            PurchaseFlowException("store_purchase", "user_cancelled", true, "cancelled")
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base")
+        advanceUntilIdle()
+
+        assertNotNull(fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseStarted>().single().dimensions)
+        assertNotNull(fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().single().dimensions)
+    }
+
+    @Test
+    fun `subscription state changes push funnel user properties`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+        advanceUntilIdle()
+
+        assertEquals("free", fake.userProperties["subscription_type"])
+        assertEquals("false", fake.userProperties["is_trial"])
+        assertNotNull(fake.userProperties["active_entitlements"])
+        assertEquals("desktop", fake.userProperties["platform"])
+    }
 }
