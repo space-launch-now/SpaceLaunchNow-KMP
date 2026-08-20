@@ -16,6 +16,7 @@ import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.billing.MockBillingManager
 import me.calebjones.spacelaunchnow.data.billing.PurchaseFlowException
+import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.MockSubscriptionRepository
@@ -521,7 +522,9 @@ class SubscriptionViewModelTest {
         assertEquals("yearly_sub", event.productId)
         assertEquals("support_us", event.source)
         assertNotNull(event.dimensions)
-        assertEquals("desktop", event.dimensions!!.platform) // tests run on the desktop JVM target
+        // commonTest runs on every target (desktopTest AND testDebug/ReleaseUnitTest),
+        // so the expected platform must come from the same source the code reads.
+        assertEquals(getPlatform().type.name.lowercase(), event.dimensions!!.platform)
     }
 
     @Test
@@ -561,6 +564,6 @@ class SubscriptionViewModelTest {
         assertEquals("free", fake.userProperties["subscription_type"])
         assertEquals("false", fake.userProperties["is_trial"])
         assertNotNull(fake.userProperties["active_entitlements"])
-        assertEquals("desktop", fake.userProperties["platform"])
+        assertEquals(getPlatform().type.name.lowercase(), fake.userProperties["platform"])
     }
 }
