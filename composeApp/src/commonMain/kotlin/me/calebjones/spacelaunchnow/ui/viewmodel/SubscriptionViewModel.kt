@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
+import me.calebjones.spacelaunchnow.data.billing.PurchaseFlowException
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.ProductPricing
@@ -176,8 +177,10 @@ class SubscriptionViewModel(
      *
      * @param productId The product ID to purchase
      * @param basePlanId The base plan (e.g., "monthly", "annual", "lifetime")
+     * @param priceAmountMicros Price in micros, used to attach revenue to the
+     *   purchase_completed analytics event (spec 018 FR-1.2)
      */
-    fun purchaseProduct(productId: String, basePlanId: String? = null) {
+    fun purchaseProduct(productId: String, basePlanId: String? = null, priceAmountMicros: Long? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
             analyticsManager.track(AnalyticsEvent.PurchaseStarted(productId = productId))
@@ -188,7 +191,12 @@ class SubscriptionViewModel(
                         isProcessing = false,
                         successMessage = "Purchase completed successfully!"
                     )
-                    analyticsManager.track(AnalyticsEvent.PurchaseCompleted(productId = productId))
+                    analyticsManager.track(
+                        AnalyticsEvent.PurchaseCompleted(
+                            productId = productId,
+                            revenue = priceAmountMicros?.let { it / 1_000_000.0 }
+                        )
+                    )
                     log.i { "Purchase successful for $productId" }
                 },
                 onFailure = { error ->
@@ -196,7 +204,22 @@ class SubscriptionViewModel(
                         isProcessing = false,
                         errorMessage = error.message ?: "Purchase failed"
                     )
-                    log.e(error) { "Purchase failed for $productId" }
+                    // Spec 018 FR-1.1: 73% of purchase attempts previously ended in
+                    // silence — attribute every failure with a coarse step + error code.
+                    val (step, errorCode) = when (error) {
+                        is PurchaseFlowException -> error.step to error.errorCode
+                        is IllegalArgumentException -> "setup" to "product_not_found"
+                        is IllegalStateException -> "setup" to "not_initialized"
+                        else -> "unknown" to "unknown"
+                    }
+                    analyticsManager.track(
+                        AnalyticsEvent.PurchaseFailed(
+                            productId = productId,
+                            step = step,
+                            errorCode = errorCode
+                        )
+                    )
+                    log.e(error) { "Purchase failed for $productId ($step/$errorCode)" }
                 }
             )
         }
@@ -208,7 +231,7 @@ class SubscriptionViewModel(
      * @param product The ProductInfo to purchase
      */
     fun purchaseProduct(product: ProductInfo) {
-        purchaseProduct(product.productId, product.basePlanId)
+        purchaseProduct(product.productId, product.basePlanId, product.priceAmountMicros)
     }
 
     /**
