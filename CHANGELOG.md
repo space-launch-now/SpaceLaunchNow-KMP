@@ -1,3 +1,14 @@
+# [5.39.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.38.0...v5.39.0) (2026-08-20)
+
+
+### Features
+
+* **notifications:** anchor Save & apply to the bottom of the filters screen ([7a2c8c9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7a2c8c9ff3d48e6d8c1969ec64dc13d57a30cc8d))
+* **notifications:** make the debug topics switch V6-aware with an immediate reconcile ([31e7c01](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/31e7c01e15110c4792f0074bee80a7ca37478c3e))
+* **notifications:** sync FCM subscriptions automatically on every filter change ([58a25d6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/58a25d69855c81f637619cae27b029c7c7384bd3))
+
+
+
 # [5.38.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.37.1...v5.38.0) (2026-08-18)
 
 
@@ -61,21 +72,6 @@
 ### Features
 
 * enhance News & Events navigation with initial tab support and update dependencies ([df122c8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/df122c839c27fd5b7e09594c61b6e9431abce3ad))
-
-
-
-# [5.35.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.34.0...v5.35.0) (2026-07-08)
-
-
-### Bug Fixes
-
-* remove outdated templates and add new documentation for monetization and analytics setup ([d62e39f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d62e39f5cc8b02dc58c476f6aa4eede2df7c99ad))
-
-
-### Features
-
-* add business analysis skill and references for monetization, analytics, and app store strategies ([2de719c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2de719c114f0eb80cb21dd23b1ed5344fca57ccb))
-* add compact countdown display and link to full schedule in featured launches row ([46c9756](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/46c9756fc46aea903190ce15142aa9753a7c8c6d))
 
 
 
