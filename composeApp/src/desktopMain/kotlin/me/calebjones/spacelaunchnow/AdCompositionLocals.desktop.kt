@@ -15,5 +15,3 @@ val LocalPreloadedNavigationLeaderboardAd = compositionLocalOf<Any?> { null }
 val LocalPreloadedLeaderboardAd = compositionLocalOf<Any?> { null }
 val LocalPreloadedFullBannerAd = compositionLocalOf<Any?> { null }
 val LocalPreloadedFluidAd = compositionLocalOf<Any?> { null }
-val LocalPreloadedInterstitialAd = compositionLocalOf<Any?> { null }
-val LocalPreloadedRewardedAd = compositionLocalOf<Any?> { null }

@@ -23,8 +23,6 @@ import me.calebjones.spacelaunchnow.LocalPreloadedNavigationLeaderboardAd
 import me.calebjones.spacelaunchnow.LocalPreloadedLeaderboardAd
 import me.calebjones.spacelaunchnow.LocalPreloadedFullBannerAd
 import me.calebjones.spacelaunchnow.LocalPreloadedFluidAd
-import me.calebjones.spacelaunchnow.LocalPreloadedInterstitialAd
-import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
 import co.touchlab.kermit.Logger
 import androidx.compose.runtime.remember
