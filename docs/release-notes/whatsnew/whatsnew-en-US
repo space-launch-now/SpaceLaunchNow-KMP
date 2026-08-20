@@ -1,5 +1,11 @@
+### Bug Fixes
+
+* **ads:** load rewarded ads on demand instead of dead preloaded handles
+* **test:** derive expected platform from getPlatform in funnel tests
+
 ### Features
 
-* **notifications:** anchor Save & apply to the bottom of the filters screen
-* **notifications:** make the debug topics switch V6-aware with an immediate reconcile
-* **notifications:** sync FCM subscriptions automatically on every filter change
+* **analytics:** add paywall_tier_selected and funnel dimensions to conversion events
+* **analytics:** add purchase_failed and notification_shown events
+* **analytics:** attach revenue and failure attribution to purchase flow
+* **analytics:** fire notification_shown and notification_tapped at display and tap time...

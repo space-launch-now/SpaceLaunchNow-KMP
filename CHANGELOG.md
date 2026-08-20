@@ -1,3 +1,24 @@
+# [5.40.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.39.0...v5.40.0) (2026-08-20)
+
+
+### Bug Fixes
+
+* **ads:** load rewarded ads on demand instead of dead preloaded handles ([a567f0f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a567f0f7be5f835feb3400379a32db933c95e81b))
+* **test:** derive expected platform from getPlatform in funnel tests ([7377235](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7377235baa55df5c0c1de53e57fa99c4b7c353c6))
+
+
+### Features
+
+* **analytics:** add paywall_tier_selected and funnel dimensions to conversion events ([ee30910](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ee309101533888b23588e387d47c866579085e4a))
+* **analytics:** add purchase_failed and notification_shown events ([66738eb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/66738eb8b2bd231a2dbdc4333ad0399fa971b332))
+* **analytics:** attach revenue and failure attribution to purchase flow ([8ccc5fe](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8ccc5fea2ae42f8e4a8f061efdc3b395147d3154))
+* **analytics:** fire notification_shown and notification_tapped at display and tap time ([7c973fc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7c973fc76725cd7343e2d8f177f7254e6a8ec927))
+* **analytics:** instrument Support-Us paywall view and tier selection ([d49fb6a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d49fb6af5d24576c38cd521836641c38a367bc0f))
+* **analytics:** stamp funnel dimensions and dual-pipeline emission in SubscriptionViewModel ([c08639e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c08639eea31304ef9e31d52f521d91d7f9ac0f20))
+* **ui:** show loading state while rewarded ad loads on demand ([f30b559](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f30b55945cfd32751b32fb7f7dea838c3cb7dcda))
+
+
+
 # [5.39.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.38.0...v5.39.0) (2026-08-20)
 
 
@@ -63,15 +84,6 @@
 * **logging:** attach rc_user_id to Datadog logs and RUM on both platforms ([bb051cc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb051ccc8fc108187cadeaa35e4009063fa888f5))
 * **logging:** remotely control per-user diagnostics via Firebase Remote Config ([171e400](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/171e40027994f4ca7fee316f5323fcbb24fab35d))
 * **notifications:** make startup push registration observable at info/warn ([d3d7ec1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d3d7ec101826b2adde8776575fda9788f57d7a84))
-
-
-
-# [5.36.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.35.0...v5.36.0) (2026-07-09)
-
-
-### Features
-
-* enhance News & Events navigation with initial tab support and update dependencies ([df122c8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/df122c839c27fd5b7e09594c61b6e9431abce3ad))
 
 
 
