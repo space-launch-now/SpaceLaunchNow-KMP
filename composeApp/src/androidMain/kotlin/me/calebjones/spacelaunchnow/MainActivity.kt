@@ -20,6 +20,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import chaintech.videoplayer.util.PlaybackPreference
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.notifications.AndroidNotificationPermissionHandler
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
     private val appPreferences: AppPreferences by inject()
     private val billingClient: BillingClient by inject()
     private val billingManager: BillingManager by inject()
+    private val analyticsManager: AnalyticsManager by inject()
     private lateinit var notificationPermissionHandler: AndroidNotificationPermissionHandler
 
     // Use mutable state for notification launch ID to trigger recomposition
@@ -73,6 +76,12 @@ class MainActivity : ComponentActivity() {
         // No auto-request here — the onboarding carousel's "Enable Notifications" button
         // triggers the system permission dialog at the appropriate time.
         log.d { "Notification permission check skipped - handled by LiveOnboarding flow" }
+
+        // Track notification taps once per launch (skip configuration-change
+        // re-delivery of the same intent). Spec 018 US5.
+        if (savedInstanceState == null) {
+            trackNotificationTapIfPresent(intent)
+        }
 
         // Check if launched from notification (with launch_id, event_id, or news_url)
         val intentLaunchId = intent?.getStringExtra("launch_id")
@@ -231,6 +240,8 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
+        trackNotificationTapIfPresent(intent)
+
         // Check if new intent has launch_id, event_id, or news_url from notification
         val newLaunchId = intent?.getStringExtra("launch_id")
         val newEventId = intent?.getIntExtra("event_id", -1)?.takeIf { it != -1 }
@@ -256,6 +267,26 @@ class MainActivity : ComponentActivity() {
 
         // Handle deep links from Wear OS companion (spacelaunchnow://...)
         handleDeepLinkIntent(intent)
+    }
+
+    /**
+     * Track a notification tap when this intent came from a notification —
+     * the notification_type extra is set only by NotificationDisplayHelper.
+     * Spec 018 US5: notification_tapped previously had zero production call sites.
+     */
+    private fun trackNotificationTapIfPresent(intent: Intent?) {
+        val type = intent?.getStringExtra("notification_type") ?: return
+        try {
+            analyticsManager.track(
+                AnalyticsEvent.NotificationTapped(
+                    type = type,
+                    launchId = intent.getStringExtra("launch_uuid")
+                        ?: intent.getStringExtra("launch_id")
+                )
+            )
+        } catch (e: Exception) {
+            log.w(e) { "Failed to track notification tap" }
+        }
     }
 
     private fun handleDeepLinkIntent(intent: Intent?) {

@@ -15,6 +15,7 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
@@ -25,6 +26,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.model.CustomNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.EventNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.NewsNotificationPayload
@@ -68,6 +71,23 @@ object NotificationDisplayHelper {
     private const val NOTIFICATION_ID = 1
 
     private val log = logger()
+
+    /**
+     * Fire notification_shown after an actual notify() call. Only when OS-level
+     * notifications are enabled — a notify() with notifications blocked is a silent
+     * no-op and must not count toward the CTR denominator. Spec 018 US5.
+     */
+    private fun trackShown(context: Context, notificationType: String) {
+        try {
+            if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
+            KoinPlatformTools.defaultContext().get().get<AnalyticsManager>().track(
+                AnalyticsEvent.NotificationShown(type = notificationType, platform = "android")
+            )
+        } catch (e: Exception) {
+            // Analytics must never break notification display.
+            log.w(e) { "Failed to track notification_shown" }
+        }
+    }
 
     /**
      * Get the notification channel ID for a specific NotificationTopic
@@ -620,6 +640,7 @@ object NotificationDisplayHelper {
             notificationData.launchId.hashCode(), // Notification ID
             notification
         )
+        trackShown(context, notificationData.notificationType)
         log.i("📱 [Notification] ✅ Notification shown successfully!")
     }
 
@@ -661,6 +682,7 @@ object NotificationDisplayHelper {
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("notification_type", "basic")
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -685,6 +707,7 @@ object NotificationDisplayHelper {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, notification)
+        trackShown(context, "basic")
     }
 
     /**
@@ -798,6 +821,7 @@ object NotificationDisplayHelper {
             payload.launchUuid.hashCode(),
             notification
         )
+        trackShown(context, payload.notificationType)
         log.i("📱 [V5 Notification] ✅ V5 Notification shown successfully!")
     }
 
@@ -906,6 +930,7 @@ object NotificationDisplayHelper {
             payload.eventId,
             notification
         )
+        trackShown(context, payload.notificationType)
         log.i("📱 [Event Notification] ✅ Event notification shown successfully!")
     }
 
@@ -995,6 +1020,7 @@ object NotificationDisplayHelper {
             payload.articleId.hashCode(),
             notification
         )
+        trackShown(context, payload.notificationType)
         log.i("📱 [News Notification] ✅ News notification shown successfully!")
     }
 
@@ -1102,6 +1128,7 @@ object NotificationDisplayHelper {
             payload.customId.hashCode(),
             notification
         )
+        trackShown(context, payload.notificationType)
         log.i("📱 [Custom Notification] ✅ Custom notification shown successfully!")
     }
 }
