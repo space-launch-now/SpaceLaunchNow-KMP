@@ -6,24 +6,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.composable.RewardedAd
+import app.lexilabs.basic.ads.composable.rememberRewardedAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
-import me.calebjones.spacelaunchnow.LocalPreloadedRewardedAd
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getPlatform
-import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import org.koin.compose.koinInject
 
 private val log by lazy { SpaceLogger.getLogger("RewardedAdHandler") }
 
 /**
  * iOS implementation of RewardedAdHandler using BasicAds library.
- * 
- * Rewarded ad handler that shows preloaded rewarded ads.
- * - Checks if the user has ad-free premium
- * - Uses the preloaded rewarded ad for instant showing
+ *
+ * Loads the rewarded ad **on demand** when [shouldShow] becomes true, mirroring the
+ * on-demand InterstitialAdHandler pattern. The old preloaded-CompositionLocal path was
+ * never provided after preloading was removed, which left this handler permanently
+ * early-returning and the "Watch Ad for 24h Premium Access" flow dead (spec 018 US2).
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
@@ -31,116 +34,86 @@ actual fun RewardedAdHandler(
     shouldShow: Boolean,
     onRewardEarned: ((rewardAmount: Int, rewardType: String) -> Unit)?,
     onAdShown: (() -> Unit)?,
-    onAdFailed: ((String) -> Unit)?
+    onAdFailed: ((String) -> Unit)?,
+    onAdDismissed: (() -> Unit)?
 ) {
+    if (!shouldShow) return
+
     val contextFactory = LocalContextFactory.current
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
 
-    // 🚀 USE PRELOADED AD: Get preloaded rewarded ad from CompositionLocal
-    val preloadedRewardedAd = LocalPreloadedRewardedAd.current
+    val subscriptionRepo =
+        koinInject<me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository>()
+    val subscriptionState by subscriptionRepo.state.collectAsStateWithLifecycle()
 
-    // Don't show ads if:
-    // 1. User has ad-free premium feature
-    // 2. Not on a mobile platform (Android/iOS)
-    // 3. No context factory available
-    // 4. No preloaded rewarded ad available
-    if (hasAdFree ||
+    if (subscriptionState.isLoading ||
+        hasAdFree ||
         !getPlatform().type.isMobile ||
-        contextFactory == null ||
-        preloadedRewardedAd == null ||
-        !shouldShow
+        contextFactory == null
     ) {
-        if (shouldShow) {
-            log.w { "⚠️ RewardedAdHandler: Not showing ad due to conditions." }
-        }
+        log.w { "⚠️ RewardedAd: Not showing ad due to conditions" }
         return
     }
 
-    // Use the preloaded rewarded ad
-    val rewardedAd = preloadedRewardedAd
-    
-    // Track if reward has been granted to avoid duplicate grants
+    // Terminal-outcome guards: rememberRewardedAd auto-reloads after DISMISSED/FAILING,
+    // so without these the ad would re-show (or callbacks would re-fire) in a loop.
     var rewardGranted by remember { mutableStateOf(false) }
+    var finished by remember { mutableStateOf(false) }
 
-    // Handle ad state changes
-    LaunchedEffect(rewardedAd.state, shouldShow) {
+    // 🚀 ON-DEMAND LOAD: only requested once the user has tapped "Watch Ad".
+    val rewardedAd by rememberRewardedAd(
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.REWARDED),
+        onFailure = { e ->
+            log.w { "❌ RewardedAd: Failed to load: ${e.message}" }
+            if (!finished) {
+                finished = true
+                onAdFailed?.invoke(e.message ?: "Failed to load")
+            }
+        }
+    )
+
+    LaunchedEffect(rewardedAd.state) {
         when (rewardedAd.state) {
-            AdState.READY -> {
-                if (shouldShow) {
-                    log.d { "🎯 RewardedAd: Ad loaded successfully and ready to show" }
-                    // Reset reward granted flag when showing new ad
-                    rewardGranted = false
-                }
-            }
-
-            AdState.SHOWING -> {
-                log.d { "✅ RewardedAd: Ad is showing!" }
-                onAdShown?.invoke()
-            }
-
-            AdState.DISMISSED -> {
-                log.d { "🎯 RewardedAd: Ad dismissed by user" }
-            }
-
+            AdState.READY -> log.d { "🎯 RewardedAd: Ad loaded and ready to show" }
+            AdState.LOADING -> log.d { "⏳ RewardedAd: Ad is loading..." }
             AdState.FAILING -> {
                 log.w { "❌ RewardedAd: Ad failed to load" }
-                onAdFailed?.invoke("Failed to load")
-            }
-
-            AdState.LOADING -> {
-                log.d { "⏳ RewardedAd: Ad is loading..." }
-            }
-
-            AdState.SHOWN -> {
-                log.d { "✅ RewardedAd: Ad has finished showing" }
-                // Grant reward when ad completes (SHOWN state)
-                if (!rewardGranted) {
-                    log.d { "🎉 RewardedAd: User earned reward!" }
-                    onRewardEarned?.invoke(1, "reward")
-                    rewardGranted = true
+                if (!finished) {
+                    finished = true
+                    onAdFailed?.invoke("Failed to load")
                 }
             }
-
-            AdState.NONE -> {
-                log.d { "⚪ RewardedAd: Initial state" }
-            }
-
-            else -> {
-                log.d { "🔄 RewardedAd: State: ${rewardedAd.state}" }
-            }
+            else -> log.v { "🔄 RewardedAd: State: ${rewardedAd.state}" }
         }
     }
 
-    // Show the rewarded ad using the Composable pattern (required by basic-ads)
-    if (shouldShow && rewardedAd.state == AdState.READY) {
+    if (!finished && rewardedAd.state == AdState.READY) {
         RewardedAd(
             loadedAd = rewardedAd,
             onRewardEarned = {
-                // Guard against duplicate reward grants (CR-7 fix)
                 if (!rewardGranted) {
-                    log.d { "🎉 RewardedAd: User earned reward! (ad callback)" }
+                    log.d { "🎉 RewardedAd: User earned reward" }
                     rewardGranted = true
                     onRewardEarned?.invoke(1, "reward")
+                }
+            },
+            onShown = { onAdShown?.invoke() },
+            onDismissed = {
+                log.d { "🎯 RewardedAd: Ad dismissed" }
+                if (!finished) {
+                    finished = true
+                    // Reward callbacks can arrive before dismissal; only report an
+                    // unrewarded dismissal if no reward was granted.
+                    if (!rewardGranted) onAdDismissed?.invoke()
+                }
+            },
+            onFailure = { e ->
+                log.w { "❌ RewardedAd: Failed to show: ${e.message}" }
+                if (!finished) {
+                    finished = true
+                    onAdFailed?.invoke(e.message ?: "Failed to show")
                 }
             }
         )
     }
-}
-
-/**
- * Helper function to manually trigger a rewarded ad.
- * Useful for premium trial features or rewards.
- */
-@Composable
-fun TriggerRewardedAdIfReady(
-    onRewardEarned: ((rewardAmount: Int, rewardType: String) -> Unit)? = null,
-    onAdShown: (() -> Unit)? = null,
-    onAdFailed: ((String) -> Unit)? = null
-) {
-    RewardedAdHandler(
-        shouldShow = true,
-        onRewardEarned = onRewardEarned,
-        onAdShown = onAdShown,
-        onAdFailed = onAdFailed
-    )
 }

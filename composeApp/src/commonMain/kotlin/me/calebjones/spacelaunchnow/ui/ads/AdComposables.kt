@@ -64,26 +64,30 @@ expect fun InterstitialAdHandler(
 )
 
 /**
- * Rewarded ad handler that shows ads that reward the user.
- * 
+ * Rewarded ad handler that loads an ad on demand and shows it.
+ *
  * On Android/iOS:
- * - Shows rewarded ads when triggered
+ * - Loads the rewarded ad on demand when [shouldShow] becomes true (no preloading)
  * - Calls reward callback when user completes watching the ad
- * 
+ * - Calls [onAdDismissed] if the user closes the ad before earning the reward —
+ *   callers MUST drop [shouldShow] in response or the ad will reload and re-show
+ *
  * On Desktop:
  * - Does nothing (no-op)
- * 
- * @param shouldShow Whether to trigger showing the rewarded ad
+ *
+ * @param shouldShow Whether to load and show the rewarded ad
  * @param onRewardEarned Called when the user earns a reward (amount, type)
  * @param onAdShown Called when a rewarded ad is successfully shown
  * @param onAdFailed Called when a rewarded ad fails to load or show
+ * @param onAdDismissed Called when the user dismisses the ad without earning the reward
  */
 @Composable
 expect fun RewardedAdHandler(
     shouldShow: Boolean = false,
     onRewardEarned: ((rewardAmount: Int, rewardType: String) -> Unit)? = null,
     onAdShown: (() -> Unit)? = null,
-    onAdFailed: ((String) -> Unit)? = null
+    onAdFailed: ((String) -> Unit)? = null,
+    onAdDismissed: (() -> Unit)? = null
 )
 
 /**
