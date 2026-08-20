@@ -157,6 +157,24 @@ sealed class AnalyticsEvent(val name: String) {
         }
     }
 
+    /**
+     * A purchase attempt ended without completion. `step` is where it died
+     * ("setup" = product lookup / not initialized, "store_purchase" = native store flow),
+     * `errorCode` is coarse ("user_cancelled" for sheet dismissal, else the
+     * RevenueCat PurchasesErrorCode name). Spec 018 FR-1.1.
+     */
+    data class PurchaseFailed(
+        val productId: String,
+        val step: String,
+        val errorCode: String
+    ) : AnalyticsEvent("purchase_failed") {
+        override fun toParameters() = mapOf(
+            "product_id" to productId,
+            "step" to step,
+            "error_code" to errorCode
+        )
+    }
+
     data class PurchaseRestored(val success: Boolean) :
         AnalyticsEvent("purchase_restored") {
         override fun toParameters() = mapOf("success" to success)
@@ -177,6 +195,23 @@ sealed class AnalyticsEvent(val name: String) {
             put("type", type)
             outcome?.let { put("outcome", it) }
             reason?.let { put("reason", it) }
+            platform?.let { put("platform", it) }
+        }
+    }
+
+    /**
+     * A notification was actually posted to the OS notification shade — the true
+     * denominator for notification CTR (notification_tapped / notification_shown).
+     * Unlike notification_received{outcome=displayed}, this is NOT fired when
+     * OS-level notification permission is off. Spec 018 US5.
+     */
+    data class NotificationShown(
+        val type: String,
+        /** "android" or "ios". */
+        val platform: String? = null
+    ) : AnalyticsEvent("notification_shown") {
+        override fun toParameters() = buildMap {
+            put("type", type)
             platform?.let { put("platform", it) }
         }
     }
