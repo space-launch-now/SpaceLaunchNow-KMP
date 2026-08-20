@@ -1,6 +1,6 @@
 # Feature Spec: Instrument the Subscription Conversion Funnel
 
-**Branch**: `014-instrument-conversion-funnel` | **Priority**: P0 (Monetization) | **Status**: Draft
+**Branch**: `feat/018-monetization-fixes` | **Priority**: P0 (Monetization) | **Status**: Implemented (code, 2026-08-19); FR-7 funnel view pending one-time console setup — see `quickstart.md`
 
 **Source**: `docs/business/MONETIZATION_TODO.md` → P0. Business-analysis run on live RevenueCat
 data (project `projbe17841f`, trailing 28 days): free→paid conversion ≈ **0.88%** (below the 1–3%
@@ -196,18 +196,21 @@ tracking are unit-tested in `commonTest`:
 
 ## Success Criteria
 
-- [ ] Opening `SupportUsScreen` emits `paywall_viewed` with `source = "support_us"` exactly once.
-- [ ] Tapping each tier emits `paywall_tier_selected` with the correct `tier` + `product_id` before
+- [x] Opening `SupportUsScreen` emits `paywall_viewed` with `source = "support_us"` exactly once.
+- [x] Tapping each tier emits `paywall_tier_selected` with the correct `tier` + `product_id` before
       the purchase sheet launches.
-- [ ] A failed/cancelled purchase emits `purchase_failed` with a coarse, non-PII `reason`;
-      cancellation is distinguishable from payment/network failure.
-- [ ] A successful purchase emits `purchase_completed` carrying non-zero `revenue`.
-- [ ] All funnel events carry `subscription_type`, `is_trial`, `active_entitlements`, `platform`.
-- [ ] Each funnel step is visible in **both** Firebase Analytics and Datadog.
-- [ ] A saved funnel view exists in the analytics backend, filtered to `source = "support_us"` and
-      segmentable by the FR-4 dimensions.
-- [ ] `commonTest` covers the new events and the ViewModel funnel sequence; all platforms build;
-      existing analytics + Datadog RUM unaffected.
+- [x] A failed/cancelled purchase emits `purchase_failed` with a coarse, non-PII classification —
+      shipped via spec 018 as `step` + `error_code` (`user_cancelled` vs RevenueCat error-code
+      names), a superset of the `reason` param specified here; cancellation is distinguishable.
+- [x] A successful purchase emits `purchase_completed` carrying non-zero `revenue` (shipped in 018).
+- [x] All funnel events carry `subscription_type`, `is_trial`, `active_entitlements`, `platform`
+      (as params, and mirrored as Firebase user properties per Q1's recommended approach).
+- [x] Each funnel step reaches **both** Firebase Analytics and Datadog in code
+      (`SubscriptionViewModel.trackFunnelStep`); device-level verification in DebugView/Datadog pending.
+- [ ] A saved funnel view exists in the analytics backend — one-time manual console setup,
+      instructions in `quickstart.md` (GA4 explorations cannot be created via API).
+- [x] `commonTest` covers the new events and the ViewModel funnel sequence; Android + desktop build
+      verified (iOS compile happens on macOS); existing analytics + Datadog RUM untouched.
 
 ## Open Questions
 

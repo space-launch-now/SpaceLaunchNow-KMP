@@ -36,6 +36,8 @@ class MockBillingManager : BillingManager {
     var shouldRefreshFail = false
     var shouldGetProductsFail = false
     var shouldLaunchPurchaseFail = false
+    /** When set (and [shouldLaunchPurchaseFail] is true), the failure returned by launchPurchaseFlow. */
+    var purchaseFailureException: Exception? = null
     var shouldRestorePurchasesFail = false
     
     var mockProducts = listOf(
@@ -90,9 +92,9 @@ class MockBillingManager : BillingManager {
         launchPurchaseFlowCalled = true
         lastProductIdPurchased = productId
         lastBasePlanIdPurchased = basePlanId
-        
+
         return if (shouldLaunchPurchaseFail) {
-            Result.failure(Exception("Mock purchase failed"))
+            Result.failure(purchaseFailureException ?: Exception("Mock purchase failed"))
         } else {
             // Simulate successful purchase
             _purchaseState.value = PurchaseState(
@@ -145,6 +147,7 @@ class MockBillingManager : BillingManager {
         shouldRefreshFail = false
         shouldGetProductsFail = false
         shouldLaunchPurchaseFail = false
+        purchaseFailureException = null
         shouldRestorePurchasesFail = false
         _isInitialized.value = false
         _purchaseState.value = PurchaseState()

@@ -3,8 +3,6 @@ package me.calebjones.spacelaunchnow
 import androidx.compose.runtime.compositionLocalOf
 import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
-import app.lexilabs.basic.ads.InterstitialAdHandler
-import app.lexilabs.basic.ads.RewardedAdHandler
 
 /**
  * CompositionLocal to provide preloaded banner ads throughout the app (Android)
@@ -49,14 +47,3 @@ val LocalPreloadedFullBannerAd =
 @OptIn(DependsOnGoogleMobileAds::class)
 val LocalPreloadedFluidAd =
     compositionLocalOf<BannerAdHandler?> { null }
-
-/**
- * CompositionLocal to provide preloaded interstitial and rewarded ads throughout the app
- */
-@OptIn(DependsOnGoogleMobileAds::class)
-val LocalPreloadedInterstitialAd =
-    compositionLocalOf<InterstitialAdHandler?> { null }
-
-@OptIn(DependsOnGoogleMobileAds::class)
-val LocalPreloadedRewardedAd =
-    compositionLocalOf<RewardedAdHandler?> { null }

@@ -1,15 +1,21 @@
 package me.calebjones.spacelaunchnow.ui.viewmodel
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.calebjones.spacelaunchnow.analytics.FakeAnalyticsProvider
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.billing.MockBillingManager
+import me.calebjones.spacelaunchnow.data.billing.PurchaseFlowException
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.MockSubscriptionRepository
@@ -398,5 +404,163 @@ class SubscriptionViewModelTest {
         val hasFeature = viewModel.hasFeature(me.calebjones.spacelaunchnow.data.model.PremiumFeature.CUSTOM_THEMES)
         // Just verify it returns a boolean (actual value depends on mock state)
         assertTrue(hasFeature is Boolean)
+    }
+
+    // ========================================
+    // Purchase Analytics Tests (spec 018 US1)
+    // ========================================
+
+    private fun analyticsWith(fake: FakeAnalyticsProvider): AnalyticsManager =
+        AnalyticsManagerImpl(listOf(fake), scope = CoroutineScope(SupervisorJob() + testDispatcher))
+
+    @Test
+    fun `purchase completed event carries revenue derived from price micros`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct(
+            ProductInfo(
+                productId = "yearly_sub",
+                basePlanId = "yearly-base",
+                title = "Yearly",
+                description = "Annual subscription",
+                formattedPrice = "$39.99",
+                priceAmountMicros = 39990000L,
+                currencyCode = "USD"
+            )
+        )
+        advanceUntilIdle()
+
+        val completed = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseCompleted>().single()
+        assertEquals("yearly_sub", completed.productId)
+        assertNotNull(completed.revenue)
+        assertEquals(39.99, completed.revenue!!, 0.0001)
+    }
+
+    @Test
+    fun `user cancellation tracks purchase_failed with user_cancelled`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        billingManager.shouldLaunchPurchaseFail = true
+        billingManager.purchaseFailureException = PurchaseFlowException(
+            step = "store_purchase",
+            errorCode = "user_cancelled",
+            userCancelled = true,
+            message = "Purchase was cancelled."
+        )
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base")
+        advanceUntilIdle()
+
+        val failed = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().single()
+        assertEquals("yearly_sub", failed.productId)
+        assertEquals("store_purchase", failed.step)
+        assertEquals("user_cancelled", failed.errorCode)
+    }
+
+    @Test
+    fun `store error tracks purchase_failed with the error code name`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        billingManager.shouldLaunchPurchaseFail = true
+        billingManager.purchaseFailureException = PurchaseFlowException(
+            step = "store_purchase",
+            errorCode = "NetworkError",
+            userCancelled = false,
+            message = "Error performing request."
+        )
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base")
+        advanceUntilIdle()
+
+        val failed = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().single()
+        assertEquals("NetworkError", failed.errorCode)
+        assertEquals("store_purchase", failed.step)
+    }
+
+    @Test
+    fun `untyped failure tracks purchase_failed with unknown code`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        billingManager.shouldLaunchPurchaseFail = true
+        billingManager.purchaseFailureException = null // mock falls back to plain Exception
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base")
+        advanceUntilIdle()
+
+        val failed = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().single()
+        assertEquals("unknown", failed.errorCode)
+        assertEquals("unknown", failed.step)
+    }
+
+    @Test
+    fun `successful purchase does not track purchase_failed`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base")
+        advanceUntilIdle()
+
+        assertTrue(fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().isEmpty())
+    }
+
+    // ========================================
+    // Conversion Funnel Tests (spec 014)
+    // ========================================
+
+    @Test
+    fun `trackTierSelected emits paywall_tier_selected with dimensions`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.trackTierSelected(ProductType.ANNUAL, "yearly_sub")
+        advanceUntilIdle()
+
+        val event = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PaywallTierSelected>().single()
+        assertEquals("annual", event.tier)
+        assertEquals("yearly_sub", event.productId)
+        assertEquals("support_us", event.source)
+        assertNotNull(event.dimensions)
+        assertEquals("desktop", event.dimensions!!.platform) // tests run on the desktop JVM target
+    }
+
+    @Test
+    fun `trackPaywallViewed carries dimensions`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.trackPaywallViewed("support_us")
+        advanceUntilIdle()
+
+        val event = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PaywallViewed>().single()
+        assertEquals("support_us", event.source)
+        assertNotNull(event.dimensions)
+    }
+
+    @Test
+    fun `purchase outcome events carry dimensions`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        billingManager.shouldLaunchPurchaseFail = true
+        billingManager.purchaseFailureException =
+            PurchaseFlowException("store_purchase", "user_cancelled", true, "cancelled")
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base")
+        advanceUntilIdle()
+
+        assertNotNull(fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseStarted>().single().dimensions)
+        assertNotNull(fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().single().dimensions)
+    }
+
+    @Test
+    fun `subscription state changes push funnel user properties`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+        advanceUntilIdle()
+
+        assertEquals("free", fake.userProperties["subscription_type"])
+        assertEquals("false", fake.userProperties["is_trial"])
+        assertNotNull(fake.userProperties["active_entitlements"])
+        assertEquals("desktop", fake.userProperties["platform"])
     }
 }

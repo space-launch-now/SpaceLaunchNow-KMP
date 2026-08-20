@@ -30,6 +30,8 @@ class AnalyticsEventTest {
     @Test fun `PurchaseStarted has correct name`() = assertEquals("purchase_started", AnalyticsEvent.PurchaseStarted("prod_1").name)
     @Test fun `PurchaseCompleted has correct name`() = assertEquals("purchase_completed", AnalyticsEvent.PurchaseCompleted("prod_1").name)
     @Test fun `PurchaseRestored has correct name`() = assertEquals("purchase_restored", AnalyticsEvent.PurchaseRestored(true).name)
+    @Test fun `PurchaseFailed has correct name`() = assertEquals("purchase_failed", AnalyticsEvent.PurchaseFailed("prod_1", "store_purchase", "user_cancelled").name)
+    @Test fun `NotificationShown has correct name`() = assertEquals("notification_shown", AnalyticsEvent.NotificationShown("launch").name)
     @Test fun `NotificationReceived has correct name`() = assertEquals("notification_received", AnalyticsEvent.NotificationReceived("launch").name)
     @Test fun `NotificationTapped has correct name`() = assertEquals("notification_tapped", AnalyticsEvent.NotificationTapped("launch").name)
     @Test fun `NotificationSettingChanged has correct name`() = assertEquals("notification_setting_changed", AnalyticsEvent.NotificationSettingChanged("launch", true).name)
@@ -42,6 +44,58 @@ class AnalyticsEventTest {
     @Test fun `ScreenViewed has correct name`() = assertEquals("screen_view", AnalyticsEvent.ScreenViewed("Home").name)
 
     // ── toParameters ─────────────────────────────────────────────────────────
+
+    @Test
+    fun `PurchaseFailed exposes step and error code params`() {
+        val params = AnalyticsEvent.PurchaseFailed("yearly_sub", "store_purchase", "NetworkError").toParameters()
+        assertEquals("yearly_sub", params["product_id"])
+        assertEquals("store_purchase", params["step"])
+        assertEquals("NetworkError", params["error_code"])
+    }
+
+    @Test fun `PaywallTierSelected has correct name`() =
+        assertEquals("paywall_tier_selected", AnalyticsEvent.PaywallTierSelected("annual", "prod_1", "support_us").name)
+
+    @Test
+    fun `PaywallTierSelected exposes tier product and source params`() {
+        val params = AnalyticsEvent.PaywallTierSelected("annual", "yearly_sub", "support_us").toParameters()
+        assertEquals("annual", params["tier"])
+        assertEquals("yearly_sub", params["product_id"])
+        assertEquals("support_us", params["source"])
+        assertFalse(params.containsKey("subscription_type"))
+    }
+
+    @Test
+    fun `funnel dimensions merge into event params when present`() {
+        val dims = AnalyticsEvent.FunnelDimensions(
+            subscriptionType = "free", isTrial = false,
+            activeEntitlements = "", platform = "android"
+        )
+        val params = AnalyticsEvent.PaywallViewed("support_us", dims).toParameters()
+        assertEquals("support_us", params["source"])
+        assertEquals("free", params["subscription_type"])
+        assertEquals(false, params["is_trial"])
+        assertEquals("", params["active_entitlements"])
+        assertEquals("android", params["platform"])
+    }
+
+    @Test
+    fun `purchase events carry dimensions when provided`() {
+        val dims = AnalyticsEvent.FunnelDimensions("premium", true, "premium", "ios")
+        assertEquals("premium", AnalyticsEvent.PurchaseCompleted("p", 39.99, dims).toParameters()["subscription_type"])
+        assertEquals("ios", AnalyticsEvent.PurchaseFailed("p", "store_purchase", "NetworkError", dims).toParameters()["platform"])
+        assertEquals(true, AnalyticsEvent.PurchaseRestored(true, dims).toParameters()["is_trial"])
+        assertEquals("premium", AnalyticsEvent.PurchaseStarted("p", dims).toParameters()["active_entitlements"])
+    }
+
+    @Test
+    fun `NotificationShown includes platform only when set`() {
+        assertEquals(mapOf<String, Any>("type" to "launch"), AnalyticsEvent.NotificationShown("launch").toParameters())
+        assertEquals(
+            mapOf<String, Any>("type" to "launch", "platform" to "android"),
+            AnalyticsEvent.NotificationShown("launch", "android").toParameters()
+        )
+    }
 
     @Test
     fun `LaunchViewed toParameters contains launch_id and launch_name`() {

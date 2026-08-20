@@ -106,6 +106,11 @@ fun SupportUsScreen(
     val annualProduct = viewModel.getProductByType(ProductType.ANNUAL)
     val monthlyProduct = viewModel.getProductByType(ProductType.MONTHLY)
 
+    // Funnel top (spec 014 FR-1): once per presentation, mirroring OnboardingPaywallScreen.
+    LaunchedEffect(Unit) {
+        viewModel.trackPaywallViewed("support_us")
+    }
+
     // Determine user status for different upgrade flows
     val subscriptionRepo = koinInject<SubscriptionRepository>()
     val fullSubscriptionState by subscriptionRepo.state.collectAsState()
@@ -310,6 +315,7 @@ fun SupportUsScreen(
                         isProcessing = uiState.isProcessing,
                         onSubscribe = {
                             if (annualProduct != null) {
+                                viewModel.trackTierSelected(ProductType.ANNUAL, annualProduct.productId)
                                 viewModel.purchaseProduct(annualProduct)
                             }
                         },
@@ -333,6 +339,7 @@ fun SupportUsScreen(
                         isProcessing = uiState.isProcessing,
                         onSubscribe = {
                             if (monthlyProduct != null) {
+                                viewModel.trackTierSelected(ProductType.MONTHLY, monthlyProduct.productId)
                                 viewModel.purchaseProduct(monthlyProduct)
                             }
                         },
@@ -369,6 +376,7 @@ fun SupportUsScreen(
                         isProcessing = uiState.isProcessing,
                         onPurchase = {
                             if (lifetimeProduct != null) {
+                                viewModel.trackTierSelected(ProductType.LIFETIME, lifetimeProduct.productId)
                                 viewModel.purchaseProduct(lifetimeProduct)
                             }
                         },

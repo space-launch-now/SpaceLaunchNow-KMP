@@ -1,4 +1,5 @@
 import ComposeApp
+import FirebaseAnalytics
 import FirebaseCore
 import FirebaseCrashlytics
 import FirebaseMessaging
@@ -566,11 +567,23 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             trigger: nil  // Show immediately
         )
 
+        // Spec 018 US5: notification_shown is the CTR denominator — fired only when the
+        // notification was actually posted. Name + params match the Kotlin AnalyticsEvent.
+        // Limitation: alert-type pushes rendered by the NotificationServiceExtension do not
+        // pass through here; the data-only → local-schedule path is the primary iOS path.
+        let shownType = (content.userInfo["notification_type"] as? String) ?? "unknown"
+
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("❌ Failed to display notification: \(error)")
             } else {
                 print("✅ Notification displayed successfully")
+                Analytics.logEvent(
+                    "notification_shown",
+                    parameters: [
+                        "type": shownType,
+                        "platform": "ios",
+                    ])
             }
         }
     }
@@ -775,6 +788,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Deep Linking
 
     private func handleNotificationTap(userInfo: [AnyHashable: Any]) {
+        // Spec 018 US5: notification_tapped had zero call sites — GA4 showed 0 rows in
+        // 7 months. Kept in this single funnel so both the tap delegate and the
+        // cold-start pending-tap path are counted. Matches the Kotlin AnalyticsEvent.
+        let tapType = (userInfo["notification_type"] as? String) ?? "unknown"
+        var tapParams: [String: Any] = ["type": tapType]
+        if let launchId = (userInfo["launch_uuid"] as? String) ?? (userInfo["launch_id"] as? String) {
+            tapParams["launch_id"] = launchId
+        }
+        Analytics.logEvent("notification_tapped", parameters: tapParams)
+
         // Custom admin notification: route by target_type.
         if isCustomNotification(userInfo) {
             handleCustomNotificationTap(userInfo: userInfo)

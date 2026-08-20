@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -68,10 +69,26 @@ fun TemporaryPremiumCard(
         )
     }
     var showRewardedAd by remember { mutableStateOf(false) }
+    var adShowing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val log = SpaceLogger.getLogger("TemporaryPremiumCard")
     val analyticsManager = koinInject<AnalyticsManager>()
     var wasExtensionAtClick by remember { mutableStateOf(false) }
+
+    // Give up if the on-demand ad hasn't resolved within 30s so the button
+    // doesn't spin forever (covers SDK hangs that never reach FAILING).
+    LaunchedEffect(showRewardedAd) {
+        if (showRewardedAd) {
+            delay(30_000)
+            if (showRewardedAd && !adShowing) {
+                log.w { "Rewarded ad load timed out" }
+                analyticsManager.track(
+                    AnalyticsEvent.RewardedAdFailed(source = source, error = "timeout")
+                )
+                showRewardedAd = false
+            }
+        }
+    }
 
     // Check temporary access status for all features
     LaunchedEffect(features) {
@@ -195,18 +212,28 @@ fun TemporaryPremiumCard(
                         )
                         showRewardedAd = true
                     },
+                    enabled = !showRewardedAd,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Extend All Access (+24h)",
-                        color = MaterialTheme.colorScheme.onTertiaryFixedVariant
-                    )
+                    if (showRewardedAd) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Loading ad…")
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Extend All Access (+24h)",
+                            color = MaterialTheme.colorScheme.onTertiaryFixedVariant
+                        )
+                    }
                 }
             } else {
                 // User doesn't have temporary access - show option to get it
@@ -221,15 +248,25 @@ fun TemporaryPremiumCard(
                         )
                         showRewardedAd = true
                     },
+                    enabled = !showRewardedAd,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Watch Ad for 24h Premium Access")
+                    if (showRewardedAd) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Loading ad…")
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Watch Ad for 24h Premium Access")
+                    }
                 }
             }
         }
@@ -257,9 +294,11 @@ fun TemporaryPremiumCard(
                     }
                     temporaryAccess = accessMap
                 }
+                adShowing = false
                 showRewardedAd = false
             },
             onAdShown = {
+                adShowing = true
                 analyticsManager.track(AnalyticsEvent.RewardedAdShown(source = source))
                 coroutineScope.launch {
                     temporaryPremiumAccess.incrementAdsShownTotal()
@@ -271,6 +310,12 @@ fun TemporaryPremiumCard(
                     AnalyticsEvent.RewardedAdFailed(source = source, error = error)
                 )
                 log.e { "❌ Failed to show rewarded ad: $error" }
+                adShowing = false
+                showRewardedAd = false
+            },
+            onAdDismissed = {
+                log.i { "Rewarded ad dismissed before reward" }
+                adShowing = false
                 showRewardedAd = false
             }
         )

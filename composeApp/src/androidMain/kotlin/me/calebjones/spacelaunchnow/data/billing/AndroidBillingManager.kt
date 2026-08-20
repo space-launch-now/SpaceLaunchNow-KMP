@@ -10,6 +10,8 @@ import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.models.CustomerInfo
 import com.revenuecat.purchases.kmp.models.PeriodType
 import com.revenuecat.purchases.kmp.models.PurchasesError
+import com.revenuecat.purchases.kmp.models.PurchasesException
+import com.revenuecat.purchases.kmp.models.PurchasesTransactionException
 import com.revenuecat.purchases.kmp.models.StoreProduct
 import com.revenuecat.purchases.kmp.models.StoreTransaction
 import com.revenuecat.purchases.kmp.models.freePhase
@@ -221,6 +223,30 @@ class AndroidBillingManager(
             log.i { "Purchase completed - productId: $productId, basePlanId: ${basePlanId ?: "default"}" }
 
             Result.success(Unit)
+        } catch (e: PurchasesTransactionException) {
+            // Wrap into the platform-neutral exception so commonMain can attribute
+            // the failure (purchase_failed analytics, spec 018 FR-1.1).
+            log.e(e) { "Purchase failed - productId: $productId (userCancelled=${e.userCancelled})" }
+            Result.failure(
+                PurchaseFlowException(
+                    step = "store_purchase",
+                    errorCode = if (e.userCancelled) "user_cancelled" else e.code.name,
+                    userCancelled = e.userCancelled,
+                    message = e.message,
+                    cause = e
+                )
+            )
+        } catch (e: PurchasesException) {
+            log.e(e) { "Purchase setup failed - productId: $productId (${e.code.name})" }
+            Result.failure(
+                PurchaseFlowException(
+                    step = "setup",
+                    errorCode = e.code.name,
+                    userCancelled = false,
+                    message = e.message,
+                    cause = e
+                )
+            )
         } catch (e: Exception) {
             log.e(e) { "Purchase failed - productId: $productId" }
             Result.failure(e)

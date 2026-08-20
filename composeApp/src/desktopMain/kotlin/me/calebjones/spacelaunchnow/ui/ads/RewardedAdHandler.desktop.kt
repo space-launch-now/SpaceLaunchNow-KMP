@@ -14,7 +14,8 @@ actual fun RewardedAdHandler(
     shouldShow: Boolean,
     onRewardEarned: ((rewardAmount: Int, rewardType: String) -> Unit)?,
     onAdShown: (() -> Unit)?,
-    onAdFailed: ((String) -> Unit)?
+    onAdFailed: ((String) -> Unit)?,
+    onAdDismissed: (() -> Unit)?
 ) {
     // No-op: Desktop doesn't show ads
     if (shouldShow) {
