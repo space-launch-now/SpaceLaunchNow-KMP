@@ -733,9 +733,9 @@ private fun NotificationsTabContent(
                                 )
                                 Text(
                                     text = if (debugSettings.useDebugTopics) {
-                                        "Subscribed to: debug_v5_${platform.name.lowercase()}"
+                                        "Subscribed to: v6_debug_* topics"
                                     } else {
-                                        "Subscribed to: prod_v5_${platform.name.lowercase()}"
+                                        "Subscribed to: v6_prod_* topics"
                                     },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant

@@ -131,8 +131,23 @@ class DebugSettingsViewModel(
             try {
                 _isLoading.value = true
                 debugPreferences.setUseDebugTopics(useDebug)
-                val topicType = if (useDebug) "debug_v5" else "prod_v5"
-                _statusMessage.value = "Switched to $topicType topics (platform-specific)"
+
+                // The env ("prod"/"debug") is baked into every v6_* topic name, so this
+                // toggle amounts to a full resubscribe — run it now, not at next app start.
+                // This switch is how a staging device reaches the v6_debug_* topics at all.
+                val env = if (useDebug) "v6_debug" else "v6_prod"
+                val result = notificationRepository?.reconcileSubscriptions()
+                _statusMessage.value = when {
+                    result == null || result.skipped ->
+                        "Switched to ${env}_* topics (no reconcile on this platform)"
+
+                    result.failed > 0 ->
+                        "Switched to ${env}_* topics, but ${result.failed} of " +
+                            "${result.attempted} topic changes failed — will retry on next reconcile"
+
+                    else ->
+                        "Switched to ${env}_* topics (${result.attempted} subscriptions reconciled)"
+                }
             } catch (e: Exception) {
                 _statusMessage.value = "Failed to update topics: ${e.message}"
             } finally {

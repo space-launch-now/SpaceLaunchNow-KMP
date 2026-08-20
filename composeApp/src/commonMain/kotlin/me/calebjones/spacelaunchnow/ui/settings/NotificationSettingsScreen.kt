@@ -701,25 +701,10 @@ fun NotificationSettingsScreen(
                 }
             }
 
-            item {
-                val isSaving by viewModel.isSavingNotifications.collectAsStateWithLifecycle()
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = viewModel::saveNotificationSettings,
-                    enabled = !isSaving
-                ) {
-                    Text(if (isSaving) "Applying…" else "Save & apply")
-                }
-                Text(
-                    text = "Changes take effect when you save. If you leave without saving, they are applied automatically the next time the app starts.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
         }
     }
 }
+
 
 @Composable
 private fun AgencyCheckboxItem(
