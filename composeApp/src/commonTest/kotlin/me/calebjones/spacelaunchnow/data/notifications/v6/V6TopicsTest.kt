@@ -70,6 +70,36 @@ class V6TopicsTest {
     }
 
     @Test
+    fun muteStarlinkEmitsTheOptOutTopic() {
+        val state = baseState().copy(muteStarlink = true)
+        assertEquals(
+            setOf("v6_prod_ios_flex_tenMinutes", "v6_prod_spacex", "v6_prod_florida", "v6_prod_starlinkMuted"),
+            V6Topics.requiredTopics(state, "prod", "ios"),
+        )
+    }
+
+    @Test
+    fun muteStarlinkAppliesUnderFollowAllToo() {
+        // Follow-all receives every launch, so the mute matters there most.
+        val state = baseState().copy(followAllLaunches = true, muteStarlink = true)
+        assertEquals(
+            setOf("v6_prod_ios_all_tenMinutes", "v6_prod_starlinkMuted"),
+            V6Topics.requiredTopics(state, "prod", "ios"),
+        )
+    }
+
+    @Test
+    fun muteStarlinkOffEmitsNoOptOutTopic() {
+        assertTrue(V6Topics.requiredTopics(baseState(), "prod", "ios").none { it.contains("starlinkMuted") })
+    }
+
+    @Test
+    fun muteStarlinkTopicIsEnvScopedAndNotPlatformScoped() {
+        val state = baseState().copy(muteStarlink = true)
+        assertTrue("v6_debug_starlinkMuted" in V6Topics.requiredTopics(state, "debug", "android"))
+    }
+
+    @Test
     fun webcastOnlyIsAClassSuffixNotATypeTopic() {
         val state = baseState().copy(
             topicSettings = baseState().topicSettings + ("webcastOnly" to true)

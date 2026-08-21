@@ -202,6 +202,13 @@ class NotificationRepositoryImpl(
         autoReconcile.request()
     }
 
+    override suspend fun setMuteStarlink(enabled: Boolean) {
+        updateState { currentState ->
+            currentState.copy(muteStarlink = enabled)
+        }
+        autoReconcile.request()
+    }
+
     override suspend fun setAgencyEnabled(agency: NotificationAgency, enabled: Boolean) {
         updateState { currentState ->
             currentState.withAgencyEnabled(agency, enabled)

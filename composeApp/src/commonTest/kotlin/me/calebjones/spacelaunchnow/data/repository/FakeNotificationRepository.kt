@@ -30,6 +30,8 @@ class FakeNotificationRepository : NotificationRepository {
 
     override suspend fun setUseStrictMatching(enabled: Boolean) {}
 
+    override suspend fun setMuteStarlink(enabled: Boolean) {}
+
     override suspend fun setTopicEnabled(topic: NotificationTopic, enabled: Boolean) {}
 
     override suspend fun setAgencyEnabled(agency: NotificationAgency, enabled: Boolean) {}
