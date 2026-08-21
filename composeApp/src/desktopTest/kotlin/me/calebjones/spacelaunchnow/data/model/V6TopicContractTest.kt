@@ -173,4 +173,33 @@ class V6TopicContractTest {
             )
         }
     }
+
+    // ----------------------------------------------------------- mute groups
+
+    @Test
+    fun `the starlink mute topic the client emits is a contract mute group`() {
+        val muteGroups = contract["muteGroups"]!!.jsonObject["values"]!!.jsonArray
+            .map { it.jsonObject["group"]!!.jsonPrimitive.content }
+        assertTrue("starlinkMuted" in muteGroups, "Client subscribes to starlinkMuted; contract must list it")
+
+        // The emitted topic follows the attribute grammar: v6_{env}_{group},
+        // env-scoped and NOT platform-scoped.
+        val state = NotificationState(muteStarlink = true)
+        val topics = me.calebjones.spacelaunchnow.data.notifications.v6.V6Topics
+            .requiredTopics(state, env = "prod", platform = "ios")
+        assertTrue("v6_prod_starlinkMuted" in topics)
+    }
+
+    @Test
+    fun `the failure exemption the ui copy promises is pinned by the contract`() {
+        // The toggle's supporting text says "You'll still be notified if a
+        // Starlink launch fails." — that promise lives in the contract's
+        // exemptTypes. If this test fails, the copy and the contract have
+        // drifted and one of them is lying to users.
+        val starlink = contract["muteGroups"]!!.jsonObject["values"]!!.jsonArray
+            .map { it.jsonObject }
+            .single { it["group"]!!.jsonPrimitive.content == "starlinkMuted" }
+        val exempt = starlink["exemptTypes"]!!.jsonArray.map { it.jsonPrimitive.content }
+        assertEquals(listOf("failure", "partial_failure"), exempt)
+    }
 }

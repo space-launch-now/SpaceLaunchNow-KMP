@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -435,6 +436,46 @@ fun NotificationSettingsScreen(
                                 if (agencyPair.size == 1) {
                                     Spacer(modifier = Modifier.weight(1f))
                                 }
+                            }
+                        }
+
+                        // Starlink mute — shown while a Starlink launch can reach
+                        // this device: SpaceX followed, or follow-all (which
+                        // receives every launch). Server-enforced via the v6
+                        // starlinkMuted opt-out topic; failures still notify.
+                        val spaceXFollowed = uiState.notificationSettings.followAllLaunches ||
+                            uiState.notificationSettings.subscribedAgencies.contains(
+                                NotificationAgency.SPACEX.id.toString()
+                            )
+                        if (spaceXFollowed) {
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = "Mute Starlink launches",
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                        Spacer(Modifier.width(4.dp))
+                                        if (!uiState.hasNotificationCustomization) {
+                                            PremiumBadge()
+                                        }
+                                    }
+                                    Text(
+                                        text = "You'll still be notified if a Starlink launch fails.",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = uiState.notificationSettings.muteStarlink,
+                                    onCheckedChange = { viewModel.toggleMuteStarlink() },
+                                    enabled = uiState.hasNotificationCustomization
+                                )
                             }
                         }
                     }

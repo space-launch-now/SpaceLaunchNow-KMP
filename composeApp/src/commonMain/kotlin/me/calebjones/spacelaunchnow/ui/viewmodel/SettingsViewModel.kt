@@ -243,6 +243,23 @@ class SettingsViewModel(
             notificationRepository.setTopicEnabled(topic, enabled)
         }
     }
+
+    /**
+     * Mute routine Starlink launch notifications (failure sends still deliver —
+     * enforced server-side via the v6 starlinkMuted opt-out topic).
+     * Premium-gated like the other notification customization toggles.
+     */
+    fun toggleMuteStarlink() {
+        if (!_hasNotificationCustomization.value) return
+        val enabled = !uiState.value.notificationSettings.muteStarlink
+        analyticsManager.track(
+            AnalyticsEvent.NotificationSettingChanged(type = "starlink_mute", enabled = enabled)
+        )
+        analyticsManager.setUserProperty("starlink_muted", enabled.toString())
+        viewModelScope.launch {
+            notificationRepository.setMuteStarlink(enabled)
+        }
+    }
     
     // Snackbar message management
     fun clearSnackbarMessage() {

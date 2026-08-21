@@ -12,6 +12,12 @@ data class NotificationState(
     val useStrictMatching: Boolean = false,
     val hideTbdLaunches: Boolean = false,
 
+    // Mute routine Starlink launch notifications. Server-enforced via the
+    // v6 starlinkMuted opt-out topic (see contracts/notification-topics.v6.json):
+    // muted devices still receive failure/partial_failure sends — the UI copy
+    // promises that, so keep it in sync with the contract's exemptTypes.
+    val muteStarlink: Boolean = false,
+
     // Topic settings (user-configurable notification timing)
     val topicSettings: Map<String, Boolean> = NotificationTopic.getDefaultTopicSettings(),
 

@@ -78,6 +78,14 @@ object V6Topics {
             if (state.isTopicEnabled(topic)) topics += "v6_${env}_${platform}_${token}"
         }
 
+        // Opt-OUT topic: subscribing EXCLUDES this device from routine Starlink
+        // sends (the server negates it in the condition; failure types are
+        // exempt). Independent of audience class on purpose — follow-all
+        // receives every launch and needs the mute most.
+        if (state.muteStarlink) {
+            topics += "v6_${env}_starlinkMuted"
+        }
+
         return topics
     }
 }

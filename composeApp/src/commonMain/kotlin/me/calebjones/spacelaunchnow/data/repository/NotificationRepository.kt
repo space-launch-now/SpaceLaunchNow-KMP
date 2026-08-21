@@ -19,6 +19,7 @@ interface NotificationRepository {
     suspend fun setNotificationsEnabled(enabled: Boolean)
     suspend fun setFollowAllLaunches(enabled: Boolean)
     suspend fun setUseStrictMatching(enabled: Boolean)
+    suspend fun setMuteStarlink(enabled: Boolean)
     suspend fun setTopicEnabled(topic: NotificationTopic, enabled: Boolean)
     suspend fun setAgencyEnabled(agency: NotificationAgency, enabled: Boolean)
     suspend fun setAgencyEnabled(topicName: String, enabled: Boolean)

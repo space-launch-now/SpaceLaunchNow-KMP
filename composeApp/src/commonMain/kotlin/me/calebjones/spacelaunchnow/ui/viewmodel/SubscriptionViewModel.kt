@@ -97,22 +97,9 @@ class SubscriptionViewModel(
             loadAvailableProducts()
         }
 
-        // Mirror funnel dimensions to Firebase user properties so ALL events are
-        // segmentable, not just funnel steps (spec 014 FR-4, Q1 recommended approach).
-        analyticsManager.setUserProperty("platform", platformName())
-        viewModelScope.launch {
-            subscriptionState.collect { state ->
-                analyticsManager.setUserProperty(
-                    "subscription_type",
-                    state.subscriptionType.name.lowercase()
-                )
-                analyticsManager.setUserProperty("is_trial", state.isInTrialPeriod.toString())
-                analyticsManager.setUserProperty(
-                    "active_entitlements",
-                    billingManager.getActiveEntitlements().sorted().joinToString(",")
-                )
-            }
-        }
+        // User-property mirroring of these dimensions lives in
+        // FunnelUserPropertySyncer (app-scoped), NOT here: a viewModelScope
+        // collector would duplicate per VM instance and leak across unit tests.
     }
 
     /**
