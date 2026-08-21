@@ -1,3 +1,17 @@
+# [5.41.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.40.0...v5.41.0) (2026-08-21)
+
+
+### Bug Fixes
+
+* **analytics:** move funnel user-property sync to an app-scoped syncer ([b37c4cf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b37c4cf7ec58925f05e43625225b4a73e1b59280))
+
+
+### Features
+
+* **notifications:** add Starlink mute toggle backed by the v6 starlinkMuted topic ([686ca1f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/686ca1f64dd6ec7de619fb62546c11fabd1abef6))
+
+
+
 # [5.40.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.39.0...v5.40.0) (2026-08-20)
 
 
@@ -63,27 +77,6 @@
 ### Bug Fixes
 
 * **deps:** update purchases-kmp to 3.3.0 for Play Billing 8 ([5230a55](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5230a557e9e0711de593e78b961382e863d07de8))
-
-
-
-# [5.37.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.36.0...v5.37.0) (2026-07-22)
-
-
-### Bug Fixes
-
-* **logging:** gate push summary direct upload on active diagnostics consent ([1dafbb1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1dafbb130bc7800ba7e31289ecfc8638b87a0867))
-
-
-### Features
-
-* **logging:** add FCM/push health rows to diagnostics report ([b05d300](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b05d3008e44b3c449e1bffde0b87a1940fba45f6))
-* **logging:** add Play Services availability expect/actual ([d473bec](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d473becc12c365180fc296b5cb94d8c62b44295a))
-* **logging:** add PushDiagnostics runtime snapshot with summary and report builders ([8fab850](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8fab850140e7fb1dc30a4ebe73d4a73ffee0d218))
-* **logging:** add remote diagnostics config parsing and resolver ([17c8744](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/17c874494dccdddfdf72458e4d71488945bcd38c))
-* **logging:** apply remote sample-rate and diagnostic-level overrides ([4a7bcd5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4a7bcd5a5efaa91b444fdfd49b753a916ba8dadf))
-* **logging:** attach rc_user_id to Datadog logs and RUM on both platforms ([bb051cc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb051ccc8fc108187cadeaa35e4009063fa888f5))
-* **logging:** remotely control per-user diagnostics via Firebase Remote Config ([171e400](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/171e40027994f4ca7fee316f5323fcbb24fab35d))
-* **notifications:** make startup push registration observable at info/warn ([d3d7ec1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d3d7ec101826b2adde8776575fda9788f57d7a84))
 
 
 

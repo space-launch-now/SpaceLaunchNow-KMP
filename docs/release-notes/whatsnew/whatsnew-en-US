@@ -1,11 +1,7 @@
 ### Bug Fixes
 
-* **ads:** load rewarded ads on demand instead of dead preloaded handles
-* **test:** derive expected platform from getPlatform in funnel tests
+* **analytics:** move funnel user-property sync to an app-scoped syncer
 
 ### Features
 
-* **analytics:** add paywall_tier_selected and funnel dimensions to conversion events
-* **analytics:** add purchase_failed and notification_shown events
-* **analytics:** attach revenue and failure attribution to purchase flow
-* **analytics:** fire notification_shown and notification_tapped at display and tap time...
+* **notifications:** add Starlink mute toggle backed by the v6 starlinkMuted topic
