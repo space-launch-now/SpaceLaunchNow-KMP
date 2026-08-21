@@ -555,15 +555,7 @@ class SubscriptionViewModelTest {
         assertNotNull(fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().single().dimensions)
     }
 
-    @Test
-    fun `subscription state changes push funnel user properties`() = runTest {
-        val fake = FakeAnalyticsProvider()
-        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
-        advanceUntilIdle()
-
-        assertEquals("free", fake.userProperties["subscription_type"])
-        assertEquals("false", fake.userProperties["is_trial"])
-        assertNotNull(fake.userProperties["active_entitlements"])
-        assertEquals(getPlatform().type.name.lowercase(), fake.userProperties["platform"])
-    }
+    // User-property mirroring is covered by FunnelUserPropertySyncerTest — it
+    // is app-scoped, not a ViewModel concern (a viewModelScope collector leaked
+    // across tests and tripped the Dispatchers.Main concurrency guard).
 }

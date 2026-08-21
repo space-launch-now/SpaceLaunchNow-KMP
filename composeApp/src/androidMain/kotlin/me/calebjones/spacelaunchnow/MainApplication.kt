@@ -207,6 +207,12 @@ class MainApplication : Application() {
                 )
                 log.d { "✅ RevenueCatAttributesSyncer started" }
 
+                // Funnel user properties (spec 014 FR-4): app-scoped mirror of
+                // subscription dimensions into Firebase user properties.
+                getKoin().get<me.calebjones.spacelaunchnow.analytics.FunnelUserPropertySyncer>()
+                    .start(scope = kotlinx.coroutines.GlobalScope, subscriptionStateFlow = repository.state)
+                log.d { "✅ FunnelUserPropertySyncer started" }
+
                 // Step 4c: Forward FCM token to RevenueCat for re-engagement campaigns.
                 try {
                     val pushMessaging =

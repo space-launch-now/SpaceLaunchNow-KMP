@@ -148,6 +148,12 @@ fun startRevenueCatAttributesSyncer() {
             }
         },
     )
+
+    // Funnel user properties (spec 014 FR-4): app-scoped mirror of subscription
+    // dimensions into Firebase user properties. Same lifecycle as the RC syncer,
+    // so the existing Swift call site starts both.
+    koin.get<me.calebjones.spacelaunchnow.analytics.FunnelUserPropertySyncer>()
+        .start(scope = scope, subscriptionStateFlow = repository.state)
 }
 
 /**

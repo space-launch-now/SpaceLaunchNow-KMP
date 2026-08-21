@@ -335,6 +335,15 @@ val appModule = module {
 
     single { AppEnvironmentInfo() }
 
+    // Mirrors conversion-funnel dimensions to Firebase user properties
+    // (spec 014 FR-4). Started at platform startup next to the RC syncer.
+    single {
+        me.calebjones.spacelaunchnow.analytics.FunnelUserPropertySyncer(
+            analyticsManager = get(),
+            billingManager = get()
+        )
+    }
+
     single {
         val tempAccess = get<TemporaryPremiumAccess>()
         val themePrefs = get<ThemePreferences>()
