@@ -23,6 +23,11 @@ struct NSEFilterPreferences {
     let topicEvents: Bool
     let topicFeaturedNews: Bool
     let topicAnnouncements: Bool
+    /// True once this device's V5→V6 changeover has completed: it then receives only
+    /// server-targeted sends and the NSE must not re-filter them (kill switch aside).
+    /// Missing key ⇒ false ⇒ the device is still on the V5 broadcast and the legacy
+    /// filter applies — so the gate can only ever be more permissive than today.
+    let v6ChangeoverComplete: Bool
 
     private static let appGroup = "group.me.spacelaunchnow.spacelaunchnow"
 
@@ -35,6 +40,7 @@ struct NSEFilterPreferences {
         static let topicEvents = "nse_topic_events"
         static let topicFeaturedNews = "nse_topic_featured_news"
         static let topicAnnouncements = "nse_topic_announcements"
+        static let v6ChangeoverComplete = "nse_v6_changeover_complete"
     }
 
     /// Load current preferences from shared App Group UserDefaults.
@@ -77,6 +83,10 @@ struct NSEFilterPreferences {
             ? defaults!.bool(forKey: Keys.topicAnnouncements)
             : true
 
+        // Missing ⇒ false: an unwritten key means the app has not reconciled onto V6 topics
+        // yet (or never ran), so the legacy filter must stay in force.
+        let v6ChangeoverComplete: Bool = defaults?.bool(forKey: Keys.v6ChangeoverComplete) ?? false
+
         return NSEFilterPreferences(
             enableNotifications: enableNotifications,
             followAllLaunches: followAllLaunches,
@@ -85,7 +95,8 @@ struct NSEFilterPreferences {
             subscribedLocations: locations,
             topicEvents: topicEvents,
             topicFeaturedNews: topicFeaturedNews,
-            topicAnnouncements: topicAnnouncements
+            topicAnnouncements: topicAnnouncements,
+            v6ChangeoverComplete: v6ChangeoverComplete
         )
     }
 }

@@ -10,6 +10,8 @@ actual fun platformNotificationDiagnostics(): List<Pair<String, String>> {
     return listOf(
         "App Group available" to snap.appGroupAvailable.toString(),
         "Any key missing" to snap.anyKeyMissing.toString(),
+        // true ⇒ the NSE skips the legacy filter (server-targeted V6 sends); MISSING/false ⇒ it filters.
+        "NSE v6 changeover complete" to present(snap.v6ChangeoverComplete),
         "NSE enableNotifications" to present(snap.enableNotifications),
         "NSE followAllLaunches" to present(snap.followAllLaunches),
         "NSE useStrictMatching" to present(snap.useStrictMatching),

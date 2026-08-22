@@ -57,13 +57,20 @@ private enum NSEBreadcrumb {
 ///
 /// For every mutable-content notification received (including when the app is killed/terminated)
 /// this extension:
-///  1. Parses the payload as V5NotificationData.
-///  2. Loads filter preferences from shared App Group UserDefaults (written by NSEPreferenceBridge).
-///  3. Applies NSENotificationFilter to decide allow/block.
-///  4. If blocked: delivers empty content so iOS suppresses visual display.
-///  5. If allowed: enriches content with server-provided title/body and downloads the launch image.
+///  1. Loads preferences from shared App Group UserDefaults (written by NSEPreferenceBridge).
+///  2. If this device has completed its V5→V6 changeover (`nse_v6_changeover_complete`), it only
+///     receives server-targeted sends: the subscription IS the filter, so apart from the kill
+///     switch nothing is re-filtered here — the push is enriched and delivered as-is. A local
+///     agency/location/per-type check can only disagree with the server (it keys on expanded
+///     LL2 IDs, the server on group names) and suppress something the user asked for.
+///  3. Otherwise the device is still on the V5 broadcast of every launch and the legacy path
+///     runs unchanged: NSENotificationFilter for launches, kill switch + per-type toggle for
+///     broadcasts; blocked pushes are delivered as empty content so iOS does not show them.
+///  4. Allowed launches are enriched with the server-provided title/body, the re-alert sound
+///     policy, and the launch image.
 ///
-/// Non-V5 payloads only go through the enableNotifications kill switch.
+/// The Kotlin side of the same gate is `LocalFilterPolicy`; keep the two in step. Both retire
+/// with the V5 broadcast.
 class NotificationService: UNNotificationServiceExtension {
 
     var contentHandler: ((UNNotificationContent) -> Void)?
@@ -91,7 +98,30 @@ class NotificationService: UNNotificationServiceExtension {
             "NSE received: type=\(notificationType, privacy: .public) isV5=\(isV5, privacy: .public) hasEventId=\(userInfo["event_id"] != nil, privacy: .public) hasArticleId=\(userInfo["article_id"] != nil, privacy: .public)"
         )
 
-        // --- V5 notifications ---
+        // --- V6: this device is on server-targeted topics — enrich only ---
+        // Missing key ⇒ false ⇒ the legacy path below; the gate can only ever be more permissive
+        // than today, never less.
+        if preferences.v6ChangeoverComplete {
+            // The only local gate left: cheap defence against a failed unsubscribe. Missing key
+            // reads as enabled (NSEFilterPreferences.load), so this fails open.
+            guard preferences.enableNotifications else {
+                NSELog.filter.log("NSE suppressed (v6): type=\(notificationType, privacy: .public) reason=kill_switch")
+                deliverEmptyNotification(notificationType: notificationType, reason: "kill_switch", contentHandler: contentHandler)
+                return
+            }
+
+            NSELog.filter.log("NSE v6 passthrough: type=\(notificationType, privacy: .public) isV5=\(isV5, privacy: .public)")
+            NSEBreadcrumb.append(notificationType: notificationType, decision: "shown", reason: "v6_passthrough")
+
+            if isV5, let v5Data = V5NotificationData.fromUserInfo(userInfo) {
+                enrichAndDeliver(v5Data, notificationType: notificationType, content: bestAttemptContent, contentHandler: contentHandler)
+            } else {
+                contentHandler(bestAttemptContent)
+            }
+            return
+        }
+
+        // --- Legacy: still on the V5 broadcast, so the client must filter ---
         if isV5,
            let v5Data = V5NotificationData.fromUserInfo(userInfo) {
 
@@ -105,17 +135,8 @@ class NotificationService: UNNotificationServiceExtension {
             NSELog.filter.log("NSE allowed V5 launch: type=\(notificationType, privacy: .public)")
             NSEBreadcrumb.append(notificationType: notificationType, decision: "shown", reason: "v5_launch_allowed")
 
-            // Enrich with server-provided title and body.
-            bestAttemptContent.title = v5Data.title
-            bestAttemptContent.body = v5Data.body
-            NotificationAlertPolicy.applySound(to: bestAttemptContent, notificationType: notificationType)
-
-            // Download and attach launch image if available.
-            if let imageUrlString = v5Data.launchImage,
-               let imageUrl = URL(string: imageUrlString) {
-                downloadAndAttachImage(url: imageUrl, to: bestAttemptContent, contentHandler: contentHandler)
-                return
-            }
+            enrichAndDeliver(v5Data, notificationType: notificationType, content: bestAttemptContent, contentHandler: contentHandler)
+            return
 
         } else {
             // Non-V5 payload (event / news / custom): apply kill switch first.
@@ -148,6 +169,27 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     // MARK: - Private
+
+    /// Enrich a launch notification with the server-provided title/body, the re-alert sound
+    /// policy and (when available) the launch image, then deliver it. Always calls
+    /// `contentHandler` exactly once — on the image path from the download callback.
+    private func enrichAndDeliver(
+        _ v5Data: V5NotificationData,
+        notificationType: String,
+        content: UNMutableNotificationContent,
+        contentHandler: @escaping (UNNotificationContent) -> Void
+    ) {
+        content.title = v5Data.title
+        content.body = v5Data.body
+        NotificationAlertPolicy.applySound(to: content, notificationType: notificationType)
+
+        if let imageUrlString = v5Data.launchImage,
+           let imageUrl = URL(string: imageUrlString) {
+            downloadAndAttachImage(url: imageUrl, to: content, contentHandler: contentHandler)
+            return
+        }
+        contentHandler(content)
+    }
 
     /// Decide whether a non-V5 broadcast-type notification (event / news / custom) is allowed
     /// by its per-type toggle. Mirrors the Kotlin worker's per-type filtering for killed-app
