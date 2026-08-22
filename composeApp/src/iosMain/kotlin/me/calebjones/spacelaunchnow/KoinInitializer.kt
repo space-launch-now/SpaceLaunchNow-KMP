@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow
 
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.notifications.IosPushMessagingBridge
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -165,4 +166,29 @@ fun setRevenueCatPushToken(tokenHex: String) {
     getKoin()
         .get<me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes>()
         .setPushToken(tokenHex)
+}
+
+/**
+ * Called from Swift (`AppDelegate.didRegisterForRemoteNotificationsWithDeviceToken`)
+ * once `Messaging.apnsToken` has been set. Firebase iOS declines every FCM
+ * token/topic call until then, so a V6 subscription reconcile that ran earlier in
+ * this launch has failed fast; this re-runs it -- the iOS counterpart of the
+ * Android onNewToken reconcile. Safe before Koin is up (no-op): the app-start
+ * reconcile then runs with APNs already registered.
+ */
+fun onApnsTokenRegistered() {
+    val log = SpaceLogger.getLogger("KoinInitializer")
+    val koin = org.koin.mp.KoinPlatformTools.defaultContext().getOrNull() ?: run {
+        log.i { "APNs registered before Koin started; the app-start reconcile covers it" }
+        return
+    }
+    val repository = koin.get<me.calebjones.spacelaunchnow.data.repository.NotificationRepository>()
+
+    @Suppress("OPT_IN_USAGE")
+    val scope = kotlinx.coroutines.GlobalScope
+    scope.launch(kotlinx.coroutines.Dispatchers.Default) {
+        runCatching { repository.reconcileSubscriptions() }
+            .onSuccess { log.i { "Post-APNs V6 reconcile: attempted=${it.attempted} failed=${it.failed} skipped=${it.skipped}" } }
+            .onFailure { log.e(it) { "Post-APNs V6 reconcile failed; next start or save retries" } }
+    }
 }

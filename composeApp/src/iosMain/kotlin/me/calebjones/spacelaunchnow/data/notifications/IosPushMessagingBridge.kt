@@ -1,9 +1,16 @@
 package me.calebjones.spacelaunchnow.data.notifications
 
+import kotlin.concurrent.Volatile
+import kotlin.coroutines.resume
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.core.component.KoinComponent
@@ -13,48 +20,73 @@ import platform.Foundation.NSNotificationName
 
 /**
  * Bridge that coordinates FCM operations between Kotlin and Swift.
- * 
- * Simple request/callback pattern:
- * 1. IosPushMessaging stores a callback lambda
- * 2. Exposes property that Swift can check (lastRequestedTopic, needsToken, etc.)
- * 3. Kotlin posts NSNotification to trigger Swift FCMBridge
- * 4. Swift FCMBridge reads the property and performs the operation
- * 5. Swift calls the provide*() function with results
- * 6. Kotlin executes the stored callback
- * 
+ *
+ * Protocol -- strictly one request at a time:
+ * 1. Kotlin takes [requestMutex], parks the caller's continuation, publishes
+ *    [pendingOperation] / [lastRequestedTopic] / [currentRequestId], and posts the
+ *    "KotlinFCMRequestPending" NSNotification.
+ * 2. Swift FCMBridge reads those properties, performs the Firebase call, and calls
+ *    the matching provide*() function, echoing the request id it served.
+ * 3. Kotlin resumes the continuation. A result carrying a stale request id is
+ *    ignored, so a late completion can never resolve a later request.
+ *
+ * Every request completes. Firebase success or failure is delivered as-is, and a
+ * completion that never arrives is failed by [REQUEST_TIMEOUT_MS]. A failure must
+ * never be held back here: the V6 reconciler retries failed topics on its next
+ * pass, but it cannot retry a call that never returns. (An earlier version kept
+ * "APNS"-flavoured errors pending, waiting for APNs registration. On a cold
+ * launch of an already-authorized device that registration never came, and the
+ * reconciler hung forever -- mutex held -- on its first legacy unsubscribe.)
+ *
  * Communication uses NSNotificationCenter to avoid cinterop complexity.
- * Swift FCMBridge already listens for "KotlinFCMRequestPending" notifications.
+ * Swift FCMBridge listens for "KotlinFCMRequestPending" notifications.
  */
 object IosPushMessagingBridge : KoinComponent {
     private val log = SpaceLogger.getLogger("IosPushMessagingBridge")
-    
+
     private val historyStorage: NotificationHistoryStorage by inject()
-    
+
     // Coroutine scope for async operations
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    
+
     // Notification name that Swift FCMBridge listens for
     private val KOTLIN_FCM_REQUEST_NOTIFICATION: NSNotificationName = "KotlinFCMRequestPending"
-    
-    // Stored callbacks
-    private var tokenCallback: ((Result<String>) -> Unit)? = null
-    private var subscribeCallback: ((Result<Unit>) -> Unit)? = null
-    private var unsubscribeCallback: ((Result<Unit>) -> Unit)? = null
-    
-    // Request state - Swift reads these
-    var lastRequestedTopic: String? = null
+
+    /**
+     * Upper bound on one Firebase call. Topic operations normally finish well
+     * under a second; this only catches a completion that never comes back and
+     * turns it into a failure the reconciler can retry.
+     */
+    private const val REQUEST_TIMEOUT_MS = 30_000L
+
+    // Swift holds exactly one in-flight request (one topic, one result slot). The
+    // lock makes the same invariant hold on the Kotlin side, so concurrent callers
+    // queue instead of overwriting each other's slot.
+    private val requestMutex = Mutex()
+    private var requestSeq = 0L
+
+    // Exactly one of these is non-null while a request is pending.
+    @Volatile private var tokenContinuation: CancellableContinuation<Result<String>>? = null
+    @Volatile private var topicContinuation: CancellableContinuation<Result<Unit>>? = null
+
+    // Request state -- Swift reads these
+    @Volatile var lastRequestedTopic: String? = null
         private set
-    
-    var pendingOperation: Operation = Operation.NONE
+
+    @Volatile var pendingOperation: Operation = Operation.NONE
         private set
-    
+
+    /** Monotonic id of the current request. Swift echoes it back in provide*(). */
+    @Volatile var currentRequestId: Long = 0L
+        private set
+
     enum class Operation {
         NONE,
         GET_TOKEN,
         SUBSCRIBE,
         UNSUBSCRIBE
     }
-    
+
     /**
      * Post a notification to trigger Swift FCMBridge.processPendingKotlinRequests()
      * Swift's FCMBridge is already set up to listen for "KotlinFCMRequestPending" notifications.
@@ -68,147 +100,116 @@ object IosPushMessagingBridge : KoinComponent {
             )
         }
     }
-    
+
     // ===== Functions called by Kotlin (IosPushMessaging) =====
-    
-    fun requestToken(callback: (Result<String>) -> Unit) {
-        log.i { "Requesting FCM token from Swift" }
-        tokenCallback = callback
-        pendingOperation = Operation.GET_TOKEN
-        // Post notification to trigger Swift FCMBridge
-        notifySwift()
+
+    suspend fun getToken(): Result<String> =
+        request(Operation.GET_TOKEN, topic = null) { tokenContinuation = it }
+
+    suspend fun subscribe(topic: String): Result<Unit> =
+        request(Operation.SUBSCRIBE, topic) { topicContinuation = it }
+
+    suspend fun unsubscribe(topic: String): Result<Unit> =
+        request(Operation.UNSUBSCRIBE, topic) { topicContinuation = it }
+
+    private suspend fun <T> request(
+        operation: Operation,
+        topic: String?,
+        park: (CancellableContinuation<Result<T>>) -> Unit,
+    ): Result<T> = requestMutex.withLock {
+        val requestId = ++requestSeq
+        val label = if (topic == null) operation.name else "${operation.name} $topic"
+        log.i { "Requesting $label from Swift (request $requestId)" }
+        val outcome = withTimeoutOrNull(REQUEST_TIMEOUT_MS) {
+            suspendCancellableCoroutine<Result<T>> { cont ->
+                park(cont)
+                lastRequestedTopic = topic
+                currentRequestId = requestId
+                pendingOperation = operation
+                cont.invokeOnCancellation { clearPending(requestId) }
+                notifySwift()
+            }
+        }
+        outcome ?: run {
+            log.e { "$label timed out after ${REQUEST_TIMEOUT_MS}ms (request $requestId); reported as failure" }
+            clearPending(requestId)
+            Result.failure<T>(IllegalStateException("FCM $label timed out"))
+        }
     }
-    
-    fun requestSubscribe(topic: String, callback: (Result<Unit>) -> Unit) {
-        log.i { "Requesting subscribe to topic: $topic" }
-        lastRequestedTopic = topic
-        subscribeCallback = callback
-        pendingOperation = Operation.SUBSCRIBE
-        // Post notification to trigger Swift FCMBridge
-        notifySwift()
+
+    /** Drop the request state for [requestId] -- a no-op if a newer request has taken the slot. */
+    private fun clearPending(requestId: Long) {
+        if (requestId != currentRequestId) return
+        tokenContinuation = null
+        topicContinuation = null
+        lastRequestedTopic = null
+        pendingOperation = Operation.NONE
     }
-    
-    fun requestUnsubscribe(topic: String, callback: (Result<Unit>) -> Unit) {
-        log.i { "Requesting unsubscribe from topic: $topic" }
-        lastRequestedTopic = topic
-        unsubscribeCallback = callback
-        pendingOperation = Operation.UNSUBSCRIBE
-        // Post notification to trigger Swift FCMBridge
-        notifySwift()
-    }
-    
+
     // ===== Functions called by Swift (FCMBridge) =====
-    
+
     /**
-     * Swift calls this to provide the FCM token.
+     * Swift calls this with the FCM token -- or the error -- for [requestId].
      */
-    fun provideToken(token: String?, errorMessage: String?) {
-        log.d { "Swift provided FCM token: ${token?.take(20)}..." }
-        val callback = tokenCallback
-        if (callback == null) {
-            log.w { "Received token but no callback registered" }
-            return
-        }
-        
+    fun provideToken(requestId: Long, token: String?, errorMessage: String?) {
+        val cont = take(requestId, "token", tokenContinuation) ?: return
         if (token != null) {
-            // Success - clear the pending operation and callback
-            callback(Result.success(token))
-            tokenCallback = null
-            pendingOperation = Operation.NONE
-            log.d { "Token request successful, clearing pending operation" }
+            log.d { "Swift provided FCM token: ${token.take(20)}..." }
+            cont.resume(Result.success(token))
         } else {
-            // Failure - check if this is likely an APNs timing issue
-            val isApnsError = errorMessage?.contains("APNS") == true || 
-                             errorMessage?.contains("apns") == true
-            
-            if (isApnsError) {
-                // Keep operation pending for automatic retry when APNs arrives
-                // Don't call callback yet - wait for retry result
-                log.w { "Token request failed due to APNs - keeping operation pending for automatic retry" }
-            } else {
-                // Other error - report failure and clear
-                log.e { "Token request failed with non-APNs error: $errorMessage" }
-                callback(Result.failure(Exception(errorMessage ?: "Failed to get FCM token")))
-                tokenCallback = null
-                pendingOperation = Operation.NONE
-            }
+            log.w { "FCM token request failed: ${errorMessage ?: "unknown error"}" }
+            cont.resume(Result.failure(Exception(errorMessage ?: "Failed to get FCM token")))
         }
     }
-    
+
     /**
-     * Swift calls this after attempting to subscribe to a topic.
+     * Swift calls this after attempting to subscribe to a topic for [requestId].
      */
-    fun provideSubscribeResult(errorMessage: String?) {
-        log.d { "Swift provided subscribe result: ${if (errorMessage == null) "success" else "error: $errorMessage"}" }
-        val callback = subscribeCallback
-        if (callback == null) {
-            log.w { "Received subscribe result but no callback registered" }
-            return
-        }
-        
-        if (errorMessage == null) {
-            // Success - clear the pending operation and callback
-            callback(Result.success(Unit))
-            subscribeCallback = null
-            lastRequestedTopic = null
-            pendingOperation = Operation.NONE
-            log.d { "Subscribe successful, clearing pending operation" }
-        } else {
-            // Failure - check if this is likely an APNs timing issue
-            val isApnsError = errorMessage.contains("APNS") || errorMessage.contains("apns")
-            
-            if (isApnsError) {
-                // Keep operation pending for automatic retry when APNs arrives
-                log.w { "Subscribe failed due to APNs - keeping operation pending for automatic retry" }
-            } else {
-                // Other error - report failure and clear
-                log.e { "Subscribe failed with non-APNs error: $errorMessage" }
-                callback(Result.failure(Exception(errorMessage)))
-                subscribeCallback = null
-                lastRequestedTopic = null
-                pendingOperation = Operation.NONE
-            }
-        }
-    }
-    
+    fun provideSubscribeResult(requestId: Long, errorMessage: String?) =
+        completeTopic(requestId, "subscribe", errorMessage)
+
     /**
-     * Swift calls this after attempting to unsubscribe from a topic.
+     * Swift calls this after attempting to unsubscribe from a topic for [requestId].
      */
-    fun provideUnsubscribeResult(errorMessage: String?) {
-        log.d { "Swift provided unsubscribe result: ${if (errorMessage == null) "success" else "error: $errorMessage"}" }
-        val callback = unsubscribeCallback
-        if (callback == null) {
-            log.w { "Received unsubscribe result but no callback registered" }
-            return
-        }
-        
+    fun provideUnsubscribeResult(requestId: Long, errorMessage: String?) =
+        completeTopic(requestId, "unsubscribe", errorMessage)
+
+    private fun completeTopic(requestId: Long, kind: String, errorMessage: String?) {
+        val topic = lastRequestedTopic
+        val cont = take(requestId, kind, topicContinuation) ?: return
         if (errorMessage == null) {
-            // Success - clear the pending operation and callback
-            callback(Result.success(Unit))
-            unsubscribeCallback = null
-            lastRequestedTopic = null
-            pendingOperation = Operation.NONE
-            log.d { "Unsubscribe successful, clearing pending operation" }
+            log.d { "Swift provided $kind result for $topic: success" }
+            cont.resume(Result.success(Unit))
         } else {
-            // Failure - check if this is likely an APNs timing issue
-            val isApnsError = errorMessage.contains("APNS") || errorMessage.contains("apns")
-            
-            if (isApnsError) {
-                // Keep operation pending for automatic retry when APNs arrives
-                log.w { "Unsubscribe failed due to APNs - keeping operation pending for automatic retry" }
-            } else {
-                // Other error - report failure and clear
-                log.e { "Unsubscribe failed with non-APNs error: $errorMessage" }
-                callback(Result.failure(Exception(errorMessage)))
-                unsubscribeCallback = null
-                lastRequestedTopic = null
-                pendingOperation = Operation.NONE
-            }
+            log.w { "FCM $kind failed for topic $topic: $errorMessage" }
+            cont.resume(Result.failure(Exception(errorMessage)))
         }
     }
-    
+
+    /**
+     * Validate a Swift result against the current request and detach its
+     * continuation. Returns null (already logged) for a stale id or an empty slot,
+     * so a request can never be resumed twice.
+     */
+    private fun <T> take(
+        requestId: Long,
+        kind: String,
+        cont: CancellableContinuation<T>?,
+    ): CancellableContinuation<T>? {
+        if (requestId != currentRequestId) {
+            log.w { "Ignoring stale $kind result for request $requestId (current is $currentRequestId)" }
+            return null
+        }
+        if (cont == null) {
+            log.w { "Received $kind result for request $requestId but no continuation is registered" }
+            return null
+        }
+        clearPending(requestId)
+        return cont
+    }
+
     // ===== Notification History Support =====
-    
+
     /**
      * Swift calls this to save a notification to history
      * This is called from AppDelegate when a notification is received
@@ -235,14 +236,14 @@ object IosPushMessagingBridge : KoinComponent {
     ) {
         // Convert parallel arrays to map
         val rawData = rawDataKeys.zip(rawDataValues).toMap()
-        
+
         log.i { "📝 Saving notification to history:" }
         log.i { "  Launch: $launchName" }
         log.i { "  Filtered: $wasFiltered" }
         log.i { "  Shown: $wasShown" }
         log.i { "  Filter Reason: ${filterReason ?: "none"}" }
         log.i { "  Raw Data JSON: $rawData" }
-        
+
         scope.launch {
             try {
                 historyStorage.addNotification(

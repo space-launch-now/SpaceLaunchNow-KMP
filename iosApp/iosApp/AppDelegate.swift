@@ -78,10 +78,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         Messaging.messaging().delegate = self
         print("✅ Delegates set\n")
 
-        // NOTE: Neither notification permission (requestAuthorization) nor
-        // registerForRemoteNotifications are called here.
-        // Both are deferred to the onboarding NotificationPermissionPage so the user
-        // sees the prompt in context rather than on cold launch.
+        // NOTE: The notification permission prompt (requestAuthorization) is NOT
+        // shown here. It is deferred to the onboarding NotificationPermissionPage
+        // so the user sees the prompt in context rather than on cold launch.
         // Kotlin posts "KotlinNotificationPermissionGranted" when the user grants permission.
         print("4️⃣ Listening for notification permission granted from Kotlin...")
         NotificationCenter.default.addObserver(
@@ -91,6 +90,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             object: nil
         )
         print("✅ Observer registered\n")
+
+        // APNs registration, however, is required on EVERY launch once permission
+        // has been granted (UIKit does not carry it across launches), and Firebase
+        // declines every FCM token/topic call until Messaging.apnsToken is set in
+        // this process. Without this, the V6 subscription reconcile on an
+        // already-authorized device failed on every cold start. This never prompts:
+        // only requestAuthorization does.
+        print("4️⃣.5 Re-registering for APNs if notifications are already authorized...")
+        registerForRemoteNotificationsIfAuthorized()
 
         // Clear badge when app launches
         if #available(iOS 16.0, *) {
@@ -121,6 +129,24 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("📱 Notification permission granted by user — registering for remote notifications")
         DispatchQueue.main.async {
             UIApplication.shared.registerForRemoteNotifications()
+        }
+    }
+
+    /// Re-register for APNs when the user has already granted notification
+    /// permission in an earlier session. Reads the authorization status only --
+    /// the permission request itself stays in onboarding / the master toggle
+    /// (Kotlin `requestPlatformNotificationPermission`).
+    private func registerForRemoteNotificationsIfAuthorized() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                print("📱 Notifications already authorized (status \(settings.authorizationStatus.rawValue)) — registering for remote notifications")
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            default:
+                print("📱 Notifications not authorized (status \(settings.authorizationStatus.rawValue)) — skipping APNs registration")
+            }
         }
     }
 
@@ -167,6 +193,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         // Process any pending Kotlin FCM requests now that we have APNs token
         FCMBridge.shared.processPendingKotlinRequests()
+
+        // APNs readiness is what unblocks FCM topic operations on iOS: Firebase
+        // declines them until apnsToken is set, so a V6 reconcile that ran earlier
+        // in this launch has failed fast. Re-run it now -- the iOS counterpart of
+        // Android's onNewToken reconcile.
+        KoinInitializerKt.onApnsTokenRegistered()
 
         KoinInitializerKt.setRevenueCatPushToken(tokenHex: tokenString)
         print("✅ APNS token forwarded to RevenueCat (length=\(deviceToken.count))")
