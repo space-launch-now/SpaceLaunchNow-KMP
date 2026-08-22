@@ -1,3 +1,6 @@
 ### Bug Fixes
 
-* **notifications:** register for APNs on launch and make the iOS FCM bridge fail fast so the V6 reconcile cannot hang
+* **notifications:** add LocalFilterPolicy so devices on V6 topics stop re-filtering server-targeted sends
+* **notifications:** Android worker skips the legacy filter once the V6 changeover has completed
+* **notifications:** iOS NSE and in-app paths skip the legacy filter once the V6 changeover has completed
+* **notifications:** keep the iOS in-app filter cache in step with saved state
