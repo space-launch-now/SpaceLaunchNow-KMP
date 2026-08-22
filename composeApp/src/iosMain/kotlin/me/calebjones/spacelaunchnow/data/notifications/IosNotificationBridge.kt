@@ -206,6 +206,17 @@ object IosNotificationBridge : KoinComponent {
     }
     
     /**
+     * Keep the in-app filter cache in step with what NotificationStateStorage just persisted
+     * (called from NSEBridgeHook on every saveState). Without this a settings change, or the
+     * V5->V6 changeover completing mid-session, would not reach willPresent /
+     * didReceiveRemoteNotification until the next launch's refreshState() -- the NSE reads the
+     * App Group fresh per push, so the two paths could disagree for a whole session.
+     */
+    fun onStateSaved(state: NotificationState) {
+        cachedState = state
+    }
+
+    /**
      * Clear the cached state.
      * Useful when app enters foreground or settings change.
      */
