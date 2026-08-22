@@ -2,7 +2,6 @@ package me.calebjones.spacelaunchnow.data.notifications
 
 import kotlinx.coroutines.runBlocking
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
-import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -87,10 +86,13 @@ object IosNotificationBridge : KoinComponent {
         log.i { "   - Webcast Live: ${data["webcast_live"]}" }
         log.i { "" }
         
-        // Use shared filter logic
-        log.i { "🔄 [KOTLIN] Running shared NotificationFilter logic..." }
-        val result = NotificationFilter.shouldShowFromMap(data, state)
-        
+        // Use the shared, gated filter logic: once this device's V5->V6 changeover has
+        // completed it only receives server-targeted sends, and the legacy filter is skipped
+        // (kill switch only). Until then it is still on the V5 broadcast and must filter.
+        val passthrough = !LocalFilterPolicy.isActive(state)
+        log.i { if (passthrough) "🔄 [KOTLIN] On V6 topics — server-targeted, local filter skipped (${LocalFilterPolicy.PASSTHROUGH_REASON})" else "🔄 [KOTLIN] Running shared NotificationFilter logic..." }
+        val result = LocalFilterPolicy.legacyLaunchAllowedFromMap(data, state)
+
         log.i { "" }
         log.i { "🎯 [KOTLIN] Filter Decision: ${if (result) "SHOW ✅" else "SUPPRESS 🔇"}" }
         log.i { "========================================" }
@@ -118,8 +120,10 @@ object IosNotificationBridge : KoinComponent {
                     "live_strict" to state.useStrictMatching,
                     "live_agency_count" to state.subscribedAgencies.size,
                     "live_location_count" to state.subscribedLocations.size,
+                    "live_v6_changeover_complete" to state.hasCompletedV6Changeover,
                     "nse_app_group_available" to nse.appGroupAvailable,
                     "nse_keys_missing" to nse.anyKeyMissing,
+                    "nse_v6_changeover_complete" to nse.v6ChangeoverComplete,
                     "nse_enable_notifications" to nse.enableNotifications,
                     "nse_follow_all" to nse.followAllLaunches,
                     "nse_strict" to nse.useStrictMatching,
@@ -201,6 +205,17 @@ object IosNotificationBridge : KoinComponent {
         }
     }
     
+    /**
+     * Keep the in-app filter cache in step with what NotificationStateStorage just persisted
+     * (called from NSEBridgeHook on every saveState). Without this a settings change, or the
+     * V5->V6 changeover completing mid-session, would not reach willPresent /
+     * didReceiveRemoteNotification until the next launch's refreshState() -- the NSE reads the
+     * App Group fresh per push, so the two paths could disagree for a whole session.
+     */
+    fun onStateSaved(state: NotificationState) {
+        cachedState = state
+    }
+
     /**
      * Clear the cached state.
      * Useful when app enters foreground or settings change.

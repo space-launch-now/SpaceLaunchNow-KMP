@@ -9,13 +9,11 @@ import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.model.CustomNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.EventNotificationPayload
-import me.calebjones.spacelaunchnow.data.model.FilterResult
 import me.calebjones.spacelaunchnow.data.model.NewsNotificationPayload
 import me.calebjones.spacelaunchnow.data.model.NotificationData
-import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
-import me.calebjones.spacelaunchnow.data.model.V5NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.V5NotificationPayload
+import me.calebjones.spacelaunchnow.data.notifications.LocalFilterPolicy
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
@@ -36,6 +34,11 @@ import org.koin.core.component.inject
  * - Detects V5 payloads by presence of 'lsp_id' field
  * - V5 payloads use V5NotificationFilter for extended filtering
  * - V4 payloads continue to use NotificationFilter for backward compatibility
+ *
+ * V6: every filter call above goes through LocalFilterPolicy. Once this device's V5->V6
+ * changeover has completed it only receives server-targeted sends, and the legacy filters
+ * (launch filter, per-type toggles) are skipped -- only the kill switch remains. Until then
+ * the device is still on the V5 broadcast and filters exactly as before.
  */
 class NotificationWorker(
     context: Context,
@@ -125,19 +128,21 @@ class NotificationWorker(
 
         log.d { "🔔 Event Parsed: ${eventPayload.toDebugString()}" }
 
-        // Check global notification toggle
+        // Kill switch always; the per-type toggle only while this device is still on the V5
+        // broadcast -- on V6 the subscription already encodes it (LocalFilterPolicy).
         val state = notificationStateStorage.getState()
-        if (!state.enableNotifications) {
-            log.i { "🔇 Event notification filtered - notifications disabled globally" }
-            trackReceipt(eventPayload.notificationType, "suppressed", "kill_switch")
-            return Result.success()
-        }
-
-        // Per-type toggle (bug fix): previously the EVENTS toggle was ignored here.
-        if (!state.isTopicEnabled(NotificationTopic.EVENTS)) {
-            log.i { "🔇 Event notification filtered - Events toggle disabled" }
-            trackReceipt(eventPayload.notificationType, "suppressed", "events_toggle_off")
-            return Result.success()
+        when (LocalFilterPolicy.broadcastBlock(NotificationTopic.EVENTS, state)) {
+            LocalFilterPolicy.BroadcastBlock.KILL_SWITCH -> {
+                log.i { "🔇 Event notification filtered - notifications disabled globally" }
+                trackReceipt(eventPayload.notificationType, "suppressed", "kill_switch")
+                return Result.success()
+            }
+            LocalFilterPolicy.BroadcastBlock.TOGGLE_OFF -> {
+                log.i { "🔇 Event notification filtered - Events toggle disabled" }
+                trackReceipt(eventPayload.notificationType, "suppressed", "events_toggle_off")
+                return Result.success()
+            }
+            null -> Unit
         }
 
         val title = eventPayload.title
@@ -191,17 +196,20 @@ class NotificationWorker(
         log.d { "🔔 News Parsed: ${newsPayload.toDebugString()}" }
 
         val state = notificationStateStorage.getState()
-        if (!state.enableNotifications) {
-            log.i { "🔇 News notification filtered - notifications disabled globally" }
-            trackReceipt(newsPayload.notificationType, "suppressed", "kill_switch")
-            saveNewsToHistory(newsPayload, dataMap, wasFiltered = true, filterReason = "Notifications disabled globally")
-            return Result.success()
-        }
-        if (!state.isTopicEnabled(NotificationTopic.FEATURED_NEWS)) {
-            log.i { "🔇 News notification filtered - Featured News toggle disabled" }
-            trackReceipt(newsPayload.notificationType, "suppressed", "featured_news_toggle_off")
-            saveNewsToHistory(newsPayload, dataMap, wasFiltered = true, filterReason = "Featured News toggle disabled")
-            return Result.success()
+        when (LocalFilterPolicy.broadcastBlock(NotificationTopic.FEATURED_NEWS, state)) {
+            LocalFilterPolicy.BroadcastBlock.KILL_SWITCH -> {
+                log.i { "🔇 News notification filtered - notifications disabled globally" }
+                trackReceipt(newsPayload.notificationType, "suppressed", "kill_switch")
+                saveNewsToHistory(newsPayload, dataMap, wasFiltered = true, filterReason = "Notifications disabled globally")
+                return Result.success()
+            }
+            LocalFilterPolicy.BroadcastBlock.TOGGLE_OFF -> {
+                log.i { "🔇 News notification filtered - Featured News toggle disabled" }
+                trackReceipt(newsPayload.notificationType, "suppressed", "featured_news_toggle_off")
+                saveNewsToHistory(newsPayload, dataMap, wasFiltered = true, filterReason = "Featured News toggle disabled")
+                return Result.success()
+            }
+            null -> Unit
         }
 
         log.i { "✅ Displaying news notification - ${newsPayload.articleTitle}" }
@@ -262,17 +270,20 @@ class NotificationWorker(
         log.d { "🔔 Custom Parsed: ${customPayload.toDebugString()}" }
 
         val state = notificationStateStorage.getState()
-        if (!state.enableNotifications) {
-            log.i { "🔇 Custom notification filtered - notifications disabled globally" }
-            trackReceipt(customPayload.notificationType, "suppressed", "kill_switch")
-            saveCustomToHistory(customPayload, dataMap, wasFiltered = true, filterReason = "Notifications disabled globally")
-            return Result.success()
-        }
-        if (!state.isTopicEnabled(NotificationTopic.ANNOUNCEMENTS)) {
-            log.i { "🔇 Custom notification filtered - Announcements toggle disabled" }
-            trackReceipt(customPayload.notificationType, "suppressed", "announcements_toggle_off")
-            saveCustomToHistory(customPayload, dataMap, wasFiltered = true, filterReason = "Announcements toggle disabled")
-            return Result.success()
+        when (LocalFilterPolicy.broadcastBlock(NotificationTopic.ANNOUNCEMENTS, state)) {
+            LocalFilterPolicy.BroadcastBlock.KILL_SWITCH -> {
+                log.i { "🔇 Custom notification filtered - notifications disabled globally" }
+                trackReceipt(customPayload.notificationType, "suppressed", "kill_switch")
+                saveCustomToHistory(customPayload, dataMap, wasFiltered = true, filterReason = "Notifications disabled globally")
+                return Result.success()
+            }
+            LocalFilterPolicy.BroadcastBlock.TOGGLE_OFF -> {
+                log.i { "🔇 Custom notification filtered - Announcements toggle disabled" }
+                trackReceipt(customPayload.notificationType, "suppressed", "announcements_toggle_off")
+                saveCustomToHistory(customPayload, dataMap, wasFiltered = true, filterReason = "Announcements toggle disabled")
+                return Result.success()
+            }
+            null -> Unit
         }
 
         log.i { "✅ Displaying custom notification - ${customPayload.title}" }
@@ -332,8 +343,10 @@ class NotificationWorker(
         // Get user settings (full NotificationState, not just v5Preferences)
         val state = notificationStateStorage.getState()
 
-        // Apply V5 client-side filtering (now uses NotificationState directly)
-        val filterResult = V5NotificationFilter.shouldShow(v5Payload, state)
+        // Legacy client-side filter while this device is still on the V5 broadcast. Once its
+        // V5->V6 changeover has completed the server has already targeted this send, and only
+        // the kill switch applies (LocalFilterPolicy).
+        val filterResult = LocalFilterPolicy.launchDecision(v5Payload, state)
 
         // Use server-provided title and body for V5
         val title = v5Payload.title
@@ -368,7 +381,10 @@ class NotificationWorker(
         }
 
         // Show notification using server-provided title and body
-        log.i { "✅ V5 Displaying notification - ${v5Payload.launchName}" }
+        log.i {
+            "✅ V5 Displaying notification - ${v5Payload.launchName}" +
+                if (LocalFilterPolicy.isActive(state)) "" else " (${LocalFilterPolicy.PASSTHROUGH_REASON})"
+        }
         trackReceipt(v5Payload.notificationType, "displayed")
 
         NotificationDisplayHelper.showV5Notification(
@@ -415,11 +431,9 @@ class NotificationWorker(
         // Get user settings
         val settings = notificationStateStorage.getState()
 
-        // Apply V4 client-side filtering
-        val shouldShow = NotificationFilter.shouldShowNotification(
-            data = notificationData,
-            state = settings
-        )
+        // Legacy V4 client-side filtering, gated like V5 (LocalFilterPolicy): kill switch only
+        // once this device is on V6 topics.
+        val shouldShow = LocalFilterPolicy.legacyLaunchAllowed(notificationData, settings)
 
         // Prepare display strings
         val title = inputData.getString("fcm_title") ?: notificationData.launchName

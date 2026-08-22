@@ -32,6 +32,9 @@ import platform.Foundation.NSUserDefaults
  *   nse_topic_events          — Bool, EVENTS per-type toggle
  *   nse_topic_featured_news   — Bool, FEATURED_NEWS per-type toggle
  *   nse_topic_announcements   — Bool, ANNOUNCEMENTS per-type toggle
+ *   nse_v6_changeover_complete — Bool, this device is on server-targeted V6 topics; the NSE
+ *                                skips the legacy filter (kill switch only) when true. Missing
+ *                                or false ⇒ still on the V5 broadcast ⇒ legacy filter applies.
  */
 object NSEPreferenceBridge {
 
@@ -47,6 +50,7 @@ object NSEPreferenceBridge {
     private const val KEY_TOPIC_EVENTS = "nse_topic_events"
     private const val KEY_TOPIC_FEATURED_NEWS = "nse_topic_featured_news"
     private const val KEY_TOPIC_ANNOUNCEMENTS = "nse_topic_announcements"
+    private const val KEY_V6_CHANGEOVER_COMPLETE = "nse_v6_changeover_complete"
 
     // Cross-process breadcrumb buffer written by the NSE (NotificationService.swift /
     // NSEBreadcrumb) and drained here. Entries are pipe-delimited "ts|type|decision|reason".
@@ -95,10 +99,16 @@ object NSEPreferenceBridge {
             forKey = KEY_TOPIC_ANNOUNCEMENTS
         )
 
+        // The client-side filter gate (see LocalFilterPolicy). Once the V5->V6 changeover has
+        // completed this device only receives server-targeted sends, and the NSE must stop
+        // re-filtering them; until then it is still on the V5 broadcast and must keep filtering.
+        userDefaults.setBool(state.hasCompletedV6Changeover, forKey = KEY_V6_CHANGEOVER_COMPLETE)
+
         userDefaults.synchronize()
 
         log.d {
             "Synced NSE prefs: enabled=${state.enableNotifications}, " +
+                "v6Changeover=${state.hasCompletedV6Changeover}, " +
                 "followAll=${state.followAllLaunches}, " +
                 "agencies(expanded)=${expandedAgencies.size}, " +
                 "locations(expanded)=${expandedLocations.size}, " +
@@ -110,7 +120,7 @@ object NSEPreferenceBridge {
 
     fun readStoredPrefs(): NsePrefsSnapshot {
         val userDefaults = NSUserDefaults(suiteName = APP_GROUP)
-            ?: return NsePrefsSnapshot(false, null, null, null, null, null)
+            ?: return NsePrefsSnapshot(false, null, null, null, null, null, null)
 
         fun boolOrNull(key: String): Boolean? =
             if (userDefaults.objectForKey(key) != null) userDefaults.boolForKey(key) else null
@@ -125,6 +135,7 @@ object NSEPreferenceBridge {
             useStrictMatching = boolOrNull(KEY_USE_STRICT_MATCHING),
             subscribedAgencies = listOrNull(KEY_SUBSCRIBED_AGENCIES),
             subscribedLocations = listOrNull(KEY_SUBSCRIBED_LOCATIONS),
+            v6ChangeoverComplete = boolOrNull(KEY_V6_CHANGEOVER_COMPLETE),
         )
     }
 
@@ -278,6 +289,8 @@ data class NsePrefsSnapshot(
     val useStrictMatching: Boolean?,
     val subscribedAgencies: List<String>?,
     val subscribedLocations: List<String>?,
+    /** Missing reads as "still on the V5 broadcast" in the NSE, so it is not a filter-key gap. */
+    val v6ChangeoverComplete: Boolean?,
 ) {
     val anyKeyMissing: Boolean
         get() = !appGroupAvailable || enableNotifications == null || followAllLaunches == null ||

@@ -933,10 +933,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
     /// Whether a broadcast-type notification (event / news / custom) may present a foreground
-    /// banner: gated by the global kill switch AND its own per-type toggle. Reads the shared
-    /// App Group UserDefaults the Kotlin NSEPreferenceBridge writes (keys mirror
-    /// NSEFilterPreferences.Keys). Missing keys default to TRUE — these topics are
-    /// defaultEnabled in Kotlin, so a never-written key should not suppress them.
+    /// banner: gated by the global kill switch AND — only while this device is still on the
+    /// V5 broadcast — its own per-type toggle. Once the V5→V6 changeover has completed
+    /// (`nse_v6_changeover_complete`) the subscription already encodes the toggle and the
+    /// server only sends what was asked for, so re-checking locally could only suppress a
+    /// wanted push. Reads the shared App Group UserDefaults the Kotlin NSEPreferenceBridge
+    /// writes (keys mirror NSEFilterPreferences.Keys). Missing toggle keys default to TRUE —
+    /// these topics are defaultEnabled in Kotlin, so a never-written key should not suppress
+    /// them; a missing changeover key reads as "still on V5" (keep filtering).
     private func broadcastForegroundAllowed(toggleKey: String) -> Bool {
         let defaults = UserDefaults(suiteName: "group.me.spacelaunchnow.spacelaunchnow")
 
@@ -944,6 +948,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             ? defaults!.bool(forKey: "nse_enable_notifications")
             : true
         guard enabled else { return false }
+
+        // Same gate as the NSE and the Kotlin LocalFilterPolicy.
+        let onV6Topics = defaults?.bool(forKey: "nse_v6_changeover_complete") ?? false
+        if onV6Topics { return true }
 
         let toggleOn = defaults?.object(forKey: toggleKey) != nil
             ? defaults!.bool(forKey: toggleKey)
