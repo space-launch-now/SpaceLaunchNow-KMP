@@ -1,3 +1,12 @@
+## [5.41.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.41.0...v5.41.1) (2026-08-22)
+
+
+### Bug Fixes
+
+* **notifications:** register for APNs on launch and make the iOS FCM bridge fail fast so the V6 reconcile cannot hang ([f2f10b5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f2f10b579a456c07cc6ba84976cf029ec9bd6cba))
+
+
+
 # [5.41.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.40.0...v5.41.0) (2026-08-21)
 
 
@@ -68,15 +77,6 @@
 * **notifications:** surface the V6 subscription ledger and a resubscribe-from-scratch action in diagnostics ([6998703](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/69987031c51876df33d769d2e5c11e314290edbb))
 * **notifications:** vendor the V6 topic contract with a desktop conformance test ([bec2aaa](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bec2aaa4427473263bcb9edf503d9bc5ed307fc5))
 * **notifications:** wire the V6 reconciler through the repository and retire the V5 subscribe trigger ([5067b13](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5067b13b4fe5223211e9159d967cdc17abc20800))
-
-
-
-## [5.37.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.37.0...v5.37.1) (2026-07-22)
-
-
-### Bug Fixes
-
-* **deps:** update purchases-kmp to 3.3.0 for Play Billing 8 ([5230a55](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5230a557e9e0711de593e78b961382e863d07de8))
 
 
 

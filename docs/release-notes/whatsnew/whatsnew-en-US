@@ -1,7 +1,3 @@
 ### Bug Fixes
 
-* **analytics:** move funnel user-property sync to an app-scoped syncer
-
-### Features
-
-* **notifications:** add Starlink mute toggle backed by the v6 starlinkMuted topic
+* **notifications:** register for APNs on launch and make the iOS FCM bridge fail fast so the V6 reconcile cannot hang
