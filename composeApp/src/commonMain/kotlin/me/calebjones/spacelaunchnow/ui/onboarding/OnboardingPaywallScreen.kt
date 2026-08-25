@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
+import kotlin.time.TimeSource
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
@@ -105,6 +106,7 @@ fun OnboardingPaywallScreen(
     val subscriptionState by viewModel.subscriptionState.collectAsState()
     val nextLaunch by nextUpViewModel.nextLaunch.collectAsState()
     val availableProducts by viewModel.availableProducts.collectAsState()
+    val shownAt = remember { TimeSource.Monotonic.markNow() }
 
     LaunchedEffect(Unit) {
         nextUpViewModel.fetchNextLaunch()
@@ -155,9 +157,13 @@ fun OnboardingPaywallScreen(
         billingUnavailable = uiState.billingUnavailable,
         nextLaunch = nextLaunch,
         isSubscribed = subscriptionState.isSubscribed,
-        onSubscribe = { product -> viewModel.purchaseProduct(product) },
-        onRestorePurchases = { viewModel.restorePurchases() },
+        onSubscribe = { type, product ->
+            viewModel.trackTierSelected(type, product.productId, source = "onboarding")
+            viewModel.purchaseProduct(product, source = "onboarding")
+        },
+        onRestorePurchases = { viewModel.restorePurchases(source = "onboarding") },
         onDismiss = {
+            viewModel.trackPaywallDismissed("onboarding", shownAt.elapsedNow().inWholeSeconds)
             coroutineScope.launch {
                 appPreferences.setOnboardingCompleted(true)
                 appPreferences.setOnboardingPaywallV1Shown(true)
@@ -182,7 +188,7 @@ fun OnboardingContent(
     billingUnavailable: Boolean = false,
     nextLaunch: Launch? = null,
     isSubscribed: Boolean = false,
-    onSubscribe: (ProductInfo) -> Unit = {},
+    onSubscribe: (ProductType, ProductInfo) -> Unit = { _, _ -> },
     onRestorePurchases: () -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
@@ -314,7 +320,7 @@ fun OnboardingContent(
 
                     Box(contentAlignment = Alignment.TopEnd) {
                         Button(
-                            onClick = { onSubscribe(annualProduct) },
+                            onClick = { onSubscribe(ProductType.ANNUAL, annualProduct) },
                             enabled = !isProcessing,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -375,7 +381,7 @@ fun OnboardingContent(
                         val perMonth =
                             if (monthlyProduct.priceAmountMicros > 0) monthlyProduct.formattedPrice else null
                         OutlinedButton(
-                            onClick = { onSubscribe(monthlyProduct) },
+                            onClick = { onSubscribe(ProductType.MONTHLY, monthlyProduct) },
                             enabled = !isProcessing,
                             modifier = Modifier.fillMaxWidth(),
                             border = androidx.compose.foundation.BorderStroke(
