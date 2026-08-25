@@ -32,8 +32,16 @@ class OnboardingViewModel(
 
     // ========== Analytics ==========
 
-    fun trackOnboardingStep(step: Int, completed: Boolean) {
-        analyticsManager.track(AnalyticsEvent.OnboardingStep(step = step, completed = completed))
+    fun trackOnboardingStep(step: Int, page: String, variant: String, completed: Boolean) {
+        analyticsManager.track(
+            AnalyticsEvent.OnboardingStep(step = step, page = page, variant = variant, completed = completed)
+        )
+    }
+
+    fun trackNotificationPermissionResult(granted: Boolean, variant: String) {
+        analyticsManager.track(
+            AnalyticsEvent.NotificationPermissionResult(granted = granted, source = "onboarding", variant = variant)
+        )
     }
 
     private val _upcomingLaunches = MutableStateFlow<List<Launch>>(emptyList())

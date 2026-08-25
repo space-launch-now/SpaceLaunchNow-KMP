@@ -36,7 +36,10 @@ class AnalyticsEventTest {
     @Test fun `NotificationTapped has correct name`() = assertEquals("notification_tapped", AnalyticsEvent.NotificationTapped("launch").name)
     @Test fun `NotificationSettingChanged has correct name`() = assertEquals("notification_setting_changed", AnalyticsEvent.NotificationSettingChanged("launch", true).name)
     @Test fun `AppOpened has correct name`() = assertEquals("app_opened", AnalyticsEvent.AppOpened().name)
-    @Test fun `OnboardingStep has correct name`() = assertEquals("onboarding_step", AnalyticsEvent.OnboardingStep(1, false).name)
+    @Test fun `OnboardingStep has correct name`() = assertEquals(
+        "onboarding_step",
+        AnalyticsEvent.OnboardingStep(step = 1, page = "welcome", variant = "control", completed = false).name
+    )
     @Test fun `ThemeChanged has correct name`() = assertEquals("theme_changed", AnalyticsEvent.ThemeChanged("dark").name)
     @Test fun `FilterChanged has correct name`() = assertEquals("filter_changed", AnalyticsEvent.FilterChanged("status", "go").name)
     @Test fun `WidgetConfigured has correct name`() = assertEquals("widget_configured", AnalyticsEvent.WidgetConfigured("launch_list").name)
@@ -199,5 +202,22 @@ class AnalyticsEventTest {
     @Test
     fun `AppOpened defaults to direct source`() {
         assertEquals("direct", AnalyticsEvent.AppOpened().toParameters()["source"])
+    }
+
+    @Test fun `OnboardingStep carries page and variant params`() {
+        val event = AnalyticsEvent.OnboardingStep(step = 1, page = "notification_permission", variant = "short", completed = true)
+        assertEquals("onboarding_step", event.name)
+        assertEquals(1, event.toParameters()["step"])
+        assertEquals("notification_permission", event.toParameters()["page"])
+        assertEquals("short", event.toParameters()["variant"])
+        assertEquals(true, event.toParameters()["completed"])
+    }
+
+    @Test fun `NotificationPermissionResult has correct name and params`() {
+        val event = AnalyticsEvent.NotificationPermissionResult(granted = false, source = "onboarding", variant = "control")
+        assertEquals("notification_permission_result", event.name)
+        assertEquals(false, event.toParameters()["granted"])
+        assertEquals("onboarding", event.toParameters()["source"])
+        assertEquals("control", event.toParameters()["variant"])
     }
 }

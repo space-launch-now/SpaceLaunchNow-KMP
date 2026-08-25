@@ -331,9 +331,31 @@ sealed class AnalyticsEvent(val name: String) {
         override fun toParameters() = mapOf("source" to source)
     }
 
-    data class OnboardingStep(val step: Int, val completed: Boolean) :
-        AnalyticsEvent("onboarding_step") {
-        override fun toParameters() = mapOf("step" to step, "completed" to completed)
+    data class OnboardingStep(
+        val step: Int,
+        val page: String,
+        val variant: String,
+        val completed: Boolean
+    ) : AnalyticsEvent("onboarding_step") {
+        override fun toParameters() = buildMap {
+            put("step", step)
+            put("page", page)
+            put("variant", variant)
+            put("completed", completed)
+        }
+    }
+
+    /** Outcome of the onboarding notification-permission page (grant, deny, or "Maybe Later" = false). */
+    data class NotificationPermissionResult(
+        val granted: Boolean,
+        val source: String,
+        val variant: String
+    ) : AnalyticsEvent("notification_permission_result") {
+        override fun toParameters() = buildMap {
+            put("granted", granted)
+            put("source", source)
+            put("variant", variant)
+        }
     }
 
     // ── Settings Events ──────────────────────────────────────────────────────
