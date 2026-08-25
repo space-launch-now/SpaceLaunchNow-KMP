@@ -189,10 +189,12 @@ sealed class AnalyticsEvent(val name: String) {
 
     data class PurchaseStarted(
         val productId: String,
-        val dimensions: FunnelDimensions? = null
+        val dimensions: FunnelDimensions? = null,
+        val source: String = "support_us"
     ) : AnalyticsEvent("purchase_started") {
         override fun toParameters() = buildMap {
             put("product_id", productId)
+            put("source", source)
             dimensions?.let { putAll(it.toParameters()) }
         }
     }
@@ -200,11 +202,13 @@ sealed class AnalyticsEvent(val name: String) {
     data class PurchaseCompleted(
         val productId: String,
         val revenue: Double? = null,
-        val dimensions: FunnelDimensions? = null
+        val dimensions: FunnelDimensions? = null,
+        val source: String = "support_us"
     ) : AnalyticsEvent("purchase_completed") {
         override fun toParameters() = buildMap {
             put("product_id", productId)
             revenue?.let { put("revenue", it) }
+            put("source", source)
             dimensions?.let { putAll(it.toParameters()) }
         }
     }
@@ -219,22 +223,26 @@ sealed class AnalyticsEvent(val name: String) {
         val productId: String,
         val step: String,
         val errorCode: String,
-        val dimensions: FunnelDimensions? = null
+        val dimensions: FunnelDimensions? = null,
+        val source: String = "support_us"
     ) : AnalyticsEvent("purchase_failed") {
         override fun toParameters() = buildMap {
             put("product_id", productId)
             put("step", step)
             put("error_code", errorCode)
+            put("source", source)
             dimensions?.let { putAll(it.toParameters()) }
         }
     }
 
     data class PurchaseRestored(
         val success: Boolean,
-        val dimensions: FunnelDimensions? = null
+        val dimensions: FunnelDimensions? = null,
+        val source: String = "support_us"
     ) : AnalyticsEvent("purchase_restored") {
         override fun toParameters() = buildMap {
             put("success", success)
+            put("source", source)
             dimensions?.let { putAll(it.toParameters()) }
         }
     }

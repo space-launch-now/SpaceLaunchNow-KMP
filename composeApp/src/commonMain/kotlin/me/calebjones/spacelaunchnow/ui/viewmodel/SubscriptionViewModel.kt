@@ -226,11 +226,16 @@ class SubscriptionViewModel(
      * @param priceAmountMicros Price in micros, used to attach revenue to the
      *   purchase_completed analytics event (spec 018 FR-1.2)
      */
-    fun purchaseProduct(productId: String, basePlanId: String? = null, priceAmountMicros: Long? = null) {
+    fun purchaseProduct(
+        productId: String,
+        basePlanId: String? = null,
+        priceAmountMicros: Long? = null,
+        source: String = "support_us"
+    ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
             analyticsManager.track(
-                AnalyticsEvent.PurchaseStarted(productId = productId, dimensions = funnelDimensions())
+                AnalyticsEvent.PurchaseStarted(productId = productId, dimensions = funnelDimensions(), source = source)
             )
 
             billingManager.launchPurchaseFlow(productId, basePlanId).fold(
@@ -243,7 +248,8 @@ class SubscriptionViewModel(
                         AnalyticsEvent.PurchaseCompleted(
                             productId = productId,
                             revenue = priceAmountMicros?.let { it / 1_000_000.0 },
-                            dimensions = funnelDimensions()
+                            dimensions = funnelDimensions(),
+                            source = source
                         )
                     )
                     log.i { "Purchase successful for $productId" }
@@ -266,7 +272,8 @@ class SubscriptionViewModel(
                             productId = productId,
                             step = step,
                             errorCode = errorCode,
-                            dimensions = funnelDimensions()
+                            dimensions = funnelDimensions(),
+                            source = source
                         )
                     )
                     log.e(error) { "Purchase failed for $productId ($step/$errorCode)" }
@@ -279,9 +286,10 @@ class SubscriptionViewModel(
      * Purchase a product (convenience method using ProductInfo)
      *
      * @param product The ProductInfo to purchase
+     * @param source The source of the purchase action (default: "support_us")
      */
-    fun purchaseProduct(product: ProductInfo) {
-        purchaseProduct(product.productId, product.basePlanId, product.priceAmountMicros)
+    fun purchaseProduct(product: ProductInfo, source: String = "support_us") {
+        purchaseProduct(product.productId, product.basePlanId, product.priceAmountMicros, source)
     }
 
     /**
@@ -322,8 +330,10 @@ class SubscriptionViewModel(
 
     /**
      * Restore previous purchases
+     *
+     * @param source The source of the restore action (default: "support_us")
      */
-    fun restorePurchases() {
+    fun restorePurchases(source: String = "support_us") {
         log.i { "🔄 restorePurchases() called" }
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isProcessing = true, errorMessage = null)
@@ -334,7 +344,8 @@ class SubscriptionViewModel(
                     analyticsManager.track(
                         AnalyticsEvent.PurchaseRestored(
                             success = state.isSubscribed,
-                            dimensions = funnelDimensions()
+                            dimensions = funnelDimensions(),
+                            source = source
                         )
                     )
                     _uiState.value = _uiState.value.copy(
@@ -348,7 +359,7 @@ class SubscriptionViewModel(
                 },
                 onFailure = { error ->
                     analyticsManager.track(
-                        AnalyticsEvent.PurchaseRestored(success = false, dimensions = funnelDimensions())
+                        AnalyticsEvent.PurchaseRestored(success = false, dimensions = funnelDimensions(), source = source)
                     )
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
