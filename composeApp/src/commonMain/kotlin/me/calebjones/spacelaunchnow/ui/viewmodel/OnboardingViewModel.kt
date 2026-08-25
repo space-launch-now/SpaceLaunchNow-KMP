@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.domain.model.Agency
@@ -39,9 +40,13 @@ class OnboardingViewModel(
     }
 
     fun trackNotificationPermissionResult(granted: Boolean, variant: String) {
-        analyticsManager.track(
-            AnalyticsEvent.NotificationPermissionResult(granted = granted, source = "onboarding", variant = variant)
+        val event = AnalyticsEvent.NotificationPermissionResult(
+            granted = granted,
+            source = "onboarding",
+            variant = variant
         )
+        analyticsManager.track(event)
+        DatadogLogger.info(event.name, event.toParameters())
     }
 
     private val _upcomingLaunches = MutableStateFlow<List<Launch>>(emptyList())

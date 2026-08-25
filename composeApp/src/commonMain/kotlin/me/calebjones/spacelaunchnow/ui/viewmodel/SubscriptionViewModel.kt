@@ -235,6 +235,8 @@ class SubscriptionViewModel(
      * @param basePlanId The base plan (e.g., "monthly", "annual", "lifetime")
      * @param priceAmountMicros Price in micros, used to attach revenue to the
      *   purchase_completed analytics event (spec 018 FR-1.2)
+     * @param source Which paywall surface initiated the purchase ("support_us" | "onboarding"),
+     *   stamped on every purchase funnel event
      */
     fun purchaseProduct(
         productId: String,

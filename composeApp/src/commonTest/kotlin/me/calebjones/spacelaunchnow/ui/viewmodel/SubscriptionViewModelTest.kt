@@ -582,6 +582,19 @@ class SubscriptionViewModelTest {
     }
 
     @Test
+    fun `purchase_failed carries the source it was started with`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        billingManager.shouldLaunchPurchaseFail = true
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base", source = "onboarding")
+        advanceUntilIdle()
+
+        val failed = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().single()
+        assertEquals("onboarding", failed.source)
+    }
+
+    @Test
     fun `restorePurchases stamps source on purchase_restored`() = runTest {
         val fake = FakeAnalyticsProvider()
         val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))

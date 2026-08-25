@@ -31,8 +31,10 @@ burden, none of the lifecycle).
 
 ## Phase 1 — Instrumentation (ships with or before the experiment; both arms need it)
 
-All new events follow the spec-014 pattern: emitted through `SubscriptionViewModel.trackFunnelStep`
-(Firebase via `AnalyticsManager` + Datadog via `DatadogLogger`), stamped with `FunnelDimensions`.
+New events are dual-pipeline (Firebase via `AnalyticsManager` + Datadog via `DatadogLogger`).
+Funnel-step events are emitted through `SubscriptionViewModel.trackFunnelStep` and stamped with
+`FunnelDimensions`; `notification_permission_result` (§1.5) is a guardrail metric — dual-pipeline
+but deliberately without `FunnelDimensions`, emitted from `OnboardingViewModel`.
 
 ### 1.1 `paywall_tier_selected` from the onboarding paywall
 

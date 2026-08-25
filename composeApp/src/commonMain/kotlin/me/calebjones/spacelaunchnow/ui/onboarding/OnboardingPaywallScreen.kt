@@ -163,7 +163,9 @@ fun OnboardingPaywallScreen(
         },
         onRestorePurchases = { viewModel.restorePurchases(source = "onboarding") },
         onDismiss = {
-            viewModel.trackPaywallDismissed("onboarding", shownAt.elapsedNow().inWholeSeconds)
+            if (!subscriptionState.isSubscribed) {
+                viewModel.trackPaywallDismissed("onboarding", shownAt.elapsedNow().inWholeSeconds)
+            }
             coroutineScope.launch {
                 appPreferences.setOnboardingCompleted(true)
                 appPreferences.setOnboardingPaywallV1Shown(true)
