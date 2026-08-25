@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
 
@@ -65,4 +66,10 @@ interface RemoteConfigRepository {
      * util/logging/RemoteDiagnostics.kt so it stays pure and unit-testable.
      */
     suspend fun getDiagnosticsConfigJson(): String?
+
+    /**
+     * The onboarding A/B variant from the 'onboarding_variant' parameter.
+     * CONTROL when unset, unknown, or Firebase is unavailable.
+     */
+    suspend fun getOnboardingVariant(): OnboardingVariant
 }
