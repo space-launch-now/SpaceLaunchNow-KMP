@@ -23,6 +23,7 @@ import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
@@ -57,6 +58,13 @@ data class PreloadState(
     val nextDestination: Any? = null
 )
 
+/** Single source of truth for where Preload navigates — extracted for testability. */
+fun preloadDestination(liveOnboardingCompleted: Boolean, onboardingPaywallShown: Boolean): Any = when {
+    !liveOnboardingCompleted -> LiveOnboarding
+    onboardingPaywallShown -> Home
+    else -> Onboarding
+}
+
 class PreloadViewModel(
     private val launchRepository: LaunchRepository,
     private val articlesRepository: ArticlesRepository,
@@ -69,7 +77,8 @@ class PreloadViewModel(
     private val spaceStationRepository: SpaceStationRepository,
     private val notificationStateStorage: NotificationStateStorage,
     private val launchFilterService: LaunchFilterService,
-    private val appPreferences: AppPreferences
+    private val appPreferences: AppPreferences,
+    private val remoteConfigRepository: RemoteConfigRepository
 ) : ViewModel() {
 
     private val log = logger()
@@ -86,11 +95,16 @@ class PreloadViewModel(
             val onboardingPaywallShown = appPreferences.onboardingPaywallV1ShownFlow.first()
             val initialPrewarmCompleted = appPreferences.initialPrewarmCompletedFlow.first()
 
-            val nextDestination: Any = when {
-                liveOnboardingCompleted == false -> LiveOnboarding
-                onboardingPaywallShown == true -> Home
-                else -> Onboarding
-            }
+            val nextDestination: Any = preloadDestination(liveOnboardingCompleted, onboardingPaywallShown)
+
+            // Onboarding A/B: the variant must be activated before LiveOnboarding renders.
+            // Runs alongside tier 1; capped so an offline first launch costs at most 3s (variant falls back to control).
+            val onboardingConfigFetch = if (nextDestination == LiveOnboarding) {
+                async {
+                    withTimeoutOrNull(3_000L) { remoteConfigRepository.fetchAndActivate() }
+                        ?: log.w { "Onboarding variant fetch timed out — control will be used" }
+                }
+            } else null
 
             // Detect low-RAM devices for memory-aware throttling
             val isLowRam = isLowRamDevice()
@@ -129,11 +143,7 @@ class PreloadViewModel(
                                 log.w(e) { "⚠️ Tier 1 failed: ${task.name}" }
                             } finally {
                                 _preloadState.update { state ->
-                                    val newCompleted = state.completedTasks + 1
-                                    state.copy(
-                                        completedTasks = newCompleted,
-                                        isComplete = newCompleted >= state.totalTasks
-                                    )
+                                    state.copy(completedTasks = state.completedTasks + 1)
                                 }
                             }
                         }
@@ -148,10 +158,10 @@ class PreloadViewModel(
                 log.i { "Tier 1 finished: ${tier1State.completedTasks}/${tier1State.totalTasks}" }
             }
 
-            // Ensure navigation happens even if tier1 timed out
-            if (!_preloadState.value.isComplete) {
-                _preloadState.update { it.copy(isComplete = true) }
-            }
+            onboardingConfigFetch?.await()
+
+            // Navigation is released only here — after tier 1 (or its timeout) AND the variant fetch.
+            _preloadState.update { it.copy(isComplete = true) }
 
             // Tier 2: fire-and-forget in background scope (first launch only, skipped on low-RAM)
             if (tier2Tasks.isNotEmpty()) {
