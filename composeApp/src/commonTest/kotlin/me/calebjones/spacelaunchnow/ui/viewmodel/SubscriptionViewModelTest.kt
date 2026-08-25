@@ -541,6 +541,20 @@ class SubscriptionViewModelTest {
     }
 
     @Test
+    fun `trackPaywallDismissed emits paywall_dismissed with dimensions`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.trackPaywallDismissed("onboarding", secondsOnScreen = 20L)
+        advanceUntilIdle()
+
+        val event = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PaywallDismissed>().single()
+        assertEquals("onboarding", event.source)
+        assertEquals(20L, event.secondsOnScreen)
+        assertNotNull(event.dimensions)
+    }
+
+    @Test
     fun `purchase events carry the source they were started with`() = runTest {
         val fake = FakeAnalyticsProvider()
         val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))

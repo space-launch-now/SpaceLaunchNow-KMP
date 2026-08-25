@@ -187,6 +187,22 @@ sealed class AnalyticsEvent(val name: String) {
         }
     }
 
+    /**
+     * User left a paywall without purchasing ("Continue for free" / dismiss).
+     * secondsOnScreen measures view-to-dismiss dwell for the onboarding A/B test.
+     */
+    data class PaywallDismissed(
+        val source: String,
+        val secondsOnScreen: Long,
+        val dimensions: FunnelDimensions? = null
+    ) : AnalyticsEvent("paywall_dismissed") {
+        override fun toParameters() = buildMap {
+            put("source", source)
+            put("seconds_on_screen", secondsOnScreen)
+            dimensions?.let { putAll(it.toParameters()) }
+        }
+    }
+
     data class PurchaseStarted(
         val productId: String,
         val dimensions: FunnelDimensions? = null,

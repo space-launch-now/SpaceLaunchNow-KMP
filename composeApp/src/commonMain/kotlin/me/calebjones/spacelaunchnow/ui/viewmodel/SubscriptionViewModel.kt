@@ -78,6 +78,16 @@ class SubscriptionViewModel(
         )
     }
 
+    fun trackPaywallDismissed(source: String, secondsOnScreen: Long) {
+        trackFunnelStep(
+            AnalyticsEvent.PaywallDismissed(
+                source = source,
+                secondsOnScreen = secondsOnScreen,
+                dimensions = funnelDimensions()
+            )
+        )
+    }
+
     // Subscription state from repository
     val subscriptionState: StateFlow<SubscriptionState> = repository.state
 

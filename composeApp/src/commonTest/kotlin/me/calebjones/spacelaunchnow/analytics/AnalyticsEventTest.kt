@@ -56,6 +56,13 @@ class AnalyticsEventTest {
     @Test fun `PaywallTierSelected has correct name`() =
         assertEquals("paywall_tier_selected", AnalyticsEvent.PaywallTierSelected("annual", "prod_1", "support_us").name)
 
+    @Test fun `PaywallDismissed has correct name and params`() {
+        val event = AnalyticsEvent.PaywallDismissed(source = "onboarding", secondsOnScreen = 12L)
+        assertEquals("paywall_dismissed", event.name)
+        assertEquals("onboarding", event.toParameters()["source"])
+        assertEquals(12L, event.toParameters()["seconds_on_screen"])
+    }
+
     @Test
     fun `PaywallTierSelected exposes tier product and source params`() {
         val params = AnalyticsEvent.PaywallTierSelected("annual", "yearly_sub", "support_us").toParameters()
