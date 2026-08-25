@@ -29,6 +29,7 @@ files=(
     "composeApp/google-services.json"
     "iosApp/iosApp/GoogleService-Info.plist"
     "iosApp/iosApp/Secrets.plist"
+    "composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/util/DesktopSecret.kt"
 )
 
 copied=()
