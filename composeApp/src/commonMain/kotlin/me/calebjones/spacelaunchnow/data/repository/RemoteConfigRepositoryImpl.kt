@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.data.repository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.remoteconfig.FirebaseRemoteConfig
 import dev.gitlive.firebase.remoteconfig.remoteConfig
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
@@ -77,6 +78,8 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
             config.fetchAndActivate()
             log.d { "Remote config fetch and activate succeeded" }
             Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             log.e(e) { "Failed to fetch remote config" }
             Result.failure(e)
