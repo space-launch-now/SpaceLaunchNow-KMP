@@ -23,6 +23,13 @@ const val MAX_CAUSE_CHAIN_DEPTH: Int = 8
  * `kotlinx.coroutines` alias resolves to, and which covers `JobCancellationException` and
  * `ChildCancelledException`. Never match on message text such as "Job was cancelled": messages
  * are not API and real failures can carry them.
+ *
+ * Platform asymmetry worth knowing: on JVM and Android this type is a typealias to
+ * `java.util.concurrent.CancellationException`, so a cancelled `Future` — from WorkManager, an
+ * executor, or the image loader — is suppressed here too, even though it is not coroutine
+ * cancellation. On Kotlin/Native it is a distinct class, so iOS matches more narrowly. Both keep
+ * the breadcrumb, so nothing goes missing entirely; but do not read this filter as
+ * coroutine-scoped on Android.
  */
 fun Throwable?.isCoroutineCancellation(): Boolean {
     if (this == null) return false
