@@ -1,3 +1,12 @@
+# [5.42.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.41.2...v5.42.0) (2026-08-26)
+
+
+### Features
+
+* **claude:** add triage skill and /investigate_issue team pipeline ([d564a8d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d564a8d5608a0992a60b218d549fdfe013da0c94))
+
+
+
 ## [5.41.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.41.1...v5.41.2) (2026-08-22)
 
 
@@ -51,17 +60,6 @@
 * **analytics:** instrument Support-Us paywall view and tier selection ([d49fb6a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d49fb6af5d24576c38cd521836641c38a367bc0f))
 * **analytics:** stamp funnel dimensions and dual-pipeline emission in SubscriptionViewModel ([c08639e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c08639eea31304ef9e31d52f521d91d7f9ac0f20))
 * **ui:** show loading state while rewarded ad loads on demand ([f30b559](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f30b55945cfd32751b32fb7f7dea838c3cb7dcda))
-
-
-
-# [5.39.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.38.0...v5.39.0) (2026-08-20)
-
-
-### Features
-
-* **notifications:** anchor Save & apply to the bottom of the filters screen ([7a2c8c9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7a2c8c9ff3d48e6d8c1969ec64dc13d57a30cc8d))
-* **notifications:** make the debug topics switch V6-aware with an immediate reconcile ([31e7c01](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/31e7c01e15110c4792f0074bee80a7ca37478c3e))
-* **notifications:** sync FCM subscriptions automatically on every filter change ([58a25d6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/58a25d69855c81f637619cae27b029c7c7384bd3))
 
 
 

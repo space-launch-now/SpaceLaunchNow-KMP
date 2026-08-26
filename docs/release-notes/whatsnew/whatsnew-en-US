@@ -1,6 +1,3 @@
-### Bug Fixes
+### Features
 
-* **notifications:** add LocalFilterPolicy so devices on V6 topics stop re-filtering server-targeted sends
-* **notifications:** Android worker skips the legacy filter once the V6 changeover has completed
-* **notifications:** iOS NSE and in-app paths skip the legacy filter once the V6 changeover has completed
-* **notifications:** keep the iOS in-app filter cache in step with saved state
+* **claude:** add triage skill and /investigate_issue team pipeline
