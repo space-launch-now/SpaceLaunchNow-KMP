@@ -8,7 +8,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * Real wrapped cancellations are one or two links deep; the bound exists so a pathological
  * chain can never turn a log call into an unbounded walk.
  */
-const val MAX_CAUSE_CHAIN_DEPTH: Int = 8
+internal const val MAX_CAUSE_CHAIN_DEPTH: Int = 8
 
 /**
  * True when this throwable is coroutine cancellation, or wraps one within
@@ -30,8 +30,14 @@ const val MAX_CAUSE_CHAIN_DEPTH: Int = 8
  * cancellation. On Kotlin/Native it is a distinct class, so iOS matches more narrowly. Both keep
  * the breadcrumb, so nothing goes missing entirely; but do not read this filter as
  * coroutine-scoped on Android.
+ *
+ * Known limitation: `TimeoutCancellationException` subclasses `CancellationException`, so a
+ * `withTimeout { }` expiry is suppressed here too — that is a genuine failure, not control flow.
+ * No call site hits it today (the codebase uses only `withTimeoutOrNull`, which returns null
+ * rather than throwing), but reach for `withTimeout` and it will go unreported. The type-only
+ * rule is worth more than the exception; just know the edge exists.
  */
-fun Throwable?.isCoroutineCancellation(): Boolean {
+internal fun Throwable?.isCoroutineCancellation(): Boolean {
     if (this == null) return false
 
     // Identity-tracked so a self-referencing or looping cause chain terminates on the loop
