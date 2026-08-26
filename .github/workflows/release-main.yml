@@ -29,7 +29,7 @@ jobs:
   # Job 1: Calculate version (no commit yet)
   version:
     name: Calculate Version & Changelog
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     outputs:
       version_name: ${{ steps.version.outputs.version_name }}
       version_code: ${{ steps.version.outputs.version_code }}
@@ -248,7 +248,7 @@ jobs:
   test:
     name: Run Tests
     needs: [ version ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
@@ -351,7 +351,7 @@ jobs:
   commit:
     name: Commit Version & Tag
     needs: [ version, test ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
@@ -391,7 +391,7 @@ jobs:
   build-aab:
     name: Build Release AAB
     needs: [ version, commit ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core # Use larger runner for Android builds
     
     env:
       GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true -Dorg.gradle.caching=true -Dkotlin.incremental=true
@@ -519,7 +519,7 @@ jobs:
     name: Deploy to Play Store
     needs: [ version, build-aab ]
     if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_play_store != 'false') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
@@ -600,7 +600,7 @@ jobs:
   deploy-firebase:
     name: Deploy to Firebase
     needs: [ version, build-aab ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
@@ -656,7 +656,7 @@ jobs:
   create-release:
     name: Create GitHub Release
     needs: [ version, build-aab, deploy-firebase ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core
     
     steps:
       - name: Checkout code
