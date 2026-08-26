@@ -26,7 +26,7 @@ and `iosSimulatorArm64()` — Kotlin/Native targets that require Xcode.
 
 | Source set | Verifiable here | Command |
 |---|---|---|
-| `commonMain` | ✅ | `./gradlew :composeApp:jvmTest` (fastest) |
+| `commonMain` | ✅ | `./gradlew :composeApp:desktopTest` (fastest) |
 | `commonMain` compile | ✅ | `./gradlew compileKotlinDesktop` |
 | `androidMain` | ✅ | `./gradlew :composeApp:assembleDebug` |
 | `desktopMain` | ✅ | `./gradlew compileKotlinDesktop` |
@@ -36,18 +36,48 @@ and `iosSimulatorArm64()` — Kotlin/Native targets that require Xcode.
 | formatting | ✅ | `./gradlew ktlintCheck` (soft-fail in CI) |
 
 Single test class:
-`./gradlew :composeApp:jvmTest --tests "me.calebjones.spacelaunchnow.util.LaunchFormatUtilTest"`
+`./gradlew :composeApp:desktopTest --tests "me.calebjones.spacelaunchnow.util.LaunchFormatUtilTest"`
 
-**The trap to refuse:** `:composeApp:jvmTest` passing says *nothing* about `iosMain`. It
+**The trap to refuse:** `:composeApp:desktopTest` passing says *nothing* about `iosMain`. It
 compiles shared code through the JVM target. If the diff touches `iosMain`, your verdict is
 at best **PASS (partial verification)** with iOS explicitly listed as unverified. State it
 in plain words — someone will read your summary as clearance to merge.
 
+## First: check whether Gradle can run here at all
+
+**Do not assume the build works.** In a fresh cloud container it usually cannot, and the
+failure is at *plugin resolution*, long before any source is compiled:
+
+```
+Plugin [id: 'com.android.application', version: '8.13.0', apply: false] was not found
+```
+
+Three independent causes, any one of which is fatal:
+
+- **Empty dependency cache** — `/root/.gradle/caches/modules-2/files-2.1` does not exist.
+- **No Android SDK** — `ANDROID_HOME` unset, nothing on disk.
+- **Blocked Maven hosts** — the agent proxy rejects `dl.google.com:443` and
+  `packages.jetbrains.team:443`. Check with `curl -sS "$HTTPS_PROXY/__agentproxy/status"`.
+
+Probe before planning any verification:
+
+```bash
+./gradlew :composeApp:compileKotlinDesktop --dry-run
+```
+
+If that fails, **no Gradle task runs** — not `desktopTest`, not `ktlintCheck`, not a compile
+check. Say so plainly and return **PASS (partial verification)** with *nothing* verified
+locally, naming CI (`pr-validation.yml`) as the first place the code compiles. Never let an
+unrunnable check be reported as passing, and never edit source to make a probe succeed.
+
+This is broader than the Linux/iOS split below: when the toolchain is missing, even
+`commonMain` is unverifiable here.
+
 ## Environment setup
 
 - `.env` is gitignored and absent in fresh cloud checkouts. `build.gradle.kts:349-354`
-  loads it softly (`if (envFile.exists())`, every property `?: ""`), so **compile checks
-  run without it**. If a task needs it: `cp .env.example .env`.
+  loads it softly (`if (envFile.exists())`, every property `?: ""`), so it does **not**
+  block compilation. If a task needs it: `cp .env.example .env`.
 - Generated API clients are **not committed**. On a clean checkout run
   `./gradlew generateAllApiClients` (or `openApiGenerate` / `generateSnapiClient`) before
   concluding that a missing `api.launchlibrary.*` symbol is a real error.

@@ -33,8 +33,8 @@ Space Launch Now is a Kotlin Multiplatform Compose app (Android, iOS, Desktop, W
 
 # Tests
 ./gradlew test                         # all platforms
-./gradlew :composeApp:jvmTest          # commonMain tests via JVM (fastest)
-./gradlew :composeApp:jvmTest --tests "me.calebjones.spacelaunchnow.util.LaunchFormatUtilTest"
+./gradlew :composeApp:desktopTest      # commonMain tests via the JVM (desktop) target
+./gradlew :composeApp:desktopTest --tests "me.calebjones.spacelaunchnow.util.LaunchFormatUtilTest"
 ./gradlew ktlintCheck                  # formatting (soft-failure in CI)
 ```
 

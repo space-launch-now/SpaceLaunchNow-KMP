@@ -52,7 +52,7 @@ This container is **Linux**. `composeApp/build.gradle.kts:69-71` declares `iosAr
 
 Mark every iOS unit `verifiable_on_linux: no` and state plainly in your summary that it
 ships unverified unless someone runs it on macOS. Do not let an agent claim an iOS fix is
-"verified" because `./gradlew :composeApp:jvmTest` passed — that compiles `commonMain`
+"verified" because `./gradlew :composeApp:desktopTest` passed — that compiles `commonMain`
 through the JVM target and touches no iOS code at all.
 
 ## Integration review
