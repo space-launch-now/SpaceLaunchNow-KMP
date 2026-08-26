@@ -81,9 +81,17 @@ Then label the issue `investigated` (create the label if missing).
 
 ## Standing limits
 
-- **Do not open a pull request** unless I explicitly ask in this session.
-- Do not merge, close, or reopen anything.
-- Do not push to `main`. Work on a branch named for the issue (`fix/issue-<n>-<slug>`).
+- **Open a pull request for the fix.** This is standing authorization from the repo owner —
+  do not stop to ask. One PR per issue, branch `fix/issue-<n>-<slug>`, base `main`, and fill
+  in `.github/PULL_REQUEST_TEMPLATE.md`.
+  - The PR body must state **honestly what was and was not verified**. Tick only the
+    checklist boxes that are actually true; for the rest, say plainly why not. A PR that
+    could not be compiled locally says so in the body — CI is then the first real check.
+  - Link the issue as `Related:`, not `Closes:`. A proposed fix is not a confirmed one, and
+    a crash issue should close on Crashlytics data, not on merge.
+- **Never merge, approve, or close.** Opening a PR is authorized; deciding it is correct is
+  not. That includes your own PRs.
+- Do not push to `main`, and do not reopen closed issues.
 - Never add Claude as a commit co-author.
 - Comment **once** per investigation. If you have already commented on this issue with an
   investigation, update that comment's content in a new one only if something material

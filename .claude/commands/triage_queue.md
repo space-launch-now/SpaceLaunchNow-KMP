@@ -52,7 +52,11 @@ Run them **sequentially, not in parallel** — they share the working tree unles
 
 ## Standing limits
 
-- **Do not open pull requests.** The flow comments a proposed fix; merging is a human call.
+- **Open a pull request per investigated issue** — standing authorization, no need to ask.
+  `/investigate_issue` owns the details (branch naming, template, honest verification
+  statement, `Related:` not `Closes:`).
+- **Never merge, approve, or close.** Opening a PR is authorized; deciding it is correct is
+  not.
 - Do not close issues. `investigated` means the team has reported, not that it is fixed.
 - To park an issue, remove its `triage` label. That is the only off switch, deliberately —
   there is no second "ignore me" label to forget about.
