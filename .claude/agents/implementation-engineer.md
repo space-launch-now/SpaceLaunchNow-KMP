@@ -102,7 +102,7 @@ Run what you can — see `quality-engineer` for the full matrix, but at minimum:
 
 ```bash
 ./gradlew compileKotlinDesktop        # fast shared-code compile check
-./gradlew :composeApp:jvmTest         # commonMain tests via JVM
+./gradlew :composeApp:desktopTest     # commonMain tests via the JVM (desktop) target
 ./gradlew ktlintCheck                 # formatting (soft-fail in CI, still fix it)
 ```
 
