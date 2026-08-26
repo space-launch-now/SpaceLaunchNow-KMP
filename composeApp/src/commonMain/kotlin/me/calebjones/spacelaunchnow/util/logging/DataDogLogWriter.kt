@@ -19,6 +19,10 @@ class DataDogLogWriter : LogWriter(), ConfigurableLogWriter {
         // Respect per-writer severity (default WARN+ for production)
         if (severity < minSeverity) return
 
+        // Coroutine cancellation is normal control flow, not an app error - don't bill it as a
+        // Datadog error event (issue #169). Crashlytics still keeps a breadcrumb for it.
+        if (severity >= Severity.Error && throwable.isCoroutineCancellation()) return
+
         // Automatically append exception message if present
         val enhancedMessage = if (throwable != null) {
             val exceptionMsg = throwable.message

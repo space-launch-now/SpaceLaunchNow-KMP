@@ -15,6 +15,12 @@ class FirebaseCrashlyticsLogWriter : LogWriter(), ConfigurableLogWriter {
 
     override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
         if (severity < minSeverity) return
-        delegate.log(severity, message, tag, throwable)
+
+        // Kermit's CrashlyticsLogWriter writes the breadcrumb AND records the non-fatal in one
+        // opaque call, so cancellation is suppressed by dropping the throwable rather than the
+        // call - skipping the delegate entirely would lose the breadcrumb too (issue #169).
+        val reportable = if (throwable.isCoroutineCancellation()) null else throwable
+
+        delegate.log(severity, message, tag, reportable)
     }
 }
