@@ -1,3 +1,15 @@
+## [5.42.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.0...v5.42.1) (2026-08-26)
+
+
+### Bug Fixes
+
+* **ci:** use standard runners so workflows can be scheduled ([25b14b7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/25b14b7fb5efa0c2f55b1bd772a92e1ba2caeb81)), closes [#174](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/174) [#175](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/175) [#176](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/176) [#174](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/174) [#175](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/175) [#174](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/174) [#175](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/175)
+* **claude:** correct stale Gradle test task and record toolchain limits ([c8f4880](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c8f488065b63e9ff202ebdec1acb181622c8095c)), closes [#169](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/169)
+* **logging:** stop reporting coroutine cancellation as a Crashlytics non-fatal ([077f9ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/077f9ffdc9c749767eebaf274c7821035e15b525))
+* **logging:** stop sending coroutine cancellation to Datadog as an error ([a7fbded](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a7fbded8ba157caaee30a9b9f439f03c730cc8b0))
+
+
+
 # [5.42.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.41.2...v5.42.0) (2026-08-26)
 
 
@@ -39,27 +51,6 @@
 ### Features
 
 * **notifications:** add Starlink mute toggle backed by the v6 starlinkMuted topic ([686ca1f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/686ca1f64dd6ec7de619fb62546c11fabd1abef6))
-
-
-
-# [5.40.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.39.0...v5.40.0) (2026-08-20)
-
-
-### Bug Fixes
-
-* **ads:** load rewarded ads on demand instead of dead preloaded handles ([a567f0f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a567f0f7be5f835feb3400379a32db933c95e81b))
-* **test:** derive expected platform from getPlatform in funnel tests ([7377235](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7377235baa55df5c0c1de53e57fa99c4b7c353c6))
-
-
-### Features
-
-* **analytics:** add paywall_tier_selected and funnel dimensions to conversion events ([ee30910](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ee309101533888b23588e387d47c866579085e4a))
-* **analytics:** add purchase_failed and notification_shown events ([66738eb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/66738eb8b2bd231a2dbdc4333ad0399fa971b332))
-* **analytics:** attach revenue and failure attribution to purchase flow ([8ccc5fe](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8ccc5fea2ae42f8e4a8f061efdc3b395147d3154))
-* **analytics:** fire notification_shown and notification_tapped at display and tap time ([7c973fc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7c973fc76725cd7343e2d8f177f7254e6a8ec927))
-* **analytics:** instrument Support-Us paywall view and tier selection ([d49fb6a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d49fb6af5d24576c38cd521836641c38a367bc0f))
-* **analytics:** stamp funnel dimensions and dual-pipeline emission in SubscriptionViewModel ([c08639e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c08639eea31304ef9e31d52f521d91d7f9ac0f20))
-* **ui:** show loading state while rewarded ad loads on demand ([f30b559](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f30b55945cfd32751b32fb7f7dea838c3cb7dcda))
 
 
 
