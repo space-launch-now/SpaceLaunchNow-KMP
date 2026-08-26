@@ -13,7 +13,7 @@ permissions:
 jobs:
   validate:
     name: Validate PR
-    runs-on: ubuntu-latest-8-core  # Use larger runner (if available on your plan)
+    runs-on: ubuntu-latest
     
     env:
       GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true -Dorg.gradle.caching=true -Dkotlin.incremental=true
