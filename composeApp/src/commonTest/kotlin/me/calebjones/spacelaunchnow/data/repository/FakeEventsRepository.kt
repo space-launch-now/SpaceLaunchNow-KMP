@@ -1,11 +1,13 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import kotlinx.coroutines.CompletableDeferred
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import kotlin.coroutines.cancellation.CancellationException
 
 class FakeEventsRepository : EventsRepository {
 
@@ -30,6 +32,14 @@ class FakeEventsRepository : EventsRepository {
      * overlap it). When a requested offset is absent, [eventsPaginatedDomainResult] is used.
      */
     val eventPagesByOffset: MutableMap<Int, DataResult<PaginatedResult<Event>>> = mutableMapOf()
+
+    /**
+     * Offsets whose [getEventsPaginatedDomain] call suspends until the test completes the
+     * deferred. Without a gate the fake never suspends, so under `StandardTestDispatcher` one
+     * load always runs to completion before the next starts and a test about two overlapping
+     * loads quietly tests nothing.
+     */
+    val eventGatesByOffset: MutableMap<Int, CompletableDeferred<Unit>> = mutableMapOf()
 
     var eventTypesDomainResult: Result<List<EventType>> = Result.success(emptyList())
 
@@ -91,6 +101,13 @@ class FakeEventsRepository : EventsRepository {
     ): Result<DataResult<PaginatedResult<Event>>> {
         getEventsPaginatedDomainCalled = true
         eventsPaginatedOffsetsRequested += offset
+        // Returned rather than thrown, matching EventsRepositoryImpl, whose
+        // `catch (e: Exception)` swallows CancellationException into a Result.failure.
+        try {
+            eventGatesByOffset[offset]?.await()
+        } catch (cancellation: CancellationException) {
+            return Result.failure(cancellation)
+        }
         if (shouldFail) return Result.failure(failureException)
         return eventPagesByOffset[offset]?.let { Result.success(it) } ?: eventsPaginatedDomainResult
     }

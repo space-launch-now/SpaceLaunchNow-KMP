@@ -2,10 +2,12 @@
 
 package me.calebjones.spacelaunchnow.data.repository
 
+import kotlinx.coroutines.CompletableDeferred
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.api.snapi.models.PaginatedArticleList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Instant
 
 /**
@@ -15,11 +17,22 @@ import kotlin.time.Instant
  * overlaps page 1 — exactly what SNAPI does when the feed gains a row between two fetches.
  * Every requested offset is recorded in [offsetsRequested] so tests can assert that a page
  * was fetched once and only once.
+ *
+ * [gatesByOffset] holds a fetch open. Without it every method here returns without ever
+ * suspending, so under `StandardTestDispatcher` a single `advanceUntilIdle()` runs each load
+ * to completion before the next one starts — and any test about two loads overlapping
+ * silently stops testing anything.
  */
 class FakeArticlesRepository : ArticlesRepository {
 
     /** Page keyed by the offset that should serve it. Unmapped offsets return an empty page. */
     val pagesByOffset: MutableMap<Int, PaginatedArticleList> = mutableMapOf()
+
+    /**
+     * Offsets whose fetch suspends until the test completes the deferred. An offset with no
+     * entry (or an already-completed one) returns immediately.
+     */
+    val gatesByOffset: MutableMap<Int, CompletableDeferred<Unit>> = mutableMapOf()
 
     val offsetsRequested: MutableList<Int> = mutableListOf()
 
@@ -36,6 +49,14 @@ class FakeArticlesRepository : ArticlesRepository {
         forceRefresh: Boolean
     ): Result<DataResult<PaginatedArticleList>> {
         offsetsRequested += offset
+        // Cancellation is returned, not thrown, to match ArticlesRepositoryImpl: its
+        // `catch (e: Exception)` swallows CancellationException into a Result.failure. A fake
+        // that re-threw would test a contract production does not honour today.
+        try {
+            gatesByOffset[offset]?.await()
+        } catch (cancellation: CancellationException) {
+            return Result.failure(cancellation)
+        }
         if (shouldFail) return Result.failure(failureException)
         return Result.success(DataResult(pagesByOffset[offset] ?: emptyPage, DataSource.NETWORK))
     }
