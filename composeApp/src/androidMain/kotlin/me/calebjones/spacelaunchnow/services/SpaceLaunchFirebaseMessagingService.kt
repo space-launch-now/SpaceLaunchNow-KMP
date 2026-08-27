@@ -61,9 +61,18 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
             .setInputData(workData.build())
             .build()
 
-        WorkManager.getInstance(this).enqueue(workRequest)
-
-        log.i { "Notification processing delegated to WorkManager - workRequestId: ${workRequest.id}, messageId: ${remoteMessage.messageId}" }
+        // WorkManager initializes on demand (its androidx.startup auto-initializer is
+        // removed in the manifest, issue #181), so initialization failures land here.
+        // runCatching, not try/catch (e: Exception): the reported failure mode is a
+        // NoSuchMethodError, which is an Error. A device that cannot init WorkManager
+        // loses this notification rather than crashing the process.
+        runCatching {
+            WorkManager.getInstance(this).enqueue(workRequest)
+        }.onSuccess {
+            log.i { "Notification processing delegated to WorkManager - workRequestId: ${workRequest.id}, messageId: ${remoteMessage.messageId}" }
+        }.onFailure { throwable ->
+            log.e(throwable) { "WorkManager unavailable - dropping FCM notification work - messageId: ${remoteMessage.messageId}" }
+        }
     }
 
     override fun onNewToken(token: String) {

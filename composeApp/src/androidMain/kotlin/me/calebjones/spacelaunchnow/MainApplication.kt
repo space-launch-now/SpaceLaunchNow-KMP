@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow
 
 import android.app.Application
+import androidx.work.Configuration
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -26,12 +27,22 @@ import org.koin.core.logger.Level
 import org.koin.dsl.includes
 import java.util.concurrent.TimeUnit
 
-class MainApplication : Application() {
+class MainApplication : Application(), Configuration.Provider {
 
     // Inject dependencies for initialization
     private val billingManager: BillingManager by inject()
 
     private val log by lazy { logger() }
+
+    /**
+     * WorkManager's androidx.startup auto-initializer is removed in AndroidManifest.xml
+     * (issue #181), so WorkManager initializes on demand from this configuration the first
+     * time [WorkManager.getInstance] is called. This override is mandatory once auto-init
+     * is gone: without it every getInstance() call throws IllegalStateException on every
+     * device, not just the broken firmware the manifest change is protecting against.
+     */
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().build()
 
     override fun onCreate() {
         super.onCreate()
@@ -276,11 +287,21 @@ class MainApplication : Application() {
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "widget_update_work",
-            ExistingPeriodicWorkPolicy.KEEP,
-            widgetUpdateRequest
-        )
+        // WorkManager now initializes lazily here rather than in InitializationProvider, so
+        // a platform-level failure (issue #181: JobScheduler.forNamespace missing on some
+        // API 34 firmware) surfaces on this call instead of killing the process at startup.
+        // runCatching is deliberate: NoSuchMethodError is an Error, so catch (e: Exception)
+        // would not catch it. log.e forwards to Crashlytics as a non-fatal via
+        // FirebaseCrashlyticsLogWriter.
+        runCatching {
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "widget_update_work",
+                ExistingPeriodicWorkPolicy.KEEP,
+                widgetUpdateRequest
+            )
+        }.onFailure { throwable ->
+            log.e(throwable) { "WorkManager unavailable; periodic widget refresh not scheduled" }
+        }
     }
 
     companion object {
