@@ -1,6 +1,6 @@
 ### Bug Fixes
 
-* **notifications:** add LocalFilterPolicy so devices on V6 topics stop re-filtering server-targeted sends
-* **notifications:** Android worker skips the legacy filter once the V6 changeover has completed
-* **notifications:** iOS NSE and in-app paths skip the legacy filter once the V6 changeover has completed
-* **notifications:** keep the iOS in-app filter cache in step with saved state
+* **ci:** use standard runners so workflows can be scheduled, closes #174 #175 #176 #174 #175 #174 #175
+* **claude:** correct stale Gradle test task and record toolchain limits, closes #169
+* **logging:** stop reporting coroutine cancellation as a Crashlytics non-fatal
+* **logging:** stop sending coroutine cancellation to Datadog as an error
