@@ -100,5 +100,31 @@
                     android:scheme="wear" />
             </intent-filter>
         </service>
+
+        <!-- Opt out of WorkManager's androidx.startup auto-initialization.
+             WorkManagerInitializer runs inside InitializationProvider.onCreate(), so any
+             throwable it raises kills the process during content-provider install, before
+             a single line of app code runs (issue #181: JobScheduler34.forNamespace() is
+             missing on some non-conforming API 34 firmware, producing a NoSuchMethodError).
+             MainApplication implements Configuration.Provider instead, so WorkManager
+             initializes on demand at the first WorkManager.getInstance() call, where the
+             failure is catchable and degrades to "no background work" rather than a crash.
+
+             tools:node="merge" keeps the shared InitializationProvider declaration alive for
+             every other androidx.startup initializer (emoji2, ProcessLifecycleInitializer,
+             ProfileInstaller) and removes only WorkManager's meta-data entry. The authority
+             and android:exported must match the library declaration exactly, otherwise the
+             manifest merger adds a second provider instead of merging into the existing one
+             and auto-init is silently reinstated. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
     </application>
 </manifest>
