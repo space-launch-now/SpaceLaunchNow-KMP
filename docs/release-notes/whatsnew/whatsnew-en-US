@@ -1,6 +1,4 @@
 ### Bug Fixes
 
-* **ci:** use standard runners so workflows can be scheduled, closes #174 #175 #176 #174 #175 #174 #175
-* **claude:** correct stale Gradle test task and record toolchain limits, closes #169
-* **logging:** stop reporting coroutine cancellation as a Crashlytics non-fatal
-* **logging:** stop sending coroutine cancellation to Datadog as an error
+* **android:** make WorkManager init non-fatal by removing startup auto-init, closes #181
+* **wear:** make WorkManager init non-fatal by removing startup auto-init, closes #181

@@ -1,3 +1,13 @@
+## [5.42.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.1...v5.42.2) (2026-08-27)
+
+
+### Bug Fixes
+
+* **android:** make WorkManager init non-fatal by removing startup auto-init ([1a49905](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1a49905e56b5d7072918ae59a3de10aaba814da5)), closes [#181](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/181)
+* **wear:** make WorkManager init non-fatal by removing startup auto-init ([73e6a00](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/73e6a0056033140fbaa0efada171c46004b6a8c1)), closes [#181](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/181)
+
+
+
 ## [5.42.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.0...v5.42.1) (2026-08-26)
 
 
@@ -37,20 +47,6 @@
 ### Bug Fixes
 
 * **notifications:** register for APNs on launch and make the iOS FCM bridge fail fast so the V6 reconcile cannot hang ([f2f10b5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f2f10b579a456c07cc6ba84976cf029ec9bd6cba))
-
-
-
-# [5.41.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.40.0...v5.41.0) (2026-08-21)
-
-
-### Bug Fixes
-
-* **analytics:** move funnel user-property sync to an app-scoped syncer ([b37c4cf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b37c4cf7ec58925f05e43625225b4a73e1b59280))
-
-
-### Features
-
-* **notifications:** add Starlink mute toggle backed by the v6 starlinkMuted topic ([686ca1f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/686ca1f64dd6ec7de619fb62546c11fabd1abef6))
 
 
 
