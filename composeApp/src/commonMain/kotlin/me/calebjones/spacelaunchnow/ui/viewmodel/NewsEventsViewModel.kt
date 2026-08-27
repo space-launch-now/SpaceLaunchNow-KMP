@@ -24,6 +24,7 @@ import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsFilterState
+import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -141,8 +142,15 @@ class NewsEventsViewModel(
         // flight was issued against the old counter, so letting it complete would append a
         // page-N slice onto a page-0 list — duplicate keys plus a page counter that then
         // requests wrong offsets forever.
+        //
+        // The flag is cleared here, beside the cancel, rather than inside the coroutine: the
+        // update below sits after a tryLock() bail, so a concurrent reload would return
+        // having cancelled the load-more without ever clearing it. NewsEventsScreen gates
+        // load-more on isLoadingMoreNews, so a stuck flag stalls pagination, not just the
+        // spinner.
         newsLoadMoreJob?.cancel()
         newsLoadMoreJob = null
+        _uiState.update { it.copy(isLoadingMoreNews = false) }
 
         viewModelScope.launch {
             if (!newsLoadMutex.tryLock()) {
@@ -154,7 +162,6 @@ class NewsEventsViewModel(
                 _uiState.update {
                     it.copy(
                         isLoadingNews = true,
-                        isLoadingMoreNews = false,
                         newsError = null,
                         newsCurrentPage = 0,
                         news = if (forceRefresh) emptyList() else it.news
@@ -240,6 +247,12 @@ class NewsEventsViewModel(
                     )
                 }
             }.onFailure { exception ->
+                // A reload cancelled this fetch, and it already owns the list state — the
+                // flag included, cleared beside the cancel in loadNews(). Cancellation arrives
+                // here rather than as a throw because the repositories catch Exception, which
+                // CancellationException extends; without this guard it would surface as
+                // "Job was cancelled" in newsError.
+                if (exception.isCoroutineCancellation()) return@onFailure
                 log.e { "Failed to load more news: ${exception.message}" }
                 _uiState.update {
                     it.copy(
@@ -270,9 +283,11 @@ class NewsEventsViewModel(
      * Load the first page of events.
      */
     fun loadEvents(forceRefresh: Boolean = false) {
-        // See loadNews(): an in-flight load-more targets the pre-reset page counter.
+        // See loadNews(): an in-flight load-more targets the pre-reset page counter, and the
+        // flag clear belongs beside the cancel, above the tryLock() bail.
         eventsLoadMoreJob?.cancel()
         eventsLoadMoreJob = null
+        _uiState.update { it.copy(isLoadingMoreEvents = false) }
 
         viewModelScope.launch {
             if (!eventsLoadMutex.tryLock()) {
@@ -284,7 +299,6 @@ class NewsEventsViewModel(
                 _uiState.update {
                     it.copy(
                         isLoadingEvents = true,
-                        isLoadingMoreEvents = false,
                         eventsError = null,
                         eventsCurrentPage = 0,
                         events = if (forceRefresh) emptyList() else it.events
@@ -369,6 +383,9 @@ class NewsEventsViewModel(
                     )
                 }
             }.onFailure { exception ->
+                // See loadMoreNews(): a cancelled page fetch is not a UI error, and loadEvents()
+                // already owns the state it was cancelled for.
+                if (exception.isCoroutineCancellation()) return@onFailure
                 log.e { "Failed to load more events: ${exception.message}" }
                 _uiState.update {
                     it.copy(
