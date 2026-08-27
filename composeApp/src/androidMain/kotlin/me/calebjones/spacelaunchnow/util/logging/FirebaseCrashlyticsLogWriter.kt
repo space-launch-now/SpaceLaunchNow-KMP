@@ -27,7 +27,9 @@ class FirebaseCrashlyticsLogWriter : LogWriter(), ConfigurableLogWriter {
 
         instance.log("[$tag] $message")
 
-        if (throwable != null && severity >= Severity.Error) {
+        // Coroutine cancellation is normal control flow, not a defect - keep the breadcrumb
+        // above, but never spend a non-fatal report on it (issue #169).
+        if (throwable != null && severity >= Severity.Error && !throwable.isCoroutineCancellation()) {
             instance.recordException(throwable)
         }
     }
