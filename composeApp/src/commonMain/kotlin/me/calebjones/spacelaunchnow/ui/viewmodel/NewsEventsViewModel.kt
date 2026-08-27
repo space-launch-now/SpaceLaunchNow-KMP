@@ -24,6 +24,7 @@ import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsFilterState
+import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -51,6 +52,16 @@ class NewsEventsViewModel(
     private val log = logger()
     private val newsLoadMutex = Mutex()
     private val eventsLoadMutex = Mutex()
+
+    // Guards against two scroll-driven load-more calls in the same frame both passing the
+    // in-flight check and fetching (then appending) the same page twice.
+    private val newsLoadMoreMutex = Mutex()
+    private val eventsLoadMoreMutex = Mutex()
+
+    // In-flight load-more jobs, cancelled when the list is reset by a reload so a page-N
+    // response can never land on a freshly reset page-0 list.
+    private var newsLoadMoreJob: Job? = null
+    private var eventsLoadMoreJob: Job? = null
 
     private val _searchInput = MutableStateFlow("")
     private val _uiState = MutableStateFlow(NewsEventsUiState())
@@ -127,6 +138,20 @@ class NewsEventsViewModel(
      * Load the first page of news articles.
      */
     fun loadNews(forceRefresh: Boolean = false) {
+        // A reload resets the page counter and replaces the list. Any load-more still in
+        // flight was issued against the old counter, so letting it complete would append a
+        // page-N slice onto a page-0 list — duplicate keys plus a page counter that then
+        // requests wrong offsets forever.
+        //
+        // The flag is cleared here, beside the cancel, rather than inside the coroutine: the
+        // update below sits after a tryLock() bail, so a concurrent reload would return
+        // having cancelled the load-more without ever clearing it. NewsEventsScreen gates
+        // load-more on isLoadingMoreNews, so a stuck flag stalls pagination, not just the
+        // spinner.
+        newsLoadMoreJob?.cancel()
+        newsLoadMoreJob = null
+        _uiState.update { it.copy(isLoadingMoreNews = false) }
+
         viewModelScope.launch {
             if (!newsLoadMutex.tryLock()) {
                 log.w { "Already loading news, skipping duplicate call" }
@@ -182,11 +207,19 @@ class NewsEventsViewModel(
      * Load the next page of news articles.
      */
     fun loadMoreNews() {
-        if (_uiState.value.isLoadingMoreNews || !_uiState.value.newsHasMore) {
+        if (!_uiState.value.newsHasMore) {
             return
         }
 
-        viewModelScope.launch {
+        // tryLock() at the call site, not inside the coroutine: a fling fires the load-more
+        // threshold twice in the same frame, and both calls would otherwise pass the
+        // in-flight check before either had a chance to set it.
+        if (!newsLoadMoreMutex.tryLock()) {
+            log.w { "Already loading more news, skipping duplicate call" }
+            return
+        }
+
+        val job = viewModelScope.launch {
             _uiState.update { it.copy(isLoadingMoreNews = true) }
 
             val nextPage = _uiState.value.newsCurrentPage + 1
@@ -204,13 +237,35 @@ class NewsEventsViewModel(
                 log.i { "Loaded page $nextPage: ${dataResult.data.results.size} more articles" }
                 _uiState.update {
                     it.copy(
-                        news = it.news + dataResult.data.results,
+                        // Offset pagination over a feed that gains rows while it is being
+                        // read re-serves items across page boundaries. Deduplicate by ID to
+                        // prevent duplicate key errors in the LazyColumn.
+                        news = (it.news + dataResult.data.results).distinctBy { article -> article.id },
                         isLoadingMoreNews = false,
                         newsHasMore = dataResult.data.next != null,
                         newsCurrentPage = nextPage
                     )
                 }
             }.onFailure { exception ->
+                // A reload cancelled this fetch, and it already owns the list state — the
+                // flag included, cleared beside the cancel in loadNews(). Cancellation arrives
+                // here rather than as a throw because the repositories catch Exception, which
+                // CancellationException extends; without this guard it would surface as
+                // "Job was cancelled" in newsError.
+                //
+                // The flag is cleared here as well as in loadNews(): isCoroutineCancellation()
+                // matches by type, and on JVM/Android that type is a typealias for
+                // java.util.concurrent.CancellationException, so a cancellation we did not
+                // cause can land here with no reload having cleared it. A stuck flag stalls
+                // pagination outright, not just the spinner — NewsEventsScreen's LaunchedEffect
+                // is keyed on the scroll predicate, so it never re-triggers while that stays
+                // true. This clear cannot race a fresh job: loadMoreNews() is the only writer
+                // of true, it is gated by newsLoadMoreMutex, and that mutex is released in
+                // invokeOnCompletion, strictly after this block.
+                if (exception.isCoroutineCancellation()) {
+                    _uiState.update { it.copy(isLoadingMoreNews = false) }
+                    return@onFailure
+                }
                 log.e { "Failed to load more news: ${exception.message}" }
                 _uiState.update {
                     it.copy(
@@ -220,6 +275,12 @@ class NewsEventsViewModel(
                 }
             }
         }
+
+        // Released on completion rather than in a finally block: loadNews() can cancel this
+        // job before its body ever runs, and a finally would never fire — leaking the lock
+        // and killing pagination for the rest of the session.
+        job.invokeOnCompletion { newsLoadMoreMutex.unlock() }
+        newsLoadMoreJob = job
     }
 
     /**
@@ -235,6 +296,12 @@ class NewsEventsViewModel(
      * Load the first page of events.
      */
     fun loadEvents(forceRefresh: Boolean = false) {
+        // See loadNews(): an in-flight load-more targets the pre-reset page counter, and the
+        // flag clear belongs beside the cancel, above the tryLock() bail.
+        eventsLoadMoreJob?.cancel()
+        eventsLoadMoreJob = null
+        _uiState.update { it.copy(isLoadingMoreEvents = false) }
+
         viewModelScope.launch {
             if (!eventsLoadMutex.tryLock()) {
                 log.w { "Already loading events, skipping duplicate call" }
@@ -291,11 +358,18 @@ class NewsEventsViewModel(
      * Load the next page of events.
      */
     fun loadMoreEvents() {
-        if (_uiState.value.isLoadingMoreEvents || !_uiState.value.eventsHasMore) {
+        if (!_uiState.value.eventsHasMore) {
             return
         }
 
-        viewModelScope.launch {
+        // See loadMoreNews(): the lock is taken at the call site so a double-fire within a
+        // single fling frame cannot fetch and append the same page twice.
+        if (!eventsLoadMoreMutex.tryLock()) {
+            log.w { "Already loading more events, skipping duplicate call" }
+            return
+        }
+
+        val job = viewModelScope.launch {
             _uiState.update { it.copy(isLoadingMoreEvents = true) }
 
             val nextPage = _uiState.value.eventsCurrentPage + 1
@@ -314,13 +388,22 @@ class NewsEventsViewModel(
                 log.i { "Loaded page $nextPage: ${dataResult.data.results.size} more events" }
                 _uiState.update {
                     it.copy(
-                        events = it.events + dataResult.data.results,
+                        // Same offset-pagination overlap as news — deduplicate by ID.
+                        events = (it.events + dataResult.data.results).distinctBy { event -> event.id },
                         isLoadingMoreEvents = false,
                         eventsHasMore = dataResult.data.next != null,
                         eventsCurrentPage = nextPage
                     )
                 }
             }.onFailure { exception ->
+                // See loadMoreNews(): a cancelled page fetch is not a UI error, and loadEvents()
+                // already owns the state it was cancelled for. The flag is cleared here too,
+                // for the same reason as news: a cancellation we did not cause would otherwise
+                // leave it stuck and stall pagination.
+                if (exception.isCoroutineCancellation()) {
+                    _uiState.update { it.copy(isLoadingMoreEvents = false) }
+                    return@onFailure
+                }
                 log.e { "Failed to load more events: ${exception.message}" }
                 _uiState.update {
                     it.copy(
@@ -330,6 +413,10 @@ class NewsEventsViewModel(
                 }
             }
         }
+
+        // See loadMoreNews(): unlock on completion so a cancel-before-start cannot leak it.
+        job.invokeOnCompletion { eventsLoadMoreMutex.unlock() }
+        eventsLoadMoreJob = job
     }
 
     /**

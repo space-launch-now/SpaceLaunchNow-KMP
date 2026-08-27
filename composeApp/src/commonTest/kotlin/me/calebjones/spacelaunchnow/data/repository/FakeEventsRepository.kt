@@ -1,11 +1,13 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import kotlinx.coroutines.CompletableDeferred
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import kotlin.coroutines.cancellation.CancellationException
 
 class FakeEventsRepository : EventsRepository {
 
@@ -25,6 +27,20 @@ class FakeEventsRepository : EventsRepository {
     var eventsPaginatedDomainResult: Result<DataResult<PaginatedResult<Event>>> =
         Result.success(DataResult(PaginatedResult(count = 0, next = null, previous = null), DataSource.NETWORK))
 
+    /**
+     * Per-offset pages, for pagination tests that need page 2 to differ from page 1 (and to
+     * overlap it). When a requested offset is absent, [eventsPaginatedDomainResult] is used.
+     */
+    val eventPagesByOffset: MutableMap<Int, DataResult<PaginatedResult<Event>>> = mutableMapOf()
+
+    /**
+     * Offsets whose [getEventsPaginatedDomain] call suspends until the test completes the
+     * deferred. Without a gate the fake never suspends, so under `StandardTestDispatcher` one
+     * load always runs to completion before the next starts and a test about two overlapping
+     * loads quietly tests nothing.
+     */
+    val eventGatesByOffset: MutableMap<Int, CompletableDeferred<Unit>> = mutableMapOf()
+
     var eventTypesDomainResult: Result<List<EventType>> = Result.success(emptyList())
 
     var shouldFail = false
@@ -41,6 +57,9 @@ class FakeEventsRepository : EventsRepository {
 
     var lastEventDetailId: Int? = null
     var lastEventsByLaunchIdLaunchId: String? = null
+
+    /** Every offset passed to [getEventsPaginatedDomain], in call order. */
+    val eventsPaginatedOffsetsRequested: MutableList<Int> = mutableListOf()
 
     // -- Domain-returning methods -----------------------------------------
 
@@ -81,8 +100,16 @@ class FakeEventsRepository : EventsRepository {
         typeIds: List<Int>?, upcoming: Boolean?, forceRefresh: Boolean
     ): Result<DataResult<PaginatedResult<Event>>> {
         getEventsPaginatedDomainCalled = true
+        eventsPaginatedOffsetsRequested += offset
+        // Returned rather than thrown, matching EventsRepositoryImpl, whose
+        // `catch (e: Exception)` swallows CancellationException into a Result.failure.
+        try {
+            eventGatesByOffset[offset]?.await()
+        } catch (cancellation: CancellationException) {
+            return Result.failure(cancellation)
+        }
         if (shouldFail) return Result.failure(failureException)
-        return eventsPaginatedDomainResult
+        return eventPagesByOffset[offset]?.let { Result.success(it) } ?: eventsPaginatedDomainResult
     }
 
     override suspend fun getEventTypesDomain(): Result<List<EventType>> {
