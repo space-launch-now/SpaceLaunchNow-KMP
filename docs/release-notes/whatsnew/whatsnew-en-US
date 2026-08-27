@@ -1,4 +1,5 @@
 ### Bug Fixes
 
-* **android:** make WorkManager init non-fatal by removing startup auto-init, closes #181
-* **wear:** make WorkManager init non-fatal by removing startup auto-init, closes #181
+* **newsevents:** clear the load-more flag on every reload path
+* **newsevents:** clear the load-more flag when a fetch is cancelled
+* **newsevents:** dedupe paginated appends and close load-more race, closes #182 #179

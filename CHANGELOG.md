@@ -1,3 +1,14 @@
+## [5.42.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.2...v5.42.3) (2026-08-27)
+
+
+### Bug Fixes
+
+* **newsevents:** clear the load-more flag on every reload path ([4b9bd96](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4b9bd96ad91ea12f633a3e56552421af370347ec))
+* **newsevents:** clear the load-more flag when a fetch is cancelled ([e73a4c4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e73a4c4c19b754897e45a67b8166a19cffe82168))
+* **newsevents:** dedupe paginated appends and close load-more race ([fc86705](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fc86705bb1ca8acb04eb1d9032bf9bd008de3297)), closes [#182](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/182) [#179](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/179)
+
+
+
 ## [5.42.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.1...v5.42.2) (2026-08-27)
 
 
@@ -38,15 +49,6 @@
 * **notifications:** Android worker skips the legacy filter once the V6 changeover has completed ([91ad718](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/91ad718cfd24356575b6c7c1ce12f5c96f2de00d))
 * **notifications:** iOS NSE and in-app paths skip the legacy filter once the V6 changeover has completed ([3f5afd6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f5afd6ee1f2fbb07c374dd83d15d03de80f44cc))
 * **notifications:** keep the iOS in-app filter cache in step with saved state ([fc07108](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fc07108c761013d8f0d42d8634ed4598c5b54f31))
-
-
-
-## [5.41.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.41.0...v5.41.1) (2026-08-22)
-
-
-### Bug Fixes
-
-* **notifications:** register for APNs on launch and make the iOS FCM bridge fail fast so the V6 reconcile cannot hang ([f2f10b5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f2f10b579a456c07cc6ba84976cf029ec9bd6cba))
 
 
 
