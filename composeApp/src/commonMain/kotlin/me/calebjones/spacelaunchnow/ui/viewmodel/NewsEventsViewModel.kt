@@ -52,6 +52,16 @@ class NewsEventsViewModel(
     private val newsLoadMutex = Mutex()
     private val eventsLoadMutex = Mutex()
 
+    // Guards against two scroll-driven load-more calls in the same frame both passing the
+    // in-flight check and fetching (then appending) the same page twice.
+    private val newsLoadMoreMutex = Mutex()
+    private val eventsLoadMoreMutex = Mutex()
+
+    // In-flight load-more jobs, cancelled when the list is reset by a reload so a page-N
+    // response can never land on a freshly reset page-0 list.
+    private var newsLoadMoreJob: Job? = null
+    private var eventsLoadMoreJob: Job? = null
+
     private val _searchInput = MutableStateFlow("")
     private val _uiState = MutableStateFlow(NewsEventsUiState())
     val uiState: StateFlow<NewsEventsUiState> = _uiState.asStateFlow()
@@ -127,6 +137,13 @@ class NewsEventsViewModel(
      * Load the first page of news articles.
      */
     fun loadNews(forceRefresh: Boolean = false) {
+        // A reload resets the page counter and replaces the list. Any load-more still in
+        // flight was issued against the old counter, so letting it complete would append a
+        // page-N slice onto a page-0 list — duplicate keys plus a page counter that then
+        // requests wrong offsets forever.
+        newsLoadMoreJob?.cancel()
+        newsLoadMoreJob = null
+
         viewModelScope.launch {
             if (!newsLoadMutex.tryLock()) {
                 log.w { "Already loading news, skipping duplicate call" }
@@ -137,6 +154,7 @@ class NewsEventsViewModel(
                 _uiState.update {
                     it.copy(
                         isLoadingNews = true,
+                        isLoadingMoreNews = false,
                         newsError = null,
                         newsCurrentPage = 0,
                         news = if (forceRefresh) emptyList() else it.news
@@ -182,11 +200,19 @@ class NewsEventsViewModel(
      * Load the next page of news articles.
      */
     fun loadMoreNews() {
-        if (_uiState.value.isLoadingMoreNews || !_uiState.value.newsHasMore) {
+        if (!_uiState.value.newsHasMore) {
             return
         }
 
-        viewModelScope.launch {
+        // tryLock() at the call site, not inside the coroutine: a fling fires the load-more
+        // threshold twice in the same frame, and both calls would otherwise pass the
+        // in-flight check before either had a chance to set it.
+        if (!newsLoadMoreMutex.tryLock()) {
+            log.w { "Already loading more news, skipping duplicate call" }
+            return
+        }
+
+        val job = viewModelScope.launch {
             _uiState.update { it.copy(isLoadingMoreNews = true) }
 
             val nextPage = _uiState.value.newsCurrentPage + 1
@@ -204,7 +230,10 @@ class NewsEventsViewModel(
                 log.i { "Loaded page $nextPage: ${dataResult.data.results.size} more articles" }
                 _uiState.update {
                     it.copy(
-                        news = it.news + dataResult.data.results,
+                        // Offset pagination over a feed that gains rows while it is being
+                        // read re-serves items across page boundaries. Deduplicate by ID to
+                        // prevent duplicate key errors in the LazyColumn.
+                        news = (it.news + dataResult.data.results).distinctBy { article -> article.id },
                         isLoadingMoreNews = false,
                         newsHasMore = dataResult.data.next != null,
                         newsCurrentPage = nextPage
@@ -220,6 +249,12 @@ class NewsEventsViewModel(
                 }
             }
         }
+
+        // Released on completion rather than in a finally block: loadNews() can cancel this
+        // job before its body ever runs, and a finally would never fire — leaking the lock
+        // and killing pagination for the rest of the session.
+        job.invokeOnCompletion { newsLoadMoreMutex.unlock() }
+        newsLoadMoreJob = job
     }
 
     /**
@@ -235,6 +270,10 @@ class NewsEventsViewModel(
      * Load the first page of events.
      */
     fun loadEvents(forceRefresh: Boolean = false) {
+        // See loadNews(): an in-flight load-more targets the pre-reset page counter.
+        eventsLoadMoreJob?.cancel()
+        eventsLoadMoreJob = null
+
         viewModelScope.launch {
             if (!eventsLoadMutex.tryLock()) {
                 log.w { "Already loading events, skipping duplicate call" }
@@ -245,6 +284,7 @@ class NewsEventsViewModel(
                 _uiState.update {
                     it.copy(
                         isLoadingEvents = true,
+                        isLoadingMoreEvents = false,
                         eventsError = null,
                         eventsCurrentPage = 0,
                         events = if (forceRefresh) emptyList() else it.events
@@ -291,11 +331,18 @@ class NewsEventsViewModel(
      * Load the next page of events.
      */
     fun loadMoreEvents() {
-        if (_uiState.value.isLoadingMoreEvents || !_uiState.value.eventsHasMore) {
+        if (!_uiState.value.eventsHasMore) {
             return
         }
 
-        viewModelScope.launch {
+        // See loadMoreNews(): the lock is taken at the call site so a double-fire within a
+        // single fling frame cannot fetch and append the same page twice.
+        if (!eventsLoadMoreMutex.tryLock()) {
+            log.w { "Already loading more events, skipping duplicate call" }
+            return
+        }
+
+        val job = viewModelScope.launch {
             _uiState.update { it.copy(isLoadingMoreEvents = true) }
 
             val nextPage = _uiState.value.eventsCurrentPage + 1
@@ -314,7 +361,8 @@ class NewsEventsViewModel(
                 log.i { "Loaded page $nextPage: ${dataResult.data.results.size} more events" }
                 _uiState.update {
                     it.copy(
-                        events = it.events + dataResult.data.results,
+                        // Same offset-pagination overlap as news — deduplicate by ID.
+                        events = (it.events + dataResult.data.results).distinctBy { event -> event.id },
                         isLoadingMoreEvents = false,
                         eventsHasMore = dataResult.data.next != null,
                         eventsCurrentPage = nextPage
@@ -330,6 +378,10 @@ class NewsEventsViewModel(
                 }
             }
         }
+
+        // See loadMoreNews(): unlock on completion so a cancel-before-start cannot leak it.
+        job.invokeOnCompletion { eventsLoadMoreMutex.unlock() }
+        eventsLoadMoreJob = job
     }
 
     /**
