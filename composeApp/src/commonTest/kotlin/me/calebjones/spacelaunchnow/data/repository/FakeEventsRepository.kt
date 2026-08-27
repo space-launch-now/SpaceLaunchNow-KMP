@@ -25,6 +25,12 @@ class FakeEventsRepository : EventsRepository {
     var eventsPaginatedDomainResult: Result<DataResult<PaginatedResult<Event>>> =
         Result.success(DataResult(PaginatedResult(count = 0, next = null, previous = null), DataSource.NETWORK))
 
+    /**
+     * Per-offset pages, for pagination tests that need page 2 to differ from page 1 (and to
+     * overlap it). When a requested offset is absent, [eventsPaginatedDomainResult] is used.
+     */
+    val eventPagesByOffset: MutableMap<Int, DataResult<PaginatedResult<Event>>> = mutableMapOf()
+
     var eventTypesDomainResult: Result<List<EventType>> = Result.success(emptyList())
 
     var shouldFail = false
@@ -41,6 +47,9 @@ class FakeEventsRepository : EventsRepository {
 
     var lastEventDetailId: Int? = null
     var lastEventsByLaunchIdLaunchId: String? = null
+
+    /** Every offset passed to [getEventsPaginatedDomain], in call order. */
+    val eventsPaginatedOffsetsRequested: MutableList<Int> = mutableListOf()
 
     // -- Domain-returning methods -----------------------------------------
 
@@ -81,8 +90,9 @@ class FakeEventsRepository : EventsRepository {
         typeIds: List<Int>?, upcoming: Boolean?, forceRefresh: Boolean
     ): Result<DataResult<PaginatedResult<Event>>> {
         getEventsPaginatedDomainCalled = true
+        eventsPaginatedOffsetsRequested += offset
         if (shouldFail) return Result.failure(failureException)
-        return eventsPaginatedDomainResult
+        return eventPagesByOffset[offset]?.let { Result.success(it) } ?: eventsPaginatedDomainResult
     }
 
     override suspend fun getEventTypesDomain(): Result<List<EventType>> {
