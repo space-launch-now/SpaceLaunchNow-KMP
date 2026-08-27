@@ -252,7 +252,20 @@ class NewsEventsViewModel(
                 // here rather than as a throw because the repositories catch Exception, which
                 // CancellationException extends; without this guard it would surface as
                 // "Job was cancelled" in newsError.
-                if (exception.isCoroutineCancellation()) return@onFailure
+                //
+                // The flag is cleared here as well as in loadNews(): isCoroutineCancellation()
+                // matches by type, and on JVM/Android that type is a typealias for
+                // java.util.concurrent.CancellationException, so a cancellation we did not
+                // cause can land here with no reload having cleared it. A stuck flag stalls
+                // pagination outright, not just the spinner — NewsEventsScreen's LaunchedEffect
+                // is keyed on the scroll predicate, so it never re-triggers while that stays
+                // true. This clear cannot race a fresh job: loadMoreNews() is the only writer
+                // of true, it is gated by newsLoadMoreMutex, and that mutex is released in
+                // invokeOnCompletion, strictly after this block.
+                if (exception.isCoroutineCancellation()) {
+                    _uiState.update { it.copy(isLoadingMoreNews = false) }
+                    return@onFailure
+                }
                 log.e { "Failed to load more news: ${exception.message}" }
                 _uiState.update {
                     it.copy(
@@ -384,8 +397,13 @@ class NewsEventsViewModel(
                 }
             }.onFailure { exception ->
                 // See loadMoreNews(): a cancelled page fetch is not a UI error, and loadEvents()
-                // already owns the state it was cancelled for.
-                if (exception.isCoroutineCancellation()) return@onFailure
+                // already owns the state it was cancelled for. The flag is cleared here too,
+                // for the same reason as news: a cancellation we did not cause would otherwise
+                // leave it stuck and stall pagination.
+                if (exception.isCoroutineCancellation()) {
+                    _uiState.update { it.copy(isLoadingMoreEvents = false) }
+                    return@onFailure
+                }
                 log.e { "Failed to load more events: ${exception.message}" }
                 _uiState.update {
                     it.copy(
