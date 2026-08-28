@@ -11,6 +11,7 @@ import chaintech.videoplayer.model.VideoPlayerConfig
 import me.calebjones.spacelaunchnow.ui.compose.LaunchVideoPlayer
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.VideoUtil
+import me.calebjones.spacelaunchnow.util.openUriSafely
 
 /**
  * Video player component without card wrapper
@@ -59,7 +60,7 @@ fun VideoPlayer(
                         video.url,
                         VideoUtil.getVideoSourceName(video)
                     )
-                    uriHandler.openUri(video.url)
+                    uriHandler.openUriSafely(video.url)
                 }
             )
         }
