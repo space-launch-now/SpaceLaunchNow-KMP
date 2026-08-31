@@ -96,7 +96,7 @@ jobs:
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         with:
-          model: gpt-4.1
+          model: claude-sonnet-4.5
           system-prompt: |
             You write Google Play "What's new" release notes for an Android space-launch tracking app.
             Your audience is end users who track rocket launches in the app — NOT developers reading a commit log.
@@ -148,7 +148,7 @@ jobs:
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         with:
-          model: gpt-4.1
+          model: claude-sonnet-4.5
           system-prompt: |
             You write GitHub Release notes for an Android/iOS/Wear OS space-launch tracking app.
             Rules:
