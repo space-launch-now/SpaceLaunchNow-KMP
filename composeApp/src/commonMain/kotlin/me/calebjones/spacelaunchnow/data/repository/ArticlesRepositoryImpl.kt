@@ -9,6 +9,7 @@ import me.calebjones.spacelaunchnow.api.snapi.extensions.getArticles
 import me.calebjones.spacelaunchnow.api.snapi.extensions.getArticlesByLaunch
 import me.calebjones.spacelaunchnow.api.snapi.extensions.getFeaturedArticles
 import me.calebjones.spacelaunchnow.api.snapi.extensions.searchArticles
+import me.calebjones.spacelaunchnow.api.snapi.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.api.snapi.models.PaginatedArticleList
 import me.calebjones.spacelaunchnow.data.model.ApiError
@@ -24,6 +25,20 @@ class ArticlesRepositoryImpl(
 
     private val log = logger()
     private val json = Json { ignoreUnknownKeys = true }
+
+    /**
+     * Ktor is configured with the default `expectSuccess = false`, so a non-2xx SNAPI response
+     * never throws on its own — deserializing its error body fails with
+     * `NoTransformationFoundException`, which lands in the catch-all arm and skips the
+     * stale-cache fallback. Raise `ResponseException` up front so server errors take the same
+     * recovery path as any other API error.
+     */
+    private suspend fun <T : Any> HttpResponse<T>.bodyOrThrow(operation: String): T {
+        if (!success) {
+            throw ResponseException(response, "SNAPI $operation failed: HTTP $status")
+        }
+        return body()
+    }
 
     private suspend fun parseApiError(rawResponse: String): String {
         return try {
@@ -71,7 +86,7 @@ class ArticlesRepositoryImpl(
                 limit = limit
             )
             
-            val body = response.body()
+            val body = response.bodyOrThrow("getArticles")
             log.i { "Successfully fetched ${body.results.size} articles from API" }
 
             // Cache the results for future use
@@ -130,7 +145,7 @@ class ArticlesRepositoryImpl(
     override suspend fun getFeaturedArticles(limit: Int): Result<PaginatedArticleList> {
         return try {
             val response = articlesApi.getFeaturedArticles(limit = limit)
-            Result.success(response.body())
+            Result.success(response.bodyOrThrow("getFeaturedArticles"))
         } catch (e: ResponseException) {
             log.e(e) { "API error while fetching featured articles" }
             // Try to return stale cache if available
@@ -171,7 +186,7 @@ class ArticlesRepositoryImpl(
                 launchIds = launchIds,
                 limit = limit
             )
-            Result.success(response.body())
+            Result.success(response.bodyOrThrow("getArticlesByLaunch"))
         } catch (e: ResponseException) {
             Result.failure(e)
         } catch (e: IOException) {
@@ -184,7 +199,7 @@ class ArticlesRepositoryImpl(
     override suspend fun getArticleById(id: Int): Result<Article> {
         return try {
             val response = articlesApi.articlesRetrieve(id = id)
-            Result.success(response.body())
+            Result.success(response.bodyOrThrow("getArticleById"))
         } catch (e: ResponseException) {
             Result.failure(e)
         } catch (e: IOException) {
@@ -200,7 +215,7 @@ class ArticlesRepositoryImpl(
                 query = query,
                 limit = limit
             )
-            Result.success(response.body())
+            Result.success(response.bodyOrThrow("searchArticles"))
         } catch (e: ResponseException) {
             log.e(e) { "API error while searching articles for query: '$query'" }
             // Try to return stale cache if available (less ideal for search, but better than nothing)
@@ -254,7 +269,7 @@ class ArticlesRepositoryImpl(
                 newsSite = newsSites?.joinToString(",")
             )
             
-            val body = response.body()
+            val body = response.bodyOrThrow("getArticlesPaginated")
             log.i { "Successfully fetched ${body.results.size} articles (offset: $offset)" }
             
             Result.success(DataResult(
