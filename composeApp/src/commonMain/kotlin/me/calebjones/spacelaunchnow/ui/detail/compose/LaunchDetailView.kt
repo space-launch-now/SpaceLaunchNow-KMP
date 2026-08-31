@@ -19,6 +19,7 @@ import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
+import me.calebjones.spacelaunchnow.ui.compose.HeroDetailScaffold
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.detail.compose.phone.PhoneLaunchDetailContent
 import me.calebjones.spacelaunchnow.ui.detail.compose.tablet.TabletLaunchDetailContent
@@ -26,7 +27,6 @@ import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 
 // Height constants for spacing adjustments
-private val TitleHeight = 110.dp
 private val CompactHeight = 40.dp
 
 /**
@@ -169,6 +169,7 @@ private fun TabletLaunchDetailView(
         titleText = launch.name,
         taglineText = launch.provider?.name ?: "",
         imageUrl = launch.imageUrl,
+        logoUrl = launch.provider?.socialLogo ?: launch.provider?.logoUrl,
         onNavigateBack = onNavigateBack,
         scrollEnabled = true, // Tablet uses scrollable layout
         backgroundColors = listOf(
@@ -237,18 +238,12 @@ private fun PhoneLaunchDetailView(
     onOpenUrl: (String) -> Unit = {},
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
-    SharedDetailScaffold(
+    HeroDetailScaffold(
         titleText = launch.name,
         taglineText = launch.provider?.name ?: "",
         imageUrl = launch.imageUrl,
+        logoUrl = launch.provider?.socialLogo ?: launch.provider?.logoUrl,
         onNavigateBack = onNavigateBack,
-        scrollEnabled = true, // Parent scrolling enabled for header collapse
-        forcePhoneLayout = forcePhoneLayout,
-        backgroundColors = listOf(
-            getLaunchStatusColor(launch.status?.id),
-            MaterialTheme.colorScheme.primaryContainer,
-            MaterialTheme.colorScheme.surfaceVariant
-        ),
     ) {
         // Column provides layout for content, parent scaffold handles scrolling
         Column(
@@ -256,8 +251,6 @@ private fun PhoneLaunchDetailView(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            Spacer(Modifier.height(TitleHeight))
-
             PhoneLaunchDetailContent(
                 launch = launch,
                 videoPlayerState = videoPlayerState,

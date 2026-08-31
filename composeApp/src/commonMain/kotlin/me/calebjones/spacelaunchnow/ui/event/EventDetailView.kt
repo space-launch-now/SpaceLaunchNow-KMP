@@ -58,8 +58,11 @@ import me.calebjones.spacelaunchnow.domain.model.SpaceStationSummary
 import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.compose.AgencyLogoBadge
+import me.calebjones.spacelaunchnow.ui.compose.HeroDetailScaffold
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
@@ -84,30 +87,59 @@ fun EventDetailView(
     onOpenUrl: (String) -> Unit = {},
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
-    SharedDetailScaffold(
-        titleText = event.name,
-        taglineText = event.type.name,
-        imageUrl = event.imageUrl,
-        onNavigateBack = onNavigateBack,
-        backgroundColors = listOf(
-            MaterialTheme.colorScheme.secondary,
-            MaterialTheme.colorScheme.secondaryContainer,
-            MaterialTheme.colorScheme.onSecondaryContainer
-        ),
-    ) {
-        EventDetailContentInBody(
-            event = event,
-            videoPlayerState = videoPlayerState,
-            onSelectVideo = onSelectVideo,
-            onSetPlayerVisible = onSetPlayerVisible,
-            onNavigateToFullscreen = onNavigateToFullscreen,
-            onAgencyClick = onAgencyClick,
-            onLaunchClick = onLaunchClick,
-            onAstronautClick = onAstronautClick,
-            onSpaceStationClick = onSpaceStationClick,
-            onOpenUrl = onOpenUrl,
-            onExternalVideoOpened = onExternalVideoOpened
-        )
+    val logoUrl = event.agencies.firstOrNull()?.let { it.socialLogo ?: it.logoUrl }
+
+    if (rememberAdaptiveLayoutState().isExpanded) {
+        SharedDetailScaffold(
+            titleText = event.name,
+            taglineText = event.type.name,
+            imageUrl = event.imageUrl,
+            logoUrl = logoUrl,
+            onNavigateBack = onNavigateBack,
+            backgroundColors = listOf(
+                MaterialTheme.colorScheme.secondary,
+                MaterialTheme.colorScheme.secondaryContainer,
+                MaterialTheme.colorScheme.onSecondaryContainer
+            ),
+        ) {
+            EventDetailContentInBody(
+                event = event,
+                videoPlayerState = videoPlayerState,
+                onSelectVideo = onSelectVideo,
+                onSetPlayerVisible = onSetPlayerVisible,
+                onNavigateToFullscreen = onNavigateToFullscreen,
+                onAgencyClick = onAgencyClick,
+                onLaunchClick = onLaunchClick,
+                onAstronautClick = onAstronautClick,
+                onSpaceStationClick = onSpaceStationClick,
+                onOpenUrl = onOpenUrl,
+                onExternalVideoOpened = onExternalVideoOpened
+            )
+        }
+    } else {
+        HeroDetailScaffold(
+            titleText = event.name,
+            taglineText = event.type.name,
+            imageUrl = event.imageUrl,
+            logoUrl = logoUrl,
+            onNavigateBack = onNavigateBack,
+        ) {
+            EventDetailContentInBody(
+                event = event,
+                videoPlayerState = videoPlayerState,
+                onSelectVideo = onSelectVideo,
+                onSetPlayerVisible = onSetPlayerVisible,
+                onNavigateToFullscreen = onNavigateToFullscreen,
+                onAgencyClick = onAgencyClick,
+                onLaunchClick = onLaunchClick,
+                onAstronautClick = onAstronautClick,
+                onSpaceStationClick = onSpaceStationClick,
+                onOpenUrl = onOpenUrl,
+                onExternalVideoOpened = onExternalVideoOpened,
+                // The hero header already shows the event image full-width
+                showFeatureImage = false
+            )
+        }
     }
 }
 
@@ -123,7 +155,8 @@ private fun EventDetailContentInBody(
     onAstronautClick: ((Int) -> Unit)? = null,
     onSpaceStationClick: ((Int) -> Unit)? = null,
     onOpenUrl: (String) -> Unit = {},
-    onExternalVideoOpened: ((String, String) -> Unit)? = null
+    onExternalVideoOpened: ((String, String) -> Unit)? = null,
+    showFeatureImage: Boolean = true
 ) {
     val isCollapsed = LocalDetailScaffoldCollapsed.current
     Column(
@@ -147,7 +180,7 @@ private fun EventDetailContentInBody(
         }
 
         // Feature image (only show if no videos — video player takes this slot)
-        if (videoPlayerState.availableVideos.isEmpty()) {
+        if (videoPlayerState.availableVideos.isEmpty() && showFeatureImage) {
             event.imageUrl?.let { imageUrl ->
                 EventFeatureImage(imageUrl = imageUrl, contentDescription = event.name)
                 Spacer(Modifier.height(16.dp))
@@ -379,19 +412,7 @@ private fun AgencyRowWithLogo(agency: Provider, onClick: () -> Unit) {
         // Logo or fallback avatar
         val logoUrl = detailed?.socialLogoUrl ?: agency.logoUrl
         if (!logoUrl.isNullOrBlank()) {
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-            ) {
-                AsyncImage(
-                    model = logoUrl,
-                    contentDescription = "Agency logo",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(CircleShape),
-                )
-            }
+            AgencyLogoBadge(logoUrl = logoUrl, size = 64.dp)
         } else {
             Box(
                 modifier = Modifier
@@ -895,23 +916,42 @@ fun EventDetailErrorView(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EventDetailLoadingView(onNavigateBack: () -> Unit) {
-    SharedDetailScaffold(
-        titleText = "Loading...",
-        taglineText = null,
-        imageUrl = null,
-        onNavigateBack = onNavigateBack,
-        backgroundColors = listOf(
-            MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-        ),
-        scrollEnabled = false,
-    ) {
-        // Loading content
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+    // Mirror the scaffold choice in EventDetailView: hero header on phones,
+    // compact SharedDetailScaffold header on expanded layouts
+    if (rememberAdaptiveLayoutState().isExpanded) {
+        SharedDetailScaffold(
+            titleText = "Loading...",
+            taglineText = null,
+            imageUrl = null,
+            onNavigateBack = onNavigateBack,
+            backgroundColors = listOf(
+                MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+            ),
+            scrollEnabled = false,
         ) {
-            LoadingIndicator()
+            EventDetailLoadingContent()
         }
+    } else {
+        HeroDetailScaffold(
+            titleText = "",
+            taglineText = null,
+            imageUrl = null, // Shimmer hero placeholder while loading
+            onNavigateBack = onNavigateBack,
+            scrollEnabled = false,
+        ) {
+            EventDetailLoadingContent()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun EventDetailLoadingContent() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        LoadingIndicator()
     }
 }

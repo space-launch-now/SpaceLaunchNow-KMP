@@ -1,3 +1,26 @@
+# [5.43.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.3...v5.43.0) (2026-08-31)
+
+
+### Bug Fixes
+
+* **analytics:** guard subscriber paywall dismissals and dual-pipeline permission results ([be543f3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/be543f3dce7ff76baf4161dd856214c7b39fc9e0))
+* **config:** rethrow cancellation so fetch timeouts are not swallowed as failures ([ab7e979](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ab7e9798c9d6a0b5f73afc90b36d3aeaf5010048))
+* request notification permission from settings when the iOS dialog was never shown ([a73e80e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a73e80e2367c26103ca0a21bf03b1ca6ba823708))
+* **ui:** guard alternate video link opens against startActivity crash ([4a14399](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4a14399774aa14f1d4d8681590b1c8d155de8c6a)), closes [#180](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/180)
+* **widgets:** keep widget refresh running while offline ([1e0d2b6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1e0d2b620926cb57c2059ddaf6005816656ef9ba)), closes [#170](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/170)
+
+
+### Features
+
+* **analytics:** add paywall_dismissed with time-on-screen ([676495e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/676495e26e0b872f2c971cef246ed7393e726f81))
+* **analytics:** attribute purchase events to their paywall source ([bd4c35b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bd4c35bdda090b97df4098ddc47558b9e344b973))
+* **analytics:** instrument onboarding paywall tier taps, source, and dismissal ([0f493f8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0f493f8a95eb7a904d8fc77fd56e2fccbb140826))
+* **onboarding:** add OnboardingVariant model, storage, and remote config plumbing ([5d16513](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5d16513fd9ca75c7af04d80953d7e771b3be6cb7))
+* **onboarding:** gate preload navigation on onboarding variant fetch ([aeaac00](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/aeaac003b554eb5f87982e802884ab05294c845e))
+* **onboarding:** variant-driven pager with page-level and permission-outcome analytics ([039011e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/039011eb70277674db48adbba006bbd2ff94eee2))
+
+
+
 ## [5.42.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.2...v5.42.3) (2026-08-27)
 
 
@@ -37,18 +60,6 @@
 ### Features
 
 * **claude:** add triage skill and /investigate_issue team pipeline ([d564a8d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d564a8d5608a0992a60b218d549fdfe013da0c94))
-
-
-
-## [5.41.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.41.1...v5.41.2) (2026-08-22)
-
-
-### Bug Fixes
-
-* **notifications:** add LocalFilterPolicy so devices on V6 topics stop re-filtering server-targeted sends ([c677ef8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c677ef8cad49bd4bf5e242e1a5d6646da088cb55))
-* **notifications:** Android worker skips the legacy filter once the V6 changeover has completed ([91ad718](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/91ad718cfd24356575b6c7c1ce12f5c96f2de00d))
-* **notifications:** iOS NSE and in-app paths skip the legacy filter once the V6 changeover has completed ([3f5afd6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f5afd6ee1f2fbb07c374dd83d15d03de80f44cc))
-* **notifications:** keep the iOS in-app filter cache in step with saved state ([fc07108](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fc07108c761013d8f0d42d8634ed4598c5b54f31))
 
 
 

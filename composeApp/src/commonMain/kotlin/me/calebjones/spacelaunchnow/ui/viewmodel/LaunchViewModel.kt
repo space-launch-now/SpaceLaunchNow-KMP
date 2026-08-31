@@ -271,15 +271,29 @@ class LaunchViewModel(
 
     // Video Player State Management
 
+    // Which launch the current video state belongs to. In the tablet list-detail
+    // pane the same ViewModel serves successive launches without navigation, so
+    // switching launches must reset playback instead of carrying it over.
+    private var videoStateLaunchId: String? = null
+
     private fun updateVideoPlayerState(launch: Launch) {
         val youTubeVideos = launch.vidUrls
+        val isNewLaunch = launch.id != videoStateLaunchId
+        videoStateLaunchId = launch.id
 
-        _videoPlayerState.value = _videoPlayerState.value.copy(
-            availableVideos = youTubeVideos,
-            selectedVideoIndex = if (youTubeVideos.isNotEmpty())
-                _videoPlayerState.value.selectedVideoIndex.coerceAtMost(youTubeVideos.size - 1)
-            else 0
-        )
+        _videoPlayerState.value = if (isNewLaunch) {
+            // Fresh launch: collapse the player back to the thumbnail and
+            // start from the highest-priority video
+            VideoPlayerState(availableVideos = youTubeVideos)
+        } else {
+            // Same launch (refresh): keep playback state, coerce the index
+            _videoPlayerState.value.copy(
+                availableVideos = youTubeVideos,
+                selectedVideoIndex = if (youTubeVideos.isNotEmpty())
+                    _videoPlayerState.value.selectedVideoIndex.coerceAtMost(youTubeVideos.size - 1)
+                else 0
+            )
+        }
     }
 
     /**

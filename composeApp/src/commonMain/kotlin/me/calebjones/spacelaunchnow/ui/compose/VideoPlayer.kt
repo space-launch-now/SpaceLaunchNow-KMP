@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
@@ -25,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,9 +72,11 @@ fun LaunchVideoPlayer(
                 .aspectRatio(16f / 9f)
                 .background(Color.Black)
         ) {
-            if (isPlayerVisible && VideoUtil.isYouTubeUrl(vidUrl.url)) {
-                // Use the VideoPlayerComposable directly - it supports all platforms
-                val playerHost = remember {
+            if (isPlayerVisible && VideoUtil.canPlayInline(vidUrl.url)) {
+                // Use the VideoPlayerComposable directly - it supports all platforms.
+                // Keyed on the URL so switching launches/videos while the player is
+                // visible can't keep a stale host playing the previous video.
+                val playerHost = remember(vidUrl.url) {
                     MediaPlayerHost(mediaUrl = vidUrl.url)
                 }
 
@@ -109,7 +111,7 @@ fun LaunchVideoPlayer(
                     modifier = Modifier
                         .fillMaxSize()
                         .clickable {
-                            if (VideoUtil.isYouTubeUrl(vidUrl.url)) {
+                            if (VideoUtil.canPlayInline(vidUrl.url)) {
                                 onSetPlayerVisible?.invoke(true) // Use ViewModel state instead of local state
                             } else {
                                 onExternalVideoOpened?.invoke(
@@ -188,55 +190,67 @@ fun LaunchVideoPlayer(
         }
 
         // Video info section below the player
+        val videoTitle = VideoUtil.getVideoTitle(vidUrl, launchName)
+        val sourceName = VideoUtil.getVideoSourceName(vidUrl)
+        // Skip the channel line when the title already names the channel
+        // (e.g. "Starlink Mission - SpaceX" + "SpaceX")
+        val showSource = sourceName.isNotBlank() &&
+            !videoTitle.contains(sourceName, ignoreCase = true)
         Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp),
         ) {
-            // Video title
-            Text(
-                text = VideoUtil.getVideoTitle(vidUrl, launchName),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            // Video info row
+            // Title + channel block with the open-in-app action beside it
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    // Source/Publisher
                     Text(
-                        text = VideoUtil.getVideoSourceName(vidUrl),
-                        style = MaterialTheme.typography.labelLarge,
+                        text = videoTitle,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
-
-                    // Live indicator
-                    if (vidUrl.live == true) {
-                        Surface(
-                            color = Color.Red,
-                            shape = RoundedCornerShape(4.dp)
-                        ) {
+                    if (showSource || vidUrl.live == true) Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        if (showSource) {
                             Text(
-                                text = "LIVE",
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                style = MaterialTheme.typography.labelSmall,
+                                text = sourceName,
+                                style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontWeight = FontWeight.Bold
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
+                        }
+                        if (vidUrl.live == true) {
+                            Surface(
+                                color = Color.Red,
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    text = "LIVE",
+                                    modifier = Modifier.padding(
+                                        horizontal = 6.dp,
+                                        vertical = 2.dp
+                                    ),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }
 
-                // Open in app button
+                Spacer(modifier = Modifier.width(12.dp))
+
                 Button(
                     onClick = {
                         onExternalVideoOpened?.invoke(
@@ -263,21 +277,26 @@ fun LaunchVideoPlayer(
             vidUrl.description?.takeIf { it.isNotBlank() }?.let { desc ->
                 var expanded by remember { mutableStateOf(false) }
                 var hasOverflow by remember { mutableStateOf(false) }
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
                         text = desc,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = if (expanded) Int.MAX_VALUE else 2,
+                        maxLines = if (expanded) Int.MAX_VALUE else 3,
                         overflow = TextOverflow.Ellipsis,
                         onTextLayout = { result ->
                             if (!expanded) hasOverflow = result.hasVisualOverflow
                         }
                     )
                     if (hasOverflow || expanded) {
-                        TextButton(onClick = { expanded = !expanded }) {
-                            Text(if (expanded) "Show less" else "Show more")
-                        }
+                        Text(
+                            text = if (expanded) "Show less" else "Show more",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .clickable { expanded = !expanded }
+                                .padding(vertical = 4.dp)
+                        )
                     }
                 }
             }
