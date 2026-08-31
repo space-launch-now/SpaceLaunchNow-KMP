@@ -36,6 +36,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.tabs.OverviewTabContent
 import me.calebjones.spacelaunchnow.ui.detail.compose.tabs.RocketTabContent
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.VideoUtil
+import me.calebjones.spacelaunchnow.util.openUriSafely
 import kotlin.time.Clock
 
 /**
@@ -122,7 +123,7 @@ fun PhoneLaunchDetailContent(
                             video.url,
                             VideoUtil.getVideoSourceName(video)
                         )
-                        uriHandler.openUri(video.url)
+                        uriHandler.openUriSafely(video.url)
                     }
                 )
                 Spacer(Modifier.height(16.dp))
