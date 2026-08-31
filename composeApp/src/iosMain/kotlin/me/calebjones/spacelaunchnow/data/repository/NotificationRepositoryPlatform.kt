@@ -9,6 +9,7 @@ import platform.UserNotifications.UNAuthorizationOptionAlert
 import platform.UserNotifications.UNAuthorizationOptionBadge
 import platform.UserNotifications.UNAuthorizationOptionSound
 import platform.UserNotifications.UNAuthorizationStatusAuthorized
+import platform.UserNotifications.UNAuthorizationStatusDenied
 import platform.UserNotifications.UNUserNotificationCenter
 import kotlin.coroutines.resume
 
@@ -32,6 +33,21 @@ actual suspend fun hasPlatformNotificationPermission(): Boolean =
     suspendCancellableCoroutine { cont ->
         UNUserNotificationCenter.currentNotificationCenter().getNotificationSettingsWithCompletionHandler { settings ->
             cont.resume(settings?.authorizationStatus == UNAuthorizationStatusAuthorized)
+        }
+    }
+
+actual suspend fun getPlatformNotificationPermissionStatus(): NotificationPermissionStatus =
+    suspendCancellableCoroutine { cont ->
+        UNUserNotificationCenter.currentNotificationCenter().getNotificationSettingsWithCompletionHandler { settings ->
+            cont.resume(
+                when (settings?.authorizationStatus) {
+                    UNAuthorizationStatusAuthorized -> NotificationPermissionStatus.GRANTED
+                    UNAuthorizationStatusDenied -> NotificationPermissionStatus.DENIED
+                    // NotDetermined, Provisional, Ephemeral: the user has never
+                    // explicitly answered the dialog, so it can still be shown.
+                    else -> NotificationPermissionStatus.NOT_DETERMINED
+                }
+            )
         }
     }
 

@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -33,7 +34,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
+import me.calebjones.spacelaunchnow.data.model.resolveOnboardingVariant
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.onboarding.pages.ExplorePage
 import me.calebjones.spacelaunchnow.ui.onboarding.pages.LaunchCardPage
@@ -53,21 +58,15 @@ private val spaceGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFF0A0E2A), Color(0xFF1A1040), Color(0xFF2A1060))
 )
 
-private const val PAGE_COUNT = 5
-
 /**
  * The main live-composable onboarding carousel.
  *
- * Displays swipeable pages:
- * 0. Welcome
- * 1. Launch card preview
- * 2. Schedule screen preview
- * 3. News & Events
- * 4. Explore
- * 5. Widgets showcase
- * 6. Notification permission request
+ * Pages shown depend on the resolved [OnboardingVariant] (see [pagesFor]):
+ * - `control`: Welcome, Launch card preview, News & Events, Widgets showcase,
+ *   Notification permission request.
+ * - `short`: Welcome, Notification permission request.
  *
- * Includes a "Skip" button, [WavyProgressBar], and a "Next" / "Get Started" button.
+ * Includes a "Skip" button, a wavy progress indicator, and a "Next" / "Get Started" button.
  * On completion or skip, persists the completed state via [AppPreferences] and
  * invokes [onComplete].
  */
@@ -81,7 +80,23 @@ fun LiveOnboardingScreen(
     onboardingViewModel: OnboardingViewModel = koinViewModel()
 ) {
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
+
+    val remoteConfigRepository: RemoteConfigRepository = koinInject()
+    val variant by produceState<OnboardingVariant?>(initialValue = null) {
+        value = resolveOnboardingVariant(
+            persisted = appPreferences.onboardingVariantFlow.first(),
+            fetchRemote = { remoteConfigRepository.getOnboardingVariant() },
+            persist = { appPreferences.setOnboardingVariant(it) }
+        )
+    }
+    val resolvedVariant = variant
+    if (resolvedVariant == null) {
+        // One frame of bare gradient while DataStore + activated config resolve (both local, no network)
+        Box(modifier = modifier.fillMaxSize().background(spaceGradient))
+        return
+    }
+    val pages = remember(resolvedVariant) { pagesFor(resolvedVariant) }
+    val pagerState = rememberPagerState(pageCount = { pages.size })
     val nextLaunch by nextUpViewModel.nextLaunch.collectAsState()
 
     val upcomingLaunches by onboardingViewModel.upcomingLaunches.collectAsState()
@@ -91,22 +106,27 @@ fun LiveOnboardingScreen(
     val rockets by onboardingViewModel.rockets.collectAsState()
     val agencies by onboardingViewModel.agencies.collectAsState()
 
-    val isLastPage = pagerState.currentPage == PAGE_COUNT - 1
+    val isLastPage = pagerState.currentPage == pages.lastIndex
     val isFirstPage = pagerState.currentPage == 0
 
-    // Data is pre-cached by PreloadViewModel; these calls load from cache into ViewModel StateFlows
-    LaunchedEffect(Unit) {
+    // Data is pre-cached by PreloadViewModel; these calls load from cache into ViewModel StateFlows.
+    // Only the control variant's content pages need the schedule/articles/explore data.
+    LaunchedEffect(resolvedVariant) {
         nextUpViewModel.fetchNextLaunch()
-        onboardingViewModel.fetchScheduleData()
-        onboardingViewModel.fetchArticles()
-        onboardingViewModel.fetchExploreData()
+        if (resolvedVariant == OnboardingVariant.CONTROL) {
+            onboardingViewModel.fetchScheduleData()
+            onboardingViewModel.fetchArticles()
+            onboardingViewModel.fetchExploreData()
+        }
     }
 
     // Track onboarding page navigation
     LaunchedEffect(pagerState.currentPage) {
         onboardingViewModel.trackOnboardingStep(
             step = pagerState.currentPage,
-            completed = pagerState.currentPage == PAGE_COUNT - 1
+            page = pages[pagerState.currentPage].analyticsName,
+            variant = resolvedVariant.value,
+            completed = pagerState.currentPage == pages.lastIndex
         )
     }
 
@@ -138,7 +158,7 @@ fun LiveOnboardingScreen(
                 ) {
                     TextButton(onClick = {
                         scope.launch {
-                            pagerState.animateScrollToPage(PAGE_COUNT - 1)
+                            pagerState.animateScrollToPage(pages.lastIndex)
                         }
                     }) {
                         Text(
@@ -156,31 +176,34 @@ fun LiveOnboardingScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-            ) { page ->
-                when (page) {
-                    0 -> WelcomePage(
+            ) { pageIndex ->
+                when (pages[pageIndex]) {
+                    OnboardingPage.WELCOME -> WelcomePage(
                         modifier = Modifier.fillMaxSize(),
                         nextLaunch = nextLaunch
                     )
 
-                    1 -> LaunchCardPage(
+                    OnboardingPage.LAUNCH_CARD -> LaunchCardPage(
                         modifier = Modifier.fillMaxSize(),
                         nextLaunch = nextLaunch
                     )
 
-                    2 -> NewsEventsPage(
+                    OnboardingPage.NEWS_EVENTS -> NewsEventsPage(
                         modifier = Modifier.fillMaxSize(),
                         articles = articles
                     )
 
+                    OnboardingPage.WIDGETS -> WidgetsPage(modifier = Modifier.fillMaxSize())
 
-                    3 -> WidgetsPage(modifier = Modifier.fillMaxSize())
-                    
-                    4 -> NotificationPermissionPage(
+                    OnboardingPage.NOTIFICATION_PERMISSION -> NotificationPermissionPage(
                         onPermissionResult = { granted ->
+                            onboardingViewModel.trackNotificationPermissionResult(granted, resolvedVariant.value)
                             if (granted) completeOnboarding()
                         },
-                        onSkip = { completeOnboarding() },
+                        onSkip = {
+                            onboardingViewModel.trackNotificationPermissionResult(false, resolvedVariant.value)
+                            completeOnboarding()
+                        },
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -191,7 +214,7 @@ fun LiveOnboardingScreen(
             if (!isLastPage) {
                 LinearWavyProgressIndicator(
                     progress = {
-                        ((pagerState.currentPage + pagerState.currentPageOffsetFraction) / (PAGE_COUNT - 1).toFloat()).coerceIn(
+                        ((pagerState.currentPage + pagerState.currentPageOffsetFraction) / (pages.size - 1).toFloat()).coerceIn(
                             0f,
                             1f
                         )
@@ -239,10 +262,11 @@ fun LiveOnboardingScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LiveOnboardingScreenPreviewContent() {
-    val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
+    val previewPageCount = pagesFor(OnboardingVariant.CONTROL).size
+    val pagerState = rememberPagerState(pageCount = { previewPageCount })
     val animatedProgress by animateFloatAsState(
         targetValue = ((pagerState.currentPage + pagerState.currentPageOffsetFraction) /
-            (PAGE_COUNT - 1).toFloat()).coerceIn(0f, 1f),
+            (previewPageCount - 1).toFloat()).coerceIn(0f, 1f),
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
     )
 

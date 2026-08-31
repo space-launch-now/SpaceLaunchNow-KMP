@@ -34,6 +34,7 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 
 expect suspend fun requestPlatformNotificationPermission(): Boolean
 expect suspend fun hasPlatformNotificationPermission(): Boolean
+expect suspend fun getPlatformNotificationPermissionStatus(): NotificationPermissionStatus
 expect fun openPlatformNotificationSettings(): Boolean
 
 class NotificationRepositoryImpl(

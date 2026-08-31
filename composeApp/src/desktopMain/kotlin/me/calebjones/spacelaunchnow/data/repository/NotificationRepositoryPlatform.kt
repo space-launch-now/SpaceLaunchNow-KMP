@@ -10,6 +10,11 @@ actual suspend fun hasPlatformNotificationPermission(): Boolean {
     return true
 }
 
+actual suspend fun getPlatformNotificationPermissionStatus(): NotificationPermissionStatus {
+    // Desktop doesn't require notification permissions
+    return NotificationPermissionStatus.GRANTED
+}
+
 actual fun openPlatformNotificationSettings(): Boolean {
     // Desktop doesn't have notification settings
     return false

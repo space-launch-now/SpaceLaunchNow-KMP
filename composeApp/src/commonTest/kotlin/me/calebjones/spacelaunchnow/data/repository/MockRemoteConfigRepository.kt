@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
 
@@ -8,12 +9,13 @@ import me.calebjones.spacelaunchnow.data.model.RoadmapData
  * Configurable responses for different test scenarios
  */
 class MockRemoteConfigRepository : RemoteConfigRepository {
-    
+
     var shouldFail = false
     var failureException = Exception("Mock failure")
     var mockRoadmapData: RoadmapData? = null
     var mockPinnedContent: PinnedContent? = null
     var mockDiagnosticsConfigJson: String? = null
+    var onboardingVariant: OnboardingVariant = OnboardingVariant.CONTROL
     var fetchAndActivateCalled = false
     var setDefaultsCalled = false
     var lastForceRefresh: Boolean? = null
@@ -53,12 +55,15 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     
     override suspend fun getDiagnosticsConfigJson(): String? = mockDiagnosticsConfigJson
 
+    override suspend fun getOnboardingVariant(): OnboardingVariant = onboardingVariant
+
     fun reset() {
         shouldFail = false
         failureException = Exception("Mock failure")
         mockRoadmapData = null
         mockPinnedContent = null
         mockDiagnosticsConfigJson = null
+        onboardingVariant = OnboardingVariant.CONTROL
         fetchAndActivateCalled = false
         setDefaultsCalled = false
         lastForceRefresh = null

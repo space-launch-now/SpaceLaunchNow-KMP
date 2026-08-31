@@ -3,7 +3,9 @@ package me.calebjones.spacelaunchnow.data.repository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.remoteconfig.FirebaseRemoteConfig
 import dev.gitlive.firebase.remoteconfig.remoteConfig
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -44,6 +46,7 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         private const val ROADMAP_DATA_KEY = "roadmap_data"
         private const val PINNED_CONTENT_KEY = "pinned_content"
         private const val DIAGNOSTICS_CONFIG_KEY = "diagnostics_config"
+        private const val ONBOARDING_VARIANT_KEY = "onboarding_variant"
         private val DEFAULT_FETCH_INTERVAL: Duration = 1.hours
         private val FORCE_REFRESH_INTERVAL: Duration = 0.seconds
         
@@ -75,6 +78,8 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
             config.fetchAndActivate()
             log.d { "Remote config fetch and activate succeeded" }
             Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             log.e(e) { "Failed to fetch remote config" }
             Result.failure(e)
@@ -134,7 +139,8 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
             config.setDefaults(
                 ROADMAP_DATA_KEY to DEFAULT_ROADMAP_JSON,
                 PINNED_CONTENT_KEY to DEFAULT_PINNED_CONTENT_JSON,
-                DIAGNOSTICS_CONFIG_KEY to ""
+                DIAGNOSTICS_CONFIG_KEY to "",
+                ONBOARDING_VARIANT_KEY to "control"
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -149,6 +155,16 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         } catch (e: Exception) {
             log.w(e) { "Failed to read diagnostics config" }
             null
+        }
+    }
+
+    override suspend fun getOnboardingVariant(): OnboardingVariant {
+        val config = remoteConfig ?: return OnboardingVariant.CONTROL
+        return try {
+            OnboardingVariant.fromString(config.getValue(ONBOARDING_VARIANT_KEY).asString())
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read onboarding variant - defaulting to control" }
+            OnboardingVariant.CONTROL
         }
     }
 }

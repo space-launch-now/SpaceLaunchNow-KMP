@@ -2,9 +2,7 @@ package me.calebjones.spacelaunchnow
 
 import android.app.Application
 import androidx.work.Configuration
-import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.launch
@@ -277,14 +275,14 @@ class MainApplication : Application(), Configuration.Provider {
     }
 
     private fun scheduleWidgetUpdates() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
+        // Deliberately unconstrained: WidgetUpdateWorker does no network I/O of its own. It
+        // re-renders the Glance widgets, and NextUpWidget's T-minus countdown is clock
+        // arithmetic over the stale-while-revalidate cache. A NetworkType.CONNECTED
+        // constraint gated that on connectivity, degrading the offline countdown to the
+        // ~30-minute updatePeriodMillis floor; 15 minutes is only reachable via WorkManager.
         val widgetUpdateRequest = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(
             15, TimeUnit.MINUTES // Update every 15 minutes
         )
-            .setConstraints(constraints)
             .build()
 
         // WorkManager now initializes lazily here rather than in InitializationProvider, so
@@ -296,7 +294,9 @@ class MainApplication : Application(), Configuration.Provider {
         runCatching {
             WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 "widget_update_work",
-                ExistingPeriodicWorkPolicy.KEEP,
+                // UPDATE, not KEEP: existing installs already hold the old network-constrained
+                // request, and KEEP would leave them on it forever.
+                ExistingPeriodicWorkPolicy.UPDATE,
                 widgetUpdateRequest
             )
         }.onFailure { throwable ->
