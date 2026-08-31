@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -69,10 +68,10 @@ fun AgencyDetailsCard(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            // Agency logo - centered
+            // Agency logo - centered, same surface chip treatment as AgencyLogoBadge
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 200.dp),
             ) {
                 SubcomposeAsyncImage(
@@ -81,7 +80,6 @@ fun AgencyDetailsCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(150.dp)
-                        .clip(RoundedCornerShape(12.dp))
                         .padding(12.dp),
                     contentScale = ContentScale.Fit,
                     loading = {
