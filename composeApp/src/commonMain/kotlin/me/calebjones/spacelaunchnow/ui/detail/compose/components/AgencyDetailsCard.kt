@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,8 +39,10 @@ import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.brands.WikipediaW
 import compose.icons.fontawesomeicons.solid.InfoCircle
+import androidx.compose.ui.graphics.Color
 import me.calebjones.spacelaunchnow.domain.model.Provider
 import me.calebjones.spacelaunchnow.domain.model.ProviderDetail
+import me.calebjones.spacelaunchnow.ui.compose.LogoWellColor
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileData
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -69,10 +70,10 @@ fun AgencyDetailsCard(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            // Agency logo - centered
+            // Agency logo - centered, same dark logo-well treatment as AgencyLogoBadge
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                color = LogoWellColor,
                 modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 200.dp),
             ) {
                 SubcomposeAsyncImage(
@@ -81,7 +82,6 @@ fun AgencyDetailsCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(150.dp)
-                        .clip(RoundedCornerShape(12.dp))
                         .padding(12.dp),
                     contentScale = ContentScale.Fit,
                     loading = {
@@ -96,7 +96,7 @@ fun AgencyDetailsCard(
                                 imageVector = Icons.Default.Business,
                                 contentDescription = null,
                                 modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                tint = Color.White.copy(alpha = 0.3f)
                             )
                         }
                     },
@@ -111,7 +111,7 @@ fun AgencyDetailsCard(
                                 imageVector = Icons.Default.Business,
                                 contentDescription = "Agency",
                                 modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                tint = Color.White.copy(alpha = 0.4f)
                             )
                         }
                     }

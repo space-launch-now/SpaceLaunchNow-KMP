@@ -34,8 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
+import me.calebjones.spacelaunchnow.ui.compose.HeroDetailScaffold
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
+import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 
 /**
  * State views for LaunchDetailScreen
@@ -104,20 +106,32 @@ fun LaunchDetailErrorView(
  */
 @Composable
 fun LaunchDetailLoadingView(onNavigateBack: (() -> Unit)? = null) {
-    // Use SharedDetailScaffold to match the responsive behavior of the actual detail view
-    SharedDetailScaffold(
-        titleText = "",
-        taglineText = null,
-        imageUrl = null, // No image for loading state
-        onNavigateBack = onNavigateBack,
-        backgroundColors = listOf(
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        ),
-        scrollEnabled = false,
-    ) {
-        // Loading content that matches the structure of LaunchDetailContentInBody
-        LaunchDetailLoadingContent()
+    // Mirror the scaffold choice in LaunchDetailView: hero header on phones,
+    // compact SharedDetailScaffold header on expanded layouts
+    if (rememberAdaptiveLayoutState().isExpanded) {
+        SharedDetailScaffold(
+            titleText = "",
+            taglineText = null,
+            imageUrl = null, // No image for loading state
+            onNavigateBack = onNavigateBack,
+            backgroundColors = listOf(
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            ),
+            scrollEnabled = false,
+        ) {
+            LaunchDetailLoadingContent()
+        }
+    } else {
+        HeroDetailScaffold(
+            titleText = "",
+            taglineText = null,
+            imageUrl = null, // Shimmer hero placeholder while loading
+            onNavigateBack = onNavigateBack,
+            scrollEnabled = false,
+        ) {
+            LaunchDetailLoadingContent()
+        }
     }
 }
 

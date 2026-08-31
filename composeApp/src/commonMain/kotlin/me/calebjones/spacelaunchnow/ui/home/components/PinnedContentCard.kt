@@ -94,10 +94,13 @@ fun PinnedContentCard(
         is PinnedMotdContent -> ""
     }
 
+    // Custom messages get a second line, so the card needs extra height for it
+    val hasCustomMessage = pinnedContent.customMessage != null
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(130.dp)
+            .height(if (hasCustomMessage) 150.dp else 130.dp)
             .padding(horizontal = 16.dp)
             .clickable {
                 when (pinnedContent) {
@@ -209,7 +212,7 @@ fun PinnedContentCard(
                         text = subtitle,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        maxLines = 1,
+                        maxLines = if (hasCustomMessage) 2 else 1,
                         overflow = TextOverflow.Ellipsis
                     )
 
@@ -378,11 +381,12 @@ private fun PinnedContentCardPreviewContent(
     val title by remember(launch) {
         mutableStateOf(LaunchFormatUtil.formatLaunchTitle(launch))
     }
+    val hasCustomMessage = pinnedContent.customMessage != null
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(130.dp)
+            .height(if (hasCustomMessage) 150.dp else 130.dp)
             .padding(horizontal = 16.dp)
             .semantics {
                 contentDescription = "Featured launch: $title. ${pinnedContent.customMessage ?: ""}. Tap to view details."
@@ -443,7 +447,7 @@ private fun PinnedContentCardPreviewContent(
                             ?: "Unknown Mission",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        maxLines = 1,
+                        maxLines = if (hasCustomMessage) 2 else 1,
                         overflow = TextOverflow.Ellipsis
                     )
 

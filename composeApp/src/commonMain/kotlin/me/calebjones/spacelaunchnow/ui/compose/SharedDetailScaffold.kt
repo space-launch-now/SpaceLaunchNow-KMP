@@ -12,6 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -115,6 +117,7 @@ private val HzPadding = 24.dp
  * @param titleText Main title text displayed in the header
  * @param taglineText Optional subtitle/tagline text
  * @param imageUrl Optional image URL for the header
+ * @param logoUrl Optional small logo shown to the left of the title/tagline
  * @param onNavigateBack Callback when back button is pressed
  * @param backgroundColors Optional custom gradient colors for background
  * @param scrollEnabled Whether scrolling is enabled (default: true)
@@ -126,6 +129,7 @@ fun SharedDetailScaffold(
     titleText: String,
     taglineText: String?,
     imageUrl: String?,
+    logoUrl: String? = null,
     onNavigateBack: (() -> Unit)? = null,
     backgroundColors: List<Color>? = null,
     scrollEnabled: Boolean = true,
@@ -158,6 +162,7 @@ fun SharedDetailScaffold(
             titleText,
             taglineText,
             scroll,
+            logoUrl = logoUrl,
             forceNoCollapse = forceNoCollapse,
             showBackButton = onNavigateBack != null,
             forcePhoneLayout = forcePhoneLayout
@@ -273,6 +278,7 @@ private fun SharedDetailTitle(
     title: String,
     tagline: String?,
     scroll: ScrollState,
+    logoUrl: String? = null,
     forceNoCollapse: Boolean = false,
     showBackButton: Boolean = true,
     forcePhoneLayout: Boolean = false,
@@ -325,30 +331,37 @@ private fun SharedDetailTitle(
             .background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
         Spacer(Modifier.height(16.dp))
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            modifier = Modifier
-                .padding(
-                    start = with(LocalDensity.current) { leftPaddingPx.toDp() },
-                    end = with(LocalDensity.current) { rightPaddingPx.toDp() },
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(
+                start = with(LocalDensity.current) { leftPaddingPx.toDp() },
+                end = with(LocalDensity.current) { rightPaddingPx.toDp() },
+            ),
+        ) {
+            if (!logoUrl.isNullOrBlank()) {
+                AgencyLogoBadge(
+                    logoUrl = logoUrl,
+                    size = if (isLargeScreen) 48.dp else 56.dp
                 )
-                .wrapContentWidth(),
-        )
-        tagline?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 1,
-                modifier = Modifier
-                    .padding(
-                        start = with(LocalDensity.current) { leftPaddingPx.toDp() },
-                        end = with(LocalDensity.current) { rightPaddingPx.toDp() },
+                Spacer(Modifier.width(12.dp))
+            }
+            Column {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier.wrapContentWidth(),
+                )
+                tagline?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1,
+                        modifier = Modifier.wrapContentWidth(),
                     )
-                    .wrapContentWidth(),
-            )
+                }
+            }
         }
         Spacer(Modifier.height(16.dp))
     }
