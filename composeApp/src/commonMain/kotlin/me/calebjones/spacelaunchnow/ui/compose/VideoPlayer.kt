@@ -46,6 +46,7 @@ import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.util.VideoUtil
+import me.calebjones.spacelaunchnow.util.openUriSafely
 
 @Composable
 fun LaunchVideoPlayer(
@@ -115,7 +116,7 @@ fun LaunchVideoPlayer(
                                     vidUrl.url,
                                     VideoUtil.getVideoSourceName(vidUrl)
                                 )
-                                uriHandler.openUri(vidUrl.url)
+                                uriHandler.openUriSafely(vidUrl.url)
                             }
                         },
                     contentAlignment = Alignment.Center
@@ -242,7 +243,7 @@ fun LaunchVideoPlayer(
                             vidUrl.url,
                             VideoUtil.getVideoSourceName(vidUrl)
                         )
-                        uriHandler.openUri(vidUrl.url)
+                        uriHandler.openUriSafely(vidUrl.url)
                     }
                 ) {
                     Icon(
