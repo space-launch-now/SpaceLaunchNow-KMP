@@ -1,3 +1,16 @@
+## [5.44.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.0...v5.44.1) (2026-08-31)
+
+
+### Bug Fixes
+
+* **ads:** keep banner mounted in AdState.SHOWN instead of tearing it down ([#179](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/179)) ([8e72425](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8e72425e41c5ceb4e9ae160afef5a745876ab65b))
+* **articles:** fail non-2xx SNAPI responses into the stale-cache fallback ([#190](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/190)) ([cc1cc7b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cc1cc7b6fdd29bae07ff2636a01b7ef4746f1346))
+* **ios:** make setRevenueCatPushToken non-throwing at the ObjC boundary ([#187](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/187)) ([c7e296f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c7e296f8536240130234b2aa5e4b04b827390339))
+* **ios:** skip ad preload while the root view controller is unattached ([#168](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/168)) ([b28832b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b28832bda6829d511f80a3ea601c2645f93f2090))
+* **ui:** route LaunchVideoPlayer link opens through openUriSafely ([#194](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/194)) ([deaf213](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/deaf21365f35eb840a0b2d4b438ba8e1fd98c413))
+
+
+
 # [5.44.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.43.0...v5.44.0) (2026-08-31)
 
 
@@ -53,18 +66,6 @@
 
 * **android:** make WorkManager init non-fatal by removing startup auto-init ([1a49905](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1a49905e56b5d7072918ae59a3de10aaba814da5)), closes [#181](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/181)
 * **wear:** make WorkManager init non-fatal by removing startup auto-init ([73e6a00](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/73e6a0056033140fbaa0efada171c46004b6a8c1)), closes [#181](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/181)
-
-
-
-## [5.42.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.0...v5.42.1) (2026-08-26)
-
-
-### Bug Fixes
-
-* **ci:** use standard runners so workflows can be scheduled ([25b14b7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/25b14b7fb5efa0c2f55b1bd772a92e1ba2caeb81)), closes [#174](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/174) [#175](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/175) [#176](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/176) [#174](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/174) [#175](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/175) [#174](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/174) [#175](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/175)
-* **claude:** correct stale Gradle test task and record toolchain limits ([c8f4880](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c8f488065b63e9ff202ebdec1acb181622c8095c)), closes [#169](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/169)
-* **logging:** stop reporting coroutine cancellation as a Crashlytics non-fatal ([077f9ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/077f9ffdc9c749767eebaf274c7821035e15b525))
-* **logging:** stop sending coroutine cancellation to Datadog as an error ([a7fbded](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a7fbded8ba157caaee30a9b9f439f03c730cc8b0))
 
 
 

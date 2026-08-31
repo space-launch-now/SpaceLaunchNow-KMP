@@ -1,7 +1,4 @@
-### Bug Fixes
-
-* adjust card height and subtitle lines for custom messages in PinnedContentCard
-
-### Features
-
-* full-bleed hero header with agency logo on launch detail
+Fixed crashes on iOS.
+News and articles load more reliably when the network is unstable.
+Banner ads display more consistently.
+Video links now open reliably.
