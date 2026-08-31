@@ -109,6 +109,17 @@ actual fun WithPreloadedAds(
         return
     }
 
+    // ContextFactory.getActivity() returns an empty-string sentinel (not null) while the
+    // UIWindowScene has no rootViewController yet — the first moments of launch. BasicAds'
+    // BannerAdHandler.load throws "Root ViewController is null" if that value reaches it,
+    // which is fatal inside composition (issue #168). Skip preloading and let a later
+    // recomposition retry once the root view controller exists, same as AdConsentPopup.
+    if (context == null || context == "") {
+        log.w { "⚠️ WithPreloadedAds: no root view controller yet, skipping ad preload this composition" }
+        content()
+        return
+    }
+
     // Primary banner ad (most common - used in content areas)
     val preloadedBannerAd by rememberBannerAd(
         activity = context,

@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.detail.compose.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -37,6 +38,8 @@ fun VideoPlayerCard(
             onVideoSelected = onVideoSelected,
             playerConfig = playerConfig,
             showVideoPicker = showVideoPicker,
+            // Keep the alternates list clear of the card's rounded bottom corners
+            alternatesPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 12.dp),
             onExternalVideoOpened = onExternalVideoOpened
         )
     }
