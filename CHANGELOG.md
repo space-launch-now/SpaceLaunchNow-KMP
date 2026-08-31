@@ -1,3 +1,17 @@
+# [5.44.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.43.0...v5.44.0) (2026-08-31)
+
+
+### Bug Fixes
+
+* adjust card height and subtitle lines for custom messages in PinnedContentCard ([8f22237](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8f22237867177186b3638d1365a8be6839c5f573))
+
+
+### Features
+
+* full-bleed hero header with agency logo on launch detail ([4e96eae](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4e96eae76c9b17754d0acb88c76c68866277efdc))
+
+
+
 # [5.43.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.3...v5.43.0) (2026-08-31)
 
 
@@ -51,15 +65,6 @@
 * **claude:** correct stale Gradle test task and record toolchain limits ([c8f4880](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c8f488065b63e9ff202ebdec1acb181622c8095c)), closes [#169](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/169)
 * **logging:** stop reporting coroutine cancellation as a Crashlytics non-fatal ([077f9ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/077f9ffdc9c749767eebaf274c7821035e15b525))
 * **logging:** stop sending coroutine cancellation to Datadog as an error ([a7fbded](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a7fbded8ba157caaee30a9b9f439f03c730cc8b0))
-
-
-
-# [5.42.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.41.2...v5.42.0) (2026-08-26)
-
-
-### Features
-
-* **claude:** add triage skill and /investigate_issue team pipeline ([d564a8d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d564a8d5608a0992a60b218d549fdfe013da0c94))
 
 
 

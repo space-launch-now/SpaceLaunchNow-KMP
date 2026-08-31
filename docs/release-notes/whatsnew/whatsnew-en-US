@@ -1,10 +1,7 @@
 ### Bug Fixes
 
-* **analytics:** guard subscriber paywall dismissals and dual-pipeline permission results
-* **config:** rethrow cancellation so fetch timeouts are not swallowed as failures
-* request notification permission from settings when the iOS dialog was never shown
-* **ui:** guard alternate video link opens against startActivity crash, closes #180
-* **widgets:** keep widget refresh running while offline, closes #170
+* adjust card height and subtitle lines for custom messages in PinnedContentCard
 
 ### Features
-...
+
+* full-bleed hero header with agency logo on launch detail
