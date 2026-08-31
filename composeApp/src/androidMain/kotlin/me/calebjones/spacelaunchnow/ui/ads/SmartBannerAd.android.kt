@@ -224,8 +224,10 @@ actual fun SmartBannerAd(
             }
         }
 
-        AdState.READY, AdState.SHOWING -> {
+        AdState.READY, AdState.SHOWING, AdState.SHOWN -> {
             // Show the banner ad with optional remove ads button
+            // SHOWN must keep hosting the AndroidView: tearing it down mid-tap triggers a
+            // focus-driven remeasure while the LazyColumn is already laying out (issue #179)
             // Note: We render even in LOADING state because iOS needs the Composable rendered to trigger load
             if (showCard) {
                 // Content area: wrapped in card
