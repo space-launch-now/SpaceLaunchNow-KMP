@@ -166,8 +166,9 @@ actual fun SmartBannerAd(
     // IMPORTANT: Always render BannerAd Composable to trigger load on iOS
     // Show layout when ad is ready, showing, or loading
     when (availableAd.state) {
-        AdState.READY, AdState.SHOWING, AdState.LOADING -> {
+        AdState.READY, AdState.SHOWING, AdState.SHOWN, AdState.LOADING -> {
             // Show the banner ad with optional remove ads button
+            // SHOWN keeps the banner mounted after a tap instead of swapping to the shimmer
             // Note: We render even in LOADING state because iOS needs the Composable rendered to trigger load
             if (showCard) {
                 // Content area: wrapped in card
