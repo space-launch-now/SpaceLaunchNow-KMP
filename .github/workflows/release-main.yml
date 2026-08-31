@@ -88,20 +88,34 @@ jobs:
           echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
           echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
 
+      # A ci/chore-only release produces an empty clean_changelog; feeding that to the
+      # model yields a conversational non-answer, so gate the humanize steps on real content.
+      - name: Check for changelog content
+        id: notes_gate
+        env:
+          CLEAN_CHANGELOG: ${{ steps.changelog.outputs.clean_changelog }}
+        run: |
+          if [ -z "$(printf '%s' "$CLEAN_CHANGELOG" | tr -d '[:space:]')" ]; then
+            echo "has_changelog=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ Changelog is empty — skipping AI humanization"
+          else
+            echo "has_changelog=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Node.js
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        if: ${{ steps.notes_gate.outputs.has_changelog == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false') }}
         continue-on-error: true
         uses: actions/setup-node@v7
 
       # ai-inference@v3 shells out to the Copilot CLI and expects it on PATH
       - name: Install Copilot CLI
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        if: ${{ steps.notes_gate.outputs.has_changelog == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false') }}
         continue-on-error: true
         run: npm install -g @github/copilot
 
       - name: Humanize Play Store notes (Copilot)
         id: ai_playstore
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        if: ${{ steps.notes_gate.outputs.has_changelog == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false') }}
         uses: actions/ai-inference@v3
         continue-on-error: true
         env:
@@ -153,7 +167,7 @@ jobs:
 
       - name: Humanize GitHub Release notes (Copilot)
         id: ai_github
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        if: ${{ steps.notes_gate.outputs.has_changelog == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false') }}
         uses: actions/ai-inference@v3
         continue-on-error: true
         env:
