@@ -16,6 +16,14 @@ on:
         default: true
         type: boolean
 
+# Queue production releases instead of overlapping them. A run cancelled after its
+# Play Store upload permanently consumes that version code (this happened 2026-08-31:
+# a cancelled ci-only run burned 1100000192 and every later run collided on it), so
+# in-flight releases must never be cancelled by a newer push.
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
 env:
   CI: true
 
