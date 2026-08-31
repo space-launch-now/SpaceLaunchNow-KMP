@@ -187,12 +187,30 @@ sealed class AnalyticsEvent(val name: String) {
         }
     }
 
+    /**
+     * User left a paywall without purchasing ("Continue for free" / dismiss).
+     * secondsOnScreen measures view-to-dismiss dwell for the onboarding A/B test.
+     */
+    data class PaywallDismissed(
+        val source: String,
+        val secondsOnScreen: Long,
+        val dimensions: FunnelDimensions? = null
+    ) : AnalyticsEvent("paywall_dismissed") {
+        override fun toParameters() = buildMap {
+            put("source", source)
+            put("seconds_on_screen", secondsOnScreen)
+            dimensions?.let { putAll(it.toParameters()) }
+        }
+    }
+
     data class PurchaseStarted(
         val productId: String,
-        val dimensions: FunnelDimensions? = null
+        val dimensions: FunnelDimensions? = null,
+        val source: String = "support_us"
     ) : AnalyticsEvent("purchase_started") {
         override fun toParameters() = buildMap {
             put("product_id", productId)
+            put("source", source)
             dimensions?.let { putAll(it.toParameters()) }
         }
     }
@@ -200,11 +218,13 @@ sealed class AnalyticsEvent(val name: String) {
     data class PurchaseCompleted(
         val productId: String,
         val revenue: Double? = null,
-        val dimensions: FunnelDimensions? = null
+        val dimensions: FunnelDimensions? = null,
+        val source: String = "support_us"
     ) : AnalyticsEvent("purchase_completed") {
         override fun toParameters() = buildMap {
             put("product_id", productId)
             revenue?.let { put("revenue", it) }
+            put("source", source)
             dimensions?.let { putAll(it.toParameters()) }
         }
     }
@@ -219,22 +239,26 @@ sealed class AnalyticsEvent(val name: String) {
         val productId: String,
         val step: String,
         val errorCode: String,
-        val dimensions: FunnelDimensions? = null
+        val dimensions: FunnelDimensions? = null,
+        val source: String = "support_us"
     ) : AnalyticsEvent("purchase_failed") {
         override fun toParameters() = buildMap {
             put("product_id", productId)
             put("step", step)
             put("error_code", errorCode)
+            put("source", source)
             dimensions?.let { putAll(it.toParameters()) }
         }
     }
 
     data class PurchaseRestored(
         val success: Boolean,
-        val dimensions: FunnelDimensions? = null
+        val dimensions: FunnelDimensions? = null,
+        val source: String = "support_us"
     ) : AnalyticsEvent("purchase_restored") {
         override fun toParameters() = buildMap {
             put("success", success)
+            put("source", source)
             dimensions?.let { putAll(it.toParameters()) }
         }
     }
@@ -307,9 +331,31 @@ sealed class AnalyticsEvent(val name: String) {
         override fun toParameters() = mapOf("source" to source)
     }
 
-    data class OnboardingStep(val step: Int, val completed: Boolean) :
-        AnalyticsEvent("onboarding_step") {
-        override fun toParameters() = mapOf("step" to step, "completed" to completed)
+    data class OnboardingStep(
+        val step: Int,
+        val page: String,
+        val variant: String,
+        val completed: Boolean
+    ) : AnalyticsEvent("onboarding_step") {
+        override fun toParameters() = buildMap {
+            put("step", step)
+            put("page", page)
+            put("variant", variant)
+            put("completed", completed)
+        }
+    }
+
+    /** Outcome of the onboarding notification-permission page (grant, deny, or "Maybe Later" = false). */
+    data class NotificationPermissionResult(
+        val granted: Boolean,
+        val source: String,
+        val variant: String
+    ) : AnalyticsEvent("notification_permission_result") {
+        override fun toParameters() = buildMap {
+            put("granted", granted)
+            put("source", source)
+            put("variant", variant)
+        }
     }
 
     // ── Settings Events ──────────────────────────────────────────────────────

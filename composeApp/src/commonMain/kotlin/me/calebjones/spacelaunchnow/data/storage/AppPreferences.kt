@@ -47,6 +47,9 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // Live onboarding (feature preview carousel) completed flag
         private val LIVE_ONBOARDING_COMPLETED = booleanPreferencesKey("live_onboarding_completed")
 
+        // Onboarding A/B variant actually shown to this install ("control"/"short") — sticky once set
+        private val ONBOARDING_VARIANT = stringPreferencesKey("onboarding_variant")
+
         // Initial pre-warm completed flag — ensures Tier 2 cache pre-warm only runs on first launch
         private val INITIAL_PREWARM_COMPLETED = booleanPreferencesKey("initial_prewarm_completed")
 
@@ -198,6 +201,14 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { preferences ->
             preferences[LIVE_ONBOARDING_COMPLETED] = completed
         }
+    }
+
+    val onboardingVariantFlow: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[ONBOARDING_VARIANT]
+    }
+
+    suspend fun setOnboardingVariant(variant: String) {
+        dataStore.edit { preferences -> preferences[ONBOARDING_VARIANT] = variant }
     }
 
     // Initial pre-warm flag methods

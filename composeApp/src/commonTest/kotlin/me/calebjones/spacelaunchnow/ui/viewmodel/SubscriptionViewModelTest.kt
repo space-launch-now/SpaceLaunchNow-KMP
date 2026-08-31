@@ -541,6 +541,72 @@ class SubscriptionViewModelTest {
     }
 
     @Test
+    fun `trackPaywallDismissed emits paywall_dismissed with dimensions`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.trackPaywallDismissed("onboarding", secondsOnScreen = 20L)
+        advanceUntilIdle()
+
+        val event = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PaywallDismissed>().single()
+        assertEquals("onboarding", event.source)
+        assertEquals(20L, event.secondsOnScreen)
+        assertNotNull(event.dimensions)
+    }
+
+    @Test
+    fun `purchase events carry the source they were started with`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base", 39990000L, source = "onboarding")
+        advanceUntilIdle()
+
+        val started = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseStarted>().single()
+        val completed = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseCompleted>().single()
+        assertEquals("onboarding", started.source)
+        assertEquals("onboarding", completed.source)
+        assertEquals("onboarding", started.toParameters()["source"])
+    }
+
+    @Test
+    fun `purchase source defaults to support_us`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base")
+        advanceUntilIdle()
+
+        val started = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseStarted>().single()
+        assertEquals("support_us", started.source)
+    }
+
+    @Test
+    fun `purchase_failed carries the source it was started with`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        billingManager.shouldLaunchPurchaseFail = true
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.purchaseProduct("yearly_sub", "yearly-base", source = "onboarding")
+        advanceUntilIdle()
+
+        val failed = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseFailed>().single()
+        assertEquals("onboarding", failed.source)
+    }
+
+    @Test
+    fun `restorePurchases stamps source on purchase_restored`() = runTest {
+        val fake = FakeAnalyticsProvider()
+        val vm = SubscriptionViewModel(repository, billingManager, analyticsWith(fake))
+
+        vm.restorePurchases(source = "onboarding")
+        advanceUntilIdle()
+
+        val restored = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PurchaseRestored>().single()
+        assertEquals("onboarding", restored.source)
+    }
+
+    @Test
     fun `purchase outcome events carry dimensions`() = runTest {
         val fake = FakeAnalyticsProvider()
         billingManager.shouldLaunchPurchaseFail = true
