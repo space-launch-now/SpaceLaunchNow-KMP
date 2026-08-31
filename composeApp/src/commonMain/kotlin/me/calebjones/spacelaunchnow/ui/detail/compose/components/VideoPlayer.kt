@@ -2,7 +2,9 @@ package me.calebjones.spacelaunchnow.ui.detail.compose.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -27,6 +29,9 @@ fun VideoPlayer(
     modifier: Modifier = Modifier,
     playerConfig: VideoPlayerConfig = VideoPlayerConfig(isFullScreenEnabled = false),
     showVideoPicker: Boolean = true,
+    // Inset for the alternate-videos list; the player itself stays edge-to-edge.
+    // Card wrappers pass this so the list clears the card's rounded corners.
+    alternatesPadding: PaddingValues = PaddingValues(0.dp),
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
     val uriHandler = LocalUriHandler.current
@@ -61,7 +66,8 @@ fun VideoPlayer(
                         VideoUtil.getVideoSourceName(video)
                     )
                     uriHandler.openUriSafely(video.url)
-                }
+                },
+                modifier = Modifier.padding(alternatesPadding)
             )
         }
     }
