@@ -161,11 +161,22 @@ fun startRevenueCatAttributesSyncer() {
  * Called from Swift (`AppDelegate.didRegisterForRemoteNotificationsWithDeviceToken`)
  * with the hex-encoded APNS token. Routes through the KMP SDK so the iOS app no
  * longer needs to link the native RevenueCat framework directly.
+ *
+ * Must never throw: this crosses the Kotlin->ObjC boundary with no `@Throws`, so any
+ * escaping exception is an unconditional process abort. APNs registration can be
+ * delivered before Koin (or the RevenueCat SDK) has started; RevenueCat re-syncs the
+ * token on the next launch, so dropping it here is safe.
  */
 fun setRevenueCatPushToken(tokenHex: String) {
-    getKoin()
-        .get<me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes>()
-        .setPushToken(tokenHex)
+    val log = SpaceLogger.getLogger("KoinInitializer")
+    val koin = org.koin.mp.KoinPlatformTools.defaultContext().getOrNull() ?: run {
+        log.i { "APNs token arrived before Koin started; RC push token will sync on next launch" }
+        return
+    }
+    runCatching {
+        koin.get<me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes>()
+            .setPushToken(tokenHex)
+    }.onFailure { log.e(it) { "Failed to forward APNS token to RevenueCat" } }
 }
 
 /**
