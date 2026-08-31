@@ -58,7 +58,11 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
-import me.calebjones.spacelaunchnow.data.repository.hasPlatformNotificationPermission
+import me.calebjones.spacelaunchnow.data.repository.NotificationPermissionRemedy
+import me.calebjones.spacelaunchnow.data.repository.NotificationPermissionStatus
+import me.calebjones.spacelaunchnow.data.repository.getPlatformNotificationPermissionStatus
+import me.calebjones.spacelaunchnow.data.repository.openPlatformNotificationSettings
+import me.calebjones.spacelaunchnow.data.repository.remedy
 import me.calebjones.spacelaunchnow.data.repository.requestPlatformNotificationPermission
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
@@ -75,10 +79,11 @@ fun NotificationSettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    var hasPermission by remember { mutableStateOf(true) }
+    var permissionStatus by remember { mutableStateOf(NotificationPermissionStatus.GRANTED) }
+    val hasPermission = permissionStatus == NotificationPermissionStatus.GRANTED
 
     LaunchedEffect(Unit) {
-        hasPermission = hasPlatformNotificationPermission()
+        permissionStatus = getPlatformNotificationPermissionStatus()
     }
 
     // Re-check permission when returning from system permission dialog
@@ -87,7 +92,7 @@ fun NotificationSettingsScreen(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 scope.launch {
-                    hasPermission = hasPlatformNotificationPermission()
+                    permissionStatus = getPlatformNotificationPermissionStatus()
                 }
             }
         }
@@ -179,11 +184,16 @@ fun NotificationSettingsScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))
+                            val permissionRemedy = permissionStatus.remedy()
                             Button(
                                 onClick = {
-                                    scope.launch {
-                                        val granted = requestPlatformNotificationPermission()
-                                        hasPermission = granted
+                                    when (permissionRemedy) {
+                                        NotificationPermissionRemedy.REQUEST_PERMISSION ->
+                                            scope.launch {
+                                                requestPlatformNotificationPermission()
+                                                permissionStatus = getPlatformNotificationPermissionStatus()
+                                            }
+                                        else -> openPlatformNotificationSettings()
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(
@@ -191,7 +201,13 @@ fun NotificationSettingsScreen(
                                     contentColor = MaterialTheme.colorScheme.onError
                                 )
                             ) {
-                                Text("Enable")
+                                Text(
+                                    if (permissionRemedy == NotificationPermissionRemedy.REQUEST_PERMISSION) {
+                                        "Enable"
+                                    } else {
+                                        "Open Settings"
+                                    }
+                                )
                             }
                         }
                     }

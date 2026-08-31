@@ -58,6 +58,18 @@ actual suspend fun hasPlatformNotificationPermission(): Boolean {
     }
 }
 
+actual suspend fun getPlatformNotificationPermissionStatus(): NotificationPermissionStatus {
+    // Android can't reliably distinguish never-asked from permanently-denied
+    // (shouldShowRequestPermissionRationale is false in both states), and the
+    // notification settings deep link always shows a working toggle regardless.
+    // Treat any non-granted state as DENIED so the UI keeps offering settings.
+    return if (hasPlatformNotificationPermission()) {
+        NotificationPermissionStatus.GRANTED
+    } else {
+        NotificationPermissionStatus.DENIED
+    }
+}
+
 actual fun openPlatformNotificationSettings(): Boolean {
     return try {
         val context = PermissionHelper.context

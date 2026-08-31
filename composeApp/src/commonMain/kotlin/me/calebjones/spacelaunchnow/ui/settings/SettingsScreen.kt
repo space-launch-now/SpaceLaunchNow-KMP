@@ -58,8 +58,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.data.repository.hasPlatformNotificationPermission
+import me.calebjones.spacelaunchnow.data.repository.NotificationPermissionRemedy
+import me.calebjones.spacelaunchnow.data.repository.NotificationPermissionStatus
+import me.calebjones.spacelaunchnow.data.repository.getPlatformNotificationPermissionStatus
 import me.calebjones.spacelaunchnow.data.repository.openPlatformNotificationSettings
+import me.calebjones.spacelaunchnow.data.repository.remedy
+import me.calebjones.spacelaunchnow.data.repository.requestPlatformNotificationPermission
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.navigation.CalendarSync
 import me.calebjones.spacelaunchnow.navigation.Diagnostics
@@ -105,10 +109,13 @@ fun SettingsScreen(
     var showPassword by remember { mutableStateOf(false) }
     var useTotp by remember { mutableStateOf(false) } // Toggle between password and TOTP
 
-    var hasNotificationPermission by remember { mutableStateOf(true) }
+    var notificationPermissionStatus by remember {
+        mutableStateOf(NotificationPermissionStatus.GRANTED)
+    }
+    val hasNotificationPermission = notificationPermissionStatus == NotificationPermissionStatus.GRANTED
 
     LaunchedEffect(Unit) {
-        hasNotificationPermission = hasPlatformNotificationPermission()
+        notificationPermissionStatus = getPlatformNotificationPermissionStatus()
     }
 
     // Re-check when returning from settings
@@ -117,7 +124,7 @@ fun SettingsScreen(
         val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
             if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
                 coroutineScope.launch {
-                    hasNotificationPermission = hasPlatformNotificationPermission()
+                    notificationPermissionStatus = getPlatformNotificationPermissionStatus()
                 }
             }
         }
@@ -228,10 +235,27 @@ fun SettingsScreen(
                                         modifier = Modifier.padding(top = 2.dp)
                                     )
                                 }
+                                val permissionRemedy = notificationPermissionStatus.remedy()
                                 TextButton(
-                                    onClick = { openPlatformNotificationSettings() }
+                                    onClick = {
+                                        when (permissionRemedy) {
+                                            NotificationPermissionRemedy.REQUEST_PERMISSION ->
+                                                coroutineScope.launch {
+                                                    requestPlatformNotificationPermission()
+                                                    notificationPermissionStatus =
+                                                        getPlatformNotificationPermissionStatus()
+                                                }
+                                            else -> openPlatformNotificationSettings()
+                                        }
+                                    }
                                 ) {
-                                    Text("Open Settings")
+                                    Text(
+                                        if (permissionRemedy == NotificationPermissionRemedy.REQUEST_PERMISSION) {
+                                            "Enable"
+                                        } else {
+                                            "Open Settings"
+                                        }
+                                    )
                                 }
                             }
                         } else {
