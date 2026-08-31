@@ -72,8 +72,10 @@ fun LaunchVideoPlayer(
                 .background(Color.Black)
         ) {
             if (isPlayerVisible && VideoUtil.canPlayInline(vidUrl.url)) {
-                // Use the VideoPlayerComposable directly - it supports all platforms
-                val playerHost = remember {
+                // Use the VideoPlayerComposable directly - it supports all platforms.
+                // Keyed on the URL so switching launches/videos while the player is
+                // visible can't keep a stale host playing the previous video.
+                val playerHost = remember(vidUrl.url) {
                     MediaPlayerHost(mediaUrl = vidUrl.url)
                 }
 
