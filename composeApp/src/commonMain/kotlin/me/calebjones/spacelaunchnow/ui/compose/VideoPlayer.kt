@@ -71,7 +71,7 @@ fun LaunchVideoPlayer(
                 .aspectRatio(16f / 9f)
                 .background(Color.Black)
         ) {
-            if (isPlayerVisible && VideoUtil.isYouTubeUrl(vidUrl.url)) {
+            if (isPlayerVisible && VideoUtil.canPlayInline(vidUrl.url)) {
                 // Use the VideoPlayerComposable directly - it supports all platforms
                 val playerHost = remember {
                     MediaPlayerHost(mediaUrl = vidUrl.url)
@@ -108,7 +108,7 @@ fun LaunchVideoPlayer(
                     modifier = Modifier
                         .fillMaxSize()
                         .clickable {
-                            if (VideoUtil.isYouTubeUrl(vidUrl.url)) {
+                            if (VideoUtil.canPlayInline(vidUrl.url)) {
                                 onSetPlayerVisible?.invoke(true) // Use ViewModel state instead of local state
                             } else {
                                 onExternalVideoOpened?.invoke(
