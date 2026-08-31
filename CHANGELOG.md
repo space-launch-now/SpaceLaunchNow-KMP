@@ -1,12 +1,3 @@
-## [5.44.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.1...v5.44.2) (2026-08-31)
-
-
-### Bug Fixes
-
-* **ci:** queue production releases so a newer push never cancels an in-flight Play upload ([37110a9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/37110a9e7f8b574dfa73d4272fd8ffb2339d5cb6))
-
-
-
 ## [5.44.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.0...v5.44.1) (2026-08-31)
 
 
@@ -14,6 +5,7 @@
 
 * **ads:** keep banner mounted in AdState.SHOWN instead of tearing it down ([#179](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/179)) ([8e72425](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8e72425e41c5ceb4e9ae160afef5a745876ab65b))
 * **articles:** fail non-2xx SNAPI responses into the stale-cache fallback ([#190](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/190)) ([cc1cc7b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cc1cc7b6fdd29bae07ff2636a01b7ef4746f1346))
+* **ci:** queue production releases so a newer push never cancels an in-flight Play upload ([37110a9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/37110a9e7f8b574dfa73d4272fd8ffb2339d5cb6))
 * **ios:** make setRevenueCatPushToken non-throwing at the ObjC boundary ([#187](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/187)) ([c7e296f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c7e296f8536240130234b2aa5e4b04b827390339))
 * **ios:** skip ad preload while the root view controller is unattached ([#168](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/168)) ([b28832b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b28832bda6829d511f80a3ea601c2645f93f2090))
 * **ui:** route LaunchVideoPlayer link opens through openUriSafely ([#194](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/194)) ([deaf213](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/deaf21365f35eb840a0b2d4b438ba8e1fd98c413))
@@ -65,6 +57,16 @@
 * **newsevents:** clear the load-more flag on every reload path ([4b9bd96](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4b9bd96ad91ea12f633a3e56552421af370347ec))
 * **newsevents:** clear the load-more flag when a fetch is cancelled ([e73a4c4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e73a4c4c19b754897e45a67b8166a19cffe82168))
 * **newsevents:** dedupe paginated appends and close load-more race ([fc86705](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fc86705bb1ca8acb04eb1d9032bf9bd008de3297)), closes [#182](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/182) [#179](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/179)
+
+
+
+## [5.42.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.1...v5.42.2) (2026-08-27)
+
+
+### Bug Fixes
+
+* **android:** make WorkManager init non-fatal by removing startup auto-init ([1a49905](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1a49905e56b5d7072918ae59a3de10aaba814da5)), closes [#181](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/181)
+* **wear:** make WorkManager init non-fatal by removing startup auto-init ([73e6a00](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/73e6a0056033140fbaa0efada171c46004b6a8c1)), closes [#181](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/181)
 
 
 
