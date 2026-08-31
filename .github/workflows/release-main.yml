@@ -11,7 +11,7 @@ on:
         default: true
         type: boolean
       humanize_notes:
-        description: 'Run release notes through GitHub Models to humanize them. Disable for raw conventional-commit output.'
+        description: 'Run release notes through Copilot AI inference to humanize them. Disable for raw conventional-commit output.'
         required: false
         default: true
         type: boolean
@@ -23,7 +23,6 @@ permissions:
   contents: write
   checks: write
   pull-requests: write
-  models: read
 
 jobs:
   # Job 1: Calculate version (no commit yet)
@@ -89,14 +88,15 @@ jobs:
           echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
           echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
 
-      - name: Humanize Play Store notes (GitHub Models)
+      - name: Humanize Play Store notes (Copilot)
         id: ai_playstore
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
-        uses: actions/ai-inference@v2
+        uses: actions/ai-inference@v3
         continue-on-error: true
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         with:
-          model: openai/gpt-4o-mini
-          max-tokens: 400
+          model: gpt-4.1
           system-prompt: |
             You write Google Play "What's new" release notes for an Android space-launch tracking app.
             Your audience is end users who track rocket launches in the app — NOT developers reading a commit log.
@@ -140,14 +140,15 @@ jobs:
             Raw changelog:
             ${{ steps.changelog.outputs.clean_changelog }}
 
-      - name: Humanize GitHub Release notes (GitHub Models)
+      - name: Humanize GitHub Release notes (Copilot)
         id: ai_github
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
-        uses: actions/ai-inference@v2
+        uses: actions/ai-inference@v3
         continue-on-error: true
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         with:
-          model: openai/gpt-4o-mini
-          max-tokens: 800
+          model: gpt-4.1
           system-prompt: |
             You write GitHub Release notes for an Android/iOS/Wear OS space-launch tracking app.
             Rules:
