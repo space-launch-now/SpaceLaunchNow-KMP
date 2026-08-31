@@ -187,9 +187,15 @@ fun LaunchVideoPlayer(
         }
 
         // Video info section below the player
+        val videoTitle = VideoUtil.getVideoTitle(vidUrl, launchName)
+        val sourceName = VideoUtil.getVideoSourceName(vidUrl)
+        // Skip the channel line when the title already names the channel
+        // (e.g. "Starlink Mission - SpaceX" + "SpaceX")
+        val showSource = sourceName.isNotBlank() &&
+            !videoTitle.contains(sourceName, ignoreCase = true)
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp),
         ) {
             // Title + channel block with the open-in-app action beside it
             Row(
@@ -201,23 +207,25 @@ fun LaunchVideoPlayer(
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     Text(
-                        text = VideoUtil.getVideoTitle(vidUrl, launchName),
+                        text = videoTitle,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Row(
+                    if (showSource || vidUrl.live == true) Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(
-                            text = VideoUtil.getVideoSourceName(vidUrl),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        if (showSource) {
+                            Text(
+                                text = sourceName,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                         if (vidUrl.live == true) {
                             Surface(
                                 color = Color.Red,
