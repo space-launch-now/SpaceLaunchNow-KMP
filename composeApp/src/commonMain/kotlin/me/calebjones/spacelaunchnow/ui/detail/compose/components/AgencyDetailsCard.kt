@@ -39,8 +39,10 @@ import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.brands.WikipediaW
 import compose.icons.fontawesomeicons.solid.InfoCircle
+import androidx.compose.ui.graphics.Color
 import me.calebjones.spacelaunchnow.domain.model.Provider
 import me.calebjones.spacelaunchnow.domain.model.ProviderDetail
+import me.calebjones.spacelaunchnow.ui.compose.LogoWellColor
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileData
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -68,10 +70,10 @@ fun AgencyDetailsCard(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            // Agency logo - centered, same surface chip treatment as AgencyLogoBadge
+            // Agency logo - centered, same dark logo-well treatment as AgencyLogoBadge
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surface,
+                color = LogoWellColor,
                 modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 200.dp),
             ) {
                 SubcomposeAsyncImage(
@@ -94,7 +96,7 @@ fun AgencyDetailsCard(
                                 imageVector = Icons.Default.Business,
                                 contentDescription = null,
                                 modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                tint = Color.White.copy(alpha = 0.3f)
                             )
                         }
                     },
@@ -109,7 +111,7 @@ fun AgencyDetailsCard(
                                 imageVector = Icons.Default.Business,
                                 contentDescription = "Agency",
                                 modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                tint = Color.White.copy(alpha = 0.4f)
                             )
                         }
                     }

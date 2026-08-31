@@ -8,11 +8,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -20,7 +20,14 @@ import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 
 /**
- * Small square agency logo on a surface chip, for use next to titles.
+ * Fixed dark tone for logo wells, independent of theme. Agency logo assets are a mix of
+ * white-on-transparent and colored artwork; a theme-tracking surface makes the white ones
+ * invisible in light theme, so logo wells always use this dark ground.
+ */
+val LogoWellColor = Color(0xFF151A22)
+
+/**
+ * Small square agency logo on a dark logo-well chip, for use next to titles.
  * Renders nothing when [logoUrl] is null or blank.
  */
 @Composable
@@ -32,7 +39,7 @@ fun AgencyLogoBadge(
     if (logoUrl.isNullOrBlank()) return
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surface,
+        color = LogoWellColor,
         modifier = modifier.size(size),
     ) {
         SubcomposeAsyncImage(
@@ -57,7 +64,7 @@ fun AgencyLogoBadge(
                     Icon(
                         imageVector = Icons.Default.Business,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                        tint = Color.White.copy(alpha = 0.4f)
                     )
                 }
             }
