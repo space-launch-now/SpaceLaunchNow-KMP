@@ -88,6 +88,17 @@ jobs:
           echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
           echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
 
+      - name: Set up Node.js
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        continue-on-error: true
+        uses: actions/setup-node@v7
+
+      # ai-inference@v3 shells out to the Copilot CLI and expects it on PATH
+      - name: Install Copilot CLI
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
+        continue-on-error: true
+        run: npm install -g @github/copilot
+
       - name: Humanize Play Store notes (Copilot)
         id: ai_playstore
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false' }}
