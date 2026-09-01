@@ -296,6 +296,13 @@ jobs:
   test:
     name: Run Tests
     needs: [ version ]
+    # Gate the entire release on a non-empty changelog. Every downstream job needs this
+    # one, so skipping here skips the whole pipeline. Without this gate, a ci/chore-only
+    # push still builds and uploads to Play — and when the semver doesn't advance, the
+    # commit job skips the build-number bump while the upload permanently consumes the
+    # version code, guaranteeing a "Version code already used" failure on the next real
+    # release (happened twice on 2026-08-31: codes 1100000192 and 1100000198).
+    if: ${{ needs.version.outputs.skipped != 'true' }}
     runs-on: ubuntu-latest-8-core
     
     steps:
@@ -399,6 +406,7 @@ jobs:
   commit:
     name: Commit Version & Tag
     needs: [ version, test ]
+    if: ${{ needs.version.outputs.skipped != 'true' }}
     runs-on: ubuntu-latest-8-core
     
     steps:
