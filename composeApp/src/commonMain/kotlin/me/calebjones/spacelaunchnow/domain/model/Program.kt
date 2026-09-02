@@ -2,12 +2,14 @@ package me.calebjones.spacelaunchnow.domain.model
 
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 /**
  * Full domain representation of a space program, expanding on the lightweight
  * [ProgramSummary] used as a nested reference in other domain types.
  */
 @Immutable
+@Serializable
 data class Program(
     val id: Int,
     val name: String,

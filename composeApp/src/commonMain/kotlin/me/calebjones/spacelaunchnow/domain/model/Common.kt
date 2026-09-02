@@ -2,7 +2,9 @@ package me.calebjones.spacelaunchnow.domain.model
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Country(
     val id: Int,
     val name: String?,
@@ -12,6 +14,7 @@ data class Country(
     val nationalityNameComposed: String?
 )
 
+@Serializable
 data class Provider(
     val id: Int,
     val name: String,
@@ -274,6 +277,7 @@ data class ProgramSummary(
     val type: String?
 )
 
+@Serializable
 data class VideoLink(
     val url: String,
     val title: String?,
@@ -295,6 +299,7 @@ data class InfoLink(
     val priority: Int?
 )
 
+@Serializable
 data class MissionPatchSummary(
     val id: Int,
     val name: String,

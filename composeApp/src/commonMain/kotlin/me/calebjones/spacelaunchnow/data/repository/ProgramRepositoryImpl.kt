@@ -50,19 +50,15 @@ class ProgramRepositoryImpl(
             println("→ CACHE MISS: Fetching program from API...")
             val response = programsApi.getProgramDetails(id)
             val program = response.body()
+            val domainProgram = program.toDomainProgram()
 
-            // NOTE (escalation): ProgramLocalDataSource.cacheProgram() is typed to the
-            // retired Launch Library `ProgramNormal` and serializes it directly to JSON.
-            // Trantor's ProgramDetail can't be passed here without either the DB layer
-            // importing api.trantor.models (forbidden by ADR-0001) or making the domain
-            // Program model kotlinx-serializable (out of this unit's scope). Disk caching
-            // of program detail is therefore skipped on this path until that's resolved;
-            // stale-read fallback below still serves any pre-migration cached rows.
-            println("✓ API SUCCESS: Fetched program '${program.name}' (not cached to disk, see escalation)")
+            // Cache the domain-mapped payload (ProgramLocalDataSource stores/reads Program directly)
+            localDataSource?.cacheProgram(domainProgram)
+            println("✓ API SUCCESS: Fetched and cached program '${domainProgram.name}'")
 
             Result.success(
                 DataResult(
-                    data = program.toDomainProgram(),
+                    data = domainProgram,
                     source = DataSource.NETWORK,
                     timestamp = now
                 )

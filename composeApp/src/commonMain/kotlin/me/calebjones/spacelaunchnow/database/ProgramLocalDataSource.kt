@@ -3,9 +3,7 @@ package me.calebjones.spacelaunchnow.database
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainProgram
 import me.calebjones.spacelaunchnow.domain.model.Program
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -14,6 +12,12 @@ import kotlin.time.Clock.System
 /**
  * Local data source for program data using SQLDelight.
  * Provides caching with automatic expiration for Starship and other program dashboards.
+ *
+ * Both writes and reads use the domain [Program] type directly - the cached JSON is the
+ * domain representation itself (kotlinx-serializable), so no API-shaped model is ever
+ * persisted or referenced from this file. A legacy (pre-migration) blob serialized from the
+ * retired Launch Library `ProgramNormal` shape will fail to decode against [Program] and is
+ * treated as a cache miss, not a crash.
  */
 class ProgramLocalDataSource(
     database: SpaceLaunchDatabase,
@@ -21,11 +25,11 @@ class ProgramLocalDataSource(
 ) {
     private val queries = database.programQueries
     private val json = Json { ignoreUnknownKeys = true }
-    
+
     // Program data changes infrequently - 1 hour cache
     private val cacheDuration = 1.hours
     private val debugCacheDuration = 2.minutes
-    
+
     private suspend fun getEffectiveCacheDuration(): kotlin.time.Duration {
         return if (appPreferences.isDebugShortCacheTtlEnabled()) {
             println("⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${cacheDuration.inWholeHours} hours")
@@ -34,20 +38,20 @@ class ProgramLocalDataSource(
             cacheDuration
         }
     }
-    
+
     /**
      * Cache a program with automatic expiration.
      */
-    suspend fun cacheProgram(program: ProgramNormal) {
+    suspend fun cacheProgram(program: Program) {
         val now = System.now().toEpochMilliseconds()
         val duration = getEffectiveCacheDuration()
         val expiresAt = now + duration.inWholeMilliseconds
-        
+
         queries.insertOrReplaceProgram(
             id = program.id.toLong(),
-            name = program.name ?: "",
+            name = program.name,
             description = program.description,
-            image_url = program.image?.imageUrl,
+            image_url = program.imageUrl,
             info_url = program.infoUrl,
             wiki_url = program.wikiUrl,
             start_date = program.startDate?.toEpochMilliseconds(),
@@ -57,9 +61,9 @@ class ProgramLocalDataSource(
             expires_at = expiresAt
         )
     }
-    
+
     private fun deserialize(jsonData: String): Program? = try {
-        json.decodeFromString<ProgramNormal>(jsonData).toDomainProgram()
+        json.decodeFromString<Program>(jsonData)
     } catch (e: Exception) {
         println("  [PROGRAM] Failed to deserialize cached program: ${e.message}")
         null
@@ -92,7 +96,7 @@ class ProgramLocalDataSource(
             deserialize(it.json_data)
         }
     }
-    
+
     /**
      * Get the cache timestamp for a program.
      * Returns epoch milliseconds when data was cached, or null if not found.
@@ -100,7 +104,7 @@ class ProgramLocalDataSource(
     suspend fun getCacheTimestamp(id: Int): Long? {
         return queries.getProgramByIdStale(id.toLong()).executeAsOneOrNull()?.cached_at
     }
-    
+
     /**
      * Delete all expired program entries.
      */
@@ -108,7 +112,7 @@ class ProgramLocalDataSource(
         val now = System.now().toEpochMilliseconds()
         queries.deleteExpiredPrograms(now)
     }
-    
+
     /**
      * Clear all cached programs.
      */
