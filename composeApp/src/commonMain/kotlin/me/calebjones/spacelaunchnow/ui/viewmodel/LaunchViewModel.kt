@@ -140,7 +140,7 @@ class LaunchViewModel(
         }
 
         // Stale-while-revalidate: Check for stale data to display while fetching
-        val staleData = repository.getStaleDetailedLaunch(id)?.toDomain()
+        val staleData = repository.getStaleDetailedLaunch(id)
         if (staleData != null) {
             // We have stale data - show it immediately while refreshing
             _launchDetails.value = staleData
