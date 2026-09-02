@@ -228,12 +228,12 @@ val appModule = module {
     singleOf(::SpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
     single<ScheduleFilterRepository> {
         ScheduleFilterRepositoryImpl(
-            agenciesApi = get(),
-            programsApi = get(),
-            launcherConfigurationsApi = get(),
-            launcherConfigurationFamiliesApi = get(),
-            locationsApi = get(),
-            configApi = get(),
+            agenciesApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi>(),
+            programsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi>(),
+            launcherConfigurationsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.LauncherConfigurationsApi>(),
+            familiesApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.FamiliesApi>(),
+            locationsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.LocationsApi>(),
+            lookupsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi>(),
             localDataSource = get()
         )
     }

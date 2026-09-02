@@ -3,32 +3,50 @@ package me.calebjones.spacelaunchnow.data.repository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getAgencyList
-import me.calebjones.spacelaunchnow.api.extensions.getConfigurationsByProgram
+import me.calebjones.spacelaunchnow.api.extensions.getConfigurationList
+import me.calebjones.spacelaunchnow.api.extensions.getFamilyList
 import me.calebjones.spacelaunchnow.api.extensions.getLocationList
+import me.calebjones.spacelaunchnow.api.extensions.getLookups
 import me.calebjones.spacelaunchnow.api.extensions.getProgramList
-import me.calebjones.spacelaunchnow.api.extensions.getStatusList
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationFamiliesApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LocationsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ProgramsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyNormal
+import me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.FamiliesApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.LauncherConfigurationsApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.LocationsApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi
+import me.calebjones.spacelaunchnow.api.trantor.models.LookupsResponse
 import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.database.FilterOptionsLocalDataSource
+import me.calebjones.spacelaunchnow.domain.mapper.toFilterOption
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class ScheduleFilterRepositoryImpl(
     private val agenciesApi: AgenciesApi,
     private val programsApi: ProgramsApi,
     private val launcherConfigurationsApi: LauncherConfigurationsApi,
-    private val launcherConfigurationFamiliesApi: LauncherConfigurationFamiliesApi,
+    private val familiesApi: FamiliesApi,
     private val locationsApi: LocationsApi,
-    private val configApi: ConfigApi,
+    private val lookupsApi: LookupsApi,
     private val localDataSource: FilterOptionsLocalDataSource? = null
 ) : ScheduleFilterRepository {
 
     private val log = logger()
+
+    // The five status/orbit/mission-type picker calls collapse into one GET /lookups
+    // payload (contract: "Lookups (one call replaces five)"). Cache it in memory so
+    // getStatuses/getOrbits/getMissionTypes share a single network round trip.
+    private var cachedLookupsResponse: LookupsResponse? = null
+
+    private suspend fun fetchLookups(forceRefresh: Boolean): LookupsResponse {
+        if (!forceRefresh) {
+            cachedLookupsResponse?.let { return it }
+        }
+        log.d { "🚀 API Call: getLookups()" }
+        val response = lookupsApi.getLookups()
+        val body = response.body()
+        cachedLookupsResponse = body
+        return body
+    }
 
     override suspend fun getAgencies(forceRefresh: Boolean): Result<List<FilterOption>> {
         return try {
@@ -51,7 +69,7 @@ class ScheduleFilterRepositoryImpl(
 
             // Fetch from API with pagination
             log.d { "Fetching agencies from API (ordering: name, featured: true)" }
-            val allAgencies = mutableListOf<AgencyNormal>()
+            val allAgencies = mutableListOf<me.calebjones.spacelaunchnow.api.trantor.models.AgencyList>()
             var offset = 0
             val limit = 100
 
@@ -76,13 +94,7 @@ class ScheduleFilterRepositoryImpl(
                 allAgencies.map { Triple(it.id, it.name, it.abbrev) }
             )
 
-            Result.success(allAgencies.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name,
-                    abbreviation = it.abbrev
-                )
-            })
+            Result.success(allAgencies.map { it.toFilterOption() })
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getAgencies: ${e.message}" }
 
@@ -144,8 +156,7 @@ class ScheduleFilterRepositoryImpl(
 
             // Fetch from API with pagination
             log.d { "Fetching programs from API (ordering: name)" }
-            val allPrograms =
-                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal>()
+            val allPrograms = mutableListOf<me.calebjones.spacelaunchnow.api.trantor.models.ProgramList>()
             var offset = 0
             val limit = 100
 
@@ -169,13 +180,7 @@ class ScheduleFilterRepositoryImpl(
                 allPrograms.map { Triple(it.id, it.name, null) }
             )
 
-            Result.success(allPrograms.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name,
-                    abbreviation = null
-                )
-            })
+            Result.success(allPrograms.map { it.toFilterOption() })
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getPrograms: ${e.message}" }
 
@@ -238,12 +243,12 @@ class ScheduleFilterRepositoryImpl(
             // Fetch from API with pagination
             log.d { "Fetching rocket configurations from API (ordering: name)" }
             val allRockets =
-                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed>()
+                mutableListOf<me.calebjones.spacelaunchnow.api.trantor.models.LauncherConfigSummary>()
             var offset = 0
             val limit = 100
 
             do {
-                val response = launcherConfigurationsApi.getConfigurationsByProgram(
+                val response = launcherConfigurationsApi.getConfigurationList(
                     limit = limit,
                     offset = offset,
                     ordering = "name",
@@ -257,21 +262,15 @@ class ScheduleFilterRepositoryImpl(
 
             log.i { "✅ API SUCCESS: Fetched ${allRockets.size} rocket configurations" }
 
-            // Clear old cache and insert fresh data
+            // Clear old cache and insert fresh data. Trantor's flat configuration row
+            // carries no manufacturer abbreviation (only manufacturerId) — see
+            // FilterOptionMappers.LauncherConfigSummary.toFilterOption.
             localDataSource?.clearAllRockets()
             localDataSource?.cacheRockets(
-                allRockets.map {
-                    Triple(it.id, it.fullName ?: it.name, it.manufacturer?.abbrev)
-                }
+                allRockets.map { Triple(it.id, it.fullName ?: it.name, null) }
             )
 
-            Result.success(allRockets.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.fullName ?: it.name,
-                    abbreviation = it.manufacturer?.abbrev
-                )
-            })
+            Result.success(allRockets.map { it.toFilterOption() })
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getRockets: ${e.message}" }
 
@@ -334,7 +333,7 @@ class ScheduleFilterRepositoryImpl(
             // Fetch from API with pagination
             log.d { "Fetching locations from API (ordering: name, active: true)" }
             val allLocations =
-                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.LocationSerializerWithPads>()
+                mutableListOf<me.calebjones.spacelaunchnow.api.trantor.models.LocationList>()
             var offset = 0
             val limit = 100
 
@@ -356,16 +355,10 @@ class ScheduleFilterRepositoryImpl(
             // Clear old cache and insert fresh data
             localDataSource?.clearAllLocations()
             localDataSource?.cacheLocations(
-                allLocations.map { Pair(it.id, it.name ?: "Unknown Location") }
+                allLocations.map { Pair(it.id, it.name) }
             )
 
-            Result.success(allLocations.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name ?: "Unknown Location",
-                    abbreviation = null
-                )
-            })
+            Result.success(allLocations.map { it.toFilterOption() })
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getLocations: ${e.message}" }
 
@@ -425,47 +418,26 @@ class ScheduleFilterRepositoryImpl(
                 }
             }
 
-            // Fetch from API with pagination
-            log.d { "Fetching statuses from API (ordering: name)" }
-            val allStatuses =
-                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchStatus>()
-            var offset = 0
-            val limit = 100
+            log.d { "Fetching statuses from /lookups" }
+            val lookups = fetchLookups(forceRefresh)
+            val statuses = lookups.launchStatuses
 
-            do {
-                val response = configApi.getStatusList(
-                    limit = limit,
-                    offset = offset,
-                    ordering = "name"
-                )
-                val page = response.body()
-                allStatuses.addAll(page.results)
-                offset += limit
-                log.v { "Fetched ${page.results.size} statuses (total: ${allStatuses.size}/${page.count})" }
-            } while (allStatuses.size < page.count)
-
-            log.i { "✅ API SUCCESS: Fetched ${allStatuses.size} statuses" }
+            log.i { "✅ API SUCCESS: Fetched ${statuses.size} statuses" }
 
             // Clear old cache and insert fresh data
             localDataSource?.clearAllStatuses()
             localDataSource?.cacheStatuses(
-                allStatuses.map {
+                statuses.map {
                     me.calebjones.spacelaunchnow.database.Tuple4(
                         it.id,
                         it.name,
                         it.abbrev,
-                        it.description
+                        null
                     )
                 }
             )
 
-            Result.success(allStatuses.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name,
-                    abbreviation = it.abbrev
-                )
-            })
+            Result.success(statuses.map { it.toFilterOption() })
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getStatuses: ${e.message}" }
 
@@ -525,40 +497,19 @@ class ScheduleFilterRepositoryImpl(
                 }
             }
 
-            // Fetch from API with pagination
-            log.d { "Fetching orbits from API (ordering: name)" }
-            val allOrbits =
-                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.Orbit>()
-            var offset = 0
-            val limit = 100
+            log.d { "Fetching orbits from /lookups" }
+            val lookups = fetchLookups(forceRefresh)
+            val orbits = lookups.orbits
 
-            do {
-                val response = configApi.configOrbitsList(
-                    limit = limit,
-                    offset = offset,
-                    ordering = "name"
-                )
-                val page = response.body()
-                allOrbits.addAll(page.results)
-                offset += limit
-                log.v { "Fetched ${page.results.size} orbits (total: ${allOrbits.size}/${page.count})" }
-            } while (allOrbits.size < page.count)
-
-            log.i { "✅ API SUCCESS: Fetched ${allOrbits.size} orbits" }
+            log.i { "✅ API SUCCESS: Fetched ${orbits.size} orbits" }
 
             // Clear old cache and insert fresh data
             localDataSource?.clearAllOrbits()
             localDataSource?.cacheOrbits(
-                allOrbits.map { Triple(it.id, it.name, it.abbrev) }
+                orbits.map { Triple(it.id, it.name, it.abbrev) }
             )
 
-            Result.success(allOrbits.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name,
-                    abbreviation = it.abbrev
-                )
-            })
+            Result.success(orbits.map { it.toFilterOption() })
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getOrbits: ${e.message}" }
 
@@ -618,40 +569,19 @@ class ScheduleFilterRepositoryImpl(
                 }
             }
 
-            // Fetch from API with pagination
-            log.d { "Fetching mission types from API (ordering: name)" }
-            val allMissionTypes =
-                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.MissionType>()
-            var offset = 0
-            val limit = 100
+            log.d { "Fetching mission types from /lookups" }
+            val lookups = fetchLookups(forceRefresh)
+            val missionTypes = lookups.missionTypes
 
-            do {
-                val response = configApi.configMissionTypesList(
-                    limit = limit,
-                    offset = offset,
-                    ordering = "name"
-                )
-                val page = response.body()
-                allMissionTypes.addAll(page.results)
-                offset += limit
-                log.v { "Fetched ${page.results.size} mission types (total: ${allMissionTypes.size}/${page.count})" }
-            } while (allMissionTypes.size < page.count)
-
-            log.i { "✅ API SUCCESS: Fetched ${allMissionTypes.size} mission types" }
+            log.i { "✅ API SUCCESS: Fetched ${missionTypes.size} mission types" }
 
             // Clear old cache and insert fresh data
             localDataSource?.clearAllMissionTypes()
             localDataSource?.cacheMissionTypes(
-                allMissionTypes.map { Pair(it.id, it.name ?: "Unknown Mission Type") }
+                missionTypes.map { Pair(it.id, it.name) }
             )
 
-            Result.success(allMissionTypes.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name ?: "Unknown Mission Type",
-                    abbreviation = null
-                )
-            })
+            Result.success(missionTypes.map { it.toFilterOption() })
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getMissionTypes: ${e.message}" }
 
@@ -714,12 +644,12 @@ class ScheduleFilterRepositoryImpl(
             // Fetch from API with pagination
             log.d { "Fetching launcher config families from API (ordering: name)" }
             val allLauncherConfigFamilies =
-                mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigFamilyNormal>()
+                mutableListOf<me.calebjones.spacelaunchnow.api.trantor.models.FamilyList>()
             var offset = 0
             val limit = 100
 
             do {
-                val response = launcherConfigurationFamiliesApi.launcherConfigurationFamiliesList(
+                val response = familiesApi.getFamilyList(
                     limit = limit,
                     offset = offset,
                     ordering = "name"
@@ -735,16 +665,10 @@ class ScheduleFilterRepositoryImpl(
             // Clear old cache and insert fresh data
             localDataSource?.clearAllLauncherConfigFamilies()
             localDataSource?.cacheLauncherConfigFamilies(
-                allLauncherConfigFamilies.map { Pair(it.id, it.name ?: "Unknown Family") }
+                allLauncherConfigFamilies.map { Pair(it.id, it.name) }
             )
 
-            Result.success(allLauncherConfigFamilies.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name ?: "Unknown Family",
-                    abbreviation = null
-                )
-            })
+            Result.success(allLauncherConfigFamilies.map { it.toFilterOption() })
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getLauncherConfigFamilies: ${e.message}" }
 
