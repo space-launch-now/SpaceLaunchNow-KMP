@@ -2,18 +2,19 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getConfigurationsByProgram
-import me.calebjones.spacelaunchnow.api.extensions.getRocketDetails
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherConfigDetailedList
+import me.calebjones.spacelaunchnow.api.extensions.getConfiguration
+import me.calebjones.spacelaunchnow.api.extensions.listConfigurations
+import me.calebjones.spacelaunchnow.api.trantor.apis.LauncherConfigurationsApi
+import me.calebjones.spacelaunchnow.api.trantor.models.LauncherConfigFull
+import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseLauncherConfigSummary
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.mapper.toVehicleDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 
 /**
- * Implementation of LauncherConfigRepository using the generated LauncherConfigurationsApi
+ * Implementation of LauncherConfigRepository using the Trantor LauncherConfigurationsApi
+ * (`GET /configurations`).
  */
 class LauncherConfigRepositoryImpl(
     private val launcherConfigurationsApi: LauncherConfigurationsApi
@@ -23,9 +24,9 @@ class LauncherConfigRepositoryImpl(
         programId: Int,
         limit: Int,
         offset: Int
-    ): Result<PaginatedLauncherConfigDetailedList> {
+    ): Result<PaginatedResponseLauncherConfigSummary> {
         return try {
-            val response = launcherConfigurationsApi.getConfigurationsByProgram(
+            val response = launcherConfigurationsApi.listConfigurations(
                 programIds = listOf(programId),
                 limit = limit,
                 offset = offset,
@@ -45,9 +46,9 @@ class LauncherConfigRepositoryImpl(
         limit: Int,
         offset: Int,
         search: String?
-    ): Result<PaginatedLauncherConfigDetailedList> {
+    ): Result<PaginatedResponseLauncherConfigSummary> {
         return try {
-            val response = launcherConfigurationsApi.getConfigurationsByProgram(
+            val response = launcherConfigurationsApi.listConfigurations(
                 programIds = null,
                 limit = limit,
                 offset = offset,
@@ -64,9 +65,9 @@ class LauncherConfigRepositoryImpl(
         }
     }
 
-    private suspend fun getConfigurationDetailsRaw(configId: Int): Result<LauncherConfigDetailed> {
+    private suspend fun getConfigurationDetailsRaw(configId: Int): Result<LauncherConfigFull> {
         return try {
-            val response = launcherConfigurationsApi.getRocketDetails(id = configId)
+            val response = launcherConfigurationsApi.getConfiguration(configId = configId)
             Result.success(response.body())
         } catch (e: ResponseException) {
             Result.failure(e)

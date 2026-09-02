@@ -2,11 +2,11 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getRocketDetails
-import me.calebjones.spacelaunchnow.api.extensions.getRocketList
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherConfigNormalList
+import me.calebjones.spacelaunchnow.api.extensions.getConfiguration
+import me.calebjones.spacelaunchnow.api.extensions.listConfigurations
+import me.calebjones.spacelaunchnow.api.trantor.apis.LauncherConfigurationsApi
+import me.calebjones.spacelaunchnow.api.trantor.models.LauncherConfigFull
+import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseLauncherConfigSummary
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.mapper.toVehicleDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
@@ -28,17 +28,17 @@ class RocketRepositoryImpl(
         familyIds: List<Int>?,
         active: Boolean?,
         reusable: Boolean?
-    ): Result<PaginatedLauncherConfigNormalList> {
+    ): Result<PaginatedResponseLauncherConfigSummary> {
         return try {
-            val response = launcherConfigurationsApi.getRocketList(
+            val response = launcherConfigurationsApi.listConfigurations(
                 limit = limit,
                 offset = offset,
                 search = search,
                 ordering = ordering,
                 active = active,
                 reusable = reusable,
-                program = programIds,
-                families = familyIds
+                programIds = programIds,
+                familyIds = familyIds
             )
             Result.success(response.body())
         } catch (e: ResponseException) {
@@ -53,9 +53,9 @@ class RocketRepositoryImpl(
         }
     }
 
-    private suspend fun getRocketDetailsRaw(id: Int): Result<LauncherConfigDetailed> {
+    private suspend fun getRocketDetailsRaw(id: Int): Result<LauncherConfigFull> {
         return try {
-            val response = launcherConfigurationsApi.getRocketDetails(id = id)
+            val response = launcherConfigurationsApi.getConfiguration(configId = id)
             Result.success(response.body())
         } catch (e: ResponseException) {
             log.e(e) { "API ERROR in getRocketDetails: ${e.message}" }
