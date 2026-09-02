@@ -2,13 +2,16 @@ package me.calebjones.spacelaunchnow.domain.model
 
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SpacecraftStatus(
     val id: Int,
     val name: String?
 )
 
 @Immutable
+@Serializable
 data class Spacecraft(
     val id: Int,
     val name: String,
@@ -20,6 +23,7 @@ data class Spacecraft(
 )
 
 @Immutable
+@Serializable
 data class SpacecraftConfig(
     val id: Int,
     val name: String,

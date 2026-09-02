@@ -63,17 +63,14 @@ class SpacecraftRepositoryImpl(
             val spacecraftList = response.body().results
             println("✓ API SUCCESS: Fetched ${spacecraftList.size} spacecraft for config $configId")
 
-            // NOTE (escalation): SpacecraftLocalDataSource.cacheSpacecraftList() is typed to
-            // the retired Launch Library `SpacecraftEndpointDetailed` and serializes it
-            // directly to JSON. Trantor's `SpacecraftSummary` can't be passed here without
-            // either the DB layer importing api.trantor.models (forbidden by ADR-0001) or
-            // making the domain Spacecraft model kotlinx-serializable (out of scope for this
-            // unit). Disk caching of spacecraft-by-config is skipped until that's resolved;
-            // stale-read fallback below still serves any pre-migration cached rows.
+            val domainSpacecraftList = spacecraftList.map { it.toDomain() }
+
+            // Cache the domain-mapped payload (SpacecraftLocalDataSource stores/reads Spacecraft directly)
+            localDataSource?.cacheSpacecraftList(domainSpacecraftList)
 
             Result.success(
                 DataResult(
-                    data = spacecraftList.map { it.toDomain() },
+                    data = domainSpacecraftList,
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
