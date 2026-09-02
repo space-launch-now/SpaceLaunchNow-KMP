@@ -2,15 +2,17 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
+import me.calebjones.spacelaunchnow.api.extensions.getFamilyList
 import me.calebjones.spacelaunchnow.api.extensions.getProgramList
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationFamiliesApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ProgramsApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.FamiliesApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi
 import me.calebjones.spacelaunchnow.data.model.FilterOption
+import me.calebjones.spacelaunchnow.domain.mapper.toFilterOption
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class RocketFilterRepositoryImpl(
     private val programsApi: ProgramsApi,
-    private val launcherConfigurationFamiliesApi: LauncherConfigurationFamiliesApi
+    private val familiesApi: FamiliesApi
 ) : RocketFilterRepository {
 
     private val log = logger()
@@ -31,7 +33,7 @@ class RocketFilterRepositoryImpl(
 
             // Fetch from API
             log.d { "Fetching programs from API" }
-            val allPrograms = mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.ProgramNormal>()
+            val allPrograms = mutableListOf<me.calebjones.spacelaunchnow.api.trantor.models.ProgramList>()
             var offset = 0
             val limit = 100
 
@@ -46,17 +48,11 @@ class RocketFilterRepositoryImpl(
                 allPrograms.addAll(page.results)
                 offset += limit
                 log.v { "Fetched ${page.results.size} programs (total: ${allPrograms.size}/${page.count})" }
-            } while (page.next != null && allPrograms.size < (page.count ?: 0))
+            } while (page.next != null && allPrograms.size < page.count)
 
             log.i { "✅ API SUCCESS: Fetched ${allPrograms.size} programs" }
 
-            val filterOptions = allPrograms.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name,
-                    abbreviation = null // ProgramNormal doesn't have abbreviation
-                )
-            }
+            val filterOptions = allPrograms.map { it.toFilterOption() }
 
             // Cache the result
             cachedPrograms = filterOptions
@@ -64,23 +60,23 @@ class RocketFilterRepositoryImpl(
             Result.success(filterOptions)
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getPrograms: ${e.message}" }
-            
+
             // Return stale cache if available
             if (cachedPrograms != null) {
                 log.w { "Using stale cache (${cachedPrograms!!.size} programs)" }
                 return Result.success(cachedPrograms!!)
             }
-            
+
             Result.failure(e)
         } catch (e: IOException) {
             log.e(e) { "❌ NETWORK ERROR in getPrograms: ${e.message}" }
-            
+
             // Return stale cache if available
             if (cachedPrograms != null) {
                 log.w { "Using stale cache (${cachedPrograms!!.size} programs)" }
                 return Result.success(cachedPrograms!!)
             }
-            
+
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "❌ UNEXPECTED ERROR in getPrograms: ${e.message}" }
@@ -100,13 +96,13 @@ class RocketFilterRepositoryImpl(
 
             // Fetch from API
             log.d { "Fetching launcher configuration families from API" }
-            val allFamilies = mutableListOf<me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigFamilyNormal>()
+            val allFamilies = mutableListOf<me.calebjones.spacelaunchnow.api.trantor.models.FamilyList>()
             var offset = 0
             val limit = 100
 
             do {
-                log.d { "🚀 API Call: launcherConfigurationFamiliesList(limit=$limit, offset=$offset)" }
-                val response = launcherConfigurationFamiliesApi.launcherConfigurationFamiliesList(
+                log.d { "🚀 API Call: getFamilyList(limit=$limit, offset=$offset)" }
+                val response = familiesApi.getFamilyList(
                     limit = limit,
                     offset = offset
                 )
@@ -114,17 +110,11 @@ class RocketFilterRepositoryImpl(
                 allFamilies.addAll(page.results)
                 offset += limit
                 log.v { "Fetched ${page.results.size} families (total: ${allFamilies.size}/${page.count})" }
-            } while (page.next != null && allFamilies.size < (page.count ?: 0))
+            } while (page.next != null && allFamilies.size < page.count)
 
             log.i { "✅ API SUCCESS: Fetched ${allFamilies.size} launcher configuration families" }
 
-            val filterOptions = allFamilies.map { family ->
-                FilterOption(
-                    id = family.id,
-                    name = family.name,
-                    abbreviation = null // Families don't typically have abbreviations
-                )
-            }
+            val filterOptions = allFamilies.map { it.toFilterOption() }
 
             // Cache the result
             cachedFamilies = filterOptions
@@ -132,23 +122,23 @@ class RocketFilterRepositoryImpl(
             Result.success(filterOptions)
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getFamilies: ${e.message}" }
-            
+
             // Return stale cache if available
             if (cachedFamilies != null) {
                 log.w { "Using stale cache (${cachedFamilies!!.size} families)" }
                 return Result.success(cachedFamilies!!)
             }
-            
+
             Result.failure(e)
         } catch (e: IOException) {
             log.e(e) { "❌ NETWORK ERROR in getFamilies: ${e.message}" }
-            
+
             // Return stale cache if available
             if (cachedFamilies != null) {
                 log.w { "Using stale cache (${cachedFamilies!!.size} families)" }
                 return Result.success(cachedFamilies!!)
             }
-            
+
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "❌ UNEXPECTED ERROR in getFamilies: ${e.message}" }

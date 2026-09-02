@@ -2,13 +2,14 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getAstronautStatuses
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
+import me.calebjones.spacelaunchnow.api.extensions.getLookups
+import me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi
 import me.calebjones.spacelaunchnow.data.model.FilterOption
+import me.calebjones.spacelaunchnow.domain.mapper.toFilterOption
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class AstronautFilterRepositoryImpl(
-    private val configApi: ConfigApi
+    private val lookupsApi: LookupsApi
 ) : AstronautFilterRepository {
 
     private val log = logger()
@@ -26,22 +27,16 @@ class AstronautFilterRepositoryImpl(
                 return Result.success(statusesCache!!)
             }
 
-            // Fetch from API
-            log.d { "Fetching astronaut statuses from API" }
-            val response = configApi.getAstronautStatuses(limit = 100)
-            val paginatedList = response.body()
-            val results = paginatedList.results
+            // Astronaut statuses are one of the six lookup tables in GET /lookups —
+            // no separate endpoint (contract: "Lookups (one call replaces five)").
+            log.d { "Fetching astronaut statuses from /lookups" }
+            val response = lookupsApi.getLookups()
+            val results = response.body().astronautStatuses
 
             log.d { "Fetched ${results.size} astronaut statuses from API" }
 
             // Map to FilterOption
-            val filterOptions = results.map {
-                FilterOption(
-                    id = it.id,
-                    name = it.name,
-                    abbreviation = null
-                )
-            }
+            val filterOptions = results.map { it.toFilterOption() }
 
             // Cache the results
             statusesCache = filterOptions
@@ -50,7 +45,7 @@ class AstronautFilterRepositoryImpl(
             Result.success(filterOptions)
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getStatuses: ${e.message}" }
-            
+
             // Return cache if available
             if (statusesCache != null) {
                 log.w { "Using cached data (${statusesCache!!.size} astronaut statuses)" }
@@ -60,7 +55,7 @@ class AstronautFilterRepositoryImpl(
             Result.failure(e)
         } catch (e: IOException) {
             log.e(e) { "❌ NETWORK ERROR in getStatuses: ${e.message}" }
-            
+
             // Return cache if available
             if (statusesCache != null) {
                 log.w { "Using cached data (${statusesCache!!.size} astronaut statuses)" }
