@@ -50,9 +50,23 @@ data class AstronautDetail(
     val flightsCount: Int?,
     val landingsCount: Int?,
     val spacewalksCount: Int?,
-    val flights: List<Launch>,
+    val flights: List<AstronautFlight>,
     val landings: List<SpacecraftFlightSummary>,
     val spacewalks: List<SpacewalkSummary>
+)
+
+/**
+ * A lightweight reference to one of an astronaut's flights (launch id/name/date only).
+ * Deliberately narrower than the domain [Launch] type — neither the retired Launch Library
+ * astronaut-detail payload nor Trantor's embedded astronaut-flights payload carries enough
+ * to build a full [Launch] (e.g. a real provider/slug), so this type exists to avoid
+ * fabricating those fields. Not to be confused with the generated API models of the same
+ * name in `api.launchlibrary.models`/`api.trantor.models`.
+ */
+data class AstronautFlight(
+    val launchId: String,
+    val launchName: String,
+    val net: Instant?
 )
 
 data class SocialMediaLink(
