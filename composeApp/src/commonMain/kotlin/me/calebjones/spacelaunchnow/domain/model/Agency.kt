@@ -1,8 +1,10 @@
 package me.calebjones.spacelaunchnow.domain.model
 
 import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
 
 @Immutable
+@Serializable
 data class Agency(
     val id: Int,
     val name: String,

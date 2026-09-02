@@ -2,7 +2,8 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ProgramsApi
+import me.calebjones.spacelaunchnow.api.extensions.getProgramDetails
+import me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
@@ -47,16 +48,17 @@ class ProgramRepositoryImpl(
 
             // Cache miss or force refresh - fetch from API
             println("→ CACHE MISS: Fetching program from API...")
-            val response = programsApi.programsRetrieve(id)
+            val response = programsApi.getProgramDetails(id)
             val program = response.body()
+            val domainProgram = program.toDomainProgram()
 
-            // Cache the raw API payload
-            localDataSource?.cacheProgram(program)
-            println("✓ API SUCCESS: Fetched and cached program '${program.name}'")
+            // Cache the domain-mapped payload (ProgramLocalDataSource stores/reads Program directly)
+            localDataSource?.cacheProgram(domainProgram)
+            println("✓ API SUCCESS: Fetched and cached program '${domainProgram.name}'")
 
             Result.success(
                 DataResult(
-                    data = program.toDomainProgram(),
+                    data = domainProgram,
                     source = DataSource.NETWORK,
                     timestamp = now
                 )

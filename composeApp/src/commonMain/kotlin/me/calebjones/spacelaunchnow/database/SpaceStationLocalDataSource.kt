@@ -2,12 +2,9 @@ package me.calebjones.spacelaunchnow.database
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.iss.IssTle
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.ExpeditionDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpaceStationDetailedEndpoint
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -19,11 +16,12 @@ import kotlin.time.Clock.System
  * Local data source for space station, expedition, and TLE data using SQLDelight.
  * Provides caching with automatic expiration.
  *
- * Writes accept raw API types (the payload received from the network); reads expose the
- * domain types [SpaceStationDetail] and [ExpeditionDetailItem] so callers outside this
- * layer do not need to import `api.launchlibrary.models.*`. The cached JSON is the API
- * representation; we deserialize to the API type and then map via [toDomain] /
- * [toDomainDetail] before returning.
+ * Space station and expedition writes/reads use the domain types [SpaceStationDetail] and
+ * [ExpeditionDetailItem] directly - the cached JSON is the domain representation itself
+ * (kotlinx-serializable), so no API-shaped model is ever persisted or referenced from this
+ * file. A legacy (pre-migration) blob serialized from the retired Launch Library
+ * `SpaceStationDetailedEndpoint` / `ExpeditionDetailed` shapes will fail to decode against
+ * the domain types and is treated as a cache miss, not a crash.
  *
  * TLE data stays as [IssTle] (sourced from the separate wheretheiss.at API, not
  * launchlibrary) — no domain equivalent is needed.
@@ -39,7 +37,7 @@ class SpaceStationLocalDataSource(
 ) {
     private val spaceStationQueries = database.spaceStationQueries
     private val json = Json { ignoreUnknownKeys = true }
-    
+
     // Station and expedition data rarely changes
     private val stationCacheDuration = 4.hours
     // TLE data updates several times daily
@@ -48,7 +46,7 @@ class SpaceStationLocalDataSource(
     private val debugCacheDuration = 2.minutes
 
     private val log = logger()
-    
+
     private suspend fun getStationCacheDuration(): kotlin.time.Duration {
         return if (appPreferences.isDebugShortCacheTtlEnabled()) {
             log.w { "⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${stationCacheDuration.inWholeHours} hours" }
@@ -57,7 +55,7 @@ class SpaceStationLocalDataSource(
             stationCacheDuration
         }
     }
-    
+
     private suspend fun getTleCacheDuration(): kotlin.time.Duration {
         return if (appPreferences.isDebugShortCacheTtlEnabled()) {
             log.w { "⚠️ DEBUG MODE: Using short cache TTL (2 minutes) instead of ${tleCacheDuration.inWholeHours} hour" }
@@ -66,21 +64,21 @@ class SpaceStationLocalDataSource(
             tleCacheDuration
         }
     }
-    
+
     // ==================== Space Station Operations ====================
-    
-    suspend fun cacheSpaceStation(station: SpaceStationDetailedEndpoint) {
+
+    suspend fun cacheSpaceStation(station: SpaceStationDetail) {
         val now = System.now().toEpochMilliseconds()
         val duration = getStationCacheDuration()
         val expiresAt = now + duration.inWholeMilliseconds
-        
+
         spaceStationQueries.insertOrReplaceSpaceStation(
             id = station.id.toLong(),
             name = station.name,
             description = station.description,
             orbit = station.orbit,
             founded = station.founded?.toString(),
-            image_url = station.image?.imageUrl,
+            image_url = station.imageUrl,
             onboard_crew = station.onboardCrew?.toLong(),
             docked_vehicles = station.dockedVehicles?.toLong(),
             json_data = json.encodeToString(station),
@@ -91,7 +89,7 @@ class SpaceStationLocalDataSource(
     }
 
     private fun deserializeStation(jsonData: String): SpaceStationDetail? = try {
-        json.decodeFromString<SpaceStationDetailedEndpoint>(jsonData).toDomain()
+        json.decodeFromString<SpaceStationDetail>(jsonData)
     } catch (e: Exception) {
         log.e(e) { "Failed to parse cached space station JSON" }
         null
@@ -122,20 +120,20 @@ class SpaceStationLocalDataSource(
             station
         }
     }
-    
+
     suspend fun deleteExpiredSpaceStations() {
         val now = System.now().toEpochMilliseconds()
         spaceStationQueries.deleteExpiredSpaceStations(now)
         log.d { "Cleaned up expired space stations" }
     }
-    
+
     // ==================== Expedition Operations ====================
-    
-    suspend fun cacheExpedition(expedition: ExpeditionDetailed, stationId: Int) {
+
+    suspend fun cacheExpedition(expedition: ExpeditionDetailItem, stationId: Int) {
         val now = System.now().toEpochMilliseconds()
         val duration = getStationCacheDuration()
         val expiresAt = now + duration.inWholeMilliseconds
-        
+
         spaceStationQueries.insertOrReplaceExpedition(
             id = expedition.id.toLong(),
             station_id = stationId.toLong(),
@@ -149,13 +147,13 @@ class SpaceStationLocalDataSource(
         )
         log.d { "Cached expedition: ${expedition.name} with ${expedition.crew.size} crew" }
     }
-    
-    suspend fun cacheExpeditions(expeditions: List<ExpeditionDetailed>, stationId: Int) {
+
+    suspend fun cacheExpeditions(expeditions: List<ExpeditionDetailItem>, stationId: Int) {
         expeditions.forEach { cacheExpedition(it, stationId) }
     }
 
     private fun deserializeExpedition(jsonData: String): ExpeditionDetailItem? = try {
-        json.decodeFromString<ExpeditionDetailed>(jsonData).toDomainDetail()
+        json.decodeFromString<ExpeditionDetailItem>(jsonData)
     } catch (e: Exception) {
         log.e(e) { "Failed to parse cached expedition JSON" }
         null
@@ -186,24 +184,24 @@ class SpaceStationLocalDataSource(
                 }
             }
     }
-    
+
     suspend fun deleteExpiredExpeditions() {
         val now = System.now().toEpochMilliseconds()
         spaceStationQueries.deleteExpiredExpeditions(now)
         log.d { "Cleaned up expired expeditions" }
     }
-    
+
     // ==================== TLE Operations ====================
-    
+
     companion object {
         const val ISS_NORAD_ID = "25544"
     }
-    
+
     suspend fun cacheTle(tle: IssTle) {
         val now = System.now().toEpochMilliseconds()
         val duration = getTleCacheDuration()
         val expiresAt = now + duration.inWholeMilliseconds
-        
+
         spaceStationQueries.insertOrReplaceTle(
             id = tle.id,
             name = tle.name,
@@ -217,11 +215,11 @@ class SpaceStationLocalDataSource(
         )
         log.d { "Cached TLE for ${tle.name} (expires in ${duration.inWholeHours}h)" }
     }
-    
+
     suspend fun getTle(noradId: String = ISS_NORAD_ID): IssTle? {
         val now = System.now().toEpochMilliseconds()
         val cached = spaceStationQueries.getTleById(noradId, now).executeAsOneOrNull()
-        return cached?.let { 
+        return cached?.let {
             try {
                 val tle = json.decodeFromString<IssTle>(it.json_data)
                 val ageMinutes = (now - it.cached_at) / 60000
@@ -233,13 +231,13 @@ class SpaceStationLocalDataSource(
             }
         }
     }
-    
+
     /**
      * Get stale (expired) TLE data for offline support.
      */
     suspend fun getTleStale(noradId: String = ISS_NORAD_ID): IssTle? {
         val cached = spaceStationQueries.getTleByIdStale(noradId).executeAsOneOrNull()
-        return cached?.let { 
+        return cached?.let {
             try {
                 val tle = json.decodeFromString<IssTle>(it.json_data)
                 log.d { "Cache STALE HIT for TLE $noradId" }
@@ -250,15 +248,15 @@ class SpaceStationLocalDataSource(
             }
         }
     }
-    
+
     suspend fun deleteExpiredTle() {
         val now = System.now().toEpochMilliseconds()
         spaceStationQueries.deleteExpiredTle(now)
         log.d { "Cleaned up expired TLE data" }
     }
-    
+
     // ==================== Cache Timestamp Helpers ====================
-    
+
     /**
      * Gets the timestamp of when a space station was last cached.
      */

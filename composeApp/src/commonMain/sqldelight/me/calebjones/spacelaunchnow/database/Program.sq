@@ -9,7 +9,7 @@ CREATE TABLE ProgramCache (
     wiki_url TEXT,
     start_date INTEGER, -- stored as epoch milliseconds
     end_date INTEGER, -- stored as epoch milliseconds
-    json_data TEXT NOT NULL, -- Full serialized ProgramNormal object
+    json_data TEXT NOT NULL, -- Full serialized domain Program object
     cached_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
 );

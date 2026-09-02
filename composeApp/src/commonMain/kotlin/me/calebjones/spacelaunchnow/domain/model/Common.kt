@@ -10,7 +10,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-
 /**
  * `kotlinx.datetime.Instant` is a deprecated typealias for `kotlin.time.Instant` (see
  * kotlinx-datetime 0.8.0), which kotlinx-datetime no longer ships a ready-made
@@ -22,14 +21,11 @@ import kotlinx.serialization.encoding.Encoder
 object InstantSerializer : KSerializer<Instant> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("me.calebjones.spacelaunchnow.domain.model.Instant", PrimitiveKind.STRING)
-
     override fun serialize(encoder: Encoder, value: Instant) {
         encoder.encodeString(value.toString())
     }
-
     override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
 }
-
 @Serializable
 data class Country(
     val id: Int,

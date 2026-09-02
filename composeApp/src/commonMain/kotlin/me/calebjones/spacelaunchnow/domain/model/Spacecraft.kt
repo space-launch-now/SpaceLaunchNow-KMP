@@ -15,6 +15,7 @@ data class SpacecraftStatus(
 )
 
 @Immutable
+@Serializable
 data class Spacecraft(
     val id: Int,
     val name: String,
@@ -26,6 +27,7 @@ data class Spacecraft(
 )
 
 @Immutable
+@Serializable
 data class SpacecraftConfig(
     val id: Int,
     val name: String,

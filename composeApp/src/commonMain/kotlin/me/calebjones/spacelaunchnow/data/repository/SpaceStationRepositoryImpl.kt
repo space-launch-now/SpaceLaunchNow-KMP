@@ -1,15 +1,11 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getSpaceStationDetailed
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
 import me.calebjones.spacelaunchnow.api.iss.IssTle
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ExpeditionsApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpaceStationsApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.SpaceStationsApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.SpaceStationLocalDataSource
@@ -21,12 +17,19 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 
 /**
- * Implementation of SpaceStationRepository with cache-first pattern.
- * Provides offline support through stale-while-revalidate for space station data.
+ * Implementation of SpaceStationRepository with cache-first pattern, backed by Trantor's
+ * `/api/v1/space_stations` endpoint.
+ *
+ * Trantor's station detail embeds `expeditions[]` with crew directly — there is no
+ * standalone `/expeditions` endpoint — so [getExpeditionDetails] fetches the station once
+ * and slices the requested expeditions out of the embedded array instead of the old
+ * per-expedition Launch Library fan-out (`ExpeditionsApi.expeditionsRetrieve` x N).
+ *
+ * [SpaceStationLocalDataSource] caches the domain [SpaceStationDetail] / [ExpeditionDetailItem]
+ * types directly, so the Trantor-mapped payloads fetched here are written straight to disk.
  */
 class SpaceStationRepositoryImpl(
     private val spaceStationsApi: SpaceStationsApi,
-    private val expeditionsApi: ExpeditionsApi,
     private val issTrackingRepository: IssTrackingRepository,
     private val localDataSource: SpaceStationLocalDataSource? = null
 ) : SpaceStationRepository {
@@ -60,7 +63,7 @@ class SpaceStationRepositoryImpl(
                         )
                     )
                 }
-                
+
                 // No fresh cache, but have stale data - return it immediately
                 if (staleCached != null) {
                     log.d { "⏳ STALE CACHE: Returning stale data immediately for station: ${staleCached.name}" }
@@ -72,7 +75,7 @@ class SpaceStationRepositoryImpl(
                         )
                     )
                 }
-                
+
                 log.d { "Cache MISS - No cached data, fetching from API" }
             }
 
@@ -82,12 +85,14 @@ class SpaceStationRepositoryImpl(
             val station = response.body()
             log.i { "Successfully fetched station: ${station.name} from API" }
 
-            // Cache the result
-            localDataSource?.cacheSpaceStation(station)
+            val domainStation = station.toDomain()
+
+            // Cache the domain-mapped payload (SpaceStationLocalDataSource stores/reads SpaceStationDetail directly)
+            localDataSource?.cacheSpaceStation(domainStation)
 
             Result.success(
                 DataResult(
-                    data = station.toDomain(),
+                    data = domainStation,
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -152,7 +157,7 @@ class SpaceStationRepositoryImpl(
                         )
                     )
                 }
-                
+
                 // No fresh cache, but have stale data - return it immediately
                 if (staleCached != null && staleCached.isNotEmpty()) {
                     log.d { "⏳ STALE CACHE: Returning ${staleCached.size} stale expeditions immediately" }
@@ -164,34 +169,31 @@ class SpaceStationRepositoryImpl(
                         )
                     )
                 }
-                
+
                 log.d { "Cache MISS - Cached ${cached.size} but need ${expeditionIds.size}, fetching from API" }
             }
 
-            // Fetch from API in parallel
-            log.d { "📡 Fetching ${expeditionIds.size} expedition details from API" }
-            val expeditions = coroutineScope {
-                expeditionIds.map { expeditionId ->
-                    async {
-                        try {
-                            val response = expeditionsApi.expeditionsRetrieve(expeditionId)
-                            response.body()
-                        } catch (e: Exception) {
-                            log.e(e) { "Error fetching expedition $expeditionId" }
-                            null
-                        }
-                    }
-                }.awaitAll().filterNotNull()
+            // Trantor has no standalone /expeditions endpoint: fetch the station once and
+            // slice the requested expeditions out of its embedded `expeditions[]` (with
+            // crew) instead of fanning out one call per expedition id.
+            log.d { "📡 Fetching station detail to extract embedded expeditions (station $stationId)" }
+            val response = spaceStationsApi.getSpaceStationDetailed(stationId)
+            val rawStation = response.body()
+            val allExpeditions = rawStation.expeditions.orEmpty().map { it.toDomainDetail() }
+            val expeditions = if (expeditionIds.isEmpty()) {
+                allExpeditions
+            } else {
+                allExpeditions.filter { it.id in expeditionIds }
             }
 
-            log.i { "Successfully fetched ${expeditions.size}/${expeditionIds.size} expeditions from API" }
+            log.i { "Successfully extracted ${expeditions.size}/${expeditionIds.size} expeditions from station detail" }
 
-            // Cache the results
+            // Cache the domain-mapped payload (SpaceStationLocalDataSource stores/reads ExpeditionDetailItem directly)
             localDataSource?.cacheExpeditions(expeditions, stationId)
 
             Result.success(
                 DataResult(
-                    data = expeditions.map { it.toDomainDetail() },
+                    data = expeditions,
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -247,7 +249,7 @@ class SpaceStationRepositoryImpl(
                         )
                     )
                 }
-                
+
                 // No fresh cache, but have stale data - return it immediately
                 if (staleCached != null) {
                     log.d { "⏳ STALE CACHE: Returning stale TLE for $noradId immediately" }
@@ -259,7 +261,7 @@ class SpaceStationRepositoryImpl(
                         )
                     )
                 }
-                
+
                 log.d { "Cache MISS - No cached TLE, fetching from API" }
             }
 
@@ -270,10 +272,10 @@ class SpaceStationRepositoryImpl(
             tleResult.fold(
                 onSuccess = { tle ->
                     log.i { "Successfully fetched TLE for ${tle.name} from API" }
-                    
+
                     // Cache the result
                     localDataSource?.cacheTle(tle)
-                    
+
                     Result.success(
                         DataResult(
                             data = tle,
@@ -315,7 +317,7 @@ class SpaceStationRepositoryImpl(
 
     override suspend fun prewarmIssCache() {
         log.i { "Pre-warming ISS cache..." }
-        
+
         try {
             // Fetch ISS station details
             val stationResult = getSpaceStationDetails(
@@ -325,7 +327,7 @@ class SpaceStationRepositoryImpl(
 
             stationResult.onSuccess { result ->
                 log.d { "Pre-warmed station: ${result.data.name} (source: ${result.source})" }
-                
+
                 // Fetch expedition details for active expeditions
                 val expeditionIds = result.data.activeExpeditions.map { it.id }
                 if (expeditionIds.isNotEmpty()) {

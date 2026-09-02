@@ -3,8 +3,10 @@ package me.calebjones.spacelaunchnow.domain.model
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 
 @Immutable
+@Serializable
 data class SpaceStationDetail(
     val id: Int,
     val name: String,
@@ -28,6 +30,7 @@ data class SpaceStationDetail(
 )
 
 @Immutable
+@Serializable
 data class ExpeditionDetailItem(
     val id: Int,
     val name: String?,
@@ -38,6 +41,7 @@ data class ExpeditionDetailItem(
     val spacewalks: List<SpacewalkSummary>
 )
 
+@Serializable
 data class ExpeditionMiniItem(
     val id: Int,
     val name: String?,
@@ -45,12 +49,14 @@ data class ExpeditionMiniItem(
     val end: Instant?
 )
 
+@Serializable
 data class DockingLocation(
     val id: Int,
     val name: String,
     val currentlyDocked: DockingEvent?
 )
 
+@Serializable
 data class DockingEvent(
     val id: Int,
     val docking: Instant,
