@@ -126,7 +126,15 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, appModule, debugModule, imageLoaderModule, analyticsModule)
+    modules(
+        networkModule,
+        apiModule,
+        trantorApiModule,
+        appModule,
+        debugModule,
+        imageLoaderModule,
+        analyticsModule
+    )
 }
 
 val appModule = module {
