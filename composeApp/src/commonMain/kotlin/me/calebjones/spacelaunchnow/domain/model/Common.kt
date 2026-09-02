@@ -312,6 +312,14 @@ data class UpdateEventRef(
     val name: String
 )
 
+// Trantor's standalone updates feed denormalizes the related launch to launch_id/launch_name
+// rather than embedding a full launch (unlike LL's UpdateEndpoint, which nested a real
+// LaunchBasic). A ref matches what's actually available; callers only ever use id/name.
+data class LaunchRef(
+    val id: String,
+    val name: String
+)
+
 data class Update(
     val id: Int,
     val profileImage: String?,
@@ -319,7 +327,7 @@ data class Update(
     val infoUrl: String?,
     val createdBy: String?,
     val createdOn: Instant?,
-    val launch: Launch? = null,
+    val launch: LaunchRef? = null,
     val event: UpdateEventRef? = null,
     val program: ProgramSummary? = null
 )
