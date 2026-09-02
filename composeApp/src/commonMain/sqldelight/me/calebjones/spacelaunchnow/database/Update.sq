@@ -6,7 +6,7 @@ CREATE TABLE UpdateCache (
     comment TEXT NOT NULL,
     info_url TEXT,
     created_on INTEGER, -- stored as epoch milliseconds
-    json_data TEXT NOT NULL, -- Full serialized UpdateEndpoint object
+    json_data TEXT NOT NULL, -- Full serialized UpdateList object (Trantor)
     cached_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
 );

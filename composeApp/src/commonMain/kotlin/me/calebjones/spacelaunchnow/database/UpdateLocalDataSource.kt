@@ -3,7 +3,7 @@ package me.calebjones.spacelaunchnow.database
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.UpdateEndpoint
+import me.calebjones.spacelaunchnow.api.trantor.models.UpdateList
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
@@ -31,11 +31,11 @@ class UpdateLocalDataSource(
         }
     }
     
-    suspend fun cacheUpdate(update: UpdateEndpoint) {
+    suspend fun cacheUpdate(update: UpdateList) {
         val now = Clock.System.now().toEpochMilliseconds()
         val duration = getEffectiveCacheDuration()
         val expiresAt = now + duration.inWholeMilliseconds
-        
+
         queries.insertOrReplaceUpdate(
             id = update.id.toLong(),
             profile_image = update.profileImage,
@@ -47,18 +47,18 @@ class UpdateLocalDataSource(
             expires_at = expiresAt
         )
     }
-    
-    suspend fun cacheUpdates(updates: List<UpdateEndpoint>) {
+
+    suspend fun cacheUpdates(updates: List<UpdateList>) {
         updates.forEach { cacheUpdate(it) }
     }
-    
-    suspend fun getUpdate(id: Int): UpdateEndpoint? {
+
+    suspend fun getUpdate(id: Int): UpdateList? {
         val now = Clock.System.now().toEpochMilliseconds()
         val cached = queries.getUpdateById(id.toLong(), now).executeAsOneOrNull()
-        return cached?.let { json.decodeFromString<UpdateEndpoint>(it.json_data) }
+        return cached?.let { json.decodeFromString<UpdateList>(it.json_data) }
     }
-    
-    suspend fun getRecentUpdates(limit: Int): List<UpdateEndpoint> {
+
+    suspend fun getRecentUpdates(limit: Int): List<UpdateList> {
         val now = Clock.System.now().toEpochMilliseconds()
         val results = queries.getRecentUpdates(now, limit.toLong())
             .executeAsList()
@@ -66,9 +66,9 @@ class UpdateLocalDataSource(
                 try {
                     val ageMinutes = (now - cached.cached_at) / 60000
                     log.v { "Cache entry age: ${ageMinutes} minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})" }
-                    json.decodeFromString<UpdateEndpoint>(cached.json_data)
+                    json.decodeFromString<UpdateList>(cached.json_data)
                 } catch (e: Exception) {
-                    log.e(e) { "Error decoding UpdateEndpoint from cache: ${e.message}" }
+                    log.e(e) { "Error decoding UpdateList from cache: ${e.message}" }
                     null
                 }
             }

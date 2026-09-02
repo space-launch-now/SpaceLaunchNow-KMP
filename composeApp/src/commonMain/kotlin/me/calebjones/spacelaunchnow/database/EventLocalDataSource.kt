@@ -3,7 +3,7 @@ package me.calebjones.spacelaunchnow.database
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointNormal
+import me.calebjones.spacelaunchnow.api.trantor.models.EventList
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Event
@@ -33,46 +33,49 @@ class EventLocalDataSource(
         }
     }
     
-    suspend fun cacheEvent(event: EventEndpointNormal) {
+    suspend fun cacheEvent(event: EventList) {
         val now = System.now().toEpochMilliseconds()
         val duration = getEffectiveCacheDuration()
         val expiresAt = now + duration.inWholeMilliseconds
-        
+
         queries.insertOrReplaceEvent(
             id = event.id.toLong(),
             name = event.name,
-            type_name = event.type.name,
-            description = event.description,
+            type_name = event.type,
+            // Trantor's compact list row has no description/news_url/video_url — those live
+            // only on the detail row (description) or nowhere any more (news_url/video_url
+            // died with LL 2.2; the app consumes info_urls/vid_urls from detail instead).
+            description = null,
             location = event.location,
-            news_url = event.infoUrls.firstOrNull()?.url,
-            video_url = event.vidUrls.firstOrNull()?.url,
-            feature_image = event.image?.imageUrl,
+            news_url = null,
+            video_url = null,
+            feature_image = event.imageUrl,
             date = event.date?.toEpochMilliseconds(),
             json_data = json.encodeToString(event),
             cached_at = now,
             expires_at = expiresAt
         )
     }
-    
-    suspend fun cacheEvents(events: List<EventEndpointNormal>) {
+
+    suspend fun cacheEvents(events: List<EventList>) {
         events.forEach { cacheEvent(it) }
     }
-    
+
     suspend fun getEvent(id: Int): Event? {
         return getEventApi(id)?.toDomain()
     }
 
-    suspend fun getEventApi(id: Int): EventEndpointNormal? {
+    suspend fun getEventApi(id: Int): EventList? {
         val now = System.now().toEpochMilliseconds()
         val cached = queries.getEventById(id.toLong(), now).executeAsOneOrNull()
-        return cached?.let { json.decodeFromString<EventEndpointNormal>(it.json_data) }
+        return cached?.let { json.decodeFromString<EventList>(it.json_data) }
     }
-    
+
     suspend fun getUpcomingEvents(limit: Int): List<Event> {
         return getUpcomingEventsApi(limit).map { it.toDomain() }
     }
 
-    suspend fun getUpcomingEventsApi(limit: Int): List<EventEndpointNormal> {
+    suspend fun getUpcomingEventsApi(limit: Int): List<EventList> {
         val now = System.now().toEpochMilliseconds()
         val results = queries.getUpcomingEvents(now, now, limit.toLong())
             .executeAsList()
@@ -80,7 +83,7 @@ class EventLocalDataSource(
                 try {
                     val ageMinutes = (now - cached.cached_at) / 60000
                     log.v { "Cache entry age: $ageMinutes minutes (cached at ${cached.cached_at}, expires at ${cached.expires_at})" }
-                    json.decodeFromString<EventEndpointNormal>(cached.json_data)
+                    json.decodeFromString<EventList>(cached.json_data)
                 } catch (e: Exception) {
                     log.e { "Failed to parse cached event: ${cached.json_data}" }
                     null
@@ -88,18 +91,18 @@ class EventLocalDataSource(
             }
         return results
     }
-    
+
     suspend fun getAllEvents(limit: Int): List<Event> {
         return getAllEventsApi(limit).map { it.toDomain() }
     }
 
-    suspend fun getAllEventsApi(limit: Int): List<EventEndpointNormal> {
+    suspend fun getAllEventsApi(limit: Int): List<EventList> {
         val now = System.now().toEpochMilliseconds()
         return queries.getAllEvents(now, limit.toLong())
             .executeAsList()
             .mapNotNull { cached ->
                 try {
-                    json.decodeFromString<EventEndpointNormal>(cached.json_data)
+                    json.decodeFromString<EventList>(cached.json_data)
                 } catch (e: Exception) {
                     log.e(e) { "Failed to parse cached event: ${cached.json_data}" }
                     null

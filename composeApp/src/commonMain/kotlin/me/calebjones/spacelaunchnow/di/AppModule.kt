@@ -202,7 +202,6 @@ val appModule = module {
     viewModelOf(::StarshipViewModel)
 
     viewModelOf(::ScheduleViewModel)
-    singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
@@ -239,14 +238,14 @@ val appModule = module {
     }
     single<EventsRepository> {
         EventsRepositoryImpl(
-            eventsApi = get(),
-            configApi = get(),
+            eventsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.EventsApi>(),
+            lookupsApi = get(),
             localDataSource = get()
         )
     }
     single<UpdatesRepository> {
         UpdatesRepositoryImpl(
-            updatesApi = get(),
+            updatesApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.UpdatesApi>(),
             localDataSource = get()
         )
     }

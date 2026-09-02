@@ -3,8 +3,8 @@ package me.calebjones.spacelaunchnow.data.repository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
-import me.calebjones.spacelaunchnow.api.extensions.getUpdates
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
+import me.calebjones.spacelaunchnow.api.extensions.getUpdatesByProgram
+import me.calebjones.spacelaunchnow.api.trantor.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
@@ -35,9 +35,9 @@ class UpdatesRepositoryImpl(
             // Try cache first if available and not forcing refresh
             if (!forceRefresh) {
                 val cachedUpdates = localDataSource?.getRecentUpdates(limit)
-                log.v { "Cache query result: ${'$'}{cachedUpdates?.size ?: 0} updates found" }
+                log.v { "Cache query result: ${cachedUpdates?.size ?: 0} updates found" }
                 if (cachedUpdates != null && cachedUpdates.isNotEmpty()) {
-                    log.i { "Cache hit - Returning ${'$'}{cachedUpdates.size} cached updates" }
+                    log.i { "Cache hit - Returning ${cachedUpdates.size} cached updates" }
                     return Result.success(
                         DataResult(
                             data = PaginatedResult(
@@ -63,16 +63,11 @@ class UpdatesRepositoryImpl(
 
             // Cache the results for future use
             localDataSource?.cacheUpdates(updates.results)
-            log.i { "Successfully fetched and cached ${'$'}{updates.results.size} updates" }
+            log.i { "Successfully fetched and cached ${updates.results.size} updates" }
 
             Result.success(
                 DataResult(
-                    data = PaginatedResult(
-                        count = updates.count,
-                        next = updates.next,
-                        previous = updates.previous,
-                        results = updates.results.map { it.toDomain() }
-                    ),
+                    data = updates.toDomain(),
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -83,7 +78,7 @@ class UpdatesRepositoryImpl(
             val staleCached = localDataSource?.getRecentUpdates(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                log.w { "Returning ${'$'}{staleCached.size} stale cached updates due to API error" }
+                log.w { "Returning ${staleCached.size} stale cached updates due to API error" }
                 return Result.success(
                     DataResult(
                         data = PaginatedResult(
@@ -104,7 +99,7 @@ class UpdatesRepositoryImpl(
             val staleCached = localDataSource?.getRecentUpdates(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("updates")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                log.w { "Returning ${'$'}{staleCached.size} stale cached updates due to network error" }
+                log.w { "Returning ${staleCached.size} stale cached updates due to network error" }
                 return Result.success(
                     DataResult(
                         data = PaginatedResult(
@@ -131,44 +126,36 @@ class UpdatesRepositoryImpl(
         forceRefresh: Boolean
     ): Result<DataResult<PaginatedResult<Update>>> {
         return try {
-            println("=== UpdatesRepository.getUpdatesByProgram ===")
-            println("Parameters: allProgram=$allProgram, limit=$limit, forceRefresh=$forceRefresh")
+            log.d { "getUpdatesByProgram called - allProgram: $allProgram, limit: $limit, forceRefresh: $forceRefresh" }
 
             val now = System.now().toEpochMilliseconds()
 
             // For now, skip caching for program-specific queries
             // TODO: Add program-specific caching if needed
 
-            println("UpdatesRepository: Fetching program $allProgram updates from API")
-            val response = updatesApi.getUpdates(
-                limit = limit,
-                allProgram = allProgram,
-                ordering = "-created_on"
+            val response = updatesApi.getUpdatesByProgram(
+                programId = allProgram,
+                limit = limit
             )
             val updates = response.body()
 
-            println("✓ API SUCCESS: Fetched ${updates.results.size} updates for program $allProgram")
+            log.i { "Fetched ${updates.results.size} updates for program $allProgram" }
 
             Result.success(
                 DataResult(
-                    data = PaginatedResult(
-                        count = updates.count,
-                        next = updates.next,
-                        previous = updates.previous,
-                        results = updates.results.map { it.toDomain() }
-                    ),
+                    data = updates.toDomain(),
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
             )
         } catch (e: ResponseException) {
-            println("UpdatesRepository: API error for program $allProgram: ${e.message}")
+            log.e(e) { "API error for program $allProgram (status: ${e.response.status})" }
             Result.failure(e)
         } catch (e: IOException) {
-            println("UpdatesRepository: Network error for program $allProgram: ${e.message}")
+            log.e(e) { "Network error for program $allProgram" }
             Result.failure(e)
         } catch (e: Exception) {
-            println("UpdatesRepository: Unexpected error for program $allProgram: ${e.message}")
+            log.e(e) { "Unexpected error for program $allProgram" }
             Result.failure(e)
         }
     }

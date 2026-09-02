@@ -450,7 +450,7 @@ class StarshipViewModel(
                 println("[STARSHIP] Events loaded: ${dataResult.data.results.size} items")
                 _eventsState.update {
                     it.copy(
-                        data = dataResult.data.results.map { event -> event.toDomain() },
+                        data = dataResult.data.results,
                         isLoading = false,
                         dataSource = dataResult.source,
                         cacheTimestamp = dataResult.timestamp
