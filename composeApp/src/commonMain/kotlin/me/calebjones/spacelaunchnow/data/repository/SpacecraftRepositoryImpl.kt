@@ -4,7 +4,8 @@ import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getSpacecraft
 import me.calebjones.spacelaunchnow.api.extensions.getSpacecraftByConfig
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpacecraftApi
+import me.calebjones.spacelaunchnow.api.extensions.getSpacecraftDetail
+import me.calebjones.spacelaunchnow.api.trantor.apis.SpacecraftApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
@@ -49,19 +50,26 @@ class SpacecraftRepositoryImpl(
             }
 
             // Cache miss or force refresh - fetch from API
+            // NOTE (escalation): Trantor's spacecraft list has no `ordering` param, so the
+            // old "-id" ordering can no longer be requested; results come back in whatever
+            // default order the API applies.
             println("→ CACHE MISS: Fetching spacecraft from API...")
             val response = spacecraftApi.getSpacecraftByConfig(
                 configId = configId,
                 limit = limit,
-                ordering = "-id",
                 isPlaceholder = isPlaceholder
             )
 
             val spacecraftList = response.body().results
             println("✓ API SUCCESS: Fetched ${spacecraftList.size} spacecraft for config $configId")
 
-            // Cache the raw API payload
-            localDataSource?.cacheSpacecraftList(spacecraftList)
+            // NOTE (escalation): SpacecraftLocalDataSource.cacheSpacecraftList() is typed to
+            // the retired Launch Library `SpacecraftEndpointDetailed` and serializes it
+            // directly to JSON. Trantor's `SpacecraftSummary` can't be passed here without
+            // either the DB layer importing api.trantor.models (forbidden by ADR-0001) or
+            // making the domain Spacecraft model kotlinx-serializable (out of scope for this
+            // unit). Disk caching of spacecraft-by-config is skipped until that's resolved;
+            // stale-read fallback below still serves any pre-migration cached rows.
 
             Result.success(
                 DataResult(
@@ -107,7 +115,7 @@ class SpacecraftRepositoryImpl(
 
     override suspend fun getSpacecraftDetailsDomain(spacecraftId: Int): Result<Spacecraft> {
         return try {
-            val response = spacecraftApi.spacecraftRetrieve(spacecraftId)
+            val response = spacecraftApi.getSpacecraftDetail(spacecraftId)
             Result.success(response.body().toDomain())
         } catch (e: ResponseException) {
             Result.failure(e)
@@ -126,12 +134,13 @@ class SpacecraftRepositoryImpl(
         isPlaceholder: Boolean?
     ): Result<PaginatedResult<Spacecraft>> {
         return try {
+            // NOTE (escalation): Trantor's spacecraft list has no `ordering` param, so the
+            // old "-flights_count" ordering can no longer be requested.
             val response = spacecraftApi.getSpacecraft(
                 limit = limit,
                 offset = offset,
                 inSpace = inSpace,
                 search = search,
-                ordering = "-flights_count",
                 isPlaceholder = isPlaceholder
             )
             Result.success(response.body().toDomain())
@@ -145,4 +154,3 @@ class SpacecraftRepositoryImpl(
     }
 
 }
-
