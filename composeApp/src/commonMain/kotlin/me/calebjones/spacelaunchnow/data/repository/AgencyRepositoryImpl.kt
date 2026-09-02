@@ -2,14 +2,22 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getAgencyList
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAgencyNormalList
+import me.calebjones.spacelaunchnow.api.extensions.getAgency
+import me.calebjones.spacelaunchnow.api.extensions.listAgencies
+import me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi
+import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseAgencyList
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.mapper.toDomainAgency
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
+/**
+ * Implementation of AgencyRepository using the Trantor AgenciesApi (`GET /agencies`).
+ *
+ * Trantor's `country_code` filter takes a single ISO alpha-2 code, unlike LL's list param —
+ * only the first selected code is honored when the caller (the country multi-select filter
+ * in AgencyListViewModel) passes more than one; see the Phase 5 browse-vehicles escalation.
+ */
 class AgencyRepositoryImpl(
     private val agenciesApi: AgenciesApi
 ) : AgencyRepository {
@@ -22,16 +30,16 @@ class AgencyRepositoryImpl(
         featured: Boolean?,
         typeId: Int?,
         countryCode: List<String>?
-    ): Result<PaginatedAgencyNormalList> {
+    ): Result<PaginatedResponseAgencyList> {
         return try {
-            val response = agenciesApi.getAgencyList(
+            val response = agenciesApi.listAgencies(
                 limit = limit,
                 offset = offset,
                 ordering = ordering,
                 search = search,
                 featured = featured,
-                typeId = typeId,
-                countryCode = countryCode
+                typeIds = typeId?.let { listOf(it) },
+                countryCode = countryCode?.firstOrNull()
             )
             Result.success(response.body())
         } catch (e: ResponseException) {
@@ -43,9 +51,9 @@ class AgencyRepositoryImpl(
         }
     }
 
-    private suspend fun searchAgenciesRaw(searchQuery: String, limit: Int): Result<PaginatedAgencyNormalList> {
+    private suspend fun searchAgenciesRaw(searchQuery: String, limit: Int): Result<PaginatedResponseAgencyList> {
         return try {
-            val response = agenciesApi.getAgencyList(
+            val response = agenciesApi.listAgencies(
                 limit = limit,
                 search = searchQuery,
                 ordering = "-total_launch_count"
@@ -86,7 +94,7 @@ class AgencyRepositoryImpl(
 
     override suspend fun getAgencyDetailDomain(id: Int): Result<Agency> {
         return try {
-            val response = agenciesApi.agenciesRetrieve(id)
+            val response = agenciesApi.getAgency(agencyId = id)
             Result.success(response.body().toDomainAgency())
         } catch (e: ResponseException) {
             Result.failure(e)

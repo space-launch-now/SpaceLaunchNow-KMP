@@ -2,16 +2,17 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchers
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchersApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherDetailedList
+import me.calebjones.spacelaunchnow.api.extensions.getLauncher
+import me.calebjones.spacelaunchnow.api.extensions.listLaunchers
+import me.calebjones.spacelaunchnow.api.trantor.apis.LaunchersApi
+import me.calebjones.spacelaunchnow.api.trantor.models.LauncherDetail as TrantorLauncherDetail
+import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseLauncherListItem
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
 /**
- * Implementation of LauncherRepository using the generated LaunchersApi
+ * Implementation of LauncherRepository using the Trantor LaunchersApi (`GET /launchers`).
  */
 class LauncherRepositoryImpl(
     private val launchersApi: LaunchersApi
@@ -24,18 +25,18 @@ class LauncherRepositoryImpl(
         ordering: String?,
         launcherConfigId: Int?,
         isPlaceholder: Boolean?
-    ): Result<PaginatedLauncherDetailedList> {
+    ): Result<PaginatedResponseLauncherListItem> {
         return try {
             println("=== LauncherRepository.getLaunchers ===")
             println("Parameters: limit=$limit, offset=$offset, search=$search, ordering=$ordering, configId=$launcherConfigId")
 
-            val response = launchersApi.getLaunchers(
+            val response = launchersApi.listLaunchers(
                 limit = limit,
                 offset = offset,
                 search = search,
                 ordering = ordering,
-                isPlaceholder = false,
-                launcherConfigIds = launcherConfigId?.let { listOf(it) }
+                isPlaceholder = isPlaceholder,
+                configIds = launcherConfigId?.let { listOf(it) }
             )
 
             val launchers = response.body()
@@ -58,23 +59,25 @@ class LauncherRepositoryImpl(
         configId: Int,
         limit: Int,
         offset: Int
-    ): Result<PaginatedLauncherDetailedList> {
+    ): Result<PaginatedResponseLauncherListItem> {
         return getLaunchersRaw(
             limit = limit,
             offset = offset,
             search = null,
-            ordering = "-id",
+            // Trantor's launchers ordering whitelist is flights/-flights only (default
+            // -flights); LL's "-id" has no equivalent, so leave it unset and take the default.
+            ordering = null,
             isPlaceholder = false,
             launcherConfigId = configId
         )
     }
 
-    private suspend fun getLauncherDetailsRaw(launcherId: Int): Result<LauncherDetailed> {
+    private suspend fun getLauncherDetailsRaw(launcherId: Int): Result<TrantorLauncherDetail> {
         return try {
             println("=== LauncherRepository.getLauncherDetails ===")
             println("Parameters: launcherId=$launcherId")
 
-            val response = launchersApi.launchersRetrieve(launcherId)
+            val response = launchersApi.getLauncher(launcherId = launcherId)
             val launcher = response.body()
 
             println("OK API SUCCESS: Fetched launcher details for ID $launcherId")
