@@ -25,14 +25,8 @@ import kotlin.time.Clock
  * and slices the requested expeditions out of the embedded array instead of the old
  * per-expedition Launch Library fan-out (`ExpeditionsApi.expeditionsRetrieve` x N).
  *
- * NOTE (escalation): [SpaceStationLocalDataSource]'s `cacheSpaceStation` / `cacheExpeditions`
- * are typed to the retired Launch Library models and serialize them directly to JSON.
- * Passing Trantor-shaped data there would require either the DB layer importing
- * `api.trantor.models` (forbidden by ADR-0001) or making the domain models
- * kotlinx-serializable (a domain/model change outside this unit's scope), so disk-cache
- * writes for station/expedition detail are skipped on this path pending that decision.
- * Reads and stale-cache fallback are left wired up as-is and still serve any pre-migration
- * cached rows until they expire.
+ * [SpaceStationLocalDataSource] caches the domain [SpaceStationDetail] / [ExpeditionDetailItem]
+ * types directly, so the Trantor-mapped payloads fetched here are written straight to disk.
  */
 class SpaceStationRepositoryImpl(
     private val spaceStationsApi: SpaceStationsApi,
@@ -91,9 +85,14 @@ class SpaceStationRepositoryImpl(
             val station = response.body()
             log.i { "Successfully fetched station: ${station.name} from API" }
 
+            val domainStation = station.toDomain()
+
+            // Cache the domain-mapped payload (SpaceStationLocalDataSource stores/reads SpaceStationDetail directly)
+            localDataSource?.cacheSpaceStation(domainStation)
+
             Result.success(
                 DataResult(
-                    data = station.toDomain(),
+                    data = domainStation,
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -188,6 +187,9 @@ class SpaceStationRepositoryImpl(
             }
 
             log.i { "Successfully extracted ${expeditions.size}/${expeditionIds.size} expeditions from station detail" }
+
+            // Cache the domain-mapped payload (SpaceStationLocalDataSource stores/reads ExpeditionDetailItem directly)
+            localDataSource?.cacheExpeditions(expeditions, stationId)
 
             Result.success(
                 DataResult(
