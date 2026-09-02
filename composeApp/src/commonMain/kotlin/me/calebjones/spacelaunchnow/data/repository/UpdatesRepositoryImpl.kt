@@ -44,7 +44,7 @@ class UpdatesRepositoryImpl(
                                 count = cachedUpdates.size,
                                 next = null,
                                 previous = null,
-                                results = cachedUpdates.map { it.toDomain() }
+                                results = cachedUpdates
                             ),
                             source = DataSource.CACHE,
                             timestamp = staleTimestamp ?: now
@@ -59,15 +59,15 @@ class UpdatesRepositoryImpl(
 
             log.d { "Fetching updates from API" }
             val response = updatesApi.getLatestUpdates(limit = limit)
-            val updates = response.body()
+            val updates = response.body().toDomain()
 
-            // Cache the results for future use
+            // Cache the domain-mapped results (not the Trantor wire model) for future use
             localDataSource?.cacheUpdates(updates.results)
             log.i { "Successfully fetched and cached ${updates.results.size} updates" }
 
             Result.success(
                 DataResult(
-                    data = updates.toDomain(),
+                    data = updates,
                     source = DataSource.NETWORK,
                     timestamp = now
                 )
@@ -85,7 +85,7 @@ class UpdatesRepositoryImpl(
                             count = staleCached.size,
                             next = null,
                             previous = null,
-                            results = staleCached.map { it.toDomain() }
+                            results = staleCached
                         ),
                         source = DataSource.STALE_CACHE,
                         timestamp = staleTimestamp
@@ -106,7 +106,7 @@ class UpdatesRepositoryImpl(
                             count = staleCached.size,
                             next = null,
                             previous = null,
-                            results = staleCached.map { it.toDomain() }
+                            results = staleCached
                         ),
                         source = DataSource.STALE_CACHE,
                         timestamp = staleTimestamp

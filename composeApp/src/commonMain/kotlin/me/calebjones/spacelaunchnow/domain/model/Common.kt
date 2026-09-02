@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.domain.model
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 
 data class Country(
     val id: Int,
@@ -264,6 +265,7 @@ data class LaunchAttemptCounts(
     val agencyYear: Int?
 )
 
+@Serializable
 data class ProgramSummary(
     val id: Int,
     val name: String,
@@ -307,6 +309,7 @@ data class TimelineEntry(
     val relativeTime: String?
 )
 
+@Serializable
 data class UpdateEventRef(
     val id: Int,
     val name: String
@@ -315,11 +318,13 @@ data class UpdateEventRef(
 // Trantor's standalone updates feed denormalizes the related launch to launch_id/launch_name
 // rather than embedding a full launch (unlike LL's UpdateEndpoint, which nested a real
 // LaunchBasic). A ref matches what's actually available; callers only ever use id/name.
+@Serializable
 data class LaunchRef(
     val id: String,
     val name: String
 )
 
+@Serializable
 data class Update(
     val id: Int,
     val profileImage: String?,
