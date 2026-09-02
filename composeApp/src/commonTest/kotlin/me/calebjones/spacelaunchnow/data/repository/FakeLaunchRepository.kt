@@ -1,12 +1,9 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
@@ -173,20 +170,20 @@ class FakeLaunchRepository : LaunchRepository {
         return Result.success(PaginatedResult(count = 0, next = null, previous = null))
     }
 
-    // -- Non-deprecated legacy passthroughs (API types kept on interface) --
+    // -- Non-deprecated legacy passthroughs (now domain-typed) -------------
 
-    override suspend fun getLaunchesByDayAndMonth(day: Int, month: Int, limit: Int): Result<PaginatedLaunchNormalList> =
+    override suspend fun getLaunchesByDayAndMonth(day: Int, month: Int, limit: Int): Result<PaginatedResult<Launch>> =
         Result.failure(NotImplementedError("Not wired in fake"))
 
-    override suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed? = null
+    override suspend fun getStaleDetailedLaunch(id: String): Launch? = null
 
-    override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> =
+    override suspend fun getAgencyDetails(id: Int): Result<Agency> =
         Result.failure(NotImplementedError("Not wired in fake"))
 
-    override suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList> =
+    override suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedResult<Launch>> =
         Result.failure(NotImplementedError("Not wired in fake"))
 
-    override suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedLaunchNormalList> =
+    override suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedResult<Launch>> =
         Result.failure(NotImplementedError("Not wired in fake"))
 
     override suspend fun getStatsCount(key: String, netGt: Instant, netLt: Instant, forceRefresh: Boolean): Result<DataResult<Int>> =
