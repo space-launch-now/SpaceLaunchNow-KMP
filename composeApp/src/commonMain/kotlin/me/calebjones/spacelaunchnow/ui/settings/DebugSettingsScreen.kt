@@ -531,6 +531,13 @@ private fun SystemTabContent(
                                 ) {
                                     Text("Local", fontSize = 12.sp)
                                 }
+                                OutlinedButton(
+                                    onClick = { debugViewModel.switchToTrantorUrl() },
+                                    enabled = !isLoading,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Trantor", fontSize = 12.sp)
+                                }
                             }
                             
                             // Current URL Display

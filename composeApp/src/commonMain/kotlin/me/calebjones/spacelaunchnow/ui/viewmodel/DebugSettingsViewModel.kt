@@ -188,6 +188,22 @@ class DebugSettingsViewModel(
         }
     }
 
+    fun switchToTrantorUrl() {
+        if (debugPreferences == null) return
+
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                debugPreferences.switchToTrantorUrl()
+                _statusMessage.value = "Switched to Trantor staging API URL"
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to switch to Trantor URL: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
     fun switchToLocalUrl() {
         if (debugPreferences == null) return
 
