@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getLookups
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getLookups
 import me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi
 import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.domain.mapper.toFilterOption

@@ -2,8 +2,8 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getConfigurationDetails
-import me.calebjones.spacelaunchnow.api.extensions.getConfigurationsByAgency
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getConfigurationDetails
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getConfigurationsByAgency
 import me.calebjones.spacelaunchnow.api.trantor.apis.SpacecraftConfigurationsApi
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult

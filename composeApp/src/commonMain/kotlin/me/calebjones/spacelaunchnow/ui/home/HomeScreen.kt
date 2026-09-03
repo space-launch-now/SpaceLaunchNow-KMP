@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import me.calebjones.spacelaunchnow.api.extensions.launchUrl
+import me.calebjones.spacelaunchnow.api.extensions.ll.launchUrl
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.navigation.NewsDetail

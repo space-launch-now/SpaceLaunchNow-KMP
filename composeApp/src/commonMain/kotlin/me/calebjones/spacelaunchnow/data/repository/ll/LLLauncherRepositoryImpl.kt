@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchers
+import me.calebjones.spacelaunchnow.api.extensions.ll.getLaunchers
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchersApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherDetailedList

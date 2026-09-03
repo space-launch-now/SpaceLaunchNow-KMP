@@ -1,7 +1,7 @@
 package me.calebjones.spacelaunchnow.tests
 
 import kotlinx.coroutines.runBlocking
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
+import me.calebjones.spacelaunchnow.api.extensions.ll.getLaunchList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import kotlin.test.Test

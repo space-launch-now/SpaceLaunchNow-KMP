@@ -5,7 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getSpaceStationDetailed
+import me.calebjones.spacelaunchnow.api.extensions.ll.getSpaceStationDetailed
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
 import me.calebjones.spacelaunchnow.api.iss.IssTle
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ExpeditionsApi

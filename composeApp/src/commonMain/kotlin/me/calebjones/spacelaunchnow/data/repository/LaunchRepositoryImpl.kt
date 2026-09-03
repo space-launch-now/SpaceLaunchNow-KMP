@@ -5,9 +5,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getAgencyDetail
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchDetail
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getAgencyDetail
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getLaunchDetail
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getLaunchList
 import me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.trantor.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.data.model.DataResult

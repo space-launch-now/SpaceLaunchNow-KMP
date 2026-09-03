@@ -2,8 +2,8 @@ package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getSpacecraft
-import me.calebjones.spacelaunchnow.api.extensions.getSpacecraftByConfig
+import me.calebjones.spacelaunchnow.api.extensions.ll.getSpacecraft
+import me.calebjones.spacelaunchnow.api.extensions.ll.getSpacecraftByConfig
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpacecraftApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource

@@ -2,8 +2,8 @@ package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
-import me.calebjones.spacelaunchnow.api.extensions.getUpdates
+import me.calebjones.spacelaunchnow.api.extensions.ll.getLatestUpdates
+import me.calebjones.spacelaunchnow.api.extensions.ll.getUpdates
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource

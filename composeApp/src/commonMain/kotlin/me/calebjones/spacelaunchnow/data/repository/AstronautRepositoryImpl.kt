@@ -2,8 +2,8 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getAstronautDetail
-import me.calebjones.spacelaunchnow.api.extensions.getAstronautList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getAstronautDetail
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getAstronautList
 import me.calebjones.spacelaunchnow.api.trantor.apis.AstronautsApi
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail

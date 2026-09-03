@@ -2,12 +2,12 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getAgencyList
-import me.calebjones.spacelaunchnow.api.extensions.getConfigurationList
-import me.calebjones.spacelaunchnow.api.extensions.getFamilyList
-import me.calebjones.spacelaunchnow.api.extensions.getLocationList
-import me.calebjones.spacelaunchnow.api.extensions.getLookups
-import me.calebjones.spacelaunchnow.api.extensions.getProgramList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getAgencyList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getConfigurationList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getFamilyList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getLocationList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getLookups
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getProgramList
 import me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.trantor.apis.FamiliesApi
 import me.calebjones.spacelaunchnow.api.trantor.apis.LauncherConfigurationsApi

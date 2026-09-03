@@ -2,10 +2,10 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getEventDetail
-import me.calebjones.spacelaunchnow.api.extensions.getEventList
-import me.calebjones.spacelaunchnow.api.extensions.getEventsByLaunchId
-import me.calebjones.spacelaunchnow.api.extensions.getUpcomingEvents
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getEventDetail
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getEventList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getEventsByLaunchId
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getUpcomingEvents
 import me.calebjones.spacelaunchnow.api.trantor.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi
 import me.calebjones.spacelaunchnow.api.trantor.models.EventDetail

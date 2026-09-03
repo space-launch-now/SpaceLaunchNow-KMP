@@ -7,9 +7,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchById
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
-import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
+import me.calebjones.spacelaunchnow.api.extensions.ll.getLaunchById
+import me.calebjones.spacelaunchnow.api.extensions.ll.getLaunchList
+import me.calebjones.spacelaunchnow.api.extensions.ll.getLaunchMiniList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.data.model.ApiError

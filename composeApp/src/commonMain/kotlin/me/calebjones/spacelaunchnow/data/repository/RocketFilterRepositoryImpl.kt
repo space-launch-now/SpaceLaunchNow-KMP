@@ -2,8 +2,8 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getFamilyList
-import me.calebjones.spacelaunchnow.api.extensions.getProgramList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getFamilyList
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getProgramList
 import me.calebjones.spacelaunchnow.api.trantor.apis.FamiliesApi
 import me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi
 import me.calebjones.spacelaunchnow.data.model.FilterOption

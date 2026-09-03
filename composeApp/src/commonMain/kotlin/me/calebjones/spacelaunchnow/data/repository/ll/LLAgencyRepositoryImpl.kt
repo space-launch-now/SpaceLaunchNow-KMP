@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getAgencyList
+import me.calebjones.spacelaunchnow.api.extensions.ll.getAgencyList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAgencyNormalList
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository

@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getSpaceStationDetailed
+import me.calebjones.spacelaunchnow.api.extensions.trantor.getSpaceStationDetailed
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
 import me.calebjones.spacelaunchnow.api.iss.IssTle
 import me.calebjones.spacelaunchnow.api.trantor.apis.SpaceStationsApi

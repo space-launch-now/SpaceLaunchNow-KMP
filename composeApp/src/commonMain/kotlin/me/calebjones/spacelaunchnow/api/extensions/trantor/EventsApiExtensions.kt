@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.api.extensions
+package me.calebjones.spacelaunchnow.api.extensions.trantor
 
 import me.calebjones.spacelaunchnow.api.trantor.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.trantor.infrastructure.HttpResponse

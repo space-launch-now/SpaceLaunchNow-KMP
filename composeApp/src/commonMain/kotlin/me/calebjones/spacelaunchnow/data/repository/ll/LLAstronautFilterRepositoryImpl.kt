@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.getAstronautStatuses
+import me.calebjones.spacelaunchnow.api.extensions.ll.getAstronautStatuses
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi
 import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository
