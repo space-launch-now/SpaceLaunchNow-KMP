@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.trantor
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
@@ -12,6 +12,7 @@ import me.calebjones.spacelaunchnow.api.trantor.models.EventDetail
 import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseEventList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
 import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Event

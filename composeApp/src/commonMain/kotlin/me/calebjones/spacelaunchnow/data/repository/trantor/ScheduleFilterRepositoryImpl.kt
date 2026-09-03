@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.trantor
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
@@ -16,6 +16,7 @@ import me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi
 import me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi
 import me.calebjones.spacelaunchnow.api.trantor.models.LookupsResponse
 import me.calebjones.spacelaunchnow.data.model.FilterOption
+import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
 import me.calebjones.spacelaunchnow.database.FilterOptionsLocalDataSource
 import me.calebjones.spacelaunchnow.domain.mapper.trantor.toFilterOption
 import me.calebjones.spacelaunchnow.util.logging.logger

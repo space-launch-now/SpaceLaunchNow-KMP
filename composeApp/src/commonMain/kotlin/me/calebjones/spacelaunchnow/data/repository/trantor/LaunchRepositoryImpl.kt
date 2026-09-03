@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.trantor
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +12,7 @@ import me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.trantor.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.database.StatsLocalDataSource

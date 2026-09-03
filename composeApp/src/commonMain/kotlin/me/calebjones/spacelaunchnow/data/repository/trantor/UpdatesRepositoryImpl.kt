@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.trantor
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
@@ -7,6 +7,7 @@ import me.calebjones.spacelaunchnow.api.extensions.trantor.getUpdatesByProgram
 import me.calebjones.spacelaunchnow.api.trantor.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
 import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult

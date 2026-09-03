@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.trantor
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
@@ -7,6 +7,7 @@ import me.calebjones.spacelaunchnow.api.extensions.trantor.listLaunchers
 import me.calebjones.spacelaunchnow.api.trantor.apis.LaunchersApi
 import me.calebjones.spacelaunchnow.api.trantor.models.LauncherDetail as TrantorLauncherDetail
 import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseLauncherListItem
+import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
 import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
 import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
