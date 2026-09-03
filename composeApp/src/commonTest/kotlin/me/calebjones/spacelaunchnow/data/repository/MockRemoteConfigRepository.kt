@@ -68,7 +68,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
         mockPinnedContent = null
         mockDiagnosticsConfigJson = null
         onboardingVariant = OnboardingVariant.CONTROL
-        dataBackend = DataBackend.TRANTOR
+        dataBackend = DataBackend.DEFAULT
         fetchAndActivateCalled = false
         setDefaultsCalled = false
         lastForceRefresh = null

@@ -143,7 +143,7 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
                 PINNED_CONTENT_KEY to DEFAULT_PINNED_CONTENT_JSON,
                 DIAGNOSTICS_CONFIG_KEY to "",
                 ONBOARDING_VARIANT_KEY to "control",
-                DATA_BACKEND_KEY to DataBackend.TRANTOR.value
+                DATA_BACKEND_KEY to DataBackend.DEFAULT.value
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -172,12 +172,12 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
     }
 
     override suspend fun getDataBackend(): DataBackend {
-        val config = remoteConfig ?: return DataBackend.TRANTOR
+        val config = remoteConfig ?: return DataBackend.DEFAULT
         return try {
             DataBackend.fromString(config.getValue(DATA_BACKEND_KEY).asString())
         } catch (e: Exception) {
-            log.w(e) { "Failed to read data backend flag - defaulting to Trantor" }
-            DataBackend.TRANTOR
+            log.w(e) { "Failed to read data backend flag - defaulting to ${DataBackend.DEFAULT}" }
+            DataBackend.DEFAULT
         }
     }
 }

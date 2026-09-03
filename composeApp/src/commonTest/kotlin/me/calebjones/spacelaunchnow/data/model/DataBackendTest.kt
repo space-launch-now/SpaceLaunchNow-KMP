@@ -10,9 +10,13 @@ class DataBackendTest {
         assertEquals(DataBackend.LL, DataBackend.fromString("ll"))
     }
 
-    @Test fun `fromString defaults to TRANTOR on unknown or null`() {
-        assertEquals(DataBackend.TRANTOR, DataBackend.fromString("something_else"))
-        assertEquals(DataBackend.TRANTOR, DataBackend.fromString(null))
+    @Test fun `fromString falls back to LL on unknown or null`() {
+        assertEquals(DataBackend.LL, DataBackend.fromString("something_else"))
+        assertEquals(DataBackend.LL, DataBackend.fromString(null))
+    }
+
+    @Test fun `DEFAULT is LL so a missing or failed flag never routes production to Trantor`() {
+        assertEquals(DataBackend.LL, DataBackend.DEFAULT)
     }
 
     @Test fun `resolve prefers a non-null local override over remote`() {
@@ -37,8 +41,8 @@ class DataBackendTest {
         )
     }
 
-    @Test fun `default is TRANTOR when both override and remote are unresolved`() {
+    @Test fun `default is LL when both override and remote are unresolved`() {
         val remoteDefault = DataBackend.fromString(null)
-        assertEquals(DataBackend.TRANTOR, resolveDataBackend(override = null, remote = remoteDefault))
+        assertEquals(DataBackend.LL, resolveDataBackend(override = null, remote = remoteDefault))
     }
 }

@@ -178,12 +178,13 @@ val appModule = module {
     // Production revert lever (amendment 2026-09-02): resolved once per Koin graph
     // (app-restart granularity, no hot swap). Local DebugPreferences override always
     // wins when set (debug builds only); otherwise falls back to Remote Config's
-    // `data_backend` key, which itself defaults to TRANTOR on any failure.
+    // `data_backend` key, which itself falls back to DataBackend.DEFAULT (LL) on any failure
+    // so a missing key or a failed fetch never routes production to Trantor.
     single<DataBackend> {
         val remote = try {
             runBlocking { get<RemoteConfigRepository>().getDataBackend() }
         } catch (e: Exception) {
-            DataBackend.TRANTOR
+            DataBackend.DEFAULT
         }
         val override = if (BuildConfig.IS_DEBUG) {
             try {

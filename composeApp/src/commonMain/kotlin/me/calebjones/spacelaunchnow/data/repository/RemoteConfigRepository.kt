@@ -76,7 +76,8 @@ interface RemoteConfigRepository {
 
     /**
      * The DataBackend production kill-switch from the 'data_backend' parameter
-     * (amendment 2026-09-02). TRANTOR when unset, unrecognized, or Firebase is unavailable.
+     * (amendment 2026-09-02). [DataBackend.DEFAULT] (LL) when unset, unrecognized, or
+     * Firebase is unavailable — the fail-safe side of the switch.
      */
     suspend fun getDataBackend(): DataBackend
 }
