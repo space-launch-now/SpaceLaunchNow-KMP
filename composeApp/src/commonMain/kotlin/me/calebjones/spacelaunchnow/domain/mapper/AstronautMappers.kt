@@ -2,16 +2,19 @@ package me.calebjones.spacelaunchnow.domain.mapper
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautEndpointNormal
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautFlight
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautFlight as LLCrewFlight
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AstronautNormal
+import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAstronautEndpointNormalList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftFlightNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacewalkNormal
 import me.calebjones.spacelaunchnow.api.trantor.models.AstronautDetail as TrantorAstronautDetail
+import me.calebjones.spacelaunchnow.api.trantor.models.AstronautFlight as TrantorAstronautFlight
 import me.calebjones.spacelaunchnow.api.trantor.models.AstronautList as TrantorAstronautList
 import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseAstronautList as TrantorPaginatedAstronautList
 import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
+import me.calebjones.spacelaunchnow.domain.model.AstronautFlight
 import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.domain.model.CrewMember
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
@@ -84,15 +87,21 @@ fun AstronautEndpointDetailed.toDomainDetail(): AstronautDetail = AstronautDetai
     flightsCount = flightsCount,
     landingsCount = landingsCount,
     spacewalksCount = spacewalksCount,
-    flights = flights.map { it.toDomain() },
+    flights = flights.map { it.toDomainAstronautFlight() },
     landings = landings.map { it.toDomainSummary() },
     spacewalks = spacewalks.map { it.toDomainSummary() }
 )
 
-fun AstronautFlight.toDomainCrewMember(): CrewMember = CrewMember(
+fun LLCrewFlight.toDomainCrewMember(): CrewMember = CrewMember(
     id = id,
     role = role?.role,
     astronaut = astronaut.toDomainListItem()
+)
+
+fun LaunchBasic.toDomainAstronautFlight(): AstronautFlight = AstronautFlight(
+    launchId = id,
+    launchName = name ?: "",
+    net = net
 )
 
 fun SpacecraftFlightNormal.toDomainSummary(): SpacecraftFlightSummary = SpacecraftFlightSummary(
@@ -139,12 +148,9 @@ fun PaginatedAstronautEndpointNormalList.toDomain(): PaginatedResult<AstronautLi
 //   requires a real non-null `id` we don't have, so this maps to an empty list rather
 //   than inventing ids.
 // - `socialMediaLinks`, `landings`, `spacewalks`: not present on Trantor astronaut detail.
-// - `flights`: Trantor's `AstronautFlight` embed only carries `launch_id`/`launch_name`/`net`,
-//   but the domain `AstronautDetail.flights` is `List<Launch>`, and `Launch.provider` /
-//   `Launch.slug` are required non-null fields Trantor doesn't give us here. Rather than
-//   fabricate a provider/slug, this maps to an empty list — flagged as a HIGH-PRIORITY
-//   escalation in the unit report; resolving it needs either a domain-model change (out of
-//   this unit's scope) or a richer Trantor astronaut-flights payload.
+// - `flights`: now maps to the narrow domain `AstronautFlight` ref type (launch id/name/net
+//   only), which is exactly what Trantor's embedded `AstronautFlight` carries — see
+//   `toDomainFlight()` below.
 
 fun TrantorAstronautList.toDomainListItem(): AstronautListItem = AstronautListItem(
     id = id,
@@ -196,7 +202,13 @@ fun TrantorAstronautDetail.toDomainDetail(): AstronautDetail = AstronautDetail(
     flightsCount = flightsCount,
     landingsCount = landingsCount,
     spacewalksCount = spacewalksCount,
-    flights = emptyList(),
+    flights = flights.orEmpty().map { it.toDomainFlight() },
     landings = emptyList(),
     spacewalks = emptyList()
+)
+
+fun TrantorAstronautFlight.toDomainFlight(): AstronautFlight = AstronautFlight(
+    launchId = launchId,
+    launchName = launchName,
+    net = net
 )
