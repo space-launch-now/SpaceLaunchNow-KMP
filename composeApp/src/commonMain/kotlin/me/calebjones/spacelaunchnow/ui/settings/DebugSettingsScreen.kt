@@ -540,12 +540,18 @@ private fun SystemTabContent(
                                 }
                             }
                             
-                            // Current URL Display
+                            // Current URL Display — both backends, since the Trantor URL
+                            // preference is now independent of the LL/SNAPI one above.
                             Text(
-                                text = "Current: ${debugSettings.customApiBaseUrl}",
+                                text = "LL/SNAPI current: ${debugSettings.customApiBaseUrl}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(top = 4.dp)
+                            )
+                            Text(
+                                text = "Trantor current: ${debugSettings.trantorApiBaseUrl}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }

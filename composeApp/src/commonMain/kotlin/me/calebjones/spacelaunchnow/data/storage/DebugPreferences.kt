@@ -14,6 +14,10 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     companion object {
         private val CUSTOM_API_BASE_URL = stringPreferencesKey("debug_custom_api_base_url")
         private val USE_CUSTOM_API_URL = booleanPreferencesKey("debug_use_custom_api_url")
+        // Trantor gets its own URL preference — distinct from CUSTOM_API_BASE_URL (LL/SNAPI
+        // only) — so the Prod/Dev/Local quick-switch buttons never redirect it. No "use custom"
+        // toggle: this preference IS the effective Trantor URL, defaulting to staging.
+        private val TRANTOR_CUSTOM_API_BASE_URL = stringPreferencesKey("debug_trantor_api_base_url")
         private val USE_FCM_DEBUG_TOPICS = booleanPreferencesKey("debug_use_fcm_debug_topics")
         // Sampling is a debug-only cost knob now; user-facing cost control is the
         // DiagnosticLevel consent (OFF = NOT_GRANTED = nothing uploads).
@@ -44,6 +48,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         DebugSettings(
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
+            trantorApiBaseUrl = preferences[TRANTOR_CUSTOM_API_BASE_URL] ?: TRANTOR_API_URL,
             useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
             datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 100f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
@@ -134,14 +139,24 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     /**
-     * Quick method to switch to the Trantor (SpaceLaunchNow-API) staging URL
+     * Set the Trantor (SpaceLaunchNow-API) base URL. Distinct from [setCustomApiBaseUrl] —
+     * writing here never affects the LL/SNAPI base URL, and vice versa.
      */
-    suspend fun switchToTrantorUrl() {
-        setCustomApiBaseUrl(TRANTOR_API_URL)
+    suspend fun setTrantorApiBaseUrl(url: String) {
+        dataStore.edit { preferences ->
+            preferences[TRANTOR_CUSTOM_API_BASE_URL] = url
+        }
     }
 
     /**
-     * Get the effective API base URL (either custom or default)
+     * Quick method to reset the Trantor base URL back to the staging default.
+     */
+    suspend fun switchToTrantorUrl() {
+        setTrantorApiBaseUrl(TRANTOR_API_URL)
+    }
+
+    /**
+     * Get the effective API base URL (either custom or default) — LL/SNAPI clients only.
      */
     suspend fun getEffectiveApiBaseUrl(): String {
         val settings = getDebugSettings()
@@ -150,6 +165,14 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         } else {
             PROD_API_URL
         }
+    }
+
+    /**
+     * Get the effective Trantor base URL. Always the stored preference (default
+     * [TRANTOR_API_URL]) — there is no separate "use custom" toggle for Trantor.
+     */
+    suspend fun getEffectiveTrantorBaseUrl(): String {
+        return getDebugSettings().trantorApiBaseUrl
     }
 
     /**
@@ -193,6 +216,8 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
 data class DebugSettings(
     val useCustomApiUrl: Boolean = false,
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
+    /** Trantor (SpaceLaunchNow-API) base URL — independent of [customApiBaseUrl]. */
+    val trantorApiBaseUrl: String = DebugPreferences.TRANTOR_API_URL,
     val useDebugTopics: Boolean = false,
     val datadogSampleRate: Float = 100f,
     val debugSubscriptionActive: Boolean = false,

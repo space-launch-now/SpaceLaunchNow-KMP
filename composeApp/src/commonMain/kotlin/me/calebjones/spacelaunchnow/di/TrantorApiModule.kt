@@ -37,6 +37,11 @@ private val trantorHttpLogger = object : Logger {
 
 // Trantor (SpaceLaunchNow-API) is unauthenticated in v1 — reads take no Authorization
 // header, so unlike apiModule's LL/SNAPI singletons, none of these call setApiKey(...).
+//
+// Trantor clients resolve against their own named("TrantorBaseUrl") qualifier (provided in
+// NetworkModule.kt) — kept separate from the LL/SNAPI named("BaseUrl") so the debug-menu's
+// Prod/Dev/Local buttons (which target LL hosts with no /api/v1 prefix) never redirect the
+// Trantor client to a host it can't serve. See amendment 2026-09-02 in the Phase 5 plan.
 val trantorApiModule = module {
     val httpClientConfig: io.ktor.client.HttpClientConfig<*>.() -> Unit = {
         install(UserAgent) {
@@ -51,7 +56,7 @@ val trantorApiModule = module {
 
     single<LaunchesApi> {
         LaunchesApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -59,7 +64,7 @@ val trantorApiModule = module {
 
     single<AgenciesApi> {
         AgenciesApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -67,7 +72,7 @@ val trantorApiModule = module {
 
     single<AstronautsApi> {
         AstronautsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -75,7 +80,7 @@ val trantorApiModule = module {
 
     single<EventsApi> {
         EventsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -83,7 +88,7 @@ val trantorApiModule = module {
 
     single<FamiliesApi> {
         FamiliesApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -91,7 +96,7 @@ val trantorApiModule = module {
 
     single<HealthApi> {
         HealthApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -99,7 +104,7 @@ val trantorApiModule = module {
 
     single<LauncherConfigurationsApi> {
         LauncherConfigurationsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -107,7 +112,7 @@ val trantorApiModule = module {
 
     single<LaunchersApi> {
         LaunchersApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -115,7 +120,7 @@ val trantorApiModule = module {
 
     single<LocationsApi> {
         LocationsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -123,7 +128,7 @@ val trantorApiModule = module {
 
     single<LookupsApi> {
         LookupsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -131,7 +136,7 @@ val trantorApiModule = module {
 
     single<PadsApi> {
         PadsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -139,7 +144,7 @@ val trantorApiModule = module {
 
     single<ProgramsApi> {
         ProgramsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -147,7 +152,7 @@ val trantorApiModule = module {
 
     single<SpacecraftApi> {
         SpacecraftApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -155,7 +160,7 @@ val trantorApiModule = module {
 
     single<SpacecraftConfigurationsApi> {
         SpacecraftConfigurationsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -163,7 +168,7 @@ val trantorApiModule = module {
 
     single<SpaceStationsApi> {
         SpaceStationsApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
@@ -171,7 +176,7 @@ val trantorApiModule = module {
 
     single<UpdatesApi> {
         UpdatesApi(
-            baseUrl = get<String>(named("BaseUrl")),
+            baseUrl = get<String>(named("TrantorBaseUrl")),
             httpClientEngine = get<HttpClientEngine>(),
             httpClientConfig = httpClientConfig,
         )
