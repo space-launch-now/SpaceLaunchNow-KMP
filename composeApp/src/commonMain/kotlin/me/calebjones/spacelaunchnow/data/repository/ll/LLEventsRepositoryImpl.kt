@@ -10,7 +10,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult

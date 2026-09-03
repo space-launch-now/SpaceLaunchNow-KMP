@@ -7,8 +7,8 @@ import me.calebjones.spacelaunchnow.api.extensions.trantor.listConfigurations
 import me.calebjones.spacelaunchnow.api.trantor.apis.LauncherConfigurationsApi
 import me.calebjones.spacelaunchnow.api.trantor.models.LauncherConfigFull
 import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseLauncherConfigSummary
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toVehicleDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toVehicleDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 

@@ -6,8 +6,8 @@ import me.calebjones.spacelaunchnow.api.extensions.ll.getAstronautDetail
 import me.calebjones.spacelaunchnow.api.extensions.ll.getAstronautList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AstronautsApi
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomainDetail
 import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
 import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult

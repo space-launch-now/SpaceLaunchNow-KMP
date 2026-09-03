@@ -8,8 +8,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfiguration
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherConfigDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherConfigNormalList
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toVehicleDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toVehicleDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.util.logging.logger

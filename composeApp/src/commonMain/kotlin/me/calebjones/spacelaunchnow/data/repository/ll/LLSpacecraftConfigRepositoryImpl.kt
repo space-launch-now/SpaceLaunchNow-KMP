@@ -6,7 +6,7 @@ import me.calebjones.spacelaunchnow.api.extensions.ll.getConfigurationDetails
 import me.calebjones.spacelaunchnow.api.extensions.ll.getConfigurationsByAgency
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpacecraftConfigurationsApi
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.SpacecraftConfig
 

@@ -7,7 +7,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchersApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LauncherDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLauncherDetailedList
 import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
 import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.util.logging.logger

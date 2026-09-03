@@ -23,7 +23,6 @@ import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.LauncherDetail

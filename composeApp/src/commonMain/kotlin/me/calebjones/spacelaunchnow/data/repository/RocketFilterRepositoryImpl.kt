@@ -7,7 +7,7 @@ import me.calebjones.spacelaunchnow.api.extensions.trantor.getProgramList
 import me.calebjones.spacelaunchnow.api.trantor.apis.FamiliesApi
 import me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi
 import me.calebjones.spacelaunchnow.data.model.FilterOption
-import me.calebjones.spacelaunchnow.domain.mapper.toFilterOption
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toFilterOption
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class RocketFilterRepositoryImpl(

@@ -9,7 +9,7 @@ import me.calebjones.spacelaunchnow.api.trantor.apis.SpacecraftApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import kotlin.time.Clock

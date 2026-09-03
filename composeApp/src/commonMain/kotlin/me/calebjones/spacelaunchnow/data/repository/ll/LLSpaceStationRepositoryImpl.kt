@@ -14,8 +14,8 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
 import me.calebjones.spacelaunchnow.database.SpaceStationLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomainDetail
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.util.logging.logger

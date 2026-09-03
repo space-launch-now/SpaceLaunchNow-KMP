@@ -8,7 +8,7 @@ import me.calebjones.spacelaunchnow.api.trantor.apis.UpdatesApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.util.logging.logger

@@ -6,8 +6,8 @@ import me.calebjones.spacelaunchnow.api.extensions.trantor.getAgency
 import me.calebjones.spacelaunchnow.api.extensions.trantor.listAgencies
 import me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseAgencyList
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainAgency
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomainAgency
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 

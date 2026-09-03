@@ -7,7 +7,7 @@ import me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainProgram
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomainProgram
 import me.calebjones.spacelaunchnow.domain.model.Program
 import kotlin.time.Clock
 

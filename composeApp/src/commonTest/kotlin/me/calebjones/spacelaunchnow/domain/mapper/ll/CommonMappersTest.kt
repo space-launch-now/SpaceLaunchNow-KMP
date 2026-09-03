@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.domain.mapper
+package me.calebjones.spacelaunchnow.domain.mapper.ll
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

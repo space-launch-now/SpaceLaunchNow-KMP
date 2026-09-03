@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.domain.mapper
+package me.calebjones.spacelaunchnow.domain.mapper.trantor
 
 import me.calebjones.spacelaunchnow.api.trantor.models.LauncherConfigFull
 import me.calebjones.spacelaunchnow.api.trantor.models.LauncherConfigSummary

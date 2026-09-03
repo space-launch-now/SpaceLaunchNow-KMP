@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.domain.mapper
+package me.calebjones.spacelaunchnow.domain.mapper.ll
 
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed

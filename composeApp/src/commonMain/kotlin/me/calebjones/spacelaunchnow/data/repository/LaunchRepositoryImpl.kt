@@ -15,8 +15,8 @@ import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.database.StatsLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainAgency
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomainAgency
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult

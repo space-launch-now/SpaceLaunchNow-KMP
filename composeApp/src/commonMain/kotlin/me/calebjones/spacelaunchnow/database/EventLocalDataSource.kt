@@ -5,7 +5,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.trantor.models.EventList
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration.Companion.hours

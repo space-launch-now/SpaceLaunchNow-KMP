@@ -9,8 +9,8 @@ import me.calebjones.spacelaunchnow.api.trantor.apis.SpaceStationsApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.SpaceStationLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomainDetail
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.util.logging.logger

@@ -13,7 +13,7 @@ import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseEventLis
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult

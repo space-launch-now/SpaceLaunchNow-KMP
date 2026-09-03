@@ -7,7 +7,7 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainProgram
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomainProgram
 import me.calebjones.spacelaunchnow.domain.model.Program
 import kotlin.time.Clock
 

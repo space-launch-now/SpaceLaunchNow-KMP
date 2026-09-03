@@ -9,7 +9,7 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
 import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import kotlin.time.Clock

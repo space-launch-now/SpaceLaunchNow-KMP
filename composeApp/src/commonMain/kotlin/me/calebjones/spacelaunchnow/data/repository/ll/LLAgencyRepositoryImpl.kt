@@ -6,8 +6,8 @@ import me.calebjones.spacelaunchnow.api.extensions.ll.getAgencyList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedAgencyNormalList
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainAgency
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomainAgency
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.util.logging.logger

@@ -5,7 +5,7 @@ import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.trantor.getLookups
 import me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi
 import me.calebjones.spacelaunchnow.data.model.FilterOption
-import me.calebjones.spacelaunchnow.domain.mapper.toFilterOption
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toFilterOption
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class AstronautFilterRepositoryImpl(

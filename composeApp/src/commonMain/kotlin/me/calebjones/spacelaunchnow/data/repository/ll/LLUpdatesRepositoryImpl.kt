@@ -9,7 +9,7 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.database.UpdateLocalDataSource
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.ll.toDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.util.logging.logger

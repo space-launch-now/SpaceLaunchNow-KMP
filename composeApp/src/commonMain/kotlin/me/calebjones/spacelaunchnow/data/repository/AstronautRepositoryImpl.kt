@@ -5,8 +5,8 @@ import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.trantor.getAstronautDetail
 import me.calebjones.spacelaunchnow.api.extensions.trantor.getAstronautList
 import me.calebjones.spacelaunchnow.api.trantor.apis.AstronautsApi
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
-import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomain
+import me.calebjones.spacelaunchnow.domain.mapper.trantor.toDomainDetail
 import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
 import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult

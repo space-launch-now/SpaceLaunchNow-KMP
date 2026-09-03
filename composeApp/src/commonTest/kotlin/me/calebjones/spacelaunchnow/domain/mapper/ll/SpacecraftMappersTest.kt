@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.domain.mapper
+package me.calebjones.spacelaunchnow.domain.mapper.ll
 
 import kotlinx.datetime.LocalDate
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigDetailed
