@@ -75,6 +75,8 @@ import me.calebjones.spacelaunchnow.data.repository.trantor.SpacecraftRepository
 import me.calebjones.spacelaunchnow.data.repository.trantor.SpaceStationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.trantor.UpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
+import me.calebjones.spacelaunchnow.di.ll.apiModule
+import me.calebjones.spacelaunchnow.di.trantor.trantorApiModule
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage

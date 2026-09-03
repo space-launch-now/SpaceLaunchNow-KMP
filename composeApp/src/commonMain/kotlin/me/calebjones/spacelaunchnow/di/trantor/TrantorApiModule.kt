@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.di
+package me.calebjones.spacelaunchnow.di.trantor
 
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.UserAgent
