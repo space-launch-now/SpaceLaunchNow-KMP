@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 
 /**
  * Debug-specific preferences for development and testing
@@ -18,6 +19,9 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         // only) — so the Prod/Dev/Local quick-switch buttons never redirect it. No "use custom"
         // toggle: this preference IS the effective Trantor URL, defaulting to staging.
         private val TRANTOR_CUSTOM_API_BASE_URL = stringPreferencesKey("debug_trantor_api_base_url")
+        // Local override of the DataBackend flag (amendment 2026-09-02). Null = follow
+        // Firebase Remote Config's `data_backend` key.
+        private val DATA_BACKEND_OVERRIDE = stringPreferencesKey("debug_data_backend_override")
         private val USE_FCM_DEBUG_TOPICS = booleanPreferencesKey("debug_use_fcm_debug_topics")
         // Sampling is a debug-only cost knob now; user-facing cost control is the
         // DiagnosticLevel consent (OFF = NOT_GRANTED = nothing uploads).
@@ -49,6 +53,9 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
             trantorApiBaseUrl = preferences[TRANTOR_CUSTOM_API_BASE_URL] ?: TRANTOR_API_URL,
+            dataBackendOverride = preferences[DATA_BACKEND_OVERRIDE]?.let {
+                DataBackend.entries.find { backend -> backend.value == it }
+            },
             useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
             datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 100f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
@@ -176,6 +183,20 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     /**
+     * Set (or clear, with null) the local DataBackend override. Null means "follow
+     * Firebase Remote Config's `data_backend` key".
+     */
+    suspend fun setDataBackendOverride(backend: DataBackend?) {
+        dataStore.edit { preferences ->
+            if (backend == null) {
+                preferences.remove(DATA_BACKEND_OVERRIDE)
+            } else {
+                preferences[DATA_BACKEND_OVERRIDE] = backend.value
+            }
+        }
+    }
+
+    /**
      * Enable debug subscription simulation
      */
     suspend fun setDebugSubscriptionSimulation(
@@ -218,6 +239,8 @@ data class DebugSettings(
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
     /** Trantor (SpaceLaunchNow-API) base URL — independent of [customApiBaseUrl]. */
     val trantorApiBaseUrl: String = DebugPreferences.TRANTOR_API_URL,
+    /** Local override of the DataBackend flag; null follows Remote Config. */
+    val dataBackendOverride: DataBackend? = null,
     val useDebugTopics: Boolean = false,
     val datadogSampleRate: Float = 100f,
     val debugSubscriptionActive: Boolean = false,

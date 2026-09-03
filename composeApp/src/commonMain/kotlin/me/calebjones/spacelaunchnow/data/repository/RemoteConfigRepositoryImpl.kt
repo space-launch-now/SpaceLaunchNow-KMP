@@ -5,6 +5,7 @@ import dev.gitlive.firebase.remoteconfig.FirebaseRemoteConfig
 import dev.gitlive.firebase.remoteconfig.remoteConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
@@ -47,6 +48,7 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         private const val PINNED_CONTENT_KEY = "pinned_content"
         private const val DIAGNOSTICS_CONFIG_KEY = "diagnostics_config"
         private const val ONBOARDING_VARIANT_KEY = "onboarding_variant"
+        private const val DATA_BACKEND_KEY = "data_backend"
         private val DEFAULT_FETCH_INTERVAL: Duration = 1.hours
         private val FORCE_REFRESH_INTERVAL: Duration = 0.seconds
         
@@ -140,7 +142,8 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
                 ROADMAP_DATA_KEY to DEFAULT_ROADMAP_JSON,
                 PINNED_CONTENT_KEY to DEFAULT_PINNED_CONTENT_JSON,
                 DIAGNOSTICS_CONFIG_KEY to "",
-                ONBOARDING_VARIANT_KEY to "control"
+                ONBOARDING_VARIANT_KEY to "control",
+                DATA_BACKEND_KEY to DataBackend.TRANTOR.value
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -165,6 +168,16 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         } catch (e: Exception) {
             log.w(e) { "Failed to read onboarding variant - defaulting to control" }
             OnboardingVariant.CONTROL
+        }
+    }
+
+    override suspend fun getDataBackend(): DataBackend {
+        val config = remoteConfig ?: return DataBackend.TRANTOR
+        return try {
+            DataBackend.fromString(config.getValue(DATA_BACKEND_KEY).asString())
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read data backend flag - defaulting to Trantor" }
+            DataBackend.TRANTOR
         }
     }
 }

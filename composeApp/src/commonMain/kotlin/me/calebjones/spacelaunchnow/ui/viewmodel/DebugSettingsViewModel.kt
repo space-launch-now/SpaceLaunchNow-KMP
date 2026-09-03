@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.NotificationHistoryItem
 import me.calebjones.spacelaunchnow.data.model.NotificationStats
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
@@ -214,6 +215,25 @@ class DebugSettingsViewModel(
                 _statusMessage.value = "Switched to local API URL"
             } catch (e: Exception) {
                 _statusMessage.value = "Failed to switch to local URL: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun setDataBackendOverride(backend: DataBackend?) {
+        if (debugPreferences == null) return
+
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                debugPreferences.setDataBackendOverride(backend)
+                _statusMessage.value = when (backend) {
+                    null -> "Backend override cleared — following Remote Config"
+                    else -> "Backend override set to ${backend.name} (restart to apply)"
+                }
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to update backend override: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

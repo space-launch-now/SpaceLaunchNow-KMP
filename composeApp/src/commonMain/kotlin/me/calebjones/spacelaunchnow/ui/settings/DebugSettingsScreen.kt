@@ -554,6 +554,56 @@ private fun SystemTabContent(
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
+
+                        HorizontalDivider()
+
+                        // Backend flag (amendment 2026-09-02): which repository
+                        // implementation set (Trantor vs. LL) Koin binds at app start.
+                        // Auto = null override = follow Remote Config's data_backend key.
+                        Text(
+                            text = "Backend:",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { debugViewModel.setDataBackendOverride(null) },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Auto", fontSize = 12.sp)
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    debugViewModel.setDataBackendOverride(
+                                        me.calebjones.spacelaunchnow.data.model.DataBackend.TRANTOR
+                                    )
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Trantor", fontSize = 12.sp)
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    debugViewModel.setDataBackendOverride(
+                                        me.calebjones.spacelaunchnow.data.model.DataBackend.LL
+                                    )
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("LL", fontSize = 12.sp)
+                            }
+                        }
+                        Text(
+                            text = "Current: ${debugSettings.dataBackendOverride?.name ?: "Auto (Remote Config)"}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
