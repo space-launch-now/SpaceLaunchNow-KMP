@@ -2,13 +2,20 @@ package me.calebjones.spacelaunchnow.domain.model
 
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 
+// @Serializable here only: SpacecraftStatus is reachable from the domain Launch graph via
+// RocketDetail -> SpacecraftFlightSummary -> SpacecraftFlightVehicle.status, so it must be
+// serializable for the launch cache (ADR-0004) even though SpacecraftLocalDataSource itself
+// is out of this unit's scope. Spacecraft/SpacecraftConfig below are untouched.
+@Serializable
 data class SpacecraftStatus(
     val id: Int,
     val name: String?
 )
 
 @Immutable
+@Serializable
 data class Spacecraft(
     val id: Int,
     val name: String,
@@ -20,6 +27,7 @@ data class Spacecraft(
 )
 
 @Immutable
+@Serializable
 data class SpacecraftConfig(
     val id: Int,
     val name: String,

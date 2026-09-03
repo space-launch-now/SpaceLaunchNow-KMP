@@ -9,7 +9,7 @@ CREATE TABLE SpaceStationCache (
     image_url TEXT,
     onboard_crew INTEGER,
     docked_vehicles INTEGER,
-    json_data TEXT NOT NULL, -- Full serialized SpaceStationDetailedEndpoint object
+    json_data TEXT NOT NULL, -- Full serialized domain SpaceStationDetail object
     cached_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
 );
@@ -25,7 +25,7 @@ CREATE TABLE ExpeditionCache (
     start_date INTEGER, -- Instant as epoch milliseconds
     end_date INTEGER, -- Instant as epoch milliseconds
     crew_count INTEGER,
-    json_data TEXT NOT NULL, -- Full serialized ExpeditionDetailed object
+    json_data TEXT NOT NULL, -- Full serialized domain ExpeditionDetailItem object
     cached_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
 );

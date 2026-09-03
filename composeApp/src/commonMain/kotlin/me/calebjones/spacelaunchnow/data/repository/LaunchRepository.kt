@@ -1,11 +1,8 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
@@ -16,13 +13,13 @@ interface LaunchRepository {
         day: Int,
         month: Int,
         limit: Int = 100
-    ): Result<PaginatedLaunchNormalList>
+    ): Result<PaginatedResult<Launch>>
 
-    suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed?
-    suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed>
+    suspend fun getStaleDetailedLaunch(id: String): Launch?
+    suspend fun getAgencyDetails(id: Int): Result<Agency>
 
-    suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList>
-    suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedLaunchNormalList>
+    suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedResult<Launch>>
+    suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedResult<Launch>>
 
     suspend fun getStatsCount(
         key: String,

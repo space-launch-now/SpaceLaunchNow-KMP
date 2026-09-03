@@ -14,50 +14,69 @@ import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.billing.DefaultRevenueCatAttributes
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributesSyncer
+import me.calebjones.spacelaunchnow.data.model.DataBackend
+import me.calebjones.spacelaunchnow.data.model.resolveDataBackend
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
-import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository
-import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
-import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
-import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
-import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
-import me.calebjones.spacelaunchnow.data.repository.LauncherRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
-import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepository
-import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
-import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
-import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
-import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
-import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
-import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
-import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLAgencyRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLAstronautFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLAstronautRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLEventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLLaunchRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLLauncherConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLLauncherRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLProgramRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLRocketFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLRocketRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLScheduleFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLSpacecraftConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLSpacecraftRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLSpaceStationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLUpdatesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.AgencyRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.AstronautFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.AstronautRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.LaunchRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.LauncherConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.LauncherRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.ProgramRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.RocketFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.RocketRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.ScheduleFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.SpacecraftConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.SpacecraftRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.SpaceStationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.UpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
+import me.calebjones.spacelaunchnow.di.ll.apiModule
+import me.calebjones.spacelaunchnow.di.trantor.trantorApiModule
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
@@ -67,6 +86,7 @@ import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
 import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
+import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
 import me.calebjones.spacelaunchnow.database.CacheCleanupService
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
@@ -126,7 +146,15 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, appModule, debugModule, imageLoaderModule, analyticsModule)
+    modules(
+        networkModule,
+        apiModule,
+        trantorApiModule,
+        appModule,
+        debugModule,
+        imageLoaderModule,
+        analyticsModule
+    )
 }
 
 val appModule = module {
@@ -149,14 +177,64 @@ val appModule = module {
     single { StatsLocalDataSource(get(), get()) }
     single { TopicSubscriptionStore(get()) }
 
+    // Production revert lever (amendment 2026-09-02): resolved once per Koin graph
+    // (app-restart granularity, no hot swap). Local DebugPreferences override always
+    // wins when set (debug builds only); otherwise falls back to Remote Config's
+    // `data_backend` key, which itself falls back to DataBackend.DEFAULT (LL) on any failure
+    // so a missing key or a failed fetch never routes production to Trantor.
+    single<DataBackend> {
+        val remote = try {
+            runBlocking { get<RemoteConfigRepository>().getDataBackend() }
+        } catch (e: Exception) {
+            DataBackend.DEFAULT
+        }
+        val override = if (BuildConfig.IS_DEBUG) {
+            try {
+                getOrNull<DebugPreferences>()?.let { prefs ->
+                    runBlocking { prefs.getDebugSettings().dataBackendOverride }
+                }
+            } catch (e: Exception) {
+                null
+            }
+        } else {
+            null
+        }
+        resolveDataBackend(override, remote)
+    }
+
+    // LL fallback implementations — bound as themselves (not to the interface) so both
+    // the Trantor and LL singletons can coexist; only whichever the DataBackend flag
+    // names above is ever actually constructed (Koin singles are lazy).
+    singleOf(::LLAgencyRepositoryImpl)
+    singleOf(::LLAstronautRepositoryImpl)
+    singleOf(::LLAstronautFilterRepositoryImpl)
+    singleOf(::LLSpaceStationRepositoryImpl)
+    singleOf(::LLRocketRepositoryImpl)
+    singleOf(::LLRocketFilterRepositoryImpl)
+    singleOf(::LLSpacecraftRepositoryImpl)
+    singleOf(::LLLauncherRepositoryImpl)
+    singleOf(::LLProgramRepositoryImpl)
+    singleOf(::LLLauncherConfigRepositoryImpl)
+    singleOf(::LLSpacecraftConfigRepositoryImpl)
+
     single<LaunchRepository> {
-        LaunchRepositoryImpl(
-            launchesApi = get(),
-            agenciesApi = get(),
-            appPreferences = get(),
-            localDataSource = get(),
-            statsLocalDataSource = get()
-        )
+        if (get<DataBackend>() == DataBackend.LL) {
+            LLLaunchRepositoryImpl(
+                launchesApi = get(),
+                agenciesApi = get(),
+                appPreferences = get(),
+                localDataSource = get(),
+                statsLocalDataSource = get()
+            )
+        } else {
+            LaunchRepositoryImpl(
+                launchesApi = get(),
+                agenciesApi = get(),
+                appPreferences = get(),
+                localDataSource = get(),
+                statsLocalDataSource = get()
+            )
+        }
     }
     single<ArticlesRepository> {
         ArticlesRepositoryImpl(
@@ -194,14 +272,22 @@ val appModule = module {
     viewModelOf(::StarshipViewModel)
 
     viewModelOf(::ScheduleViewModel)
-    singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
     viewModelOf(::AgencyListViewModel)
-    singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
-    singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
-    singleOf(::AstronautFilterRepositoryImpl) { bind<AstronautFilterRepository>() }
+    singleOf(::AgencyRepositoryImpl)
+    single<AgencyRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLAgencyRepositoryImpl>() else get<AgencyRepositoryImpl>()
+    }
+    singleOf(::AstronautRepositoryImpl)
+    single<AstronautRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLAstronautRepositoryImpl>() else get<AstronautRepositoryImpl>()
+    }
+    singleOf(::AstronautFilterRepositoryImpl)
+    single<AstronautFilterRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLAstronautFilterRepositoryImpl>() else get<AstronautFilterRepositoryImpl>()
+    }
     viewModelOf(::AstronautListViewModel)
     viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), get(), astronautId) }
 
@@ -209,38 +295,88 @@ val appModule = module {
     singleOf(::IssTrackingRepositoryImpl) {
         bind<IssTrackingRepository>()
     }
-    singleOf(::SpaceStationRepositoryImpl) { bind<SpaceStationRepository>() }
+    singleOf(::SpaceStationRepositoryImpl)
+    single<SpaceStationRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLSpaceStationRepositoryImpl>() else get<SpaceStationRepositoryImpl>()
+    }
     viewModelOf(::SpaceStationViewModel)
-    singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
-    singleOf(::RocketFilterRepositoryImpl) { bind<RocketFilterRepository>() }
-    singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
-    singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
-    singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
-    singleOf(::LauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
-    singleOf(::SpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
+    singleOf(::RocketRepositoryImpl)
+    single<RocketRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLRocketRepositoryImpl>() else get<RocketRepositoryImpl>()
+    }
+    singleOf(::RocketFilterRepositoryImpl)
+    single<RocketFilterRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLRocketFilterRepositoryImpl>() else get<RocketFilterRepositoryImpl>()
+    }
+    singleOf(::SpacecraftRepositoryImpl)
+    single<SpacecraftRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLSpacecraftRepositoryImpl>() else get<SpacecraftRepositoryImpl>()
+    }
+    singleOf(::LauncherRepositoryImpl)
+    single<LauncherRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLLauncherRepositoryImpl>() else get<LauncherRepositoryImpl>()
+    }
+    singleOf(::ProgramRepositoryImpl)
+    single<ProgramRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLProgramRepositoryImpl>() else get<ProgramRepositoryImpl>()
+    }
+    singleOf(::LauncherConfigRepositoryImpl)
+    single<LauncherConfigRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLLauncherConfigRepositoryImpl>() else get<LauncherConfigRepositoryImpl>()
+    }
+    singleOf(::SpacecraftConfigRepositoryImpl)
+    single<SpacecraftConfigRepository> {
+        if (get<DataBackend>() == DataBackend.LL) get<LLSpacecraftConfigRepositoryImpl>() else get<SpacecraftConfigRepositoryImpl>()
+    }
     single<ScheduleFilterRepository> {
-        ScheduleFilterRepositoryImpl(
-            agenciesApi = get(),
-            programsApi = get(),
-            launcherConfigurationsApi = get(),
-            launcherConfigurationFamiliesApi = get(),
-            locationsApi = get(),
-            configApi = get(),
-            localDataSource = get()
-        )
+        if (get<DataBackend>() == DataBackend.LL) {
+            LLScheduleFilterRepositoryImpl(
+                agenciesApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi>(),
+                programsApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.ProgramsApi>(),
+                launcherConfigurationsApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationsApi>(),
+                launcherConfigurationFamiliesApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.LauncherConfigurationFamiliesApi>(),
+                locationsApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.LocationsApi>(),
+                configApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi>(),
+                localDataSource = get()
+            )
+        } else {
+            ScheduleFilterRepositoryImpl(
+                agenciesApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi>(),
+                programsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.ProgramsApi>(),
+                launcherConfigurationsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.LauncherConfigurationsApi>(),
+                familiesApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.FamiliesApi>(),
+                locationsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.LocationsApi>(),
+                lookupsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi>(),
+                localDataSource = get()
+            )
+        }
     }
     single<EventsRepository> {
-        EventsRepositoryImpl(
-            eventsApi = get(),
-            configApi = get(),
-            localDataSource = get()
-        )
+        if (get<DataBackend>() == DataBackend.LL) {
+            LLEventsRepositoryImpl(
+                eventsApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi>(),
+                configApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.ConfigApi>()
+            )
+        } else {
+            EventsRepositoryImpl(
+                eventsApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.EventsApi>(),
+                lookupsApi = get(),
+                localDataSource = get()
+            )
+        }
     }
     single<UpdatesRepository> {
-        UpdatesRepositoryImpl(
-            updatesApi = get(),
-            localDataSource = get()
-        )
+        if (get<DataBackend>() == DataBackend.LL) {
+            LLUpdatesRepositoryImpl(
+                updatesApi = get<me.calebjones.spacelaunchnow.api.launchlibrary.apis.UpdatesApi>(),
+                localDataSource = get()
+            )
+        } else {
+            UpdatesRepositoryImpl(
+                updatesApi = get<me.calebjones.spacelaunchnow.api.trantor.apis.UpdatesApi>(),
+                localDataSource = get()
+            )
+        }
     }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)

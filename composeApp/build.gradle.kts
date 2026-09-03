@@ -222,6 +222,7 @@ kotlin {
         commonMain {
             kotlin.srcDir("$projectDir/src/openApiLL/src/commonMain/kotlin")
             kotlin.srcDir("$projectDir/src/openApiSNAPI/src/commonMain/kotlin")
+            kotlin.srcDir("$projectDir/src/openApiTrantor/src/commonMain/kotlin")
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
@@ -504,10 +505,21 @@ tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("gen
     configFile.set("$projectDir/openapi-config-snapi.yaml")
 }
 
-// Convenience task to generate both API clients
+// Register separate task for Trantor (SpaceLaunchNow-API) generation
+tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("generateTrantorClient") {
+    generatorName.set("kotlin")
+    // Windows note: mixing $projectDir (backslashes) with a "/../" relative suffix produces
+    // a malformed URI the generator's spec validator rejects ("Illegal character in opaque
+    // part"). Normalize to forward slashes like the plugin expects on every OS.
+    inputSpec.set(file("$projectDir/../schema/trantor_v1.json").absolutePath.replace("\\", "/"))
+    outputDir.set("$projectDir/src/openApiTrantor")
+    configFile.set("$projectDir/openapi-config-trantor.yaml")
+}
+
+// Convenience task to generate all API clients
 tasks.register("generateAllApiClients") {
-    dependsOn("openApiGenerate", "generateSnapiClient")
-    description = "Generate both Launch Library 2.4.0 and SNAPI v4 API clients"
+    dependsOn("openApiGenerate", "generateSnapiClient", "generateTrantorClient")
+    description = "Generate Launch Library 2.4.0, SNAPI v4, and Trantor API clients"
 }
 
 // Helper to safely copy build outputs (APKs/AABs). Checks for existence, avoids copying

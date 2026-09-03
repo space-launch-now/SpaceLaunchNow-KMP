@@ -43,6 +43,7 @@ import com.valentinilk.shimmer.shimmer
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.InfoCircle
+import me.calebjones.spacelaunchnow.domain.model.LaunchRef
 import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.navigation.EventDetail
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
@@ -679,7 +680,7 @@ private val sampleUpdateLongComment = Update(
     comment = "Weather forecast updated: 80% chance of favorable conditions for launch window. Upper level winds are within acceptable limits. Ground weather team confirms go for propellant loading.",
     infoUrl = "https://example.com/weather",
     createdBy = "45th Weather Squadron",
-    launch = PreviewData.domainLaunchSpaceX,
+    launch = LaunchRef(id = PreviewData.domainLaunchSpaceX.id, name = PreviewData.domainLaunchSpaceX.name),
     createdOn = System.now() - 1.days
 )
 
@@ -689,7 +690,7 @@ private val sampleUpdateOld = Update(
     comment = "Payload integration complete. Fairing encapsulation scheduled for tomorrow.",
     infoUrl = null,
     createdBy = "Mission Integration Team",
-    launch = PreviewData.domainLaunchULA,
+    launch = LaunchRef(id = PreviewData.domainLaunchULA.id, name = PreviewData.domainLaunchULA.name),
     createdOn = System.now() - 5.days
 )
 

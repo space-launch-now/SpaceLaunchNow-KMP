@@ -531,16 +531,79 @@ private fun SystemTabContent(
                                 ) {
                                     Text("Local", fontSize = 12.sp)
                                 }
+                                OutlinedButton(
+                                    onClick = { debugViewModel.switchToTrantorUrl() },
+                                    enabled = !isLoading,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Trantor", fontSize = 12.sp)
+                                }
                             }
                             
-                            // Current URL Display
+                            // Current URL Display — both backends, since the Trantor URL
+                            // preference is now independent of the LL/SNAPI one above.
                             Text(
-                                text = "Current: ${debugSettings.customApiBaseUrl}",
+                                text = "LL/SNAPI current: ${debugSettings.customApiBaseUrl}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
+                            Text(
+                                text = "Trantor current: ${debugSettings.trantorApiBaseUrl}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
+
+                        HorizontalDivider()
+
+                        // Backend flag (amendment 2026-09-02): which repository
+                        // implementation set (Trantor vs. LL) Koin binds at app start.
+                        // Auto = null override = follow Remote Config's data_backend key.
+                        Text(
+                            text = "Backend:",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { debugViewModel.setDataBackendOverride(null) },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Auto", fontSize = 12.sp)
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    debugViewModel.setDataBackendOverride(
+                                        me.calebjones.spacelaunchnow.data.model.DataBackend.TRANTOR
+                                    )
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Trantor", fontSize = 12.sp)
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    debugViewModel.setDataBackendOverride(
+                                        me.calebjones.spacelaunchnow.data.model.DataBackend.LL
+                                    )
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("LL", fontSize = 12.sp)
+                            }
+                        }
+                        Text(
+                            text = "Current: ${debugSettings.dataBackendOverride?.name ?: "Auto (Remote Config)"}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }

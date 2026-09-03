@@ -2,7 +2,31 @@ package me.calebjones.spacelaunchnow.domain.model
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-
+import kotlinx.serialization.Serializable
+import kotlinx.datetime.serializers.LocalDateIso8601Serializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+/**
+ * `kotlinx.datetime.Instant` is a deprecated typealias for `kotlin.time.Instant` (see
+ * kotlinx-datetime 0.8.0), which kotlinx-datetime no longer ships a ready-made
+ * `@Serializable` object for (only the abstract `FormattedInstantSerializer` base remains).
+ * `Instant.toString()`/`Instant.parse()` already round-trip ISO-8601, so this is a minimal
+ * wrapper rather than a custom format. Used to make the domain `Launch` graph (ADR-0004:
+ * docs/architecture/adr/0004-cache-schema-versioning.md) serializable for the launch cache.
+ */
+object InstantSerializer : KSerializer<Instant> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("me.calebjones.spacelaunchnow.domain.model.Instant", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: Instant) {
+        encoder.encodeString(value.toString())
+    }
+    override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
+}
+@Serializable
 data class Country(
     val id: Int,
     val name: String?,
@@ -12,6 +36,7 @@ data class Country(
     val nationalityNameComposed: String?
 )
 
+@Serializable
 data class Provider(
     val id: Int,
     val name: String,
@@ -23,6 +48,7 @@ data class Provider(
     val imageUrl: String?
 )
 
+@Serializable
 data class ProviderDetail(
     val description: String?,
     val administrator: String?,
@@ -40,16 +66,19 @@ data class ProviderDetail(
     val wikiUrl: String?
 )
 
+@Serializable
 data class RocketFamily(
     val id: Int,
     val name: String
 )
 
+@Serializable
 data class RocketManufacturer(
     val id: Int,
     val name: String?
 )
 
+@Serializable
 data class RocketConfig(
     val id: Int,
     val name: String,
@@ -84,18 +113,21 @@ data class RocketConfig(
     val successfulLandings: Int? = null,
     val failedLandings: Int? = null,
     val consecutiveSuccessfulLandings: Int? = null,
+    @Serializable(with = LocalDateIso8601Serializer::class)
     val maidenFlight: LocalDate? = null,
     val fastestTurnaround: String? = null,
     val infoUrl: String? = null,
     val wikiUrl: String? = null
 )
 
+@Serializable
 data class RocketDetail(
     val stages: List<RocketStage>,
     val spacecraftFlights: List<SpacecraftFlightSummary>,
     val payloads: List<PayloadSummary>
 )
 
+@Serializable
 data class RocketStage(
     val id: Int,
     val type: String?,
@@ -103,10 +135,12 @@ data class RocketStage(
     val launcherFlightNumber: Int?,
     val launcher: LauncherSummary?,
     val landingAttempt: LandingAttemptSummary?,
+    @Serializable(with = InstantSerializer::class)
     val previousFlightDate: Instant? = null,
     val turnAroundTime: String? = null
 )
 
+@Serializable
 data class LauncherSummary(
     val id: Int,
     val serialNumber: String?,
@@ -114,11 +148,13 @@ data class LauncherSummary(
     val imageUrl: String?
 )
 
+@Serializable
 data class LandingLocationSummary(
     val id: Int,
     val name: String?
 )
 
+@Serializable
 data class LandingAttemptSummary(
     val id: Int,
     val attempt: Boolean?,
@@ -131,11 +167,13 @@ data class LandingAttemptSummary(
     val type: String?
 )
 
+@Serializable
 data class SpacecraftFlightSummary(
     val id: Int,
     val serialNumber: String?,
     val spacecraftName: String?,
     val destination: String?,
+    @Serializable(with = InstantSerializer::class)
     val missionEnd: Instant?,
     val spacecraft: SpacecraftFlightVehicle? = null,
     val duration: String? = null,
@@ -147,6 +185,7 @@ data class SpacecraftFlightSummary(
     val landingCrew: List<CrewMemberSummary> = emptyList()
 )
 
+@Serializable
 data class CrewMemberSummary(
     val astronautId: Int,
     val astronautName: String?,
@@ -154,6 +193,7 @@ data class CrewMemberSummary(
     val role: String?
 )
 
+@Serializable
 data class SpacecraftFlightVehicle(
     val id: Int,
     val name: String,
@@ -170,30 +210,39 @@ data class SpacecraftFlightVehicle(
     val fastestTurnaround: String? = null
 )
 
+@Serializable
 data class SpacecraftLandingSummary(
     val type: LandingTypeSummary? = null,
     val landingLocation: LandingLocationSummary? = null
 )
 
+@Serializable
 data class LandingTypeSummary(val id: Int, val name: String?)
 
+@Serializable
 data class SpacecraftDockingEventSummary(
     val id: Int,
+    @Serializable(with = InstantSerializer::class)
     val docking: Instant,
+    @Serializable(with = InstantSerializer::class)
     val departure: Instant? = null,
     val dockingLocation: DockingLocationRef,
     val spaceStationTarget: SpaceStationRef? = null
 )
 
+@Serializable
 data class DockingLocationRef(val id: Int, val name: String)
+@Serializable
 data class SpaceStationRef(val id: Int, val name: String)
 
+@Serializable
 data class PayloadSummary(
     val id: Int,
     val name: String?,
     val description: String?
 )
 
+@Serializable
 data class Pad(
     val id: Int,
     val name: String?,
@@ -211,6 +260,7 @@ data class Pad(
     val wikiUrl: String? = null
 )
 
+@Serializable
 data class Location(
     val id: Int,
     val name: String?,
@@ -224,6 +274,7 @@ data class Location(
     val description: String? = null
 )
 
+@Serializable
 data class Mission(
     val id: Int,
     val name: String?,
@@ -233,12 +284,14 @@ data class Mission(
     val imageUrl: String?
 )
 
+@Serializable
 data class Orbit(
     val id: Int,
     val name: String,
     val abbrev: String
 )
 
+@Serializable
 data class LaunchStatus(
     val id: Int,
     val name: String,
@@ -246,6 +299,7 @@ data class LaunchStatus(
     val description: String?
 )
 
+@Serializable
 data class NetPrecision(
     val id: Int,
     val name: String?,
@@ -253,6 +307,7 @@ data class NetPrecision(
     val description: String?
 )
 
+@Serializable
 data class LaunchAttemptCounts(
     val orbital: Int?,
     val location: Int?,
@@ -264,6 +319,7 @@ data class LaunchAttemptCounts(
     val agencyYear: Int?
 )
 
+@Serializable
 data class ProgramSummary(
     val id: Int,
     val name: String,
@@ -274,6 +330,7 @@ data class ProgramSummary(
     val type: String?
 )
 
+@Serializable
 data class VideoLink(
     val url: String,
     val title: String?,
@@ -285,6 +342,7 @@ data class VideoLink(
     val priority: Int?
 )
 
+@Serializable
 data class InfoLink(
     val url: String,
     val title: String?,
@@ -295,6 +353,7 @@ data class InfoLink(
     val priority: Int?
 )
 
+@Serializable
 data class MissionPatchSummary(
     val id: Int,
     val name: String,
@@ -302,24 +361,36 @@ data class MissionPatchSummary(
     val priority: Int?
 )
 
+@Serializable
 data class TimelineEntry(
     val type: String?,
     val relativeTime: String?
 )
 
+@Serializable
 data class UpdateEventRef(
     val id: Int,
     val name: String
 )
 
+// Trantor's standalone updates feed denormalizes the related launch to launch_id/launch_name
+// rather than embedding a full launch (unlike LL's UpdateEndpoint, which nested a real
+// LaunchBasic). A ref matches what's actually available; callers only ever use id/name.
+@Serializable
+data class LaunchRef(
+    val id: String,
+    val name: String
+)
+@Serializable
 data class Update(
     val id: Int,
     val profileImage: String?,
     val comment: String?,
     val infoUrl: String?,
     val createdBy: String?,
+    @Serializable(with = InstantSerializer::class)
     val createdOn: Instant?,
-    val launch: Launch? = null,
+    val launch: LaunchRef? = null,
     val event: UpdateEventRef? = null,
     val program: ProgramSummary? = null
 )

@@ -59,13 +59,21 @@ SQLDelight cache  +  Generated OpenAPI client (api.launchlibrary.*, api.snapi.*)
 2. ViewModels depend on repositories (or use cases when they exist), never on mappers or API extensions directly.
 3. Cache blobs should be domain JSON with a `schema_version` (in progress — see ADR-0004).
 
+**LL / Trantor package split (Phase 5):** `api/extensions/`, `domain/mapper/`, and `data/repository/` each split into backend-specific subpackages so LL and Trantor code never share a file:
+- `api/extensions/ll/` and `api/extensions/trantor/` — extension functions per backend, same file names (Trantor files drop the `Trantor` prefix).
+- `domain/mapper/ll/` and `domain/mapper/trantor/` — mapper functions per backend. A handful of source files carried both LL and Trantor overloads of the same mapper (`AstronautMappers.kt`, `CommonMappers.kt`, `EventMappers.kt`, `ProgramMappers.kt`, `SpaceStationMappers.kt`, `SpacecraftMappers.kt`) and were split function-by-function into the matching `ll/`/`trantor/` file; function names are unchanged. Pure domain-only helpers with no generated-model dependency (none exist today) would stay at `domain/mapper/` root.
+- `data/repository/ll/` (pre-existing, `LL`-prefixed classes) and `data/repository/trantor/` (class names unchanged) hold the backend-specific repository implementations. The repository **interfaces** and backend-neutral impls (`ArticlesRepositoryImpl`, `InfoRepositoryImpl`, `NotificationRepositoryImpl`, `RemoteConfigRepositoryImpl`, etc.) stay at `data/repository/` root.
+- `di/ll/ApiModule.kt` (`apiModule`, also registers the SNAPI clients) and `di/trantor/TrantorApiModule.kt` (`trantorApiModule`) hold the generated API client Koin singletons per backend; `di/AppModule.kt` imports both by name and wires the `DataBackend`-flagged repository bindings.
+
+Known pre-existing ADR-0001 leaks outside `api/extensions/**` and `domain/mapper/**` (not introduced by the Phase 5 split, not yet cleaned up): `database/EventLocalDataSource.kt` (queued for the cache-unification unit) and several `data/repository/ll/LL*RepositoryImpl.kt` / `data/repository/trantor/*RepositoryImpl.kt` files that import a generated `*List`/`*Detail` model directly for a paginated-response or detail-response type instead of going through a mapper indirection.
+
 Known debt to avoid making worse: god repositories (e.g. `LaunchRepositoryImpl` ~1,400 lines), monolithic Compose screens (>1,000 lines), and the triple-nested `Result<DataResult<PaginatedResult<T>>>` wrapper. Don't add to these — split when touching them.
 
 ## Generated API client pattern
 
 OpenAPI generates from `schema/ll_2.4.0.json` and `schema/snapi_v4.yaml` into `composeApp/src/openApiLL/` and `composeApp/src/openApiSNAPI/`. Generated methods have **70+ positional parameters** — never call them directly.
 
-Always go through extension functions in `composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/extensions/`:
+Always go through extension functions in `composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/extensions/ll/` (LL) or `.../api/extensions/trantor/` (Trantor):
 
 ```kotlin
 // ✅ Use this
@@ -81,9 +89,10 @@ Auth: `setApiKey(...)` + `setApiKeyPrefix("Bearer")` on the generated client. La
 
 ## DI (Koin)
 
-- `di/AppModule.kt` — ViewModels (`viewModelOf`) + repositories (`bind<Interface>()` singletons).
+- `di/AppModule.kt` — ViewModels (`viewModelOf`) + repositories (`bind<Interface>()` singletons), including the `DataBackend`-flagged LL vs. Trantor bindings.
 - `di/NetworkModule.kt` — Ktor clients with platform engines (Android/Darwin/CIO).
-- `di/ApiModule.kt` — generated API client instances.
+- `di/ll/ApiModule.kt` (`apiModule`) — generated LL + SNAPI API client instances.
+- `di/trantor/TrantorApiModule.kt` (`trantorApiModule`) — generated Trantor API client instances.
 - `di/AnalyticsModule.kt`, `di/ImageLoaderModule.kt` — supporting graph.
 - Platform-specific Koin setup goes through the `nativeConfig()` expect/actual pattern.
 

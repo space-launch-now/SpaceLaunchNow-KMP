@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 
 /**
  * Debug-specific preferences for development and testing
@@ -14,6 +15,13 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     companion object {
         private val CUSTOM_API_BASE_URL = stringPreferencesKey("debug_custom_api_base_url")
         private val USE_CUSTOM_API_URL = booleanPreferencesKey("debug_use_custom_api_url")
+        // Trantor gets its own URL preference — distinct from CUSTOM_API_BASE_URL (LL/SNAPI
+        // only) — so the Prod/Dev/Local quick-switch buttons never redirect it. No "use custom"
+        // toggle: this preference IS the effective Trantor URL, defaulting to staging.
+        private val TRANTOR_CUSTOM_API_BASE_URL = stringPreferencesKey("debug_trantor_api_base_url")
+        // Local override of the DataBackend flag (amendment 2026-09-02). Null = follow
+        // Firebase Remote Config's `data_backend` key.
+        private val DATA_BACKEND_OVERRIDE = stringPreferencesKey("debug_data_backend_override")
         private val USE_FCM_DEBUG_TOPICS = booleanPreferencesKey("debug_use_fcm_debug_topics")
         // Sampling is a debug-only cost knob now; user-facing cost control is the
         // DiagnosticLevel consent (OFF = NOT_GRANTED = nothing uploads).
@@ -33,6 +41,8 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         const val PROD_API_URL = "https://spacelaunchnow.app"
         const val DEV_API_URL = "https://staging.spacelaunchnow.app"
         const val LOCAL_API_URL = "http://localhost:8000"
+        // Trantor (SpaceLaunchNow-API) staging — Phase 5 KMP client adoption
+        const val TRANTOR_API_URL = "https://staging-api.spacelaunchnow.app"
     }
 
     /**
@@ -42,6 +52,10 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         DebugSettings(
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
+            trantorApiBaseUrl = preferences[TRANTOR_CUSTOM_API_BASE_URL] ?: TRANTOR_API_URL,
+            dataBackendOverride = preferences[DATA_BACKEND_OVERRIDE]?.let {
+                DataBackend.entries.find { backend -> backend.value == it }
+            },
             useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
             datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 100f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
@@ -132,7 +146,24 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     /**
-     * Get the effective API base URL (either custom or default)
+     * Set the Trantor (SpaceLaunchNow-API) base URL. Distinct from [setCustomApiBaseUrl] —
+     * writing here never affects the LL/SNAPI base URL, and vice versa.
+     */
+    suspend fun setTrantorApiBaseUrl(url: String) {
+        dataStore.edit { preferences ->
+            preferences[TRANTOR_CUSTOM_API_BASE_URL] = url
+        }
+    }
+
+    /**
+     * Quick method to reset the Trantor base URL back to the staging default.
+     */
+    suspend fun switchToTrantorUrl() {
+        setTrantorApiBaseUrl(TRANTOR_API_URL)
+    }
+
+    /**
+     * Get the effective API base URL (either custom or default) — LL/SNAPI clients only.
      */
     suspend fun getEffectiveApiBaseUrl(): String {
         val settings = getDebugSettings()
@@ -140,6 +171,28 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
             settings.customApiBaseUrl
         } else {
             PROD_API_URL
+        }
+    }
+
+    /**
+     * Get the effective Trantor base URL. Always the stored preference (default
+     * [TRANTOR_API_URL]) — there is no separate "use custom" toggle for Trantor.
+     */
+    suspend fun getEffectiveTrantorBaseUrl(): String {
+        return getDebugSettings().trantorApiBaseUrl
+    }
+
+    /**
+     * Set (or clear, with null) the local DataBackend override. Null means "follow
+     * Firebase Remote Config's `data_backend` key".
+     */
+    suspend fun setDataBackendOverride(backend: DataBackend?) {
+        dataStore.edit { preferences ->
+            if (backend == null) {
+                preferences.remove(DATA_BACKEND_OVERRIDE)
+            } else {
+                preferences[DATA_BACKEND_OVERRIDE] = backend.value
+            }
         }
     }
 
@@ -184,6 +237,10 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
 data class DebugSettings(
     val useCustomApiUrl: Boolean = false,
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
+    /** Trantor (SpaceLaunchNow-API) base URL — independent of [customApiBaseUrl]. */
+    val trantorApiBaseUrl: String = DebugPreferences.TRANTOR_API_URL,
+    /** Local override of the DataBackend flag; null follows Remote Config. */
+    val dataBackendOverride: DataBackend? = null,
     val useDebugTopics: Boolean = false,
     val datadogSampleRate: Float = 100f,
     val debugSubscriptionActive: Boolean = false,

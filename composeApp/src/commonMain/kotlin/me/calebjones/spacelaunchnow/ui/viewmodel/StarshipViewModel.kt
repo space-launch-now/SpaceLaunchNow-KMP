@@ -23,7 +23,6 @@ import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
@@ -450,7 +449,7 @@ class StarshipViewModel(
                 println("[STARSHIP] Events loaded: ${dataResult.data.results.size} items")
                 _eventsState.update {
                     it.copy(
-                        data = dataResult.data.results.map { event -> event.toDomain() },
+                        data = dataResult.data.results,
                         isLoading = false,
                         dataSource = dataResult.source,
                         cacheTimestamp = dataResult.timestamp
