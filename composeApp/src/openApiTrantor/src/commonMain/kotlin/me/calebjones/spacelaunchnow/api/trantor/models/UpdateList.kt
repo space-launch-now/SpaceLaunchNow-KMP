@@ -25,15 +25,16 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param comment 
- * @param infoUrl 
  * @param createdBy 
  * @param createdOn 
- * @param launchId 
- * @param launchName 
  * @param eventId 
  * @param eventName 
- * @param programId 
+ * @param infoUrl 
+ * @param launchId 
+ * @param launchName 
  * @param profileImage 
+ * @param programId 
+ * @param programName 
  */
 @Serializable
 
@@ -43,23 +44,25 @@ data class UpdateList (
 
     @SerialName(value = "comment") val comment: kotlin.String? = null,
 
-    @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
-
     @SerialName(value = "created_by") val createdBy: kotlin.String? = null,
 
     @SerialName(value = "created_on") val createdOn: kotlin.time.Instant? = null,
-
-    @SerialName(value = "launch_id") val launchId: kotlin.String? = null,
-
-    @SerialName(value = "launch_name") val launchName: kotlin.String? = null,
 
     @SerialName(value = "event_id") val eventId: kotlin.Int? = null,
 
     @SerialName(value = "event_name") val eventName: kotlin.String? = null,
 
+    @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
+
+    @SerialName(value = "launch_id") val launchId: kotlin.String? = null,
+
+    @SerialName(value = "launch_name") val launchName: kotlin.String? = null,
+
+    @SerialName(value = "profile_image") val profileImage: kotlin.String? = null,
+
     @SerialName(value = "program_id") val programId: kotlin.Int? = null,
 
-    @SerialName(value = "profile_image") val profileImage: kotlin.String? = null
+    @SerialName(value = "program_name") val programName: kotlin.String? = null
 
 ) {
 

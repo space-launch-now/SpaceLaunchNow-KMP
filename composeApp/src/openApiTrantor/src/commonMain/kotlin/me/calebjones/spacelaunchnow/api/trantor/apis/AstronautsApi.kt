@@ -46,7 +46,7 @@ open class AstronautsApi : ApiClient {
 
     /**
      * Get astronaut detail
-     * Full astronaut payload â€” bio, dates, and flight history from launch_crews, newest first.
+     * Full astronaut payload — bio, dates, and flight history from launch_crews, newest first.
      * @param astronautId 
      * @return AstronautDetail
      */
@@ -82,9 +82,9 @@ open class AstronautsApi : ApiClient {
      * Paginated list of astronauts. Filter by status, agency, has_flown, in_space, is_human (excludes the &#39;Non-Human&#39; astronaut type by name), or name search.
      * @param statusIds Comma-separated astronaut status ids (optional)
      * @param agencyIds Comma-separated agency ids (optional)
-     * @param hasFlown true â†’ flights_count &gt; 0; false â†’ 0 or unrecorded (optional)
+     * @param hasFlown true → flights_count &gt; 0; false → 0 or unrecorded (optional)
      * @param inSpace Currently in space (optional)
-     * @param isHuman true â†’ excludes astronaut type &#39;Non-Human&#39;; false â†’ only that type. An astronaut with no recorded type counts as human. (optional)
+     * @param isHuman true → excludes astronaut type &#39;Non-Human&#39;; false → only that type. An astronaut with no recorded type counts as human. (optional)
      * @param search Search astronaut name (optional)
      * @param ordering Order by &#x60;name&#x60;. Prefix - for descending. Unknown values fall back to name. (optional, default to "name")
      * @param limit Number of results per page (optional, default to 25)

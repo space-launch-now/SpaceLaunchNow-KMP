@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 Get event detail
 
-Full event payload â€” description, info_urls/vid_urls (ordered by priority), related launch ids, and program ids.
+Full event payload — description, info_urls/vid_urls (ordered by priority), related launch ids and program ids, plus the embedded launches, programs, space_stations, agencies, astronauts, and expeditions rows (each resource&#39;s list row, nested one level).
 
 ### Example
 ```kotlin
@@ -69,12 +69,12 @@ Paginated list of events, ordered by date. Filter by upcoming/previous, date ran
 //import me.calebjones.spacelaunchnow.api.trantor.models.*
 
 val apiInstance = EventsApi()
-val upcoming : kotlin.Boolean = true // kotlin.Boolean | true â†’ date now or later; false â†’ date in the past. Pure filter â€” combine with ordering=date for soonest-first.
+val upcoming : kotlin.Boolean = true // kotlin.Boolean | true → date now or later; false → date in the past. Pure filter — combine with ordering=date for soonest-first.
 val dateAfter : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date at or after this datetime (ISO 8601)
 val dateBefore : kotlin.time.Instant = 2013-10-20T19:20:30+01:00 // kotlin.time.Instant | Date at or before this datetime (ISO 8601)
 val typeIds : kotlin.String = typeIds_example // kotlin.String | Comma-separated event type ids
 val programIds : kotlin.String = programIds_example // kotlin.String | Comma-separated program ids
-val launchId : kotlin.String = launchId_example // kotlin.String | Launch id â€” related events for a launch
+val launchId : kotlin.String = launchId_example // kotlin.String | Launch id — related events for a launch
 val search : kotlin.String = search_example // kotlin.String | Search event name
 val ordering : kotlin.String = ordering_example // kotlin.String | Order by `date`. Prefix - for descending. Unknown values fall back to -date.
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results per page
@@ -92,12 +92,12 @@ try {
 ```
 
 ### Parameters
-| **upcoming** | **kotlin.Boolean**| true â†’ date now or later; false â†’ date in the past. Pure filter â€” combine with ordering&#x3D;date for soonest-first. | [optional] |
+| **upcoming** | **kotlin.Boolean**| true → date now or later; false → date in the past. Pure filter — combine with ordering&#x3D;date for soonest-first. | [optional] |
 | **dateAfter** | **kotlin.time.Instant**| Date at or after this datetime (ISO 8601) | [optional] |
 | **dateBefore** | **kotlin.time.Instant**| Date at or before this datetime (ISO 8601) | [optional] |
 | **typeIds** | **kotlin.String**| Comma-separated event type ids | [optional] |
 | **programIds** | **kotlin.String**| Comma-separated program ids | [optional] |
-| **launchId** | **kotlin.String**| Launch id â€” related events for a launch | [optional] |
+| **launchId** | **kotlin.String**| Launch id — related events for a launch | [optional] |
 | **search** | **kotlin.String**| Search event name | [optional] |
 | **ordering** | **kotlin.String**| Order by &#x60;date&#x60;. Prefix - for descending. Unknown values fall back to -date. | [optional] [default to &quot;-date&quot;] |
 | **limit** | **kotlin.Int**| Number of results per page | [optional] [default to 25] |

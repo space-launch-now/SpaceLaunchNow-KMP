@@ -25,14 +25,14 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
+ * @param deorbited 
+ * @param founded 
+ * @param imageUrl 
+ * @param orbit 
  * @param status 
  * @param statusId 
  * @param type 
  * @param typeId 
- * @param imageUrl 
- * @param orbit 
- * @param founded 
- * @param deorbited 
  */
 @Serializable
 
@@ -42,21 +42,21 @@ data class StationList (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
+    @SerialName(value = "deorbited") val deorbited: kotlin.Boolean? = null,
+
+    @SerialName(value = "founded") val founded: kotlinx.datetime.LocalDate? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "orbit") val orbit: kotlin.String? = null,
+
     @SerialName(value = "status") val status: kotlin.String? = null,
 
     @SerialName(value = "status_id") val statusId: kotlin.Int? = null,
 
     @SerialName(value = "type") val type: kotlin.String? = null,
 
-    @SerialName(value = "type_id") val typeId: kotlin.Int? = null,
-
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
-
-    @SerialName(value = "orbit") val orbit: kotlin.String? = null,
-
-    @SerialName(value = "founded") val founded: kotlinx.datetime.LocalDate? = null,
-
-    @SerialName(value = "deorbited") val deorbited: kotlin.Boolean? = null
+    @SerialName(value = "type_id") val typeId: kotlin.Int? = null
 
 ) {
 

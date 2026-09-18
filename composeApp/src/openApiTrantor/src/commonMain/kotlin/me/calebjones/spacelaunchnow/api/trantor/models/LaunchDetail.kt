@@ -30,39 +30,40 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * Default detail response â€” FK IDs + denormalized names.
+ * Default detail response — FK IDs + denormalized names.
  *
  * @param id 
  * @param name 
+ * @param net 
  * @param slug 
  * @param status 
  * @param statusId 
- * @param net 
- * @param netPrecision 
- * @param windowStart 
- * @param windowEnd 
+ * @param failreason 
+ * @param flightclubUrl 
  * @param imageUrl 
+ * @param infoUrls 
+ * @param lastUpdated 
+ * @param mission 
+ * @param missionId 
+ * @param missionPatches 
+ * @param netPrecision 
+ * @param netPrecisionId 
+ * @param pad 
+ * @param padId 
+ * @param padTurnaround 
+ * @param probability 
+ * @param provider 
  * @param providerId 
  * @param providerName 
- * @param rocketId 
- * @param missionId 
- * @param padId 
- * @param probability 
- * @param weatherConcerns 
- * @param failreason 
- * @param webcastLive 
- * @param padTurnaround 
- * @param flightclubUrl 
- * @param lastUpdated 
- * @param provider 
  * @param rocket 
- * @param mission 
- * @param pad 
- * @param updates 
+ * @param rocketId 
  * @param timeline 
- * @param infoUrls 
+ * @param updates 
  * @param vidUrls 
- * @param missionPatches 
+ * @param weatherConcerns 
+ * @param webcastLive 
+ * @param windowEnd 
+ * @param windowStart 
  */
 @Serializable
 
@@ -72,63 +73,65 @@ data class LaunchDetail (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
+    @SerialName(value = "net") @Required val net: kotlin.time.Instant,
+
     @SerialName(value = "slug") @Required val slug: kotlin.String,
 
     @SerialName(value = "status") @Required val status: kotlin.String,
 
     @SerialName(value = "status_id") @Required val statusId: kotlin.Int,
 
-    @SerialName(value = "net") @Required val net: kotlin.time.Instant,
+    @SerialName(value = "failreason") val failreason: kotlin.String? = null,
+
+    @SerialName(value = "flightclub_url") val flightclubUrl: kotlin.String? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "info_urls") val infoUrls: kotlin.collections.List<InfoUrl>? = null,
+
+    @SerialName(value = "last_updated") val lastUpdated: kotlin.time.Instant? = null,
+
+    @SerialName(value = "mission") val mission: Mission? = null,
+
+    @SerialName(value = "mission_id") val missionId: kotlin.Int? = null,
+
+    @SerialName(value = "mission_patches") val missionPatches: kotlin.collections.List<MissionPatchSchema>? = null,
 
     @SerialName(value = "net_precision") val netPrecision: kotlin.String? = null,
 
-    @SerialName(value = "window_start") val windowStart: kotlin.time.Instant? = null,
+    @SerialName(value = "net_precision_id") val netPrecisionId: kotlin.Int? = null,
 
-    @SerialName(value = "window_end") val windowEnd: kotlin.time.Instant? = null,
+    @SerialName(value = "pad") val pad: PadSummary? = null,
 
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+    @SerialName(value = "pad_id") val padId: kotlin.Int? = null,
+
+    @SerialName(value = "pad_turnaround") val padTurnaround: kotlin.String? = null,
+
+    @SerialName(value = "probability") val probability: kotlin.Int? = null,
+
+    @SerialName(value = "provider") val provider: AgencySummary? = null,
 
     @SerialName(value = "provider_id") val providerId: kotlin.Int? = null,
 
     @SerialName(value = "provider_name") val providerName: kotlin.String? = null,
 
-    @SerialName(value = "rocket_id") val rocketId: kotlin.Int? = null,
-
-    @SerialName(value = "mission_id") val missionId: kotlin.Int? = null,
-
-    @SerialName(value = "pad_id") val padId: kotlin.Int? = null,
-
-    @SerialName(value = "probability") val probability: kotlin.Int? = null,
-
-    @SerialName(value = "weather_concerns") val weatherConcerns: kotlin.String? = null,
-
-    @SerialName(value = "failreason") val failreason: kotlin.String? = null,
-
-    @SerialName(value = "webcast_live") val webcastLive: kotlin.Boolean? = false,
-
-    @SerialName(value = "pad_turnaround") val padTurnaround: kotlin.String? = null,
-
-    @SerialName(value = "flightclub_url") val flightclubUrl: kotlin.String? = null,
-
-    @SerialName(value = "last_updated") val lastUpdated: kotlin.time.Instant? = null,
-
-    @SerialName(value = "provider") val provider: AgencySummary? = null,
-
     @SerialName(value = "rocket") val rocket: Rocket? = null,
 
-    @SerialName(value = "mission") val mission: Mission? = null,
-
-    @SerialName(value = "pad") val pad: PadSummary? = null,
-
-    @SerialName(value = "updates") val updates: kotlin.collections.List<LaunchUpdate>? = null,
+    @SerialName(value = "rocket_id") val rocketId: kotlin.Int? = null,
 
     @SerialName(value = "timeline") val timeline: kotlin.collections.List<TimelineEvent>? = null,
 
-    @SerialName(value = "info_urls") val infoUrls: kotlin.collections.List<InfoUrl>? = null,
+    @SerialName(value = "updates") val updates: kotlin.collections.List<LaunchUpdate>? = null,
 
     @SerialName(value = "vid_urls") val vidUrls: kotlin.collections.List<VidUrl>? = null,
 
-    @SerialName(value = "mission_patches") val missionPatches: kotlin.collections.List<MissionPatchSchema>? = null
+    @SerialName(value = "weather_concerns") val weatherConcerns: kotlin.String? = null,
+
+    @SerialName(value = "webcast_live") val webcastLive: kotlin.Boolean? = false,
+
+    @SerialName(value = "window_end") val windowEnd: kotlin.time.Instant? = null,
+
+    @SerialName(value = "window_start") val windowStart: kotlin.time.Instant? = null
 
 ) {
 

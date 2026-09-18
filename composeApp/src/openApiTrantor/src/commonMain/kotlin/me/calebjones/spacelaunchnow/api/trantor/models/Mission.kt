@@ -28,11 +28,11 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param type 
+ * @param agencyIds 
  * @param description 
  * @param orbit 
  * @param orbitName 
- * @param agencyIds 
+ * @param type 
  * @param agencies 
  */
 @Serializable
@@ -43,7 +43,7 @@ data class Mission (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "type") val type: kotlin.String? = null,
+    @SerialName(value = "agency_ids") val agencyIds: kotlin.collections.List<kotlin.Int>? = null,
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 
@@ -51,7 +51,7 @@ data class Mission (
 
     @SerialName(value = "orbit_name") val orbitName: kotlin.String? = null,
 
-    @SerialName(value = "agency_ids") val agencyIds: kotlin.collections.List<kotlin.Int>? = null,
+    @SerialName(value = "type") val type: kotlin.String? = null,
 
     @SerialName(value = "agencies") val agencies: kotlin.collections.List<AgencyList>? = null
 

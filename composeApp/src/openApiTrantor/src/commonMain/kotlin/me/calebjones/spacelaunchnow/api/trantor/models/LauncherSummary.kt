@@ -25,12 +25,12 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param serialNumber 
- * @param flightProven 
- * @param status 
- * @param flights 
- * @param successfulLandings 
  * @param attemptedLandings 
  * @param details 
+ * @param flightProven 
+ * @param flights 
+ * @param status 
+ * @param successfulLandings 
  */
 @Serializable
 
@@ -40,17 +40,17 @@ data class LauncherSummary (
 
     @SerialName(value = "serial_number") @Required val serialNumber: kotlin.String,
 
-    @SerialName(value = "flight_proven") val flightProven: kotlin.Boolean? = false,
+    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = 0,
 
-    @SerialName(value = "status") val status: kotlin.String? = null,
+    @SerialName(value = "details") val details: kotlin.String? = null,
+
+    @SerialName(value = "flight_proven") val flightProven: kotlin.Boolean? = false,
 
     @SerialName(value = "flights") val flights: kotlin.Int? = 0,
 
-    @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = 0,
+    @SerialName(value = "status") val status: kotlin.String? = null,
 
-    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = 0,
-
-    @SerialName(value = "details") val details: kotlin.String? = null
+    @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = 0
 
 ) {
 

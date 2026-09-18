@@ -6,13 +6,13 @@
 | ------------ | ------------- | ------------- | ------------- |
 | **id** | **kotlin.Int** |  |  |
 | **serialNumber** | **kotlin.String** |  |  |
-| **status** | **kotlin.String** |  |  [optional] |
-| **statusId** | **kotlin.Int** |  |  [optional] |
-| **imageUrl** | **kotlin.String** |  |  [optional] |
+| **configName** | **kotlin.String** |  |  [optional] |
 | **flights** | **kotlin.Int** |  |  [optional] |
+| **imageUrl** | **kotlin.String** |  |  [optional] |
 | **isPlaceholder** | **kotlin.Boolean** |  |  [optional] |
 | **launcherConfigId** | **kotlin.Int** |  |  [optional] |
-| **configName** | **kotlin.String** |  |  [optional] |
+| **status** | **kotlin.String** |  |  [optional] |
+| **statusId** | **kotlin.Int** |  |  [optional] |
 
 
 

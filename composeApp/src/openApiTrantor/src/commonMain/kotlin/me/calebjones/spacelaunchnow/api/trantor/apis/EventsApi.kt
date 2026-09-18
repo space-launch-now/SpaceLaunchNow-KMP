@@ -46,7 +46,7 @@ open class EventsApi : ApiClient {
 
     /**
      * Get event detail
-     * Full event payload â€” description, info_urls/vid_urls (ordered by priority), related launch ids, and program ids.
+     * Full event payload — description, info_urls/vid_urls (ordered by priority), related launch ids and program ids, plus the embedded launches, programs, space_stations, agencies, astronauts, and expeditions rows (each resource&#39;s list row, nested one level).
      * @param eventId 
      * @return EventDetail
      */
@@ -80,12 +80,12 @@ open class EventsApi : ApiClient {
     /**
      * List events
      * Paginated list of events, ordered by date. Filter by upcoming/previous, date range, type, program, related launch, or name search.
-     * @param upcoming true â†’ date now or later; false â†’ date in the past. Pure filter â€” combine with ordering&#x3D;date for soonest-first. (optional)
+     * @param upcoming true → date now or later; false → date in the past. Pure filter — combine with ordering&#x3D;date for soonest-first. (optional)
      * @param dateAfter Date at or after this datetime (ISO 8601) (optional)
      * @param dateBefore Date at or before this datetime (ISO 8601) (optional)
      * @param typeIds Comma-separated event type ids (optional)
      * @param programIds Comma-separated program ids (optional)
-     * @param launchId Launch id â€” related events for a launch (optional)
+     * @param launchId Launch id — related events for a launch (optional)
      * @param search Search event name (optional)
      * @param ordering Order by &#x60;date&#x60;. Prefix - for descending. Unknown values fall back to -date. (optional, default to "-date")
      * @param limit Number of results per page (optional, default to 25)

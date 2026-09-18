@@ -25,32 +25,32 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param type 
  * @param agencyId 
  * @param agencyName 
- * @param inUse 
+ * @param attemptedLandings 
+ * @param capability 
+ * @param crewCapacity 
+ * @param details 
+ * @param diameter 
+ * @param failedLandings 
+ * @param failedLaunches 
+ * @param fastestTurnaround 
+ * @param flightLife 
+ * @param height 
+ * @param history 
  * @param humanRated 
  * @param imageUrl 
+ * @param inUse 
  * @param infoUrl 
- * @param wikiUrl 
- * @param capability 
- * @param history 
- * @param details 
  * @param maidenFlight 
- * @param height 
- * @param diameter 
- * @param crewCapacity 
  * @param payloadCapacity 
  * @param payloadReturnCapacity 
- * @param flightLife 
- * @param fastestTurnaround 
  * @param spacecraftFlown 
- * @param totalLaunchCount 
- * @param successfulLaunches 
- * @param failedLaunches 
- * @param attemptedLandings 
  * @param successfulLandings 
- * @param failedLandings 
+ * @param successfulLaunches 
+ * @param totalLaunchCount 
+ * @param type 
+ * @param wikiUrl 
  */
 @Serializable
 
@@ -60,57 +60,57 @@ data class SpacecraftConfigFull (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "type") val type: kotlin.String? = null,
-
     @SerialName(value = "agency_id") val agencyId: kotlin.Int? = null,
 
     @SerialName(value = "agency_name") val agencyName: kotlin.String? = null,
 
-    @SerialName(value = "in_use") val inUse: kotlin.Boolean? = null,
+    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = null,
+
+    @SerialName(value = "capability") val capability: kotlin.String? = null,
+
+    @SerialName(value = "crew_capacity") val crewCapacity: kotlin.Int? = null,
+
+    @SerialName(value = "details") val details: kotlin.String? = null,
+
+    @SerialName(value = "diameter") val diameter: kotlin.Double? = null,
+
+    @SerialName(value = "failed_landings") val failedLandings: kotlin.Int? = null,
+
+    @SerialName(value = "failed_launches") val failedLaunches: kotlin.Int? = null,
+
+    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null,
+
+    @SerialName(value = "flight_life") val flightLife: kotlin.String? = null,
+
+    @SerialName(value = "height") val height: kotlin.Double? = null,
+
+    @SerialName(value = "history") val history: kotlin.String? = null,
 
     @SerialName(value = "human_rated") val humanRated: kotlin.Boolean? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
+    @SerialName(value = "in_use") val inUse: kotlin.Boolean? = null,
+
     @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
 
-    @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null,
-
-    @SerialName(value = "capability") val capability: kotlin.String? = null,
-
-    @SerialName(value = "history") val history: kotlin.String? = null,
-
-    @SerialName(value = "details") val details: kotlin.String? = null,
-
     @SerialName(value = "maiden_flight") val maidenFlight: kotlinx.datetime.LocalDate? = null,
-
-    @SerialName(value = "height") val height: kotlin.Double? = null,
-
-    @SerialName(value = "diameter") val diameter: kotlin.Double? = null,
-
-    @SerialName(value = "crew_capacity") val crewCapacity: kotlin.Int? = null,
 
     @SerialName(value = "payload_capacity") val payloadCapacity: kotlin.Int? = null,
 
     @SerialName(value = "payload_return_capacity") val payloadReturnCapacity: kotlin.Int? = null,
 
-    @SerialName(value = "flight_life") val flightLife: kotlin.String? = null,
-
-    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null,
-
     @SerialName(value = "spacecraft_flown") val spacecraftFlown: kotlin.Int? = null,
-
-    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = null,
-
-    @SerialName(value = "successful_launches") val successfulLaunches: kotlin.Int? = null,
-
-    @SerialName(value = "failed_launches") val failedLaunches: kotlin.Int? = null,
-
-    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = null,
 
     @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = null,
 
-    @SerialName(value = "failed_landings") val failedLandings: kotlin.Int? = null
+    @SerialName(value = "successful_launches") val successfulLaunches: kotlin.Int? = null,
+
+    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = null,
+
+    @SerialName(value = "type") val type: kotlin.String? = null,
+
+    @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
 
 ) {
 

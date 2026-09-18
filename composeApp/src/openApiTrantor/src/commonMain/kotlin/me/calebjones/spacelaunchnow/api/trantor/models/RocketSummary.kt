@@ -24,8 +24,8 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param id 
  * @param configurationId 
+ * @param id 
  * @param configurationName 
  * @param stages 
  */
@@ -33,9 +33,9 @@ import kotlinx.serialization.encoding.*
 
 data class RocketSummary (
 
-    @SerialName(value = "id") @Required val id: kotlin.Int,
-
     @SerialName(value = "configuration_id") @Required val configurationId: kotlin.Int,
+
+    @SerialName(value = "id") @Required val id: kotlin.Int,
 
     @SerialName(value = "configuration_name") val configurationName: kotlin.String? = null,
 

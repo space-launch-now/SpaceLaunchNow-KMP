@@ -25,10 +25,10 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param id 
+ * @param crew 
+ * @param end 
  * @param name 
  * @param start 
- * @param end 
- * @param crew 
  */
 @Serializable
 
@@ -36,13 +36,13 @@ data class Expedition (
 
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
-    @SerialName(value = "name") val name: kotlin.String? = null,
-
-    @SerialName(value = "start") val start: kotlin.time.Instant? = null,
+    @SerialName(value = "crew") val crew: kotlin.collections.List<ExpeditionCrewMember>? = null,
 
     @SerialName(value = "end") val end: kotlin.time.Instant? = null,
 
-    @SerialName(value = "crew") val crew: kotlin.collections.List<ExpeditionCrewMember>? = null
+    @SerialName(value = "name") val name: kotlin.String? = null,
+
+    @SerialName(value = "start") val start: kotlin.time.Instant? = null
 
 ) {
 

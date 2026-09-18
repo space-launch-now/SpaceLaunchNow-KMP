@@ -25,33 +25,35 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param fullName 
- * @param variant 
  * @param active 
- * @param reusable 
- * @param manufacturerId 
+ * @param apogee 
+ * @param description 
+ * @param diameter 
+ * @param failedLandings 
+ * @param failedLaunches 
+ * @param fastestTurnaround 
+ * @param fullName 
+ * @param gtoCapacity 
  * @param imageUrl 
  * @param infoUrl 
- * @param wikiUrl 
- * @param description 
- * @param minStage 
- * @param maxStage 
- * @param length 
- * @param diameter 
- * @param maidenFlight 
  * @param launchCost 
  * @param launchMass 
+ * @param length 
  * @param leoCapacity 
- * @param gtoCapacity 
- * @param toThrust 
- * @param apogee 
- * @param totalLaunchCount 
- * @param successfulLaunches 
- * @param failedLaunches 
+ * @param maidenFlight 
+ * @param manufacturerAbbrev 
+ * @param manufacturerId 
+ * @param manufacturerName 
+ * @param maxStage 
+ * @param minStage 
  * @param pendingLaunches 
+ * @param reusable 
  * @param successfulLandings 
- * @param failedLandings 
- * @param fastestTurnaround 
+ * @param successfulLaunches 
+ * @param toThrust 
+ * @param totalLaunchCount 
+ * @param variant 
+ * @param wikiUrl 
  */
 @Serializable
 
@@ -61,59 +63,63 @@ data class LauncherConfigFull (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "full_name") val fullName: kotlin.String? = null,
-
-    @SerialName(value = "variant") val variant: kotlin.String? = null,
-
     @SerialName(value = "active") val active: kotlin.Boolean? = true,
 
-    @SerialName(value = "reusable") val reusable: kotlin.Boolean? = false,
+    @SerialName(value = "apogee") val apogee: kotlin.Double? = null,
 
-    @SerialName(value = "manufacturer_id") val manufacturerId: kotlin.Int? = null,
+    @SerialName(value = "description") val description: kotlin.String? = null,
+
+    @SerialName(value = "diameter") val diameter: kotlin.Double? = null,
+
+    @SerialName(value = "failed_landings") val failedLandings: kotlin.Int? = 0,
+
+    @SerialName(value = "failed_launches") val failedLaunches: kotlin.Int? = 0,
+
+    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null,
+
+    @SerialName(value = "full_name") val fullName: kotlin.String? = null,
+
+    @SerialName(value = "gto_capacity") val gtoCapacity: kotlin.Double? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
 
-    @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null,
-
-    @SerialName(value = "description") val description: kotlin.String? = null,
-
-    @SerialName(value = "min_stage") val minStage: kotlin.Int? = null,
-
-    @SerialName(value = "max_stage") val maxStage: kotlin.Int? = null,
-
-    @SerialName(value = "length") val length: kotlin.Double? = null,
-
-    @SerialName(value = "diameter") val diameter: kotlin.Double? = null,
-
-    @SerialName(value = "maiden_flight") val maidenFlight: kotlinx.datetime.LocalDate? = null,
-
     @SerialName(value = "launch_cost") val launchCost: kotlin.Int? = null,
 
     @SerialName(value = "launch_mass") val launchMass: kotlin.Double? = null,
 
+    @SerialName(value = "length") val length: kotlin.Double? = null,
+
     @SerialName(value = "leo_capacity") val leoCapacity: kotlin.Double? = null,
 
-    @SerialName(value = "gto_capacity") val gtoCapacity: kotlin.Double? = null,
+    @SerialName(value = "maiden_flight") val maidenFlight: kotlinx.datetime.LocalDate? = null,
 
-    @SerialName(value = "to_thrust") val toThrust: kotlin.Double? = null,
+    @SerialName(value = "manufacturer_abbrev") val manufacturerAbbrev: kotlin.String? = null,
 
-    @SerialName(value = "apogee") val apogee: kotlin.Double? = null,
+    @SerialName(value = "manufacturer_id") val manufacturerId: kotlin.Int? = null,
 
-    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
+    @SerialName(value = "manufacturer_name") val manufacturerName: kotlin.String? = null,
 
-    @SerialName(value = "successful_launches") val successfulLaunches: kotlin.Int? = 0,
+    @SerialName(value = "max_stage") val maxStage: kotlin.Int? = null,
 
-    @SerialName(value = "failed_launches") val failedLaunches: kotlin.Int? = 0,
+    @SerialName(value = "min_stage") val minStage: kotlin.Int? = null,
 
     @SerialName(value = "pending_launches") val pendingLaunches: kotlin.Int? = 0,
 
+    @SerialName(value = "reusable") val reusable: kotlin.Boolean? = false,
+
     @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = 0,
 
-    @SerialName(value = "failed_landings") val failedLandings: kotlin.Int? = 0,
+    @SerialName(value = "successful_launches") val successfulLaunches: kotlin.Int? = 0,
 
-    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null
+    @SerialName(value = "to_thrust") val toThrust: kotlin.Double? = null,
+
+    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
+
+    @SerialName(value = "variant") val variant: kotlin.String? = null,
+
+    @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
 
 ) {
 

@@ -46,7 +46,7 @@ open class LaunchesApi : ApiClient {
 
     /**
      * Get launch detail
-     * Full launch payload â€” provider, rocket (with stages, launcher, landing), mission (with agencies), pad (with location), updates, timeline, info_urls, vid_urls, and mission patches all included.
+     * Full launch payload — provider, rocket (with stages, launcher, landing), mission (with agencies), pad (with location), updates, timeline, info_urls, vid_urls, and mission patches all included.
      * @param launchId 
      * @return LaunchDetail
      */
@@ -79,8 +79,8 @@ open class LaunchesApi : ApiClient {
 
     /**
      * List launches
-     * Paginated list of launches, ordered by NET. Filter by upcoming/previous, NET range or day/month, status, provider, location, program, orbit, mission type, launcher family, rocket configuration, pad, crew, suborbital inclusion, or name search. Multi-value &#x60;*_ids&#x60; params take comma-separated integers.
-     * @param upcoming true â†’ NET now or later; false â†’ NET in the past. Pure filter â€” combine with ordering&#x3D;net for soonest-first. (optional)
+     * Paginated list of launches, ordered by NET. Filter by upcoming/previous, NET range or day/month, status, provider, location, program, orbit, mission type, launcher family, rocket configuration, pad, crew, suborbital inclusion, or name search. Multi-value &#x60;*_ids&#x60; params take comma-separated integers. &#x60;upcoming&#x3D;true&#x60; callers must pass &#x60;ordering&#x3D;net&#x60; — the default &#x60;-net&#x60; orders the previous list, newest first.
+     * @param upcoming true → NET now or later; false → NET in the past. Pure filter — combine with ordering&#x3D;net for soonest-first. (optional)
      * @param netAfter NET at or after this datetime (ISO 8601) (optional)
      * @param netBefore NET at or before this datetime (ISO 8601) (optional)
      * @param netDay Day of month of NET, evaluated in UTC (optional)
@@ -88,14 +88,15 @@ open class LaunchesApi : ApiClient {
      * @param statusIds Comma-separated launch status ids (optional)
      * @param providerIds Comma-separated launch service provider (agency) ids (optional)
      * @param locationIds Comma-separated location ids (matched via the pad) (optional)
+     * @param locationId Single location id (matched via the pad — a launch has exactly one location through its pad). 422 if combined with location_ids. (optional)
      * @param programIds Comma-separated program ids (optional)
      * @param orbitIds Comma-separated orbit ids (matched via the mission) (optional)
      * @param missionTypeIds Comma-separated mission type ids (matched via the mission) (optional)
      * @param familyIds Comma-separated launcher-configuration family ids (optional)
      * @param rocketConfigId Launcher configuration id (optional)
      * @param padId Launch pad id (optional)
-     * @param isCrewed true â†’ carries human crew; false â†’ no crew, or non-human passengers only (optional)
-     * @param includeSuborbital false â†’ exclude suborbital launches. Omitted or true includes them. (optional)
+     * @param isCrewed true → carries human crew; false → no crew, or non-human passengers only (optional)
+     * @param includeSuborbital false → exclude suborbital launches. Omitted or true includes them. (optional)
      * @param search Search launch name (optional)
      * @param ordering Order by &#x60;net&#x60; or &#x60;name&#x60;. Prefix - for descending. Unknown values fall back to -net. (optional, default to "-net")
      * @param limit Number of results per page (optional, default to 25)
@@ -103,7 +104,7 @@ open class LaunchesApi : ApiClient {
      * @return PaginatedResponseLaunchList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun listLaunchesApiV1LaunchesGet(upcoming: kotlin.Boolean? = null, netAfter: kotlin.time.Instant? = null, netBefore: kotlin.time.Instant? = null, netDay: kotlin.Int? = null, netMonth: kotlin.Int? = null, statusIds: kotlin.String? = null, providerIds: kotlin.String? = null, locationIds: kotlin.String? = null, programIds: kotlin.String? = null, orbitIds: kotlin.String? = null, missionTypeIds: kotlin.String? = null, familyIds: kotlin.String? = null, rocketConfigId: kotlin.Int? = null, padId: kotlin.Int? = null, isCrewed: kotlin.Boolean? = null, includeSuborbital: kotlin.Boolean? = null, search: kotlin.String? = null, ordering: kotlin.String? = "-net", limit: kotlin.Int? = 25, offset: kotlin.Int? = 0): HttpResponse<PaginatedResponseLaunchList> {
+    open suspend fun listLaunchesApiV1LaunchesGet(upcoming: kotlin.Boolean? = null, netAfter: kotlin.time.Instant? = null, netBefore: kotlin.time.Instant? = null, netDay: kotlin.Int? = null, netMonth: kotlin.Int? = null, statusIds: kotlin.String? = null, providerIds: kotlin.String? = null, locationIds: kotlin.String? = null, locationId: kotlin.Int? = null, programIds: kotlin.String? = null, orbitIds: kotlin.String? = null, missionTypeIds: kotlin.String? = null, familyIds: kotlin.String? = null, rocketConfigId: kotlin.Int? = null, padId: kotlin.Int? = null, isCrewed: kotlin.Boolean? = null, includeSuborbital: kotlin.Boolean? = null, search: kotlin.String? = null, ordering: kotlin.String? = "-net", limit: kotlin.Int? = 25, offset: kotlin.Int? = 0): HttpResponse<PaginatedResponseLaunchList> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -119,6 +120,7 @@ open class LaunchesApi : ApiClient {
         statusIds?.apply { localVariableQuery["status_ids"] = listOf("$statusIds") }
         providerIds?.apply { localVariableQuery["provider_ids"] = listOf("$providerIds") }
         locationIds?.apply { localVariableQuery["location_ids"] = listOf("$locationIds") }
+        locationId?.apply { localVariableQuery["location_id"] = listOf("$locationId") }
         programIds?.apply { localVariableQuery["program_ids"] = listOf("$programIds") }
         orbitIds?.apply { localVariableQuery["orbit_ids"] = listOf("$orbitIds") }
         missionTypeIds?.apply { localVariableQuery["mission_type_ids"] = listOf("$missionTypeIds") }

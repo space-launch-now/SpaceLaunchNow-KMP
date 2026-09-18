@@ -27,8 +27,8 @@ import kotlinx.serialization.encoding.*
  * @param loc 
  * @param msg 
  * @param type 
- * @param input 
  * @param ctx 
+ * @param input 
  */
 @Serializable
 
@@ -40,9 +40,9 @@ data class ValidationError (
 
     @SerialName(value = "type") @Required val type: kotlin.String,
 
-    @SerialName(value = "input") @Contextual val input: kotlin.Any? = null,
+    @SerialName(value = "ctx") val ctx: kotlin.String? = null,
 
-    @SerialName(value = "ctx") val ctx: kotlin.String? = null
+    @SerialName(value = "input") val input: kotlin.Any? = null
 
 ) {
 

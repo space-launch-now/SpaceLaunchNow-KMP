@@ -25,8 +25,8 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param id 
  * @param configurationId 
+ * @param id 
  * @param configuration 
  * @param stages 
  */
@@ -34,9 +34,9 @@ import kotlinx.serialization.encoding.*
 
 data class RocketExpanded (
 
-    @SerialName(value = "id") @Required val id: kotlin.Int,
-
     @SerialName(value = "configuration_id") @Required val configurationId: kotlin.Int,
+
+    @SerialName(value = "id") @Required val id: kotlin.Int,
 
     @SerialName(value = "configuration") val configuration: LauncherConfigSummary? = null,
 

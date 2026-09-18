@@ -23,80 +23,80 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
+ * @param abbrev 
  * @param id 
  * @param name 
- * @param abbrev 
- * @param agencyType 
- * @param featured 
- * @param description 
  * @param administrator 
- * @param foundingYear 
- * @param launchers 
- * @param spacecraft 
- * @param countryCodes 
- * @param imageUrl 
- * @param logoUrl 
- * @param socialLogoUrl 
- * @param totalLaunchCount 
- * @param consecutiveSuccessfulLaunches 
- * @param successfulLaunches 
- * @param failedLaunches 
- * @param pendingLaunches 
- * @param successfulLandings 
- * @param failedLandings 
+ * @param agencyType 
  * @param attemptedLandings 
+ * @param consecutiveSuccessfulLaunches 
+ * @param countryCodes 
+ * @param description 
+ * @param failedLandings 
+ * @param failedLaunches 
+ * @param featured 
+ * @param foundingYear 
+ * @param imageUrl 
  * @param infoUrl 
+ * @param launchers 
+ * @param logoUrl 
+ * @param pendingLaunches 
+ * @param socialLogoUrl 
+ * @param spacecraft 
+ * @param successfulLandings 
+ * @param successfulLaunches 
+ * @param totalLaunchCount 
  * @param wikiUrl 
  */
 @Serializable
 
 data class AgencyFull (
 
+    @SerialName(value = "abbrev") @Required val abbrev: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "abbrev") @Required val abbrev: kotlin.String,
+    @SerialName(value = "administrator") val administrator: kotlin.String? = null,
 
     @SerialName(value = "agency_type") val agencyType: kotlin.String? = null,
 
-    @SerialName(value = "featured") val featured: kotlin.Boolean? = false,
-
-    @SerialName(value = "description") val description: kotlin.String? = null,
-
-    @SerialName(value = "administrator") val administrator: kotlin.String? = null,
-
-    @SerialName(value = "founding_year") val foundingYear: kotlin.Int? = null,
-
-    @SerialName(value = "launchers") val launchers: kotlin.String? = null,
-
-    @SerialName(value = "spacecraft") val spacecraft: kotlin.String? = null,
-
-    @SerialName(value = "country_codes") val countryCodes: kotlin.collections.List<kotlin.String>? = null,
-
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
-
-    @SerialName(value = "logo_url") val logoUrl: kotlin.String? = null,
-
-    @SerialName(value = "social_logo_url") val socialLogoUrl: kotlin.String? = null,
-
-    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
+    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = 0,
 
     @SerialName(value = "consecutive_successful_launches") val consecutiveSuccessfulLaunches: kotlin.Int? = 0,
 
-    @SerialName(value = "successful_launches") val successfulLaunches: kotlin.Int? = 0,
+    @SerialName(value = "country_codes") val countryCodes: kotlin.collections.List<kotlin.String>? = null,
 
-    @SerialName(value = "failed_launches") val failedLaunches: kotlin.Int? = 0,
-
-    @SerialName(value = "pending_launches") val pendingLaunches: kotlin.Int? = 0,
-
-    @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = 0,
+    @SerialName(value = "description") val description: kotlin.String? = null,
 
     @SerialName(value = "failed_landings") val failedLandings: kotlin.Int? = 0,
 
-    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = 0,
+    @SerialName(value = "failed_launches") val failedLaunches: kotlin.Int? = 0,
+
+    @SerialName(value = "featured") val featured: kotlin.Boolean? = false,
+
+    @SerialName(value = "founding_year") val foundingYear: kotlin.Int? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
+
+    @SerialName(value = "launchers") val launchers: kotlin.String? = null,
+
+    @SerialName(value = "logo_url") val logoUrl: kotlin.String? = null,
+
+    @SerialName(value = "pending_launches") val pendingLaunches: kotlin.Int? = 0,
+
+    @SerialName(value = "social_logo_url") val socialLogoUrl: kotlin.String? = null,
+
+    @SerialName(value = "spacecraft") val spacecraft: kotlin.String? = null,
+
+    @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = 0,
+
+    @SerialName(value = "successful_launches") val successfulLaunches: kotlin.Int? = 0,
+
+    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
 
     @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
 

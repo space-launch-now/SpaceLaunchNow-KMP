@@ -13,7 +13,7 @@ All URIs are relative to *http://localhost*
 
 List updates
 
-Paginated standalone update feed, ordered by created_on. Filter by program (direct, or reachable through the update&#39;s launch or event program junctions â€” LL&#39;s all__program semantics) or launch. Multi-value &#x60;*_ids&#x60; params take comma-separated integers.
+Paginated standalone update feed, ordered by created_on. Filter by program (direct, or reachable through the update&#39;s launch or event program junctions — LL&#39;s all__program semantics) or launch. Multi-value &#x60;*_ids&#x60; params take comma-separated integers.
 
 ### Example
 ```kotlin

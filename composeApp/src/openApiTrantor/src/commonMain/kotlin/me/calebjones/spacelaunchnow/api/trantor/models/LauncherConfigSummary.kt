@@ -25,13 +25,15 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param fullName 
- * @param variant 
  * @param active 
- * @param reusable 
- * @param manufacturerId 
+ * @param fullName 
  * @param imageUrl 
  * @param infoUrl 
+ * @param manufacturerAbbrev 
+ * @param manufacturerId 
+ * @param manufacturerName 
+ * @param reusable 
+ * @param variant 
  * @param wikiUrl 
  */
 @Serializable
@@ -42,19 +44,23 @@ data class LauncherConfigSummary (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "full_name") val fullName: kotlin.String? = null,
-
-    @SerialName(value = "variant") val variant: kotlin.String? = null,
-
     @SerialName(value = "active") val active: kotlin.Boolean? = true,
 
-    @SerialName(value = "reusable") val reusable: kotlin.Boolean? = false,
-
-    @SerialName(value = "manufacturer_id") val manufacturerId: kotlin.Int? = null,
+    @SerialName(value = "full_name") val fullName: kotlin.String? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
+
+    @SerialName(value = "manufacturer_abbrev") val manufacturerAbbrev: kotlin.String? = null,
+
+    @SerialName(value = "manufacturer_id") val manufacturerId: kotlin.Int? = null,
+
+    @SerialName(value = "manufacturer_name") val manufacturerName: kotlin.String? = null,
+
+    @SerialName(value = "reusable") val reusable: kotlin.Boolean? = false,
+
+    @SerialName(value = "variant") val variant: kotlin.String? = null,
 
     @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
 

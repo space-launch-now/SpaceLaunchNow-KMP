@@ -25,19 +25,23 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
+ * @param net 
  * @param slug 
  * @param status 
  * @param statusId 
- * @param net 
+ * @param configurationName 
  * @param imageUrl 
+ * @param locationId 
+ * @param locationName 
+ * @param missionId 
+ * @param missionName 
+ * @param netPrecision 
+ * @param netPrecisionId 
+ * @param padId 
+ * @param padName 
  * @param providerId 
  * @param providerName 
  * @param rocketId 
- * @param configurationName 
- * @param missionId 
- * @param missionName 
- * @param padId 
- * @param padName 
  * @param webcastLive 
  */
 @Serializable
@@ -48,31 +52,39 @@ data class LaunchList (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
+    @SerialName(value = "net") @Required val net: kotlin.time.Instant,
+
     @SerialName(value = "slug") @Required val slug: kotlin.String,
 
     @SerialName(value = "status") @Required val status: kotlin.String,
 
     @SerialName(value = "status_id") @Required val statusId: kotlin.Int,
 
-    @SerialName(value = "net") @Required val net: kotlin.time.Instant,
+    @SerialName(value = "configuration_name") val configurationName: kotlin.String? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "location_id") val locationId: kotlin.Int? = null,
+
+    @SerialName(value = "location_name") val locationName: kotlin.String? = null,
+
+    @SerialName(value = "mission_id") val missionId: kotlin.Int? = null,
+
+    @SerialName(value = "mission_name") val missionName: kotlin.String? = null,
+
+    @SerialName(value = "net_precision") val netPrecision: kotlin.String? = null,
+
+    @SerialName(value = "net_precision_id") val netPrecisionId: kotlin.Int? = null,
+
+    @SerialName(value = "pad_id") val padId: kotlin.Int? = null,
+
+    @SerialName(value = "pad_name") val padName: kotlin.String? = null,
 
     @SerialName(value = "provider_id") val providerId: kotlin.Int? = null,
 
     @SerialName(value = "provider_name") val providerName: kotlin.String? = null,
 
     @SerialName(value = "rocket_id") val rocketId: kotlin.Int? = null,
-
-    @SerialName(value = "configuration_name") val configurationName: kotlin.String? = null,
-
-    @SerialName(value = "mission_id") val missionId: kotlin.Int? = null,
-
-    @SerialName(value = "mission_name") val missionName: kotlin.String? = null,
-
-    @SerialName(value = "pad_id") val padId: kotlin.Int? = null,
-
-    @SerialName(value = "pad_name") val padName: kotlin.String? = null,
 
     @SerialName(value = "webcast_live") val webcastLive: kotlin.Boolean? = false
 

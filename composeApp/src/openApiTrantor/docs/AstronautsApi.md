@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 Get astronaut detail
 
-Full astronaut payload â€” bio, dates, and flight history from launch_crews, newest first.
+Full astronaut payload — bio, dates, and flight history from launch_crews, newest first.
 
 ### Example
 ```kotlin
@@ -71,9 +71,9 @@ Paginated list of astronauts. Filter by status, agency, has_flown, in_space, is_
 val apiInstance = AstronautsApi()
 val statusIds : kotlin.String = statusIds_example // kotlin.String | Comma-separated astronaut status ids
 val agencyIds : kotlin.String = agencyIds_example // kotlin.String | Comma-separated agency ids
-val hasFlown : kotlin.Boolean = true // kotlin.Boolean | true â†’ flights_count > 0; false â†’ 0 or unrecorded
+val hasFlown : kotlin.Boolean = true // kotlin.Boolean | true → flights_count > 0; false → 0 or unrecorded
 val inSpace : kotlin.Boolean = true // kotlin.Boolean | Currently in space
-val isHuman : kotlin.Boolean = true // kotlin.Boolean | true â†’ excludes astronaut type 'Non-Human'; false â†’ only that type. An astronaut with no recorded type counts as human.
+val isHuman : kotlin.Boolean = true // kotlin.Boolean | true → excludes astronaut type 'Non-Human'; false → only that type. An astronaut with no recorded type counts as human.
 val search : kotlin.String = search_example // kotlin.String | Search astronaut name
 val ordering : kotlin.String = ordering_example // kotlin.String | Order by `name`. Prefix - for descending. Unknown values fall back to name.
 val limit : kotlin.Int = 56 // kotlin.Int | Number of results per page
@@ -93,9 +93,9 @@ try {
 ### Parameters
 | **statusIds** | **kotlin.String**| Comma-separated astronaut status ids | [optional] |
 | **agencyIds** | **kotlin.String**| Comma-separated agency ids | [optional] |
-| **hasFlown** | **kotlin.Boolean**| true â†’ flights_count &gt; 0; false â†’ 0 or unrecorded | [optional] |
+| **hasFlown** | **kotlin.Boolean**| true → flights_count &gt; 0; false → 0 or unrecorded | [optional] |
 | **inSpace** | **kotlin.Boolean**| Currently in space | [optional] |
-| **isHuman** | **kotlin.Boolean**| true â†’ excludes astronaut type &#39;Non-Human&#39;; false â†’ only that type. An astronaut with no recorded type counts as human. | [optional] |
+| **isHuman** | **kotlin.Boolean**| true → excludes astronaut type &#39;Non-Human&#39;; false → only that type. An astronaut with no recorded type counts as human. | [optional] |
 | **search** | **kotlin.String**| Search astronaut name | [optional] |
 | **ordering** | **kotlin.String**| Order by &#x60;name&#x60;. Prefix - for descending. Unknown values fall back to name. | [optional] [default to &quot;name&quot;] |
 | **limit** | **kotlin.Int**| Number of results per page | [optional] [default to 25] |

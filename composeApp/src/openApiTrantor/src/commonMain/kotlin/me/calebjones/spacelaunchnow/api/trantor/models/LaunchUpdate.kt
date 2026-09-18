@@ -23,25 +23,25 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param id 
  * @param comment 
  * @param createdOn 
- * @param infoUrl 
+ * @param id 
  * @param createdBy 
+ * @param infoUrl 
  */
 @Serializable
 
 data class LaunchUpdate (
 
-    @SerialName(value = "id") @Required val id: kotlin.Int,
-
     @SerialName(value = "comment") @Required val comment: kotlin.String,
 
     @SerialName(value = "created_on") @Required val createdOn: kotlin.time.Instant,
 
-    @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
+    @SerialName(value = "id") @Required val id: kotlin.Int,
 
-    @SerialName(value = "created_by") val createdBy: kotlin.String? = null
+    @SerialName(value = "created_by") val createdBy: kotlin.String? = null,
+
+    @SerialName(value = "info_url") val infoUrl: kotlin.String? = null
 
 ) {
 
