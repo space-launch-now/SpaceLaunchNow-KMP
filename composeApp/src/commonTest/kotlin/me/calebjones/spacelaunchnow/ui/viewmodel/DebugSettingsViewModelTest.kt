@@ -139,6 +139,70 @@ class DebugSettingsViewModelTest {
         assertTrue(message.contains("failed"), "status must surface the failure, was: $message")
     }
 
+    // ========================================
+    // Clear All Caches (Trantor migration lever)
+    // ========================================
+
+    private class FakeCacheWiper : me.calebjones.spacelaunchnow.database.CacheWiper {
+        var clearCalls = 0
+        var failWith: Exception? = null
+        override suspend fun clearAll(imageLoader: coil3.ImageLoader?) {
+            failWith?.let { throw it }
+            clearCalls++
+        }
+    }
+
+    @Test
+    fun `clearAllCaches wipes the caches and tells the user to restart`() = runTest {
+        val wiper = FakeCacheWiper()
+        val vm = DebugSettingsViewModel(
+            debugPreferences = null,
+            billingManager = billingManager,
+            launchRepository = null,
+            notificationRepository = null,
+            cacheWiper = wiper
+        )
+
+        vm.clearAllCaches()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(1, wiper.clearCalls)
+        val message = vm.statusMessage.first()
+        assertNotNull(message)
+        assertTrue(message!!.contains("restart", ignoreCase = true), "status should ask for a restart, was: $message")
+        assertFalse(vm.isLoading.first())
+    }
+
+    @Test
+    fun `clearAllCaches surfaces a wipe failure instead of claiming success`() = runTest {
+        val wiper = FakeCacheWiper().apply { failWith = IllegalStateException("disk locked") }
+        val vm = DebugSettingsViewModel(
+            debugPreferences = null,
+            billingManager = billingManager,
+            launchRepository = null,
+            notificationRepository = null,
+            cacheWiper = wiper
+        )
+
+        vm.clearAllCaches()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val message = vm.statusMessage.first()
+        assertNotNull(message)
+        assertTrue(message!!.contains("disk locked"), "status must surface the failure, was: $message")
+        assertFalse(vm.isLoading.first())
+    }
+
+    @Test
+    fun `clearAllCaches reports when no wiper is wired`() = runTest {
+        viewModel.clearAllCaches()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val message = viewModel.statusMessage.first()
+        assertNotNull(message)
+        assertTrue(message!!.contains("not available"), "was: $message")
+    }
+
     @Test
     fun `checkBillingInitialization should handle null billing manager`() = runTest {
         // Given: ViewModel with no billing manager

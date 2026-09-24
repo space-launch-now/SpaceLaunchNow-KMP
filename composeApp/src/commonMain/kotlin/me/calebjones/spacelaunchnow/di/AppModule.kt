@@ -89,10 +89,12 @@ import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
 import me.calebjones.spacelaunchnow.database.CacheCleanupService
+import me.calebjones.spacelaunchnow.database.CacheWiper
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
 import me.calebjones.spacelaunchnow.database.FilterOptionsLocalDataSource
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
+import me.calebjones.spacelaunchnow.database.LocalCacheWiper
 import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
 import me.calebjones.spacelaunchnow.database.SpacecraftLocalDataSource
@@ -583,6 +585,9 @@ val debugModule = module {
         NotificationHistoryStorage(historyDataStore)
     }
 
+    // Trantor migration lever: "Clear All Caches" in the System tab
+    single<CacheWiper> { LocalCacheWiper(database = get(), launchCache = get()) }
+
     // DebugSettingsViewModel - now uses BillingManager (Phase 7 complete!)
     viewModel {
         DebugSettingsViewModel(
@@ -591,7 +596,8 @@ val debugModule = module {
             launchRepository = getOrNull(),
             notificationRepository = getOrNull(),
             pushMessaging = getOrNull(),
-            notificationHistoryStorage = get()  // NOT optional - we need this!
+            notificationHistoryStorage = get(),  // NOT optional - we need this!
+            cacheWiper = getOrNull()
         )
     }
 }
