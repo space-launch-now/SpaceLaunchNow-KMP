@@ -18,7 +18,7 @@ suspend fun AgenciesApi.listAgencies(
     search: String? = null,
     featured: Boolean? = null,
     typeIds: List<Int>? = null,
-    countryCode: String? = null,
+    countryCodes: List<String>? = null,
     ordering: String? = "name",
     limit: Int? = 25,
     offset: Int? = 0
@@ -26,7 +26,7 @@ suspend fun AgenciesApi.listAgencies(
     search = search,
     featured = featured,
     typeIds = typeIds?.joinToString(","),
-    countryCode = countryCode,
+    countryCodes = countryCodes?.joinToString(","),
     ordering = ordering,
     limit = limit,
     offset = offset
@@ -47,13 +47,13 @@ suspend fun AgenciesApi.getAgencyList(
     search: String? = null,
     featured: Boolean? = null,
     typeIds: String? = null,
-    countryCode: String? = null
+    countryCodes: String? = null
 ): HttpResponse<PaginatedResponseAgencyList> {
     return listAgenciesApiV1AgenciesGet(
         search = search,
         featured = featured,
         typeIds = typeIds,
-        countryCode = countryCode,
+        countryCodes = countryCodes,
         ordering = ordering,
         limit = limit,
         offset = offset

@@ -40,7 +40,8 @@ class AgencyRepositoryImpl(
                 search = search,
                 featured = featured,
                 typeIds = typeId?.let { listOf(it) },
-                countryCode = countryCode?.firstOrNull()
+                // E6(P5): the server takes a CSV of codes; the UI multi-selects.
+                countryCodes = countryCode
             )
             Result.success(response.body())
         } catch (e: ResponseException) {

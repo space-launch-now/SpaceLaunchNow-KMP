@@ -18,6 +18,7 @@ package me.calebjones.spacelaunchnow.api.trantor.models
 import me.calebjones.spacelaunchnow.api.trantor.models.ValidationErrorLocInner
 
 import kotlinx.serialization.*
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
@@ -42,7 +43,7 @@ data class ValidationError (
 
     @SerialName(value = "ctx") val ctx: kotlin.String? = null,
 
-    @SerialName(value = "input") val input: kotlin.Any? = null
+    @SerialName(value = "input") @Contextual val input: kotlin.Any? = null
 
 ) {
 
