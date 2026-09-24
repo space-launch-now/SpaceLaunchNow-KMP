@@ -9,9 +9,8 @@ import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseAgencyLi
  * Extension functions for the Trantor AgenciesApi to provide clean, named-parameter
  * access to GET /agencies and /agencies/{id}.
  *
- * Note: Trantor's `country_code` filter takes a single ISO alpha-2 code, unlike the
- * legacy LL client which accepted a list. Callers with a multi-select country filter
- * should only send the first selected code; see AgencyRepositoryImpl.
+ * Note: Trantor's `country_codes` filter (E6(P5)) takes a CSV of ISO alpha-2 codes, matching
+ * the legacy LL client's list param; the country multi-select filter sends every selected code.
  */
 
 suspend fun AgenciesApi.listAgencies(
