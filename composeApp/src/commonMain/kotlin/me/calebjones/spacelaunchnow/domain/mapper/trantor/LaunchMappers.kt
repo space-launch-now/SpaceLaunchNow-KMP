@@ -20,6 +20,7 @@ import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.LaunchStatus
 import me.calebjones.spacelaunchnow.domain.model.Location
 import me.calebjones.spacelaunchnow.domain.model.MissionPatchSummary
+import me.calebjones.spacelaunchnow.domain.model.NetPrecision
 import me.calebjones.spacelaunchnow.domain.model.Pad
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.Provider
@@ -44,8 +45,6 @@ import me.calebjones.spacelaunchnow.domain.model.Update as DomainUpdate
  *  - Mission.orbit: Trantor's embedded Mission carries only orbit/orbit_name strings, no
  *    orbit id, so the domain Orbit(id, name, abbrev) can't be built without inventing an
  *    id. Left null.
- *  - Launch.netPrecision: Trantor's LaunchDetail.net_precision is a plain string, not an
- *    id-bearing object. Left null.
  *  - Launch.programs: Trantor's LaunchDetail has no embedded program list (the junction
  *    table exists server-side, but detail doesn't inline it yet). Left empty.
  *  - Launch.launchAttemptCounts: not served by Trantor's launch detail/list. Left null.
@@ -80,7 +79,7 @@ fun LaunchList.toDomain(): Launch = Launch(
     imageUrl = imageUrl,
     thumbnailUrl = null,
     infographic = null,
-    netPrecision = null,
+    netPrecision = netPrecisionId?.let { pid -> NetPrecision(id = pid, name = netPrecision, abbrev = null, description = null) },
     rocket = rocketId?.let { rid ->
         RocketConfig(
             id = rid,
@@ -112,7 +111,7 @@ fun LaunchList.toDomain(): Launch = Launch(
             mapUrl = null,
             mapImage = null,
             totalLaunchCount = null,
-            location = null
+            location = locationId?.let { lid -> Location(id = lid, name = locationName, countryCode = null) }
         )
     },
     webcastLive = webcastLive ?: false
@@ -132,7 +131,7 @@ fun AgencySummary.toDomain(): Provider = Provider(
     type = agencyType,
     countryCode = countryCodes?.firstOrNull(),
     logoUrl = logoUrl,
-    socialLogo = null,
+    socialLogo = socialLogoUrl,
     imageUrl = imageUrl
 )
 
@@ -297,7 +296,7 @@ fun LaunchDetail.toDomain(): Launch {
         imageUrl = imageUrl,
         thumbnailUrl = null,
         infographic = null,
-        netPrecision = null,
+        netPrecision = netPrecisionId?.let { pid -> NetPrecision(id = pid, name = netPrecision, abbrev = null, description = null) },
         rocket = resolvedRocket,
         mission = mission?.toDomain(),
         pad = pad?.toDomain(),
