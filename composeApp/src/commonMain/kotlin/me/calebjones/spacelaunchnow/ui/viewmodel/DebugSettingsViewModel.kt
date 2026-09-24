@@ -18,6 +18,7 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugSettings
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
+import me.calebjones.spacelaunchnow.database.CacheWiper
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import kotlin.random.Random
 
@@ -36,7 +37,8 @@ class DebugSettingsViewModel(
     private val launchRepository: LaunchRepository? = null,
     private val notificationRepository: NotificationRepository? = null,
     private val pushMessaging: PushMessaging? = null,
-    private val notificationHistoryStorage: NotificationHistoryStorage? = null
+    private val notificationHistoryStorage: NotificationHistoryStorage? = null,
+    private val cacheWiper: CacheWiper? = null
 ) : ViewModel() {
 
     private val _debugSettings = MutableStateFlow(
@@ -234,6 +236,32 @@ class DebugSettingsViewModel(
                 }
             } catch (e: Exception) {
                 _statusMessage.value = "Failed to update backend override: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Trantor migration lever: empty every local cache (SQLDelight tables, in-memory
+     * LaunchCache, Coil image cache) so the next fetch comes from the backend the
+     * DataBackend flag names. Preference stores are untouched, so the Trantor URL and
+     * backend override survive. The flag itself resolves once at Koin start, hence the
+     * restart prompt.
+     */
+    fun clearAllCaches(imageLoader: coil3.ImageLoader? = null) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                if (cacheWiper == null) {
+                    _statusMessage.value = "Cache wiper not available"
+                    return@launch
+                }
+                cacheWiper.clearAll(imageLoader)
+                _statusMessage.value =
+                    "All caches cleared — settings kept. Restart the app to refetch."
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to clear caches: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
