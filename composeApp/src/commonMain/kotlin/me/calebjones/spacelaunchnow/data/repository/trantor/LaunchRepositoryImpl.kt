@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.data.repository.trantor
 
 import io.ktor.client.plugins.ResponseException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -97,6 +98,51 @@ class LaunchRepositoryImpl(
         return filtered
     }
 
+    /**
+     * D3 (home-parity spec): merge launch detail (mission description, provider with all
+     * three images, pad.location, netPrecision, window fields) over the featured launch's
+     * flat list row. Routed through the same domain-JSON detail cache the launch-detail
+     * screen uses ([LaunchLocalDataSource.getDetailedLaunch] / `cacheDetailedLaunch`), so a
+     * repeat home load is served from that cache instead of re-fetching detail. A detail
+     * failure (404/network) never fails the hero - the row is returned unchanged, logged at
+     * warn. Only the first candidate (the hero) is merged; the rest are cards, which already
+     * carry location/precision on the list row (D1).
+     */
+    private suspend fun mergeFeaturedDetailIntoFirst(
+        results: List<Launch>,
+        forceRefresh: Boolean
+    ): List<Launch> {
+        val first = results.firstOrNull() ?: return results
+        val merged = try {
+            val cachedDetail = if (!forceRefresh) localDataSource?.getDetailedLaunch(first.id) else null
+            val detail = cachedDetail ?: launchesApi.getLaunchDetail(first.id).body().toDomain()
+                .also { localDataSource?.cacheDetailedLaunch(it) }
+            mergeDetailOverRow(first, detail)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (e: ResponseException) {
+            log.w(e) { "Featured launch detail fetch failed (API) for ${first.id}, using the list row" }
+            first
+        } catch (e: IOException) {
+            log.w(e) { "Featured launch detail fetch failed (network) for ${first.id}, using the list row" }
+            first
+        } catch (e: Exception) {
+            log.w(e) { "Featured launch detail fetch failed (unexpected) for ${first.id}, using the list row" }
+            first
+        }
+        return listOf(merged) + results.drop(1)
+    }
+
+    private fun mergeDetailOverRow(row: Launch, detail: Launch): Launch = row.copy(
+        windowStart = detail.windowStart,
+        windowEnd = detail.windowEnd,
+        lastUpdated = detail.lastUpdated ?: row.lastUpdated,
+        mission = detail.mission ?: row.mission,
+        provider = detail.provider,
+        pad = detail.pad ?: row.pad,
+        netPrecision = detail.netPrecision ?: row.netPrecision
+    )
+
     // ── Domain-returning method implementations ───────────────────────────
 
     override suspend fun getUpcomingLaunchesDomain(
@@ -142,8 +188,9 @@ class LaunchRepositoryImpl(
                     val filtered = filterLaunchesByPreferences(cached, agencyIds, locationIds)
                     if (filtered.isNotEmpty()) {
                         log.i { "Cache hit - returning ${filtered.size}/${cached.size} filtered fresh cached featured launches" }
+                        val merged = mergeFeaturedDetailIntoFirst(filtered, forceRefresh = false)
                         return Result.success(
-                            DataResult(paginatedOf(filtered), DataSource.CACHE, staleTimestamp ?: now)
+                            DataResult(paginatedOf(merged), DataSource.CACHE, staleTimestamp ?: now)
                         )
                     }
                 } else {
@@ -152,8 +199,9 @@ class LaunchRepositoryImpl(
                         val filteredStale = filterLaunchesByPreferences(stale, agencyIds, locationIds)
                         if (filteredStale.isNotEmpty()) {
                             log.i { "Returning ${filteredStale.size} stale featured launches" }
+                            val merged = mergeFeaturedDetailIntoFirst(filteredStale, forceRefresh = false)
                             return Result.success(
-                                DataResult(paginatedOf(filteredStale), DataSource.STALE_CACHE, staleTimestamp ?: now)
+                                DataResult(paginatedOf(merged), DataSource.STALE_CACHE, staleTimestamp ?: now)
                             )
                         }
                     }
@@ -174,7 +222,8 @@ class LaunchRepositoryImpl(
                 localDataSource?.cacheListLaunches(launches.results.take(4))
             }
 
-            return Result.success(DataResult(launches, DataSource.NETWORK, now))
+            val mergedResults = mergeFeaturedDetailIntoFirst(launches.results, forceRefresh)
+            return Result.success(DataResult(launches.copy(results = mergedResults), DataSource.NETWORK, now))
         } catch (e: Exception) {
             if (e is ResponseException) {
                 log.e(e) { "API error in getFeaturedLaunchDomain: ${e.message}" }
@@ -188,9 +237,10 @@ class LaunchRepositoryImpl(
                 val filteredStale = filterLaunchesByPreferences(stale, agencyIds, locationIds)
                 if (filteredStale.isNotEmpty()) {
                     log.w { "Returning ${filteredStale.size} filtered stale featured launches as fallback" }
+                    val merged = mergeFeaturedDetailIntoFirst(filteredStale, forceRefresh = false)
                     return Result.success(
                         DataResult(
-                            paginatedOf(filteredStale),
+                            paginatedOf(merged),
                             DataSource.STALE_CACHE,
                             localDataSource?.getCacheTimestamp("upcoming_launches")
                         )
