@@ -1,3 +1,12 @@
+## [5.44.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.1...v5.44.2) (2026-10-01)
+
+
+### Performance Improvements
+
+* **api:** round time filters and sort id filters for cacheable URLs ([2dce1e6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2dce1e6a315c95ebdcec787b88f0e294686b41e1))
+
+
+
 ## [5.44.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.0...v5.44.1) (2026-08-31)
 
 
@@ -57,16 +66,6 @@
 * **newsevents:** clear the load-more flag on every reload path ([4b9bd96](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4b9bd96ad91ea12f633a3e56552421af370347ec))
 * **newsevents:** clear the load-more flag when a fetch is cancelled ([e73a4c4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e73a4c4c19b754897e45a67b8166a19cffe82168))
 * **newsevents:** dedupe paginated appends and close load-more race ([fc86705](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fc86705bb1ca8acb04eb1d9032bf9bd008de3297)), closes [#182](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/182) [#179](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/179)
-
-
-
-## [5.42.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.1...v5.42.2) (2026-08-27)
-
-
-### Bug Fixes
-
-* **android:** make WorkManager init non-fatal by removing startup auto-init ([1a49905](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1a49905e56b5d7072918ae59a3de10aaba814da5)), closes [#181](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/181)
-* **wear:** make WorkManager init non-fatal by removing startup auto-init ([73e6a00](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/73e6a0056033140fbaa0efada171c46004b6a8c1)), closes [#181](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/181)
 
 
 

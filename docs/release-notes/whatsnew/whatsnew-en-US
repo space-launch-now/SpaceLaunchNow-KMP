@@ -1,4 +1,3 @@
-News articles now appear even when your connection is slow.
-Fixed several crashes on iOS.
-Launch video links open more reliably.
-Banner ads are more stable.
+### Performance Improvements
+
+* **api:** round time filters and sort id filters for cacheable URLs
