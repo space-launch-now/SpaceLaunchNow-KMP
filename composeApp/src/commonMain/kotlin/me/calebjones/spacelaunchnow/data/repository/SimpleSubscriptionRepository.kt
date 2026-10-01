@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
@@ -38,6 +40,13 @@ class SimpleSubscriptionRepository(
     private val temporaryPremiumAccess: TemporaryPremiumAccess
 ) : SubscriptionRepository {
     private val log = logger()
+
+    // Guards initialize() so its body runs at most once per instance. This repository is a
+    // Koin singleton and initialize() is called from several startup paths; without this,
+    // two coroutines could reach syncNow() together and have RevenueCat read the cached
+    // CustomerInfo on one thread while the other is still writing it (issue #192).
+    private val initializeMutex = Mutex()
+    private var initialized = false
 
     // Scope for StateFlow conversion
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -114,24 +123,38 @@ class SimpleSubscriptionRepository(
      * - Trigger initial sync if needed
      */
     override suspend fun initialize() {
-        log.d { "SimpleSubscriptionRepository: Initializing..." }
+        initializeMutex.withLock {
+            if (initialized) {
+                log.d { "SimpleSubscriptionRepository: Already initialized — skipping" }
+                return
+            }
+            log.d { "SimpleSubscriptionRepository: Initializing..." }
 
-        billingClient.initialize()
+            // The billing managers report failure as Result.failure rather than throwing. Leave
+            // the repository uninitialised so a later caller retries billing init.
+            val billingResult = billingClient.initialize()
+            if (billingResult.isFailure) {
+                log.w { "SimpleSubscriptionRepository: billing initialisation failed — will retry on next call" }
+                return
+            }
 
-        // Read needsSync before startSyncing() to avoid a potential race where the
-        // background coroutine clears needsSync before we can check it.
-        val shouldRetrySync = localStorage.get().needsSync
+            // Read needsSync before startSyncing() to avoid a potential race where the
+            // background coroutine clears needsSync before we can check it.
+            val shouldRetrySync = localStorage.get().needsSync
 
-        syncer.startSyncing()
+            syncer.startSyncing()
 
-        // If a previous sync failed (write error or corruption recovery), the needsSync flag
-        // was set on disk. Retry immediately rather than waiting for the next RC state update.
-        if (shouldRetrySync) {
-            log.i { "needsSync=true on cold start — triggering immediate sync" }
-            syncer.syncNow()
+            // If a previous sync failed (write error or corruption recovery), the needsSync flag
+            // was set on disk. Retry immediately rather than waiting for the next RC state update.
+            if (shouldRetrySync) {
+                log.i { "needsSync=true on cold start — triggering immediate sync" }
+                syncer.syncNow()
+            }
+
+            // Set only after the body completes so a thrown initialize() stays retryable.
+            initialized = true
+            log.i { "SimpleSubscriptionRepository: ✅ Initialized" }
         }
-
-        log.i { "SimpleSubscriptionRepository: ✅ Initialized" }
     }
 
     /**

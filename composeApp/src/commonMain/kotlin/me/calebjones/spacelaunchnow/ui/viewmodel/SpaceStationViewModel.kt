@@ -12,13 +12,13 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
-import me.calebjones.spacelaunchnow.api.snapi.apis.ArticlesApi
-import me.calebjones.spacelaunchnow.api.snapi.extensions.searchArticles
-import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
+import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.domain.model.VideoLink
+import me.calebjones.spacelaunchnow.domain.mapper.toDomainSummary
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.AppSecrets
 import me.calebjones.spacelaunchnow.util.LatLng
@@ -45,7 +45,7 @@ data class IssPositionData(
  */
 class SpaceStationViewModel(
     private val spaceStationRepository: SpaceStationRepository,
-    private val articlesApi: ArticlesApi,
+    private val articlesRepository: ArticlesRepository,
     private val issTrackingRepository: IssTrackingRepository,
     private val httpClient: HttpClient,
     private val analyticsManager: AnalyticsManager
@@ -81,8 +81,8 @@ class SpaceStationViewModel(
     val orbitPath: StateFlow<List<LatLng>> = _orbitPath
 
     // Related news articles
-    private val _articles = MutableStateFlow<List<Article>>(emptyList())
-    val articles: StateFlow<List<Article>> = _articles
+    private val _articles = MutableStateFlow<List<ArticleSummary>>(emptyList())
+    val articles: StateFlow<List<ArticleSummary>> = _articles
 
     // Video player state for ISS live stream
     private val _videoPlayerState = MutableStateFlow(VideoPlayerState())
@@ -179,18 +179,15 @@ class SpaceStationViewModel(
     private suspend fun fetchArticles() {
         try {
             log.d { "Fetching articles for: International Space Station" }
-            val articlesResponse = articlesApi.searchArticles(
+            articlesRepository.searchArticles(
                 query = "International Space Station",
                 limit = 10
-            )
-            log.d { "Articles API response status: ${articlesResponse.status}" }
-            try {
-                val body = articlesResponse.body()
-                log.d { "Articles API response body count: ${body.count}" }
-                _articles.value = body.results
+            ).onSuccess { body ->
+                log.d { "Articles response body count: ${body.count}" }
+                _articles.value = body.results.map { it.toDomainSummary() }
                 log.i { "Loaded ${body.results.size} articles" }
-            } catch (bodyEx: Exception) {
-                log.e(bodyEx) { "Error parsing articles body" }
+            }.onFailure { exception ->
+                log.e(exception) { "Error fetching articles: ${exception.message}" }
             }
         } catch (exception: Exception) {
             log.e(exception) { "Error fetching articles: ${exception.message}" }

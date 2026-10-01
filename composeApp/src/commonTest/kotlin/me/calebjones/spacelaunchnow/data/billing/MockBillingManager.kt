@@ -21,6 +21,7 @@ class MockBillingManager : BillingManager {
     
     // Test state tracking
     var initializeCalled = false
+    var initializeCallCount = 0
     var refreshCalled = false
     var getProductsCalled = false
     var launchPurchaseFlowCalled = false
@@ -63,6 +64,7 @@ class MockBillingManager : BillingManager {
     
     override suspend fun initialize(appUserId: String?): Result<Unit> {
         initializeCalled = true
+        initializeCallCount++
         lastAppUserId = appUserId
         
         return if (shouldInitializeFail) {

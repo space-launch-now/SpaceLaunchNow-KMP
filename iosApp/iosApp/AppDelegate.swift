@@ -53,6 +53,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("1️⃣ Configuring Firebase...")
         FirebaseApp.configure()
         Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(true)
+        Crashlytics.crashlytics().setCustomValue("app_delegate", forKey: "startup_phase")
         print("✅ Firebase + Crashlytics configured\n")
 
         // Initialize FCMBridge early so it registers its NSNotification observer
