@@ -1,3 +1,24 @@
+## [5.44.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.2...v5.44.3) (2026-10-01)
+
+
+### Bug Fixes
+
+* **android:** clear WebView accessibility focus before release ([1bf2038](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1bf203889782c40c7b7210690aaf329b927c96dc))
+* **billing:** initialise subscription repository at most once ([d2967d8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d2967d877900a503ff0393e37140e8f6dad1c4ae))
+* **billing:** retry subscription init when billing initialisation fails ([c429f95](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c429f95dab9065789c75eae6ca171a3c5c0cb99f))
+* **ios:** avoid competing crash handlers ([a407c62](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a407c62afd41a5a86fe04ac29ece34a2738d8d94))
+* **ios:** collapse duplicate Datadog user-context writes ([6afef87](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6afef87521dae00c48553cc5f28478807e7544ac))
+* **ios:** report Crashlytics non-fatals at Error and above only ([2dde315](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2dde3154c6a75e07cfdddb3233c59923510ab277))
+* **ios:** serialise billing init and skip cached CustomerInfo after failed sync ([518dabb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/518dabb8e8535f5c2becb6d614aea06a92425718))
+* **logging:** collapse duplicate Datadog user-context writes on Android ([38bd584](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/38bd584d6e6d28cf546bff31ae1165fb9b113f57))
+* **news:** stop reporting cache-rescued SNAPI errors as non-fatals ([639794b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/639794b6a76275e4fc90b9a7b6f730a58b7861ef))
+* route space station articles through repository ([83f6b7f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/83f6b7f5288b236cbf20462f541836f4fd55ff6c))
+* **ui:** cancel in-flight pagination when rocket, astronaut or agency list reloads ([457b4ad](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/457b4ad949ab88f0cdfd8168a352949ed52aad60))
+* **ui:** dedupe paginated appends in rocket, astronaut and agency lists ([3316dda](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3316ddaf0256c940d1cb9cfd4ba14ec668bfe8da))
+* **ui:** keep full news card layout for domain article summaries ([097a087](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/097a087b35b6ad7d5d0549b1c48e795e37ef3c0f))
+
+
+
 ## [5.44.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.1...v5.44.2) (2026-10-01)
 
 
@@ -55,17 +76,6 @@
 * **onboarding:** add OnboardingVariant model, storage, and remote config plumbing ([5d16513](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5d16513fd9ca75c7af04d80953d7e771b3be6cb7))
 * **onboarding:** gate preload navigation on onboarding variant fetch ([aeaac00](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/aeaac003b554eb5f87982e802884ab05294c845e))
 * **onboarding:** variant-driven pager with page-level and permission-outcome analytics ([039011e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/039011eb70277674db48adbba006bbd2ff94eee2))
-
-
-
-## [5.42.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.42.2...v5.42.3) (2026-08-27)
-
-
-### Bug Fixes
-
-* **newsevents:** clear the load-more flag on every reload path ([4b9bd96](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4b9bd96ad91ea12f633a3e56552421af370347ec))
-* **newsevents:** clear the load-more flag when a fetch is cancelled ([e73a4c4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e73a4c4c19b754897e45a67b8166a19cffe82168))
-* **newsevents:** dedupe paginated appends and close load-more race ([fc86705](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fc86705bb1ca8acb04eb1d9032bf9bd008de3297)), closes [#182](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/182) [#179](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/179)
 
 
 
