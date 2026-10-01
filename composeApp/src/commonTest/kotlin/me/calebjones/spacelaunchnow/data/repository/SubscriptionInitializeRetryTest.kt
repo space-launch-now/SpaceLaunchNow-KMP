@@ -3,9 +3,13 @@ package me.calebjones.spacelaunchnow.data.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
@@ -17,6 +21,7 @@ import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionData
 import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -124,5 +129,59 @@ class SubscriptionInitializeRetryTest {
         repo.initialize()
 
         assertTrue(syncNowCalled, "syncNow must still be attempted when needsSync=true, even if it fails")
+    }
+
+    @Test
+    fun `concurrent initialize calls run the body once`() = runTest {
+        var syncNowCount = 0
+        val gate = CompletableDeferred<Unit>()
+        val mockBilling = MockBillingManager()
+        val fakeStorage = FakeLocalSubscriptionStorage(LocalSubscriptionData(needsSync = true))
+        val fakeSyncer = FakeSubscriptionSyncer(fakeStorage, mockBilling) {
+            syncNowCount++
+            gate.await() // hold the first caller inside the body so the second overlaps
+            true
+        }
+        val dataStore = InMemoryDataStore()
+
+        val repo = SimpleSubscriptionRepository(
+            localStorage = fakeStorage,
+            syncer = fakeSyncer,
+            billingClient = BillingClient(mockBilling),
+            widgetPreferences = WidgetPreferences(dataStore),
+            temporaryPremiumAccess = TemporaryPremiumAccess(dataStore)
+        )
+
+        val calls = listOf(async { repo.initialize() }, async { repo.initialize() })
+        runCurrent()
+        gate.complete(Unit)
+        calls.awaitAll()
+
+        assertEquals(1, mockBilling.initializeCallCount, "billingClient.initialize must run once")
+        assertEquals(1, syncNowCount, "syncNow must run once")
+    }
+
+    @Test
+    fun `second sequential initialize is a no-op`() = runTest {
+        var syncNowCount = 0
+        val mockBilling = MockBillingManager()
+        val fakeStorage = FakeLocalSubscriptionStorage(LocalSubscriptionData(needsSync = true))
+        val fakeSyncer = FakeSubscriptionSyncer(fakeStorage, mockBilling) {
+            syncNowCount++; true
+        }
+        val dataStore = InMemoryDataStore()
+
+        val repo = SimpleSubscriptionRepository(
+            localStorage = fakeStorage,
+            syncer = fakeSyncer,
+            billingClient = BillingClient(mockBilling),
+            widgetPreferences = WidgetPreferences(dataStore),
+            temporaryPremiumAccess = TemporaryPremiumAccess(dataStore)
+        )
+        repo.initialize()
+        repo.initialize()
+
+        assertEquals(1, mockBilling.initializeCallCount)
+        assertEquals(1, syncNowCount)
     }
 }
