@@ -49,6 +49,15 @@ object UserContext {
     }
 
     /**
+     * Record billing identity for log attributes without pushing to Datadog. The caller
+     * follows with one richer DatadogRUM.setUser that supersedes anything this would send.
+     */
+    fun setBillingIdentity(userId: String?, isPremium: Boolean) {
+        _isPremium.value = isPremium
+        _revenueCatUserId.value = userId
+    }
+
+    /**
      * Clear user context (on logout/reset)
      */
     fun clear() {
