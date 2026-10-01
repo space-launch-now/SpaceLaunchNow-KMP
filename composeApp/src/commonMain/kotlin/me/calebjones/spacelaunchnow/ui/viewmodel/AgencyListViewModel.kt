@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +14,7 @@ import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.domain.model.Agency
+import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
@@ -27,6 +29,10 @@ class AgencyListViewModel(
 ) : ViewModel() {
 
     private val log = logger()
+
+    // In-flight load-more job, cancelled when the list is reset by a reload so a page-N
+    // response can never land on a freshly reset page-0 list.
+    private var loadMoreJob: Job? = null
     private val loadMutex = Mutex() // 🔒 Prevents concurrent initial loads
 
     private val _uiState = MutableStateFlow(AgencyListUiState())
@@ -43,6 +49,16 @@ class AgencyListViewModel(
     fun loadAgencies() {
         log.i { "🔄 loadAgencies called from ViewModel ${this.hashCode()}" }
         
+        // Cancelled here rather than in refresh(), because init and retry reach this
+        // function directly. The flag is cleared beside the cancel: the reset below uses
+        // copy(), so it does not clear isLoadingMore on its own, and the screen gates
+        // load-more on that flag. The cancellation guards in loadMore() deliberately do not
+        // clear it (a late write could unstick a newer load-more), so a cancellation we did
+        // not cause would leave it set; accepted, see the guards below.
+        loadMoreJob?.cancel()
+        loadMoreJob = null
+        _uiState.update { it.copy(isLoadingMore = false) }
+
         viewModelScope.launch {
             // 🔒 Use mutex to prevent concurrent loads
             if (!loadMutex.tryLock()) {
@@ -123,7 +139,7 @@ class AgencyListViewModel(
             return
         }
 
-        viewModelScope.launch {
+        loadMoreJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoadingMore = true) }
             
             try {
@@ -153,6 +169,13 @@ class AgencyListViewModel(
                         }
                     },
                     onFailure = { exception ->
+                        // Cancellation arrives here rather than as a throw because the
+                        // repository catches Exception, which CancellationException extends;
+                        // without this guard "Job was cancelled" would be painted over the
+                        // freshly reloaded list.
+                        if (exception.isCoroutineCancellation()) {
+                            return@fold
+                        }
                         log.e(exception) { "❌ Failed to load more agencies" }
                         _uiState.update {
                             it.copy(
@@ -163,6 +186,10 @@ class AgencyListViewModel(
                     }
                 )
             } catch (e: Exception) {
+                // Cancellation that reached us as a throw rather than a failed Result.
+                if (e.isCoroutineCancellation()) {
+                    return@launch
+                }
                 log.e(e) { "❌ Unexpected error loading more agencies" }
                 _uiState.update {
                     it.copy(

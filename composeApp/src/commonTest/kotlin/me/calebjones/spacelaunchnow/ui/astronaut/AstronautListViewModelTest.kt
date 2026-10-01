@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.astronaut
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -407,9 +408,99 @@ class AstronautListViewModelTest {
         assertEquals(listOf(1, 2, 3), newViewModel.uiState.value.astronauts.map { it.id })
     }
 
+    @Test
+    fun `loadAstronauts while loadMore in flight cancels stale page and clears flag`() = runTest {
+        val gatedRepository = GatedAstronautRepository()
+        val newViewModel = AstronautListViewModel(gatedRepository, mockFilterRepository, analyticsManager)
+        advanceUntilIdle()
+        assertEquals(listOf(1, 2), newViewModel.uiState.value.astronauts.map { it.id })
+
+        newViewModel.loadMore()
+        advanceUntilIdle()
+        assertTrue(newViewModel.uiState.value.isLoadingMore)
+
+        // Reload through the funnel directly: copy() alone would leave isLoadingMore set.
+        gatedRepository.firstPage = listOf(createMockAstronaut(id = 9, name = "Nine"))
+        newViewModel.loadAstronauts()
+        advanceUntilIdle()
+        gatedRepository.gate.complete(Unit)
+        advanceUntilIdle()
+
+        val state = newViewModel.uiState.value
+        assertEquals(listOf(9), state.astronauts.map { it.id })
+        assertNull(state.error)
+        assertFalse(state.isLoadingMore)
+        assertEquals(1, state.currentPage)
+    }
+
+    @Test
+    fun `updateSearchQuery while loadMore in flight cancels stale page`() = runTest {
+        val gatedRepository = GatedAstronautRepository()
+        val newViewModel = AstronautListViewModel(gatedRepository, mockFilterRepository, analyticsManager)
+        advanceUntilIdle()
+
+        newViewModel.loadMore()
+        advanceUntilIdle()
+
+        gatedRepository.firstPage = listOf(createMockAstronaut(id = 9, name = "Nine"))
+        newViewModel.updateSearchQuery("nine")
+        advanceUntilIdle()
+        gatedRepository.gate.complete(Unit)
+        advanceUntilIdle()
+
+        val state = newViewModel.uiState.value
+        assertEquals(listOf(9), state.astronauts.map { it.id })
+        assertNull(state.error)
+        assertFalse(state.isLoadingMore)
+    }
+
     // ========================================
     // Helper Methods
     // ========================================
+
+    /** Page 1 returns [firstPage]; any later page suspends on [gate], then fails if cancelled. */
+    private inner class GatedAstronautRepository : AstronautRepository {
+        var firstPage: List<AstronautListItem> = listOf(
+            createMockAstronaut(id = 1, name = "One"),
+            createMockAstronaut(id = 2, name = "Two")
+        )
+        val gate = CompletableDeferred<Unit>()
+
+        override suspend fun getAstronauts(
+            limit: Int,
+            offset: Int,
+            search: String?,
+            statusIds: List<Int>?,
+            agencyIds: List<Int>?,
+            ordering: String?,
+            hasFlown: Boolean?,
+            inSpace: Boolean?,
+            isHuman: Boolean?
+        ): Result<PaginatedResult<AstronautListItem>> {
+            if (offset == 0) {
+                return Result.success(
+                    PaginatedResult(count = 40, next = "next", previous = null, results = firstPage)
+                )
+            }
+            // Mirrors AstronautRepositoryImpl: a cancelled fetch surfaces as a failed Result.
+            return try {
+                gate.await()
+                Result.success(
+                    PaginatedResult(
+                        count = 40,
+                        next = null,
+                        previous = null,
+                        results = listOf(createMockAstronaut(id = 3, name = "Three"))
+                    )
+                )
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+        override suspend fun getAstronautDetail(id: Int): Result<AstronautDetail> =
+            Result.failure(UnsupportedOperationException())
+    }
 
     private fun createMockAstronaut(id: Int, name: String): AstronautListItem {
         return AstronautListItem(
