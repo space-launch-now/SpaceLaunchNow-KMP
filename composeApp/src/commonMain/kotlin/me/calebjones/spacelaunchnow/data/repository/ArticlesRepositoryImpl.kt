@@ -99,12 +99,11 @@ class ArticlesRepositoryImpl(
                 timestamp = now
             ))
         } catch (e: ResponseException) {
-            log.e(e) { "API error while fetching articles" }
             // On error, try to return stale cache if available
             val staleCached = localDataSource?.getRecentArticles(limit)
             val staleTimestamp = localDataSource?.getCacheTimestamp("articles")
             if (staleCached != null && staleCached.isNotEmpty()) {
-                log.w { "Returning ${staleCached.size} stale cached articles due to API error" }
+                log.w(e) { "Returning ${staleCached.size} stale cached articles after HTTP ${e.response.status}" }
                 return Result.success(DataResult(
                     data = PaginatedArticleList(
                         count = staleCached.size,
@@ -116,6 +115,7 @@ class ArticlesRepositoryImpl(
                     timestamp = staleTimestamp
                 ))
             }
+            log.e(e) { "API error while fetching articles, no cache to fall back on" }
             Result.failure(e)
         } catch (e: IOException) {
             log.e(e) { "Network error while fetching articles" }
