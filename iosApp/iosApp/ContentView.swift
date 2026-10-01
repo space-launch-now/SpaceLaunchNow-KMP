@@ -1,4 +1,5 @@
 import ComposeApp
+import FirebaseCrashlytics
 import SwiftUI
 import UIKit
 
@@ -24,6 +25,7 @@ class ComposeViewController: UIViewController {
         }
 
         // Create the Compose view controller
+        Crashlytics.crashlytics().setCustomValue("compose_startup", forKey: "startup_phase")
         composeViewController = MainViewControllerKt.MainViewController()
 
         if let composeVC = composeViewController {
