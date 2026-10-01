@@ -73,6 +73,8 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            // Issue 172: without this, release frameworks ship no stack frames to CrashKiOS.
+            binaryOption("sourceInfoType", "libbacktrace")
         }
     }
     sourceSets {
