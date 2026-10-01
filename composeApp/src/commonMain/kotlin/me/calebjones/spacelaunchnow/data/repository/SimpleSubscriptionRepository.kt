@@ -130,7 +130,13 @@ class SimpleSubscriptionRepository(
             }
             log.d { "SimpleSubscriptionRepository: Initializing..." }
 
-            billingClient.initialize()
+            // The billing managers report failure as Result.failure rather than throwing. Leave
+            // the repository uninitialised so a later caller retries billing init.
+            val billingResult = billingClient.initialize()
+            if (billingResult.isFailure) {
+                log.w { "SimpleSubscriptionRepository: billing initialisation failed — will retry on next call" }
+                return
+            }
 
             // Read needsSync before startSyncing() to avoid a potential race where the
             // background coroutine clears needsSync before we can check it.

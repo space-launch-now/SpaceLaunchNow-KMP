@@ -184,4 +184,36 @@ class SubscriptionInitializeRetryTest {
         assertEquals(1, mockBilling.initializeCallCount)
         assertEquals(1, syncNowCount)
     }
+
+    @Test
+    fun `initialize retries billing init after a failed result then becomes a no-op`() = runTest {
+        var syncNowCount = 0
+        val mockBilling = MockBillingManager().apply { shouldInitializeFail = true }
+        val fakeStorage = FakeLocalSubscriptionStorage(LocalSubscriptionData(needsSync = true))
+        val fakeSyncer = FakeSubscriptionSyncer(fakeStorage, mockBilling) {
+            syncNowCount++; true
+        }
+        val dataStore = InMemoryDataStore()
+
+        val repo = SimpleSubscriptionRepository(
+            localStorage = fakeStorage,
+            syncer = fakeSyncer,
+            billingClient = BillingClient(mockBilling),
+            widgetPreferences = WidgetPreferences(dataStore),
+            temporaryPremiumAccess = TemporaryPremiumAccess(dataStore)
+        )
+
+        repo.initialize()
+        repo.initialize()
+        assertEquals(2, mockBilling.initializeCallCount, "failed billing init must be retried")
+
+        mockBilling.shouldInitializeFail = false
+        repo.initialize()
+        assertEquals(3, mockBilling.initializeCallCount)
+        assertEquals(1, syncNowCount, "sync runs only once billing init succeeded")
+
+        repo.initialize()
+        assertEquals(3, mockBilling.initializeCallCount, "initialised repo must be a no-op")
+        assertEquals(1, syncNowCount)
+    }
 }
