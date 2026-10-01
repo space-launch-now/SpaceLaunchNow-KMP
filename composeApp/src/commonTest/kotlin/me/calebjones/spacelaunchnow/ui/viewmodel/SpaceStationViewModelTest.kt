@@ -21,6 +21,7 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.FakeArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.FakeSpaceStationRepository
+import me.calebjones.spacelaunchnow.data.repository.articlePage
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionMiniItem
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
@@ -77,29 +78,6 @@ class SpaceStationViewModelTest {
             )
         }
 
-        @Test
-        fun fetchStationDetails_loadsArticlesThroughRepositoryAsDomainSummaries() = runTest(dispatcher) {
-            val articlesRepository = FakeArticlesRepository().apply {
-                searchResult = Result.success(articlePage(1, 1, null, 1))
-            }
-            val viewModel = createViewModel(
-                repository = FakeSpaceStationRepository().apply {
-                    spaceStationDetailsResult = Result.success(
-                        DataResult(sampleStationDetail(NON_ISS_STATION_ID, emptyList()), DataSource.NETWORK)
-                    )
-                },
-                articlesRepository = articlesRepository
-            )
-
-            viewModel.fetchStationDetails(NON_ISS_STATION_ID)
-            advanceUntilIdle()
-
-            assertTrue(articlesRepository.searchArticlesCalled)
-            assertEquals("International Space Station", articlesRepository.lastSearchQuery)
-            assertEquals(1, viewModel.articles.value.size)
-            assertEquals("Article 1", viewModel.articles.value.single().title)
-        }
-
         val viewModel = createViewModel(repository)
 
         viewModel.fetchStationDetails(NON_ISS_STATION_ID)
@@ -113,6 +91,29 @@ class SpaceStationViewModelTest {
         assertNull(viewModel.error.value)
         assertTrue(repository.getExpeditionDetailsCalled)
         assertEquals(listOf(71), repository.lastExpeditionIds)
+    }
+
+    @Test
+    fun fetchStationDetails_loadsArticlesThroughRepositoryAsDomainSummaries() = runTest(dispatcher) {
+        val articlesRepository = FakeArticlesRepository().apply {
+            searchResult = Result.success(articlePage(startId = 1, count = 1, next = null, totalCount = 1))
+        }
+        val viewModel = createViewModel(
+            repository = FakeSpaceStationRepository().apply {
+                spaceStationDetailsResult = Result.success(
+                    DataResult(sampleStationDetail(NON_ISS_STATION_ID, emptyList()), DataSource.NETWORK)
+                )
+            },
+            articlesRepository = articlesRepository
+        )
+
+        viewModel.fetchStationDetails(NON_ISS_STATION_ID)
+        advanceUntilIdle()
+
+        assertTrue(articlesRepository.searchArticlesCalled)
+        assertEquals("International Space Station", articlesRepository.lastSearchQuery)
+        assertEquals(1, viewModel.articles.value.size)
+        assertEquals("Article 1", viewModel.articles.value.single().title)
     }
 
     @Test
