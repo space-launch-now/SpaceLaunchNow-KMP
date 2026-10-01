@@ -124,6 +124,35 @@ class RocketViewModelTest {
         assertEquals("falcon", repository.lastSearch)
     }
 
+    @Test
+    fun loadMore_overlappingPage_doesNotDuplicateIds() = runTest(dispatcher) {
+        val repository = FakeRocketRepository().apply {
+            rocketsDomainResult = Result.success(
+                PaginatedResult(
+                    count = 3,
+                    next = "next",
+                    previous = null,
+                    results = listOf(sampleRocket(1, "One"), sampleRocket(2, "Two"))
+                )
+            )
+        }
+        val viewModel = createViewModel(repository)
+        advanceUntilIdle()
+
+        repository.rocketsDomainResult = Result.success(
+            PaginatedResult(
+                count = 3,
+                next = "next",
+                previous = null,
+                results = listOf(sampleRocket(2, "Two"), sampleRocket(3, "Three"))
+            )
+        )
+        viewModel.loadMore()
+        advanceUntilIdle()
+
+        assertEquals(listOf(1, 2, 3), viewModel.uiState.value.rockets.map { it.id })
+    }
+
     // -- Helpers ----------------------------------------------------------
 
     private fun createViewModel(repository: FakeRocketRepository): RocketViewModel {

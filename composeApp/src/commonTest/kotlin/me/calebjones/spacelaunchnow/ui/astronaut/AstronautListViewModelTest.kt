@@ -374,6 +374,39 @@ class AstronautListViewModelTest {
         assertFalse(newViewModel.uiState.value.hasMore)
     }
 
+    @Test
+    fun `loadMore should not duplicate ids when pages overlap`() = runTest {
+        mockRepository.setAstronautsResponse(
+            PaginatedResult(
+                count = 3,
+                next = "next_page_url",
+                previous = null,
+                results = listOf(
+                    createMockAstronaut(id = 1, name = "Astronaut 1"),
+                    createMockAstronaut(id = 2, name = "Astronaut 2")
+                )
+            )
+        )
+        val newViewModel = AstronautListViewModel(mockRepository, mockFilterRepository, analyticsManager)
+        advanceUntilIdle()
+
+        mockRepository.setAstronautsResponse(
+            PaginatedResult(
+                count = 3,
+                next = "next_page_url",
+                previous = "prev_page_url",
+                results = listOf(
+                    createMockAstronaut(id = 2, name = "Astronaut 2"),
+                    createMockAstronaut(id = 3, name = "Astronaut 3")
+                )
+            )
+        )
+        newViewModel.loadMore()
+        advanceUntilIdle()
+
+        assertEquals(listOf(1, 2, 3), newViewModel.uiState.value.astronauts.map { it.id })
+    }
+
     // ========================================
     // Helper Methods
     // ========================================

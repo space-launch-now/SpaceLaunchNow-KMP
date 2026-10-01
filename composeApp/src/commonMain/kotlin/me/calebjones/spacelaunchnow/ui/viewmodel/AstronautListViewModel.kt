@@ -135,7 +135,7 @@ class AstronautListViewModel(
                         log.i { "✅ Loaded ${paginatedList.results.size} more astronauts (page $nextPage)" }
                         _uiState.update {
                             it.copy(
-                                astronauts = it.astronauts + paginatedList.results,
+                                astronauts = (it.astronauts + paginatedList.results).distinctBy { astronaut -> astronaut.id },
                                 isLoadingMore = false,
                                 currentPage = nextPage,
                                 hasMore = paginatedList.next != null

@@ -154,7 +154,7 @@ class RocketViewModel(
                         log.i { "✅ Loaded ${paginatedList.results.size} more rockets (page $nextPage)" }
                         _uiState.update {
                             it.copy(
-                                rockets = it.rockets + paginatedList.results,
+                                rockets = (it.rockets + paginatedList.results).distinctBy { rocket -> rocket.id },
                                 isLoadingMore = false,
                                 currentPage = nextPage,
                                 hasMore = paginatedList.next != null

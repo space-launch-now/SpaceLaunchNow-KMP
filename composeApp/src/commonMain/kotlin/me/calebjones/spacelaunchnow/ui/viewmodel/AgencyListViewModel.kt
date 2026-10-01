@@ -145,7 +145,7 @@ class AgencyListViewModel(
                         log.i { "✅ Loaded ${paginatedList.results.size} more agencies (page $nextPage)" }
                         _uiState.update {
                             it.copy(
-                                agencies = it.agencies + paginatedList.results,
+                                agencies = (it.agencies + paginatedList.results).distinctBy { agency -> agency.id },
                                 isLoadingMore = false,
                                 currentPage = nextPage,
                                 hasMore = paginatedList.next != null
