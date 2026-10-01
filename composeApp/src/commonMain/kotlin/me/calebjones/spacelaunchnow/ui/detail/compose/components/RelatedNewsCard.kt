@@ -41,6 +41,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 
@@ -118,6 +119,7 @@ fun RelatedNewsItem(
             } else {
                 uriHandler.openUri(article.url)
             }
+
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -216,6 +218,44 @@ fun RelatedNewsItem(
                         fontSize = 9.sp
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun RelatedNewsItem(
+    article: ArticleSummary,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
+) {
+    val uriHandler = LocalUriHandler.current
+    Card(
+        onClick = {
+            if (onArticleClick != null) {
+                onArticleClick(article.url, article.title)
+            } else {
+                uriHandler.openUri(article.url)
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SubcomposeAsyncImage(
+                model = article.imageUrl,
+                contentDescription = "Article Image",
+                modifier = Modifier.size(96.dp).clip(RoundedCornerShape(2.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(article.title, fontWeight = FontWeight.Bold)
+                Text(article.newsSite, color = MaterialTheme.colorScheme.primary)
             }
         }
     }

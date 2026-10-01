@@ -37,6 +37,9 @@ class FakeArticlesRepository : ArticlesRepository {
     val offsetsRequested: MutableList<Int> = mutableListOf()
 
     var shouldFail = false
+    var searchArticlesCalled = false
+    var lastSearchQuery: String? = null
+    var searchResult: Result<PaginatedArticleList>? = null
     private val failureException = Exception("FakeArticlesRepository configured to fail")
 
     private val emptyPage = PaginatedArticleList(count = 0, results = emptyList(), next = null, previous = null)
@@ -75,8 +78,11 @@ class FakeArticlesRepository : ArticlesRepository {
     override suspend fun getArticleById(id: Int): Result<Article> =
         Result.failure(NotImplementedError("Not wired in fake"))
 
-    override suspend fun searchArticles(query: String, limit: Int): Result<PaginatedArticleList> =
-        if (shouldFail) Result.failure(failureException) else Result.success(emptyPage)
+    override suspend fun searchArticles(query: String, limit: Int): Result<PaginatedArticleList> {
+        searchArticlesCalled = true
+        lastSearchQuery = query
+        return searchResult ?: if (shouldFail) Result.failure(failureException) else Result.success(emptyPage)
+    }
 }
 
 /** Build a page of [count] articles with sequential ids starting at [startId]. */

@@ -3,10 +3,7 @@ package me.calebjones.spacelaunchnow.ui.viewmodel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.headersOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -20,9 +17,9 @@ import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
 import me.calebjones.spacelaunchnow.api.iss.IssPosition
 import me.calebjones.spacelaunchnow.api.iss.IssTle
 import me.calebjones.spacelaunchnow.api.iss.IssTrackingRepository
-import me.calebjones.spacelaunchnow.api.snapi.apis.ArticlesApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.data.repository.FakeArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.FakeSpaceStationRepository
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionMiniItem
@@ -43,8 +40,8 @@ import kotlin.test.assertTrue
  * id (anything other than [ISS_STATION_ID] = 4), which keeps [HttpClient] /
  * [IssTrackingRepository] / YouTube lookup out of the assertion surface.
  *
- * The SNAPI [ArticlesApi] is backed by a [MockEngine] that returns an empty
- * result so the side-effect article fetch completes cleanly without network.
+ * The SNAPI [FakeArticlesRepository] returns an empty result so the side-effect
+ * article fetch completes cleanly without network.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SpaceStationViewModelTest {
@@ -78,6 +75,29 @@ class SpaceStationViewModelTest {
             expeditionDetailsResult = Result.success(
                 DataResult(listOf(expeditionDetail), DataSource.NETWORK)
             )
+        }
+
+        @Test
+        fun fetchStationDetails_loadsArticlesThroughRepositoryAsDomainSummaries() = runTest(dispatcher) {
+            val articlesRepository = FakeArticlesRepository().apply {
+                searchResult = Result.success(articlePage(1, 1, null, 1))
+            }
+            val viewModel = createViewModel(
+                repository = FakeSpaceStationRepository().apply {
+                    spaceStationDetailsResult = Result.success(
+                        DataResult(sampleStationDetail(NON_ISS_STATION_ID, emptyList()), DataSource.NETWORK)
+                    )
+                },
+                articlesRepository = articlesRepository
+            )
+
+            viewModel.fetchStationDetails(NON_ISS_STATION_ID)
+            advanceUntilIdle()
+
+            assertTrue(articlesRepository.searchArticlesCalled)
+            assertEquals("International Space Station", articlesRepository.lastSearchQuery)
+            assertEquals(1, viewModel.articles.value.size)
+            assertEquals("Article 1", viewModel.articles.value.single().title)
         }
 
         val viewModel = createViewModel(repository)
@@ -142,10 +162,11 @@ class SpaceStationViewModelTest {
     // ── Helpers ──────────────────────────────────────────────────────────
 
     private fun createViewModel(
-        repository: FakeSpaceStationRepository
+        repository: FakeSpaceStationRepository,
+        articlesRepository: FakeArticlesRepository = FakeArticlesRepository()
     ): SpaceStationViewModel = SpaceStationViewModel(
         spaceStationRepository = repository,
-        articlesApi = createArticlesApiReturningEmpty(),
+        articlesRepository = articlesRepository,
         issTrackingRepository = NoopIssTrackingRepository,
         httpClient = HttpClient(
             MockEngine { respond("", HttpStatusCode.NotFound) }
@@ -199,18 +220,6 @@ private fun sampleExpeditionDetail(id: Int): ExpeditionDetailItem = ExpeditionDe
     missionPatches = emptyList(),
     spacewalks = emptyList()
 )
-
-private fun createArticlesApiReturningEmpty(): ArticlesApi {
-    val emptyPage = """{"count":0,"next":null,"previous":null,"results":[]}"""
-    val engine = MockEngine {
-        respond(
-            content = emptyPage,
-            status = HttpStatusCode.OK,
-            headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        )
-    }
-    return ArticlesApi(baseUrl = "https://snapi.test", httpClientEngine = engine)
-}
 
 private object NoopIssTrackingRepository : IssTrackingRepository {
     override suspend fun getCurrentPosition(): Result<IssPosition> =
