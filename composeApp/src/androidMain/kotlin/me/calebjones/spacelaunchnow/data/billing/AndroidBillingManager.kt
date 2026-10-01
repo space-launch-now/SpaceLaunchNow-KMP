@@ -362,9 +362,8 @@ class AndroidBillingManager(
         )
 
         // Attach rc_user_id/is_premium to every log line (REMOTE_LOG_SAMPLING_SPEC Phase 0).
-        // Must run BEFORE the richer DatadogRUM.setUser below so that call wins on extraInfo.
-        UserContext.setPremiumStatus(subscriptionType != SubscriptionType.FREE)
-        UserContext.setRevenueCatUserId(customerInfo.originalAppUserId)
+        // Updates flows only; the single richer DatadogRUM.setUser below does the Datadog push.
+        UserContext.setBillingIdentity(customerInfo.originalAppUserId, subscriptionType != SubscriptionType.FREE)
 
         // Update Datadog RUM with user subscription info
         DatadogRUM.setUser(

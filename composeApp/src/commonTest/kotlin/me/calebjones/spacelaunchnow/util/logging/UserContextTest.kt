@@ -41,4 +41,25 @@ class UserContextTest {
         assertFalse(attrs.containsKey("rc_user_id"))
         assertEquals(false, attrs["is_premium"])
     }
+
+    @Test
+    fun setBillingIdentitySetsBothFlowsAndAttributes() {
+        UserContext.setBillingIdentity("user-2", true)
+
+        assertEquals("user-2", UserContext.revenueCatUserId.value)
+        assertEquals(true, UserContext.isPremium.value)
+        val attrs = UserContext.getLogAttributes()
+        assertEquals("user-2", attrs["rc_user_id"])
+        assertEquals(true, attrs["is_premium"])
+    }
+
+    @Test
+    fun setBillingIdentityAcceptsNullUserId() {
+        UserContext.setBillingIdentity("user-2", true)
+        UserContext.setBillingIdentity(null, false)
+
+        val attrs = UserContext.getLogAttributes()
+        assertFalse(attrs.containsKey("rc_user_id"))
+        assertEquals(false, attrs["is_premium"])
+    }
 }
