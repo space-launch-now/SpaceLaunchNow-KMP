@@ -40,8 +40,7 @@ object AppTracking {
                 awaitActive()
                 suspendCancellableCoroutine<Unit> { cont ->
                     ATTrackingManager.requestTrackingAuthorizationWithCompletionHandler { status ->
-                        // TODO(ads-analytics): track the A1 ad-consent event with this status during integration.
-                        log.i { "ATT authorization status: $status" }
+                        AdTelemetry.trackingStatus(attStatusLabel(status.toLong()))
                         if (cont.isActive) cont.resume(Unit)
                     }
                 }
@@ -50,6 +49,15 @@ object AppTracking {
         } catch (e: Exception) {
             log.w(e) { "ATT request failed: ${e.message}" }
         }
+    }
+
+    /** Maps ATTrackingManager.AuthorizationStatus raw values (0..3) to analytics labels. */
+    private fun attStatusLabel(raw: Long): String = when (raw) {
+        0L -> "not_determined"
+        1L -> "restricted"
+        2L -> "denied"
+        3L -> "authorized"
+        else -> "unknown"
     }
 
     /** ATT only prompts while the app is active; wait for the next activation otherwise. */

@@ -51,6 +51,11 @@ internal object AdTelemetry {
         send(AnalyticsEvent.AdLifecycle(AdResult.CLICKED, format, size, handler))
     }
 
+    fun trackingStatus(status: String) {
+        log.i { "ad_att_status status=$status" }
+        send(AnalyticsEvent.AdTrackingStatus(status))
+    }
+
     private fun send(event: AnalyticsEvent) {
         try {
             KoinPlatform.getKoin().get<AnalyticsManager>().track(event)

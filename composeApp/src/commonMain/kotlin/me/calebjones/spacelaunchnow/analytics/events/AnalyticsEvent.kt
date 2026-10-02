@@ -460,4 +460,9 @@ sealed class AnalyticsEvent(val name: String) {
             errorMessage?.let { put("error_message", it.take(100)) }
         }
     }
+
+    /** iOS App Tracking Transparency answer: not_determined, restricted, denied or authorized. */
+    data class AdTrackingStatus(val status: String) : AnalyticsEvent("ad_att_status") {
+        override fun toParameters(): Map<String, Any?> = mapOf("status" to status)
+    }
 }
