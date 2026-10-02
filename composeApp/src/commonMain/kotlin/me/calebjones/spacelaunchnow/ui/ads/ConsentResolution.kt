@@ -32,9 +32,14 @@ class ConsentResolver(private val onResolved: (() -> Unit)?) {
  * UMP's `canRequestAds` is a plain getter, not Compose state, so nothing recomposes when it
  * flips. Poll it instead: returns as soon as it is true, or [TIMED_OUT][ConsentPollOutcome.TIMED_OUT]
  * after [timeoutMs].
+ *
+ * The timeout only covers UMP never calling back. While [holdTimeoutWhile] is true (a consent
+ * form is required, so the user may still be reading it) the clock does not advance: ads must
+ * not be requested in a consent region before the user answers.
  */
 suspend fun awaitCanRequestAds(
     canRequestAds: () -> Boolean,
+    holdTimeoutWhile: () -> Boolean = { false },
     intervalMs: Long = CONSENT_POLL_INTERVAL_MS,
     timeoutMs: Long = CONSENT_TIMEOUT_MS,
 ): ConsentPollOutcome {
@@ -43,6 +48,6 @@ suspend fun awaitCanRequestAds(
         if (canRequestAds()) return ConsentPollOutcome.CAN_REQUEST_ADS
         if (waited >= timeoutMs) return ConsentPollOutcome.TIMED_OUT
         delay(intervalMs)
-        waited += intervalMs
+        if (!holdTimeoutWhile()) waited += intervalMs
     }
 }

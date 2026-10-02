@@ -76,11 +76,18 @@ actual fun AdConsentPopup(
     // which overwrites gdprApplies back to 0.
     // Resolution is driven by the UMP callbacks; a poll of canRequestAds (a plain getter,
     // not Compose state) is the fallback, and a 15 s timeout resolves anyway so ad loading
-    // is never blocked indefinitely. ConsentResolver makes sure we resolve only once.
+    // is never blocked indefinitely — unless a consent form is required, in which case we
+    // wait for the user's answer. ConsentResolver makes sure we resolve only once.
     LaunchedEffect(consent, params) {
         val resolver = ConsentResolver(onConsentResolved)
         launch {
-            when (awaitCanRequestAds(canRequestAds = { resolver.isResolved || consent.canRequestAds })) {
+            when (
+                awaitCanRequestAds(
+                    canRequestAds = { resolver.isResolved || consent.canRequestAds },
+                    // A required form means the user may still be reading it: never time out.
+                    holdTimeoutWhile = { consent.isPrivacyOptionsRequired() },
+                )
+            ) {
                 ConsentPollOutcome.CAN_REQUEST_ADS -> {
                     if (resolver.resolve()) log.d { "Consent resolved via canRequestAds poll" }
                 }

@@ -53,6 +53,29 @@ class ConsentResolutionTest {
     }
 
     @Test
+    fun pollNeverTimesOutWhileHeld() = runTest {
+        // A consent form is on screen: 100 polls (25 s) is well past the 15 s timeout.
+        var polls = 0
+        val outcome = awaitCanRequestAds(
+            canRequestAds = { ++polls > 100 },
+            holdTimeoutWhile = { true },
+        )
+        assertEquals(ConsentPollOutcome.CAN_REQUEST_ADS, outcome)
+        assertEquals(100 * 250L, currentTime)
+    }
+
+    @Test
+    fun pollTimesOutOnlyAfterHoldReleases() = runTest {
+        var polls = 0
+        val outcome = awaitCanRequestAds(
+            canRequestAds = { polls++; false },
+            holdTimeoutWhile = { polls <= 20 },
+        )
+        assertEquals(ConsentPollOutcome.TIMED_OUT, outcome)
+        assertEquals(20 * 250L + 15_000L, currentTime)
+    }
+
+    @Test
     fun pollHonoursCustomTimeout() = runTest {
         val outcome = awaitCanRequestAds(
             canRequestAds = { false },

@@ -85,9 +85,15 @@ actual fun AdConsentPopup(
     // sees UMP finish (the update is async and nothing recomposes), which left the ad gate
     // closed until relaunch on fresh installs. ConsentPopup owns the UMP calls, so poll the
     // getter once per Consent instance. A timeout resolves anyway (regions with no consent
-    // form must never wait).
+    // form must never wait) unless a form is required, in which case we wait for the answer.
     LaunchedEffect(consent) {
-        when (awaitCanRequestAds(canRequestAds = { resolver.isResolved || consent.canRequestAds })) {
+        when (
+            awaitCanRequestAds(
+                canRequestAds = { resolver.isResolved || consent.canRequestAds },
+                // A required form means the user may still be reading it: never time out.
+                holdTimeoutWhile = { consent.isPrivacyOptionsRequired() },
+            )
+        ) {
             ConsentPollOutcome.CAN_REQUEST_ADS -> {
                 if (resolver.resolve()) log.d { "Consent resolved via canRequestAds poll" }
             }
