@@ -46,6 +46,8 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Space Launch Now uses your location to show launches near you and relevant launch site information.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This lets Space Launch Now show ads that are more relevant to you, which helps keep the app free.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

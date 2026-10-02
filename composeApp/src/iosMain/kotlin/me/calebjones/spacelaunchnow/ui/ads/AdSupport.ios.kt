@@ -7,7 +7,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.Consent
@@ -45,7 +47,17 @@ actual fun AdConsentPopup(
     var viewController by remember { mutableStateOf<Any?>(null) }
     // Resolve at most once, however many paths (poll, failure, no-VC) try to.
     val latestOnResolved by rememberUpdatedState(onConsentResolved)
-    val resolver = remember { ConsentResolver { latestOnResolved?.invoke() } }
+    // Google's order: UMP form first, then ATT, then ads. ATT is bounded and never throws,
+    // so it cannot block the gate.
+    val scope = rememberCoroutineScope()
+    val resolver = remember {
+        ConsentResolver {
+            scope.launch {
+                AppTracking.requestIfNeeded()
+                latestOnResolved?.invoke()
+            }
+        }
+    }
 
     // Retry up to 5 times with 500ms gaps to handle the startup race where the
     // UIWindowScene is not yet foreground-active when this first composes.
