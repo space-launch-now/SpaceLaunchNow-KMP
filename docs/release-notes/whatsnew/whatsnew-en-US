@@ -1,3 +1,3 @@
-### Bug Fixes
+### Features
 
-* **ads:** raise max ad content rating from G to PG
+* **ads:** load a fresh banner for each launch detail visit

@@ -1,3 +1,12 @@
+# [5.45.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.4...v5.45.0) (2026-10-02)
+
+
+### Features
+
+* **ads:** load a fresh banner for each launch detail visit ([dd11a9c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dd11a9c845b5cf662de9eb9f82f56e242fa55961))
+
+
+
 ## [5.44.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.3...v5.44.4) (2026-10-02)
 
 
@@ -48,20 +57,6 @@
 * **ios:** make setRevenueCatPushToken non-throwing at the ObjC boundary ([#187](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/187)) ([c7e296f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c7e296f8536240130234b2aa5e4b04b827390339))
 * **ios:** skip ad preload while the root view controller is unattached ([#168](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/168)) ([b28832b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b28832bda6829d511f80a3ea601c2645f93f2090))
 * **ui:** route LaunchVideoPlayer link opens through openUriSafely ([#194](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/194)) ([deaf213](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/deaf21365f35eb840a0b2d4b438ba8e1fd98c413))
-
-
-
-# [5.44.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.43.0...v5.44.0) (2026-08-31)
-
-
-### Bug Fixes
-
-* adjust card height and subtitle lines for custom messages in PinnedContentCard ([8f22237](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8f22237867177186b3638d1365a8be6839c5f573))
-
-
-### Features
-
-* full-bleed hero header with agency logo on launch detail ([4e96eae](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4e96eae76c9b17754d0acb88c76c68866277efdc))
 
 
 
