@@ -18,7 +18,10 @@ enum class AdType {
  * - Android/iOS: Full ad management with BasicAds integration
  * - Desktop: No-op stub implementation
  */
-expect class GlobalAdManager(contextFactory: ContextFactory?) {
+expect class GlobalAdManager(
+    contextFactory: ContextFactory?,
+    interstitialGate: InterstitialGate?,
+) {
     /**
      * Initialize the ad manager and prepare optimizations
      */

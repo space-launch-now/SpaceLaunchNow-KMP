@@ -29,7 +29,8 @@ import me.calebjones.spacelaunchnow.data.config.AdMobConfig
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 actual class GlobalAdManager actual constructor(
-    private val contextFactory: ContextFactory?
+    private val contextFactory: ContextFactory?,
+    private val interstitialGate: InterstitialGate?
 ) {
     private val log = logger()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -40,11 +41,7 @@ actual class GlobalAdManager actual constructor(
     var isOptimizationReady by mutableStateOf(false)
         private set
 
-    // Interstitial ad tracking for detailed views
-    private var detailViewVisitCount = 0
-    private var lastInterstitialShownAt = 0L
-    private val minInterstitialInterval = 120_000L // 2 minutes minimum between interstitials
-    private val visitsBeforeInterstitial = 6 // Show interstitial every 6th visit
+    // Interstitial pacing lives in [interstitialGate] (persisted, Remote Config driven)
 
     // Ad configuration cache for faster setup
     private val adConfigurations = mutableMapOf<AdSize, AdConfig>()
@@ -244,54 +241,30 @@ actual class GlobalAdManager actual constructor(
 
     /**
      * Should show interstitial ad when entering detail view?
-     * Shows every Nth visit (configurable via visitsBeforeInterstitial) with minimum
-     * time interval between ads (minInterstitialInterval).
+     * Delegates to [InterstitialGate]: every Nth visit with a minimum interval,
+     * both set by Remote Config and persisted across launches.
      */
-    actual fun shouldShowInterstitialOnDetailView(): Boolean {
-        detailViewVisitCount++
-
-        val shouldShowByCount = detailViewVisitCount % visitsBeforeInterstitial == 0
-        val currentTime = System.now().toEpochMilliseconds()
-        val enoughTimeElapsed = (currentTime - lastInterstitialShownAt) >= minInterstitialInterval
-
-        val shouldShow = shouldShowByCount && enoughTimeElapsed
-
-        log.d { "🎯 InterstitialAd: Visit #$detailViewVisitCount, ShouldShow: $shouldShow (Count: $shouldShowByCount, Time: $enoughTimeElapsed)" }
-
-        if (shouldShow) {
-            lastInterstitialShownAt = currentTime
-            log.d { "📅 InterstitialAd: Timestamp updated to $currentTime" }
-        }
-
-        return shouldShow
-    }
+    actual fun shouldShowInterstitialOnDetailView(): Boolean =
+        interstitialGate?.shouldShow() ?: false
 
     /**
      * Reset detail view counter (useful for testing or app restart)
      */
     actual fun resetDetailViewCounter() {
-        detailViewVisitCount = 0
-        lastInterstitialShownAt = 0L
-        log.d { "🔄 InterstitialAd: Counter reset" }
+        interstitialGate?.reset()
     }
 
     /**
      * Get current detail view visit count (for debugging)
      */
-    actual fun getDetailViewVisitCount(): Int = detailViewVisitCount
+    actual fun getDetailViewVisitCount(): Int = interstitialGate?.visitCount ?: 0
 
     /**
      * Get minutes since last interstitial ad was shown (for debugging)
      */
-    actual fun getMinutesSinceLastInterstitial(): Long {
-        val currentTime = System.now().toEpochMilliseconds()
-        return if (lastInterstitialShownAt > 0) {
-            (currentTime - lastInterstitialShownAt) / 60_000L
-        } else {
-            999L // No ad shown yet
-        }
-    }
-    
+    actual fun getMinutesSinceLastInterstitial(): Long =
+        interstitialGate?.minutesSinceLastShown() ?: 999L
+
     /**
      * Pre-warm ad requests to reduce time-to-first-ad.
      * Call this immediately after SDK initialization to signal the system is ready.

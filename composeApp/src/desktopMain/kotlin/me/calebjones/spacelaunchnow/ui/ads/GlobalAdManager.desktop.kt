@@ -10,7 +10,8 @@ import me.calebjones.spacelaunchnow.util.BuildConfig
  * Desktop doesn't support ads, so all operations are no-ops.
  */
 actual class GlobalAdManager actual constructor(
-    private val contextFactory: ContextFactory?
+    private val contextFactory: ContextFactory?,
+    private val interstitialGate: InterstitialGate?
 ) {
     private val log = logger()
     
