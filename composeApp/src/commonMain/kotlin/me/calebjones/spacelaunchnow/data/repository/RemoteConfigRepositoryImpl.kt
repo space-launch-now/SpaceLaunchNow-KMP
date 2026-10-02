@@ -47,6 +47,10 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         private const val PINNED_CONTENT_KEY = "pinned_content"
         private const val DIAGNOSTICS_CONFIG_KEY = "diagnostics_config"
         private const val ONBOARDING_VARIANT_KEY = "onboarding_variant"
+        private const val INTERSTITIAL_VISITS_KEY = "ads_interstitial_visits"
+        private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
+        const val DEFAULT_INTERSTITIAL_VISITS = 4
+        const val DEFAULT_INTERSTITIAL_MIN_INTERVAL_S = 120L
         private val DEFAULT_FETCH_INTERVAL: Duration = 1.hours
         private val FORCE_REFRESH_INTERVAL: Duration = 0.seconds
         
@@ -140,7 +144,9 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
                 ROADMAP_DATA_KEY to DEFAULT_ROADMAP_JSON,
                 PINNED_CONTENT_KEY to DEFAULT_PINNED_CONTENT_JSON,
                 DIAGNOSTICS_CONFIG_KEY to "",
-                ONBOARDING_VARIANT_KEY to "control"
+                ONBOARDING_VARIANT_KEY to "control",
+                INTERSTITIAL_VISITS_KEY to DEFAULT_INTERSTITIAL_VISITS.toString(),
+                INTERSTITIAL_MIN_INTERVAL_KEY to DEFAULT_INTERSTITIAL_MIN_INTERVAL_S.toString()
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -165,6 +171,28 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         } catch (e: Exception) {
             log.w(e) { "Failed to read onboarding variant - defaulting to control" }
             OnboardingVariant.CONTROL
+        }
+    }
+
+    override suspend fun getInterstitialVisits(): Int {
+        val config = remoteConfig ?: return DEFAULT_INTERSTITIAL_VISITS
+        return try {
+            config.getValue(INTERSTITIAL_VISITS_KEY).asString().trim().toIntOrNull()
+                ?: DEFAULT_INTERSTITIAL_VISITS
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read interstitial visits - using default" }
+            DEFAULT_INTERSTITIAL_VISITS
+        }
+    }
+
+    override suspend fun getInterstitialMinIntervalSeconds(): Long {
+        val config = remoteConfig ?: return DEFAULT_INTERSTITIAL_MIN_INTERVAL_S
+        return try {
+            config.getValue(INTERSTITIAL_MIN_INTERVAL_KEY).asString().trim().toLongOrNull()
+                ?: DEFAULT_INTERSTITIAL_MIN_INTERVAL_S
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read interstitial interval - using default" }
+            DEFAULT_INTERSTITIAL_MIN_INTERVAL_S
         }
     }
 }

@@ -45,6 +45,7 @@ import me.calebjones.spacelaunchnow.navigation.NewsEvents
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.rememberScreenVisitKey
 import me.calebjones.spacelaunchnow.ui.components.OfflineBanner
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
@@ -318,13 +319,15 @@ fun ResponsiveHomeContent(
         // Ad placement (non-premium users only)
         if (!hasAdFree) {
             item(key = "ad_banner") {
+                val visitKey = rememberScreenVisitKey()
                 SmartBannerAd(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     placementType = AdPlacementType.FEED,
                     showRemoveAdsButton = true,
-                    onRemoveAdsClick = { navController.navigate(SupportUs) }
+                    onRemoveAdsClick = { navController.navigate(SupportUs) },
+                    refreshKey = visitKey
                 )
             }
         }

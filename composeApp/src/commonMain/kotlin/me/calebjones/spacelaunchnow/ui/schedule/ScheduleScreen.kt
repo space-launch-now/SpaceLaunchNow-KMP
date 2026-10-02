@@ -64,15 +64,22 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.isTabletOrDesktop
+import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.rememberScreenVisitKey
 import me.calebjones.spacelaunchnow.ui.compose.ListDetailWrapper
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
 import me.calebjones.spacelaunchnow.ui.layout.AdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.schedule.components.ScheduleLaunchView
+import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import org.koin.compose.viewmodel.koinViewModel
+
+private const val AD_AFTER_ITEMS = 4
 
 @Composable
 fun ScheduleScreen(
@@ -136,6 +143,10 @@ private fun ScheduleContent(
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
     val isTablet = isTabletOrDesktop()
+
+    val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
+    val showInlineAd = !hasAdFree && rememberAdaptiveLayoutState().isCompact
+    val visitKey = rememberScreenVisitKey()
 
     val upcomingListState = rememberLazyListState()
     val previousListState = rememberLazyListState()
@@ -398,22 +409,38 @@ private fun ScheduleContent(
                         }
                     }
 
-                    itemsIndexed(tabState.items) { index, launch ->
+                    // One inline banner after the 4th launch (or the last, if fewer). The CONTENT
+                    // placement is the shared 320x50 BANNER handler on compact width, which the
+                    // nav banner does not use. Only the settled page mounts it, because a handler's
+                    // AdView can have just one parent while two pages show during a swipe.
+                    val adSlot = showInlineAd && page == pagerState.settledPage &&
+                        tabState.items.isNotEmpty()
+                    val adAfter = minOf(AD_AFTER_ITEMS, tabState.items.size)
+
+                    itemsIndexed(tabState.items.take(adAfter)) { _, launch ->
                         ScheduleLaunchView(
                             launch = launch,
                             onClick = { onLaunchClick(launch.id) }
                         )
+                    }
 
-                        // // 🚀 PERFORMANCE BOOST: Show inline banner ad every 5 items for maximum visibility
-                        // // This dramatically improves show rate by embedding ads in the content feed
-                        // if ((index + 1) % 25 == 0 && index < tabState.items.size - 1) {
-                        //     SmartBannerAd(
-                        //         placementType = AdPlacementType.CONTENT,
-                        //         showRemoveAdsButton = false,
-                        //         showCard = true,
-                        //         modifier = Modifier.padding(vertical = 4.dp)
-                        //     )
-                        // }
+                    if (adSlot) {
+                        item(key = "ad_banner_${tab.name}", contentType = "ad_banner") {
+                            SmartBannerAd(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                placementType = AdPlacementType.CONTENT,
+                                showRemoveAdsButton = false,
+                                showCard = true,
+                                refreshKey = tab.name to visitKey
+                            )
+                        }
+                    }
+
+                    itemsIndexed(tabState.items.drop(adAfter)) { _, launch ->
+                        ScheduleLaunchView(
+                            launch = launch,
+                            onClick = { onLaunchClick(launch.id) }
+                        )
                     }
 
                     if (tabState.isLoading && tabState.items.isNotEmpty()) {

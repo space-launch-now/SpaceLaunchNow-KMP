@@ -18,7 +18,10 @@ enum class AdType {
  * - Android/iOS: Full ad management with BasicAds integration
  * - Desktop: No-op stub implementation
  */
-expect class GlobalAdManager(contextFactory: ContextFactory?) {
+expect class GlobalAdManager(
+    contextFactory: ContextFactory?,
+    interstitialGate: InterstitialGate?,
+) {
     /**
      * Initialize the ad manager and prepare optimizations
      */
@@ -44,13 +47,6 @@ expect class GlobalAdManager(contextFactory: ContextFactory?) {
      * Get minutes since last interstitial ad was shown (for debugging)
      */
     fun getMinutesSinceLastInterstitial(): Long
-    
-    /**
-     * Pre-warm ad requests to reduce time-to-first-ad.
-     * Call this immediately after SDK initialization to signal the system is ready
-     * for ad requests and optimize initial ad loading.
-     */
-    fun preWarmAdRequests()
     
     companion object {
         /**

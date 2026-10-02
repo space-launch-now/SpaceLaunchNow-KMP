@@ -64,6 +64,7 @@ actual fun RewardedAdHandler(
     val rewardedAd by rememberRewardedAd(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.REWARDED),
         onFailure = { e ->
+            AdTelemetry.failed("rewarded", e)
             log.e { "Rewarded ad failed to load: ${e.message}" }
             if (!finished) {
                 finished = true
@@ -74,7 +75,10 @@ actual fun RewardedAdHandler(
 
     LaunchedEffect(rewardedAd.state) {
         when (rewardedAd.state) {
-            AdState.READY -> log.d { "Rewarded ad loaded and ready to show" }
+            AdState.READY -> {
+                log.d { "Rewarded ad loaded and ready to show" }
+                AdTelemetry.loaded("rewarded")
+            }
             AdState.LOADING -> log.d { "Rewarded ad is loading..." }
             AdState.FAILING -> {
                 log.e { "Rewarded ad failed" }
@@ -97,7 +101,10 @@ actual fun RewardedAdHandler(
                     onRewardEarned?.invoke(1, "reward")
                 }
             },
-            onShown = { onAdShown?.invoke() },
+            onShown = {
+                AdTelemetry.impression("rewarded")
+                onAdShown?.invoke()
+            },
             onDismissed = {
                 log.d { "Rewarded ad dismissed" }
                 if (!finished) {
@@ -108,6 +115,7 @@ actual fun RewardedAdHandler(
                 }
             },
             onFailure = { e ->
+                AdTelemetry.failed("rewarded", e)
                 log.e { "Rewarded ad failed to show: ${e.message}" }
                 if (!finished) {
                     finished = true

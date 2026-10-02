@@ -59,6 +59,8 @@ import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.ui.ads.InterstitialGate
+import me.calebjones.spacelaunchnow.ui.ads.createInterstitialGate
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
@@ -259,9 +261,15 @@ val appModule = module {
         )
     }
 
+    // Interstitial pacing gate - persisted counters, Remote Config thresholds
+    single { createInterstitialGate(get<AppPreferences>(), get<RemoteConfigRepository>()) }
+
     // Global Ad Manager - Singleton managed by Koin
     single {
-        GlobalAdManager(contextFactory = getOrNull<ContextFactory>()).also {
+        GlobalAdManager(
+            contextFactory = getOrNull<ContextFactory>(),
+            interstitialGate = get<InterstitialGate>(),
+        ).also {
             it.initializeAndPreload()
         }
     }

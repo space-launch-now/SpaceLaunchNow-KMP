@@ -7,6 +7,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.Consent
@@ -42,6 +45,19 @@ actual fun AdConsentPopup(
 ) {
     val contextFactory = LocalContextFactory.current
     var viewController by remember { mutableStateOf<Any?>(null) }
+    // Resolve at most once, however many paths (poll, failure, no-VC) try to.
+    val latestOnResolved by rememberUpdatedState(onConsentResolved)
+    // Google's order: UMP form first, then ATT, then ads. ATT is bounded and never throws,
+    // so it cannot block the gate.
+    val scope = rememberCoroutineScope()
+    val resolver = remember {
+        ConsentResolver {
+            scope.launch {
+                AppTracking.requestIfNeeded()
+                latestOnResolved?.invoke()
+            }
+        }
+    }
 
     // Retry up to 5 times with 500ms gaps to handle the startup race where the
     // UIWindowScene is not yet foreground-active when this first composes.
@@ -57,7 +73,7 @@ actual fun AdConsentPopup(
         if (viewController == null) {
             log.w { "⚠️ AdConsentPopup: ViewController is null after retries, consent popup will not be shown" }
             // Resolve to avoid blocking ad loading indefinitely
-            onConsentResolved?.invoke()
+            resolver.resolve()
         }
     }
 
@@ -65,10 +81,25 @@ actual fun AdConsentPopup(
 
     val consent by rememberConsent(activity = vc)
 
-    // CR-2: Call onConsentResolved when UMP signals ads can be requested
-    LaunchedEffect(consent.canRequestAds) {
-        if (consent.canRequestAds) {
-            onConsentResolved?.invoke()
+    // canRequestAds is a plain getter, not Compose state: reading it at composition time never
+    // sees UMP finish (the update is async and nothing recomposes), which left the ad gate
+    // closed until relaunch on fresh installs. ConsentPopup owns the UMP calls, so poll the
+    // getter once per Consent instance. A timeout resolves anyway (regions with no consent
+    // form must never wait) unless a form is required, in which case we wait for the answer.
+    LaunchedEffect(consent) {
+        when (
+            awaitCanRequestAds(
+                canRequestAds = { resolver.isResolved || consent.canRequestAds },
+                // A required form means the user may still be reading it: never time out.
+                holdTimeoutWhile = { consent.isPrivacyOptionsRequired() },
+            )
+        ) {
+            ConsentPollOutcome.CAN_REQUEST_ADS -> {
+                if (resolver.resolve()) log.d { "Consent resolved via canRequestAds poll" }
+            }
+            ConsentPollOutcome.TIMED_OUT -> {
+                if (resolver.resolve()) log.w { "Consent not resolved after ${CONSENT_TIMEOUT_MS}ms, allowing ad loading anyway" }
+            }
         }
     }
 
@@ -78,7 +109,7 @@ actual fun AdConsentPopup(
             log.e(throwable) { "❌ Consent popup failure" }
             onFailure?.invoke(throwable)
             // Also resolve on failure to avoid blocking ad loading indefinitely
-            onConsentResolved?.invoke()
+            resolver.resolve()
         }
     )
 }
@@ -124,21 +155,39 @@ actual fun WithPreloadedAds(
     val preloadedBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.BANNER
+        adSize = AdSize.BANNER,
+        onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "BANNER") },
+        onFailure = { AdTelemetry.failed("banner", it, AdSize.BANNER.label(), "BANNER") },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "BANNER") },
+        onClick = { AdTelemetry.clicked("banner", AdSize.BANNER.label(), "BANNER") }
     )
 
     // Large banner for detail pages and featured content
     val preloadedLargeBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.LARGE_BANNER
+        adSize = AdSize.LARGE_BANNER,
+        onLoad = { AdTelemetry.loaded("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
+        onFailure = { AdTelemetry.failed("banner", it, AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
+        onClick = { AdTelemetry.clicked("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") }
     )
 
     // Medium rectangle for inline list ads (also phone INTERSTITIAL placement)
     val preloadedMediumRectangleAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.MEDIUM_RECTANGLE
+        adSize = AdSize.MEDIUM_RECTANGLE,
+        onLoad = { AdTelemetry.loaded("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
+        onFailure = { AdTelemetry.failed("banner", it, AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
+        onClick = { AdTelemetry.clicked("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") }
     )
 
     // Dedicated navigation banner — separate request to avoid recomposition fights
@@ -146,7 +195,13 @@ actual fun WithPreloadedAds(
     val preloadedNavigationBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.BANNER
+        adSize = AdSize.BANNER,
+        onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "NAVIGATION") },
+        onFailure = { AdTelemetry.failed("banner", it, AdSize.BANNER.label(), "NAVIGATION") },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "NAVIGATION") },
+        onClick = { AdTelemetry.clicked("banner", AdSize.BANNER.label(), "NAVIGATION") }
     )
 
     // Aliased fallbacks for sizes/placements that produced ~$0 in production.
@@ -203,3 +258,5 @@ actual fun rememberPrivacyOptionsRequired(): Boolean {
     val consent = remember(vc) { Consent(vc) }
     return consent.isPrivacyOptionsRequired()
 }
+
+private fun AdSize.label(): String = AdTelemetry.sizeLabel(width, height)

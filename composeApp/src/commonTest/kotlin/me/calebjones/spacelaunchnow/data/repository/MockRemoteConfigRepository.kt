@@ -57,6 +57,10 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
 
     override suspend fun getOnboardingVariant(): OnboardingVariant = onboardingVariant
 
+    override suspend fun getInterstitialVisits(): Int = 4
+
+    override suspend fun getInterstitialMinIntervalSeconds(): Long = 120L
+
     fun reset() {
         shouldFail = false
         failureException = Exception("Mock failure")
