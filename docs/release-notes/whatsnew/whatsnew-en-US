@@ -1,9 +1,3 @@
 ### Bug Fixes
 
-* **android:** clear WebView accessibility focus before release
-* **billing:** initialise subscription repository at most once
-* **billing:** retry subscription init when billing initialisation fails
-* **ios:** avoid competing crash handlers
-* **ios:** collapse duplicate Datadog user-context writes
-* **ios:** report Crashlytics non-fatals at Error and above only
-* **ios:** serialise billing init and skip cached CustomerInfo after failed sync...
+* **ads:** raise max ad content rating from G to PG
