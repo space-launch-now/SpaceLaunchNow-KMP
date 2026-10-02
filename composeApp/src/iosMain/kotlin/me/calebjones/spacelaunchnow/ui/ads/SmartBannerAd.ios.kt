@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.ads
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +19,7 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +36,8 @@ import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
 import app.lexilabs.basic.ads.composable.BannerAd
+import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.LocalContextFactory
 import me.calebjones.spacelaunchnow.LocalPreloadedBannerAd
 import me.calebjones.spacelaunchnow.LocalPreloadedFluidAd
@@ -171,35 +176,58 @@ actual fun SmartBannerAd(
             BannerRefreshTracker.shouldReload(availableAd, refreshKey to lifecycleOwner)
         ) {
             log.d { "SmartBannerAd: New screen for placement $placementType - loading a fresh banner" }
-            val size = AdTelemetry.sizeLabel(availableAd.adSize.width, availableAd.adSize.height)
-            availableAd.load(
-                adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-                adSize = availableAd.adSize,
-                onLoad = { AdTelemetry.loaded("banner", size, placementType.name) },
-                onFailure = { AdTelemetry.failed("banner", it, size, placementType.name) },
-                onDismissed = {},
-                onShown = {},
-                onImpression = { AdTelemetry.impression("banner", size, placementType.name) },
-                onClick = { AdTelemetry.clicked("banner", size, placementType.name) }
-            )
+            availableAd.reloadBanner(placementType.name)
         }
         refreshChecked = true
     }
     if (!refreshChecked) return
 
-    // 🚀 PERFORMANCE: Fast-path return for failing ads to avoid layout delays
-    if (availableAd.state == AdState.FAILING || availableAd.state == AdState.NONE) {
-        log.v { "SmartBannerAd: Ad state is ${availableAd.state} - skipping to avoid layout delays" }
-        return
+    // RETRY LOGIC: backoff state lives per handler in BannerRetryPolicy (1s, 3s, 10s, 30s, 60s,
+    // then every 120s, never giving up), so one failed preload no longer hides the handler for
+    // the process. NONE means the library has not started loading: kick one load after the delay.
+    val retryPolicy = BannerRetryPolicy.shared
+    var retryRound by remember(availableAd) { mutableIntStateOf(0) }
+    val adState = availableAd.state
+    LaunchedEffect(adState, retryRound) {
+        when (adState) {
+            AdState.READY, AdState.SHOWING, AdState.SHOWN -> {
+                retryPolicy.reset(availableAd)
+                retryPolicy.markShown(availableAd)
+            }
+
+            AdState.FAILING, AdState.NONE -> {
+                val delayMs = retryPolicy.nextDelayMs(availableAd)
+                log.d { "SmartBannerAd: Ad state $adState, retrying in ${delayMs}ms for placement $placementType" }
+                delay(delayMs)
+                // The preloader or another instance may have moved on while we waited
+                if (availableAd.state == adState) {
+                    retryPolicy.recordAttempt(availableAd)
+                    availableAd.reloadBanner(placementType.name)
+                }
+                retryRound++
+            }
+
+            else -> Unit
+        }
     }
 
     // Debug logging for ad state
-    log.v { "SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType" }
+    log.v { "SmartBannerAd: Ad state is $adState for placement $placementType" }
+
+    // The library reports FAILING for any failed load, including an auto-refresh no-fill while
+    // an earlier creative is still on screen. Keep rendering that creative during the retry.
+    val keepShownCreative = adState == AdState.FAILING && retryPolicy.hasShown(availableAd)
+    val bannerHeight = when {
+        actualAdSize.height > 0 -> actualAdSize.height.dp
+        actualAdSize.height == -2 -> 250.dp // FLUID
+        else -> 50.dp
+    }
 
     // IMPORTANT: Always render BannerAd Composable to trigger load on iOS
     // Show layout when ad is ready, showing, or loading
-    when (availableAd.state) {
-        AdState.READY, AdState.SHOWING, AdState.SHOWN, AdState.LOADING -> {
+    when {
+        adState == AdState.READY || adState == AdState.SHOWING || adState == AdState.SHOWN ||
+            adState == AdState.LOADING || keepShownCreative -> {
             // Show the banner ad with optional remove ads button
             // SHOWN keeps the banner mounted after a tap instead of swapping to the shimmer
             // Note: We render even in LOADING state because iOS needs the Composable rendered to trigger load
@@ -257,22 +285,75 @@ actual fun SmartBannerAd(
             }
             
             // Log loading state for debugging
-            if (availableAd.state == AdState.LOADING) {
+            if (adState == AdState.LOADING) {
                 log.d { "🔄 SmartBannerAd: Ad is loading for placement $placementType - BannerAd Composable rendered to trigger load" }
             }
         }
 
-        AdState.FAILING, AdState.NONE, AdState.DISMISSED -> {
-            // Ad failed to load or was dismissed - don't show anything (no placeholder)
-            // This prevents white gaps and invisible barriers when ads fail to load
-            log.v { "SmartBannerAd: Ad state is ${availableAd.state} for placement $placementType - hiding ad space" }
-            // Don't render anything - let the layout collapse
+        adState == AdState.FAILING || adState == AdState.NONE -> {
+            // Shimmer while waiting for a retry: the slot is never left empty
+            AdShimmerPlaceholder(height = bannerHeight, showCard = showCard, modifier = modifier)
+        }
+
+        adState == AdState.DISMISSED -> {
+            // Ad was dismissed - don't show anything
+            log.v { "SmartBannerAd: Ad dismissed for placement $placementType - hiding ad space" }
         }
 
         else -> {
             // Unknown state or SHOWN (already displayed)
-            log.w { "SmartBannerAd: Unknown ad state ${availableAd.state} for placement $placementType" }
+            log.w { "SmartBannerAd: Unknown ad state $adState for placement $placementType" }
         }
+    }
+}
+
+/**
+ * Reloads with this app's ad unit and the handler's own size. A bare load() falls back to
+ * the library defaults: Google's test ad unit at FULL_BANNER size.
+ */
+@OptIn(DependsOnGoogleMobileAds::class)
+private fun BannerAdHandler.reloadBanner(placement: String) {
+    val size = AdTelemetry.sizeLabel(adSize.width, adSize.height)
+    load(
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
+        adSize = adSize,
+        onLoad = { AdTelemetry.loaded("banner", size, placement) },
+        onFailure = { AdTelemetry.failed("banner", it, size, placement) },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", size, placement) },
+        onClick = { AdTelemetry.clicked("banner", size, placement) }
+    )
+}
+
+/** Shimmer placeholder shown while ads are loading or waiting for a retry. */
+@Composable
+private fun AdShimmerPlaceholder(height: Dp, showCard: Boolean, modifier: Modifier = Modifier) {
+    val placeholderContent = @Composable {
+        Box(
+            modifier = Modifier
+                .shimmer()
+                .fillMaxWidth()
+                .height(height)
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+        )
+    }
+
+    if (showCard) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            )
+        ) {
+            Box(modifier = Modifier.padding(8.dp)) { placeholderContent() }
+        }
+    } else {
+        Box(modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp)) { placeholderContent() }
     }
 }
 

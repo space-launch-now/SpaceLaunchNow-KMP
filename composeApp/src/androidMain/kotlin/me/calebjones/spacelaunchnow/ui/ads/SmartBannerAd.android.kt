@@ -204,29 +204,45 @@ actual fun SmartBannerAd(
         return
     }
 
-    // 🚀 RETRY LOGIC: Track retry attempts for failed ads
-    var retryCount by remember { mutableIntStateOf(0) }
-    val maxRetries = 2
+    // RETRY LOGIC: backoff state lives per handler in BannerRetryPolicy, so the persistent nav
+    // banner keeps retrying (1s, 3s, 10s, 30s, 60s, then every 120s) instead of dying after a
+    // cold-start no-fill. A successful load resets the backoff.
+    val retryPolicy = BannerRetryPolicy.shared
+    var retryRound by remember(availableAd) { mutableIntStateOf(0) }
+    val adState = availableAd.state
+    LaunchedEffect(adState, retryRound) {
+        when (adState) {
+            AdState.READY, AdState.SHOWING, AdState.SHOWN -> {
+                retryPolicy.reset(availableAd)
+                retryPolicy.markShown(availableAd)
+            }
 
-    // Trigger retry with exponential backoff when ad fails
-    LaunchedEffect(availableAd.state, retryCount) {
-        if (availableAd.state == AdState.FAILING && retryCount < maxRetries) {
-            val delayMs = if (retryCount == 0) 1000L else 3000L
-            log.d { "Ad failed, retrying in ${delayMs}ms (attempt ${retryCount + 1}/$maxRetries)" }
-            delay(delayMs)
-            availableAd.reloadBanner(placementType.name)
-            retryCount++
+            AdState.FAILING -> {
+                val delayMs = retryPolicy.nextDelayMs(availableAd)
+                log.d { "Ad failed, retrying in ${delayMs}ms for placement $placementType" }
+                delay(delayMs)
+                retryPolicy.recordAttempt(availableAd)
+                availableAd.reloadBanner(placementType.name)
+                retryRound++
+            }
+
+            else -> Unit
         }
     }
 
     // Debug logging for ad state
-    log.d { "Ad state is ${availableAd.state} for placement $placementType (retries: $retryCount/$maxRetries)" }
+    log.d { "Ad state is $adState for placement $placementType" }
+
+    // The library reports FAILING for any failed load, including an auto-refresh no-fill while
+    // an earlier creative is still on screen. Keep rendering that creative during the retry.
+    val keepShownCreative = adState == AdState.FAILING && retryPolicy.hasShown(availableAd)
 
     // IMPORTANT: Always render BannerAd Composable to trigger load
     // Show shimmer during loading/retry, ad when ready, nothing after final failure
-    when (availableAd.state) {
-        AdState.LOADING, AdState.NONE -> {
-            // Show shimmer placeholder while loading
+    when {
+        adState == AdState.LOADING || adState == AdState.NONE ||
+            (adState == AdState.FAILING && !keepShownCreative) -> {
+            // Shimmer while loading or waiting for a retry: the slot is never left empty
             AdShimmerPlaceholder(
                 height = bannerHeight,
                 showCard = showCard,
@@ -234,21 +250,8 @@ actual fun SmartBannerAd(
             )
         }
 
-        AdState.FAILING -> {
-            // Show shimmer during retries, hide after all retries exhausted
-            if (retryCount < maxRetries) {
-                AdShimmerPlaceholder(
-                    height = bannerHeight,
-                    showCard = showCard,
-                    modifier = modifier
-                )
-            } else {
-                log.d { "Ad failed after $maxRetries retries - hiding ad space" }
-                return
-            }
-        }
-
-        AdState.READY, AdState.SHOWING, AdState.SHOWN -> {
+        adState == AdState.READY || adState == AdState.SHOWING || adState == AdState.SHOWN ||
+            keepShownCreative -> {
             // Show the banner ad with optional remove ads button
             // SHOWN must keep hosting the AndroidView: tearing it down mid-tap triggers a
             // focus-driven remeasure while the LazyColumn is already laying out (issue #179)
@@ -312,14 +315,14 @@ actual fun SmartBannerAd(
             }
         }
 
-        AdState.DISMISSED -> {
+        adState == AdState.DISMISSED -> {
             // Ad was dismissed - don't show anything
             log.w { "Ad dismissed for placement $placementType - hiding ad space" }
         }
 
         else -> {
             // Unknown state - show shimmer as fallback
-            log.w { "Unknown ad state ${availableAd.state} for placement $placementType" }
+            log.w { "Unknown ad state $adState for placement $placementType" }
             AdShimmerPlaceholder(
                 height = bannerHeight,
                 showCard = showCard,
