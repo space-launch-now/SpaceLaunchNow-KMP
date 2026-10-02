@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.window.core.layout.WindowWidthSizeClass
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.AdState
@@ -72,7 +74,8 @@ actual fun SmartBannerAd(
     showRemoveAdsButton: Boolean,
     showCard: Boolean,
     onRemoveAdsClick: (() -> Unit)?,
-    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?
+    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?,
+    refreshKey: Any?
 ) {
     val contextFactory = LocalContextFactory.current
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
@@ -173,6 +176,34 @@ actual fun SmartBannerAd(
         return
     }
 
+    // Calculate banner height for shimmer placeholder
+    val bannerHeight = when {
+        actualAdSize.height > 0 -> actualAdSize.height.dp
+        actualAdSize.height == -2 -> 250.dp // FLUID
+        else -> 50.dp
+    }
+
+    // A new screen visit (e.g. a different launch) loads a fresh creative instead of
+    // re-showing the one this shared banner already displayed. Hold the shimmer until
+    // the check runs so the old creative never flashes.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var refreshChecked by remember(availableAd, refreshKey, lifecycleOwner) {
+        mutableStateOf(refreshKey == null)
+    }
+    LaunchedEffect(availableAd, refreshKey, lifecycleOwner) {
+        if (refreshKey != null &&
+            BannerRefreshTracker.shouldReload(availableAd, refreshKey to lifecycleOwner)
+        ) {
+            log.d { "New screen for placement $placementType - loading a fresh banner" }
+            availableAd.reloadBanner()
+        }
+        refreshChecked = true
+    }
+    if (!refreshChecked) {
+        AdShimmerPlaceholder(height = bannerHeight, showCard = showCard, modifier = modifier)
+        return
+    }
+
     // 🚀 RETRY LOGIC: Track retry attempts for failed ads
     var retryCount by remember { mutableIntStateOf(0) }
     val maxRetries = 2
@@ -183,20 +214,13 @@ actual fun SmartBannerAd(
             val delayMs = if (retryCount == 0) 1000L else 3000L
             log.d { "Ad failed, retrying in ${delayMs}ms (attempt ${retryCount + 1}/$maxRetries)" }
             delay(delayMs)
-            availableAd.load()
+            availableAd.reloadBanner()
             retryCount++
         }
     }
 
     // Debug logging for ad state
     log.d { "Ad state is ${availableAd.state} for placement $placementType (retries: $retryCount/$maxRetries)" }
-
-    // Calculate banner height for shimmer placeholder
-    val bannerHeight = when {
-        actualAdSize.height > 0 -> actualAdSize.height.dp
-        actualAdSize.height == -2 -> 250.dp // FLUID
-        else -> 50.dp
-    }
 
     // IMPORTANT: Always render BannerAd Composable to trigger load
     // Show shimmer during loading/retry, ad when ready, nothing after final failure
@@ -303,6 +327,15 @@ actual fun SmartBannerAd(
             )
         }
     }
+}
+
+/**
+ * Reloads with this app's ad unit and the handler's own size. A bare load() falls back to
+ * the library defaults: Google's test ad unit at FULL_BANNER size.
+ */
+@OptIn(DependsOnGoogleMobileAds::class)
+private fun BannerAdHandler.reloadBanner() {
+    load(adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER), adSize = adSize)
 }
 
 /**

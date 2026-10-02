@@ -53,7 +53,8 @@ fun AgencyTabContent(
             modifier = Modifier.fillMaxWidth(),
             placementType = AdPlacementType.CONTENT,
             showRemoveAdsButton = false,
-            showCard = true
+            showCard = true,
+            refreshKey = launch.id
         )
 
         // Bottom spacing for better scrolling

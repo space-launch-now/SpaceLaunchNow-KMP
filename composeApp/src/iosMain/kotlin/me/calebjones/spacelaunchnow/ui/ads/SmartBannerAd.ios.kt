@@ -17,12 +17,16 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.window.core.layout.WindowWidthSizeClass
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.AdState
@@ -63,7 +67,8 @@ actual fun SmartBannerAd(
     showRemoveAdsButton: Boolean,
     showCard: Boolean,
     onRemoveAdsClick: (() -> Unit)?,
-    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?
+    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?,
+    refreshKey: Any?
 ) {
     val log = SpaceLogger.getLogger("SmartBannerAd")
     // Convert placement type to AdSize for Android implementation
@@ -153,6 +158,27 @@ actual fun SmartBannerAd(
         log.w { "SmartBannerAd: No preloaded ad available for size $actualAdSize - skipping ad display" }
         return
     }
+
+    // A new screen visit (e.g. a different launch) loads a fresh creative instead of
+    // re-showing the one this shared banner already displayed. BannerAd stays out of
+    // composition until the check runs, so it first mounts the reloaded view.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var refreshChecked by remember(availableAd, refreshKey, lifecycleOwner) {
+        mutableStateOf(refreshKey == null)
+    }
+    LaunchedEffect(availableAd, refreshKey, lifecycleOwner) {
+        if (refreshKey != null &&
+            BannerRefreshTracker.shouldReload(availableAd, refreshKey to lifecycleOwner)
+        ) {
+            log.d { "SmartBannerAd: New screen for placement $placementType - loading a fresh banner" }
+            availableAd.load(
+                adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
+                adSize = availableAd.adSize
+            )
+        }
+        refreshChecked = true
+    }
+    if (!refreshChecked) return
 
     // 🚀 PERFORMANCE: Fast-path return for failing ads to avoid layout delays
     if (availableAd.state == AdState.FAILING || availableAd.state == AdState.NONE) {

@@ -97,7 +97,8 @@ fun TabletLaunchDetailContent(
                 modifier = Modifier.fillMaxWidth(),
                 placementType = AdPlacementType.INTERSTITIAL,
                 showRemoveAdsButton = true,
-                onRemoveAdsClick = onNavigateToSettings
+                onRemoveAdsClick = onNavigateToSettings,
+                refreshKey = launch.id
             )
 
             Spacer(Modifier.height(8.dp))
