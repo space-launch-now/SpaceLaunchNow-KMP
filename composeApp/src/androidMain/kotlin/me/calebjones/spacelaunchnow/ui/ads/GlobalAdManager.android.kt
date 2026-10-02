@@ -75,36 +75,11 @@ actual class GlobalAdManager actual constructor(
      * Initialize the ad manager and prepare optimizations
      */
     actual fun initializeAndPreload() {
-        // Note: iOS doesn't require a context factory, only Android does
-        if (contextFactory == null && getPlatform().type == PlatformType.ANDROID) {
-            return
-        }
-
-        // Configuration happens synchronously now instead of in coroutine
-        isInitialized = true
-    
-        // Setup configurations synchronously for instant availability
+        // Configuration needs no Android context. The ContextFactory is often not
+        // bound yet when Koin builds this singleton, so never gate on it.
         setupAdConfigurations()
-    }
-    
-    /**
-     * Pre-warm ad requests to reduce time-to-first-ad.
-     * Call this immediately after SDK initialization to signal the system is ready.
-     */
-    actual fun preWarmAdRequests() {
-        if (!isInitialized) {
-            log.w { "🚨 Cannot pre-warm ads: GlobalAdManager not initialized" }
-            return
-        }
-        
-        log.d { "🚀 Pre-warming ad requests - SDK ready for ad loading" }
-        
-        // Signal that optimization is ready for ad requests
-        // The actual preloading happens via WithPreloadedAds CompositionLocal
+        isInitialized = true
         isOptimizationReady = true
-        
-        // Log configuration summary
-        log.d { "📊 Ad configurations ready: ${adConfigurations.size} sizes configured" }
     }
 
     private fun setupAdConfigurations() {
