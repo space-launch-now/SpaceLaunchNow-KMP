@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.Consent
@@ -42,6 +43,9 @@ actual fun AdConsentPopup(
 ) {
     val contextFactory = LocalContextFactory.current
     var viewController by remember { mutableStateOf<Any?>(null) }
+    // Resolve at most once, however many paths (poll, failure, no-VC) try to.
+    val latestOnResolved by rememberUpdatedState(onConsentResolved)
+    val resolver = remember { ConsentResolver { latestOnResolved?.invoke() } }
 
     // Retry up to 5 times with 500ms gaps to handle the startup race where the
     // UIWindowScene is not yet foreground-active when this first composes.
@@ -57,7 +61,7 @@ actual fun AdConsentPopup(
         if (viewController == null) {
             log.w { "⚠️ AdConsentPopup: ViewController is null after retries, consent popup will not be shown" }
             // Resolve to avoid blocking ad loading indefinitely
-            onConsentResolved?.invoke()
+            resolver.resolve()
         }
     }
 
@@ -65,10 +69,19 @@ actual fun AdConsentPopup(
 
     val consent by rememberConsent(activity = vc)
 
-    // CR-2: Call onConsentResolved when UMP signals ads can be requested
-    LaunchedEffect(consent.canRequestAds) {
-        if (consent.canRequestAds) {
-            onConsentResolved?.invoke()
+    // canRequestAds is a plain getter, not Compose state: reading it at composition time never
+    // sees UMP finish (the update is async and nothing recomposes), which left the ad gate
+    // closed until relaunch on fresh installs. ConsentPopup owns the UMP calls, so poll the
+    // getter once per Consent instance. A timeout resolves anyway (regions with no consent
+    // form must never wait).
+    LaunchedEffect(consent) {
+        when (awaitCanRequestAds(canRequestAds = { resolver.isResolved || consent.canRequestAds })) {
+            ConsentPollOutcome.CAN_REQUEST_ADS -> {
+                if (resolver.resolve()) log.d { "Consent resolved via canRequestAds poll" }
+            }
+            ConsentPollOutcome.TIMED_OUT -> {
+                if (resolver.resolve()) log.w { "Consent not resolved after ${CONSENT_TIMEOUT_MS}ms, allowing ad loading anyway" }
+            }
         }
     }
 
@@ -78,7 +91,7 @@ actual fun AdConsentPopup(
             log.e(throwable) { "❌ Consent popup failure" }
             onFailure?.invoke(throwable)
             // Also resolve on failure to avoid blocking ad loading indefinitely
-            onConsentResolved?.invoke()
+            resolver.resolve()
         }
     )
 }

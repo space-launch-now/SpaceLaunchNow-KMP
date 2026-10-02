@@ -26,6 +26,7 @@ import me.calebjones.spacelaunchnow.LocalPreloadedFluidAd
 import me.calebjones.spacelaunchnow.LocalContextFactory
 import co.touchlab.kermit.Logger
 import androidx.compose.runtime.remember
+import kotlinx.coroutines.launch
 
 
 /**
@@ -73,26 +74,40 @@ actual fun AdConsentPopup(
     // Single LaunchedEffect — fires ONE requestConsentInfoUpdate with debug settings.
     // We avoid ConsentPopup because it fires a SECOND request WITHOUT debug settings,
     // which overwrites gdprApplies back to 0.
+    // Resolution is driven by the UMP callbacks; a poll of canRequestAds (a plain getter,
+    // not Compose state) is the fallback, and a 15 s timeout resolves anyway so ad loading
+    // is never blocked indefinitely. ConsentResolver makes sure we resolve only once.
     LaunchedEffect(consent, params) {
+        val resolver = ConsentResolver(onConsentResolved)
+        launch {
+            when (awaitCanRequestAds(canRequestAds = { resolver.isResolved || consent.canRequestAds })) {
+                ConsentPollOutcome.CAN_REQUEST_ADS -> {
+                    if (resolver.resolve()) log.d { "Consent resolved via canRequestAds poll" }
+                }
+                ConsentPollOutcome.TIMED_OUT -> {
+                    if (resolver.resolve()) log.w { "Consent not resolved after ${CONSENT_TIMEOUT_MS}ms, allowing ad loading anyway" }
+                }
+            }
+        }
         consent.requestConsentInfoUpdate(
             params = params,
             onCompletion = {
                 if (consent.canRequestAds) {
                     log.d { "Consent already granted — ads can be requested" }
-                    onConsentResolved?.invoke()
+                    resolver.resolve()
                 } else {
                     consent.loadAndShowConsentForm(
                         onLoaded = { log.d { "Consent form loaded" } },
                         onShown = {
                             log.d { "Consent form shown" }
                             if (consent.canRequestAds) {
-                                onConsentResolved?.invoke()
+                                resolver.resolve()
                             }
                         },
                         onError = { throwable ->
                             log.w(throwable) { "Consent form unavailable: ${throwable.message}" }
                             onFailure?.invoke(throwable)
-                            onConsentResolved?.invoke()
+                            resolver.resolve()
                         }
                     )
                 }
@@ -100,7 +115,7 @@ actual fun AdConsentPopup(
             onError = { exception ->
                 log.w(exception) { "Consent info update failed: ${exception.message}" }
                 onFailure?.invoke(exception)
-                onConsentResolved?.invoke()
+                resolver.resolve()
             }
         )
     }
