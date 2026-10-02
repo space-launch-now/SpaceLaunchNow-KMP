@@ -195,7 +195,7 @@ actual fun SmartBannerAd(
             BannerRefreshTracker.shouldReload(availableAd, refreshKey to lifecycleOwner)
         ) {
             log.d { "New screen for placement $placementType - loading a fresh banner" }
-            availableAd.reloadBanner()
+            availableAd.reloadBanner(placementType.name)
         }
         refreshChecked = true
     }
@@ -214,7 +214,7 @@ actual fun SmartBannerAd(
             val delayMs = if (retryCount == 0) 1000L else 3000L
             log.d { "Ad failed, retrying in ${delayMs}ms (attempt ${retryCount + 1}/$maxRetries)" }
             delay(delayMs)
-            availableAd.reloadBanner()
+            availableAd.reloadBanner(placementType.name)
             retryCount++
         }
     }
@@ -334,8 +334,18 @@ actual fun SmartBannerAd(
  * the library defaults: Google's test ad unit at FULL_BANNER size.
  */
 @OptIn(DependsOnGoogleMobileAds::class)
-private fun BannerAdHandler.reloadBanner() {
-    load(adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER), adSize = adSize)
+private fun BannerAdHandler.reloadBanner(placement: String) {
+    val size = AdTelemetry.sizeLabel(adSize.width, adSize.height)
+    load(
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
+        adSize = adSize,
+        onLoad = { AdTelemetry.loaded("banner", size, placement) },
+        onFailure = { AdTelemetry.failed("banner", it, size, placement) },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", size, placement) },
+        onClick = { AdTelemetry.clicked("banner", size, placement) }
+    )
 }
 
 /**

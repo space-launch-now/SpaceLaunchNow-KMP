@@ -432,4 +432,32 @@ sealed class AnalyticsEvent(val name: String) {
             "is_extension" to isExtension
         )
     }
+
+    // ── Ad Lifecycle Events ──────────────────────────────────────────────────
+    // Observation only: one event per banner/interstitial/rewarded load, failure,
+    // impression and click, so ad revenue audits have per-placement data.
+
+    enum class AdResult(val eventName: String) {
+        LOADED("ad_loaded"),
+        FAILED("ad_failed"),
+        IMPRESSION("ad_impression"),
+        CLICKED("ad_clicked")
+    }
+
+    data class AdLifecycle(
+        val result: AdResult,
+        val format: String,
+        val size: String? = null,
+        val handler: String? = null,
+        val errorCode: String? = null,
+        val errorMessage: String? = null
+    ) : AnalyticsEvent(result.eventName) {
+        override fun toParameters(): Map<String, Any?> = buildMap {
+            put("format", format)
+            this@AdLifecycle.size?.let { put("size", it) }
+            handler?.let { put("handler", it) }
+            errorCode?.let { put("error_code", it) }
+            errorMessage?.let { put("error_message", it.take(100)) }
+        }
+    }
 }

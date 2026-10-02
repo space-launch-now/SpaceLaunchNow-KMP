@@ -124,21 +124,39 @@ actual fun WithPreloadedAds(
     val preloadedBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.BANNER
+        adSize = AdSize.BANNER,
+        onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "BANNER") },
+        onFailure = { AdTelemetry.failed("banner", it, AdSize.BANNER.label(), "BANNER") },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "BANNER") },
+        onClick = { AdTelemetry.clicked("banner", AdSize.BANNER.label(), "BANNER") }
     )
 
     // Large banner for detail pages and featured content
     val preloadedLargeBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.LARGE_BANNER
+        adSize = AdSize.LARGE_BANNER,
+        onLoad = { AdTelemetry.loaded("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
+        onFailure = { AdTelemetry.failed("banner", it, AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
+        onClick = { AdTelemetry.clicked("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") }
     )
 
     // Medium rectangle for inline list ads (also phone INTERSTITIAL placement)
     val preloadedMediumRectangleAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.MEDIUM_RECTANGLE
+        adSize = AdSize.MEDIUM_RECTANGLE,
+        onLoad = { AdTelemetry.loaded("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
+        onFailure = { AdTelemetry.failed("banner", it, AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
+        onClick = { AdTelemetry.clicked("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") }
     )
 
     // Dedicated navigation banner — separate request to avoid recomposition fights
@@ -146,7 +164,13 @@ actual fun WithPreloadedAds(
     val preloadedNavigationBannerAd by rememberBannerAd(
         activity = context,
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.BANNER
+        adSize = AdSize.BANNER,
+        onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "NAVIGATION") },
+        onFailure = { AdTelemetry.failed("banner", it, AdSize.BANNER.label(), "NAVIGATION") },
+        onDismissed = {},
+        onShown = {},
+        onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "NAVIGATION") },
+        onClick = { AdTelemetry.clicked("banner", AdSize.BANNER.label(), "NAVIGATION") }
     )
 
     // Aliased fallbacks for sizes/placements that produced ~$0 in production.
@@ -203,3 +227,5 @@ actual fun rememberPrivacyOptionsRequired(): Boolean {
     val consent = remember(vc) { Consent(vc) }
     return consent.isPrivacyOptionsRequired()
 }
+
+private fun AdSize.label(): String = AdTelemetry.sizeLabel(width, height)

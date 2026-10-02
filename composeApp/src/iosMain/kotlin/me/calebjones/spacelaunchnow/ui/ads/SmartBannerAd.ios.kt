@@ -171,9 +171,16 @@ actual fun SmartBannerAd(
             BannerRefreshTracker.shouldReload(availableAd, refreshKey to lifecycleOwner)
         ) {
             log.d { "SmartBannerAd: New screen for placement $placementType - loading a fresh banner" }
+            val size = AdTelemetry.sizeLabel(availableAd.adSize.width, availableAd.adSize.height)
             availableAd.load(
                 adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-                adSize = availableAd.adSize
+                adSize = availableAd.adSize,
+                onLoad = { AdTelemetry.loaded("banner", size, placementType.name) },
+                onFailure = { AdTelemetry.failed("banner", it, size, placementType.name) },
+                onDismissed = {},
+                onShown = {},
+                onImpression = { AdTelemetry.impression("banner", size, placementType.name) },
+                onClick = { AdTelemetry.clicked("banner", size, placementType.name) }
             )
         }
         refreshChecked = true
