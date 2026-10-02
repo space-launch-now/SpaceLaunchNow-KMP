@@ -33,6 +33,8 @@ enum class AdPlacementType {
  * @param showCard Whether to wrap ad in Material card (Android/iOS only)
  * @param onRemoveAdsClick Callback when "Remove Ads" button is clicked
  * @param onSizeChanged Callback when ad size changes (widthDp, heightPx: Int)
+ * @param refreshKey When set, a new ad loads if the shared preloaded banner was last shown
+ *   for a different key or a different screen visit (e.g. pass the launch id on detail screens)
  */
 @Composable
 expect fun SmartBannerAd(
@@ -41,7 +43,8 @@ expect fun SmartBannerAd(
     showRemoveAdsButton: Boolean = false,
     showCard: Boolean = true,
     onRemoveAdsClick: (() -> Unit)? = null,
-    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)? = null
+    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)? = null,
+    refreshKey: Any? = null
 )
 
 /**

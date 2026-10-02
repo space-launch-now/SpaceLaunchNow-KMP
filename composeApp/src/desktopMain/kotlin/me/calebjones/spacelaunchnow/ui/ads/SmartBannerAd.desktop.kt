@@ -18,7 +18,8 @@ actual fun SmartBannerAd(
     showRemoveAdsButton: Boolean,
     showCard: Boolean,
     onRemoveAdsClick: (() -> Unit)?,
-    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?
+    onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?,
+    refreshKey: Any?
 ) {
     // No-op: Desktop doesn't show ads
     log.d { "🎯 SmartBannerAd (Desktop): Ads not supported, skipping" }
