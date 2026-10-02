@@ -58,6 +58,7 @@ import me.calebjones.spacelaunchnow.domain.model.SpaceStationSummary
 import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.rememberScreenVisitKey
 import me.calebjones.spacelaunchnow.ui.compose.AgencyLogoBadge
 import me.calebjones.spacelaunchnow.ui.compose.HeroDetailScaffold
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
@@ -194,9 +195,11 @@ private fun EventDetailContentInBody(
 
 
         // Banner Ad - positioned after description
+        val visitKey = rememberScreenVisitKey()
         SmartBannerAd(
             modifier = Modifier.fillMaxWidth(),
-            placementType = AdPlacementType.FEED
+            placementType = AdPlacementType.FEED,
+            refreshKey = event.id to visitKey
         )
 
         Spacer(Modifier.height(16.dp))

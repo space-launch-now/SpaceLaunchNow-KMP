@@ -52,6 +52,7 @@ import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.getOrientation
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
+import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 
 /**
@@ -173,7 +174,11 @@ actual fun SmartBannerAd(
     }
     LaunchedEffect(availableAd, refreshKey, lifecycleOwner) {
         if (refreshKey != null &&
-            BannerRefreshTracker.shouldReload(availableAd, refreshKey to lifecycleOwner)
+            BannerRefreshTracker.shouldReload(
+                availableAd,
+                refreshKey to lifecycleOwner,
+                Clock.System.now().toEpochMilliseconds()
+            )
         ) {
             log.d { "SmartBannerAd: New screen for placement $placementType - loading a fresh banner" }
             availableAd.reloadBanner(placementType.name)

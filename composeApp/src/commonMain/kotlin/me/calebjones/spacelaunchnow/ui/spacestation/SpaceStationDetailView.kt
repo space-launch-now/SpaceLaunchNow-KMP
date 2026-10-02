@@ -39,6 +39,7 @@ import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.rememberScreenVisitKey
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
@@ -390,9 +391,11 @@ private fun SpaceStationDetailContent(
         }
 
         // Banner ad
+        val visitKey = rememberScreenVisitKey()
         SmartBannerAd(
             modifier = Modifier.fillMaxWidth(),
-            placementType = AdPlacementType.CONTENT
+            placementType = AdPlacementType.CONTENT,
+            refreshKey = station.id to visitKey
         )
         Spacer(Modifier.height(16.dp))
 
