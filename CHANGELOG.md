@@ -1,3 +1,24 @@
+# [5.46.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.45.0...v5.46.0) (2026-10-02)
+
+
+### Bug Fixes
+
+* **ads:** drop dead preWarmAdRequests and its false warn on Android ([50a6881](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/50a68818f4713ab2a5712afa38aea43a5e3e7732))
+* **ads:** hold the consent timeout while a consent form is required ([c379141](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c37914136632188064c730d15e1a2b0502692911))
+* **ads:** resolve consent gate via callbacks and polling, once ([36979da](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/36979da224fdef9f12855a4bc8b2e44813110c97))
+* **ads:** retry failed banners with backoff and keep shown creatives ([d14324a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d14324a75446a9da2ac35a370860c4b7d01e21d6))
+
+
+### Features
+
+* **ads:** persist interstitial cadence and drive it from Remote Config ([700e6a8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/700e6a8cac8f24551839e3ccbc67bf9f65c4b1a0))
+* **ads:** reload banners per screen visit with a 45s rate floor ([735ecae](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/735ecae3c9832db7e2b5bae2a380cf76de41f9f6))
+* **ads:** report banner, interstitial and rewarded ad lifecycle events ([f4697da](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f4697da616a8c92c395b3546d465ced2f36eff9a))
+* **ads:** request iOS App Tracking Transparency after consent ([ced8a3b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ced8a3baa6519744659220189ff4be2c047bb636))
+* **ads:** show one inline banner in each Schedule tab on phones ([8978051](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8978051f367ddc7a2cb44656ee0b586cd4880c56))
+
+
+
 # [5.45.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.4...v5.45.0) (2026-10-02)
 
 
@@ -43,20 +64,6 @@
 ### Performance Improvements
 
 * **api:** round time filters and sort id filters for cacheable URLs ([2dce1e6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2dce1e6a315c95ebdcec787b88f0e294686b41e1))
-
-
-
-## [5.44.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.0...v5.44.1) (2026-08-31)
-
-
-### Bug Fixes
-
-* **ads:** keep banner mounted in AdState.SHOWN instead of tearing it down ([#179](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/179)) ([8e72425](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8e72425e41c5ceb4e9ae160afef5a745876ab65b))
-* **articles:** fail non-2xx SNAPI responses into the stale-cache fallback ([#190](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/190)) ([cc1cc7b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cc1cc7b6fdd29bae07ff2636a01b7ef4746f1346))
-* **ci:** queue production releases so a newer push never cancels an in-flight Play upload ([37110a9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/37110a9e7f8b574dfa73d4272fd8ffb2339d5cb6))
-* **ios:** make setRevenueCatPushToken non-throwing at the ObjC boundary ([#187](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/187)) ([c7e296f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c7e296f8536240130234b2aa5e4b04b827390339))
-* **ios:** skip ad preload while the root view controller is unattached ([#168](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/168)) ([b28832b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b28832bda6829d511f80a3ea601c2645f93f2090))
-* **ui:** route LaunchVideoPlayer link opens through openUriSafely ([#194](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/194)) ([deaf213](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/deaf21365f35eb840a0b2d4b438ba8e1fd98c413))
 
 
 
