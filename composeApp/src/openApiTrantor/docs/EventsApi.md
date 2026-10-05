@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 Get event detail
 
-Full event payload — description, info_urls/vid_urls (ordered by priority), related launch ids and program ids, plus the embedded launches, programs, space_stations, agencies, astronauts, and expeditions rows (each resource&#39;s list row, nested one level).
+Full event payload — description, info_urls/vid_urls (ordered by priority), related launch ids and program ids, plus the embedded launches, programs, space_stations, agencies, astronauts, and expeditions rows (each resource&#39;s list row, nested one level), plus duration, last_updated, programs[].description and updates[] (newest first).
 
 ### Example
 ```kotlin

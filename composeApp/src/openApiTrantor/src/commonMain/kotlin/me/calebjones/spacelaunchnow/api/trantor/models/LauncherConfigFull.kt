@@ -27,12 +27,16 @@ import kotlinx.serialization.encoding.*
  * @param name 
  * @param active 
  * @param apogee 
+ * @param attemptedLandings 
+ * @param consecutiveSuccessfulLandings 
+ * @param consecutiveSuccessfulLaunches 
  * @param description 
  * @param diameter 
  * @param failedLandings 
  * @param failedLaunches 
  * @param fastestTurnaround 
  * @param fullName 
+ * @param geoCapacity 
  * @param gtoCapacity 
  * @param imageUrl 
  * @param infoUrl 
@@ -48,6 +52,7 @@ import kotlinx.serialization.encoding.*
  * @param minStage 
  * @param pendingLaunches 
  * @param reusable 
+ * @param ssoCapacity 
  * @param successfulLandings 
  * @param successfulLaunches 
  * @param toThrust 
@@ -67,6 +72,12 @@ data class LauncherConfigFull (
 
     @SerialName(value = "apogee") val apogee: kotlin.Double? = null,
 
+    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = 0,
+
+    @SerialName(value = "consecutive_successful_landings") val consecutiveSuccessfulLandings: kotlin.Int? = 0,
+
+    @SerialName(value = "consecutive_successful_launches") val consecutiveSuccessfulLaunches: kotlin.Int? = 0,
+
     @SerialName(value = "description") val description: kotlin.String? = null,
 
     @SerialName(value = "diameter") val diameter: kotlin.Double? = null,
@@ -78,6 +89,8 @@ data class LauncherConfigFull (
     @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null,
 
     @SerialName(value = "full_name") val fullName: kotlin.String? = null,
+
+    @SerialName(value = "geo_capacity") val geoCapacity: kotlin.Double? = null,
 
     @SerialName(value = "gto_capacity") val gtoCapacity: kotlin.Double? = null,
 
@@ -108,6 +121,8 @@ data class LauncherConfigFull (
     @SerialName(value = "pending_launches") val pendingLaunches: kotlin.Int? = 0,
 
     @SerialName(value = "reusable") val reusable: kotlin.Boolean? = false,
+
+    @SerialName(value = "sso_capacity") val ssoCapacity: kotlin.Double? = null,
 
     @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = 0,
 

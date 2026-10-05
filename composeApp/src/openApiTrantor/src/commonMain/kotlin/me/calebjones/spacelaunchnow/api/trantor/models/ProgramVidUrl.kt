@@ -21,29 +21,41 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
+ * Same shape as the event detail's `vid_urls[]` (E14(P5)).
  *
- * @param priority 
  * @param url 
  * @param description 
+ * @param endTime 
  * @param featureImage 
+ * @param live 
+ * @param priority 
+ * @param publisher 
  * @param source 
+ * @param startTime 
  * @param title 
  * @param type 
  */
 @Serializable
 
-data class InfoUrl (
-
-    @SerialName(value = "priority") @Required val priority: kotlin.Int,
+data class ProgramVidUrl (
 
     @SerialName(value = "url") @Required val url: kotlin.String,
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 
+    @SerialName(value = "end_time") val endTime: kotlin.time.Instant? = null,
+
     @SerialName(value = "feature_image") val featureImage: kotlin.String? = null,
 
+    @SerialName(value = "live") val live: kotlin.Boolean? = null,
+
+    @SerialName(value = "priority") val priority: kotlin.Int? = null,
+
+    @SerialName(value = "publisher") val publisher: kotlin.String? = null,
+
     @SerialName(value = "source") val source: kotlin.String? = null,
+
+    @SerialName(value = "start_time") val startTime: kotlin.time.Instant? = null,
 
     @SerialName(value = "title") val title: kotlin.String? = null,
 

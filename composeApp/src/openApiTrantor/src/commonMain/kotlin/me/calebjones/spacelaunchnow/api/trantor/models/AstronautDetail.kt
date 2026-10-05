@@ -27,6 +27,7 @@ import kotlinx.serialization.encoding.*
  * @param id 
  * @param name 
  * @param age 
+ * @param agencyAbbrev 
  * @param agencyId 
  * @param agencyName 
  * @param bio 
@@ -41,6 +42,7 @@ import kotlinx.serialization.encoding.*
  * @param landingsCount 
  * @param lastFlight 
  * @param nationality 
+ * @param nationalityCodes 
  * @param spacewalksCount 
  * @param status 
  * @param statusId 
@@ -58,6 +60,8 @@ data class AstronautDetail (
     @SerialName(value = "name") @Required val name: kotlin.String,
 
     @SerialName(value = "age") val age: kotlin.Int? = null,
+
+    @SerialName(value = "agency_abbrev") val agencyAbbrev: kotlin.String? = null,
 
     @SerialName(value = "agency_id") val agencyId: kotlin.Int? = null,
 
@@ -86,6 +90,8 @@ data class AstronautDetail (
     @SerialName(value = "last_flight") val lastFlight: kotlin.time.Instant? = null,
 
     @SerialName(value = "nationality") val nationality: kotlin.collections.List<kotlin.String>? = null,
+
+    @SerialName(value = "nationality_codes") val nationalityCodes: kotlin.collections.List<kotlin.String>? = null,
 
     @SerialName(value = "spacewalks_count") val spacewalksCount: kotlin.Int? = null,
 

@@ -26,6 +26,7 @@ import kotlinx.serialization.encoding.*
  * @param id 
  * @param name 
  * @param date 
+ * @param description 
  * @param imageUrl 
  * @param launchIds 
  * @param location 
@@ -44,6 +45,8 @@ data class EventList (
     @SerialName(value = "name") @Required val name: kotlin.String,
 
     @SerialName(value = "date") val date: kotlin.time.Instant? = null,
+
+    @SerialName(value = "description") val description: kotlin.String? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 

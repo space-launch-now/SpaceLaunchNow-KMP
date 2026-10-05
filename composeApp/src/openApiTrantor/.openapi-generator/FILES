@@ -11,10 +11,12 @@ docs/AstronautsApi.md
 docs/EventDetail.md
 docs/EventInfoUrl.md
 docs/EventList.md
+docs/EventProgram.md
 docs/EventVidUrl.md
 docs/EventsApi.md
 docs/Expedition.md
 docs/ExpeditionCrewMember.md
+docs/ExpeditionMissionPatch.md
 docs/FamiliesApi.md
 docs/FamilyList.md
 docs/HTTPValidationError.md
@@ -60,6 +62,7 @@ docs/PaginatedResponseStationList.md
 docs/PaginatedResponseUpdateList.md
 docs/ProgramDetail.md
 docs/ProgramList.md
+docs/ProgramVidUrl.md
 docs/ProgramsApi.md
 docs/Rocket.md
 docs/RocketExpanded.md
@@ -120,9 +123,11 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/AstronautL
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/EventDetail.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/EventInfoUrl.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/EventList.kt
+src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/EventProgram.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/EventVidUrl.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/Expedition.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ExpeditionCrewMember.kt
+src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ExpeditionMissionPatch.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/FamilyList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/HTTPValidationError.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/InfoUrl.kt
@@ -160,6 +165,7 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/PaginatedR
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/PaginatedResponseUpdateList.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ProgramDetail.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ProgramList.kt
+src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ProgramVidUrl.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/Rocket.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/RocketExpanded.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/RocketSummary.kt
@@ -176,3 +182,6 @@ src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/UpdateList
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ValidationError.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ValidationErrorLocInner.kt
 src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/VidUrl.kt
+src/test/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/EventProgramTest.kt
+src/test/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ExpeditionMissionPatchTest.kt
+src/test/kotlin/me/calebjones/spacelaunchnow/api/trantor/models/ProgramVidUrlTest.kt

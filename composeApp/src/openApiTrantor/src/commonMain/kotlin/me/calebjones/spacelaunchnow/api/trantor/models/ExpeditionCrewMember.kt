@@ -23,17 +23,29 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
+ * @param agencyAbbrev 
+ * @param agencyId 
+ * @param agencyName 
  * @param astronautId 
  * @param astronautName 
+ * @param imageUrl 
  * @param role 
  */
 @Serializable
 
 data class ExpeditionCrewMember (
 
+    @SerialName(value = "agency_abbrev") val agencyAbbrev: kotlin.String? = null,
+
+    @SerialName(value = "agency_id") val agencyId: kotlin.Int? = null,
+
+    @SerialName(value = "agency_name") val agencyName: kotlin.String? = null,
+
     @SerialName(value = "astronaut_id") val astronautId: kotlin.Int? = null,
 
     @SerialName(value = "astronaut_name") val astronautName: kotlin.String? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "role") val role: kotlin.String? = null
 

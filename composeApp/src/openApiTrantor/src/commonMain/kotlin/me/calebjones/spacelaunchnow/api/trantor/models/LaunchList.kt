@@ -29,16 +29,20 @@ import kotlinx.serialization.encoding.*
  * @param slug 
  * @param status 
  * @param statusId 
+ * @param configurationFullName 
  * @param configurationName 
+ * @param configurationVariant 
  * @param imageUrl 
  * @param locationId 
  * @param locationName 
+ * @param missionDescription 
  * @param missionId 
  * @param missionName 
  * @param netPrecision 
  * @param netPrecisionId 
  * @param padId 
  * @param padName 
+ * @param providerAbbrev 
  * @param providerId 
  * @param providerName 
  * @param rocketId 
@@ -60,13 +64,19 @@ data class LaunchList (
 
     @SerialName(value = "status_id") @Required val statusId: kotlin.Int,
 
+    @SerialName(value = "configuration_full_name") val configurationFullName: kotlin.String? = null,
+
     @SerialName(value = "configuration_name") val configurationName: kotlin.String? = null,
+
+    @SerialName(value = "configuration_variant") val configurationVariant: kotlin.String? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "location_id") val locationId: kotlin.Int? = null,
 
     @SerialName(value = "location_name") val locationName: kotlin.String? = null,
+
+    @SerialName(value = "mission_description") val missionDescription: kotlin.String? = null,
 
     @SerialName(value = "mission_id") val missionId: kotlin.Int? = null,
 
@@ -79,6 +89,8 @@ data class LaunchList (
     @SerialName(value = "pad_id") val padId: kotlin.Int? = null,
 
     @SerialName(value = "pad_name") val padName: kotlin.String? = null,
+
+    @SerialName(value = "provider_abbrev") val providerAbbrev: kotlin.String? = null,
 
     @SerialName(value = "provider_id") val providerId: kotlin.Int? = null,
 

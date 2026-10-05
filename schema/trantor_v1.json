@@ -426,6 +426,17 @@
             ],
             "title": "Age"
           },
+          "agency_abbrev": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agency Abbrev"
+          },
           "agency_id": {
             "anyOf": [
               {
@@ -580,6 +591,14 @@
             "title": "Nationality",
             "type": "array"
           },
+          "nationality_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Nationality Codes",
+            "type": "array"
+          },
           "spacewalks_count": {
             "anyOf": [
               {
@@ -698,6 +717,17 @@
       "AstronautList": {
         "description": "Compact shape for list endpoints.",
         "properties": {
+          "agency_abbrev": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agency Abbrev"
+          },
           "agency_id": {
             "anyOf": [
               {
@@ -787,6 +817,14 @@
             "title": "Nationality",
             "type": "array"
           },
+          "nationality_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Nationality Codes",
+            "type": "array"
+          },
           "status": {
             "anyOf": [
               {
@@ -818,7 +856,7 @@
         "type": "object"
       },
       "EventDetail": {
-        "description": "List row + description + ordered info/vid URL arrays + E7 embeds.",
+        "description": "List row (incl. `description`) + ordered info/vid URL arrays + E7\nembeds + E14(P5) additions.\n\n`duration` is LL's stored free-text interval, served verbatim as a string\n(e.g. `\"01:30:00\"`); null when LL has none. `last_updated` is LL's\nlast-modified timestamp. `updates[]` is the updates flat row, newest first.",
         "properties": {
           "agencies": {
             "default": [],
@@ -859,6 +897,17 @@
             ],
             "title": "Description"
           },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration"
+          },
           "expeditions": {
             "default": [],
             "items": {
@@ -889,6 +938,18 @@
             },
             "title": "Info Urls",
             "type": "array"
+          },
+          "last_updated": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Updated"
           },
           "launch_ids": {
             "default": [],
@@ -932,7 +993,7 @@
           "programs": {
             "default": [],
             "items": {
-              "$ref": "#/components/schemas/ProgramList"
+              "$ref": "#/components/schemas/EventProgram"
             },
             "title": "Programs",
             "type": "array"
@@ -977,6 +1038,14 @@
               }
             ],
             "title": "Type Id"
+          },
+          "updates": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/UpdateList"
+            },
+            "title": "Updates",
+            "type": "array"
           },
           "vid_urls": {
             "default": [],
@@ -1093,6 +1162,17 @@
             ],
             "title": "Date"
           },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -1183,6 +1263,79 @@
           "name"
         ],
         "title": "EventList",
+        "type": "object"
+      },
+      "EventProgram": {
+        "description": "Programs list row + `description` (E14(P5)) - same source as\n`GET /programs/{id}`.",
+        "properties": {
+          "agency_ids": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Agency Ids",
+            "type": "array"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "EventProgram",
         "type": "object"
       },
       "EventVidUrl": {
@@ -1336,6 +1489,14 @@
             "title": "Id",
             "type": "integer"
           },
+          "mission_patches": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ExpeditionMissionPatch"
+            },
+            "title": "Mission Patches",
+            "type": "array"
+          },
           "name": {
             "anyOf": [
               {
@@ -1368,6 +1529,39 @@
       },
       "ExpeditionCrewMember": {
         "properties": {
+          "agency_abbrev": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agency Abbrev"
+          },
+          "agency_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agency Id"
+          },
+          "agency_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agency Name"
+          },
           "astronaut_id": {
             "anyOf": [
               {
@@ -1390,6 +1584,17 @@
             ],
             "title": "Astronaut Name"
           },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
           "role": {
             "anyOf": [
               {
@@ -1403,6 +1608,46 @@
           }
         },
         "title": "ExpeditionCrewMember",
+        "type": "object"
+      },
+      "ExpeditionMissionPatch": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ExpeditionMissionPatch",
         "type": "object"
       },
       "FamilyList": {
@@ -1455,6 +1700,28 @@
       },
       "InfoUrl": {
         "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "feature_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feature Image"
+          },
           "priority": {
             "title": "Priority",
             "type": "integer"
@@ -1569,6 +1836,28 @@
       "LaunchDetail": {
         "description": "Default detail response \u2014 FK IDs + denormalized names.",
         "properties": {
+          "agency_launch_attempt_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agency Launch Attempt Count"
+          },
+          "agency_launch_attempt_count_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agency Launch Attempt Count Year"
+          },
           "failreason": {
             "anyOf": [
               {
@@ -1631,6 +1920,28 @@
               }
             ],
             "title": "Last Updated"
+          },
+          "location_launch_attempt_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Launch Attempt Count"
+          },
+          "location_launch_attempt_count_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Launch Attempt Count Year"
           },
           "mission": {
             "anyOf": [
@@ -1702,6 +2013,28 @@
             ],
             "title": "Net Precision Id"
           },
+          "orbital_launch_attempt_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Orbital Launch Attempt Count"
+          },
+          "orbital_launch_attempt_count_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Orbital Launch Attempt Count Year"
+          },
           "pad": {
             "anyOf": [
               {
@@ -1722,6 +2055,28 @@
               }
             ],
             "title": "Pad Id"
+          },
+          "pad_launch_attempt_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pad Launch Attempt Count"
+          },
+          "pad_launch_attempt_count_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pad Launch Attempt Count Year"
           },
           "pad_turnaround": {
             "anyOf": [
@@ -1911,6 +2266,17 @@
       "LaunchList": {
         "description": "Compact shape for list endpoints.",
         "properties": {
+          "configuration_full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configuration Full Name"
+          },
           "configuration_name": {
             "anyOf": [
               {
@@ -1921,6 +2287,17 @@
               }
             ],
             "title": "Configuration Name"
+          },
+          "configuration_variant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configuration Variant"
           },
           "id": {
             "title": "Id",
@@ -1958,6 +2335,17 @@
               }
             ],
             "title": "Location Name"
+          },
+          "mission_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mission Description"
           },
           "mission_id": {
             "anyOf": [
@@ -2033,6 +2421,17 @@
               }
             ],
             "title": "Pad Name"
+          },
+          "provider_abbrev": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Abbrev"
           },
           "provider_id": {
             "anyOf": [
@@ -2132,6 +2531,17 @@
               }
             ],
             "title": "Info Url"
+          },
+          "profile_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Image"
           }
         },
         "required": [
@@ -2159,6 +2569,21 @@
               }
             ],
             "title": "Apogee"
+          },
+          "attempted_landings": {
+            "default": 0,
+            "title": "Attempted Landings",
+            "type": "integer"
+          },
+          "consecutive_successful_landings": {
+            "default": 0,
+            "title": "Consecutive Successful Landings",
+            "type": "integer"
+          },
+          "consecutive_successful_launches": {
+            "default": 0,
+            "title": "Consecutive Successful Launches",
+            "type": "integer"
           },
           "description": {
             "anyOf": [
@@ -2213,6 +2638,17 @@
               }
             ],
             "title": "Full Name"
+          },
+          "geo_capacity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geo Capacity"
           },
           "gto_capacity": {
             "anyOf": [
@@ -2375,6 +2811,17 @@
             "default": false,
             "title": "Reusable",
             "type": "boolean"
+          },
+          "sso_capacity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sso Capacity"
           },
           "successful_landings": {
             "default": 0,
@@ -4018,6 +4465,14 @@
             ],
             "title": "Start Date"
           },
+          "vid_urls": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProgramVidUrl"
+            },
+            "title": "Vid Urls",
+            "type": "array"
+          },
           "wiki_url": {
             "anyOf": [
               {
@@ -4097,6 +4552,132 @@
           "name"
         ],
         "title": "ProgramList",
+        "type": "object"
+      },
+      "ProgramVidUrl": {
+        "description": "Same shape as the event detail's `vid_urls[]` (E14(P5)).",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "end_time": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Time"
+          },
+          "feature_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feature Image"
+          },
+          "live": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "publisher": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publisher"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "start_time": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Time"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "ProgramVidUrl",
         "type": "object"
       },
       "RocketExpanded": {
@@ -5595,6 +6176,13 @@
       },
       "ValidationError": {
         "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
           "loc": {
             "items": {
               "anyOf": [
@@ -5616,13 +6204,6 @@
           "type": {
             "title": "Error Type",
             "type": "string"
-          },
-          "input": {
-            "title": "Input"
-          },
-          "ctx": {
-            "title": "Context",
-            "type": "object"
           }
         },
         "required": [
@@ -5635,6 +6216,28 @@
       },
       "VidUrl": {
         "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "feature_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feature Image"
+          },
           "live": {
             "default": false,
             "title": "Live",
@@ -6617,7 +7220,7 @@
     },
     "/api/v1/events/{event_id}": {
       "get": {
-        "description": "Full event payload \u2014 description, info_urls/vid_urls (ordered by priority), related launch ids and program ids, plus the embedded launches, programs, space_stations, agencies, astronauts, and expeditions rows (each resource's list row, nested one level).",
+        "description": "Full event payload \u2014 description, info_urls/vid_urls (ordered by priority), related launch ids and program ids, plus the embedded launches, programs, space_stations, agencies, astronauts, and expeditions rows (each resource's list row, nested one level), plus duration, last_updated, programs[].description and updates[] (newest first).",
         "operationId": "get_event_api_v1_events__event_id__get",
         "parameters": [
           {
@@ -7752,7 +8355,7 @@
     },
     "/api/v1/programs/{program_id}": {
       "get": {
-        "description": "Full program payload \u2014 list row plus description, info_url, and wiki_url.",
+        "description": "Full program payload \u2014 list row plus description, info_url, wiki_url, and vid_urls (ordered by priority).",
         "operationId": "get_program_api_v1_programs__program_id__get",
         "parameters": [
           {

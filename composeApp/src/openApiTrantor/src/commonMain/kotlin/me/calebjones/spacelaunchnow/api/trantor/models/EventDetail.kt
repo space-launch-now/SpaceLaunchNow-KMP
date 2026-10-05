@@ -18,18 +18,19 @@ package me.calebjones.spacelaunchnow.api.trantor.models
 import me.calebjones.spacelaunchnow.api.trantor.models.AgencyList
 import me.calebjones.spacelaunchnow.api.trantor.models.AstronautList
 import me.calebjones.spacelaunchnow.api.trantor.models.EventInfoUrl
+import me.calebjones.spacelaunchnow.api.trantor.models.EventProgram
 import me.calebjones.spacelaunchnow.api.trantor.models.EventVidUrl
 import me.calebjones.spacelaunchnow.api.trantor.models.Expedition
 import me.calebjones.spacelaunchnow.api.trantor.models.LaunchList
-import me.calebjones.spacelaunchnow.api.trantor.models.ProgramList
 import me.calebjones.spacelaunchnow.api.trantor.models.StationList
+import me.calebjones.spacelaunchnow.api.trantor.models.UpdateList
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * List row + description + ordered info/vid URL arrays + E7 embeds.
+ * List row (incl. `description`) + ordered info/vid URL arrays + E7 embeds + E14(P5) additions.  `duration` is LL's stored free-text interval, served verbatim as a string (e.g. `\"01:30:00\"`); null when LL has none. `last_updated` is LL's last-modified timestamp. `updates[]` is the updates flat row, newest first.
  *
  * @param id 
  * @param name 
@@ -37,9 +38,11 @@ import kotlinx.serialization.encoding.*
  * @param astronauts 
  * @param date 
  * @param description 
+ * @param duration 
  * @param expeditions 
  * @param imageUrl 
  * @param infoUrls 
+ * @param lastUpdated 
  * @param launchIds 
  * @param launches 
  * @param location 
@@ -49,6 +52,7 @@ import kotlinx.serialization.encoding.*
  * @param spaceStations 
  * @param type 
  * @param typeId 
+ * @param updates 
  * @param vidUrls 
  * @param webcastLive 
  */
@@ -68,11 +72,15 @@ data class EventDetail (
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 
+    @SerialName(value = "duration") val duration: kotlin.String? = null,
+
     @SerialName(value = "expeditions") val expeditions: kotlin.collections.List<Expedition>? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "info_urls") val infoUrls: kotlin.collections.List<EventInfoUrl>? = null,
+
+    @SerialName(value = "last_updated") val lastUpdated: kotlin.time.Instant? = null,
 
     @SerialName(value = "launch_ids") val launchIds: kotlin.collections.List<kotlin.String>? = null,
 
@@ -82,7 +90,7 @@ data class EventDetail (
 
     @SerialName(value = "program_ids") val programIds: kotlin.collections.List<kotlin.Int>? = null,
 
-    @SerialName(value = "programs") val programs: kotlin.collections.List<ProgramList>? = null,
+    @SerialName(value = "programs") val programs: kotlin.collections.List<EventProgram>? = null,
 
     @SerialName(value = "slug") val slug: kotlin.String? = null,
 
@@ -91,6 +99,8 @@ data class EventDetail (
     @SerialName(value = "type") val type: kotlin.String? = null,
 
     @SerialName(value = "type_id") val typeId: kotlin.Int? = null,
+
+    @SerialName(value = "updates") val updates: kotlin.collections.List<UpdateList>? = null,
 
     @SerialName(value = "vid_urls") val vidUrls: kotlin.collections.List<EventVidUrl>? = null,
 

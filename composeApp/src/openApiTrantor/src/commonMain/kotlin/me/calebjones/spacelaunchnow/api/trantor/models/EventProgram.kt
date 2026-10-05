@@ -15,14 +15,13 @@
 
 package me.calebjones.spacelaunchnow.api.trantor.models
 
-import me.calebjones.spacelaunchnow.api.trantor.models.ProgramVidUrl
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * List row + description and external links.
+ * Programs list row + `description` (E14(P5)) - same source as `GET /programs/{id}`.
  *
  * @param id 
  * @param name 
@@ -30,14 +29,11 @@ import kotlinx.serialization.encoding.*
  * @param description 
  * @param endDate 
  * @param imageUrl 
- * @param infoUrl 
  * @param startDate 
- * @param vidUrls 
- * @param wikiUrl 
  */
 @Serializable
 
-data class ProgramDetail (
+data class EventProgram (
 
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
@@ -51,13 +47,7 @@ data class ProgramDetail (
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
-    @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
-
-    @SerialName(value = "start_date") val startDate: kotlin.time.Instant? = null,
-
-    @SerialName(value = "vid_urls") val vidUrls: kotlin.collections.List<ProgramVidUrl>? = null,
-
-    @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
+    @SerialName(value = "start_date") val startDate: kotlin.time.Instant? = null
 
 ) {
 

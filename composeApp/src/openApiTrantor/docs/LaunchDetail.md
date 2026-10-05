@@ -10,18 +10,26 @@
 | **slug** | **kotlin.String** |  |  |
 | **status** | **kotlin.String** |  |  |
 | **statusId** | **kotlin.Int** |  |  |
+| **agencyLaunchAttemptCount** | **kotlin.Int** |  |  [optional] |
+| **agencyLaunchAttemptCountYear** | **kotlin.Int** |  |  [optional] |
 | **failreason** | **kotlin.String** |  |  [optional] |
 | **flightclubUrl** | **kotlin.String** |  |  [optional] |
 | **imageUrl** | **kotlin.String** |  |  [optional] |
 | **infoUrls** | [**kotlin.collections.List&lt;InfoUrl&gt;**](InfoUrl.md) |  |  [optional] |
 | **lastUpdated** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
+| **locationLaunchAttemptCount** | **kotlin.Int** |  |  [optional] |
+| **locationLaunchAttemptCountYear** | **kotlin.Int** |  |  [optional] |
 | **mission** | [**Mission**](Mission.md) |  |  [optional] |
 | **missionId** | **kotlin.Int** |  |  [optional] |
 | **missionPatches** | [**kotlin.collections.List&lt;MissionPatchSchema&gt;**](MissionPatchSchema.md) |  |  [optional] |
 | **netPrecision** | **kotlin.String** |  |  [optional] |
 | **netPrecisionId** | **kotlin.Int** |  |  [optional] |
+| **orbitalLaunchAttemptCount** | **kotlin.Int** |  |  [optional] |
+| **orbitalLaunchAttemptCountYear** | **kotlin.Int** |  |  [optional] |
 | **pad** | [**PadSummary**](PadSummary.md) |  |  [optional] |
 | **padId** | **kotlin.Int** |  |  [optional] |
+| **padLaunchAttemptCount** | **kotlin.Int** |  |  [optional] |
+| **padLaunchAttemptCountYear** | **kotlin.Int** |  |  [optional] |
 | **padTurnaround** | **kotlin.String** |  |  [optional] |
 | **probability** | **kotlin.Int** |  |  [optional] |
 | **provider** | [**AgencySummary**](AgencySummary.md) |  |  [optional] |

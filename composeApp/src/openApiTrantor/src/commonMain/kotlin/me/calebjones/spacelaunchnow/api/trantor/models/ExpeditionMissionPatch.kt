@@ -23,28 +23,22 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param comment 
- * @param createdOn 
  * @param id 
- * @param createdBy 
- * @param infoUrl 
- * @param profileImage 
+ * @param name 
+ * @param imageUrl 
+ * @param priority 
  */
 @Serializable
 
-data class LaunchUpdate (
-
-    @SerialName(value = "comment") @Required val comment: kotlin.String,
-
-    @SerialName(value = "created_on") @Required val createdOn: kotlin.time.Instant,
+data class ExpeditionMissionPatch (
 
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
-    @SerialName(value = "created_by") val createdBy: kotlin.String? = null,
+    @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
-    @SerialName(value = "profile_image") val profileImage: kotlin.String? = null
+    @SerialName(value = "priority") val priority: kotlin.Int? = null
 
 ) {
 

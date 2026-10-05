@@ -25,6 +25,7 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
+ * @param agencyAbbrev 
  * @param agencyId 
  * @param agencyName 
  * @param firstFlight 
@@ -33,6 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param inSpace 
  * @param lastFlight 
  * @param nationality 
+ * @param nationalityCodes 
  * @param status 
  * @param statusId 
  */
@@ -43,6 +45,8 @@ data class AstronautList (
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
     @SerialName(value = "name") @Required val name: kotlin.String,
+
+    @SerialName(value = "agency_abbrev") val agencyAbbrev: kotlin.String? = null,
 
     @SerialName(value = "agency_id") val agencyId: kotlin.Int? = null,
 
@@ -59,6 +63,8 @@ data class AstronautList (
     @SerialName(value = "last_flight") val lastFlight: kotlin.time.Instant? = null,
 
     @SerialName(value = "nationality") val nationality: kotlin.collections.List<kotlin.String>? = null,
+
+    @SerialName(value = "nationality_codes") val nationalityCodes: kotlin.collections.List<kotlin.String>? = null,
 
     @SerialName(value = "status") val status: kotlin.String? = null,
 

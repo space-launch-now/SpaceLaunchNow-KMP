@@ -46,7 +46,7 @@ open class ProgramsApi : ApiClient {
 
     /**
      * Get program detail
-     * Full program payload — list row plus description, info_url, and wiki_url.
+     * Full program payload — list row plus description, info_url, wiki_url, and vid_urls (ordered by priority).
      * @param programId 
      * @return ProgramDetail
      */

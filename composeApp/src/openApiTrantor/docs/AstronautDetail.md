@@ -7,6 +7,7 @@
 | **id** | **kotlin.Int** |  |  |
 | **name** | **kotlin.String** |  |  |
 | **age** | **kotlin.Int** |  |  [optional] |
+| **agencyAbbrev** | **kotlin.String** |  |  [optional] |
 | **agencyId** | **kotlin.Int** |  |  [optional] |
 | **agencyName** | **kotlin.String** |  |  [optional] |
 | **bio** | **kotlin.String** |  |  [optional] |
@@ -21,6 +22,7 @@
 | **landingsCount** | **kotlin.Int** |  |  [optional] |
 | **lastFlight** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **nationality** | **kotlin.collections.List&lt;kotlin.String&gt;** |  |  [optional] |
+| **nationalityCodes** | **kotlin.collections.List&lt;kotlin.String&gt;** |  |  [optional] |
 | **spacewalksCount** | **kotlin.Int** |  |  [optional] |
 | **status** | **kotlin.String** |  |  [optional] |
 | **statusId** | **kotlin.Int** |  |  [optional] |

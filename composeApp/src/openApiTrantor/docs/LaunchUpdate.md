@@ -9,6 +9,7 @@
 | **id** | **kotlin.Int** |  |  |
 | **createdBy** | **kotlin.String** |  |  [optional] |
 | **infoUrl** | **kotlin.String** |  |  [optional] |
+| **profileImage** | **kotlin.String** |  |  [optional] |
 
 
 

@@ -38,18 +38,26 @@ import kotlinx.serialization.encoding.*
  * @param slug 
  * @param status 
  * @param statusId 
+ * @param agencyLaunchAttemptCount 
+ * @param agencyLaunchAttemptCountYear 
  * @param failreason 
  * @param flightclubUrl 
  * @param imageUrl 
  * @param infoUrls 
  * @param lastUpdated 
+ * @param locationLaunchAttemptCount 
+ * @param locationLaunchAttemptCountYear 
  * @param mission 
  * @param missionId 
  * @param missionPatches 
  * @param netPrecision 
  * @param netPrecisionId 
+ * @param orbitalLaunchAttemptCount 
+ * @param orbitalLaunchAttemptCountYear 
  * @param pad 
  * @param padId 
+ * @param padLaunchAttemptCount 
+ * @param padLaunchAttemptCountYear 
  * @param padTurnaround 
  * @param probability 
  * @param provider 
@@ -81,6 +89,10 @@ data class LaunchDetail (
 
     @SerialName(value = "status_id") @Required val statusId: kotlin.Int,
 
+    @SerialName(value = "agency_launch_attempt_count") val agencyLaunchAttemptCount: kotlin.Int? = null,
+
+    @SerialName(value = "agency_launch_attempt_count_year") val agencyLaunchAttemptCountYear: kotlin.Int? = null,
+
     @SerialName(value = "failreason") val failreason: kotlin.String? = null,
 
     @SerialName(value = "flightclub_url") val flightclubUrl: kotlin.String? = null,
@@ -90,6 +102,10 @@ data class LaunchDetail (
     @SerialName(value = "info_urls") val infoUrls: kotlin.collections.List<InfoUrl>? = null,
 
     @SerialName(value = "last_updated") val lastUpdated: kotlin.time.Instant? = null,
+
+    @SerialName(value = "location_launch_attempt_count") val locationLaunchAttemptCount: kotlin.Int? = null,
+
+    @SerialName(value = "location_launch_attempt_count_year") val locationLaunchAttemptCountYear: kotlin.Int? = null,
 
     @SerialName(value = "mission") val mission: Mission? = null,
 
@@ -101,9 +117,17 @@ data class LaunchDetail (
 
     @SerialName(value = "net_precision_id") val netPrecisionId: kotlin.Int? = null,
 
+    @SerialName(value = "orbital_launch_attempt_count") val orbitalLaunchAttemptCount: kotlin.Int? = null,
+
+    @SerialName(value = "orbital_launch_attempt_count_year") val orbitalLaunchAttemptCountYear: kotlin.Int? = null,
+
     @SerialName(value = "pad") val pad: PadSummary? = null,
 
     @SerialName(value = "pad_id") val padId: kotlin.Int? = null,
+
+    @SerialName(value = "pad_launch_attempt_count") val padLaunchAttemptCount: kotlin.Int? = null,
+
+    @SerialName(value = "pad_launch_attempt_count_year") val padLaunchAttemptCountYear: kotlin.Int? = null,
 
     @SerialName(value = "pad_turnaround") val padTurnaround: kotlin.String? = null,
 

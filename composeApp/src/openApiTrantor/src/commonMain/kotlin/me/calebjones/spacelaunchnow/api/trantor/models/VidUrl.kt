@@ -25,6 +25,8 @@ import kotlinx.serialization.encoding.*
  *
  * @param priority 
  * @param url 
+ * @param description 
+ * @param featureImage 
  * @param live 
  * @param publisher 
  * @param source 
@@ -39,6 +41,10 @@ data class VidUrl (
     @SerialName(value = "priority") @Required val priority: kotlin.Int,
 
     @SerialName(value = "url") @Required val url: kotlin.String,
+
+    @SerialName(value = "description") val description: kotlin.String? = null,
+
+    @SerialName(value = "feature_image") val featureImage: kotlin.String? = null,
 
     @SerialName(value = "live") val live: kotlin.Boolean? = false,
 

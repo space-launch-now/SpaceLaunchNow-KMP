@@ -16,6 +16,7 @@
 package me.calebjones.spacelaunchnow.api.trantor.models
 
 import me.calebjones.spacelaunchnow.api.trantor.models.ExpeditionCrewMember
+import me.calebjones.spacelaunchnow.api.trantor.models.ExpeditionMissionPatch
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -27,6 +28,7 @@ import kotlinx.serialization.encoding.*
  * @param id 
  * @param crew 
  * @param end 
+ * @param missionPatches 
  * @param name 
  * @param start 
  */
@@ -39,6 +41,8 @@ data class Expedition (
     @SerialName(value = "crew") val crew: kotlin.collections.List<ExpeditionCrewMember>? = null,
 
     @SerialName(value = "end") val end: kotlin.time.Instant? = null,
+
+    @SerialName(value = "mission_patches") val missionPatches: kotlin.collections.List<ExpeditionMissionPatch>? = null,
 
     @SerialName(value = "name") val name: kotlin.String? = null,
 
