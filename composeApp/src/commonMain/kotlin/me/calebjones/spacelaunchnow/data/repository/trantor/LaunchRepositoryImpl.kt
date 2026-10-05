@@ -52,10 +52,18 @@ class LaunchRepositoryImpl(
     private val agenciesApi: AgenciesApi,
     private val appPreferences: AppPreferences,
     private val localDataSource: LaunchLocalDataSource? = null,
-    private val statsLocalDataSource: StatsLocalDataSource? = null
+    private val statsLocalDataSource: StatsLocalDataSource? = null,
+    private val statusAbbrevResolver: LaunchStatusAbbrevResolver? = null
 ) : LaunchRepository {
 
     private val log = logger()
+
+    // Trantor rows carry no status abbrev; fill it from the lookups payload. A missing
+    // resolver or unavailable lookups leaves it null so the UI falls back to the status name.
+    private suspend fun Launch.resolved(): Launch = statusAbbrevResolver?.resolve(this) ?: this
+
+    private suspend fun PaginatedResult<Launch>.resolved(): PaginatedResult<Launch> =
+        statusAbbrevResolver?.resolve(this) ?: this
 
     /** Status ids to exclude when the user has enabled "hide TBD launches" (TBD=2, TBC=8). */
     private suspend fun hideTbdStatusIds(): List<Int>? {
@@ -115,7 +123,7 @@ class LaunchRepositoryImpl(
         val first = results.firstOrNull() ?: return results
         val merged = try {
             val cachedDetail = if (!forceRefresh) localDataSource?.getDetailedLaunch(first.id) else null
-            val detail = cachedDetail ?: launchesApi.getLaunchDetail(first.id).body().toDomain()
+            val detail = cachedDetail ?: launchesApi.getLaunchDetail(first.id).body().toDomain().resolved()
                 .also { localDataSource?.cacheDetailedLaunch(it) }
             mergeDetailOverRow(first, detail)
         } catch (cancellation: CancellationException) {
@@ -158,7 +166,7 @@ class LaunchRepositoryImpl(
             netAfter = netGt,
             netBefore = netLt,
             ordering = "net"
-        ).body().toDomain()
+        ).body().toDomain().resolved()
     }
 
     override suspend fun getPreviousLaunchesDomain(
@@ -170,7 +178,7 @@ class LaunchRepositoryImpl(
             offset = offset,
             previous = true,
             ordering = "-net"
-        ).body().toDomain()
+        ).body().toDomain().resolved()
     }
 
     override suspend fun getFeaturedLaunchDomain(
@@ -216,7 +224,7 @@ class LaunchRepositoryImpl(
                 providerIds = agencyIds,
                 locationIds = locationIds,
                 statusIds = hideTbdStatusIds()
-            ).body().toDomain()
+            ).body().toDomain().resolved()
 
             if (launches.results.isNotEmpty()) {
                 localDataSource?.cacheListLaunches(launches.results.take(4))
@@ -277,7 +285,7 @@ class LaunchRepositoryImpl(
                 locationIds = locationIds,
                 limit = 5,
                 ordering = "net"
-            ).body().toDomain()
+            ).body().toDomain().resolved()
 
             if (launches.results.isNotEmpty()) {
                 localDataSource?.cacheListLaunches(launches.results)
@@ -341,7 +349,7 @@ class LaunchRepositoryImpl(
                 providerIds = agencyIds,
                 locationIds = locationIds,
                 statusIds = hideTbdStatusIds()
-            ).body().toDomain()
+            ).body().toDomain().resolved()
 
             localDataSource?.cacheListLaunches(launches.results)
             log.i { "Fetched and cached ${launches.results.size} upcoming launches (agencies=$agencyIds, locations=$locationIds)" }
@@ -411,7 +419,7 @@ class LaunchRepositoryImpl(
                 ordering = "-net",
                 providerIds = agencyIds,
                 locationIds = locationIds
-            ).body().toDomain()
+            ).body().toDomain().resolved()
 
             localDataSource?.cacheListLaunches(launches.results)
             log.i { "Fetched and cached ${launches.results.size} previous launches (agencies=$agencyIds, locations=$locationIds)" }
@@ -454,7 +462,7 @@ class LaunchRepositoryImpl(
                 }
             }
 
-            val launch = launchesApi.getLaunchDetail(id).body().toDomain()
+            val launch = launchesApi.getLaunchDetail(id).body().toDomain().resolved()
             localDataSource?.cacheDetailedLaunch(launch)
             log.i { "Fetched and cached detailed launch: ${launch.name} (ID: ${launch.id})" }
             return Result.success(launch)
@@ -485,7 +493,7 @@ class LaunchRepositoryImpl(
             upcoming = true,
             ordering = "net",
             programIds = programId ?: listOf(1)
-        ).body().toDomain()
+        ).body().toDomain().resolved()
     }
 
     override suspend fun getStarshipHistoryDomain(
@@ -514,7 +522,7 @@ class LaunchRepositoryImpl(
                 previous = true,
                 ordering = "-net",
                 programIds = listOf(1) // Starship program
-            ).body().toDomain()
+            ).body().toDomain().resolved()
 
             localDataSource?.cacheStarshipHistory(launches.results)
             log.i { "Fetched and cached ${launches.results.size} Starship history launches" }
@@ -540,7 +548,7 @@ class LaunchRepositoryImpl(
     }
 
     override suspend fun getLaunchByIdDomain(id: String): Result<Launch?> = apiCall("getLaunchByIdDomain") {
-        launchesApi.getLaunchDetail(id).body().toDomain()
+        launchesApi.getLaunchDetail(id).body().toDomain().resolved()
     }
 
     override suspend fun getFilteredLaunchesDomain(
@@ -578,7 +586,7 @@ class LaunchRepositoryImpl(
             orbitIds = orbitIds,
             missionTypeIds = missionTypeIds,
             familyIds = launcherConfigFamilyIds
-        ).body().toDomain()
+        ).body().toDomain().resolved()
     }
 
     // ── Non-deprecated legacy passthroughs (now domain-typed; see LaunchRepository) ──────
@@ -594,7 +602,7 @@ class LaunchRepositoryImpl(
             netDay = day,
             netMonth = month,
             ordering = "-net"
-        ).body().toDomain()
+        ).body().toDomain().resolved()
     }
 
     /**
@@ -610,12 +618,12 @@ class LaunchRepositoryImpl(
 
     override suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedResult<Launch>> =
         apiCall("getNextDetailedLaunch") {
-            launchesApi.getLaunchList(limit = limit, upcoming = true, ordering = "net").body().toDomain()
+            launchesApi.getLaunchList(limit = limit, upcoming = true, ordering = "net").body().toDomain().resolved()
         }
 
     override suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedResult<Launch>> =
         apiCall("getNextNormalLaunch") {
-            launchesApi.getLaunchList(limit = limit, upcoming = true, ordering = "net").body().toDomain()
+            launchesApi.getLaunchList(limit = limit, upcoming = true, ordering = "net").body().toDomain().resolved()
         }
 
     override suspend fun getStatsCount(

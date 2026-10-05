@@ -64,6 +64,7 @@ import me.calebjones.spacelaunchnow.data.repository.trantor.AstronautFilterRepos
 import me.calebjones.spacelaunchnow.data.repository.trantor.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.trantor.EventsRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.trantor.LaunchRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.trantor.LaunchStatusAbbrevResolver
 import me.calebjones.spacelaunchnow.data.repository.trantor.LauncherConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.trantor.LauncherRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.trantor.ProgramRepositoryImpl
@@ -236,7 +237,8 @@ val appModule = module {
                 agenciesApi = get(),
                 appPreferences = get(),
                 localDataSource = get(),
-                statsLocalDataSource = get()
+                statsLocalDataSource = get(),
+                statusAbbrevResolver = LaunchStatusAbbrevResolver(get<me.calebjones.spacelaunchnow.api.trantor.apis.LookupsApi>())
             )
         }
     }
