@@ -1,7 +1,9 @@
 package me.calebjones.spacelaunchnow.domain.mapper.trantor
 
 import me.calebjones.spacelaunchnow.api.trantor.models.ProgramDetail as TrantorProgramDetail
+import me.calebjones.spacelaunchnow.api.trantor.models.ProgramVidUrl
 import me.calebjones.spacelaunchnow.domain.model.Program
+import me.calebjones.spacelaunchnow.domain.model.VideoLink
 
 /**
  * Map the Trantor [TrantorProgramDetail] to the full [Program] domain type
@@ -13,7 +15,8 @@ import me.calebjones.spacelaunchnow.domain.model.Program
  * - `agencies`: Trantor only returns `agency_ids` (no names), and [me.calebjones.spacelaunchnow.domain.model.Provider.name]
  *   is a required non-null field, so building a `Provider` list without real names would mean
  *   inventing data. Left empty rather than faked.
- * - `missionPatches` / `vidUrls`: not present on the Trantor program payload.
+ * - `missionPatches`: not present on the Trantor program payload. `vidUrls` is mapped
+ *   from `vid_urls[]` since E14(P5).
  */
 fun TrantorProgramDetail.toDomainProgram(): Program = Program(
     id = id,
@@ -27,5 +30,16 @@ fun TrantorProgramDetail.toDomainProgram(): Program = Program(
     endDate = endDate,
     agencies = emptyList(),
     missionPatches = emptyList(),
-    vidUrls = emptyList()
+    vidUrls = vidUrls?.map { it.toDomain() } ?: emptyList()
+)
+
+fun ProgramVidUrl.toDomain(): VideoLink = VideoLink(
+    url = url,
+    title = title,
+    source = source,
+    publisher = publisher,
+    description = description,
+    featureImage = featureImage,
+    live = live,
+    priority = priority
 )

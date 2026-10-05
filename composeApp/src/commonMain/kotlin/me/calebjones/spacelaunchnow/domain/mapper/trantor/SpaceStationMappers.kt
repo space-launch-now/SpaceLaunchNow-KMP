@@ -2,12 +2,14 @@ package me.calebjones.spacelaunchnow.domain.mapper.trantor
 
 import me.calebjones.spacelaunchnow.api.trantor.models.Expedition as TrantorExpedition
 import me.calebjones.spacelaunchnow.api.trantor.models.ExpeditionCrewMember as TrantorExpeditionCrewMember
+import me.calebjones.spacelaunchnow.api.trantor.models.ExpeditionMissionPatch as TrantorExpeditionMissionPatch
 import me.calebjones.spacelaunchnow.api.trantor.models.StationDetail as TrantorStationDetail
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.domain.model.CrewMember
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionMiniItem
+import me.calebjones.spacelaunchnow.domain.model.MissionPatchSummary
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 
 // ==================== Trantor overloads (phase5-browse-space migration) ====================
@@ -21,12 +23,12 @@ import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 // - `dockingLocations`: no docking-location entity exists in the Trantor contract at all.
 // - `activeExpeditions`: Trantor's `expeditions[]` is the full history, not filtered to
 //   "active"; approximated here as expeditions with no `end` date.
-// - `ExpeditionDetailItem.missionPatches` / `.spacewalks`: not present on Trantor's embedded
-//   expedition/crew payload.
-// - `CrewMember.astronaut`: Trantor's crew entries carry only `astronaut_id`/`astronaut_name`
-//   /`role` (no full astronaut record), so the embedded `AstronautListItem` below only has
-//   those three fields populated and everything else null/empty — not a fabrication, just a
-//   much thinner astronaut reference than the old per-expedition LL payload provided.
+// - `ExpeditionDetailItem.spacewalks`: not present on Trantor's embedded expedition payload.
+//   (`mission_patches[]` is mapped since E14(P5).)
+// - `CrewMember.astronaut`: Trantor's crew entries carry `astronaut_id`/`astronaut_name`/
+//   `role` plus, since E14(P5), `image_url` and the agency id/name/abbrev (no full astronaut
+//   record), so the embedded `AstronautListItem` fills those and leaves everything else
+//   null/empty — not a fabrication, just a thinner reference than the old LL payload.
 
 fun TrantorStationDetail.toDomain(): SpaceStationDetail = SpaceStationDetail(
     id = id,
@@ -81,8 +83,15 @@ fun TrantorExpedition.toDomainDetail(): ExpeditionDetailItem = ExpeditionDetailI
     start = start,
     end = end,
     crew = (crew ?: emptyList()).map { it.toDomainCrewMember() },
-    missionPatches = emptyList(),
+    missionPatches = missionPatches?.map { it.toDomain() } ?: emptyList(),
     spacewalks = emptyList()
+)
+
+fun TrantorExpeditionMissionPatch.toDomain(): MissionPatchSummary = MissionPatchSummary(
+    id = id,
+    name = name,
+    imageUrl = imageUrl,
+    priority = priority
 )
 
 fun TrantorExpeditionCrewMember.toDomainCrewMember(): CrewMember = CrewMember(
@@ -93,11 +102,11 @@ fun TrantorExpeditionCrewMember.toDomainCrewMember(): CrewMember = CrewMember(
         name = astronautName,
         statusName = null,
         statusId = null,
-        agencyName = null,
-        agencyAbbrev = null,
-        agencyId = null,
-        imageUrl = null,
-        thumbnailUrl = null,
+        agencyName = agencyName,
+        agencyAbbrev = agencyAbbrev,
+        agencyId = agencyId,
+        imageUrl = imageUrl,
+        thumbnailUrl = imageUrl,
         age = null,
         bio = null,
         typeName = null,
