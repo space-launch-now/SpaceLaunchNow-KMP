@@ -11,15 +11,14 @@ import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
 // ==================== Trantor overloads (phase5-browse-space migration) ====================
 //
-// Escalations (fields the Trantor `/api/v1/astronauts` contract does not expose, left
-// absent rather than fabricated per the fail-closed rule for this unit):
-// - `agencyAbbrev`, `age` (list row), `typeName` (list row): not present on Trantor's
-//   `AstronautList` row (only on `AstronautDetail`, and even there there's no abbrev).
+// Fields the Trantor `/api/v1/astronauts` contract does not expose, left absent rather
+// than fabricated per the fail-closed rule for this unit:
+// - `age` (list row), `typeName` (list row): not present on Trantor's `AstronautList` row
+//   (only on `AstronautDetail`).
 // - `thumbnailUrl`: Trantor exposes a single `image_url`; reused for both fields since
 //   there is no separate thumbnail variant.
-// - `nationality`: Trantor gives plain country-name strings; the domain `Country` type
-//   requires a real non-null `id` we don't have, so this maps to an empty list rather
-//   than inventing ids.
+// - `nationality`: built from `nationality_codes` (ISO alpha-2) via `toDomainCountry()`,
+//   which resolves the display name and flag. Empty when the server sends no codes.
 // - `socialMediaLinks`, `landings`, `spacewalks`: not present on Trantor astronaut detail.
 // - `flights`: now maps to the narrow domain `AstronautFlight` ref type (launch id/name/net
 //   only), which is exactly what Trantor's embedded `AstronautFlight` carries — see
@@ -31,14 +30,14 @@ fun TrantorAstronautList.toDomainListItem(): AstronautListItem = AstronautListIt
     statusName = status,
     statusId = statusId,
     agencyName = agencyName,
-    agencyAbbrev = null,
+    agencyAbbrev = agencyAbbrev,
     agencyId = agencyId,
     imageUrl = imageUrl,
     thumbnailUrl = imageUrl,
     age = null,
     bio = null,
     typeName = null,
-    nationality = emptyList()
+    nationality = nationalityCodes?.map { it.toDomainCountry() } ?: emptyList()
 )
 
 fun TrantorPaginatedAstronautList.toDomain(): PaginatedResult<AstronautListItem> =
@@ -55,14 +54,14 @@ fun TrantorAstronautDetail.toDomainDetail(): AstronautDetail = AstronautDetail(
     statusName = status,
     statusId = statusId,
     agencyName = agencyName,
-    agencyAbbrev = null,
+    agencyAbbrev = agencyAbbrev,
     agencyId = agencyId,
     imageUrl = imageUrl,
     thumbnailUrl = imageUrl,
     age = age,
     bio = bio,
     typeName = type,
-    nationality = emptyList(),
+    nationality = nationalityCodes?.map { it.toDomainCountry() } ?: emptyList(),
     inSpace = inSpace,
     timeInSpace = timeInSpace,
     evaTime = evaTime,
