@@ -4,6 +4,7 @@ import me.calebjones.spacelaunchnow.api.trantor.models.AstronautList
 import me.calebjones.spacelaunchnow.api.trantor.models.EventDetail
 import me.calebjones.spacelaunchnow.api.trantor.models.EventInfoUrl
 import me.calebjones.spacelaunchnow.api.trantor.models.EventList
+import me.calebjones.spacelaunchnow.api.trantor.models.EventProgram
 import me.calebjones.spacelaunchnow.api.trantor.models.EventVidUrl
 import me.calebjones.spacelaunchnow.api.trantor.models.Expedition
 import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseEventList
@@ -34,7 +35,7 @@ fun EventList.toDomain(): Event = Event(
     name = name,
     slug = slug ?: "",
     type = DomainEventType(id = typeId ?: 0, name = type),
-    description = null,
+    description = description,
     date = date,
     location = location,
     imageUrl = imageUrl,
@@ -57,12 +58,12 @@ fun EventDetail.toDomain(): Event = Event(
     location = location,
     imageUrl = imageUrl,
     webcastLive = webcastLive ?: false,
-    lastUpdated = null,
-    duration = null,
+    lastUpdated = lastUpdated,
+    duration = duration,
     datePrecision = null,
     infoUrls = infoUrls?.map { it.toDomain() } ?: emptyList(),
     vidUrls = vidUrls?.map { it.toDomain() } ?: emptyList(),
-    updates = emptyList(),
+    updates = updates?.map { it.toDomain() } ?: emptyList(),
     agencies = agencies?.map { it.toDomain() } ?: emptyList(),
     launches = launches?.map { it.toDomain() } ?: emptyList(),
     expeditions = expeditions?.map { it.toDomainSummary() } ?: emptyList(),
@@ -83,6 +84,16 @@ fun ProgramList.toDomainSummary(): ProgramSummary = ProgramSummary(
     name = name,
     imageUrl = imageUrl,
     description = null,
+    infoUrl = null,
+    wikiUrl = null,
+    type = null
+)
+
+fun EventProgram.toDomainSummary(): ProgramSummary = ProgramSummary(
+    id = id,
+    name = name,
+    imageUrl = imageUrl,
+    description = description,
     infoUrl = null,
     wikiUrl = null,
     type = null

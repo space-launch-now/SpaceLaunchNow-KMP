@@ -6,7 +6,7 @@ import me.calebjones.spacelaunchnow.api.trantor.models.AstronautList
 import me.calebjones.spacelaunchnow.api.trantor.models.EventDetail
 import me.calebjones.spacelaunchnow.api.trantor.models.Expedition
 import me.calebjones.spacelaunchnow.api.trantor.models.LaunchList
-import me.calebjones.spacelaunchnow.api.trantor.models.ProgramList
+import me.calebjones.spacelaunchnow.api.trantor.models.EventProgram
 import me.calebjones.spacelaunchnow.api.trantor.models.StationList
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,7 +25,7 @@ class EventMappersTest {
         astronauts: List<AstronautList>? = null,
         expeditions: List<Expedition>? = null,
         launches: List<LaunchList>? = null,
-        programs: List<ProgramList>? = null,
+        programs: List<EventProgram>? = null,
         spaceStations: List<StationList>? = null
     ) = EventDetail(
         id = 1,
@@ -67,7 +67,7 @@ class EventMappersTest {
                     statusId = 1
                 )
             ),
-            programs = listOf(ProgramList(id = 2, name = "Starlink")),
+            programs = listOf(EventProgram(id = 2, name = "Starlink")),
             spaceStations = listOf(StationList(id = 4, name = "ISS", orbit = "LEO"))
         ).toDomain()
 
