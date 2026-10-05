@@ -7,6 +7,7 @@ import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.Country
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.Provider
+import me.calebjones.spacelaunchnow.util.CountryNames
 
 /**
  * Trantor equivalents of the LL mappers in AgencyMappers.kt.
@@ -17,21 +18,22 @@ import me.calebjones.spacelaunchnow.domain.model.Provider
  * per row from those fields (client pass E7/E9(P5)).
  */
 
+/** Trantor sends bare ISO alpha-2 codes; the display name comes from [CountryNames]. */
+fun String.toDomainCountry(): Country = Country(
+    id = 0,
+    name = CountryNames.nameFor(this),
+    alpha2Code = this,
+    alpha3Code = null,
+    nationalityName = null,
+    nationalityNameComposed = null
+)
+
 fun AgencyList.toDomainAgency(): Agency = Agency(
     id = id,
     name = name,
     abbrev = abbrev,
     typeName = type,
-    countries = countryCodes?.map { code ->
-        Country(
-            id = 0,
-            name = null,
-            alpha2Code = code,
-            alpha3Code = null,
-            nationalityName = null,
-            nationalityNameComposed = null
-        )
-    } ?: emptyList(),
+    countries = countryCodes?.map { it.toDomainCountry() } ?: emptyList(),
     imageUrl = imageUrl,
     logoUrl = logoUrl,
     socialLogoUrl = socialLogoUrl,
@@ -62,16 +64,7 @@ fun AgencyFull.toDomainAgency(): Agency = Agency(
     name = name,
     abbrev = abbrev,
     typeName = agencyType,
-    countries = countryCodes?.map { code ->
-        Country(
-            id = 0,
-            name = null,
-            alpha2Code = code,
-            alpha3Code = null,
-            nationalityName = null,
-            nationalityNameComposed = null
-        )
-    } ?: emptyList(),
+    countries = countryCodes?.map { it.toDomainCountry() } ?: emptyList(),
     imageUrl = imageUrl,
     logoUrl = logoUrl,
     socialLogoUrl = socialLogoUrl,
