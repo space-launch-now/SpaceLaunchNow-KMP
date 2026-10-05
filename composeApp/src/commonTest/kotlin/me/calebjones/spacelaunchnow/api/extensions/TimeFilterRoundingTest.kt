@@ -14,8 +14,8 @@ class TimeFilterRoundingTest {
     private val edge = Instant.parse("2026-10-01T14:10:00Z")
 
     @Test
-    fun `bucket is five minutes`() {
-        assertEquals(5.minutes, TimeFilterRounding.BUCKET)
+    fun `bucket is one minute`() {
+        assertEquals(1.minutes, TimeFilterRounding.BUCKET)
     }
 
     @Test
@@ -35,12 +35,12 @@ class TimeFilterRoundingTest {
 
     @Test
     fun `ceil just after an edge returns the next edge`() {
-        assertEquals(edge + 5.minutes, TimeFilterRounding.ceil(edge + 1.nanoseconds))
+        assertEquals(edge + 1.minutes, TimeFilterRounding.ceil(edge + 1.nanoseconds))
     }
 
     @Test
     fun `floor just before an edge returns the previous edge`() {
-        assertEquals(edge - 5.minutes, TimeFilterRounding.floor(edge - 1.nanoseconds))
+        assertEquals(edge - 1.minutes, TimeFilterRounding.floor(edge - 1.nanoseconds))
     }
 
     @Test
@@ -53,7 +53,7 @@ class TimeFilterRoundingTest {
         // The shape the app sent during the 2026-10-01 incident.
         val sent = Instant.parse("2026-10-01T14:14:12.895063Z")
 
-        assertEquals("2026-10-01T14:10:00Z", TimeFilterRounding.floor(sent).toString())
+        assertEquals("2026-10-01T14:14:00Z", TimeFilterRounding.floor(sent).toString())
         assertEquals("2026-10-01T14:15:00Z", TimeFilterRounding.ceil(sent).toString())
     }
 
@@ -72,8 +72,8 @@ class TimeFilterRoundingTest {
             val ceil = TimeFilterRounding.ceil(instant)
             assertTrue(floor <= instant, "floor($instant) = $floor moved later")
             assertTrue(ceil >= instant, "ceil($instant) = $ceil moved earlier")
-            assertTrue(instant - floor < 5.minutes, "floor($instant) = $floor moved a whole bucket")
-            assertTrue(ceil - instant < 5.minutes, "ceil($instant) = $ceil moved a whole bucket")
+            assertTrue(instant - floor < 1.minutes, "floor($instant) = $floor moved a whole bucket")
+            assertTrue(ceil - instant < 1.minutes, "ceil($instant) = $ceil moved a whole bucket")
         }
     }
 }
