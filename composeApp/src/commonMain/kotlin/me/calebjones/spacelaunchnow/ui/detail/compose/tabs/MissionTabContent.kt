@@ -83,7 +83,8 @@ fun MissionTabContent(
             modifier = Modifier.fillMaxWidth(),
             placementType = AdPlacementType.FEED,
             showRemoveAdsButton = false,
-            showCard = true
+            showCard = true,
+            refreshKey = launch.id
         )
 
         // Bottom spacing for better scrolling

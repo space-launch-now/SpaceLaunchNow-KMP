@@ -44,7 +44,10 @@ actual fun initializeDatadog(
         env = appEnvironment
     )
         .useSite(DatadogSite.US5)
-        .trackCrashes(true)
+        // Crashlytics owns iOS crash reporting (AppDelegate.swift). Running
+        // Datadog's KSCrash handlers alongside it chains terminate handlers
+        // and can obscure the originating app frames.
+        .trackCrashes(false)
         .build()
 
     Datadog.initialize(context, configuration, TrackingConsent.PENDING)

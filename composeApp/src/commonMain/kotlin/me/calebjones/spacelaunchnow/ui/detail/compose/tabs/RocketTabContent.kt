@@ -71,7 +71,8 @@ fun RocketTabContent(
                 modifier = Modifier.fillMaxWidth(),
                 placementType = AdPlacementType.FEED,
                 showRemoveAdsButton = false,
-                showCard = true
+                showCard = true,
+                refreshKey = launch.id
             )
             Spacer(Modifier.height(16.dp))
         }

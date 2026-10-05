@@ -97,9 +97,13 @@ actual fun InterstitialAdHandler(
 
     LaunchedEffect(interstitialAd.state) {
         when (interstitialAd.state) {
-            AdState.READY -> log.d { "🎯 InterstitialAd: Ad loaded successfully and ready to show" }
+            AdState.READY -> {
+                log.d { "🎯 InterstitialAd: Ad loaded successfully and ready to show" }
+                AdTelemetry.loaded("interstitial")
+            }
             AdState.SHOWING -> {
                 log.d { "✅ InterstitialAd: Ad is showing!" }
+                AdTelemetry.impression("interstitial")
                 onAdShown?.invoke()
             }
 
@@ -110,6 +114,7 @@ actual fun InterstitialAdHandler(
 
             AdState.FAILING -> {
                 log.w { "❌ InterstitialAd: Ad failed to load" }
+                AdTelemetry.failed("interstitial", null)
                 onAdFailed?.invoke("Failed to load")
                 adShownThisSession = true
             }

@@ -34,11 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import chaintech.videoplayer.model.VideoPlayerConfig
-import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.rememberScreenVisitKey
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
@@ -69,7 +70,7 @@ fun SpaceStationDetailView(
     issPosition: LatLng?,
     issPositionData: IssPositionData?,
     orbitPath: List<LatLng>,
-    articles: List<Article>,
+    articles: List<ArticleSummary>,
     videoPlayerState: VideoPlayerState,
     onSetPlayerVisible: (Boolean) -> Unit,
     onVideoSelected: (Int) -> Unit,
@@ -115,7 +116,7 @@ private fun SpaceStationDetailContent(
     issPosition: LatLng?,
     issPositionData: IssPositionData?,
     orbitPath: List<LatLng>,
-    articles: List<Article>,
+    articles: List<ArticleSummary>,
     videoPlayerState: VideoPlayerState,
     onSetPlayerVisible: (Boolean) -> Unit,
     onVideoSelected: (Int) -> Unit,
@@ -390,9 +391,11 @@ private fun SpaceStationDetailContent(
         }
 
         // Banner ad
+        val visitKey = rememberScreenVisitKey()
         SmartBannerAd(
             modifier = Modifier.fillMaxWidth(),
-            placementType = AdPlacementType.CONTENT
+            placementType = AdPlacementType.CONTENT,
+            refreshKey = station.id to visitKey
         )
         Spacer(Modifier.height(16.dp))
 

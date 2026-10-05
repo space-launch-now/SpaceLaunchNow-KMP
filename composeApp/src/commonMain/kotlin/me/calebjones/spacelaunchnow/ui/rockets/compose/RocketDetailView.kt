@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.rememberScreenVisitKey
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
@@ -59,9 +60,11 @@ private fun RocketDetailContent(rocket: VehicleConfig) {
         Spacer(Modifier.height(16.dp))
 
         // Banner Ad
+        val visitKey = rememberScreenVisitKey()
         SmartBannerAd(
             modifier = Modifier.fillMaxWidth(),
-            placementType = AdPlacementType.CONTENT
+            placementType = AdPlacementType.CONTENT,
+            refreshKey = rocket.id to visitKey
         )
 
         Spacer(Modifier.height(16.dp))

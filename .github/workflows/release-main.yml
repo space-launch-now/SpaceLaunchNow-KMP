@@ -116,6 +116,8 @@ jobs:
         uses: actions/setup-node@v7
 
       # ai-inference@v3 shells out to the Copilot CLI and expects it on PATH
+      # `model` must be a name the Copilot CLI still offers; a retired name (claude-sonnet-4.5 since 2026-10)
+      # makes the CLI exit 1 and, because these steps are continue-on-error, the release silently ships raw notes.
       - name: Install Copilot CLI
         if: ${{ steps.notes_gate.outputs.has_changelog == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.humanize_notes != 'false') }}
         continue-on-error: true
@@ -129,7 +131,7 @@ jobs:
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         with:
-          model: claude-sonnet-4.5
+          model: claude-sonnet-5
           system-prompt: |
             You write the Google Play "What's new" text for Space Launch Now, a rocket-launch tracking app.
             This text appears on the public Play Store listing for the ANDROID and WEAR OS app only.
@@ -195,7 +197,7 @@ jobs:
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         with:
-          model: claude-sonnet-4.5
+          model: claude-sonnet-5
           system-prompt: |
             You write GitHub Release notes for an Android/iOS/Wear OS space-launch tracking app.
             Rules:
