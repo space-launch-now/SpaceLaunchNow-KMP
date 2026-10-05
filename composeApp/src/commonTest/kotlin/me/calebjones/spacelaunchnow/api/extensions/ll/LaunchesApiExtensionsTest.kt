@@ -46,7 +46,7 @@ class LaunchesApiExtensionsTest {
         api.getLaunchList(limit = 4, netGt = sent, netLt = sent + 1.days, ordering = "net")
 
         val url = requested.single()
-        assertEquals("2026-10-01T14:10:00Z", url.parameters["net__gt"])
+        assertEquals("2026-10-01T14:14:00Z", url.parameters["net__gt"])
         assertEquals("2026-10-02T14:15:00Z", url.parameters["net__lt"])
     }
 
@@ -55,7 +55,7 @@ class LaunchesApiExtensionsTest {
         api.getLaunchMiniList(limit = 1, upcoming = true, netGt = sent, netLt = sent + 1.days)
 
         val url = requested.single()
-        assertEquals("2026-10-01T14:10:00Z", url.parameters["net__gt"])
+        assertEquals("2026-10-01T14:14:00Z", url.parameters["net__gt"])
         assertEquals("2026-10-02T14:15:00Z", url.parameters["net__lt"])
     }
 

@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.api.extensions.ll
+package me.calebjones.spacelaunchnow.api.extensions.trantor
 
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -8,7 +8,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
+import me.calebjones.spacelaunchnow.api.trantor.apis.EventsApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
@@ -20,7 +20,7 @@ class EventsApiExtensionsTest {
     private val requested = mutableListOf<Url>()
 
     private val api = EventsApi(
-        baseUrl = "https://ll.test",
+        baseUrl = "https://trantor.test",
         httpClientEngine = MockEngine { request ->
             requested += request.url
             respond(
@@ -34,13 +34,11 @@ class EventsApiExtensionsTest {
     private val sent = Instant.parse("2026-10-01T14:14:12.895063Z")
 
     @Test
-    fun `getEventList rounds lower date bounds down and upper bounds up`() = runTest {
-        api.getEventList(dateGt = sent, dateGte = sent, dateLt = sent, dateLte = sent)
+    fun `getEventList rounds dateAfter down and dateBefore up`() = runTest {
+        api.getEventList(dateAfter = sent, dateBefore = sent)
 
         val url = requested.single()
-        assertEquals("2026-10-01T14:14:00Z", url.parameters["date__gt"])
-        assertEquals("2026-10-01T14:14:00Z", url.parameters["date__gte"])
-        assertEquals("2026-10-01T14:15:00Z", url.parameters["date__lt"])
-        assertEquals("2026-10-01T14:15:00Z", url.parameters["date__lte"])
+        assertEquals("2026-10-01T14:14:00Z", url.parameters["date_after"])
+        assertEquals("2026-10-01T14:15:00Z", url.parameters["date_before"])
     }
 }

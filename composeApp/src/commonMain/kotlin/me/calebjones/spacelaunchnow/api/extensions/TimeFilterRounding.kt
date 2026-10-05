@@ -15,8 +15,8 @@ import kotlin.time.Instant
  */
 @OptIn(ExperimentalTime::class)
 object TimeFilterRounding {
-    /** Bucket size. Matches the nginx ingress cache TTL. */
-    val BUCKET: Duration = 5.minutes
+    /** Bucket size. Matches the nginx ingress cache key, which cuts time filters to the minute. */
+    val BUCKET: Duration = 1.minutes
 
     /** Rounds down to the start of the bucket. Use for lower bounds (`__gt`, `__gte`). */
     fun floor(instant: Instant, bucket: Duration = BUCKET): Instant {

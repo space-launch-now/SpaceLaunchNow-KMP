@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.api.extensions.trantor
 
+import me.calebjones.spacelaunchnow.api.extensions.TimeFilterRounding
 import me.calebjones.spacelaunchnow.api.trantor.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.trantor.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.trantor.models.LaunchDetail
@@ -29,6 +30,8 @@ private fun List<Int>?.toCommaParam(): String? =
  * There is no server-side `previous` param anymore: `previous = true` is translated to
  * `upcoming = false` here so call sites don't need to know about the rename. A call site
  * that already passes `upcoming` directly is left alone.
+ *
+ * netAfter/netBefore are rounded with [TimeFilterRounding] so caches can serve the request.
  */
 @OptIn(ExperimentalTime::class)
 suspend fun LaunchesApi.getLaunchList(
@@ -55,8 +58,8 @@ suspend fun LaunchesApi.getLaunchList(
     netMonth: Int? = null
 ): HttpResponse<PaginatedResponseLaunchList> = listLaunchesApiV1LaunchesGet(
     upcoming = upcoming ?: previous?.let { !it },
-    netAfter = netAfter,
-    netBefore = netBefore,
+    netAfter = netAfter?.let { TimeFilterRounding.floor(it) },
+    netBefore = netBefore?.let { TimeFilterRounding.ceil(it) },
     netDay = netDay,
     netMonth = netMonth,
     statusIds = statusIds.toCommaParam(),

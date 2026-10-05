@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.api.extensions.trantor
 
+import me.calebjones.spacelaunchnow.api.extensions.TimeFilterRounding
 import me.calebjones.spacelaunchnow.api.trantor.apis.EventsApi
 import me.calebjones.spacelaunchnow.api.trantor.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.trantor.models.EventDetail
@@ -12,6 +13,10 @@ import kotlin.time.Instant
  * mirroring the retired LL EventsApiExtensions' call-site ergonomics.
  */
 
+/**
+ * Get a list of events with clean parameter interface.
+ * Date filters are rounded with [TimeFilterRounding] so caches can serve the request.
+ */
 @OptIn(ExperimentalTime::class)
 suspend fun EventsApi.getEventList(
     limit: Int? = null,
@@ -26,8 +31,8 @@ suspend fun EventsApi.getEventList(
     search: String? = null
 ): HttpResponse<PaginatedResponseEventList> = listEventsApiV1EventsGet(
     upcoming = upcoming,
-    dateAfter = dateAfter,
-    dateBefore = dateBefore,
+    dateAfter = dateAfter?.let { TimeFilterRounding.floor(it) },
+    dateBefore = dateBefore?.let { TimeFilterRounding.ceil(it) },
     typeIds = typeIds?.joinToString(","),
     programIds = programIds?.joinToString(","),
     launchId = launchId,
