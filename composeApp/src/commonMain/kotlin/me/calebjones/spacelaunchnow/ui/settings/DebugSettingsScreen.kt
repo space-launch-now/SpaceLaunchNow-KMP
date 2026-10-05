@@ -536,15 +536,36 @@ private fun SystemTabContent(
                                 ) {
                                     Text("Local", fontSize = 12.sp)
                                 }
+                            }
+
+                            // Trantor target — its own row, since these write the
+                            // Trantor URL preference and never the LL/SNAPI one above.
+                            Text(
+                                text = "Trantor Target:",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
                                 OutlinedButton(
                                     onClick = { debugViewModel.switchToTrantorUrl() },
                                     enabled = !isLoading,
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("Trantor", fontSize = 12.sp)
+                                    Text("Staging", fontSize = 12.sp)
+                                }
+                                OutlinedButton(
+                                    onClick = { debugViewModel.switchToTrantorProdUrl() },
+                                    enabled = !isLoading,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Prod", fontSize = 12.sp)
                                 }
                             }
-                            
+
                             // Current URL Display — both backends, since the Trantor URL
                             // preference is now independent of the LL/SNAPI one above.
                             Text(

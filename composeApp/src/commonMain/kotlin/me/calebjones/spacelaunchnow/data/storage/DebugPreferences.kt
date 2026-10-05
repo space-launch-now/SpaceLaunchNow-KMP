@@ -43,6 +43,8 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         const val LOCAL_API_URL = "http://localhost:8000"
         // Trantor (SpaceLaunchNow-API) staging — Phase 5 KMP client adoption
         const val TRANTOR_API_URL = "https://staging-api.spacelaunchnow.app"
+        // Trantor prod — a debug-menu target only; staging stays the default.
+        const val TRANTOR_PROD_API_URL = "https://api.spacelaunchnow.app"
     }
 
     /**
@@ -160,6 +162,13 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
      */
     suspend fun switchToTrantorUrl() {
         setTrantorApiBaseUrl(TRANTOR_API_URL)
+    }
+
+    /**
+     * Quick method to point the Trantor base URL at production.
+     */
+    suspend fun switchToTrantorProdUrl() {
+        setTrantorApiBaseUrl(TRANTOR_PROD_API_URL)
     }
 
     /**

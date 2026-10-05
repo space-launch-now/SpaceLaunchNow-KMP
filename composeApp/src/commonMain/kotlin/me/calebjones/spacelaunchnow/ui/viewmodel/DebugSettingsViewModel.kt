@@ -207,6 +207,22 @@ class DebugSettingsViewModel(
         }
     }
 
+    fun switchToTrantorProdUrl() {
+        if (debugPreferences == null) return
+
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                debugPreferences.switchToTrantorProdUrl()
+                _statusMessage.value = "Switched to Trantor production API URL"
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to switch to Trantor prod URL: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
     fun switchToLocalUrl() {
         if (debugPreferences == null) return
 
