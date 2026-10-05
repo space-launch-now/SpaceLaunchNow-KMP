@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.ui.components.webview
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.view.accessibility.AccessibilityNodeInfo
 import android.webkit.WebChromeClient
 import android.webkit.WebView as AndroidWebView
 import android.webkit.WebViewClient
@@ -71,6 +72,11 @@ actual fun WebView(
             }
         },
         onRelease = { webView ->
+            webView.performAccessibilityAction(
+                AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS,
+                null,
+            )
+            webView.clearFocus()
             webView.stopLoading()
             webView.destroy()
         },

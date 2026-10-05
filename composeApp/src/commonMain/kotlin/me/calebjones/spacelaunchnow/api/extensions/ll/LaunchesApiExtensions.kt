@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.api.extensions.ll
 
+import me.calebjones.spacelaunchnow.api.extensions.TimeFilterRounding
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
@@ -10,8 +11,14 @@ import kotlin.time.Instant
 
 /**
  * Extension functions for LaunchesApi to provide cleaner, named-parameter interfaces
- * instead of the verbose generated API methods
+ * instead of the verbose generated API methods.
+ *
+ * These functions also make equal requests build equal URLs, so caches can serve them:
+ * time filters are rounded with [TimeFilterRounding], and id filters are sorted and de-duplicated.
  */
+
+/** Sorts and de-duplicates an id filter, so the same set of ids builds the same URL. */
+private fun List<Int>?.normalizedIds(): List<Int>? = this?.distinct()?.sorted()
 
 /**
  * Get launch mini list with commonly used parameters
@@ -62,9 +69,9 @@ suspend fun LaunchesApi.getLaunchMiniList(
     lastUpdatedLte = null,
     launchDesignator = null,
     launcherConfigId = null,
-    launcherConfigFamilyIds = launcherConfigFamilyIds,
+    launcherConfigFamilyIds = launcherConfigFamilyIds.normalizedIds(),
     limit = limit,
-    locationIds = locationIds,
+    locationIds = locationIds.normalizedIds(),
     locationLaunchAttemptCount = null,
     locationLaunchAttemptCountGt = null,
     locationLaunchAttemptCountGte = null,
@@ -75,23 +82,23 @@ suspend fun LaunchesApi.getLaunchMiniList(
     locationLaunchAttemptCountYearGte = null,
     locationLaunchAttemptCountYearLt = null,
     locationLaunchAttemptCountYearLte = null,
-    lspId = lspId,
+    lspId = lspId.normalizedIds(),
     lspName = null,
     missionAgencyIds = null,
     missionOrbitCelestialBodyId = null,
     missionOrbitName = null,
     missionOrbitNameIcontains = null,
-    missionTypeIds = missionTypeIds,
+    missionTypeIds = missionTypeIds.normalizedIds(),
     name = null,
     netDay = netDay,
-    netGt = netGt,
+    netGt = netGt?.let { TimeFilterRounding.floor(it) },
     netGte = null,
-    netLt = netLt,
+    netLt = netLt?.let { TimeFilterRounding.ceil(it) },
     netLte = null,
     netMonth = netMonth,
     netYear = null,
     offset = offset,
-    orbitIds = orbitIds,
+    orbitIds = orbitIds.normalizedIds(),
     orbitalLaunchAttemptCount = null,
     orbitalLaunchAttemptCountGt = null,
     orbitalLaunchAttemptCountGte = null,
@@ -117,8 +124,8 @@ suspend fun LaunchesApi.getLaunchMiniList(
     padLaunchAttemptCountYearLt = null,
     padLaunchAttemptCountYearLte = null,
     previous = previous,
-    program = program,
-    relatedLspId = relatedLspId,
+    program = program.normalizedIds(),
+    relatedLspId = relatedLspId.normalizedIds(),
     relatedLspName = null,
     rocketConfigurationFullName = null,
     rocketConfigurationFullNameIcontains = null,
@@ -134,7 +141,7 @@ suspend fun LaunchesApi.getLaunchMiniList(
     slug = null,
     spacecraftConfigIds = null,
     status = status,
-    statusIds = statusIds,
+    statusIds = statusIds.normalizedIds(),
     upcoming = upcoming,
     upcomingWithRecent = null,
     videoUrl = null,
@@ -199,9 +206,9 @@ suspend fun LaunchesApi.getLaunchList(
     lastUpdatedLte = null,
     launchDesignator = null,
     launcherConfigId = null,
-    launcherConfigFamilyIds = launcherConfigFamilyIds,
+    launcherConfigFamilyIds = launcherConfigFamilyIds.normalizedIds(),
     limit = limit,
-    locationIds = locationIds,
+    locationIds = locationIds.normalizedIds(),
     locationLaunchAttemptCount = null,
     locationLaunchAttemptCountGt = null,
     locationLaunchAttemptCountGte = null,
@@ -212,23 +219,23 @@ suspend fun LaunchesApi.getLaunchList(
     locationLaunchAttemptCountYearGte = null,
     locationLaunchAttemptCountYearLt = null,
     locationLaunchAttemptCountYearLte = null,
-    lspId = lspId,
+    lspId = lspId.normalizedIds(),
     lspName = null,
     missionAgencyIds = null,
     missionOrbitCelestialBodyId = null,
     missionOrbitName = null,
     missionOrbitNameIcontains = null,
-    missionTypeIds = missionTypeIds,
+    missionTypeIds = missionTypeIds.normalizedIds(),
     name = null,
     netDay = netDay,
-    netGt = netGt,
+    netGt = netGt?.let { TimeFilterRounding.floor(it) },
     netGte = null,
-    netLt = netLt,
+    netLt = netLt?.let { TimeFilterRounding.ceil(it) },
     netLte = null,
     netMonth = netMonth,
     netYear = null,
     offset = offset,
-    orbitIds = orbitIds,
+    orbitIds = orbitIds.normalizedIds(),
     orbitalLaunchAttemptCount = null,
     orbitalLaunchAttemptCountGt = null,
     orbitalLaunchAttemptCountGte = null,
@@ -254,8 +261,8 @@ suspend fun LaunchesApi.getLaunchList(
     padLaunchAttemptCountYearLt = null,
     padLaunchAttemptCountYearLte = null,
     previous = previous,
-    program = program,
-    relatedLspId = relatedLspId,
+    program = program.normalizedIds(),
+    relatedLspId = relatedLspId.normalizedIds(),
     relatedLspName = null,
     rocketConfigurationFullName = null,
     rocketConfigurationFullNameIcontains = null,
@@ -271,7 +278,7 @@ suspend fun LaunchesApi.getLaunchList(
     slug = null,
     spacecraftConfigIds = null,
     status = status,
-    statusIds = statusIds,
+    statusIds = statusIds.normalizedIds(),
     upcoming = upcoming,
     upcomingWithRecent = upcomingWithRecent,
     videoUrl = null,

@@ -191,6 +191,8 @@ fun AdaptiveAppScaffold(
                             },
                             placementType = AdPlacementType.NAVIGATION,
                             showCard = false,
+                            // Each navigation may load a fresh ad, subject to the reload floor
+                            refreshKey = navBackStackEntry?.id ?: currentRoute,
                         )
                     }
 

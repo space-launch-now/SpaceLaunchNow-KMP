@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +50,10 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
         // Onboarding A/B variant actually shown to this install ("control"/"short") — sticky once set
         private val ONBOARDING_VARIANT = stringPreferencesKey("onboarding_variant")
+
+        // Interstitial pacing: detail-view visit count and last show time (epoch ms)
+        private val ADS_INTERSTITIAL_VISIT_COUNT = intPreferencesKey("ads_interstitial_visit_count")
+        private val ADS_INTERSTITIAL_LAST_SHOWN_MS = longPreferencesKey("ads_interstitial_last_shown_ms")
 
         // Initial pre-warm completed flag — ensures Tier 2 cache pre-warm only runs on first launch
         private val INITIAL_PREWARM_COMPLETED = booleanPreferencesKey("initial_prewarm_completed")
@@ -209,6 +214,20 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
     suspend fun setOnboardingVariant(variant: String) {
         dataStore.edit { preferences -> preferences[ONBOARDING_VARIANT] = variant }
+    }
+
+    // Interstitial pacing methods
+    suspend fun getInterstitialVisitCount(): Int =
+        dataStore.data.map { it[ADS_INTERSTITIAL_VISIT_COUNT] }.first() ?: 0
+
+    suspend fun getInterstitialLastShownMs(): Long =
+        dataStore.data.map { it[ADS_INTERSTITIAL_LAST_SHOWN_MS] }.first() ?: 0L
+
+    suspend fun setInterstitialState(visitCount: Int, lastShownAtMs: Long) {
+        dataStore.edit { preferences ->
+            preferences[ADS_INTERSTITIAL_VISIT_COUNT] = visitCount
+            preferences[ADS_INTERSTITIAL_LAST_SHOWN_MS] = lastShownAtMs
+        }
     }
 
     // Initial pre-warm flag methods

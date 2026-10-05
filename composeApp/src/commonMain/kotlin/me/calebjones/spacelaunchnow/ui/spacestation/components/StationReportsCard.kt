@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsItem
 
 /**
@@ -29,7 +29,7 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsItem
  */
 @Composable
 fun StationReportsCard(
-    articles: List<Article>,
+    articles: List<ArticleSummary>,
     modifier: Modifier = Modifier,
     onArticleClick: ((url: String, title: String) -> Unit)? = null
 ) {

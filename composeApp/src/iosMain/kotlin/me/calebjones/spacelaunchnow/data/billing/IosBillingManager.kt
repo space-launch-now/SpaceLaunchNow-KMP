@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import com.revenuecat.purchases.kmp.models.CacheFetchPolicy
 import com.revenuecat.purchases.kmp.models.DiscountPaymentMode
 import com.revenuecat.purchases.kmp.models.PeriodType
 import com.revenuecat.purchases.kmp.models.PurchasesException
@@ -40,62 +43,92 @@ class IosBillingManager : BillingManager {
     private val purchases: Purchases
         get() = Purchases.sharedInstance
     
+    // Serialises initialize(): the _isInitialized check-then-set is a check-then-act, and on
+    // Kotlin/Native's multithreaded Dispatchers.Default two concurrent callers could both pass
+    // the guard and configure RevenueCat twice.
+    private val initMutex = Mutex()
+
     override suspend fun initialize(appUserId: String?): Result<Unit> {
-        // Guard against double initialization
+        // Fast path: once initialized, never wait on the mutex. The initializing caller holds
+        // it across two untimed RevenueCat round trips.
         if (_isInitialized.value) {
             log.d { "IosBillingManager already initialized, skipping" }
             return Result.success(Unit)
         }
 
-        return try {
-            log.i { "🚀 Initializing IosBillingManager..." }
-            
-            // Configure RevenueCat with iOS API key
-            Purchases.logLevel = if (RevenueCatConfig.isDebug) LogLevel.DEBUG else LogLevel.WARN
-            
-            val apiKey = AppSecrets.revenueCatIosKey
-            if (apiKey.isEmpty()) {
-                log.e { "❌ RevenueCat iOS API key is empty!" }
-                return Result.failure(IllegalStateException("RevenueCat iOS API key not configured"))
+        return initMutex.withLock {
+            // Re-check under the lock: two callers can both pass the check above.
+            if (_isInitialized.value) {
+                return@withLock Result.success(Unit)
             }
-            
-            log.d { "🔑 Using API key: ${apiKey.take(5)}..." }
-            
-            Purchases.configure(apiKey = apiKey) {
-                this.appUserId = appUserId
-            }
-            
-            _isInitialized.value = true
-            log.i { "✅ IosBillingManager initialized successfully" }
-            
-            // Sync on-device App Store receipt with RevenueCat (silent, no UI).
-            // This is required for users upgrading from legacy versions of the app
-            // so that RevenueCat learns about their prior purchases before we query
-            // customer info. Without this, legacy users appear as FREE tier until
-            // they manually tap "Restore Purchases".
-            // Note: syncPurchases() reads the local receipt and POSTs it to RevenueCat
-            // — it does NOT trigger an Apple ID / StoreKit sign-in dialog.
-            syncPurchases()
 
-            // Now fetch the updated customer info (which includes the synced purchases)
-            refreshPurchaseState()
+            try {
+                log.i { "🚀 Initializing IosBillingManager..." }
             
-            Result.success(Unit)
-        } catch (e: Exception) {
-            log.e(e) { "❌ IosBillingManager initialization failed" }
-            Result.failure(e)
+                // Configure RevenueCat with iOS API key
+                Purchases.logLevel = if (RevenueCatConfig.isDebug) LogLevel.DEBUG else LogLevel.WARN
+            
+                val apiKey = AppSecrets.revenueCatIosKey
+                if (apiKey.isEmpty()) {
+                    log.e { "❌ RevenueCat iOS API key is empty!" }
+                    return@withLock Result.failure(IllegalStateException("RevenueCat iOS API key not configured"))
+                }
+            
+                log.d { "🔑 Using API key: ${apiKey.take(5)}..." }
+            
+                Purchases.configure(apiKey = apiKey) {
+                    this.appUserId = appUserId
+                }
+            
+                _isInitialized.value = true
+                log.i { "✅ IosBillingManager initialized successfully" }
+            
+                // Sync on-device App Store receipt with RevenueCat (silent, no UI).
+                // This is required for users upgrading from legacy versions of the app
+                // so that RevenueCat learns about their prior purchases before we query
+                // customer info. Without this, legacy users appear as FREE tier until
+                // they manually tap "Restore Purchases".
+                // Note: syncPurchases() reads the local receipt and POSTs it to RevenueCat
+                // — it does NOT trigger an Apple ID / StoreKit sign-in dialog.
+                //
+                // On success, onSuccess already applied the fresh CustomerInfo, so nothing is
+                // left to fetch. On failure, RevenueCat's own queue may still be writing the
+                // UserDefaults-backed CustomerInfo cache; reading that cache here raced the write
+                // and faulted inside JSONDecoder (EXC_BAD_ACCESS, issue #192). FETCH_CURRENT
+                // bypasses the cache.
+                if (!syncPurchasesInternal()) {
+                    refreshPurchaseState(CacheFetchPolicy.FETCH_CURRENT)
+                }
+            
+                Result.success(Unit)
+            } catch (e: Exception) {
+                log.e(e) { "❌ IosBillingManager initialization failed" }
+                Result.failure(e)
+            }
         }
     }
     
-    override suspend fun refreshPurchaseState(): Boolean {
+    override suspend fun refreshPurchaseState(): Boolean =
+        refreshPurchaseState(CacheFetchPolicy.default())
+
+    private suspend fun refreshPurchaseState(fetchPolicy: CacheFetchPolicy): Boolean {
         return try {
             log.i { "🔄 Refreshing purchase state..." }
-            val customerInfo = purchases.awaitCustomerInfo()
+            val customerInfo = purchases.awaitCustomerInfo(fetchPolicy)
             updatePurchaseState(customerInfo)
             log.i { "✅ Purchase state refreshed" }
             true
         } catch (e: Exception) {
-            log.e(e) { "❌ Failed to refresh purchase state" }
+            // _purchaseState is deliberately left untouched: lastRefreshed stays 0 (hasLoaded
+            // false) so SubscriptionSyncer skips persisting and a failed refresh never
+            // downgrades a paying user to FREE.
+            if (fetchPolicy == CacheFetchPolicy.FETCH_CURRENT) {
+                // A fresh fetch fails offline; log without the throwable so offline cold starts
+                // do not each file a Crashlytics non-fatal (Warn + throwable still records on iOS).
+                log.w { "Failed to refresh purchase state (fresh fetch after failed sync): ${e.message}" }
+            } else {
+                log.e(e) { "❌ Failed to refresh purchase state" }
+            }
             false
         }
     }
@@ -210,22 +243,26 @@ class IosBillingManager : BillingManager {
     }
     
     override suspend fun syncPurchases() {
+        syncPurchasesInternal()
+    }
+
+    /** Returns true when the sync succeeded and its CustomerInfo was applied. */
+    private suspend fun syncPurchasesInternal(): Boolean =
         suspendCancellableCoroutine { continuation ->
             log.i { "🔄 Syncing purchases..." }
             
             purchases.syncPurchases(
                 onError = { 
                     log.w { "⚠️ Sync failed (non-critical)" }
-                    continuation.resume(Unit) 
+                    continuation.resume(false)
                 },
                 onSuccess = { customerInfo ->
                     log.i { "✅ Purchases synced" }
                     updatePurchaseState(customerInfo)
-                    continuation.resume(Unit)
+                    continuation.resume(true)
                 }
             )
         }
-    }
     
     override fun hasEntitlement(entitlementId: String): Boolean {
         val hasIt = _purchaseState.value.activeEntitlements.contains(entitlementId)
@@ -285,9 +322,8 @@ class IosBillingManager : BillingManager {
         )
 
         // Attach rc_user_id/is_premium to every log line (REMOTE_LOG_SAMPLING_SPEC Phase 0).
-        // Must run BEFORE the richer DatadogRUM.setUser below so that call wins on extraInfo.
-        UserContext.setPremiumStatus(subscriptionType != SubscriptionType.FREE)
-        UserContext.setRevenueCatUserId(customerInfo.originalAppUserId)
+        // Updates flows only; the single richer DatadogRUM.setUser below does the Datadog push.
+        UserContext.setBillingIdentity(customerInfo.originalAppUserId, subscriptionType != SubscriptionType.FREE)
 
         // Update Datadog RUM with user subscription info (parity with AndroidBillingManager)
         DatadogRUM.setUser(

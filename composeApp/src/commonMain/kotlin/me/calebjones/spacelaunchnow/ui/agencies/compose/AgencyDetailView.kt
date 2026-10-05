@@ -60,6 +60,7 @@ import compose.icons.fontawesomeicons.solid.InfoCircle
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.rememberScreenVisitKey
 import me.calebjones.spacelaunchnow.ui.components.CountryChip
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileData
@@ -147,9 +148,11 @@ private fun AgencyDetailContentInBody(
         Spacer(Modifier.height(16.dp))
 
         // Banner Ad
+        val visitKey = rememberScreenVisitKey()
         SmartBannerAd(
             modifier = Modifier.fillMaxWidth(),
-            placementType = AdPlacementType.CONTENT
+            placementType = AdPlacementType.CONTENT,
+            refreshKey = agency.id to visitKey
         )
 
         Spacer(Modifier.height(16.dp))

@@ -76,7 +76,9 @@ actual fun InterstitialAdHandler(
     // Previously this was preloaded at app start which produced ~159K wasted matched
     // requests/month against ~422 actual impressions on Android.
     val interstitialAd by rememberInterstitialAd(
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.INTERSTITIAL)
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.INTERSTITIAL),
+        onLoad = { AdTelemetry.loaded("interstitial") },
+        onFailure = { AdTelemetry.failed("interstitial", it) }
     )
 
     if (BuildConfig.IS_DEBUG) {
@@ -108,6 +110,7 @@ actual fun InterstitialAdHandler(
             AdState.READY -> log.d { "Ad loaded successfully and ready to show" }
             AdState.SHOWING -> {
                 log.d { "Ad is showing!" }
+                AdTelemetry.impression("interstitial")
                 onAdShown?.invoke()
             }
 

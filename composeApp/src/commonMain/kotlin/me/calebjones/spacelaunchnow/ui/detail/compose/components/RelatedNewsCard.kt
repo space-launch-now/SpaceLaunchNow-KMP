@@ -41,6 +41,8 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
+import me.calebjones.spacelaunchnow.domain.mapper.toDomainSummary
+import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 
@@ -104,10 +106,18 @@ fun RelatedNewsCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelatedNewsItem(
     article: Article,
+    onArticleClick: ((url: String, title: String) -> Unit)? = null
+) {
+    RelatedNewsItem(article = article.toDomainSummary(), onArticleClick = onArticleClick)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RelatedNewsItem(
+    article: ArticleSummary,
     onArticleClick: ((url: String, title: String) -> Unit)? = null
 ) {
     val uriHandler = LocalUriHandler.current

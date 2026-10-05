@@ -31,7 +31,8 @@ private val log by lazy { SpaceLogger.getLogger("GlobalAdManager") }
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 actual class GlobalAdManager actual constructor(
-    private val contextFactory: ContextFactory?
+    private val contextFactory: ContextFactory?,
+    private val interstitialGate: InterstitialGate?
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -41,11 +42,7 @@ actual class GlobalAdManager actual constructor(
     var isOptimizationReady by mutableStateOf(false)
         private set
 
-    // Interstitial ad tracking for detailed views
-    private var detailViewVisitCount = 0
-    private var lastInterstitialShownAt = 0L
-    private val minInterstitialInterval = 120_000L // 2 minutes minimum between interstitials
-    private val visitsBeforeInterstitial = 6 // Show interstitial every 6th visit
+    // Interstitial pacing lives in [interstitialGate] (persisted, Remote Config driven)
 
     // Ad configuration cache for faster setup
     private val adConfigurations = mutableMapOf<AdSize, AdConfig>()
@@ -78,36 +75,11 @@ actual class GlobalAdManager actual constructor(
      * Initialize the ad manager and prepare optimizations
      */
     actual fun initializeAndPreload() {
-        // Note: iOS doesn't require a context factory, only Android does
-        if (contextFactory == null && getPlatform().type == PlatformType.ANDROID) {
-            return
-        }
-
-        // Configuration happens synchronously now instead of in coroutine
-        isInitialized = true
-    
-        // Setup configurations synchronously for instant availability
+        // Configuration needs no Android context. The ContextFactory is often not
+        // bound yet when Koin builds this singleton, so never gate on it.
         setupAdConfigurations()
-    }
-    
-    /**
-     * Pre-warm ad requests to reduce time-to-first-ad.
-     * Call this immediately after SDK initialization to signal the system is ready.
-     */
-    actual fun preWarmAdRequests() {
-        if (!isInitialized) {
-            log.w { "🚨 Cannot pre-warm ads: GlobalAdManager not initialized" }
-            return
-        }
-        
-        log.d { "🚀 Pre-warming ad requests - SDK ready for ad loading" }
-        
-        // Signal that optimization is ready for ad requests
-        // The actual preloading happens via WithPreloadedAds CompositionLocal
+        isInitialized = true
         isOptimizationReady = true
-        
-        // Log configuration summary
-        log.d { "📊 Ad configurations ready: ${adConfigurations.size} sizes configured" }
     }
 
     private fun setupAdConfigurations() {
@@ -252,51 +224,29 @@ actual class GlobalAdManager actual constructor(
 
     /**
      * Should show interstitial ad when entering detail view?
-     * Shows every Nth visit (configurable via visitsBeforeInterstitial) with minimum time interval
+     * Delegates to [InterstitialGate]: every Nth visit with a minimum interval,
+     * both set by Remote Config and persisted across launches.
      */
-    actual fun shouldShowInterstitialOnDetailView(): Boolean {
-        detailViewVisitCount++
-
-        val shouldShowByCount = detailViewVisitCount % visitsBeforeInterstitial == 0
-        val currentTime = System.now().toEpochMilliseconds()
-        val enoughTimeElapsed = (currentTime - lastInterstitialShownAt) >= minInterstitialInterval
-
-        val shouldShow = shouldShowByCount && enoughTimeElapsed
-
-        log.d("🎯 InterstitialAd: Visit #$detailViewVisitCount, ShouldShow: $shouldShow (Count: $shouldShowByCount, Time: $enoughTimeElapsed)")
-
-        if (shouldShow) {
-            lastInterstitialShownAt = currentTime
-        }
-
-        return shouldShow
-    }
+    actual fun shouldShowInterstitialOnDetailView(): Boolean =
+        interstitialGate?.shouldShow() ?: false
 
     /**
      * Reset detail view counter (useful for testing or app restart)
      */
     actual fun resetDetailViewCounter() {
-        detailViewVisitCount = 0
-        lastInterstitialShownAt = 0L
-        log.d("🔄 InterstitialAd: Counter reset")
+        interstitialGate?.reset()
     }
 
     /**
      * Get current detail view visit count (for debugging)
      */
-    actual fun getDetailViewVisitCount(): Int = detailViewVisitCount
+    actual fun getDetailViewVisitCount(): Int = interstitialGate?.visitCount ?: 0
 
     /**
      * Get minutes since last interstitial ad was shown (for debugging)
      */
-    actual fun getMinutesSinceLastInterstitial(): Long {
-        val currentTime = System.now().toEpochMilliseconds()
-        return if (lastInterstitialShownAt > 0) {
-            (currentTime - lastInterstitialShownAt) / 60_000L
-        } else {
-            999L // No ad shown yet
-        }
-    }
+    actual fun getMinutesSinceLastInterstitial(): Long =
+        interstitialGate?.minutesSinceLastShown() ?: 999L
 
     actual companion object {
         /**

@@ -84,7 +84,8 @@ fun PhoneLaunchDetailContent(
             modifier = Modifier.fillMaxWidth(),
             placementType = AdPlacementType.INTERSTITIAL,
             showRemoveAdsButton = true,
-            onRemoveAdsClick = onNavigateToSettings
+            onRemoveAdsClick = onNavigateToSettings,
+            refreshKey = launch.id
         )
         Spacer(Modifier.height(16.dp))
 

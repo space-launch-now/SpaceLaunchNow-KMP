@@ -61,6 +61,10 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
 
     override suspend fun getDataBackend(): DataBackend = dataBackend
 
+    override suspend fun getInterstitialVisits(): Int = 4
+
+    override suspend fun getInterstitialMinIntervalSeconds(): Long = 120L
+
     fun reset() {
         shouldFail = false
         failureException = Exception("Mock failure")

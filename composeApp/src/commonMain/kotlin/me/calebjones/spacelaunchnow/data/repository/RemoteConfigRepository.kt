@@ -80,4 +80,16 @@ interface RemoteConfigRepository {
      * Firebase is unavailable — the fail-safe side of the switch.
      */
     suspend fun getDataBackend(): DataBackend
+
+    /**
+     * Detail-view visits between interstitials, from 'ads_interstitial_visits'.
+     * Default 4; a value of 0 or less turns interstitials off.
+     */
+    suspend fun getInterstitialVisits(): Int
+
+    /**
+     * Minimum seconds between interstitials, from 'ads_interstitial_min_interval_s'.
+     * Default 120.
+     */
+    suspend fun getInterstitialMinIntervalSeconds(): Long
 }

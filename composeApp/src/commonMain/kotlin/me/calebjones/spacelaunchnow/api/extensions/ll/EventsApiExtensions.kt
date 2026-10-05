@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.api.extensions.ll
 
+import me.calebjones.spacelaunchnow.api.extensions.TimeFilterRounding
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.EventsApi
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -10,7 +11,8 @@ import kotlin.time.Instant
  */
 
 /**
- * Get a list of events with clean parameter interface
+ * Get a list of events with clean parameter interface.
+ * Date filters are rounded with [TimeFilterRounding] so caches can serve the request.
  */
 @OptIn(ExperimentalTime::class)
 suspend fun EventsApi.getEventList(
@@ -28,10 +30,10 @@ suspend fun EventsApi.getEventList(
     search: String? = null
 ) = this.eventsList(
     agencyIds = agencyIds,
-    dateGt = dateGt,
-    dateGte = dateGte,
-    dateLt = dateLt,
-    dateLte = dateLte,
+    dateGt = dateGt?.let { TimeFilterRounding.floor(it) },
+    dateGte = dateGte?.let { TimeFilterRounding.floor(it) },
+    dateLt = dateLt?.let { TimeFilterRounding.ceil(it) },
+    dateLte = dateLte?.let { TimeFilterRounding.ceil(it) },
     day = null,
     id = null,
     lastUpdatedGte = null,

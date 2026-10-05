@@ -217,6 +217,7 @@ fun TabletDesktopLayout(
                         ),
                         placementType = AdPlacementType.NAVIGATION, // Navigation context
                         showCard = false,
+                        refreshKey = navBackStackEntry?.id,
                     )
                 }
             }
