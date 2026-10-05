@@ -1,4 +1,13 @@
-# [5.46.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.45.0...v5.46.0) (2026-10-02)
+## [5.46.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.0...v5.46.1) (2026-10-05)
+
+
+### Performance Improvements
+
+* **api:** round LL time filters to 1 minute ([#230](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/230)) ([35ba2ee](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/35ba2ee25ae33e0a9e110b1a386523e2fdbaf70f))
+
+
+
+# [5.46.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.45.0...v5.46.0) (2026-10-03)
 
 
 ### Bug Fixes
@@ -55,15 +64,6 @@
 * **ui:** cancel in-flight pagination when rocket, astronaut or agency list reloads ([457b4ad](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/457b4ad949ab88f0cdfd8168a352949ed52aad60))
 * **ui:** dedupe paginated appends in rocket, astronaut and agency lists ([3316dda](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3316ddaf0256c940d1cb9cfd4ba14ec668bfe8da))
 * **ui:** keep full news card layout for domain article summaries ([097a087](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/097a087b35b6ad7d5d0549b1c48e795e37ef3c0f))
-
-
-
-## [5.44.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.1...v5.44.2) (2026-10-01)
-
-
-### Performance Improvements
-
-* **api:** round time filters and sort id filters for cacheable URLs ([2dce1e6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2dce1e6a315c95ebdcec787b88f0e294686b41e1))
 
 
 
