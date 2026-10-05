@@ -81,7 +81,7 @@ fun AgencyDetailView(
     SharedDetailScaffold(
         titleText = agency.name,
         taglineText = agency.typeName,
-        imageUrl = agency.socialLogoUrl,
+        imageUrl = agency.socialLogoUrl ?: agency.logoUrl,
         onNavigateBack = onNavigateBack,
         backgroundColors = listOf(
             MaterialTheme.colorScheme.tertiary,

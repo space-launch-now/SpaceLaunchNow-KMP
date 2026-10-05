@@ -87,7 +87,7 @@ private fun AgencyItem(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                agency.socialLogoUrl?.let { logoUrl ->
+                (agency.socialLogoUrl ?: agency.logoUrl)?.let { logoUrl ->
                     AsyncImage(
                         model = logoUrl,
                         contentDescription = "${agency.name} logo",

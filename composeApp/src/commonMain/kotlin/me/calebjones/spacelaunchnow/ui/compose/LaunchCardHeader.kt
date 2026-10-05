@@ -27,8 +27,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +47,7 @@ import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.agencyLogoCandidates
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -125,17 +128,26 @@ fun LaunchCardHeaderOverlay(
         verticalAlignment = Alignment.Top,
     ) {
         // Circular Agency Logo (if enabled and available) - always top-aligned
-        if (showAgencyLogo && launch.provider.socialLogo != null) {
+        // social_logo_url first, logo_url as fallback (null or load error), then the placeholder.
+        val logoCandidates = remember(launch.provider.socialLogo, launch.provider.logoUrl) {
+            agencyLogoCandidates(launch.provider.socialLogo, launch.provider.logoUrl)
+        }
+        var logoIndex by remember(logoCandidates) { mutableIntStateOf(0) }
+        val logoModel = logoCandidates.getOrNull(logoIndex)
+        if (showAgencyLogo && logoCandidates.isNotEmpty()) {
             SubcomposeAsyncImage(
-                model = launch.provider.socialLogo,
+                model = logoModel,
                 contentDescription = "Agency Logo",
                 modifier = Modifier
                     .size(logoSize)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
+                onError = { if (logoIndex < logoCandidates.lastIndex) logoIndex++ },
                 loading = { AgencyLogoShimmer(logoSize = logoSize) },
                 error = {
-                    Box(
+                    if (logoIndex < logoCandidates.lastIndex) {
+                        AgencyLogoShimmer(logoSize = logoSize)
+                    } else Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(MaterialTheme.colorScheme.surfaceVariant),
