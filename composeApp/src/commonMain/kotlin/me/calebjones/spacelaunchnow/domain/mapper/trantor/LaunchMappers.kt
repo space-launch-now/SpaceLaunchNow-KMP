@@ -16,6 +16,7 @@ import me.calebjones.spacelaunchnow.api.trantor.models.TimelineEvent
 import me.calebjones.spacelaunchnow.api.trantor.models.VidUrl
 import me.calebjones.spacelaunchnow.domain.model.InfoLink
 import me.calebjones.spacelaunchnow.domain.model.LandingAttemptSummary
+import me.calebjones.spacelaunchnow.domain.model.LaunchAttemptCounts
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.LaunchStatus
 import me.calebjones.spacelaunchnow.domain.model.Location
@@ -47,7 +48,6 @@ import me.calebjones.spacelaunchnow.domain.model.Update as DomainUpdate
  *    id. Left null.
  *  - Launch.programs: Trantor's LaunchDetail has no embedded program list (the junction
  *    table exists server-side, but detail doesn't inline it yet). Left empty.
- *  - Launch.launchAttemptCounts: not served by Trantor's launch detail/list. Left null.
  *  - RocketDetail.spacecraftFlights / .payloads: not served by Trantor's Rocket object.
  *    Left empty.
  *  - LandingAttemptSummary.landingLocation / downrangeDistance: Trantor's LandingSummary
@@ -55,10 +55,10 @@ import me.calebjones.spacelaunchnow.domain.model.Update as DomainUpdate
  *    is preserved in the `location` field instead.
  */
 
-private fun flatProvider(providerId: Int?, providerName: String?): Provider = Provider(
+private fun flatProvider(providerId: Int?, providerName: String?, providerAbbrev: String? = null): Provider = Provider(
     id = providerId ?: 0,
     name = providerName ?: "Unknown",
-    abbrev = null,
+    abbrev = providerAbbrev,
     type = null,
     countryCode = null,
     logoUrl = null,
@@ -75,7 +75,7 @@ fun LaunchList.toDomain(): Launch = Launch(
     windowEnd = null,
     lastUpdated = null,
     status = LaunchStatus(id = statusId, name = status, abbrev = null, description = null),
-    provider = flatProvider(providerId, providerName),
+    provider = flatProvider(providerId, providerName, providerAbbrev),
     imageUrl = imageUrl,
     thumbnailUrl = null,
     infographic = null,
@@ -84,9 +84,9 @@ fun LaunchList.toDomain(): Launch = Launch(
         RocketConfig(
             id = rid,
             name = configurationName ?: "",
-            fullName = null,
+            fullName = configurationFullName,
             family = null,
-            variant = null,
+            variant = configurationVariant,
             imageUrl = null,
             active = null,
             reusable = null
@@ -96,7 +96,7 @@ fun LaunchList.toDomain(): Launch = Launch(
         DomainMission(
             id = mid,
             name = missionName ?: "",
-            description = null,
+            description = missionDescription,
             type = null,
             orbit = null,
             imageUrl = null
@@ -229,7 +229,7 @@ fun PadSummary.toDomain(): Pad = Pad(
 
 fun LaunchUpdate.toDomain(): DomainUpdate = DomainUpdate(
     id = id,
-    profileImage = null,
+    profileImage = profileImage,
     comment = comment,
     infoUrl = infoUrl,
     createdBy = createdBy,
@@ -245,8 +245,8 @@ fun InfoUrl.toDomain(): InfoLink = InfoLink(
     url = url,
     title = title,
     source = source,
-    description = null,
-    featureImage = null,
+    description = description,
+    featureImage = featureImage,
     type = type,
     priority = priority
 )
@@ -256,8 +256,8 @@ fun VidUrl.toDomain(): VideoLink = VideoLink(
     title = title,
     source = source,
     publisher = publisher,
-    description = null,
-    featureImage = null,
+    description = description,
+    featureImage = featureImage,
     live = live ?: false,
     priority = priority
 )
@@ -306,7 +306,7 @@ fun LaunchDetail.toDomain(): Launch {
         failreason = failreason,
         hashtag = null,
         webcastLive = webcastLive ?: false,
-        launchAttemptCounts = null,
+        launchAttemptCounts = toLaunchAttemptCounts(),
         updates = updates?.map { it.toDomain() } ?: emptyList(),
         infoUrls = infoUrls?.map { it.toDomain() } ?: emptyList(),
         vidUrls = vidUrls?.map { it.toDomain() } ?: emptyList(),
@@ -317,4 +317,22 @@ fun LaunchDetail.toDomain(): Launch {
         padTurnaround = padTurnaround,
         providerDetail = provider?.toProviderDetail()
     )
+}
+
+/** Null when the server sent none of the eight attempt counters. */
+internal fun LaunchDetail.toLaunchAttemptCounts(): LaunchAttemptCounts? {
+    val counts = LaunchAttemptCounts(
+        orbital = orbitalLaunchAttemptCount,
+        location = locationLaunchAttemptCount,
+        pad = padLaunchAttemptCount,
+        agency = agencyLaunchAttemptCount,
+        orbitalYear = orbitalLaunchAttemptCountYear,
+        locationYear = locationLaunchAttemptCountYear,
+        padYear = padLaunchAttemptCountYear,
+        agencyYear = agencyLaunchAttemptCountYear
+    )
+    val allNull = counts.orbital == null && counts.location == null && counts.pad == null &&
+        counts.agency == null && counts.orbitalYear == null && counts.locationYear == null &&
+        counts.padYear == null && counts.agencyYear == null
+    return if (allNull) null else counts
 }
