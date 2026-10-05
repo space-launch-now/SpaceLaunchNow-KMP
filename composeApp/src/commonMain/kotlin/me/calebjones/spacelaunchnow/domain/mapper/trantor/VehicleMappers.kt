@@ -13,9 +13,10 @@ import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 
 /**
  * Trantor equivalents of the LL mappers in VehicleMappers.kt. Trantor's `/configurations`
- * schema carries `manufacturer_id` only (no denormalized manufacturer name) and no `families`
- * array, so [VehicleConfig.manufacturerName] and [VehicleConfig.family] come back null from
- * every Trantor source below — see Phase 5 browse-vehicles unit escalation.
+ * schema (E10(P5)) joins `manufacturer_name` and `manufacturer_abbrev` beside
+ * `manufacturer_id` at read time; [VehicleConfig] has no abbrev field (no UI reads one), so
+ * only `manufacturerName` is mapped. Trantor still has no `families` array, so
+ * [VehicleConfig.family] comes back null from every source below.
  */
 
 fun LauncherConfigSummary.toVehicleDomain(): VehicleConfig = VehicleConfig(
@@ -27,7 +28,7 @@ fun LauncherConfigSummary.toVehicleDomain(): VehicleConfig = VehicleConfig(
     imageUrl = imageUrl,
     infoUrl = infoUrl,
     wikiUrl = wikiUrl,
-    manufacturerName = null,
+    manufacturerName = manufacturerName,
     active = active,
     reusable = reusable
 )
@@ -42,7 +43,7 @@ fun LauncherConfigFull.toVehicleDomain(): VehicleConfig = VehicleConfig(
     description = description,
     infoUrl = infoUrl,
     wikiUrl = wikiUrl,
-    manufacturerName = null,
+    manufacturerName = manufacturerName,
     minStage = minStage,
     maxStage = maxStage,
     length = length,

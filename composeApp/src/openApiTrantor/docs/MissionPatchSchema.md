@@ -5,9 +5,9 @@
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
 | **id** | **kotlin.Int** |  |  |
+| **imageUrl** | **kotlin.String** |  |  |
 | **name** | **kotlin.String** |  |  |
 | **priority** | **kotlin.Int** |  |  |
-| **imageUrl** | **kotlin.String** |  |  |
 | **agencyId** | **kotlin.Int** |  |  [optional] |
 
 

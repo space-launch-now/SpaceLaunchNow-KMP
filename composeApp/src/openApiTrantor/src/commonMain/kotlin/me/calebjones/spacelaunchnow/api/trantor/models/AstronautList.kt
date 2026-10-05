@@ -25,16 +25,16 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param status 
- * @param statusId 
  * @param agencyId 
  * @param agencyName 
- * @param nationality 
+ * @param firstFlight 
+ * @param flightsCount 
  * @param imageUrl 
  * @param inSpace 
- * @param flightsCount 
- * @param firstFlight 
  * @param lastFlight 
+ * @param nationality 
+ * @param status 
+ * @param statusId 
  */
 @Serializable
 
@@ -44,25 +44,25 @@ data class AstronautList (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "status") val status: kotlin.String? = null,
-
-    @SerialName(value = "status_id") val statusId: kotlin.Int? = null,
-
     @SerialName(value = "agency_id") val agencyId: kotlin.Int? = null,
 
     @SerialName(value = "agency_name") val agencyName: kotlin.String? = null,
 
-    @SerialName(value = "nationality") val nationality: kotlin.collections.List<kotlin.String>? = null,
+    @SerialName(value = "first_flight") val firstFlight: kotlin.time.Instant? = null,
+
+    @SerialName(value = "flights_count") val flightsCount: kotlin.Int? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "in_space") val inSpace: kotlin.Boolean? = false,
 
-    @SerialName(value = "flights_count") val flightsCount: kotlin.Int? = null,
+    @SerialName(value = "last_flight") val lastFlight: kotlin.time.Instant? = null,
 
-    @SerialName(value = "first_flight") val firstFlight: kotlin.time.Instant? = null,
+    @SerialName(value = "nationality") val nationality: kotlin.collections.List<kotlin.String>? = null,
 
-    @SerialName(value = "last_flight") val lastFlight: kotlin.time.Instant? = null
+    @SerialName(value = "status") val status: kotlin.String? = null,
+
+    @SerialName(value = "status_id") val statusId: kotlin.Int? = null
 
 ) {
 

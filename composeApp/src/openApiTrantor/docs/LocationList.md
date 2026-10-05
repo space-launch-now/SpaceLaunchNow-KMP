@@ -6,8 +6,8 @@
 | ------------ | ------------- | ------------- | ------------- |
 | **id** | **kotlin.Int** |  |  |
 | **name** | **kotlin.String** |  |  |
-| **countryCode** | **kotlin.String** |  |  [optional] |
 | **active** | **kotlin.Boolean** |  |  [optional] |
+| **countryCode** | **kotlin.String** |  |  [optional] |
 | **totalLaunchCount** | **kotlin.Int** |  |  [optional] |
 
 

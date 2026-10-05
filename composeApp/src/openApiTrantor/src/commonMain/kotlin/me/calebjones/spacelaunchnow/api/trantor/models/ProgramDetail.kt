@@ -25,12 +25,12 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param imageUrl 
  * @param agencyIds 
- * @param startDate 
- * @param endDate 
  * @param description 
+ * @param endDate 
+ * @param imageUrl 
  * @param infoUrl 
+ * @param startDate 
  * @param wikiUrl 
  */
 @Serializable
@@ -41,17 +41,17 @@ data class ProgramDetail (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
-
     @SerialName(value = "agency_ids") val agencyIds: kotlin.collections.List<kotlin.Int>? = null,
-
-    @SerialName(value = "start_date") val startDate: kotlin.time.Instant? = null,
-
-    @SerialName(value = "end_date") val endDate: kotlin.time.Instant? = null,
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 
+    @SerialName(value = "end_date") val endDate: kotlin.time.Instant? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
     @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
+
+    @SerialName(value = "start_date") val startDate: kotlin.time.Instant? = null,
 
     @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
 

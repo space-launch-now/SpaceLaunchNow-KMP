@@ -15,9 +15,8 @@ import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 /**
  * Implementation of AgencyRepository using the Trantor AgenciesApi (`GET /agencies`).
  *
- * Trantor's `country_code` filter takes a single ISO alpha-2 code, unlike LL's list param —
- * only the first selected code is honored when the caller (the country multi-select filter
- * in AgencyListViewModel) passes more than one; see the Phase 5 browse-vehicles escalation.
+ * Trantor's `country_codes` filter (E6(P5)) takes a CSV of ISO alpha-2 codes, matching the
+ * country multi-select filter in AgencyListViewModel one-to-one.
  */
 class AgencyRepositoryImpl(
     private val agenciesApi: AgenciesApi
@@ -40,7 +39,8 @@ class AgencyRepositoryImpl(
                 search = search,
                 featured = featured,
                 typeIds = typeId?.let { listOf(it) },
-                countryCode = countryCode?.firstOrNull()
+                // E6(P5): the server takes a CSV of codes; the UI multi-selects.
+                countryCodes = countryCode
             )
             Result.success(response.body())
         } catch (e: ResponseException) {

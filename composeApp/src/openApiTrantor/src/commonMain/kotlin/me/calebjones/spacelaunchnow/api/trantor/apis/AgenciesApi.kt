@@ -85,14 +85,14 @@ open class AgenciesApi : ApiClient {
      * @param search Search agency name (optional)
      * @param featured Filter featured agencies (optional)
      * @param typeIds Comma-separated agency type ids (optional)
-     * @param countryCode Agency operates from this country (ISO alpha-2 code) (optional)
+     * @param countryCodes Comma-separated ISO alpha-2 country codes the agency operates from (case-insensitive) (optional)
      * @param ordering Order by &#x60;name&#x60; or &#x60;total_launch_count&#x60;. Prefix - for descending. Unknown values fall back to name. (optional, default to "name")
      * @param limit Number of results per page (optional, default to 25)
      * @param offset Number of results to skip (optional, default to 0)
      * @return PaginatedResponseAgencyList
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun listAgenciesApiV1AgenciesGet(search: kotlin.String? = null, featured: kotlin.Boolean? = null, typeIds: kotlin.String? = null, countryCode: kotlin.String? = null, ordering: kotlin.String? = "name", limit: kotlin.Int? = 25, offset: kotlin.Int? = 0): HttpResponse<PaginatedResponseAgencyList> {
+    open suspend fun listAgenciesApiV1AgenciesGet(search: kotlin.String? = null, featured: kotlin.Boolean? = null, typeIds: kotlin.String? = null, countryCodes: kotlin.String? = null, ordering: kotlin.String? = "name", limit: kotlin.Int? = 25, offset: kotlin.Int? = 0): HttpResponse<PaginatedResponseAgencyList> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -103,7 +103,7 @@ open class AgenciesApi : ApiClient {
         search?.apply { localVariableQuery["search"] = listOf("$search") }
         featured?.apply { localVariableQuery["featured"] = listOf("$featured") }
         typeIds?.apply { localVariableQuery["type_ids"] = listOf("$typeIds") }
-        countryCode?.apply { localVariableQuery["country_code"] = listOf("$countryCode") }
+        countryCodes?.apply { localVariableQuery["country_codes"] = listOf("$countryCodes") }
         ordering?.apply { localVariableQuery["ordering"] = listOf("$ordering") }
         limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
         offset?.apply { localVariableQuery["offset"] = listOf("$offset") }

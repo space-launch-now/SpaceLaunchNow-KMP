@@ -24,28 +24,28 @@ import kotlinx.serialization.encoding.*
 /**
  * One cacheable payload replacing the app's five ``/config/_*`` calls.
  *
- * @param launchStatuses 
- * @param eventTypes 
- * @param orbits 
- * @param missionTypes 
- * @param astronautStatuses 
  * @param agencyTypes 
+ * @param astronautStatuses 
+ * @param eventTypes 
+ * @param launchStatuses 
+ * @param missionTypes 
+ * @param orbits 
  */
 @Serializable
 
 data class LookupsResponse (
 
-    @SerialName(value = "launch_statuses") @Required val launchStatuses: kotlin.collections.List<LookupItem>,
-
-    @SerialName(value = "event_types") @Required val eventTypes: kotlin.collections.List<LookupItem>,
-
-    @SerialName(value = "orbits") @Required val orbits: kotlin.collections.List<LookupItem>,
-
-    @SerialName(value = "mission_types") @Required val missionTypes: kotlin.collections.List<LookupItem>,
+    @SerialName(value = "agency_types") @Required val agencyTypes: kotlin.collections.List<LookupItem>,
 
     @SerialName(value = "astronaut_statuses") @Required val astronautStatuses: kotlin.collections.List<LookupItem>,
 
-    @SerialName(value = "agency_types") @Required val agencyTypes: kotlin.collections.List<LookupItem>
+    @SerialName(value = "event_types") @Required val eventTypes: kotlin.collections.List<LookupItem>,
+
+    @SerialName(value = "launch_statuses") @Required val launchStatuses: kotlin.collections.List<LookupItem>,
+
+    @SerialName(value = "mission_types") @Required val missionTypes: kotlin.collections.List<LookupItem>,
+
+    @SerialName(value = "orbits") @Required val orbits: kotlin.collections.List<LookupItem>
 
 ) {
 

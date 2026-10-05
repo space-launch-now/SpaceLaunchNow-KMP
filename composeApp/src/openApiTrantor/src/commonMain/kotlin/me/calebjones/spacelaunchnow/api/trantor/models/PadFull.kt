@@ -24,20 +24,20 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param id 
- * @param name 
  * @param latitude 
  * @param longitude 
+ * @param name 
+ * @param active 
+ * @param countryCode 
+ * @param description 
+ * @param fastestTurnaround 
+ * @param imageUrl 
  * @param location 
  * @param locationId 
- * @param totalLaunchCount 
- * @param imageUrl 
- * @param active 
- * @param description 
- * @param wikiUrl 
  * @param mapUrl 
- * @param countryCode 
  * @param orbitalLaunchAttemptCount 
- * @param fastestTurnaround 
+ * @param totalLaunchCount 
+ * @param wikiUrl 
  */
 @Serializable
 
@@ -45,33 +45,33 @@ data class PadFull (
 
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
-    @SerialName(value = "name") @Required val name: kotlin.String,
-
     @SerialName(value = "latitude") @Required val latitude: kotlin.Double,
 
     @SerialName(value = "longitude") @Required val longitude: kotlin.Double,
+
+    @SerialName(value = "name") @Required val name: kotlin.String,
+
+    @SerialName(value = "active") val active: kotlin.Boolean? = true,
+
+    @SerialName(value = "country_code") val countryCode: kotlin.String? = null,
+
+    @SerialName(value = "description") val description: kotlin.String? = null,
+
+    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "location") val location: kotlin.String? = null,
 
     @SerialName(value = "location_id") val locationId: kotlin.Int? = null,
 
-    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
-
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
-
-    @SerialName(value = "active") val active: kotlin.Boolean? = true,
-
-    @SerialName(value = "description") val description: kotlin.String? = null,
-
-    @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null,
-
     @SerialName(value = "map_url") val mapUrl: kotlin.String? = null,
-
-    @SerialName(value = "country_code") val countryCode: kotlin.String? = null,
 
     @SerialName(value = "orbital_launch_attempt_count") val orbitalLaunchAttemptCount: kotlin.Int? = 0,
 
-    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null
+    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
+
+    @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
 
 ) {
 

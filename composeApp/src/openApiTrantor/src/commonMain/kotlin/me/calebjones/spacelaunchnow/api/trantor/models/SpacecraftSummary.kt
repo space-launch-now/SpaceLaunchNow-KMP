@@ -25,13 +25,13 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param serialNumber 
- * @param status 
- * @param spacecraftConfigId 
- * @param spacecraftConfigName 
+ * @param imageUrl 
  * @param inSpace 
  * @param isPlaceholder 
- * @param imageUrl 
+ * @param serialNumber 
+ * @param spacecraftConfigId 
+ * @param spacecraftConfigName 
+ * @param status 
  */
 @Serializable
 
@@ -41,19 +41,19 @@ data class SpacecraftSummary (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "serial_number") val serialNumber: kotlin.String? = null,
-
-    @SerialName(value = "status") val status: kotlin.String? = null,
-
-    @SerialName(value = "spacecraft_config_id") val spacecraftConfigId: kotlin.Int? = null,
-
-    @SerialName(value = "spacecraft_config_name") val spacecraftConfigName: kotlin.String? = null,
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "in_space") val inSpace: kotlin.Boolean? = null,
 
     @SerialName(value = "is_placeholder") val isPlaceholder: kotlin.Boolean? = null,
 
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null
+    @SerialName(value = "serial_number") val serialNumber: kotlin.String? = null,
+
+    @SerialName(value = "spacecraft_config_id") val spacecraftConfigId: kotlin.Int? = null,
+
+    @SerialName(value = "spacecraft_config_name") val spacecraftConfigName: kotlin.String? = null,
+
+    @SerialName(value = "status") val status: kotlin.String? = null
 
 ) {
 

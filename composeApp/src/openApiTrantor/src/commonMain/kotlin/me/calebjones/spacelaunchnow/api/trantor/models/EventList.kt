@@ -25,15 +25,15 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
+ * @param date 
+ * @param imageUrl 
+ * @param launchIds 
+ * @param location 
+ * @param programIds 
  * @param slug 
  * @param type 
  * @param typeId 
- * @param date 
- * @param imageUrl 
- * @param location 
  * @param webcastLive 
- * @param programIds 
- * @param launchIds 
  */
 @Serializable
 
@@ -43,23 +43,23 @@ data class EventList (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
+    @SerialName(value = "date") val date: kotlin.time.Instant? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "launch_ids") val launchIds: kotlin.collections.List<kotlin.String>? = null,
+
+    @SerialName(value = "location") val location: kotlin.String? = null,
+
+    @SerialName(value = "program_ids") val programIds: kotlin.collections.List<kotlin.Int>? = null,
+
     @SerialName(value = "slug") val slug: kotlin.String? = null,
 
     @SerialName(value = "type") val type: kotlin.String? = null,
 
     @SerialName(value = "type_id") val typeId: kotlin.Int? = null,
 
-    @SerialName(value = "date") val date: kotlin.time.Instant? = null,
-
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
-
-    @SerialName(value = "location") val location: kotlin.String? = null,
-
-    @SerialName(value = "webcast_live") val webcastLive: kotlin.Boolean? = false,
-
-    @SerialName(value = "program_ids") val programIds: kotlin.collections.List<kotlin.Int>? = null,
-
-    @SerialName(value = "launch_ids") val launchIds: kotlin.collections.List<kotlin.String>? = null
+    @SerialName(value = "webcast_live") val webcastLive: kotlin.Boolean? = false
 
 ) {
 

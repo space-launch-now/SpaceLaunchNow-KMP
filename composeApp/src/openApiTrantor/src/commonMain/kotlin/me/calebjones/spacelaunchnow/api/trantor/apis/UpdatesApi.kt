@@ -45,7 +45,7 @@ open class UpdatesApi : ApiClient {
 
     /**
      * List updates
-     * Paginated standalone update feed, ordered by created_on. Filter by program (direct, or reachable through the update&#39;s launch or event program junctions â€” LL&#39;s all__program semantics) or launch. Multi-value &#x60;*_ids&#x60; params take comma-separated integers.
+     * Paginated standalone update feed, ordered by created_on. Filter by program (direct, or reachable through the update&#39;s launch or event program junctions — LL&#39;s all__program semantics) or launch. Multi-value &#x60;*_ids&#x60; params take comma-separated integers.
      * @param programIds Comma-separated program ids (optional)
      * @param launchId Launch id (optional)
      * @param ordering Order by &#x60;created_on&#x60;. Prefix - for descending. Unknown values fall back to -created_on. (optional, default to "-created_on")

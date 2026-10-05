@@ -25,10 +25,10 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param attempt 
- * @param success 
  * @param description 
- * @param type 
  * @param landingLocationName 
+ * @param success 
+ * @param type 
  */
 @Serializable
 
@@ -38,13 +38,13 @@ data class LandingSummary (
 
     @SerialName(value = "attempt") val attempt: kotlin.Boolean? = false,
 
-    @SerialName(value = "success") val success: kotlin.Boolean? = null,
-
     @SerialName(value = "description") val description: kotlin.String? = null,
 
-    @SerialName(value = "type") val type: kotlin.String? = null,
+    @SerialName(value = "landing_location_name") val landingLocationName: kotlin.String? = null,
 
-    @SerialName(value = "landing_location_name") val landingLocationName: kotlin.String? = null
+    @SerialName(value = "success") val success: kotlin.Boolean? = null,
+
+    @SerialName(value = "type") val type: kotlin.String? = null
 
 ) {
 

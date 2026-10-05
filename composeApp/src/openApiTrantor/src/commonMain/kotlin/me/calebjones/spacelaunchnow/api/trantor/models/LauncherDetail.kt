@@ -25,19 +25,19 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param serialNumber 
- * @param status 
- * @param statusId 
- * @param imageUrl 
- * @param flights 
- * @param isPlaceholder 
- * @param launcherConfigId 
+ * @param attemptedLandings 
  * @param configName 
  * @param details 
- * @param successfulLandings 
- * @param attemptedLandings 
- * @param lastLaunchDate 
- * @param firstLaunchDate 
  * @param fastestTurnaround 
+ * @param firstLaunchDate 
+ * @param flights 
+ * @param imageUrl 
+ * @param isPlaceholder 
+ * @param lastLaunchDate 
+ * @param launcherConfigId 
+ * @param status 
+ * @param statusId 
+ * @param successfulLandings 
  */
 @Serializable
 
@@ -47,31 +47,31 @@ data class LauncherDetail (
 
     @SerialName(value = "serial_number") @Required val serialNumber: kotlin.String,
 
-    @SerialName(value = "status") val status: kotlin.String? = null,
-
-    @SerialName(value = "status_id") val statusId: kotlin.Int? = null,
-
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
-
-    @SerialName(value = "flights") val flights: kotlin.Int? = 0,
-
-    @SerialName(value = "is_placeholder") val isPlaceholder: kotlin.Boolean? = false,
-
-    @SerialName(value = "launcher_config_id") val launcherConfigId: kotlin.Int? = null,
+    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = 0,
 
     @SerialName(value = "config_name") val configName: kotlin.String? = null,
 
     @SerialName(value = "details") val details: kotlin.String? = null,
 
-    @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = 0,
-
-    @SerialName(value = "attempted_landings") val attemptedLandings: kotlin.Int? = 0,
-
-    @SerialName(value = "last_launch_date") val lastLaunchDate: kotlin.time.Instant? = null,
+    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null,
 
     @SerialName(value = "first_launch_date") val firstLaunchDate: kotlin.time.Instant? = null,
 
-    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null
+    @SerialName(value = "flights") val flights: kotlin.Int? = 0,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "is_placeholder") val isPlaceholder: kotlin.Boolean? = false,
+
+    @SerialName(value = "last_launch_date") val lastLaunchDate: kotlin.time.Instant? = null,
+
+    @SerialName(value = "launcher_config_id") val launcherConfigId: kotlin.Int? = null,
+
+    @SerialName(value = "status") val status: kotlin.String? = null,
+
+    @SerialName(value = "status_id") val statusId: kotlin.Int? = null,
+
+    @SerialName(value = "successful_landings") val successfulLandings: kotlin.Int? = 0
 
 ) {
 

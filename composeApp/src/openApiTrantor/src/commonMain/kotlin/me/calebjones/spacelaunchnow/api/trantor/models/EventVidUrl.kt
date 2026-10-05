@@ -24,16 +24,16 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param url 
- * @param priority 
- * @param source 
- * @param publisher 
- * @param title 
  * @param description 
- * @param featureImage 
- * @param type 
- * @param startTime 
  * @param endTime 
+ * @param featureImage 
  * @param live 
+ * @param priority 
+ * @param publisher 
+ * @param source 
+ * @param startTime 
+ * @param title 
+ * @param type 
  */
 @Serializable
 
@@ -41,25 +41,25 @@ data class EventVidUrl (
 
     @SerialName(value = "url") @Required val url: kotlin.String,
 
-    @SerialName(value = "priority") val priority: kotlin.Int? = null,
-
-    @SerialName(value = "source") val source: kotlin.String? = null,
-
-    @SerialName(value = "publisher") val publisher: kotlin.String? = null,
-
-    @SerialName(value = "title") val title: kotlin.String? = null,
-
     @SerialName(value = "description") val description: kotlin.String? = null,
-
-    @SerialName(value = "feature_image") val featureImage: kotlin.String? = null,
-
-    @SerialName(value = "type") val type: kotlin.String? = null,
-
-    @SerialName(value = "start_time") val startTime: kotlin.time.Instant? = null,
 
     @SerialName(value = "end_time") val endTime: kotlin.time.Instant? = null,
 
-    @SerialName(value = "live") val live: kotlin.Boolean? = null
+    @SerialName(value = "feature_image") val featureImage: kotlin.String? = null,
+
+    @SerialName(value = "live") val live: kotlin.Boolean? = null,
+
+    @SerialName(value = "priority") val priority: kotlin.Int? = null,
+
+    @SerialName(value = "publisher") val publisher: kotlin.String? = null,
+
+    @SerialName(value = "source") val source: kotlin.String? = null,
+
+    @SerialName(value = "start_time") val startTime: kotlin.time.Instant? = null,
+
+    @SerialName(value = "title") val title: kotlin.String? = null,
+
+    @SerialName(value = "type") val type: kotlin.String? = null
 
 ) {
 

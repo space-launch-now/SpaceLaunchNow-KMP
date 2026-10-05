@@ -26,18 +26,18 @@ import kotlinx.serialization.encoding.*
  * Stage with expanded launcher and landing.
  *
  * @param id 
- * @param type 
- * @param reused 
+ * @param landing 
+ * @param landingAttempt 
+ * @param landingId 
+ * @param landingType 
+ * @param launcher 
  * @param launcherFlightNumber 
  * @param launcherId 
- * @param serialNumber 
- * @param landingId 
- * @param landingAttempt 
- * @param landingType 
  * @param previousFlightId 
+ * @param reused 
+ * @param serialNumber 
  * @param turnAroundTime 
- * @param launcher 
- * @param landing 
+ * @param type 
  */
 @Serializable
 
@@ -45,29 +45,29 @@ data class StageExpanded (
 
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
-    @SerialName(value = "type") val type: kotlin.String? = null,
+    @SerialName(value = "landing") val landing: LandingSummary? = null,
 
-    @SerialName(value = "reused") val reused: kotlin.Boolean? = false,
+    @SerialName(value = "landing_attempt") val landingAttempt: kotlin.Boolean? = null,
+
+    @SerialName(value = "landing_id") val landingId: kotlin.Int? = null,
+
+    @SerialName(value = "landing_type") val landingType: kotlin.String? = null,
+
+    @SerialName(value = "launcher") val launcher: LauncherSummary? = null,
 
     @SerialName(value = "launcher_flight_number") val launcherFlightNumber: kotlin.Int? = null,
 
     @SerialName(value = "launcher_id") val launcherId: kotlin.Int? = null,
 
-    @SerialName(value = "serial_number") val serialNumber: kotlin.String? = null,
-
-    @SerialName(value = "landing_id") val landingId: kotlin.Int? = null,
-
-    @SerialName(value = "landing_attempt") val landingAttempt: kotlin.Boolean? = null,
-
-    @SerialName(value = "landing_type") val landingType: kotlin.String? = null,
-
     @SerialName(value = "previous_flight_id") val previousFlightId: kotlin.String? = null,
+
+    @SerialName(value = "reused") val reused: kotlin.Boolean? = false,
+
+    @SerialName(value = "serial_number") val serialNumber: kotlin.String? = null,
 
     @SerialName(value = "turn_around_time") val turnAroundTime: kotlin.String? = null,
 
-    @SerialName(value = "launcher") val launcher: LauncherSummary? = null,
-
-    @SerialName(value = "landing") val landing: LandingSummary? = null
+    @SerialName(value = "type") val type: kotlin.String? = null
 
 ) {
 

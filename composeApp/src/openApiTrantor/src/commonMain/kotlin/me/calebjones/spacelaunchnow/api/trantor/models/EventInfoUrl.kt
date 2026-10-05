@@ -24,11 +24,11 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param url 
+ * @param description 
+ * @param featureImage 
  * @param priority 
  * @param source 
  * @param title 
- * @param description 
- * @param featureImage 
  * @param type 
  */
 @Serializable
@@ -37,15 +37,15 @@ data class EventInfoUrl (
 
     @SerialName(value = "url") @Required val url: kotlin.String,
 
+    @SerialName(value = "description") val description: kotlin.String? = null,
+
+    @SerialName(value = "feature_image") val featureImage: kotlin.String? = null,
+
     @SerialName(value = "priority") val priority: kotlin.Int? = null,
 
     @SerialName(value = "source") val source: kotlin.String? = null,
 
     @SerialName(value = "title") val title: kotlin.String? = null,
-
-    @SerialName(value = "description") val description: kotlin.String? = null,
-
-    @SerialName(value = "feature_image") val featureImage: kotlin.String? = null,
 
     @SerialName(value = "type") val type: kotlin.String? = null
 

@@ -15,30 +15,42 @@
 
 package me.calebjones.spacelaunchnow.api.trantor.models
 
+import me.calebjones.spacelaunchnow.api.trantor.models.AgencyList
+import me.calebjones.spacelaunchnow.api.trantor.models.AstronautList
 import me.calebjones.spacelaunchnow.api.trantor.models.EventInfoUrl
 import me.calebjones.spacelaunchnow.api.trantor.models.EventVidUrl
+import me.calebjones.spacelaunchnow.api.trantor.models.Expedition
+import me.calebjones.spacelaunchnow.api.trantor.models.LaunchList
+import me.calebjones.spacelaunchnow.api.trantor.models.ProgramList
+import me.calebjones.spacelaunchnow.api.trantor.models.StationList
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * List row + description + ordered info/vid URL arrays.
+ * List row + description + ordered info/vid URL arrays + E7 embeds.
  *
  * @param id 
  * @param name 
+ * @param agencies 
+ * @param astronauts 
+ * @param date 
+ * @param description 
+ * @param expeditions 
+ * @param imageUrl 
+ * @param infoUrls 
+ * @param launchIds 
+ * @param launches 
+ * @param location 
+ * @param programIds 
+ * @param programs 
  * @param slug 
+ * @param spaceStations 
  * @param type 
  * @param typeId 
- * @param date 
- * @param imageUrl 
- * @param location 
- * @param webcastLive 
- * @param programIds 
- * @param launchIds 
- * @param description 
- * @param infoUrls 
  * @param vidUrls 
+ * @param webcastLive 
  */
 @Serializable
 
@@ -48,29 +60,41 @@ data class EventDetail (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
+    @SerialName(value = "agencies") val agencies: kotlin.collections.List<AgencyList>? = null,
+
+    @SerialName(value = "astronauts") val astronauts: kotlin.collections.List<AstronautList>? = null,
+
+    @SerialName(value = "date") val date: kotlin.time.Instant? = null,
+
+    @SerialName(value = "description") val description: kotlin.String? = null,
+
+    @SerialName(value = "expeditions") val expeditions: kotlin.collections.List<Expedition>? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "info_urls") val infoUrls: kotlin.collections.List<EventInfoUrl>? = null,
+
+    @SerialName(value = "launch_ids") val launchIds: kotlin.collections.List<kotlin.String>? = null,
+
+    @SerialName(value = "launches") val launches: kotlin.collections.List<LaunchList>? = null,
+
+    @SerialName(value = "location") val location: kotlin.String? = null,
+
+    @SerialName(value = "program_ids") val programIds: kotlin.collections.List<kotlin.Int>? = null,
+
+    @SerialName(value = "programs") val programs: kotlin.collections.List<ProgramList>? = null,
+
     @SerialName(value = "slug") val slug: kotlin.String? = null,
+
+    @SerialName(value = "space_stations") val spaceStations: kotlin.collections.List<StationList>? = null,
 
     @SerialName(value = "type") val type: kotlin.String? = null,
 
     @SerialName(value = "type_id") val typeId: kotlin.Int? = null,
 
-    @SerialName(value = "date") val date: kotlin.time.Instant? = null,
+    @SerialName(value = "vid_urls") val vidUrls: kotlin.collections.List<EventVidUrl>? = null,
 
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
-
-    @SerialName(value = "location") val location: kotlin.String? = null,
-
-    @SerialName(value = "webcast_live") val webcastLive: kotlin.Boolean? = false,
-
-    @SerialName(value = "program_ids") val programIds: kotlin.collections.List<kotlin.Int>? = null,
-
-    @SerialName(value = "launch_ids") val launchIds: kotlin.collections.List<kotlin.String>? = null,
-
-    @SerialName(value = "description") val description: kotlin.String? = null,
-
-    @SerialName(value = "info_urls") val infoUrls: kotlin.collections.List<EventInfoUrl>? = null,
-
-    @SerialName(value = "vid_urls") val vidUrls: kotlin.collections.List<EventVidUrl>? = null
+    @SerialName(value = "webcast_live") val webcastLive: kotlin.Boolean? = false
 
 ) {
 

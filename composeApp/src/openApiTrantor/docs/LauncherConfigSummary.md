@@ -6,13 +6,15 @@
 | ------------ | ------------- | ------------- | ------------- |
 | **id** | **kotlin.Int** |  |  |
 | **name** | **kotlin.String** |  |  |
-| **fullName** | **kotlin.String** |  |  [optional] |
-| **variant** | **kotlin.String** |  |  [optional] |
 | **active** | **kotlin.Boolean** |  |  [optional] |
-| **reusable** | **kotlin.Boolean** |  |  [optional] |
-| **manufacturerId** | **kotlin.Int** |  |  [optional] |
+| **fullName** | **kotlin.String** |  |  [optional] |
 | **imageUrl** | **kotlin.String** |  |  [optional] |
 | **infoUrl** | **kotlin.String** |  |  [optional] |
+| **manufacturerAbbrev** | **kotlin.String** |  |  [optional] |
+| **manufacturerId** | **kotlin.Int** |  |  [optional] |
+| **manufacturerName** | **kotlin.String** |  |  [optional] |
+| **reusable** | **kotlin.Boolean** |  |  [optional] |
+| **variant** | **kotlin.String** |  |  [optional] |
 | **wikiUrl** | **kotlin.String** |  |  [optional] |
 
 

@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 Get space station detail
 
-Full station payload â€” description, physical measurements, owners (agencies), and expeditions with crew (no standalone /expeditions endpoint).
+Full station payload — description, physical measurements, owners (agencies), and expeditions with crew (no standalone /expeditions endpoint).
 
 ### Example
 ```kotlin

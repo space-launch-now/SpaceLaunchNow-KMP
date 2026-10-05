@@ -25,8 +25,8 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param countryCode 
  * @param active 
+ * @param countryCode 
  * @param totalLaunchCount 
  */
 @Serializable
@@ -37,9 +37,9 @@ data class LocationList (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "country_code") val countryCode: kotlin.String? = null,
-
     @SerialName(value = "active") val active: kotlin.Boolean? = true,
+
+    @SerialName(value = "country_code") val countryCode: kotlin.String? = null,
 
     @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0
 

@@ -15,6 +15,7 @@
 
 package me.calebjones.spacelaunchnow.api.trantor.models
 
+import me.calebjones.spacelaunchnow.api.trantor.models.AgencyList
 import me.calebjones.spacelaunchnow.api.trantor.models.Expedition
 
 import kotlinx.serialization.*
@@ -26,24 +27,25 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
+ * @param deorbited 
+ * @param description 
+ * @param dockedVehicles 
+ * @param expeditions 
+ * @param founded 
+ * @param height 
+ * @param imageUrl 
+ * @param mass 
+ * @param onboardCrew 
+ * @param orbit 
+ * @param ownerIds Deprecated — use owners[]; removed one release after the client pass (E12(P5)).
+ * @param ownerNames Deprecated — use owners[]; removed one release after the client pass (E12(P5)).
+ * @param owners 
  * @param status 
  * @param statusId 
  * @param type 
  * @param typeId 
- * @param imageUrl 
- * @param orbit 
- * @param founded 
- * @param deorbited 
- * @param description 
- * @param height 
- * @param width 
- * @param mass 
  * @param volume 
- * @param onboardCrew 
- * @param dockedVehicles 
- * @param ownerIds 
- * @param ownerNames 
- * @param expeditions 
+ * @param width 
  */
 @Serializable
 
@@ -53,6 +55,34 @@ data class StationDetail (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
+    @SerialName(value = "deorbited") val deorbited: kotlin.Boolean? = null,
+
+    @SerialName(value = "description") val description: kotlin.String? = null,
+
+    @SerialName(value = "docked_vehicles") val dockedVehicles: kotlin.Int? = null,
+
+    @SerialName(value = "expeditions") val expeditions: kotlin.collections.List<Expedition>? = null,
+
+    @SerialName(value = "founded") val founded: kotlinx.datetime.LocalDate? = null,
+
+    @SerialName(value = "height") val height: kotlin.Double? = null,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "mass") val mass: kotlin.Double? = null,
+
+    @SerialName(value = "onboard_crew") val onboardCrew: kotlin.Int? = null,
+
+    @SerialName(value = "orbit") val orbit: kotlin.String? = null,
+
+    /* Deprecated — use owners[]; removed one release after the client pass (E12(P5)). */
+    @SerialName(value = "owner_ids") val ownerIds: kotlin.collections.List<kotlin.Int>? = null,
+
+    /* Deprecated — use owners[]; removed one release after the client pass (E12(P5)). */
+    @SerialName(value = "owner_names") val ownerNames: kotlin.collections.List<kotlin.String>? = null,
+
+    @SerialName(value = "owners") val owners: kotlin.collections.List<AgencyList>? = null,
+
     @SerialName(value = "status") val status: kotlin.String? = null,
 
     @SerialName(value = "status_id") val statusId: kotlin.Int? = null,
@@ -61,33 +91,9 @@ data class StationDetail (
 
     @SerialName(value = "type_id") val typeId: kotlin.Int? = null,
 
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
-
-    @SerialName(value = "orbit") val orbit: kotlin.String? = null,
-
-    @SerialName(value = "founded") val founded: kotlinx.datetime.LocalDate? = null,
-
-    @SerialName(value = "deorbited") val deorbited: kotlin.Boolean? = null,
-
-    @SerialName(value = "description") val description: kotlin.String? = null,
-
-    @SerialName(value = "height") val height: kotlin.Double? = null,
-
-    @SerialName(value = "width") val width: kotlin.Double? = null,
-
-    @SerialName(value = "mass") val mass: kotlin.Double? = null,
-
     @SerialName(value = "volume") val volume: kotlin.Int? = null,
 
-    @SerialName(value = "onboard_crew") val onboardCrew: kotlin.Int? = null,
-
-    @SerialName(value = "docked_vehicles") val dockedVehicles: kotlin.Int? = null,
-
-    @SerialName(value = "owner_ids") val ownerIds: kotlin.collections.List<kotlin.Int>? = null,
-
-    @SerialName(value = "owner_names") val ownerNames: kotlin.collections.List<kotlin.String>? = null,
-
-    @SerialName(value = "expeditions") val expeditions: kotlin.collections.List<Expedition>? = null
+    @SerialName(value = "width") val width: kotlin.Double? = null
 
 ) {
 

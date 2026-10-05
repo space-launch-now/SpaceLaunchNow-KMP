@@ -24,13 +24,13 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param id 
- * @param name 
  * @param latitude 
  * @param longitude 
+ * @param name 
+ * @param imageUrl 
  * @param location 
  * @param locationId 
  * @param totalLaunchCount 
- * @param imageUrl 
  */
 @Serializable
 
@@ -38,19 +38,19 @@ data class PadSummary (
 
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
-    @SerialName(value = "name") @Required val name: kotlin.String,
-
     @SerialName(value = "latitude") @Required val latitude: kotlin.Double,
 
     @SerialName(value = "longitude") @Required val longitude: kotlin.Double,
+
+    @SerialName(value = "name") @Required val name: kotlin.String,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "location") val location: kotlin.String? = null,
 
     @SerialName(value = "location_id") val locationId: kotlin.Int? = null,
 
-    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
-
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null
+    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0
 
 ) {
 

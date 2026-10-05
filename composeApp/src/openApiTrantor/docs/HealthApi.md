@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 Healthz
 
-Liveness probe â€” no I/O.
+Liveness probe — no I/O.
 
 ### Example
 ```kotlin
@@ -57,7 +57,7 @@ No authorization required
 
 Readyz
 
-Readiness probe â€” checks DB pool and Redis (if configured).
+Readiness probe — checks DB pool and Redis (if configured).
 
 ### Example
 ```kotlin

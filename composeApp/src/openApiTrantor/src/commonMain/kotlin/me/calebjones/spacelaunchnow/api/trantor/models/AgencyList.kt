@@ -21,21 +21,45 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * Minimal agency info for list views.
+ * Flat agency row for list views and one-level embeds (ruling E9(P5)): scalar ids plus the denormalized display fields the list view renders.
  *
+ * @param abbrev 
  * @param id 
  * @param name 
- * @param abbrev 
+ * @param countryCodes 
+ * @param featured 
+ * @param imageUrl 
+ * @param logoUrl 
+ * @param socialLogoUrl 
+ * @param totalLaunchCount 
+ * @param type 
+ * @param typeId 
  */
 @Serializable
 
 data class AgencyList (
 
+    @SerialName(value = "abbrev") @Required val abbrev: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "abbrev") @Required val abbrev: kotlin.String
+    @SerialName(value = "country_codes") val countryCodes: kotlin.collections.List<kotlin.String>? = null,
+
+    @SerialName(value = "featured") val featured: kotlin.Boolean? = false,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "logo_url") val logoUrl: kotlin.String? = null,
+
+    @SerialName(value = "social_logo_url") val socialLogoUrl: kotlin.String? = null,
+
+    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
+
+    @SerialName(value = "type") val type: kotlin.String? = null,
+
+    @SerialName(value = "type_id") val typeId: kotlin.Int? = null
 
 ) {
 

@@ -25,12 +25,12 @@ import kotlinx.serialization.encoding.*
  *
  * @param priority 
  * @param url 
- * @param source 
+ * @param live 
  * @param publisher 
+ * @param source 
+ * @param startTime 
  * @param title 
  * @param type 
- * @param startTime 
- * @param live 
  */
 @Serializable
 
@@ -40,17 +40,17 @@ data class VidUrl (
 
     @SerialName(value = "url") @Required val url: kotlin.String,
 
-    @SerialName(value = "source") val source: kotlin.String? = null,
+    @SerialName(value = "live") val live: kotlin.Boolean? = false,
 
     @SerialName(value = "publisher") val publisher: kotlin.String? = null,
 
-    @SerialName(value = "title") val title: kotlin.String? = null,
-
-    @SerialName(value = "type") val type: kotlin.String? = null,
+    @SerialName(value = "source") val source: kotlin.String? = null,
 
     @SerialName(value = "start_time") val startTime: kotlin.time.Instant? = null,
 
-    @SerialName(value = "live") val live: kotlin.Boolean? = false
+    @SerialName(value = "title") val title: kotlin.String? = null,
+
+    @SerialName(value = "type") val type: kotlin.String? = null
 
 ) {
 

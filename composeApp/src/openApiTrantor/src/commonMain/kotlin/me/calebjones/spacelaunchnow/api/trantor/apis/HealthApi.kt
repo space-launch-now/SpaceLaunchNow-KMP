@@ -43,7 +43,7 @@ open class HealthApi : ApiClient {
 
     /**
      * Healthz
-     * Liveness probe â€” no I/O.
+     * Liveness probe — no I/O.
      * @return kotlin.Any
      */
     @Suppress("UNCHECKED_CAST")
@@ -75,7 +75,7 @@ open class HealthApi : ApiClient {
 
     /**
      * Readyz
-     * Readiness probe â€” checks DB pool and Redis (if configured).
+     * Readiness probe — checks DB pool and Redis (if configured).
      * @return kotlin.Any
      */
     @Suppress("UNCHECKED_CAST")

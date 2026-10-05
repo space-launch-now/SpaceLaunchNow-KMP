@@ -9,16 +9,15 @@ import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseAgencyLi
  * Extension functions for the Trantor AgenciesApi to provide clean, named-parameter
  * access to GET /agencies and /agencies/{id}.
  *
- * Note: Trantor's `country_code` filter takes a single ISO alpha-2 code, unlike the
- * legacy LL client which accepted a list. Callers with a multi-select country filter
- * should only send the first selected code; see AgencyRepositoryImpl.
+ * Note: Trantor's `country_codes` filter (E6(P5)) takes a CSV of ISO alpha-2 codes, matching
+ * the legacy LL client's list param; the country multi-select filter sends every selected code.
  */
 
 suspend fun AgenciesApi.listAgencies(
     search: String? = null,
     featured: Boolean? = null,
     typeIds: List<Int>? = null,
-    countryCode: String? = null,
+    countryCodes: List<String>? = null,
     ordering: String? = "name",
     limit: Int? = 25,
     offset: Int? = 0
@@ -26,7 +25,7 @@ suspend fun AgenciesApi.listAgencies(
     search = search,
     featured = featured,
     typeIds = typeIds?.joinToString(","),
-    countryCode = countryCode,
+    countryCodes = countryCodes?.joinToString(","),
     ordering = ordering,
     limit = limit,
     offset = offset
@@ -47,13 +46,13 @@ suspend fun AgenciesApi.getAgencyList(
     search: String? = null,
     featured: Boolean? = null,
     typeIds: String? = null,
-    countryCode: String? = null
+    countryCodes: String? = null
 ): HttpResponse<PaginatedResponseAgencyList> {
     return listAgenciesApiV1AgenciesGet(
         search = search,
         featured = featured,
         typeIds = typeIds,
-        countryCode = countryCode,
+        countryCodes = countryCodes,
         ordering = ordering,
         limit = limit,
         offset = offset

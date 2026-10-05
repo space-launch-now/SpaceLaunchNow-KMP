@@ -25,13 +25,13 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param serialNumber 
- * @param status 
- * @param statusId 
- * @param imageUrl 
+ * @param configName 
  * @param flights 
+ * @param imageUrl 
  * @param isPlaceholder 
  * @param launcherConfigId 
- * @param configName 
+ * @param status 
+ * @param statusId 
  */
 @Serializable
 
@@ -41,19 +41,19 @@ data class LauncherListItem (
 
     @SerialName(value = "serial_number") @Required val serialNumber: kotlin.String,
 
-    @SerialName(value = "status") val status: kotlin.String? = null,
-
-    @SerialName(value = "status_id") val statusId: kotlin.Int? = null,
-
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+    @SerialName(value = "config_name") val configName: kotlin.String? = null,
 
     @SerialName(value = "flights") val flights: kotlin.Int? = 0,
+
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "is_placeholder") val isPlaceholder: kotlin.Boolean? = false,
 
     @SerialName(value = "launcher_config_id") val launcherConfigId: kotlin.Int? = null,
 
-    @SerialName(value = "config_name") val configName: kotlin.String? = null
+    @SerialName(value = "status") val status: kotlin.String? = null,
+
+    @SerialName(value = "status_id") val statusId: kotlin.Int? = null
 
 ) {
 

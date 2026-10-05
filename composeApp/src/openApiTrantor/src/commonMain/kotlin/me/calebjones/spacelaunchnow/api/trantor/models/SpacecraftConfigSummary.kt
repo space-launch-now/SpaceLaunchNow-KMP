@@ -25,13 +25,13 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param type 
  * @param agencyId 
  * @param agencyName 
- * @param inUse 
  * @param humanRated 
  * @param imageUrl 
+ * @param inUse 
  * @param infoUrl 
+ * @param type 
  * @param wikiUrl 
  */
 @Serializable
@@ -42,19 +42,19 @@ data class SpacecraftConfigSummary (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "type") val type: kotlin.String? = null,
-
     @SerialName(value = "agency_id") val agencyId: kotlin.Int? = null,
 
     @SerialName(value = "agency_name") val agencyName: kotlin.String? = null,
-
-    @SerialName(value = "in_use") val inUse: kotlin.Boolean? = null,
 
     @SerialName(value = "human_rated") val humanRated: kotlin.Boolean? = null,
 
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
+    @SerialName(value = "in_use") val inUse: kotlin.Boolean? = null,
+
     @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
+
+    @SerialName(value = "type") val type: kotlin.String? = null,
 
     @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
 

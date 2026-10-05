@@ -25,19 +25,19 @@ import kotlinx.serialization.encoding.*
  *
  * @param id 
  * @param name 
- * @param serialNumber 
- * @param status 
- * @param spacecraftConfigId 
- * @param spacecraftConfigName 
+ * @param description 
+ * @param fastestTurnaround 
+ * @param flightsCount 
+ * @param imageUrl 
  * @param inSpace 
  * @param isPlaceholder 
- * @param imageUrl 
- * @param description 
- * @param timeInSpace 
- * @param timeDocked 
- * @param flightsCount 
  * @param missionEndsCount 
- * @param fastestTurnaround 
+ * @param serialNumber 
+ * @param spacecraftConfigId 
+ * @param spacecraftConfigName 
+ * @param status 
+ * @param timeDocked 
+ * @param timeInSpace 
  */
 @Serializable
 
@@ -47,31 +47,31 @@ data class SpacecraftFull (
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "serial_number") val serialNumber: kotlin.String? = null,
+    @SerialName(value = "description") val description: kotlin.String? = null,
 
-    @SerialName(value = "status") val status: kotlin.String? = null,
+    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null,
 
-    @SerialName(value = "spacecraft_config_id") val spacecraftConfigId: kotlin.Int? = null,
+    @SerialName(value = "flights_count") val flightsCount: kotlin.Int? = null,
 
-    @SerialName(value = "spacecraft_config_name") val spacecraftConfigName: kotlin.String? = null,
+    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
 
     @SerialName(value = "in_space") val inSpace: kotlin.Boolean? = null,
 
     @SerialName(value = "is_placeholder") val isPlaceholder: kotlin.Boolean? = null,
 
-    @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+    @SerialName(value = "mission_ends_count") val missionEndsCount: kotlin.Int? = null,
 
-    @SerialName(value = "description") val description: kotlin.String? = null,
+    @SerialName(value = "serial_number") val serialNumber: kotlin.String? = null,
 
-    @SerialName(value = "time_in_space") val timeInSpace: kotlin.String? = null,
+    @SerialName(value = "spacecraft_config_id") val spacecraftConfigId: kotlin.Int? = null,
+
+    @SerialName(value = "spacecraft_config_name") val spacecraftConfigName: kotlin.String? = null,
+
+    @SerialName(value = "status") val status: kotlin.String? = null,
 
     @SerialName(value = "time_docked") val timeDocked: kotlin.String? = null,
 
-    @SerialName(value = "flights_count") val flightsCount: kotlin.Int? = null,
-
-    @SerialName(value = "mission_ends_count") val missionEndsCount: kotlin.Int? = null,
-
-    @SerialName(value = "fastest_turnaround") val fastestTurnaround: kotlin.String? = null
+    @SerialName(value = "time_in_space") val timeInSpace: kotlin.String? = null
 
 ) {
 

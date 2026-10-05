@@ -18,9 +18,6 @@ import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 //   `LocalDate?` (a deorbit date). These are different types — a bool can't be turned into
 //   a date without inventing one, so this maps to null (a type-shape mismatch, not just a
 //   missing value; needs a domain-model or contract decision).
-// - `owners`: Trantor gives parallel `owner_ids`/`owner_names` lists (real data, zipped
-//   into minimal `Agency(id, name)` values below) but no abbreviation/country/logo/etc., so
-//   those Agency fields are null rather than invented.
 // - `dockingLocations`: no docking-location entity exists in the Trantor contract at all.
 // - `activeExpeditions`: Trantor's `expeditions[]` is the full history, not filtered to
 //   "active"; approximated here as expeditions with no `end` date.
@@ -42,21 +39,25 @@ fun TrantorStationDetail.toDomain(): SpaceStationDetail = SpaceStationDetail(
     description = description,
     orbit = orbit,
     typeName = type,
-    owners = (ownerIds ?: emptyList()).zip(ownerNames ?: emptyList()) { ownerId, ownerName ->
-        Agency(
-            id = ownerId,
-            name = ownerName,
-            abbrev = null,
-            typeName = null,
-            countries = emptyList(),
-            imageUrl = null,
-            logoUrl = null,
-            socialLogoUrl = null,
-            description = null,
-            administrator = null,
-            foundingYear = null
-        )
-    },
+    owners = owners?.takeIf { it.isNotEmpty() }?.map { it.toDomainAgency() }
+        // TODO(E12(P5) follow-up phase5-owners-cleanup): drop the owner_ids/owner_names
+        // fallback once `owners[]` has shipped for a release and the parallel lists are
+        // removed from the contract.
+        ?: (ownerIds ?: emptyList()).zip(ownerNames ?: emptyList()) { ownerId, ownerName ->
+            Agency(
+                id = ownerId,
+                name = ownerName,
+                abbrev = null,
+                typeName = null,
+                countries = emptyList(),
+                imageUrl = null,
+                logoUrl = null,
+                socialLogoUrl = null,
+                description = null,
+                administrator = null,
+                foundingYear = null
+            )
+        },
     activeExpeditions = (expeditions ?: emptyList()).filter { it.end == null }.map { it.toDomainMini() },
     dockingLocations = emptyList(),
     height = height,

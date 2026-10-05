@@ -6,33 +6,35 @@
 | ------------ | ------------- | ------------- | ------------- |
 | **id** | **kotlin.Int** |  |  |
 | **name** | **kotlin.String** |  |  |
-| **fullName** | **kotlin.String** |  |  [optional] |
-| **variant** | **kotlin.String** |  |  [optional] |
 | **active** | **kotlin.Boolean** |  |  [optional] |
-| **reusable** | **kotlin.Boolean** |  |  [optional] |
-| **manufacturerId** | **kotlin.Int** |  |  [optional] |
+| **apogee** | **kotlin.Double** |  |  [optional] |
+| **description** | **kotlin.String** |  |  [optional] |
+| **diameter** | **kotlin.Double** |  |  [optional] |
+| **failedLandings** | **kotlin.Int** |  |  [optional] |
+| **failedLaunches** | **kotlin.Int** |  |  [optional] |
+| **fastestTurnaround** | **kotlin.String** |  |  [optional] |
+| **fullName** | **kotlin.String** |  |  [optional] |
+| **gtoCapacity** | **kotlin.Double** |  |  [optional] |
 | **imageUrl** | **kotlin.String** |  |  [optional] |
 | **infoUrl** | **kotlin.String** |  |  [optional] |
-| **wikiUrl** | **kotlin.String** |  |  [optional] |
-| **description** | **kotlin.String** |  |  [optional] |
-| **minStage** | **kotlin.Int** |  |  [optional] |
-| **maxStage** | **kotlin.Int** |  |  [optional] |
-| **length** | **kotlin.Double** |  |  [optional] |
-| **diameter** | **kotlin.Double** |  |  [optional] |
-| **maidenFlight** | [**kotlinx.datetime.LocalDate**](kotlinx.datetime.LocalDate.md) |  |  [optional] |
 | **launchCost** | **kotlin.Int** |  |  [optional] |
 | **launchMass** | **kotlin.Double** |  |  [optional] |
+| **length** | **kotlin.Double** |  |  [optional] |
 | **leoCapacity** | **kotlin.Double** |  |  [optional] |
-| **gtoCapacity** | **kotlin.Double** |  |  [optional] |
-| **toThrust** | **kotlin.Double** |  |  [optional] |
-| **apogee** | **kotlin.Double** |  |  [optional] |
-| **totalLaunchCount** | **kotlin.Int** |  |  [optional] |
-| **successfulLaunches** | **kotlin.Int** |  |  [optional] |
-| **failedLaunches** | **kotlin.Int** |  |  [optional] |
+| **maidenFlight** | [**kotlinx.datetime.LocalDate**](kotlinx.datetime.LocalDate.md) |  |  [optional] |
+| **manufacturerAbbrev** | **kotlin.String** |  |  [optional] |
+| **manufacturerId** | **kotlin.Int** |  |  [optional] |
+| **manufacturerName** | **kotlin.String** |  |  [optional] |
+| **maxStage** | **kotlin.Int** |  |  [optional] |
+| **minStage** | **kotlin.Int** |  |  [optional] |
 | **pendingLaunches** | **kotlin.Int** |  |  [optional] |
+| **reusable** | **kotlin.Boolean** |  |  [optional] |
 | **successfulLandings** | **kotlin.Int** |  |  [optional] |
-| **failedLandings** | **kotlin.Int** |  |  [optional] |
-| **fastestTurnaround** | **kotlin.String** |  |  [optional] |
+| **successfulLaunches** | **kotlin.Int** |  |  [optional] |
+| **toThrust** | **kotlin.Double** |  |  [optional] |
+| **totalLaunchCount** | **kotlin.Int** |  |  [optional] |
+| **variant** | **kotlin.String** |  |  [optional] |
+| **wikiUrl** | **kotlin.String** |  |  [optional] |
 
 
 

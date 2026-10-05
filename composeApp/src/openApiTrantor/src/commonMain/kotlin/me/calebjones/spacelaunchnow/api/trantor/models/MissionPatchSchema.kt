@@ -24,9 +24,9 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param id 
+ * @param imageUrl 
  * @param name 
  * @param priority 
- * @param imageUrl 
  * @param agencyId 
  */
 @Serializable
@@ -35,11 +35,11 @@ data class MissionPatchSchema (
 
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
+    @SerialName(value = "image_url") @Required val imageUrl: kotlin.String,
+
     @SerialName(value = "name") @Required val name: kotlin.String,
 
     @SerialName(value = "priority") @Required val priority: kotlin.Int,
-
-    @SerialName(value = "image_url") @Required val imageUrl: kotlin.String,
 
     @SerialName(value = "agency_id") val agencyId: kotlin.Int? = null
 

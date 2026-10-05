@@ -23,47 +23,50 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
+ * @param abbrev 
  * @param id 
  * @param name 
- * @param abbrev 
  * @param agencyType 
- * @param featured 
  * @param countryCodes 
- * @param imageUrl 
- * @param logoUrl 
- * @param totalLaunchCount 
- * @param successfulLaunches 
  * @param failedLaunches 
+ * @param featured 
+ * @param imageUrl 
  * @param infoUrl 
+ * @param logoUrl 
+ * @param socialLogoUrl 
+ * @param successfulLaunches 
+ * @param totalLaunchCount 
  * @param wikiUrl 
  */
 @Serializable
 
 data class AgencySummary (
 
+    @SerialName(value = "abbrev") @Required val abbrev: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.Int,
 
     @SerialName(value = "name") @Required val name: kotlin.String,
 
-    @SerialName(value = "abbrev") @Required val abbrev: kotlin.String,
-
     @SerialName(value = "agency_type") val agencyType: kotlin.String? = null,
-
-    @SerialName(value = "featured") val featured: kotlin.Boolean? = false,
 
     @SerialName(value = "country_codes") val countryCodes: kotlin.collections.List<kotlin.String>? = null,
 
+    @SerialName(value = "failed_launches") val failedLaunches: kotlin.Int? = 0,
+
+    @SerialName(value = "featured") val featured: kotlin.Boolean? = false,
+
     @SerialName(value = "image_url") val imageUrl: kotlin.String? = null,
+
+    @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
 
     @SerialName(value = "logo_url") val logoUrl: kotlin.String? = null,
 
-    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
+    @SerialName(value = "social_logo_url") val socialLogoUrl: kotlin.String? = null,
 
     @SerialName(value = "successful_launches") val successfulLaunches: kotlin.Int? = 0,
 
-    @SerialName(value = "failed_launches") val failedLaunches: kotlin.Int? = 0,
-
-    @SerialName(value = "info_url") val infoUrl: kotlin.String? = null,
+    @SerialName(value = "total_launch_count") val totalLaunchCount: kotlin.Int? = 0,
 
     @SerialName(value = "wiki_url") val wikiUrl: kotlin.String? = null
 
