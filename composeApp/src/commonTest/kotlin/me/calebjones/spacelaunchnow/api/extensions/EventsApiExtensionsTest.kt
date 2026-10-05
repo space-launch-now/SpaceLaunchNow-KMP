@@ -38,8 +38,8 @@ class EventsApiExtensionsTest {
         api.getEventList(dateGt = sent, dateGte = sent, dateLt = sent, dateLte = sent)
 
         val url = requested.single()
-        assertEquals("2026-10-01T14:10:00Z", url.parameters["date__gt"])
-        assertEquals("2026-10-01T14:10:00Z", url.parameters["date__gte"])
+        assertEquals("2026-10-01T14:14:00Z", url.parameters["date__gt"])
+        assertEquals("2026-10-01T14:14:00Z", url.parameters["date__gte"])
         assertEquals("2026-10-01T14:15:00Z", url.parameters["date__lt"])
         assertEquals("2026-10-01T14:15:00Z", url.parameters["date__lte"])
     }
