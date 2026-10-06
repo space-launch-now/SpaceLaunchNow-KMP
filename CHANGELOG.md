@@ -1,3 +1,12 @@
+## [5.46.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.1...v5.46.2) (2026-10-06)
+
+
+### Bug Fixes
+
+* **ios:** reference UIApplicationStateActive through its enum class ([3303b56](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3303b56dc09f54f0b4300367861324f719bb2660))
+
+
+
 ## [5.46.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.0...v5.46.1) (2026-10-05)
 
 
@@ -43,27 +52,6 @@
 ### Bug Fixes
 
 * **ads:** raise max ad content rating from G to PG ([c94a660](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c94a6608ea2f1b637ad47ce2325d00536a57a3ac))
-
-
-
-## [5.44.3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.2...v5.44.3) (2026-10-01)
-
-
-### Bug Fixes
-
-* **android:** clear WebView accessibility focus before release ([1bf2038](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1bf203889782c40c7b7210690aaf329b927c96dc))
-* **billing:** initialise subscription repository at most once ([d2967d8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d2967d877900a503ff0393e37140e8f6dad1c4ae))
-* **billing:** retry subscription init when billing initialisation fails ([c429f95](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c429f95dab9065789c75eae6ca171a3c5c0cb99f))
-* **ios:** avoid competing crash handlers ([a407c62](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a407c62afd41a5a86fe04ac29ece34a2738d8d94))
-* **ios:** collapse duplicate Datadog user-context writes ([6afef87](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6afef87521dae00c48553cc5f28478807e7544ac))
-* **ios:** report Crashlytics non-fatals at Error and above only ([2dde315](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2dde3154c6a75e07cfdddb3233c59923510ab277))
-* **ios:** serialise billing init and skip cached CustomerInfo after failed sync ([518dabb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/518dabb8e8535f5c2becb6d614aea06a92425718))
-* **logging:** collapse duplicate Datadog user-context writes on Android ([38bd584](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/38bd584d6e6d28cf546bff31ae1165fb9b113f57))
-* **news:** stop reporting cache-rescued SNAPI errors as non-fatals ([639794b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/639794b6a76275e4fc90b9a7b6f730a58b7861ef))
-* route space station articles through repository ([83f6b7f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/83f6b7f5288b236cbf20462f541836f4fd55ff6c))
-* **ui:** cancel in-flight pagination when rocket, astronaut or agency list reloads ([457b4ad](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/457b4ad949ab88f0cdfd8168a352949ed52aad60))
-* **ui:** dedupe paginated appends in rocket, astronaut and agency lists ([3316dda](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3316ddaf0256c940d1cb9cfd4ba14ec668bfe8da))
-* **ui:** keep full news card layout for domain article summaries ([097a087](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/097a087b35b6ad7d5d0549b1c48e795e37ef3c0f))
 
 
 
