@@ -9,7 +9,7 @@ import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationDidBecomeActiveNotification
-import platform.UIKit.UIApplicationStateActive
+import platform.UIKit.UIApplicationState
 import kotlin.coroutines.resume
 
 private val log by lazy { SpaceLogger.getLogger("AppTracking") }
@@ -62,7 +62,7 @@ object AppTracking {
 
     /** ATT only prompts while the app is active; wait for the next activation otherwise. */
     private suspend fun awaitActive() {
-        if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) return
+        if (UIApplication.sharedApplication.applicationState == UIApplicationState.UIApplicationStateActive) return
         suspendCancellableCoroutine<Unit> { cont ->
             val center = NSNotificationCenter.defaultCenter
             var observer: Any? = null
