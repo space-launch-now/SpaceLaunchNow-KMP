@@ -74,11 +74,10 @@ actual fun SmartBannerAd(
     showCard: Boolean,
     onRemoveAdsClick: (() -> Unit)?,
     onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?,
-    refreshKey: Any?
+    refreshKey: Any?,
+    slot: InlineAdSlot?
 ) {
     val log = SpaceLogger.getLogger("SmartBannerAd")
-    // Convert placement type to AdSize for Android implementation
-    val adSize = getAdSizeForPlacement(placementType)
     val contextFactory = LocalContextFactory.current
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
 
@@ -92,11 +91,6 @@ actual fun SmartBannerAd(
     val preloadedLeaderboardAd = LocalPreloadedLeaderboardAd.current
     val preloadedFullBannerAd = LocalPreloadedFullBannerAd.current
     val preloadedFluidAd = LocalPreloadedFluidAd.current
-
-    // Get the actual ad size based on placement type
-    val actualAdSize = getAdSizeForPlacement(placementType)
-    
-    log.d { "🎯 SmartBannerAd (iOS): Using AdSize ${actualAdSize.width}x${actualAdSize.height} for placement $placementType" }
 
     // Don't show ads if:
     // 1. User has ad-free premium feature
@@ -113,6 +107,19 @@ actual fun SmartBannerAd(
         log.v { "SmartBannerAd: Not showing ad due to conditions." }
         return
     }
+
+    // An inline slot owns its handler (created on first compose, kept by the screen) and is
+    // always 300x250; the preloaded pool below is only for the other placements.
+    val slotHandler = slot?.handler { BannerAdHandler(contextFactory.getActivity()) }
+
+    // Get the actual ad size based on placement type
+    val actualAdSize = if (slotHandler != null) {
+        AdSize.MEDIUM_RECTANGLE
+    } else {
+        getAdSizeForPlacement(placementType)
+    }
+
+    log.d { "🎯 SmartBannerAd (iOS): Using AdSize ${actualAdSize.width}x${actualAdSize.height} for placement $placementType" }
 
     // Map AdSize dimensions directly to the appropriate preloaded ad
     // This avoids iOS issues with AdSize constant comparisons
@@ -144,7 +151,7 @@ actual fun SmartBannerAd(
     // (e.g. a 320x50 banner inside a 300x250 medium-rectangle box would render
     // empty space around the creative). If a height-compatible ad isn't ready,
     // let the shimmer ride until the correct preload fills.
-    val availableAd = bannerAd ?: run {
+    val availableAd = slotHandler ?: bannerAd ?: run {
         log.w { "SmartBannerAd: Primary ad ($actualAdSize) not available, trying size-compatible fallbacks" }
         when {
             placementType == AdPlacementType.NAVIGATION -> {
@@ -201,13 +208,21 @@ actual fun SmartBannerAd(
             }
 
             AdState.FAILING, AdState.NONE -> {
-                val delayMs = retryPolicy.nextDelayMs(availableAd)
+                // A slot handler starts empty and nothing else loads it: its first load is
+                // immediate and is not a retry
+                val firstSlotLoad = adState == AdState.NONE && slotHandler != null
+                val delayMs = if (firstSlotLoad) 0L else retryPolicy.nextDelayMs(availableAd)
                 log.d { "SmartBannerAd: Ad state $adState, retrying in ${delayMs}ms for placement $placementType" }
                 delay(delayMs)
                 // The preloader or another instance may have moved on while we waited
                 if (availableAd.state == adState) {
-                    retryPolicy.recordAttempt(availableAd)
-                    availableAd.reloadBanner(placementType.name)
+                    if (!firstSlotLoad) retryPolicy.recordAttempt(availableAd)
+                    // A new slot handler still holds the library's FULL_BANNER default size
+                    if (slotHandler != null) {
+                        availableAd.reloadBanner(placementType.name, actualAdSize)
+                    } else {
+                        availableAd.reloadBanner(placementType.name)
+                    }
                 }
                 retryRound++
             }
@@ -312,16 +327,19 @@ actual fun SmartBannerAd(
     }
 }
 
+/** Nothing to tear down by hand: UIKit frees a slot's GADBannerView once the handler is dropped. */
+internal actual fun destroyBannerHandler(handler: Any) = Unit
+
 /**
- * Reloads with this app's ad unit and the handler's own size. A bare load() falls back to
- * the library defaults: Google's test ad unit at FULL_BANNER size.
+ * Reloads with this app's ad unit and [loadSize], by default the handler's own size. A bare
+ * load() falls back to the library defaults: Google's test ad unit at FULL_BANNER size.
  */
 @OptIn(DependsOnGoogleMobileAds::class)
-private fun BannerAdHandler.reloadBanner(placement: String) {
-    val size = AdTelemetry.sizeLabel(adSize.width, adSize.height)
+private fun BannerAdHandler.reloadBanner(placement: String, loadSize: AdSize = adSize) {
+    val size = AdTelemetry.sizeLabel(loadSize.width, loadSize.height)
     load(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = adSize,
+        adSize = loadSize,
         onLoad = { AdTelemetry.loaded("banner", size, placement) },
         onFailure = { AdTelemetry.failed("banner", it, size, placement) },
         onDismissed = {},

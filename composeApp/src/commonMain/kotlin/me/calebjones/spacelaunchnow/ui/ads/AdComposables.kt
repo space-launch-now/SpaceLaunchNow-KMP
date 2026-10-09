@@ -35,6 +35,9 @@ enum class AdPlacementType {
  * @param onSizeChanged Callback when ad size changes (widthDp, heightPx: Int)
  * @param refreshKey When set, a new ad loads if the shared preloaded banner was last shown
  *   for a different key or a different screen visit (e.g. pass the launch id on detail screens)
+ * @param slot When set, the ad is an inline MEDIUM_RECTANGLE (300x250) slot with its own handler
+ *   from an [InlineAdSlots] kept above the list, instead of a shared preloaded banner; the
+ *   placement type then only labels telemetry (Android/iOS only)
  */
 @Composable
 expect fun SmartBannerAd(
@@ -44,7 +47,8 @@ expect fun SmartBannerAd(
     showCard: Boolean = true,
     onRemoveAdsClick: (() -> Unit)? = null,
     onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)? = null,
-    refreshKey: Any? = null
+    refreshKey: Any? = null,
+    slot: InlineAdSlot? = null
 )
 
 /**

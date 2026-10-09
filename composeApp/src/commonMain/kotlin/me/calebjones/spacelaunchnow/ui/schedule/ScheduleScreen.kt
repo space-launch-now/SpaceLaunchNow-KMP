@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -59,15 +61,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
+import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.isTabletOrDesktop
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
+import me.calebjones.spacelaunchnow.ui.ads.inlineAdSlotRows
+import me.calebjones.spacelaunchnow.ui.ads.rememberInlineAdSlots
 import me.calebjones.spacelaunchnow.ui.ads.rememberScreenVisitKey
 import me.calebjones.spacelaunchnow.ui.compose.ListDetailWrapper
 import me.calebjones.spacelaunchnow.ui.detail.LaunchDetailScreen
@@ -75,11 +77,16 @@ import me.calebjones.spacelaunchnow.ui.layout.AdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.schedule.components.ScheduleLaunchView
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
+import me.calebjones.spacelaunchnow.ui.viewmodel.SCHEDULE_PAGE_SIZE
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
-private const val AD_AFTER_ITEMS = 4
+/** Page-end ad slots per tab: after rows 25, 50, 75 and 100. */
+private const val MAX_PAGE_AD_SLOTS = 4
+
+/** Load the next page when the last visible list item is this close to the end of the list. */
+private const val LOAD_MORE_THRESHOLD = 8
 
 @Composable
 fun ScheduleScreen(
@@ -147,6 +154,9 @@ private fun ScheduleContent(
     val hasAdFree by rememberHasFeature(PremiumFeature.AD_FREE)
     val showInlineAd = !hasAdFree && rememberAdaptiveLayoutState().isCompact
     val visitKey = rememberScreenVisitKey()
+    // Handlers for the inline ad slots live here, above the lists, so scrolling a slot away and
+    // back keeps its ad. They are released when the schedule leaves composition.
+    val adSlots = rememberInlineAdSlots()
 
     val upcomingListState = rememberLazyListState()
     val previousListState = rememberLazyListState()
@@ -192,27 +202,11 @@ private fun ScheduleContent(
 
     // Infinite scroll for each tab
     LaunchedEffect(upcomingListState) {
-        snapshotFlow { upcomingListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .filter { it != null }
-            .map { it!! }
-            .distinctUntilChanged()
-            .collectLatest { lastIndex ->
-                if (lastIndex >= uiState.upcomingTab.items.size - 8) {
-                    viewModel.loadNextPage(ScheduleTab.Upcoming)
-                }
-            }
+        upcomingListState.onNearListEnd { viewModel.loadNextPage(ScheduleTab.Upcoming) }
     }
 
     LaunchedEffect(previousListState) {
-        snapshotFlow { previousListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .filter { it != null }
-            .map { it!! }
-            .distinctUntilChanged()
-            .collectLatest { lastIndex ->
-                if (lastIndex >= uiState.previousTab.items.size - 8) {
-                    viewModel.loadNextPage(ScheduleTab.Previous)
-                }
-            }
+        previousListState.onNearListEnd { viewModel.loadNextPage(ScheduleTab.Previous) }
     }
 
     PullToRefreshBox(
@@ -409,39 +403,34 @@ private fun ScheduleContent(
                         }
                     }
 
-                    // One inline banner after the 4th launch (or the last, if fewer). The CONTENT
-                    // placement is the shared 320x50 BANNER handler on compact width, which the
-                    // nav banner does not use. Only the settled page mounts it, because a handler's
-                    // AdView can have just one parent while two pages show during a swipe.
-                    val adSlot = showInlineAd && page == pagerState.settledPage &&
-                        tabState.items.isNotEmpty()
-                    val adAfter = minOf(AD_AFTER_ITEMS, tabState.items.size)
-
-                    itemsIndexed(tabState.items.take(adAfter)) { _, launch ->
-                        ScheduleLaunchView(
-                            launch = launch,
-                            onClick = { onLaunchClick(launch.id) }
+                    // 300x250 inline ads: one after each full page of launches. Every slot has its
+                    // own handler, so the slots of both pages can show during a swipe.
+                    val adRows = if (showInlineAd) {
+                        inlineAdSlotRows(
+                            itemCount = tabState.items.size,
+                            pageSize = SCHEDULE_PAGE_SIZE,
+                            maxPageSlots = MAX_PAGE_AD_SLOTS
                         )
+                    } else {
+                        emptyList()
                     }
 
-                    if (adSlot) {
-                        item(key = "ad_banner_${tab.name}", contentType = "ad_banner") {
+                    var from = 0
+                    adRows.forEach { row ->
+                        launchRows(tabState.items, from, row, onLaunchClick)
+                        item(key = "ad_banner_${tab.name}_$row", contentType = "ad_banner") {
                             SmartBannerAd(
                                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                                 placementType = AdPlacementType.CONTENT,
                                 showRemoveAdsButton = false,
                                 showCard = true,
-                                refreshKey = tab.name to visitKey
+                                refreshKey = tab.name to visitKey,
+                                slot = adSlots.slot(tab.name to row)
                             )
                         }
+                        from = row
                     }
-
-                    itemsIndexed(tabState.items.drop(adAfter)) { _, launch ->
-                        ScheduleLaunchView(
-                            launch = launch,
-                            onClick = { onLaunchClick(launch.id) }
-                        )
-                    }
+                    launchRows(tabState.items, from, tabState.items.size, onLaunchClick)
 
                     if (tabState.isLoading && tabState.items.isNotEmpty()) {
                         item {
@@ -510,4 +499,33 @@ private fun ScheduleContent(
             )
         }
     }
+}
+
+/** Launch rows `[from, to)` of the list. */
+private fun LazyListScope.launchRows(
+    launches: List<Launch>,
+    from: Int,
+    to: Int,
+    onLaunchClick: (String) -> Unit
+) {
+    if (to <= from) return
+    itemsIndexed(launches.subList(from, to)) { _, launch ->
+        ScheduleLaunchView(
+            launch = launch,
+            onClick = { onLaunchClick(launch.id) }
+        )
+    }
+}
+
+/**
+ * Calls [action] whenever the last visible item is within [LOAD_MORE_THRESHOLD] items of the end
+ * of the list. The count is the list's own, so ad slots and the loading row do not skew it, and
+ * it fires again when the list grows while the user is still near the end.
+ */
+private suspend fun LazyListState.onNearListEnd(action: () -> Unit) {
+    snapshotFlow { layoutInfo.visibleItemsInfo.lastOrNull()?.index to layoutInfo.totalItemsCount }
+        .distinctUntilChanged()
+        .collect { (lastIndex, total) ->
+            if (lastIndex != null && lastIndex >= total - LOAD_MORE_THRESHOLD) action()
+        }
 }
