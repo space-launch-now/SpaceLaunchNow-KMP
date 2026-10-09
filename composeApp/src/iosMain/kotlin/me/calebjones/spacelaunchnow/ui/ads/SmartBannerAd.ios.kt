@@ -217,7 +217,12 @@ actual fun SmartBannerAd(
                 // The preloader or another instance may have moved on while we waited
                 if (availableAd.state == adState) {
                     if (!firstSlotLoad) retryPolicy.recordAttempt(availableAd)
-                    availableAd.reloadBanner(placementType.name)
+                    // A new slot handler still holds the library's FULL_BANNER default size
+                    if (slotHandler != null) {
+                        availableAd.reloadBanner(placementType.name, actualAdSize)
+                    } else {
+                        availableAd.reloadBanner(placementType.name)
+                    }
                 }
                 retryRound++
             }
@@ -326,15 +331,15 @@ actual fun SmartBannerAd(
 internal actual fun destroyBannerHandler(handler: Any) = Unit
 
 /**
- * Reloads with this app's ad unit and the handler's own size. A bare load() falls back to
- * the library defaults: Google's test ad unit at FULL_BANNER size.
+ * Reloads with this app's ad unit and [loadSize], by default the handler's own size. A bare
+ * load() falls back to the library defaults: Google's test ad unit at FULL_BANNER size.
  */
 @OptIn(DependsOnGoogleMobileAds::class)
-private fun BannerAdHandler.reloadBanner(placement: String) {
-    val size = AdTelemetry.sizeLabel(adSize.width, adSize.height)
+private fun BannerAdHandler.reloadBanner(placement: String, loadSize: AdSize = adSize) {
+    val size = AdTelemetry.sizeLabel(loadSize.width, loadSize.height)
     load(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = adSize,
+        adSize = loadSize,
         onLoad = { AdTelemetry.loaded("banner", size, placement) },
         onFailure = { AdTelemetry.failed("banner", it, size, placement) },
         onDismissed = {},

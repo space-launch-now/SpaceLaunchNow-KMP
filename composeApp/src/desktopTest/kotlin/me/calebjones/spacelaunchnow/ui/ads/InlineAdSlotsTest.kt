@@ -61,16 +61,6 @@ class InlineAdSlotsTest {
     }
 
     @Test
-    fun slotsAtOrBeforeCountsAdsInFrontOfAListIndex() {
-        val slotRows = listOf(4, 25) // list index of the slots: 4 and 26
-        assertEquals(0, inlineAdSlotsAtOrBefore(3, slotRows))
-        assertEquals(1, inlineAdSlotsAtOrBefore(4, slotRows))
-        assertEquals(1, inlineAdSlotsAtOrBefore(25, slotRows))
-        assertEquals(2, inlineAdSlotsAtOrBefore(26, slotRows))
-        assertEquals(0, inlineAdSlotsAtOrBefore(10, emptyList()))
-    }
-
-    @Test
     fun slotKeepsItsHandlerUntilRelease() {
         val slots = InlineAdSlots()
         var created = 0

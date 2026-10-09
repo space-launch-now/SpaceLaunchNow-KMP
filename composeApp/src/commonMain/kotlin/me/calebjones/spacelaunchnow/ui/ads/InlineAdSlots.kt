@@ -31,13 +31,6 @@ fun inlineAdSlotRows(
 }
 
 /**
- * Number of ad slots that sit at or before [listIndex] in a list built from [slotRows]
- * (see [inlineAdSlotRows]). The slot after row `r` has list index `r + slotsBefore`.
- */
-fun inlineAdSlotsAtOrBefore(listIndex: Int, slotRows: List<Int>): Int =
-    slotRows.withIndex().count { (slot, row) -> row + slot <= listIndex }
-
-/**
  * Banner handlers for the inline ad slots of one screen, kept above the lazy list.
  *
  * A handler's AdView can have only one parent, so every slot needs its own handler. Handlers
