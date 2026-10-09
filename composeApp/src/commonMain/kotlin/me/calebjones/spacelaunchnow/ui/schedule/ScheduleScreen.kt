@@ -82,8 +82,6 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
-private const val AD_AFTER_ITEMS = 4
-
 /** Page-end ad slots per tab: after rows 25, 50, 75 and 100. */
 private const val MAX_PAGE_AD_SLOTS = 4
 
@@ -405,14 +403,12 @@ private fun ScheduleContent(
                         }
                     }
 
-                    // 300x250 inline ads: one after the 4th launch (or the last, if fewer) and one
-                    // after each full page of launches. Every slot has its own handler, so the
-                    // slots of both pages can show during a swipe.
+                    // 300x250 inline ads: one after each full page of launches. Every slot has its
+                    // own handler, so the slots of both pages can show during a swipe.
                     val adRows = if (showInlineAd) {
                         inlineAdSlotRows(
                             itemCount = tabState.items.size,
                             pageSize = SCHEDULE_PAGE_SIZE,
-                            firstSlotAfter = AD_AFTER_ITEMS,
                             maxPageSlots = MAX_PAGE_AD_SLOTS
                         )
                     } else {
@@ -422,17 +418,14 @@ private fun ScheduleContent(
                     var from = 0
                     adRows.forEach { row ->
                         launchRows(tabState.items, from, row, onLaunchClick)
-                        // The first slot is slot 0 whatever its row, so it keeps its handler
-                        // when the list grows past row 4
-                        val slotId = if (row <= AD_AFTER_ITEMS) 0 else row
-                        item(key = "ad_banner_${tab.name}_$slotId", contentType = "ad_banner") {
+                        item(key = "ad_banner_${tab.name}_$row", contentType = "ad_banner") {
                             SmartBannerAd(
                                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                                 placementType = AdPlacementType.CONTENT,
                                 showRemoveAdsButton = false,
                                 showCard = true,
                                 refreshKey = tab.name to visitKey,
-                                slot = adSlots.slot(tab.name to slotId)
+                                slot = adSlots.slot(tab.name to row)
                             )
                         }
                         from = row

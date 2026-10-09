@@ -7,28 +7,14 @@ import androidx.compose.runtime.remember
 /**
  * Rows after which an inline ad slot goes in a paged list.
  *
- * One slot after row [firstSlotAfter] (or after the last row when the list is shorter), then one
- * after each full page: rows [pageSize], 2 * [pageSize] and so on, at most [maxPageSlots] of them.
- * A page-end slot shows only once the list holds that many rows, so the rows of the next page
- * load after the slot and the slot stays between the pages.
+ * One slot after each full page: rows [pageSize], 2 * [pageSize] and so on, at most
+ * [maxPageSlots] of them. A slot shows only once the list holds that many rows, so the rows of
+ * the next page load after the slot and the slot stays between the pages.
  *
- * Returns ascending row counts without duplicates. Empty for an empty list.
+ * Returns ascending row counts. Empty while the list holds less than one full page.
  */
-fun inlineAdSlotRows(
-    itemCount: Int,
-    pageSize: Int,
-    firstSlotAfter: Int,
-    maxPageSlots: Int
-): List<Int> {
-    if (itemCount <= 0) return emptyList()
-    val rows = mutableListOf(minOf(firstSlotAfter, itemCount))
-    for (page in 1..maxPageSlots) {
-        val row = pageSize * page
-        if (row > itemCount) break
-        rows.add(row)
-    }
-    return rows.distinct().sorted()
-}
+fun inlineAdSlotRows(itemCount: Int, pageSize: Int, maxPageSlots: Int): List<Int> =
+    (1..maxPageSlots).map { pageSize * it }.takeWhile { it <= itemCount }
 
 /**
  * Banner handlers for the inline ad slots of one screen, kept above the lazy list.
