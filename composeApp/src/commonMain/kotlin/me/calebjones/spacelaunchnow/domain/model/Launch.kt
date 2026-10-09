@@ -2,15 +2,21 @@ package me.calebjones.spacelaunchnow.domain.model
 
 import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 @Immutable
+@Serializable
 data class Launch(
     val id: String,
     val name: String,
     val slug: String,
+    @Serializable(with = InstantSerializer::class)
     val net: Instant?,
+    @Serializable(with = InstantSerializer::class)
     val windowStart: Instant?,
+    @Serializable(with = InstantSerializer::class)
     val windowEnd: Instant?,
+    @Serializable(with = InstantSerializer::class)
     val lastUpdated: Instant?,
     val status: LaunchStatus?,
     val provider: Provider,

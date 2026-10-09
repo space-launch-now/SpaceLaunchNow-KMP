@@ -1,24 +1,19 @@
 package me.calebjones.spacelaunchnow.data.repository
 
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
 interface EventsRepository {
 
+    // Domain-typed (fixes the pre-Trantor ADR-0001 violation where this returned the raw
+    // LL PaginatedEventEndpointNormalList).
     suspend fun getEventsByProgram(
         programId: Int,
         limit: Int = 20,
         upcoming: Boolean? = true,
         forceRefresh: Boolean = false
-    ): Result<DataResult<PaginatedEventEndpointNormalList>>
-
-    suspend fun getEvents(
-        limit: Int = 10,
-        upcoming: Boolean? = null,
-        typeIds: List<Int>? = null
-    ): Result<PaginatedEventEndpointNormalList>
+    ): Result<DataResult<PaginatedResult<Event>>>
 
     // -- Domain-returning methods --------------------------------------------
 

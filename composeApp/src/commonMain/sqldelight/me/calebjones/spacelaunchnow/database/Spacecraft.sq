@@ -9,7 +9,7 @@ CREATE TABLE SpacecraftCache (
     description TEXT,
     spacecraft_config_id INTEGER,
     spacecraft_config_name TEXT,
-    json_data TEXT NOT NULL, -- Full serialized SpacecraftEndpointDetailed object
+    json_data TEXT NOT NULL, -- Full serialized domain Spacecraft object
     cached_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
 );

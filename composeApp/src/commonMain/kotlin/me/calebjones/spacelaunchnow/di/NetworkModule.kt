@@ -56,7 +56,7 @@ val networkModule = module {
         }
     }
 
-    // Provide the base URL as a named dependency
+    // Provide the base URL as a named dependency (LL + SNAPI clients only — see apiModule)
     single<String>(named("BaseUrl")) {
         if (BuildConfig.IS_DEBUG) {
             // In debug mode, try to get custom URL from debug preferences
@@ -73,6 +73,27 @@ val networkModule = module {
             }
         } else {
             "https://spacelaunchnow.app"
+        }
+    }
+
+    // Trantor (SpaceLaunchNow-API) base URL — a distinct qualifier from the LL/SNAPI
+    // "BaseUrl" above (amendment 2026-09-02, Phase 5 plan) so that debug-menu URL
+    // switching never points the Trantor client at a host with no /api/v1 prefix.
+    // Release fallback is the same staging constant until prod Trantor activates.
+    single<String>(named("TrantorBaseUrl")) {
+        if (BuildConfig.IS_DEBUG) {
+            try {
+                val debugPreferences = getOrNull<DebugPreferences>()
+                if (debugPreferences != null) {
+                    runBlocking { debugPreferences.getEffectiveTrantorBaseUrl() }
+                } else {
+                    DebugPreferences.TRANTOR_API_URL
+                }
+            } catch (e: Exception) {
+                DebugPreferences.TRANTOR_API_URL
+            }
+        } else {
+            DebugPreferences.TRANTOR_API_URL
         }
     }
 }

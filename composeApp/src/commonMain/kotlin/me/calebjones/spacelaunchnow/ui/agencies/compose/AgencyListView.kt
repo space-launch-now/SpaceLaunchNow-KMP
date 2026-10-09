@@ -218,7 +218,7 @@ fun AgencyListItem(
                                 onClick = { },
                                 label = {
                                     Text(
-                                        text = country.name ?: "Unknown",
+                                        text = country.name ?: country.alpha2Code ?: "Unknown",
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }

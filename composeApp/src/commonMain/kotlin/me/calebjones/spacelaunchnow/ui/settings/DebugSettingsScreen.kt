@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,6 +45,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +64,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.compose.LocalPlatformContext
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
@@ -532,15 +537,99 @@ private fun SystemTabContent(
                                     Text("Local", fontSize = 12.sp)
                                 }
                             }
-                            
-                            // Current URL Display
+
+                            // Trantor target — its own row, since these write the
+                            // Trantor URL preference and never the LL/SNAPI one above.
                             Text(
-                                text = "Current: ${debugSettings.customApiBaseUrl}",
+                                text = "Trantor Target:",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = { debugViewModel.switchToTrantorUrl() },
+                                    enabled = !isLoading,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Staging", fontSize = 12.sp)
+                                }
+                                OutlinedButton(
+                                    onClick = { debugViewModel.switchToTrantorProdUrl() },
+                                    enabled = !isLoading,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Prod", fontSize = 12.sp)
+                                }
+                            }
+
+                            // Current URL Display — both backends, since the Trantor URL
+                            // preference is now independent of the LL/SNAPI one above.
+                            Text(
+                                text = "LL/SNAPI current: ${debugSettings.customApiBaseUrl}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
+                            Text(
+                                text = "Trantor current: ${debugSettings.trantorApiBaseUrl}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
+
+                        HorizontalDivider()
+
+                        // Backend flag (amendment 2026-09-02): which repository
+                        // implementation set (Trantor vs. LL) Koin binds at app start.
+                        // Auto = null override = follow Remote Config's data_backend key.
+                        Text(
+                            text = "Backend:",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { debugViewModel.setDataBackendOverride(null) },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Auto", fontSize = 12.sp)
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    debugViewModel.setDataBackendOverride(
+                                        me.calebjones.spacelaunchnow.data.model.DataBackend.TRANTOR
+                                    )
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Trantor", fontSize = 12.sp)
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    debugViewModel.setDataBackendOverride(
+                                        me.calebjones.spacelaunchnow.data.model.DataBackend.LL
+                                    )
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("LL", fontSize = 12.sp)
+                            }
+                        }
+                        Text(
+                            text = "Current: ${debugSettings.dataBackendOverride?.name ?: "Auto (Remote Config)"}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
@@ -606,6 +695,14 @@ private fun SystemTabContent(
             }
         }
         
+        // Section: Local Caches (Trantor migration lever)
+        item {
+            ClearAllCachesCard(
+                isLoading = isLoading,
+                onConfirm = { imageLoader -> debugViewModel.clearAllCaches(imageLoader) }
+            )
+        }
+
         // Section 6: Info Section
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -642,6 +739,89 @@ private fun SystemTabContent(
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Empties every local cache (SQLDelight tables, in-memory LaunchCache, Coil image cache)
+ * so the next fetch comes from whichever backend the DataBackend flag names. Preference
+ * stores are not touched, so the Trantor URL and backend override above survive.
+ */
+@Composable
+private fun ClearAllCachesCard(
+    isLoading: Boolean,
+    onConfirm: (ImageLoader?) -> Unit
+) {
+    val imageLoader = SingletonImageLoader.get(LocalPlatformContext.current)
+    var showConfirm by remember { mutableStateOf(false) }
+
+    if (showConfirm) {
+        AlertDialog(
+            onDismissRequest = { showConfirm = false },
+            title = { Text("Clear all caches?") },
+            text = {
+                Text(
+                    "Wipes every cached launch, event, article, filter option, stats and " +
+                        "image on this device. Settings, the Trantor URL and the backend " +
+                        "override are kept. Restart the app afterwards."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirm = false
+                        onConfirm(imageLoader)
+                    }
+                ) {
+                    Text("Clear")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirm = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "Local Caches",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Wipe every cached API response and image so the next launch " +
+                        "refetches from the selected backend. Use after switching between " +
+                        "LL and Trantor. Preferences are not touched.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+                Button(
+                    onClick = { showConfirm = true },
+                    enabled = !isLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                ) {
+                    Text("Clear All Caches")
                 }
             }
         }
@@ -1804,6 +1984,22 @@ private fun SystemTabDarkPreview() {
             customUrlText = "https://ll.thespacedevs.com/2.4.0/",
             onCustomUrlTextChange = {}
         )
+    }
+}
+
+@Preview
+@Composable
+private fun ClearAllCachesCardPreview() {
+    SpaceLaunchNowPreviewTheme {
+        ClearAllCachesCard(isLoading = false, onConfirm = {})
+    }
+}
+
+@Preview
+@Composable
+private fun ClearAllCachesCardDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        ClearAllCachesCard(isLoading = false, onConfirm = {})
     }
 }
 
