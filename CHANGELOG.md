@@ -1,3 +1,18 @@
+# [5.47.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.2...v5.47.0) (2026-10-09)
+
+
+### Bug Fixes
+
+* **ads:** load new inline slot handlers at 300x250, not the library default ([619f183](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/619f18329e33e312e4bb9f60a524ddac4de15ab5))
+
+
+### Features
+
+* **schedule:** drop the inline ad after row 4, keep only page-end ads ([33f6be9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/33f6be98e0ce4e5e0173bb982c5c1a8f7c4cea96))
+* **schedule:** show 300x250 inline ads after row 4 and each loaded page ([24a0a7b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/24a0a7b2fe420d2017821275e9dab8127e3abfd2))
+
+
+
 ## [5.46.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.1...v5.46.2) (2026-10-06)
 
 
@@ -43,15 +58,6 @@
 ### Features
 
 * **ads:** load a fresh banner for each launch detail visit ([dd11a9c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dd11a9c845b5cf662de9eb9f82f56e242fa55961))
-
-
-
-## [5.44.4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.3...v5.44.4) (2026-10-02)
-
-
-### Bug Fixes
-
-* **ads:** raise max ad content rating from G to PG ([c94a660](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c94a6608ea2f1b637ad47ce2325d00536a57a3ac))
 
 
 
