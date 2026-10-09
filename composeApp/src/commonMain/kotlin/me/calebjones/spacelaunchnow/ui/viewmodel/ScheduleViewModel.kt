@@ -18,6 +18,9 @@ import me.calebjones.spacelaunchnow.ui.schedule.ScheduleFilterState
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
 
+/** Launches requested per page; the schedule list also places its inline ads by this. */
+const val SCHEDULE_PAGE_SIZE = 25
+
 enum class ScheduleTab { Upcoming, Previous }
 
 data class TabState(
@@ -220,7 +223,7 @@ class ScheduleViewModel(
 
             try {
                 val offset = if (reset) 0 else tabState.items.size
-                val limit = 25
+                val limit = SCHEDULE_PAGE_SIZE
                 val ordering = if (tab == ScheduleTab.Upcoming) "net" else "-net"
                 val searchQuery = _uiState.value.searchQuery.takeIf { it.isNotBlank() }
                 val filterState = _uiState.value.filterState

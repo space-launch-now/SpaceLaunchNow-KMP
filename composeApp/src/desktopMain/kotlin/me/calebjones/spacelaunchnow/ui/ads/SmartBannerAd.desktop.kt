@@ -19,8 +19,12 @@ actual fun SmartBannerAd(
     showCard: Boolean,
     onRemoveAdsClick: (() -> Unit)?,
     onSizeChanged: ((widthDp: Dp, heightPx: Int) -> Unit)?,
-    refreshKey: Any?
+    refreshKey: Any?,
+    slot: InlineAdSlot?
 ) {
     // No-op: Desktop doesn't show ads
     log.d { "🎯 SmartBannerAd (Desktop): Ads not supported, skipping" }
 }
+
+/** Desktop never creates banner handlers, so there is nothing to destroy. */
+internal actual fun destroyBannerHandler(handler: Any) = Unit

@@ -40,4 +40,10 @@ internal object BannerRefreshTracker {
         lastLoadMs[banner] = nowMs
         return true
     }
+
+    /** Drops the state kept for [banner]; call when its handler is destroyed. */
+    fun forget(banner: Any) {
+        lastTokens.remove(banner)
+        lastLoadMs.remove(banner)
+    }
 }

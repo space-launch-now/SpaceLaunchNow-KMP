@@ -54,6 +54,11 @@ internal class BannerRetryPolicy(
 
     fun hasShown(handler: Any): Boolean = entries[handler]?.shown == true
 
+    /** Drops the state kept for [handler]; call when it is destroyed. */
+    fun forget(handler: Any) {
+        entries.remove(handler)
+    }
+
     companion object {
         const val MIN_DELAY_MS = 1_000L
         private val BACKOFF_MS = longArrayOf(1_000L, 3_000L, 10_000L, 30_000L, 60_000L, 120_000L)
