@@ -63,7 +63,6 @@ class SimpleSubscriptionRepository(
                 try {
                     val hasWidgetAccess =
                         local.availableFeatures.contains(PremiumFeature.ADVANCED_WIDGETS)
-                    log.d { "Updating widget access to: $hasWidgetAccess" }
 
                     // Wait for DataStore write to complete before triggering widget update
                     widgetPreferences.updateWidgetAccessGranted(hasWidgetAccess)
@@ -171,7 +170,6 @@ class SimpleSubscriptionRepository(
 
         val hasFeature = hasSubscriptionFeature || hasTemporaryAccess
 
-        log.d { "SimpleSubscriptionRepository: hasFeature(${feature.name}) = $hasFeature (subscription: $hasSubscriptionFeature, temporary: $hasTemporaryAccess)" }
         return hasFeature
     }
 
@@ -399,7 +397,6 @@ class SimpleSubscriptionRepository(
             log.d { "SimpleSubscriptionRepository: Triggering widget update after $reason" }
             try {
                 platformWidgetUpdater.updateAllWidgets()
-                log.i { "Widget update completed for: $reason" }
             } catch (e: Exception) {
                 log.e(e) { "ERROR updating widgets after $reason: ${e.message}" }
             }

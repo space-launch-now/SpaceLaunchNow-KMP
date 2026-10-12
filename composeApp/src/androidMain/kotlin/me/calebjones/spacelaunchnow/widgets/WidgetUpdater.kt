@@ -42,28 +42,19 @@ object WidgetUpdater {
     suspend fun updateWidget(context: Context, widgetClass: Class<out androidx.glance.appwidget.GlanceAppWidget>) {
         withContext(Dispatchers.Main) {
             try {
-                log.d { "Updating widget: ${widgetClass.simpleName}" }
                 when (widgetClass.simpleName) {
                     "NextUpWidget" -> {
-                        val manager = GlanceAppWidgetManager(context)
-                        val widgetIds = manager.getGlanceIds(NextUpWidget::class.java)
-                        log.d { "Found ${widgetIds.size} NextUpWidget instances" }
                         NextUpWidget().updateAll(context)
                     }
                     "LaunchListWidget" -> {
-                        val manager = GlanceAppWidgetManager(context)
-                        val widgetIds = manager.getGlanceIds(LaunchListWidget::class.java)
-                        log.d { "Found ${widgetIds.size} LaunchListWidget instances" }
                         LaunchListWidget().updateAll(context)
                     }
                     else -> {
                         // Update all widgets
-                        log.d { "Updating all widgets" }
                         NextUpWidget().updateAll(context)
                         LaunchListWidget().updateAll(context)
                     }
                 }
-                log.d { "Widget update completed for ${widgetClass.simpleName}" }
             } catch (e: Exception) {
                 e.rethrowIfCancellation()
                 log.e(e) { "ERROR updating widgets" }
@@ -80,7 +71,6 @@ object WidgetUpdater {
     suspend fun updateAllWidgets(context: Context) {
         withContext(Dispatchers.Main) {
             try {
-                log.d { "Starting updateAllWidgets()" }
                 
                 // Read current appearance values from DataStore ONCE
                 val widgetPreferences: WidgetPreferences by inject(WidgetPreferences::class.java)
@@ -92,27 +82,22 @@ object WidgetUpdater {
                 val hasAccess = widgetPreferences.widgetAccessGrantedFlow.first()
                 val appThemeMode = appPreferences.themeFlow.first().name // System/Light/Dark
                 
-                log.d { "Read from DataStore - Source: $themeSource, AppTheme: $appThemeMode, Alpha: $backgroundAlpha, Radius: $cornerRadius, Access: $hasAccess" }
-                
                 val glanceManager = GlanceAppWidgetManager(context)
                 val currentTime = System.currentTimeMillis()
                 
                 // Check for NextUpWidget instances
                 val nextUpIds = glanceManager.getGlanceIds(NextUpWidget::class.java)
-                log.d { "Found ${nextUpIds.size} NextUpWidget instances on home screen" }
                 
                 // Check for LaunchListWidget instances
                 val launchListIds = glanceManager.getGlanceIds(LaunchListWidget::class.java)
-                log.d { "Found ${launchListIds.size} LaunchListWidget instances on home screen" }
-                
+                log.d { "updateAllWidgets nextUp=${nextUpIds.size} launchList=${launchListIds.size} access=$hasAccess" }
+
                 if (nextUpIds.isEmpty() && launchListIds.isEmpty()) {
-                    log.d { "No widgets found on home screen! User needs to add widgets first" }
                     return@withContext
                 }
                 
                 // Update NextUp widgets - Write appearance values directly to Glance state
                 if (nextUpIds.isNotEmpty()) {
-                    log.d { "Updating ${nextUpIds.size} NextUpWidget instances..." }
                     val nextUpWidget = NextUpWidget()
                     
                     nextUpIds.forEach { glanceId ->
@@ -136,7 +121,6 @@ object WidgetUpdater {
                 
                 // Update LaunchList widgets - Same pattern
                 if (launchListIds.isNotEmpty()) {
-                    log.d { "Updating ${launchListIds.size} LaunchListWidget instances..." }
                     val launchListWidget = LaunchListWidget()
                     
                     launchListIds.forEach { glanceId ->

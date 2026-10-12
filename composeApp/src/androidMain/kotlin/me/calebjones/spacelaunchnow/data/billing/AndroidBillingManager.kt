@@ -324,8 +324,6 @@ class AndroidBillingManager(
      * Update purchase state from RevenueCat CustomerInfo
      */
     private fun updatePurchaseState(customerInfo: CustomerInfo) {
-        log.d { "Updating purchase state..." }
-
         val activeEntitlements = customerInfo.entitlements.active.keys
 
         // Collect product IDs from entitlements and active subscriptions only.
@@ -349,7 +347,7 @@ class AndroidBillingManager(
         val isInTrial = trialEntitlement != null
         val trialExpires = trialEntitlement?.expirationDateMillis
 
-        log.i { "Purchase state updated - type: $subscriptionType, entitlements: $activeEntitlements, products: $productIds, inTrial: $isInTrial" }
+        log.d { "Purchase state updated - type: $subscriptionType, entitlements: $activeEntitlements, products: $productIds, inTrial: $isInTrial" }
 
         _purchaseState.value = PurchaseState(
             isSubscribed = subscriptionType != SubscriptionType.FREE,
@@ -411,12 +409,6 @@ class AndroidBillingManager(
         entitlements: Set<String>,
         productIds: Set<String>
     ): SubscriptionType {
-        log.d {
-            "Determining subscription type - entitlements: ${
-                entitlements.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }
-            }, products: ${productIds.joinToString(", ") { "\"$it\"" }.ifEmpty { "(none)" }}"
-        }
-
         // Check entitlements first (most reliable)
         val result = when {
             // Check for premium entitlement (all variations)
@@ -473,13 +465,8 @@ class AndroidBillingManager(
                 SubscriptionType.PREMIUM
             }
 
-            else -> {
-                log.d { "No entitlements or products found → FREE" }
-                SubscriptionType.FREE
-            }
+            else -> SubscriptionType.FREE
         }
-
-        log.i { "Subscription type determined: $result - entitlements: ${entitlements.size}, products: ${productIds.size}" }
 
         return result
     }

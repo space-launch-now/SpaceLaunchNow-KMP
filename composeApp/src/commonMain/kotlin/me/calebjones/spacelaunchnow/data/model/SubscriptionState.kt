@@ -55,7 +55,6 @@ data class SubscriptionState(
      */
     fun hasFeature(feature: PremiumFeature): Boolean {
         val hasAccess = isSubscribed && !isExpired() && features.contains(feature)
-        log.d { "hasFeature(${feature.name}): isSubscribed=$isSubscribed, isExpired=${isExpired()}, features=$features, hasAccess=$hasAccess" }
         return hasAccess
     }
 
