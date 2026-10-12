@@ -10,11 +10,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import me.calebjones.spacelaunchnow.LocalUseUtc
+import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
+import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
@@ -24,7 +36,10 @@ import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.detail.compose.phone.PhoneLaunchDetailContent
 import me.calebjones.spacelaunchnow.ui.detail.compose.tablet.TabletLaunchDetailContent
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
+import me.calebjones.spacelaunchnow.util.SharingFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
+import me.calebjones.spacelaunchnow.util.sharePlainText
+import org.koin.compose.koinInject
 
 // Height constants for spacing adjustments
 private val CompactHeight = 40.dp
@@ -238,12 +253,36 @@ private fun PhoneLaunchDetailView(
     onOpenUrl: (String) -> Unit = {},
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
+    val useUtc = LocalUseUtc.current
+    val analyticsManager: AnalyticsManager = koinInject()
     HeroDetailScaffold(
         titleText = launch.name,
         taglineText = launch.provider?.name ?: "",
         imageUrl = launch.imageUrl,
         logoUrl = launch.provider?.socialLogo ?: launch.provider?.logoUrl,
         onNavigateBack = onNavigateBack,
+        actions = {
+            IconButton(
+                onClick = {
+                    analyticsManager.track(AnalyticsEvent.LaunchShared(launch.id.toString(), "share_sheet"))
+                    sharePlainText(
+                        SharingFormatUtil.formatLaunchShareText(launch, useUtc),
+                        "Space Launch Information"
+                    )
+                },
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(color = Color(0xff121212).copy(alpha = 0.32f), shape = CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Share,
+                    contentDescription = "Share",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
     ) {
         // Column provides layout for content, parent scaffold handles scrolling
         Column(

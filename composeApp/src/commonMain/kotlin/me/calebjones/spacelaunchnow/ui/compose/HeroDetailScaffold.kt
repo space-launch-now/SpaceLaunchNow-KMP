@@ -1,10 +1,12 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -60,6 +62,7 @@ private val HzPadding = 20.dp
  * @param logoUrl Optional agency logo shown to the left of the title block
  * @param onNavigateBack Callback for the pinned back button; hidden if null
  * @param scrollEnabled Whether scrolling is enabled (default: true)
+ * @param actions Optional pinned action buttons shown at the top end, opposite the back button
  * @param content The scrollable content rendered below the title block
  */
 @Composable
@@ -70,6 +73,7 @@ fun HeroDetailScaffold(
     logoUrl: String? = null,
     onNavigateBack: (() -> Unit)? = null,
     scrollEnabled: Boolean = true,
+    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val scroll = rememberScrollState(0)
@@ -119,6 +123,16 @@ fun HeroDetailScaffold(
                 content()
             }
         }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            content = actions,
+        )
 
         if (onNavigateBack != null) {
             IconButton(
