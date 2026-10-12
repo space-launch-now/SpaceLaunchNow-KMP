@@ -1,0 +1,74 @@
+package me.calebjones.spacelaunchnow.api.extensions.trantor
+
+import me.calebjones.spacelaunchnow.api.trantor.apis.AgenciesApi
+import me.calebjones.spacelaunchnow.api.trantor.infrastructure.HttpResponse
+import me.calebjones.spacelaunchnow.api.trantor.models.AgencyFull
+import me.calebjones.spacelaunchnow.api.trantor.models.PaginatedResponseAgencyList
+
+/**
+ * Extension functions for the Trantor AgenciesApi to provide clean, named-parameter
+ * access to GET /agencies and /agencies/{id}.
+ *
+ * Note: Trantor's `country_codes` filter (E6(P5)) takes a CSV of ISO alpha-2 codes, matching
+ * the legacy LL client's list param; the country multi-select filter sends every selected code.
+ */
+
+suspend fun AgenciesApi.listAgencies(
+    search: String? = null,
+    featured: Boolean? = null,
+    typeIds: List<Int>? = null,
+    countryCodes: List<String>? = null,
+    ordering: String? = "name",
+    limit: Int? = 25,
+    offset: Int? = 0
+): HttpResponse<PaginatedResponseAgencyList> = listAgenciesApiV1AgenciesGet(
+    search = search,
+    featured = featured,
+    typeIds = typeIds?.joinToString(","),
+    countryCodes = countryCodes?.joinToString(","),
+    ordering = ordering,
+    limit = limit,
+    offset = offset
+)
+
+suspend fun AgenciesApi.getAgency(
+    agencyId: Int,
+    expand: String? = null
+): HttpResponse<AgencyFull> = getAgencyApiV1AgenciesAgencyIdGet(agencyId = agencyId, expand = expand)
+
+/**
+ * Get a list of agencies with clean named parameters.
+ */
+suspend fun AgenciesApi.getAgencyList(
+    limit: Int? = null,
+    offset: Int? = null,
+    ordering: String? = null,
+    search: String? = null,
+    featured: Boolean? = null,
+    typeIds: String? = null,
+    countryCodes: String? = null
+): HttpResponse<PaginatedResponseAgencyList> {
+    return listAgenciesApiV1AgenciesGet(
+        search = search,
+        featured = featured,
+        typeIds = typeIds,
+        countryCodes = countryCodes,
+        ordering = ordering,
+        limit = limit,
+        offset = offset
+    )
+}
+
+/**
+ * Extension functions for the Trantor AgenciesApi, providing named-parameter ergonomics
+ * over the generated methods, matching the pattern established for the LL client in
+ * AgenciesApiExtensions.kt.
+ */
+
+/**
+ * Get a single agency's full detail (`GET /agencies/{id}`).
+ */
+suspend fun AgenciesApi.getAgencyDetail(
+    id: Int,
+    expand: String? = null
+): HttpResponse<AgencyFull> = getAgencyApiV1AgenciesAgencyIdGet(agencyId = id, expand = expand)

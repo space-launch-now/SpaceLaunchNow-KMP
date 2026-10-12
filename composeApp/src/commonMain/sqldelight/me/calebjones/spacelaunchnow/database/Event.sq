@@ -10,7 +10,7 @@ CREATE TABLE EventCache (
     video_url TEXT,
     feature_image TEXT,
     date INTEGER, -- stored as epoch milliseconds
-    json_data TEXT NOT NULL, -- Full serialized EventEndpointNormal object
+    json_data TEXT NOT NULL, -- Full serialized EventList object (Trantor)
     cached_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
 );

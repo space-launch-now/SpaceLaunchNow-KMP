@@ -1,7 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.coroutines.CompletableDeferred
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.domain.model.Event
@@ -118,11 +117,6 @@ class FakeEventsRepository : EventsRepository {
         return eventTypesDomainResult
     }
 
-    // -- Non-deprecated legacy passthroughs (API types kept on interface) --
-
-    override suspend fun getEventsByProgram(programId: Int, limit: Int, upcoming: Boolean?, forceRefresh: Boolean): Result<DataResult<PaginatedEventEndpointNormalList>> =
-        Result.failure(NotImplementedError("Not wired in fake"))
-
-    override suspend fun getEvents(limit: Int, upcoming: Boolean?, typeIds: List<Int>?): Result<PaginatedEventEndpointNormalList> =
+    override suspend fun getEventsByProgram(programId: Int, limit: Int, upcoming: Boolean?, forceRefresh: Boolean): Result<DataResult<PaginatedResult<Event>>> =
         Result.failure(NotImplementedError("Not wired in fake"))
 }

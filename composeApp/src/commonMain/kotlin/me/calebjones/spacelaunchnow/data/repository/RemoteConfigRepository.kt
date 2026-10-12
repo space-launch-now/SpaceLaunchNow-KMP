@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
@@ -72,6 +73,13 @@ interface RemoteConfigRepository {
      * CONTROL when unset, unknown, or Firebase is unavailable.
      */
     suspend fun getOnboardingVariant(): OnboardingVariant
+
+    /**
+     * The DataBackend production kill-switch from the 'data_backend' parameter
+     * (amendment 2026-09-02). [DataBackend.DEFAULT] (LL) when unset, unrecognized, or
+     * Firebase is unavailable — the fail-safe side of the switch.
+     */
+    suspend fun getDataBackend(): DataBackend
 
     /**
      * Detail-view visits between interstitials, from 'ads_interstitial_visits'.

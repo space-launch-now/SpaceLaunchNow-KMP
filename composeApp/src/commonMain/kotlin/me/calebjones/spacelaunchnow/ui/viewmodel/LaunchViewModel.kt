@@ -15,7 +15,6 @@ import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.Launch
@@ -140,7 +139,7 @@ class LaunchViewModel(
         }
 
         // Stale-while-revalidate: Check for stale data to display while fetching
-        val staleData = repository.getStaleDetailedLaunch(id)?.toDomain()
+        val staleData = repository.getStaleDetailedLaunch(id)
         if (staleData != null) {
             // We have stale data - show it immediately while refreshing
             _launchDetails.value = staleData
