@@ -34,7 +34,7 @@ val networkModule = module {
         HttpClient(get<HttpClientEngine>()) {
             // Install Logging plugin for debugging purposes
             install(Logging) {
-                level = LogLevel.BODY
+                level = LogLevel.INFO
             }            // Install DefaultRequest plugin to add headers to every request
             install(DefaultRequest) {
                 // We no longer need to set Authorization header here as ApiClient.setApiKey will handle this
