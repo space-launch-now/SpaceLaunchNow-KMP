@@ -17,6 +17,7 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 
 class ArticlesRepositoryImpl(
     private val articlesApi: ArticlesApi,
@@ -284,6 +285,7 @@ class ArticlesRepositoryImpl(
             log.e(e) { "Network error in getArticlesPaginated" }
             Result.failure(e)
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Unexpected error in getArticlesPaginated" }
             Result.failure(e)
         }

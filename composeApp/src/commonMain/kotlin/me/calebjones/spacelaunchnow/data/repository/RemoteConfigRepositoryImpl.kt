@@ -85,7 +85,13 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            log.e(e) { "Failed to fetch remote config" }
+            // Backend/network failures are expected and self-healing: warn. A Firebase
+            // Installations auth failure means the device cannot authenticate: keep it at error.
+            if (e.isFirebaseInstallationsAuthFailure()) {
+                log.e(e) { "Failed to fetch remote config (Firebase Installations auth)" }
+            } else {
+                log.w(e) { "Failed to fetch remote config" }
+            }
             Result.failure(e)
         }
     }
@@ -195,4 +201,16 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
             DEFAULT_INTERSTITIAL_MIN_INTERVAL_S
         }
     }
+}
+
+private fun Throwable.isFirebaseInstallationsAuthFailure(): Boolean {
+    var current: Throwable? = this
+    var depth = 0
+    while (current != null && depth < 5) {
+        val message = current.message.orEmpty()
+        if (message.contains("FIS_AUTH_ERROR") || message.contains("Firebase Installations", ignoreCase = true)) return true
+        current = current.cause
+        depth++
+    }
+    return false
 }

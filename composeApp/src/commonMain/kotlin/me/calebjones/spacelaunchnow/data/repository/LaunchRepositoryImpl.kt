@@ -28,6 +28,7 @@ import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
@@ -1419,6 +1420,7 @@ class LaunchRepositoryImpl(
             log.e(e) { "API error in getFilteredLaunchesDomain" }
             Result.failure(e)
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Unexpected error in getFilteredLaunchesDomain" }
             Result.failure(e)
         }

@@ -17,6 +17,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import org.koin.java.KoinJavaComponent.inject
 import kotlinx.coroutines.flow.first
 
@@ -64,6 +65,7 @@ object WidgetUpdater {
                 }
                 log.d { "Widget update completed for ${widgetClass.simpleName}" }
             } catch (e: Exception) {
+                e.rethrowIfCancellation()
                 log.e(e) { "ERROR updating widgets" }
             }
         }
@@ -158,6 +160,7 @@ object WidgetUpdater {
                 
                 log.i { "All widget updates completed successfully" }
             } catch (e: Exception) {
+                e.rethrowIfCancellation()
                 log.e(e) { "FATAL ERROR updating all widgets" }
             }
         }

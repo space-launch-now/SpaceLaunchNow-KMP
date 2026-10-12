@@ -17,6 +17,7 @@ import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.time.Clock
 import kotlin.time.Clock.System
 
@@ -318,6 +319,7 @@ class EventsRepositoryImpl(
             log.e(e) { "Network error in getEventsPaginated" }
             Result.failure(e)
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Unexpected error in getEventsPaginated" }
             Result.failure(e)
         }

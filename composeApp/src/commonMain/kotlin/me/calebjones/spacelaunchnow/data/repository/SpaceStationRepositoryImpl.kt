@@ -18,6 +18,7 @@ import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.time.Clock
 
 /**
@@ -100,6 +101,7 @@ class SpaceStationRepositoryImpl(
             log.e(e) { "Network error while fetching station $stationId" }
             returnStaleStationOrFailure(stationId, e)
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Unexpected error while fetching station $stationId" }
             returnStaleStationOrFailure(stationId, e)
         }
@@ -177,6 +179,7 @@ class SpaceStationRepositoryImpl(
                             val response = expeditionsApi.expeditionsRetrieve(expeditionId)
                             response.body()
                         } catch (e: Exception) {
+                            e.rethrowIfCancellation()
                             log.e(e) { "Error fetching expedition $expeditionId" }
                             null
                         }
@@ -198,6 +201,7 @@ class SpaceStationRepositoryImpl(
             )
 
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Error fetching expedition details" }
             returnStaleExpeditionsOrFailure(stationId, e)
         }
@@ -289,6 +293,7 @@ class SpaceStationRepositoryImpl(
             )
 
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Error fetching TLE" }
             returnStaleTleOrFailure(noradId, e)
         }
@@ -355,6 +360,7 @@ class SpaceStationRepositoryImpl(
             log.i { "ISS cache pre-warm complete" }
 
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Error during ISS cache pre-warm" }
         }
     }
