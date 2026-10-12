@@ -79,7 +79,7 @@ actual object DatadogRUM {
         extraInfo: Map<String, Any?>
     ) {
         Datadog.setUserInfo(id = id, name = name, email = email, extraInfo = extraInfo)
-        log.i { "Datadog User Set: id=$id, extraInfo=$extraInfo" }
+        log.i { "Datadog user set" }
     }
 
     actual fun clearUser() {
@@ -98,7 +98,7 @@ actual object DatadogRuntime {
                 if (granted) TrackingConsent.GRANTED else TrackingConsent.NOT_GRANTED
             )
         }
-        log.i { "Datadog consent set: granted=$granted (sdkInitialized=${Datadog.isInitialized()})" }
+        log.d { "Datadog consent set: granted=$granted (sdkInitialized=${Datadog.isInitialized()})" }
     }
 
     actual fun isRemoteLoggingActive(): Boolean = Datadog.isInitialized() && consentGranted
@@ -141,7 +141,6 @@ actual object DatadogLogger {
             .setBundleWithRumEnabled(false)
             .setName("SLN")
             .build()
-        logger?.info("DatadogLogger initialized with sample rate: $sampleRate%")
     }
 
     actual fun debug(message: String, attributes: Map<String, Any?>) {
