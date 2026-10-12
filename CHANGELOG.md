@@ -1,3 +1,12 @@
+# [5.48.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.47.0...v5.48.0) (2026-10-12)
+
+
+### Features
+
+* **detail:** add Share button to phone launch detail hero ([4489156](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/448915620beb9b0734959f0d2d8b8125357dbb70))
+
+
+
 # [5.47.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.2...v5.47.0) (2026-10-09)
 
 
@@ -49,15 +58,6 @@
 * **ads:** report banner, interstitial and rewarded ad lifecycle events ([f4697da](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f4697da616a8c92c395b3546d465ced2f36eff9a))
 * **ads:** request iOS App Tracking Transparency after consent ([ced8a3b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ced8a3baa6519744659220189ff4be2c047bb636))
 * **ads:** show one inline banner in each Schedule tab on phones ([8978051](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8978051f367ddc7a2cb44656ee0b586cd4880c56))
-
-
-
-# [5.45.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.44.4...v5.45.0) (2026-10-02)
-
-
-### Features
-
-* **ads:** load a fresh banner for each launch detail visit ([dd11a9c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dd11a9c845b5cf662de9eb9f82f56e242fa55961))
 
 
 
