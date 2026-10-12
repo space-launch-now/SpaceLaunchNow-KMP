@@ -66,8 +66,13 @@ class PhoneDataLayerService(
     private val log = Logger.withTag("PhoneDataLayerService")
     private val json = Json { ignoreUnknownKeys = true }
     private val dataClient by lazy { Wearable.getDataClient(context) }
+    private val wearAvailability = WearAvailability()
 
     override suspend fun syncToWatch() {
+        if (wearAvailability.isUnavailable) {
+            log.d { "Wearable API unavailable on this device, skipping launch sync" }
+            return
+        }
         try {
             log.d { "Syncing launch data to watch" }
 
@@ -101,17 +106,22 @@ class PhoneDataLayerService(
             putDataMapReq.dataMap.putByteArray("payload", payloadJson.toByteArray())
             val putDataReq = putDataMapReq.asPutDataRequest().setUrgent()
 
-            withContext(Dispatchers.IO) {
-                Tasks.await(dataClient.putDataItem(putDataReq))
+            val synced = wearAvailability.runIfAvailable {
+                withContext(Dispatchers.IO) {
+                    Tasks.await(dataClient.putDataItem(putDataReq))
+                }
             }
-            log.i { "Successfully synced ${syncLaunches.size} launches to watch (filtered: ${!notificationState.followAllLaunches})" }
+            if (synced) {
+                log.i { "Successfully synced ${syncLaunches.size} launches to watch (filtered: ${!notificationState.followAllLaunches})" }
+            }
         } catch (e: Exception) {
             log.e(e) { "Failed to sync launch data to watch" }
         }
     }
 
     override suspend fun syncEntitlementToWatch(active: Boolean, expiresAt: Instant?) {
-        try {
+        // Failures other than "Wearable API missing" propagate; the caller logs them once.
+        val synced = wearAvailability.runIfAvailable {
             val request = PutDataMapRequest.create(PATH_ENTITLEMENT).apply {
                 dataMap.putBoolean(KEY_ACTIVE, active)
                 dataMap.putString(KEY_EXPIRES_AT, expiresAt?.toString() ?: "")
@@ -123,10 +133,9 @@ class PhoneDataLayerService(
                     .addOnSuccessListener { cont.resume(Unit) }
                     .addOnFailureListener { cont.resumeWithException(it) }
             }
+        }
+        if (synced) {
             Logger.i { "Synced entitlement to watch: active=$active, expiresAt=$expiresAt" }
-        } catch (e: Exception) {
-            Logger.e(e) { "Failed to sync entitlement to watch" }
-            throw e
         }
     }
 
