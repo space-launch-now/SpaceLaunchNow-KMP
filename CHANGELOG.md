@@ -1,3 +1,18 @@
+## [5.48.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.48.0...v5.48.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **logging:** cap Ktor HTTP logging at INFO so API bodies never ship ([53483e5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/53483e5d3dc95ad939cb78a862b9226b4fcfd3ae))
+* **logging:** collapse purchase-state, widget, feature-gate and ad-size trace bursts ([d57834e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d57834e9e03493c5e67b69831432d905e2b7b8a0))
+* **logging:** demote billing activity reflection misses to debug ([a4c193c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a4c193ca0ab332c63eab87da720f6e1267d07d0d))
+* **logging:** drop Datadog logger init line and demote consent and user-set lines ([7b0b629](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7b0b62995c4f398c6cd41a77e5c143dc6ba77100))
+* **logging:** rethrow coroutine cancellation before logging in catch-alls and warn on remote config backend failures ([d4ae003](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d4ae0030852ec8506cd42ebfcfe416b786dd967d))
+* **subscription:** ignore lastSynced when verifying the storage read-back ([0f2ce7c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0f2ce7c2f997e8e54ea9f2bcc272de851f8bb6c7))
+* **wear:** skip watch sync once the Wearable API is missing instead of logging errors ([8c1fdd0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8c1fdd0f541f7e9186e0eddfc71add43af317fa2))
+
+
+
 # [5.48.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.47.0...v5.48.0) (2026-10-12)
 
 
@@ -37,27 +52,6 @@
 ### Performance Improvements
 
 * **api:** round LL time filters to 1 minute ([#230](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/230)) ([35ba2ee](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/35ba2ee25ae33e0a9e110b1a386523e2fdbaf70f))
-
-
-
-# [5.46.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.45.0...v5.46.0) (2026-10-03)
-
-
-### Bug Fixes
-
-* **ads:** drop dead preWarmAdRequests and its false warn on Android ([50a6881](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/50a68818f4713ab2a5712afa38aea43a5e3e7732))
-* **ads:** hold the consent timeout while a consent form is required ([c379141](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c37914136632188064c730d15e1a2b0502692911))
-* **ads:** resolve consent gate via callbacks and polling, once ([36979da](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/36979da224fdef9f12855a4bc8b2e44813110c97))
-* **ads:** retry failed banners with backoff and keep shown creatives ([d14324a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d14324a75446a9da2ac35a370860c4b7d01e21d6))
-
-
-### Features
-
-* **ads:** persist interstitial cadence and drive it from Remote Config ([700e6a8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/700e6a8cac8f24551839e3ccbc67bf9f65c4b1a0))
-* **ads:** reload banners per screen visit with a 45s rate floor ([735ecae](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/735ecae3c9832db7e2b5bae2a380cf76de41f9f6))
-* **ads:** report banner, interstitial and rewarded ad lifecycle events ([f4697da](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f4697da616a8c92c395b3546d465ced2f36eff9a))
-* **ads:** request iOS App Tracking Transparency after consent ([ced8a3b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ced8a3baa6519744659220189ff4be2c047bb636))
-* **ads:** show one inline banner in each Schedule tab on phones ([8978051](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8978051f367ddc7a2cb44656ee0b586cd4880c56))
 
 
 
