@@ -55,6 +55,7 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.theme.getWidgetAppearanceBlocking
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.math.abs
 import org.koin.java.KoinJavaComponent.inject as koinInject
 
@@ -118,6 +119,7 @@ class NextUpWidget : GlanceAppWidget() {
                 )
                 result.getOrNull()?.data?.results?.firstOrNull()
             } catch (e: Exception) {
+                e.rethrowIfCancellation()
                 log.e(e) { "Failed to fetch next launch" }
                 null
             }

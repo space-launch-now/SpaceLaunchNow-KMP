@@ -5,6 +5,7 @@ import androidx.glance.appwidget.updateAll
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import me.calebjones.spacelaunchnow.widgets.LaunchListWidget
 import me.calebjones.spacelaunchnow.widgets.NextUpWidget
 
@@ -26,6 +27,7 @@ class WidgetUpdateWorker(
             log.i { "Widgets updated successfully" }
             Result.success()
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Failed to update widgets: ${e.message}" }
             Result.retry()
         }

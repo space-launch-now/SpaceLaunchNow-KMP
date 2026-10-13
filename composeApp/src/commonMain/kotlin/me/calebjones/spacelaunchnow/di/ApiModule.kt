@@ -43,7 +43,7 @@ val apiModule = module {
         // Install Logging plugin to show requests and headers
         install(Logging) {
             logger = ktorHttpLogger
-            level = LogLevel.ALL // Show everything including request/response body
+            level = LogLevel.INFO // URL + status only; never headers or bodies
         }
     }
 

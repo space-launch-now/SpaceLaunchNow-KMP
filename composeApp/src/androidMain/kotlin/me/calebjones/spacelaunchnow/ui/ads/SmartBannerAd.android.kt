@@ -116,8 +116,6 @@ actual fun SmartBannerAd(
         getAdSizeForPlacement(placementType)
     }
     
-    log.d { "Using AdSize ${actualAdSize.width}x${actualAdSize.height} for placement $placementType" }
-
     // Map AdSize dimensions directly to the appropriate preloaded ad
     // This avoids iOS issues with AdSize constant comparisons
     val bannerAd = when {
@@ -486,8 +484,6 @@ fun SmartBannerAdContent(
 fun getAdSizeForPlacement(placementType: AdPlacementType): AdSize {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val widthSizeClass = windowSizeClass.windowWidthSizeClass
-
-    log.d { "Placement=$placementType, WidthClass=$widthSizeClass" }
 
     return when (placementType) {
         AdPlacementType.NAVIGATION -> {

@@ -55,7 +55,6 @@ class TemporaryPremiumAccess(
         val now = System.now()
         val expiresAt = getExpirationTime(feature)
         val hasAccess = expiresAt?.let { now < it } ?: false
-        log.d { "🔍 hasTemporaryAccess($feature): now=$now, expiresAt=$expiresAt, hasAccess=$hasAccess" }
         return hasAccess
     }
 

@@ -280,7 +280,6 @@ class IosBillingManager : BillingManager {
         if (_isInitialized.value) purchases.appUserID else null
 
     private fun updatePurchaseState(customerInfo: com.revenuecat.purchases.kmp.models.CustomerInfo) {
-        log.i { "📊 Updating purchase state..." }
         
         val activeEntitlements = customerInfo.entitlements.active.keys
         val productIds = buildSet {

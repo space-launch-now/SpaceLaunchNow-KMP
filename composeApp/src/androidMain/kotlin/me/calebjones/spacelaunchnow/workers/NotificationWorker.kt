@@ -18,6 +18,7 @@ import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -110,6 +111,7 @@ class NotificationWorker(
                 processV4Notification(notificationDataMap)
             }
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "❌ NotificationWorker failed: ${e.message}" }
             Result.failure()
         }

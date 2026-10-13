@@ -174,7 +174,7 @@ class MainActivity : ComponentActivity() {
             log.d { "Set billing client activity" }
         } catch (e: Exception) {
             // Not an Android billing client or method doesn't exist - that's okay
-            log.w { "Billing client doesn't support setActivity - ${e.message}" }
+            log.d { "Billing client doesn't support setActivity - ${e.message}" }
         }
 
         // Refresh purchase state to catch any changes made while app was in background
@@ -219,7 +219,7 @@ class MainActivity : ComponentActivity() {
             setActivityMethod.invoke(billingClient, null)
             log.d { "Cleared billing client activity" }
         } catch (e: Exception) {
-            log.w { "Could not clear billing client activity - ${e.message}" }
+            log.d { "Could not clear billing client activity - ${e.message}" }
         }
     }
 
@@ -232,7 +232,7 @@ class MainActivity : ComponentActivity() {
             setActivityMethod.invoke(billingClient, null)
             log.d { "Cleared billing client activity on destroy" }
         } catch (e: Exception) {
-            log.w { "Could not clear billing client activity on destroy - ${e.message}" }
+            log.d { "Could not clear billing client activity on destroy - ${e.message}" }
         }
         NotificationPermissionManager.clearCurrentActivity()
     }

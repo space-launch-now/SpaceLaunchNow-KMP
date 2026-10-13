@@ -52,6 +52,7 @@ import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -135,6 +136,7 @@ class LaunchListWidget : GlanceAppWidget() {
                 )
                 result.getOrNull()?.data?.results ?: emptyList()
             } catch (e: Exception) {
+                e.rethrowIfCancellation()
                 log.e(e) { "Failed to fetch launches" }
                 emptyList()
             }

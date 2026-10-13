@@ -78,6 +78,17 @@ data class LocalSubscriptionData(
 }
 
 /**
+ * True when [readBack] holds the same subscription state as [expected].
+ *
+ * `lastSynced` is excluded: it is a timestamp, not state, and a concurrent syncer can move it by
+ * milliseconds between a write and its read-back. Every other field must match.
+ */
+internal fun readBackMatches(expected: LocalSubscriptionData, readBack: LocalSubscriptionData?): Boolean {
+    if (readBack == null) return false
+    return expected.copy(lastSynced = 0L) == readBack.copy(lastSynced = 0L)
+}
+
+/**
  * Local storage for subscription data using KStore
  * This provides immediate, synchronous access to subscription status
  */
@@ -163,7 +174,9 @@ open class LocalSubscriptionStorage {
 
             // Verify write succeeded by reading back
             val readBack = store.get()
-            val success = readBack == data
+            // lastSynced is stamped by the syncer and can legitimately move by a few ms between
+            // this write and the read-back (concurrent sync); it must not fail verification.
+            val success = readBackMatches(data, readBack)
 
             if (success) {
                 log.i { "Subscription data saved and verified successfully" }
