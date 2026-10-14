@@ -12,6 +12,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.NotificationHistoryItem
 import me.calebjones.spacelaunchnow.data.model.NotificationStats
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
+import me.calebjones.spacelaunchnow.data.notifications.v6.ReconcileTrigger
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
@@ -136,7 +137,7 @@ class DebugSettingsViewModel(
                 // toggle amounts to a full resubscribe — run it now, not at next app start.
                 // This switch is how a staging device reaches the v6_debug_* topics at all.
                 val env = if (useDebug) "v6_debug" else "v6_prod"
-                val result = notificationRepository?.reconcileSubscriptions()
+                val result = notificationRepository?.reconcileSubscriptions(ReconcileTrigger.DEBUG)
                 _statusMessage.value = when {
                     result == null || result.skipped ->
                         "Switched to ${env}_* topics (no reconcile on this platform)"

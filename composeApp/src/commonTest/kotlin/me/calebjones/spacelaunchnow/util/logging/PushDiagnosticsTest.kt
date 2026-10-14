@@ -73,6 +73,28 @@ class PushDiagnosticsTest {
     }
 
     @Test
+    fun tokenStateMapsPresentApnsPendingAndUnavailable() {
+        assertEquals("unavailable", PushDiagnostics.tokenState(PushDiagnostics.snapshot))
+
+        PushDiagnostics.recordTokenSuccess(rawToken)
+        assertEquals("present", PushDiagnostics.tokenState(PushDiagnostics.snapshot))
+
+        PushDiagnostics.recordTokenUnavailable("No APNS token specified before fetching FCM Token")
+        assertEquals("apns_pending", PushDiagnostics.tokenState(PushDiagnostics.snapshot))
+
+        PushDiagnostics.recordTokenUnavailable("FIS_AUTH_ERROR")
+        assertEquals("unavailable", PushDiagnostics.tokenState(PushDiagnostics.snapshot))
+    }
+
+    @Test
+    fun summaryAttributesCarryTokenStateAndReason() {
+        PushDiagnostics.recordTokenUnavailable("No APNS token specified")
+        val attrs = PushDiagnostics.summaryAttributes(PushDiagnostics.snapshot, "STANDARD")
+        assertEquals("apns_pending", attrs["push.token_state"])
+        assertEquals("No APNS token specified", attrs["push.token_unavailable_reason"])
+    }
+
+    @Test
     fun reportRowsSeededSnapshot() {
         PushDiagnostics.recordTokenSuccess(rawToken, nowEpochSeconds = 1_752_000_000)
         PushDiagnostics.recordForwardedToRc(nowEpochSeconds = 1_752_000_100)

@@ -217,7 +217,12 @@ fun SpaceLaunchNowApp(
                     if (token.isNullOrBlank()) {
                         val reason = tokenResult.exceptionOrNull()?.message ?: "null_or_blank"
                         PushDiagnostics.recordTokenUnavailable(reason)
-                        log.w { "FCM token unavailable at startup: $reason" }
+                        // The APNs precondition self-heals (post-APNs reconcile); log it at debug only.
+                        if (me.calebjones.spacelaunchnow.util.logging.isApnsPreconditionMessage(reason)) {
+                            log.d { "FCM token unavailable at startup (APNs pending): $reason" }
+                        } else {
+                            log.w { "FCM token unavailable at startup: $reason" }
+                        }
                     } else {
                         log.i { "FCM token present (len=${token.length}, …${token.takeLast(6)})" }
                     }
