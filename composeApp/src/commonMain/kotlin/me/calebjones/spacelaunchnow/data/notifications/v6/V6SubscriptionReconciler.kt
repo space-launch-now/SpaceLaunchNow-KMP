@@ -3,12 +3,54 @@ package me.calebjones.spacelaunchnow.data.notifications.v6
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import me.calebjones.spacelaunchnow.data.model.NotificationState
+import me.calebjones.spacelaunchnow.util.logging.isApnsPreconditionMessage
 import me.calebjones.spacelaunchnow.util.logging.logger
+
+/** Why a reconcile pass failed; the wire value is the `failure_class` attribute of `push_reconcile`. */
+enum class ReconcileFailureClass(val wire: String) {
+    NONE("none"),
+    APNS_PENDING("apns_pending"),
+    TIMEOUT("timeout"),
+    FCM_ERROR("fcm_error"),
+    MIXED("mixed"),
+    ;
+
+    companion object {
+        /**
+         * Classify recorded failure messages. apns_pending when every message is the APNs
+         * precondition, timeout when every one is a bridge timeout, fcm_error when none is
+         * either, mixed otherwise, none when there are no failures.
+         */
+        fun classify(messages: List<String?>): ReconcileFailureClass {
+            if (messages.isEmpty()) return NONE
+            val apns = messages.map { isApnsPreconditionMessage(it) }
+            val timeout = messages.map { it?.contains("timed out", ignoreCase = true) == true }
+            return when {
+                apns.all { it } -> APNS_PENDING
+                timeout.all { it } -> TIMEOUT
+                apns.none { it } && timeout.none { it } -> FCM_ERROR
+                else -> MIXED
+            }
+        }
+    }
+}
+
+/** What caused a reconcile pass; the wire value is the `trigger` attribute of `push_reconcile`. */
+enum class ReconcileTrigger(val wire: String) {
+    APP_START("app_start"),
+    POST_APNS("post_apns"),
+    SETTINGS("settings"),
+    KILL_SWITCH("kill_switch"),
+    TOKEN_REFRESH("token_refresh"),
+    FORCE("force"),
+    DEBUG("debug"),
+}
 
 data class V6ReconcileResult(
     val attempted: Int,
     val failed: Int,
     val skipped: Boolean = false,
+    val failureClass: ReconcileFailureClass = ReconcileFailureClass.NONE,
 ) {
     val clean: Boolean get() = !skipped && failed == 0
 }
@@ -44,12 +86,17 @@ class V6SubscriptionReconciler(
         val platform = platform ?: return V6ReconcileResult(0, 0, skipped = true)
         mutex.withLock {
             val state = stateProvider()
-            if (!state.hasCompletedV6Changeover) runChangeover(platform)
-            return reconcileLocked(state, platform)
+            val failureMessages = mutableListOf<String?>()
+            if (!state.hasCompletedV6Changeover) runChangeover(platform, failureMessages)
+            return reconcileLocked(state, platform, failureMessages)
         }
     }
 
-    private suspend fun reconcileLocked(state: NotificationState, platform: String): V6ReconcileResult {
+    private suspend fun reconcileLocked(
+        state: NotificationState,
+        platform: String,
+        failureMessages: MutableList<String?>,
+    ): V6ReconcileResult {
         val required = V6Topics.requiredTopics(state, envProvider(), platform)
         store.replaceDesired(required)
 
@@ -60,7 +107,7 @@ class V6SubscriptionReconciler(
             attempted++
             messaging.unsubscribe(topic)
                 .onSuccess { store.confirm(topic, confirmed = false, nowMillis = nowMillis()) }
-                .onFailure { failed++; store.recordFailure(topic, it.message, nowMillis()) }
+                .onFailure { failed++; failureMessages += it.message; store.recordFailure(topic, it.message, nowMillis()) }
         }
         store.deleteSettled()
 
@@ -68,11 +115,12 @@ class V6SubscriptionReconciler(
             attempted++
             messaging.subscribe(topic)
                 .onSuccess { store.confirm(topic, confirmed = true, nowMillis = nowMillis()) }
-                .onFailure { failed++; store.recordFailure(topic, it.message, nowMillis()) }
+                .onFailure { failed++; failureMessages += it.message; store.recordFailure(topic, it.message, nowMillis()) }
         }
 
-        if (failed > 0) log.w { "V6 reconcile: $failed of $attempted FCM operations failed; will retry next pass" }
-        return V6ReconcileResult(attempted, failed)
+        // The push_reconcile event (NotificationRepositoryImpl) carries the outcome and severity.
+        if (failed > 0) log.d { "V6 reconcile: $failed of $attempted FCM operations failed; will retry next pass" }
+        return V6ReconcileResult(attempted, failed, failureClass = ReconcileFailureClass.classify(failureMessages))
     }
 
     /**
@@ -82,16 +130,20 @@ class V6SubscriptionReconciler(
      * changeover retries on the next reconcile (transient double delivery is
      * collapsed by apns-collapse-id / collapse_key).
      */
-    private suspend fun runChangeover(platform: String) {
+    private suspend fun runChangeover(platform: String, failureMessages: MutableList<String?>) {
         val legacy = listOf("prod_v5_$platform", "debug_v5_$platform", "k_prod_v4", "k_debug_v4")
         // filter evaluates every element: every topic must be attempted; a
         // short-circuiting all{} over the unsubscribe calls would not be.
-        val failedTopics = legacy.filter { topic -> messaging.unsubscribe(topic).isFailure }
+        val failedTopics = legacy.filter { topic ->
+            val outcome = messaging.unsubscribe(topic)
+            outcome.exceptionOrNull()?.let { failureMessages += it.message }
+            outcome.isFailure
+        }
         if (failedTopics.isEmpty()) {
             markChangeoverComplete()
             log.i { "V6 changeover complete: legacy topics unsubscribed ($legacy)" }
         } else {
-            log.w { "V6 changeover incomplete; failed to unsubscribe $failedTopics; will retry next reconcile" }
+            log.d { "V6 changeover incomplete; failed to unsubscribe $failedTopics; will retry next reconcile" }
         }
     }
 

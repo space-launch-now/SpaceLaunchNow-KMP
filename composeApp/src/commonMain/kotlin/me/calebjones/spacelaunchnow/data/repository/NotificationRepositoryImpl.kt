@@ -20,7 +20,9 @@ import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.notifications.v6.AutoReconcileTrigger
+import me.calebjones.spacelaunchnow.data.notifications.v6.PushReconcileEvent
 import me.calebjones.spacelaunchnow.data.notifications.v6.PushTopicMessaging
+import me.calebjones.spacelaunchnow.data.notifications.v6.ReconcileTrigger
 import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.notifications.v6.V6ReconcileResult
 import me.calebjones.spacelaunchnow.data.notifications.v6.V6SubscriptionReconciler
@@ -116,22 +118,26 @@ class NotificationRepositoryImpl(
         }
     }
 
-    override suspend fun reconcileSubscriptions(): V6ReconcileResult = withContext(Dispatchers.Default) {
-        val result = reconciler.reconcile()
-        recordReconcileDiagnostics(result)
-        result
-    }
+    override suspend fun reconcileSubscriptions(trigger: ReconcileTrigger): V6ReconcileResult =
+        withContext(Dispatchers.Default) {
+            val result = reconciler.reconcile()
+            recordAndEmitReconcile(result, trigger)
+            result
+        }
 
     override suspend fun forceResubscribe(): V6ReconcileResult = withContext(Dispatchers.Default) {
         val result = reconciler.forceResubscribe()
-        recordReconcileDiagnostics(result)
+        recordAndEmitReconcile(result, ReconcileTrigger.FORCE)
         result
     }
 
-    private fun recordReconcileDiagnostics(result: V6ReconcileResult) {
+    private suspend fun recordAndEmitReconcile(result: V6ReconcileResult, trigger: ReconcileTrigger) {
         if (result.skipped) return
-        PushDiagnostics.recordSubscribedTopicCount(topicSubscriptionStore.counts().confirmed.toInt())
+        val confirmed = topicSubscriptionStore.counts().confirmed.toInt()
+        PushDiagnostics.recordSubscribedTopicCount(confirmed)
         if (result.clean) PushDiagnostics.recordCleanReconcile()
+        val changeoverComplete = runCatching { storage.getState().hasCompletedV6Changeover }.getOrDefault(false)
+        PushReconcileEvent.emit(result, trigger, changeoverComplete, confirmed)
     }
 
     override suspend fun initialize() {
@@ -158,7 +164,7 @@ class NotificationRepositoryImpl(
             // loaded state to DEFAULT and hand the next toggle a wiped state to
             // persist.
             repositoryScope.launch {
-                runCatching { reconcileSubscriptions() }
+                runCatching { reconcileSubscriptions(ReconcileTrigger.APP_START) }
                     .onFailure { log.e(it) { "App-start V6 reconcile failed; next start or save retries" } }
             }
 
@@ -176,7 +182,7 @@ class NotificationRepositoryImpl(
         }
         // The kill switch must not wait for Save or next app start: under V6
         // the unsubscribe IS the switch-off (and the resubscribe the switch-on).
-        reconcileSubscriptions()
+        reconcileSubscriptions(ReconcileTrigger.KILL_SWITCH)
     }
 
     override suspend fun setFollowAllLaunches(enabled: Boolean) {

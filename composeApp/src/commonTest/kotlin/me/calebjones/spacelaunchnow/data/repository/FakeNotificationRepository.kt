@@ -7,6 +7,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import me.calebjones.spacelaunchnow.data.notifications.v6.ReconcileTrigger
 import me.calebjones.spacelaunchnow.data.notifications.v6.V6ReconcileResult
 
 /**
@@ -50,7 +51,7 @@ class FakeNotificationRepository : NotificationRepository {
 
     override suspend fun hasNotificationPermission(): Boolean = true
 
-    override suspend fun reconcileSubscriptions(): V6ReconcileResult {
+    override suspend fun reconcileSubscriptions(trigger: ReconcileTrigger): V6ReconcileResult {
         reconcileCalls++
         return nextReconcileResult
     }

@@ -46,6 +46,7 @@ class PushSummaryLoggingTest {
         assertTrue(summary.second.contains("push.token_present=true"))
         assertTrue(summary.second.contains("push.play_services=available"))
         assertTrue(summary.second.contains("diagnostics.level=STANDARD"))
+        assertTrue(summary.second.contains("push.token_state=present"))
         assertFalse(summary.second.contains(rawToken))
     }
 }

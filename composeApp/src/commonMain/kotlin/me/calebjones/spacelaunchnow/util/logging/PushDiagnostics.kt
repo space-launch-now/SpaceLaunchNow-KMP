@@ -5,8 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlin.time.Clock
 import kotlin.time.Instant
-import me.calebjones.spacelaunchnow.analytics.DatadogLogger
-import me.calebjones.spacelaunchnow.analytics.DatadogRuntime
 
 /**
  * Runtime cache of the startup push-registration outcomes (spec 015 §3.4).
@@ -95,6 +93,15 @@ object PushDiagnostics {
         put("push.play_services", (snapshot.playServices ?: PlayServicesAvailability.UNKNOWN).label())
         put("push.subscribed_topic_count", snapshot.subscribedTopicCount ?: 0)
         put("diagnostics.level", diagnosticLevelName ?: "unknown")
+        put("push.token_state", tokenState(snapshot))
+        snapshot.tokenUnavailableReason?.let { put("push.token_unavailable_reason", it.take(200)) }
+    }
+
+    /** `present` | `apns_pending` (iOS precondition, self-heals) | `unavailable` (anything else, incl. not yet recorded). */
+    fun tokenState(snapshot: PushDiagnosticsSnapshot): String = when {
+        snapshot.tokenPresent == true -> "present"
+        snapshot.tokenPresent == false && isApnsPreconditionMessage(snapshot.tokenUnavailableReason) -> "apns_pending"
+        else -> "unavailable"
     }
 
     /** Label/value rows for the shareable diagnostics report (spec 015 §4). */
@@ -144,16 +151,21 @@ object PushDiagnostics {
      * VERBOSE, where the Kermit line already reaches Datadog through the writer.
      */
     fun logSummary(diagnosticLevelName: String?) {
-        val attrs = summaryAttributes(snapshot, diagnosticLevelName)
-        log.i { "Push registration summary " + attrs.entries.joinToString(" ") { "${it.key}=${it.value}" } }
-        if (DatadogRuntime.isRemoteLoggingActive() && SpaceLogger.getDataDogSeverity() > Severity.Info) {
-            DatadogLogger.info(
-                "Push registration summary",
-                attrs + mapOf("tag" to "SLN-PushDiagnostics") + UserContext.getLogAttributes(),
-            )
-        }
+        DiagnosticEvents.emit(
+            kind = DiagnosticEventKind.PUSH_SUMMARY,
+            severity = Severity.Info,
+            tag = "SLN-PushDiagnostics",
+            attrs = summaryAttributes(snapshot, diagnosticLevelName),
+            label = "Push registration summary", // runbook string, kept (spec D2)
+        )
     }
 }
+
+/**
+ * True when [message] is the Firebase iOS "no APNs token yet" precondition. It self-heals
+ * once APNs registers, so it is not a failure worth a warn or error line.
+ */
+fun isApnsPreconditionMessage(message: String?): Boolean = message?.contains("apns", ignoreCase = true) == true
 
 private fun PlayServicesAvailability.label(): String = when (this) {
     PlayServicesAvailability.AVAILABLE -> "available"

@@ -11,6 +11,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
+import me.calebjones.spacelaunchnow.data.notifications.v6.ReconcileTrigger
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -87,7 +88,7 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
         // name, and wiping the record would orphan every stale subscription.
         serviceScope.launch {
             runCatching {
-                KoinPlatform.getKoin().get<NotificationRepository>().reconcileSubscriptions()
+                KoinPlatform.getKoin().get<NotificationRepository>().reconcileSubscriptions(ReconcileTrigger.TOKEN_REFRESH)
             }.onFailure {
                 log.w(it) { "Reconcile after token refresh failed; app-start pass will retry" }
             }

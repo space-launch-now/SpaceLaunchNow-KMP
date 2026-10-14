@@ -220,6 +220,49 @@ class V6SubscriptionReconcilerTest {
         assertEquals(3, h.store.confirmedTopics().size)
     }
 
+    private val apnsMsg = "No APNS token specified before fetching FCM Token"
+    private val topics = listOf("v6_prod_ios_flex_tenMinutes", "v6_prod_spacex", "v6_prod_florida")
+
+    @Test
+    fun failureClassNoneWhenEverythingSucceeds() = runTest {
+        val h = Harness(flexState)
+        assertEquals(ReconcileFailureClass.NONE, h.reconciler.reconcile().failureClass)
+    }
+
+    @Test
+    fun failureClassApnsPendingWhenEveryFailureIsThePrecondition() = runTest {
+        val h = Harness(flexState)
+        h.fake.failSubscribes = topics.toSet()
+        h.fake.failureMessages = topics.associateWith { apnsMsg }
+        val result = h.reconciler.reconcile()
+        assertEquals(3, result.failed)
+        assertEquals(ReconcileFailureClass.APNS_PENDING, result.failureClass)
+    }
+
+    @Test
+    fun failureClassTimeoutWhenEveryFailureTimedOut() = runTest {
+        val h = Harness(flexState)
+        h.fake.failSubscribes = topics.toSet()
+        h.fake.failureMessages = topics.associateWith { "subscribe timed out after 10s" }
+        assertEquals(ReconcileFailureClass.TIMEOUT, h.reconciler.reconcile().failureClass)
+    }
+
+    @Test
+    fun failureClassFcmErrorWhenNoFailureIsApnsOrTimeout() = runTest {
+        val h = Harness(flexState)
+        h.fake.failSubscribes = setOf("v6_prod_spacex")
+        h.fake.failureMessages = mapOf("v6_prod_spacex" to "FIS_AUTH_ERROR")
+        assertEquals(ReconcileFailureClass.FCM_ERROR, h.reconciler.reconcile().failureClass)
+    }
+
+    @Test
+    fun failureClassMixedWhenCausesDiffer() = runTest {
+        val h = Harness(flexState)
+        h.fake.failSubscribes = setOf("v6_prod_spacex", "v6_prod_florida")
+        h.fake.failureMessages = mapOf("v6_prod_spacex" to apnsMsg, "v6_prod_florida" to "FIS_AUTH_ERROR")
+        assertEquals(ReconcileFailureClass.MIXED, h.reconciler.reconcile().failureClass)
+    }
+
     @Test
     fun forceResubscribeWithPartialFailureKeepsFailedRowsForRetry() = runTest {
         val h = Harness(flexState)
