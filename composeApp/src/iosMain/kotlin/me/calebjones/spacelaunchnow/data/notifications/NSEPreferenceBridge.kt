@@ -107,16 +107,21 @@ object NSEPreferenceBridge {
 
         userDefaults.synchronize()
 
-        log.d {
-            "Synced NSE prefs: enabled=${state.enableNotifications}, " +
-                "v6Changeover=${state.hasCompletedV6Changeover}, " +
-                "followAll=${state.followAllLaunches}, " +
-                "agencies(expanded)=${expandedAgencies.size}, " +
-                "locations(expanded)=${expandedLocations.size}, " +
-                "events=${state.isTopicEnabled(NotificationTopic.EVENTS)}, " +
-                "news=${state.isTopicEnabled(NotificationTopic.FEATURED_NEWS)}, " +
-                "announcements=${state.isTopicEnabled(NotificationTopic.ANNOUNCEMENTS)}"
-        }
+        // Debug, Kermit-only: the write-side twin of startup_state.
+        DiagnosticEvents.emit(
+            kind = DiagnosticEventKind.NSE_PREFS_SYNC,
+            severity = Severity.Debug,
+            tag = "SLN-NSEPreferenceBridge",
+            attrs = mapOf(
+                "enabled" to state.enableNotifications,
+                "v6_changeover" to state.hasCompletedV6Changeover,
+                "follow_all" to state.followAllLaunches,
+                "strict" to state.useStrictMatching,
+                "agency_count_expanded" to expandedAgencies.size,
+                "location_count_expanded" to expandedLocations.size,
+            ),
+            upload = false,
+        )
     }
 
     fun readStoredPrefs(): NsePrefsSnapshot {
@@ -168,44 +173,42 @@ object NSEPreferenceBridge {
      * since we are not going through DataDogLogWriter (which would otherwise add them).
      * Call once on app foreground/startup (see IosNotificationBridge).
      * No-op (buffer preserved) when DatadogRuntime.isRemoteLoggingActive() is false.
+     *
+     * @return the number of breadcrumbs drained (0 when skipped or empty).
      */
     @OptIn(ExperimentalAtomicApi::class)
-    fun drainNseEventLog() {
+    fun drainNseEventLog(): Int {
         // CRITICAL: never read-then-clear the buffer unless the logs will actually
         // upload. Draining into an uninitialized/non-consented logger DESTROYS the
         // only evidence of killed-app delivery decisions.
         if (!DatadogRuntime.isRemoteLoggingActive()) {
             log.d { "NSE drain skipped — remote logging inactive; breadcrumbs preserved" }
-            return
+            return 0
         }
 
         // Serialize our two callers: if a drain is already in progress, skip (the in-flight one
         // is clearing the buffer anyway). Prevents the startup coroutine and the first
         // applicationDidBecomeActive from interleaving their read-then-clear.
         if (!draining.compareAndSet(expectedValue = false, newValue = true)) {
-            log.d { "NSE drain already in progress — skipping concurrent call" }
-            return
+            log.v { "NSE drain already in progress — skipping concurrent call" }
+            return 0
         }
         try {
             val userDefaults = NSUserDefaults(suiteName = APP_GROUP)
             if (userDefaults == null) {
                 log.e { "Failed to get NSUserDefaults for app group: $APP_GROUP (NSE drain skipped)" }
-                return
+                return 0
             }
 
             @Suppress("UNCHECKED_CAST")
             val entries = userDefaults.arrayForKey(KEY_NSE_EVENT_LOG) as? List<String>
-            if (entries.isNullOrEmpty()) {
-                log.d { "NSE event log empty — nothing to drain" }
-                return
-            }
+            if (entries.isNullOrEmpty()) return 0
 
             // Read-then-clear: remove before emitting so a crash mid-drain can't double-ship the
             // whole buffer on next launch (at worst we lose this batch — acceptable for diagnostics).
             userDefaults.removeObjectForKey(KEY_NSE_EVENT_LOG)
             userDefaults.synchronize()
 
-            log.i { "Draining ${entries.size} NSE breadcrumb(s) to Datadog" }
             entries.forEach { entry ->
                 val crumb = NseBreadcrumb.parse(entry)
                 val ts = crumb?.timestampEpochSeconds?.toString() ?: ""
@@ -233,6 +236,7 @@ object NSEPreferenceBridge {
                     label = message,
                 )
             }
+            return entries.size
         } finally {
             draining.store(false)
         }

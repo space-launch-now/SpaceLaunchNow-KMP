@@ -43,60 +43,14 @@ object IosNotificationBridge : KoinComponent {
      * @return true if notification should be displayed, false if it should be suppressed
      */
     fun shouldShowNotification(data: Map<String, String>): Boolean {
-        log.i { "========================================" }
-        log.i { "🔍 [KOTLIN] EVALUATING NOTIFICATION FILTER" }
-        log.i { "========================================" }
-        
-        // Get current notification state (use cache if available, refresh in background)
         val state = getCachedOrFetchState()
-        
-        // Print current notification settings
-        log.i { "⚙️ [KOTLIN] Current Notification State:" }
-        log.i { "   - Notifications Enabled: ${state.enableNotifications}" }
-        log.i { "   - Follow All Launches: ${state.followAllLaunches}" }
-        log.i { "   - Use Strict Matching: ${state.useStrictMatching}" }
-        log.i { "   - Hide TBD Launches: ${state.hideTbdLaunches}" }
-        log.i { "" }
-        log.i { "⏰ [KOTLIN] Timing Settings (Topics):" }
-        state.topicSettings.forEach { (topic, enabled) ->
-            log.i { "   - $topic: ${if (enabled) "✅" else "❌"}" }
-        }
-        log.i { "" }
-        log.i { "🚀 [KOTLIN] Agency Filter:" }
-        if (state.subscribedAgencies.isEmpty()) {
-            log.i { "   - No agencies subscribed (will block all)" }
-        } else {
-            log.i { "   - ${state.subscribedAgencies.size} agencies subscribed: ${state.subscribedAgencies.take(10)}${if (state.subscribedAgencies.size > 10) "..." else ""}" }
-        }
-        log.i { "" }
-        log.i { "📍 [KOTLIN] Location Filter:" }
-        if (state.subscribedLocations.isEmpty()) {
-            log.i { "   - No locations subscribed (will block all)" }
-        } else {
-            log.i { "   - ${state.subscribedLocations.size} locations subscribed: ${state.subscribedLocations.take(10)}${if (state.subscribedLocations.size > 10) "..." else ""}" }
-        }
-        log.i { "" }
-        
-        // Print notification data being evaluated
-        log.i { "📩 [KOTLIN] Evaluating Notification:" }
-        log.i { "   - Type: ${data["notification_type"]}" }
-        log.i { "   - Launch: ${data["launch_name"]}" }
-        log.i { "   - Agency ID: ${data["agency_id"]}" }
-        log.i { "   - Location ID: ${data["location_id"]}" }
-        log.i { "   - Webcast: ${data["webcast"]}" }
-        log.i { "   - Webcast Live: ${data["webcast_live"]}" }
-        log.i { "" }
-        
-        // Use the shared, gated filter logic: once this device's V5->V6 changeover has
-        // completed it only receives server-targeted sends, and the legacy filter is skipped
-        // (kill switch only). Until then it is still on the V5 broadcast and must filter.
-        val passthrough = !LocalFilterPolicy.isActive(state)
-        log.i { if (passthrough) "🔄 [KOTLIN] On V6 topics — server-targeted, local filter skipped (${LocalFilterPolicy.PASSTHROUGH_REASON})" else "🔄 [KOTLIN] Running shared NotificationFilter logic..." }
-        val result = LocalFilterPolicy.legacyLaunchAllowedFromMap(data, state)
 
-        log.i { "" }
-        log.i { "🎯 [KOTLIN] Filter Decision: ${if (result) "SHOW ✅" else "SUPPRESS 🔇"}" }
-        log.i { "========================================" }
+        // Once this device's V5->V6 changeover has completed it only receives server-targeted
+        // sends, and the legacy filter is skipped (kill switch only). Until then it is still on
+        // the V5 broadcast and must filter.
+        val passthrough = !LocalFilterPolicy.isActive(state)
+        val result = LocalFilterPolicy.legacyLaunchAllowedFromMap(data, state)
+        FilterDecisionEvent.emit(data, state, shown = result, passthrough = passthrough)
         return result
     }
     
@@ -112,6 +66,8 @@ object IosNotificationBridge : KoinComponent {
             try {
                 val state = notificationStateStorage.getState()
                 val nse = NSEPreferenceBridge.readStoredPrefs()
+                // Drain first so the count rides on the startup_state event.
+                val drainedCount = NSEPreferenceBridge.drainNseEventLog()
                 // Sentinel conventions: missing NSE keys -> null for booleans (nse_keys_missing covers querying), -1 for counts (keeps the facet numeric).
                 // DiagnosticEvents adds log_kind, platform, tag and UserContext attributes.
                 val attributes = mapOf(
@@ -129,6 +85,7 @@ object IosNotificationBridge : KoinComponent {
                     "nse_strict" to nse.useStrictMatching,
                     "nse_agency_count" to (nse.subscribedAgencies?.size ?: -1),
                     "nse_location_count" to (nse.subscribedLocations?.size ?: -1),
+                    "drained_count" to drainedCount,
                 )
                 DiagnosticEvents.emit(
                     kind = DiagnosticEventKind.STARTUP_STATE,
@@ -140,8 +97,6 @@ object IosNotificationBridge : KoinComponent {
                 log.e(e) { "Failed to emit startup state" }
             }
         }
-        // Drain NSE breadcrumbs (no-op preserve when remote logging inactive).
-        NSEPreferenceBridge.drainNseEventLog()
     }
 
     /**

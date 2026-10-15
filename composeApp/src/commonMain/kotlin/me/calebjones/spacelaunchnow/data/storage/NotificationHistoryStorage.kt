@@ -111,8 +111,6 @@ class NotificationHistoryStorage(private val dataStore: DataStore<Preferences>) 
             // Save back to storage
             val jsonString = json.encodeToString(currentHistory)
             preferences[NOTIFICATION_HISTORY_KEY] = jsonString
-
-            log.d { "Added notification to history: $notificationType for ${launchName ?: "unknown"}, wasFiltered=$wasFiltered, total history size=${currentHistory.size}" }
         }
     }
 

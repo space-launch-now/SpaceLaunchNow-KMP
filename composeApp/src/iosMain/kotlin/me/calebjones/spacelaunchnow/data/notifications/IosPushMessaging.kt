@@ -27,21 +27,20 @@ actual class PushMessaging actual constructor() {
     actual val messages: Flow<PushMessage> = _messages.asSharedFlow()
 
     actual suspend fun subscribeToTopic(topic: String): Result<Unit> {
-        log.i { "Subscribing to topic: $topic" }
+        log.v { "Subscribing to topic: $topic" }
         return IosPushMessagingBridge.subscribe(topic)
     }
 
     actual suspend fun unsubscribeFromTopic(topic: String): Result<Unit> {
-        log.i { "Unsubscribing from topic: $topic" }
+        log.v { "Unsubscribing from topic: $topic" }
         return IosPushMessagingBridge.unsubscribe(topic)
     }
 
     actual suspend fun getToken(): Result<String> {
-        log.i { "Getting FCM token" }
         return IosPushMessagingBridge.getToken()
             .onSuccess { token ->
                 PushDiagnostics.recordTokenSuccess(token)
-                log.i { "SUCCESS - Got FCM token (len=${token.length}, …${token.takeLast(6)})" }
+                log.d { "Got FCM token (len=${token.length}, …${token.takeLast(6)})" }
             }
             .onFailure { error ->
                 PushDiagnostics.recordTokenUnavailable(error.message ?: "exception")

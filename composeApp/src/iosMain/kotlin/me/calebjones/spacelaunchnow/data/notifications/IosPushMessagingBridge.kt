@@ -119,7 +119,7 @@ object IosPushMessagingBridge : KoinComponent {
     ): Result<T> = requestMutex.withLock {
         val requestId = ++requestSeq
         val label = if (topic == null) operation.name else "${operation.name} $topic"
-        log.i { "Requesting $label from Swift (request $requestId)" }
+        log.v { "Requesting $label from Swift (request $requestId)" }
         val outcome = withTimeoutOrNull(REQUEST_TIMEOUT_MS) {
             suspendCancellableCoroutine<Result<T>> { cont ->
                 park(cont)
@@ -154,7 +154,7 @@ object IosPushMessagingBridge : KoinComponent {
     fun provideToken(requestId: Long, token: String?, errorMessage: String?) {
         val cont = take(requestId, "token", tokenContinuation) ?: return
         if (token != null) {
-            log.d { "Swift provided FCM token: ${token.take(20)}..." }
+            log.d { "Swift provided FCM token: len=${token.length} suffix=${token.takeLast(6)}" }
             cont.resume(Result.success(token))
         } else {
             if (errorMessage?.contains("apns", ignoreCase = true) == true) {
@@ -245,12 +245,7 @@ object IosPushMessagingBridge : KoinComponent {
         // Convert parallel arrays to map
         val rawData = rawDataKeys.zip(rawDataValues).toMap()
 
-        log.i { "📝 Saving notification to history:" }
-        log.i { "  Launch: $launchName" }
-        log.i { "  Filtered: $wasFiltered" }
-        log.i { "  Shown: $wasShown" }
-        log.i { "  Filter Reason: ${filterReason ?: "none"}" }
-        log.i { "  Raw Data JSON: $rawData" }
+        log.d { "notification_history_write launch_id=$launchId filtered=$wasFiltered reason=${filterReason ?: "none"}" }
 
         scope.launch {
             try {
@@ -273,9 +268,8 @@ object IosPushMessagingBridge : KoinComponent {
                     filterReason = filterReason,
                     wasShown = wasShown
                 )
-                log.i { "✅ Saved notification to history: $launchName (filtered=$wasFiltered, shown=$wasShown)" }
             } catch (e: Exception) {
-                log.e { "❌ Failed to save notification to history: ${e.message}" }
+                log.e(e) { "Failed to save notification to history" }
             }
         }
     }

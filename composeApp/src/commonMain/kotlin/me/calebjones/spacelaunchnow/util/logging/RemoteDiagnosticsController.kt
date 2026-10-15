@@ -57,7 +57,7 @@ class RemoteDiagnosticsController(
             debugPreferences?.setRemoteDatadogSampleRateOverride(resolved.sampleRate)
             loggingPreferences.setRemoteDiagnosticLevelOverride(resolved.diagnosticLevel)
             if (resolved.sampleRate != null || resolved.diagnosticLevel != null) {
-                log.i {
+                log.v {
                     "Remote diagnostics override applied: sampleRate=${resolved.sampleRate}, " +
                         "level=${resolved.diagnosticLevel}"
                 }

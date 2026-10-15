@@ -152,9 +152,6 @@ class NotificationRepositoryImpl(
                 _state.value = persistedState
             }
 
-            log.i { "Loaded notification state - notificationsEnabled: ${persistedState.enableNotifications}" }
-            log.v { "Topic settings: ${persistedState.topicSettings}" }
-
             log.i { "notification_state_loaded agency_count=${persistedState.subscribedAgencies.size} location_count=${persistedState.subscribedLocations.size} enable_notifications=${persistedState.enableNotifications} follow_all=${persistedState.followAllLaunches}" }
 
             // App-start reconcile: the retry path for anything that failed at
@@ -167,8 +164,6 @@ class NotificationRepositoryImpl(
                 runCatching { reconcileSubscriptions(ReconcileTrigger.APP_START) }
                     .onFailure { log.e(it) { "App-start V6 reconcile failed; next start or save retries" } }
             }
-
-            log.i { "NotificationRepository initialized successfully" }
         } catch (e: Exception) {
             log.e(e) { "Failed to initialize NotificationRepository" }
             // On failure, clear loading state so UI isn't stuck on spinner
@@ -273,20 +268,13 @@ class NotificationRepositoryImpl(
     private suspend fun updateState(update: (NotificationState) -> NotificationState) {
         stateMutex.withLock {
             try {
-                log.d { "Notification state update requested" }
-
                 val oldState = _state.value
                 val newState = update(oldState)
-
-                log.i { "State updated - agencies: ${newState.subscribedAgencies.size}, locations: ${newState.subscribedLocations.size}" }
-                log.v { "Subscribed agencies: ${newState.subscribedAgencies}" }
-                log.v { "Subscribed locations: ${newState.subscribedLocations}" }
 
                 // Persist to storage FIRST — only update in-memory state on success
                 val result = storage.saveState(newState)
                 if (result.isSuccess) {
                     _state.value = newState
-                    log.d { "Notification state persisted and applied" }
                 } else {
                     log.e(result.exceptionOrNull()) { "Failed to persist notification state — keeping old state" }
                     _state.value = oldState.withError(result.exceptionOrNull()?.message)
