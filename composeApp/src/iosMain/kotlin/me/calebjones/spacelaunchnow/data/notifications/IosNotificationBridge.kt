@@ -1,11 +1,12 @@
 package me.calebjones.spacelaunchnow.data.notifications
 
 import kotlinx.coroutines.runBlocking
-import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import co.touchlab.kermit.Severity
+import me.calebjones.spacelaunchnow.util.logging.DiagnosticEventKind
+import me.calebjones.spacelaunchnow.util.logging.DiagnosticEvents
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
-import me.calebjones.spacelaunchnow.util.logging.UserContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -112,9 +113,8 @@ object IosNotificationBridge : KoinComponent {
                 val state = notificationStateStorage.getState()
                 val nse = NSEPreferenceBridge.readStoredPrefs()
                 // Sentinel conventions: missing NSE keys -> null for booleans (nse_keys_missing covers querying), -1 for counts (keeps the facet numeric).
-                val attributes = UserContext.getLogAttributes() + mapOf(
-                    "log_kind" to "startup_state",
-                    "platform" to "ios",
+                // DiagnosticEvents adds log_kind, platform, tag and UserContext attributes.
+                val attributes = mapOf(
                     "live_enable_notifications" to state.enableNotifications,
                     "live_follow_all" to state.followAllLaunches,
                     "live_strict" to state.useStrictMatching,
@@ -130,14 +130,14 @@ object IosNotificationBridge : KoinComponent {
                     "nse_agency_count" to (nse.subscribedAgencies?.size ?: -1),
                     "nse_location_count" to (nse.subscribedLocations?.size ?: -1),
                 )
-                DatadogLogger.info("[STARTUP] notification_state", attributes)
-                log.i {
-                    "startup_state live(followAll=${state.followAllLaunches}, strict=${state.useStrictMatching}, " +
-                        "agencies=${state.subscribedAgencies.size}, locations=${state.subscribedLocations.size}) " +
-                        "nse(keysMissing=${nse.anyKeyMissing})"
-                }
+                DiagnosticEvents.emit(
+                    kind = DiagnosticEventKind.STARTUP_STATE,
+                    severity = Severity.Info,
+                    tag = "SLN-IosNotificationBridge",
+                    attrs = attributes,
+                )
             } catch (e: Exception) {
-                log.e { "Failed to emit startup state: ${e.message}" }
+                log.e(e) { "Failed to emit startup state" }
             }
         }
         // Drain NSE breadcrumbs (no-op preserve when remote logging inactive).
@@ -153,7 +153,7 @@ object IosNotificationBridge : KoinComponent {
         try {
             NSEPreferenceBridge.drainNseEventLog()
         } catch (e: Exception) {
-            log.e { "Failed to drain NSE event log: ${e.message}" }
+            log.e(e) { "Failed to drain NSE event log" }
         }
     }
 

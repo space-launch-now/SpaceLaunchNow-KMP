@@ -45,7 +45,13 @@ actual class PushMessaging actual constructor() {
             }
             .onFailure { error ->
                 PushDiagnostics.recordTokenUnavailable(error.message ?: "exception")
-                log.e { "ERROR - Failed to get FCM token: ${error.message}" }
+                // The APNs precondition is the designed pre-registration path; the reconciler
+                // and PushDiagnostics carry the outcome. Anything else is a real failure.
+                if (error.message?.contains("apns", ignoreCase = true) == true) {
+                    log.d { "FCM token unavailable until APNs registers: ${error.message}" }
+                } else {
+                    log.w { "Failed to get FCM token: ${error.message}" }
+                }
             }
     }
 }

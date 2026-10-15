@@ -131,7 +131,7 @@ object IosPushMessagingBridge : KoinComponent {
             }
         }
         outcome ?: run {
-            log.e { "$label timed out after ${REQUEST_TIMEOUT_MS}ms (request $requestId); reported as failure" }
+            log.w { "$label timed out after ${REQUEST_TIMEOUT_MS}ms (request $requestId); reported as failure" }
             clearPending(requestId)
             Result.failure<T>(IllegalStateException("FCM $label timed out"))
         }
@@ -157,7 +157,11 @@ object IosPushMessagingBridge : KoinComponent {
             log.d { "Swift provided FCM token: ${token.take(20)}..." }
             cont.resume(Result.success(token))
         } else {
-            log.w { "FCM token request failed: ${errorMessage ?: "unknown error"}" }
+            if (errorMessage?.contains("apns", ignoreCase = true) == true) {
+                log.d { "FCM token request failed (APNs not ready): $errorMessage" }
+            } else {
+                log.w { "FCM token request failed: ${errorMessage ?: "unknown error"}" }
+            }
             cont.resume(Result.failure(Exception(errorMessage ?: "Failed to get FCM token")))
         }
     }
@@ -181,7 +185,11 @@ object IosPushMessagingBridge : KoinComponent {
             log.d { "Swift provided $kind result for $topic: success" }
             cont.resume(Result.success(Unit))
         } else {
-            log.w { "FCM $kind failed for topic $topic: $errorMessage" }
+            if (errorMessage.contains("apns", ignoreCase = true)) {
+                log.d { "FCM $kind failed for topic $topic (APNs not ready): $errorMessage" }
+            } else {
+                log.w { "FCM $kind failed for topic $topic: $errorMessage" }
+            }
             cont.resume(Result.failure(Exception(errorMessage)))
         }
     }
@@ -197,11 +205,11 @@ object IosPushMessagingBridge : KoinComponent {
         cont: CancellableContinuation<T>?,
     ): CancellableContinuation<T>? {
         if (requestId != currentRequestId) {
-            log.w { "Ignoring stale $kind result for request $requestId (current is $currentRequestId)" }
+            log.d { "Ignoring stale $kind result for request $requestId (current is $currentRequestId)" }
             return null
         }
         if (cont == null) {
-            log.w { "Received $kind result for request $requestId but no continuation is registered" }
+            log.d { "Received $kind result for request $requestId but no continuation is registered" }
             return null
         }
         clearPending(requestId)

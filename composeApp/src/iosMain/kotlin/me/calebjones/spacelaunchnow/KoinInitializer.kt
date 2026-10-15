@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.notifications.IosPushMessagingBridge
+import me.calebjones.spacelaunchnow.data.notifications.v6.ReconcileTrigger
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
@@ -198,7 +199,7 @@ fun onApnsTokenRegistered() {
     @Suppress("OPT_IN_USAGE")
     val scope = kotlinx.coroutines.GlobalScope
     scope.launch(kotlinx.coroutines.Dispatchers.Default) {
-        runCatching { repository.reconcileSubscriptions() }
+        runCatching { repository.reconcileSubscriptions(ReconcileTrigger.POST_APNS) }
             .onSuccess { log.i { "Post-APNs V6 reconcile: attempted=${it.attempted} failed=${it.failed} skipped=${it.skipped}" } }
             .onFailure { log.e(it) { "Post-APNs V6 reconcile failed; next start or save retries" } }
     }
