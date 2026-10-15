@@ -725,19 +725,14 @@ object NotificationDisplayHelper {
         context: Context,
         payload: me.calebjones.spacelaunchnow.data.model.V5NotificationPayload,
         title: String,
-        body: String
+        body: String,
+        reason: String = FilterDecisionEvent.REASON_FILTER_PASSED,
     ) {
-        log.d("📱 [V5 Notification] Starting V5 notification display...")
-        log.d("📱 [V5 Notification] Title: $title")
-        log.d("📱 [V5 Notification] Body: $body")
-        log.d("📱 [V5 Notification] Launch: ${payload.launchName}")
-
         // Ensure channels exist
         createNotificationChannels(context)
 
         // Determine which channel to use
         val channelId = getChannelId(payload.notificationType)
-        log.d("📱 [V5 Notification] Channel: $channelId")
 
         // Add 🔴 emoji to title if webcast is live (like old app)
         val displayTitle = if (payload.webcastLive) {
@@ -779,19 +774,15 @@ object NotificationDisplayHelper {
             .setOnlyAlertOnce(true)
 
         // Load and display image if available
-        log.d("📱 [V5 Notification] Image URL: ${payload.launchImage}")
-
         var imageBitmap = loadImageFromUrlSync(context, payload.launchImage)
-        log.d("📱 [V5 Notification] Image bitmap result: $imageBitmap")
+        val hasImage = imageBitmap != null
 
         // Add LIVE badge if webcast is live
         if (imageBitmap != null && payload.webcastLive) {
-            log.d("📱 [V5 Notification] 🔴 Adding LIVE badge")
             imageBitmap = drawLiveBadge(imageBitmap)
         }
 
         if (imageBitmap != null) {
-            log.d("📱 [V5 Notification] ✅ Setting large icon and BigPictureStyle")
             notificationBuilder
                 .setLargeIcon(imageBitmap)
                 .setStyle(
@@ -800,7 +791,6 @@ object NotificationDisplayHelper {
                         .bigLargeIcon(null as Bitmap?)
                 )
         } else {
-            log.d("📱 [V5 Notification] Using BigTextStyle (no image)")
             notificationBuilder.setStyle(
                 NotificationCompat.BigTextStyle()
                     .bigText(body)
@@ -808,21 +798,24 @@ object NotificationDisplayHelper {
         }
 
         val notification = notificationBuilder.build()
-        log.i("📱 [V5 Notification] Notification built successfully")
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Use launchUuid as the notification tag (collapse key)
-        log.i("📱 [V5 Notification] Showing notification - Tag: ${payload.launchUuid}, ID: ${payload.launchUuid.hashCode()}")
-
         notificationManager.notify(
             payload.launchUuid,
             payload.launchUuid.hashCode(),
             notification
         )
         trackShown(context, payload.notificationType)
-        log.i("📱 [V5 Notification] ✅ V5 Notification shown successfully!")
+        NotificationDisplayedEvent.emit(
+            notificationType = payload.notificationType,
+            launchId = payload.launchUuid,
+            reason = reason,
+            channel = channelId,
+            hasImage = hasImage,
+        )
     }
 
     /**

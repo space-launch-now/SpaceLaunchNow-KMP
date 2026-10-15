@@ -141,9 +141,9 @@ class V6SubscriptionReconciler(
         }
         if (failedTopics.isEmpty()) {
             markChangeoverComplete()
-            log.i { "V6 changeover complete: legacy topics unsubscribed ($legacy)" }
+            log.d { "V6 changeover complete: ${legacy.size} legacy topics unsubscribed" }
         } else {
-            log.d { "V6 changeover incomplete; failed to unsubscribe $failedTopics; will retry next reconcile" }
+            log.d { "V6 changeover incomplete; failed to unsubscribe ${failedTopics.size} legacy topics; will retry next reconcile" }
         }
     }
 

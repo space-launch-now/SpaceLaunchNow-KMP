@@ -171,8 +171,6 @@ fun SpaceLaunchNowApp(
         // Run all initialization on background thread to avoid blocking UI on iOS
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
 
-            log.i { "=== APP START DEBUG INFO ===" }
-
             try {
                 // Lazy inject repositories only when needed (on background thread)
                 val koin = org.koin.mp.KoinPlatform.getKoin()
@@ -224,7 +222,7 @@ fun SpaceLaunchNowApp(
                             log.w { "FCM token unavailable at startup: $reason" }
                         }
                     } else {
-                        log.i { "FCM token present (len=${token.length}, …${token.takeLast(6)})" }
+                        log.d { "FCM token present (len=${token.length}, …${token.takeLast(6)})" }
                     }
                 } catch (e: Exception) {
                     log.w(e) { "Failed to get FCM token" }
@@ -234,25 +232,10 @@ fun SpaceLaunchNowApp(
                     // Initialize notifications
                     notificationRepository.initialize()
 
-                    // Get and print current state (using the new state flow)
-                    val currentState = notificationRepository.state.value
-                    log.d { "Current state:" }
-                    log.d { "  - Notifications enabled: ${currentState.enableNotifications}" }
-                    log.d { "  - Follow all launches: ${currentState.followAllLaunches}" }
-                    log.d { "  - Use strict matching: ${currentState.useStrictMatching}" }
-                    log.d { "  - Subscribed agencies: ${currentState.subscribedAgencies.size}" }
-                    log.d { "  - Subscribed locations: ${currentState.subscribedLocations.size}" }
-                    log.d { "  - Topic settings: ${currentState.topicSettings}" }
-                    log.d { "  - Subscribed FCM topics: ${currentState.subscribedTopics.size}" }
-
-                    log.i { "Settings loaded - state management handled by repository" }
-
                     // Push-registration preconditions (spec 015 §3.3) + summary (§3.2)
                     val notificationsEnabled = notificationRepository.hasNotificationPermission()
                     PushDiagnostics.recordNotificationsEnabled(notificationsEnabled)
-                    if (notificationsEnabled) {
-                        log.i { "OS notifications enabled" }
-                    } else {
+                    if (!notificationsEnabled) {
                         log.w { "OS notifications disabled (permission not granted)" }
                     }
 
@@ -263,7 +246,7 @@ fun SpaceLaunchNowApp(
                         PlayServicesAvailability.UPDATE_REQUIRED,
                         PlayServicesAvailability.UNKNOWN ->
                             log.w { "Google Play Services not available: $playServices" }
-                        else -> log.i { "Google Play Services: $playServices" }
+                        else -> Unit
                     }
 
                     val diagnosticLevelName = runCatching {
@@ -277,15 +260,12 @@ fun SpaceLaunchNowApp(
                 try {
                     // Initialize subscription billing
                     subscriptionRepository.initialize()
-                    log.i { "Subscription repository initialized successfully" }
                 } catch (e: Exception) {
                     log.e(e) { "Failed to initialize subscription repository" }
                 }
             } catch (e: Exception) {
                 log.e(e) { "Failed during app initialization" }
             }
-
-            log.i { "=== END APP START DEBUG INFO ===" }
         }
     }
 

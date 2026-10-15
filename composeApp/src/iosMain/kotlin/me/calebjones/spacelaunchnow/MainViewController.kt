@@ -128,13 +128,11 @@ fun MainViewController() = ComposeUIViewController {
             val sampleRate = runBlocking {
                 debugPrefs.debugSettingsFlow.first().datadogSampleRate
             }
-            log.d { "Initializing Datadog (consent-based) with ${sampleRate.toInt()}% sample rate..." }
             initializeDatadog(
                 context = null,
                 sampleRate = sampleRate,
                 debugPreferences = debugPrefs
             )
-            log.d { "✅ Datadog initialized" }
             loggingPrefs
         } catch (e: Exception) {
             log.e(e) { "❌ Failed to initialize Datadog" }
@@ -158,12 +156,9 @@ fun MainViewController() = ComposeUIViewController {
         // internally — no need to call them separately here.
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                log.i { "iOS: 🚀 Starting billing and subscription initialization..." }
-
                 val repository = getKoin().get<SubscriptionRepository>()
                 repository.initialize()
 
-                log.i { "iOS: 🎉 Billing and subscription systems initialized" }
             } catch (e: Exception) {
                 log.e(e) { "iOS: ❌ Failed to initialize billing/subscription system" }
             }

@@ -21,7 +21,7 @@ twice at VERBOSE. "Kermit only" means `upload = false`.
 | `push_reconcile` | end of every `reconcileSubscriptions()` / `forceResubscribe()` that is not skipped | warn if `failed > 0` and `failure_class != apns_pending`; debug if `failure_class == apns_pending`; info otherwise | direct upload, except Kermit only for the debug case | `trigger` (`app_start`, `post_apns`, `settings`, `kill_switch`, `token_refresh`, `force`, `debug`), `attempted`, `failed`, `skipped`, `failure_class` (`none`, `apns_pending`, `timeout`, `fcm_error`, `mixed`), `changeover_complete`, `confirmed_topic_count`, `token_present` |
 | `filter_decision` | iOS in-app notification filter | warn if suppressed, else info | direct upload | `decision`, `reason`, `notification_type`, `agency_id`, `location_id`, `v6_passthrough`, `strict`, `follow_all`, `agency_count`, `location_count` |
 | `nse_prefs_sync` | after each App Group preference write | debug | Kermit only | `enabled`, `v6_changeover`, `follow_all`, `strict`, `agency_count_expanded`, `location_count_expanded` |
-| `notification_displayed` | Android `NotificationWorker` after `notify()` (Phase 3, not yet emitted) | info | direct upload | `notification_type`, `launch_id`, `reason`, `channel`, `has_image` |
+| `notification_displayed` | Android `NotificationWorker` after `notify()` (emitted by `NotificationDisplayHelper.showV5Notification`) | info | direct upload | `notification_type`, `launch_id`, `reason`, `channel`, `has_image` |
 
 ## Rules for changes
 
