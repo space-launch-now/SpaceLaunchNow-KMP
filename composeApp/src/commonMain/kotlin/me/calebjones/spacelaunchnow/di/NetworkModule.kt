@@ -3,7 +3,7 @@ package me.calebjones.spacelaunchnow.di
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.logging.LogLevel
+import me.calebjones.spacelaunchnow.util.logging.SHARED_HTTP_LOG_LEVEL
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
@@ -34,7 +34,7 @@ val networkModule = module {
         HttpClient(get<HttpClientEngine>()) {
             // Install Logging plugin for debugging purposes
             install(Logging) {
-                level = LogLevel.INFO
+                level = SHARED_HTTP_LOG_LEVEL
             }            // Install DefaultRequest plugin to add headers to every request
             install(DefaultRequest) {
                 // We no longer need to set Authorization header here as ApiClient.setApiKey will handle this
