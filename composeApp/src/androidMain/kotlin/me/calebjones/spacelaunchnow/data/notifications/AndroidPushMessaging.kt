@@ -17,10 +17,10 @@ actual class PushMessaging actual constructor() {
     actual val messages: Flow<PushMessage> = _messages.asSharedFlow()
 
     actual suspend fun subscribeToTopic(topic: String): Result<Unit> {
-        log.d { "Subscribing to FCM topic: $topic" }
+        log.v { "Subscribing to FCM topic: $topic" }
         return try {
             FirebaseMessaging.getInstance().subscribeToTopic(topic).await()
-            log.d { "SUCCESS - Subscribed to FCM topic: $topic" }
+            log.v { "Subscribed to FCM topic: $topic" }
             Result.success(Unit)
         } catch (e: Exception) {
             log.e { "ERROR - Failed to subscribe to topic $topic: ${e.message}" }
@@ -29,10 +29,10 @@ actual class PushMessaging actual constructor() {
     }
 
     actual suspend fun unsubscribeFromTopic(topic: String): Result<Unit> {
-        log.d { "Unsubscribing from FCM topic: $topic" }
+        log.v { "Unsubscribing from FCM topic: $topic" }
         return try {
             FirebaseMessaging.getInstance().unsubscribeFromTopic(topic).await()
-            log.d { "SUCCESS - Unsubscribed from FCM topic: $topic" }
+            log.v { "Unsubscribed from FCM topic: $topic" }
             Result.success(Unit)
         } catch (e: Exception) {
             log.e { "ERROR - Failed to unsubscribe from topic $topic: ${e.message}" }
@@ -41,11 +41,10 @@ actual class PushMessaging actual constructor() {
     }
 
     actual suspend fun getToken(): Result<String> {
-        log.d { "Getting FCM token" }
         return try {
             val token = FirebaseMessaging.getInstance().token.await()
             PushDiagnostics.recordTokenSuccess(token)
-            log.i { "SUCCESS - Got FCM token (len=${token.length}, …${token.takeLast(6)})" }
+            log.d { "Got FCM token (len=${token.length}, …${token.takeLast(6)})" }
             Result.success(token)
         } catch (e: Exception) {
             PushDiagnostics.recordTokenUnavailable(e.message ?: "exception")

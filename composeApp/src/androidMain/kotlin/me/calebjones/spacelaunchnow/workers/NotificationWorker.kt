@@ -14,6 +14,7 @@ import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import me.calebjones.spacelaunchnow.data.model.V5NotificationPayload
 import me.calebjones.spacelaunchnow.data.notifications.LocalFilterPolicy
+import me.calebjones.spacelaunchnow.data.notifications.FilterDecisionEvent
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
@@ -393,7 +394,12 @@ class NotificationWorker(
             context = applicationContext,
             payload = v5Payload,
             title = title,
-            body = body
+            body = body,
+            reason = if (LocalFilterPolicy.isActive(state)) {
+                FilterDecisionEvent.REASON_FILTER_PASSED
+            } else {
+                LocalFilterPolicy.PASSTHROUGH_REASON
+            },
         )
 
         // Save to history
