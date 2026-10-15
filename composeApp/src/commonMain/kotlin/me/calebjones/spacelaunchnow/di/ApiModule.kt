@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.di
 
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.UserAgent
-import io.ktor.client.plugins.logging.LogLevel
+import me.calebjones.spacelaunchnow.util.logging.SHARED_HTTP_LOG_LEVEL
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -43,7 +43,7 @@ val apiModule = module {
         // Install Logging plugin to show requests and headers
         install(Logging) {
             logger = ktorHttpLogger
-            level = LogLevel.INFO // URL + status only; never headers or bodies
+            level = SHARED_HTTP_LOG_LEVEL
         }
     }
 

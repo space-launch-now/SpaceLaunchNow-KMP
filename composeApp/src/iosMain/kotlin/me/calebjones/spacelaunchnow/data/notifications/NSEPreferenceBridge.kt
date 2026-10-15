@@ -1,6 +1,5 @@
 package me.calebjones.spacelaunchnow.data.notifications
 
-import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.analytics.DatadogRuntime
 import me.calebjones.spacelaunchnow.data.model.NotificationAgency
 import me.calebjones.spacelaunchnow.data.model.NotificationLocation
@@ -8,8 +7,10 @@ import me.calebjones.spacelaunchnow.data.model.NotificationState
 import me.calebjones.spacelaunchnow.data.model.NotificationTopic
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import co.touchlab.kermit.Severity
+import me.calebjones.spacelaunchnow.util.logging.DiagnosticEventKind
+import me.calebjones.spacelaunchnow.util.logging.DiagnosticEvents
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
-import me.calebjones.spacelaunchnow.util.logging.UserContext
 import platform.Foundation.NSMutableArray
 import platform.Foundation.NSUserDefaults
 
@@ -205,7 +206,6 @@ object NSEPreferenceBridge {
             userDefaults.synchronize()
 
             log.i { "Draining ${entries.size} NSE breadcrumb(s) to Datadog" }
-            val baseAttributes = UserContext.getLogAttributes()
             entries.forEach { entry ->
                 val crumb = NseBreadcrumb.parse(entry)
                 val ts = crumb?.timestampEpochSeconds?.toString() ?: ""
@@ -214,27 +214,24 @@ object NSEPreferenceBridge {
                 val reason = crumb?.reason ?: ""
 
                 val message = "[NSE-DELIVERY] type=$type decision=$decision reason=$reason ts=$ts platform=ios"
-                val attributes = baseAttributes + mapOf(
-                    // Structural diagnostic markers so Datadog dashboards/monitors can EXCLUDE
-                    // these by attribute (robust) rather than by matching the message prefix
-                    // (fragile). log_kind is the dedicated exclusion key.
-                    "log_kind" to "nse_breadcrumb",
+                val attributes = mapOf(
+                    // log_kind, platform, tag and UserContext are added by DiagnosticEvents.
                     "source" to "nse_breadcrumb",
                     "notification_type" to type,
                     "decision" to decision,
                     "reason" to reason,
                     "nse_ts" to ts,
-                    "platform" to "ios"
                 )
 
-                // Call DatadogLogger directly (bypasses Kermit's DataDogLogWriter ERROR gate) at an
-                // honest severity: suppressions as warn (stand out), shown as info. Never ERROR —
-                // these are normal diagnostics, not failures.
-                if (decision == "suppressed") {
-                    DatadogLogger.warn(message, attributes)
-                } else {
-                    DatadogLogger.info(message, attributes)
-                }
+                // Honest severity: suppressions as warn (stand out), shown as info. Never ERROR;
+                // these are normal diagnostics, not failures. The message is the stable label.
+                DiagnosticEvents.emit(
+                    kind = DiagnosticEventKind.NSE_BREADCRUMB,
+                    severity = if (decision == "suppressed") Severity.Warn else Severity.Info,
+                    tag = "SLN-NSEPreferenceBridge",
+                    attrs = attributes,
+                    label = message,
+                )
             }
         } finally {
             draining.store(false)
