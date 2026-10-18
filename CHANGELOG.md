@@ -1,3 +1,15 @@
+# [5.49.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.48.1...v5.49.0) (2026-10-18)
+
+
+### Features
+
+* **logging:** add DiagnosticEvents and push_reconcile event with failure classes ([4658be5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4658be5e978585f0f6f4d87810a54d4cf56adee2))
+* **logging:** emit filter_decision and trim iOS notification log noise ([b7c5b8a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b7c5b8ae7e9365c26a44c6a0469f0193e2232adb))
+* **logging:** emit notification_displayed and trim Android push log noise ([c6e5100](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c6e51005d8d7f43ddf2a45da5bac7cfbbc5a8f6f))
+* **logging:** route iOS startup/NSE events through DiagnosticEvents and pass POST_APNS trigger ([2f527bc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2f527bc0f90dfc3fe6887f9207b2eaf9bba3a8dc))
+
+
+
 ## [5.48.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.48.0...v5.48.1) (2026-10-13)
 
 
@@ -43,15 +55,6 @@
 ### Bug Fixes
 
 * **ios:** reference UIApplicationStateActive through its enum class ([3303b56](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3303b56dc09f54f0b4300367861324f719bb2660))
-
-
-
-## [5.46.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.0...v5.46.1) (2026-10-05)
-
-
-### Performance Improvements
-
-* **api:** round LL time filters to 1 minute ([#230](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/230)) ([35ba2ee](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/35ba2ee25ae33e0a9e110b1a386523e2fdbaf70f))
 
 
 
