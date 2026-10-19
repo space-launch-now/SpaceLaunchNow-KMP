@@ -24,6 +24,7 @@ internal object PushReconcileEvent {
         trigger: ReconcileTrigger,
         changeoverComplete: Boolean,
         confirmedTopicCount: Int,
+        stateAttrs: Map<String, Any?> = emptyMap(),
     ) {
         if (result.skipped) return
         val severity = severityFor(result)
@@ -40,7 +41,7 @@ internal object PushReconcileEvent {
                 "changeover_complete" to changeoverComplete,
                 "confirmed_topic_count" to confirmedTopicCount,
                 "token_present" to (PushDiagnostics.snapshot.tokenPresent ?: false),
-            ),
+            ) + stateAttrs,
             upload = severity != Severity.Debug,
         )
     }

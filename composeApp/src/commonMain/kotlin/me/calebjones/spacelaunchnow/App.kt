@@ -232,7 +232,8 @@ fun SpaceLaunchNowApp(
                     // Initialize notifications
                     notificationRepository.initialize()
 
-                    // Push-registration preconditions (spec 015 §3.3) + summary (§3.2)
+                    // Push-registration preconditions (spec 015 §3.3). The summary (§3.2) is
+                    // emitted by NotificationRepositoryImpl once the app-start reconcile ends.
                     val notificationsEnabled = notificationRepository.hasNotificationPermission()
                     PushDiagnostics.recordNotificationsEnabled(notificationsEnabled)
                     if (!notificationsEnabled) {
@@ -252,9 +253,13 @@ fun SpaceLaunchNowApp(
                     val diagnosticLevelName = runCatching {
                         koin.get<LoggingPreferences>().getDiagnosticSettings().first().level.name
                     }.getOrNull()
-                    PushDiagnostics.logSummary(diagnosticLevelName)
+                    PushDiagnostics.recordDiagnosticLevel(diagnosticLevelName)
                 } catch (e: Exception) {
                     log.e(e) { "Failed to initialize notifications" }
+                } finally {
+                    // push_summary is emitted by NotificationRepositoryImpl after the app-start
+                    // reconcile; this tells it the records above have landed.
+                    PushDiagnostics.recordStartupRecordsReady()
                 }
 
                 try {

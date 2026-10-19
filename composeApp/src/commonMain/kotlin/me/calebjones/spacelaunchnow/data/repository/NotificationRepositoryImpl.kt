@@ -1,8 +1,11 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
@@ -23,6 +27,7 @@ import me.calebjones.spacelaunchnow.data.notifications.v6.AutoReconcileTrigger
 import me.calebjones.spacelaunchnow.data.notifications.v6.PushReconcileEvent
 import me.calebjones.spacelaunchnow.data.notifications.v6.PushTopicMessaging
 import me.calebjones.spacelaunchnow.data.notifications.v6.ReconcileTrigger
+import me.calebjones.spacelaunchnow.data.notifications.v6.SubscriptionCounts
 import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.notifications.v6.V6ReconcileResult
 import me.calebjones.spacelaunchnow.data.notifications.v6.V6SubscriptionReconciler
@@ -32,6 +37,7 @@ import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
+import me.calebjones.spacelaunchnow.util.logging.PushReconcileState
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 expect suspend fun requestPlatformNotificationPermission(): Boolean
@@ -39,18 +45,32 @@ expect suspend fun hasPlatformNotificationPermission(): Boolean
 expect suspend fun getPlatformNotificationPermissionStatus(): NotificationPermissionStatus
 expect fun openPlatformNotificationSettings(): Boolean
 
+internal const val PUSH_SUMMARY_FALLBACK_MS = 15_000L
+
 class NotificationRepositoryImpl(
     private val pushMessaging: PushMessaging,
     private val storage: NotificationStateStorage,
     private val topicSubscriptionStore: TopicSubscriptionStore,
     private val debugPreferences: DebugPreferences? = null,
-    private val analyticsManager: AnalyticsManager? = null
+    private val analyticsManager: AnalyticsManager? = null,
+    // Seams for tests; production keeps the defaults.
+    private val repositoryScope: CoroutineScope = CoroutineScope(SupervisorJob()),
+    private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val platformName: String? = when (getPlatform().type) {
+        PlatformType.ANDROID -> "android"
+        PlatformType.IOS -> "ios"
+        PlatformType.DESKTOP -> null   // desktop is a no-op, as today
+    },
+    private val summaryFallbackMs: Long = PUSH_SUMMARY_FALLBACK_MS,
 ) : NotificationRepository {
 
     private val log = logger()
 
-    // Repository scope for background work
-    private val repositoryScope = CoroutineScope(SupervisorJob())
+    // push_summary is emitted at most once per initialize(): by the first completed app_start
+    // reconcile, or by the fallback timer if none completes in time.
+    private val summaryMutex = Mutex()
+    private var summaryEmitted = false
+    private var summaryFallbackJob: Job? = null
 
     // Mutex to protect state mutations — prevents concurrent writes from corrupting persistence
     private val stateMutex = Mutex()
@@ -63,11 +83,7 @@ class NotificationRepositoryImpl(
     private val reconciler = V6SubscriptionReconciler(
         store = topicSubscriptionStore,
         messaging = PushTopicMessaging(pushMessaging),
-        platform = when (getPlatform().type) {
-            PlatformType.ANDROID -> "android"
-            PlatformType.IOS -> "ios"
-            PlatformType.DESKTOP -> null   // desktop is a no-op, as today
-        },
+        platform = platformName,
         envProvider = { if (useDebugTopics()) "debug" else "prod" },
         stateProvider = { storage.getState() },
         markChangeoverComplete = {
@@ -119,13 +135,13 @@ class NotificationRepositoryImpl(
     }
 
     override suspend fun reconcileSubscriptions(trigger: ReconcileTrigger): V6ReconcileResult =
-        withContext(Dispatchers.Default) {
+        withContext(workDispatcher) {
             val result = reconciler.reconcile()
             recordAndEmitReconcile(result, trigger)
             result
         }
 
-    override suspend fun forceResubscribe(): V6ReconcileResult = withContext(Dispatchers.Default) {
+    override suspend fun forceResubscribe(): V6ReconcileResult = withContext(workDispatcher) {
         val result = reconciler.forceResubscribe()
         recordAndEmitReconcile(result, ReconcileTrigger.FORCE)
         result
@@ -137,7 +153,43 @@ class NotificationRepositoryImpl(
         PushDiagnostics.recordSubscribedTopicCount(confirmed)
         if (result.clean) PushDiagnostics.recordCleanReconcile()
         val changeoverComplete = runCatching { storage.getState().hasCompletedV6Changeover }.getOrDefault(false)
-        PushReconcileEvent.emit(result, trigger, changeoverComplete, confirmed)
+        val stateAttrs = pushStateAttributes(PushReconcileState.COMPLETE)
+        PushReconcileEvent.emit(result, trigger, changeoverComplete, confirmed, stateAttrs)
+        if (trigger == ReconcileTrigger.APP_START) {
+            // Detached: the summary waits for the startup records and must not delay the caller.
+            repositoryScope.launch {
+                val ready = PushDiagnostics.startupRecordsReady ||
+                    withTimeoutOrNull(summaryFallbackMs) { PushDiagnostics.awaitStartupRecords(); true } == true
+                // Not ready in time: the fallback emits with reconcile_state=pending.
+                if (ready) {
+                    summaryFallbackJob?.cancel()
+                    emitSummaryOnce(PushReconcileState.COMPLETE)
+                }
+            }
+        }
+    }
+
+    /**
+     * Spec S3 D9 attributes, read from persisted state and the ledger at call time, never from
+     * the in-memory [_state] (still DEFAULT when a token-refresh reconcile runs before initialize()).
+     * Also stored on the diagnostics snapshot so the shareable report shows the same rows.
+     */
+    private suspend fun pushStateAttributes(reconcileState: PushReconcileState): Map<String, Any?> {
+        val persisted = runCatching { storage.getState() }.getOrNull() ?: NotificationState.DEFAULT
+        val counts = runCatching { topicSubscriptionStore.counts() }.getOrNull()
+            ?: SubscriptionCounts(0, 0, 0)
+        val attrs = PushDiagnostics.stateAttributes(persisted, counts, persisted.hasCompletedV6Changeover)
+        PushDiagnostics.recordPushState(attrs)
+        return attrs + ("push.reconcile_state" to reconcileState.wire)
+    }
+
+    private suspend fun emitSummaryOnce(reconcileState: PushReconcileState) {
+        val first = summaryMutex.withLock {
+            if (summaryEmitted) false else { summaryEmitted = true; true }
+        }
+        if (!first) return
+        val attrs = pushStateAttributes(reconcileState)
+        PushDiagnostics.logSummary(PushDiagnostics.snapshot.diagnosticLevelName, attrs)
     }
 
     override suspend fun initialize() {
@@ -150,6 +202,13 @@ class NotificationRepositoryImpl(
             // Protect state assignment with mutex to prevent race with concurrent updateState calls
             stateMutex.withLock {
                 _state.value = persistedState
+            }
+
+            summaryFallbackJob?.cancel()
+            summaryMutex.withLock { summaryEmitted = false }
+            summaryFallbackJob = repositoryScope.launch {
+                delay(summaryFallbackMs)
+                emitSummaryOnce(PushReconcileState.PENDING)
             }
 
             log.i { "notification_state_loaded agency_count=${persistedState.subscribedAgencies.size} location_count=${persistedState.subscribedLocations.size} enable_notifications=${persistedState.enableNotifications} follow_all=${persistedState.followAllLaunches}" }

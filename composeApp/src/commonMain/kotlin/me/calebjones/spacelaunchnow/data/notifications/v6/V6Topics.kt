@@ -49,6 +49,14 @@ object V6Topics {
         }
     }
 
+    /** Enabled launch-type toggles in contract order. Shared with the push_summary attribute. */
+    fun enabledLaunchTypes(state: NotificationState): List<NotificationTopic> =
+        LAUNCH_TYPE_TOPICS.filter { state.isTopicEnabled(it) }
+
+    /** Enabled broadcast toggles as wire tokens (`events`, `news`, `announce`). */
+    fun enabledBroadcastTokens(state: NotificationState): List<String> =
+        BROADCAST_TOKENS.filter { (topic, _) -> state.isTopicEnabled(topic) }.values.toList()
+
     fun requiredTopics(state: NotificationState, env: String, platform: String): Set<String> {
         // Unsubscribing is the real kill switch now, not a local check.
         if (!state.enableNotifications) return emptySet()
@@ -56,7 +64,7 @@ object V6Topics {
         val audienceClass = audienceClass(state)
         val topics = mutableSetOf<String>()
 
-        LAUNCH_TYPE_TOPICS.filter { state.isTopicEnabled(it) }.forEach { type ->
+        enabledLaunchTypes(state).forEach { type ->
             topics += "v6_${env}_${platform}_${audienceClass}_${type.id}"
         }
 
@@ -74,8 +82,8 @@ object V6Topics {
             }
         }
 
-        BROADCAST_TOKENS.forEach { (topic, token) ->
-            if (state.isTopicEnabled(topic)) topics += "v6_${env}_${platform}_${token}"
+        enabledBroadcastTokens(state).forEach { token ->
+            topics += "v6_${env}_${platform}_${token}"
         }
 
         // Opt-OUT topic: subscribing EXCLUDES this device from routine Starlink

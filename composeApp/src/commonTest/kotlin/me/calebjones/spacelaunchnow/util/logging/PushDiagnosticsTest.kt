@@ -1,5 +1,8 @@
 package me.calebjones.spacelaunchnow.util.logging
 
+import me.calebjones.spacelaunchnow.data.model.NotificationState
+import me.calebjones.spacelaunchnow.data.model.NotificationTopic
+import me.calebjones.spacelaunchnow.data.notifications.v6.SubscriptionCounts
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -133,5 +136,55 @@ class PushDiagnosticsTest {
         assertEquals("unknown", byLabel["Play Services"])
         assertEquals("unavailable", byLabel["FCM token"])
         assertEquals("no", byLabel["Forwarded to RevenueCat"])
+    }
+
+    private val flexOneHourOneMinuteOff = NotificationState(
+        followAllLaunches = false,
+        useStrictMatching = false,
+        topicSettings = NotificationState.DEFAULT.topicSettings +
+            mapOf(NotificationTopic.ONE_HOUR.id to false, NotificationTopic.ONE_MINUTE.id to false),
+    )
+
+    @Test
+    fun stateAttributesCarryTogglesAudienceClassAndCounts() {
+        val attrs = PushDiagnostics.stateAttributes(
+            flexOneHourOneMinuteOff,
+            SubscriptionCounts(confirmed = 14, pendingSubscribe = 2, pendingUnsubscribe = 1),
+            changeoverComplete = true,
+        )
+        assertEquals("flex", attrs["push.audience_class"])
+        assertEquals("twentyFourHour,tenMinutes,success,failure,partial_failure", attrs["push.enabled_types"])
+        assertEquals(14, attrs["push.subscribed_topic_count"])
+        assertEquals(2, attrs["push.pending_subscribe_count"])
+        assertEquals(1, attrs["push.pending_unsubscribe_count"])
+        assertEquals(true, attrs["push.changeover_complete"])
+        assertEquals(false, attrs["push.follow_all"])
+        assertEquals(false, attrs["push.strict"])
+        assertTrue(attrs.containsKey("push.enabled_broadcasts"))
+        assertTrue(attrs.containsKey("push.agency_count"))
+        assertTrue(attrs.containsKey("push.location_count"))
+    }
+
+    @Test
+    fun reportRowsShowPushStateOnceRecorded() {
+        val attrs = PushDiagnostics.stateAttributes(
+            flexOneHourOneMinuteOff,
+            SubscriptionCounts(confirmed = 14, pendingSubscribe = 2, pendingUnsubscribe = 1),
+            changeoverComplete = true,
+        )
+        PushDiagnostics.recordPushState(attrs)
+        val byLabel = PushDiagnostics.reportRows(PushDiagnostics.snapshot, true, PlayServicesAvailability.AVAILABLE).toMap()
+        assertEquals("flex", byLabel["Audience class"])
+        assertEquals("twentyFourHour,tenMinutes,success,failure,partial_failure", byLabel["Enabled types"])
+        assertEquals("true", byLabel["Changeover complete"])
+        assertEquals("subscribe 2, unsubscribe 1", byLabel["Pending ops"])
+    }
+
+    @Test
+    fun reportRowsPushStateUnknownBeforeFirstEmit() {
+        val byLabel = PushDiagnostics.reportRows(PushDiagnostics.snapshot, null, null).toMap()
+        assertEquals("unknown", byLabel["Audience class"])
+        assertEquals("unknown", byLabel["Enabled types"])
+        assertEquals("unknown", byLabel["Pending ops"])
     }
 }
