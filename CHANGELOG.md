@@ -1,3 +1,12 @@
+# [5.50.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.49.0...v5.50.0) (2026-10-20)
+
+
+### Features
+
+* **logging:** emit push_summary after the app-start reconcile with toggle state ([1986654](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1986654e58db0ae428db8486cd024ce25c8610bf))
+
+
+
 # [5.49.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.48.1...v5.49.0) (2026-10-18)
 
 
@@ -46,15 +55,6 @@
 
 * **schedule:** drop the inline ad after row 4, keep only page-end ads ([33f6be9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/33f6be98e0ce4e5e0173bb982c5c1a8f7c4cea96))
 * **schedule:** show 300x250 inline ads after row 4 and each loaded page ([24a0a7b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/24a0a7b2fe420d2017821275e9dab8127e3abfd2))
-
-
-
-## [5.46.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.1...v5.46.2) (2026-10-06)
-
-
-### Bug Fixes
-
-* **ios:** reference UIApplicationStateActive through its enum class ([3303b56](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3303b56dc09f54f0b4300367861324f719bb2660))
 
 
 
