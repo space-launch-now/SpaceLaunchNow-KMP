@@ -128,6 +128,15 @@ class LaunchRepositoryNonSuccessTest {
         )
     }
 
+    /** A 200 whose JSON body is missing the required fields, i.e. the MissingFieldException path. */
+    private fun malformedBodyEngine() = MockEngine {
+        respond(
+            content = """{"detail":"unexpected shape"}""",
+            status = HttpStatusCode.OK,
+            headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        )
+    }
+
     private fun assertNoTransformationFailure(writer: CapturingWriter) {
         assertFalse(
             writer.entries.any { it.throwable is NoTransformationFoundException },
@@ -167,5 +176,37 @@ class LaunchRepositoryNonSuccessTest {
         assertEquals(DataSource.STALE_CACHE, result.getOrThrow().source)
         assertTrue(result.getOrThrow().data.results.isNotEmpty())
         assertNoTransformationFailure(writer)
+    }
+
+    @Test
+    fun featuredLaunchServesStaleCacheWhenA200FailsToDeserialize() = runTest {
+        val writer = CapturingWriter()
+        val repo = newRepository(writer, malformedBodyEngine())
+
+        val result = repo.getFeaturedLaunchDomain(
+            forceRefresh = true,
+            agencyIds = null,
+            locationIds = null
+        )
+
+        assertTrue(result.isSuccess, "Expected stale cache, got ${result.exceptionOrNull()}")
+        assertEquals(DataSource.STALE_CACHE, result.getOrThrow().source)
+        assertTrue(result.getOrThrow().data.results.isNotEmpty())
+    }
+
+    @Test
+    fun inFlightLaunchesServeStaleCacheWhenA200FailsToDeserialize() = runTest {
+        val writer = CapturingWriter()
+        val repo = newRepository(writer, malformedBodyEngine())
+
+        val result = repo.getInFlightLaunchesDomain(
+            forceRefresh = true,
+            agencyIds = null,
+            locationIds = null
+        )
+
+        assertTrue(result.isSuccess, "Expected stale cache, got ${result.exceptionOrNull()}")
+        assertEquals(DataSource.STALE_CACHE, result.getOrThrow().source)
+        assertTrue(result.getOrThrow().data.results.isNotEmpty())
     }
 }

@@ -242,7 +242,28 @@ class LaunchRepositoryImpl(
             }
             Result.failure(e)
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "Unexpected error while fetching featured launch" }
+            // A malformed 200 is still a failed refresh: fall back like any other API error
+            val staleCached = localDataSource?.getUpcomingNormalLaunchesStaleApi(4)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                val filteredStale = filterLaunchesByPreferences(staleCached, agencyIds, locationIds)
+                if (filteredStale.isNotEmpty()) {
+                    log.w { "Returning ${filteredStale.size} filtered stale featured launch as fallback (unexpected error)" }
+                    return Result.success(
+                        DataResult(
+                            data = PaginatedLaunchNormalList(
+                                count = filteredStale.size,
+                                next = null,
+                                previous = null,
+                                results = filteredStale
+                            ),
+                            source = DataSource.STALE_CACHE,
+                            timestamp = localDataSource?.getCacheTimestamp("featured_launch")
+                        )
+                    )
+                }
+            }
             Result.failure(e)
         }
     }
@@ -340,8 +361,20 @@ class LaunchRepositoryImpl(
                 Result.failure(e)
             }
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             log.e(e) { "\u274C UNEXPECTED ERROR in getInFlightLaunches: ${e::class.simpleName}: ${e.message}" }
-            Result.failure(e)
+            // A malformed 200 is still a failed refresh: fall back like any other API error
+            val staleCached = localDataSource?.getInFlightNormalLaunchesStaleApi(5)
+            if (staleCached != null && staleCached.isNotEmpty()) {
+                val now = Clock.System.now().toEpochMilliseconds()
+                Result.success(DataResult(
+                    data = PaginatedLaunchNormalList(count = staleCached.size, results = staleCached, next = null, previous = null),
+                    source = DataSource.STALE_CACHE,
+                    timestamp = now
+                ))
+            } else {
+                Result.failure(e)
+            }
         }
     }
 
