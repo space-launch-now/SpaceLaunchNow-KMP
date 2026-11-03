@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -184,12 +186,11 @@ actual fun SmartBannerAd(
         return
     }
 
-    // Calculate banner height for shimmer placeholder
-    val bannerHeight = when {
-        actualAdSize.height > 0 -> actualAdSize.height.dp
-        actualAdSize.height == -2 -> 250.dp // FLUID
-        else -> 50.dp
-    }
+    // Shimmer height: the handler's own size once it has loaded (a fallback handler can differ
+    // from the requested size); a fresh slot handler still holds the library default, so it
+    // uses the requested size
+    val reservedSize = if (availableAd.state == AdState.NONE) actualAdSize else availableAd.adSize
+    val bannerHeight = if (reservedSize.height > 0) reservedSize.height.dp else 50.dp
 
     // A new screen visit (e.g. a different launch) loads a fresh creative instead of
     // re-showing the one this shared banner already displayed. Hold the shimmer until
@@ -274,57 +275,87 @@ actual fun SmartBannerAd(
             // SHOWN must keep hosting the AndroidView: tearing it down mid-tap triggers a
             // focus-driven remeasure while the LazyColumn is already laying out (issue #179)
             // Note: We render even in LOADING state because iOS needs the Composable rendered to trigger load
-            if (showCard) {
-                // Content area: wrapped in card
-                Column(
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Card(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                        )
-                    ) {
-                        SmartBannerAdContent(
-                            modifier = modifier.padding(8.dp),
-                            adSize = actualAdSize,
-                            showRemoveAdsButton = showRemoveAdsButton,
-                            onSizeChanged = onSizeChanged,
-                            bannerAd = availableAd
-                        )
+            //
+            // AdMob "Resizing Ad Frames": the AdView shows at the size it was LOADED at (the
+            // handler's adSize, which can differ from the slot's requested size). A slot too
+            // narrow for the card drops chrome (BannerFrame.chromeFor); a slot narrower than the
+            // ad shows no ad. The caller's modifier goes on this outer box, once.
+            val loadedSize = availableAd.adSize
+            BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+                val chrome = BannerFrame.chromeFor(
+                    adWidthDp = loadedSize.width,
+                    adHeightDp = loadedSize.height,
+                    slotWidthDp = maxWidth.value,
+                    preferCard = showCard
+                )
+                if (chrome == BannerFrame.Chrome.NONE) {
+                    log.d {
+                        "Skipping ${loadedSize.width}x${loadedSize.height} banner for $placementType: " +
+                            "slot is only $maxWidth wide"
                     }
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        when (chrome) {
+                            BannerFrame.Chrome.CARD -> Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        horizontal = BannerFrame.CARD_OUTER_PAD_DP.dp,
+                                        vertical = 4.dp
+                                    ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                shape = MaterialTheme.shapes.medium,
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                )
+                            ) {
+                                SmartBannerAdContent(
+                                    modifier = Modifier.padding(BannerFrame.CARD_INNER_PAD_DP.dp),
+                                    showRemoveAdsButton = showRemoveAdsButton,
+                                    onSizeChanged = onSizeChanged,
+                                    bannerAd = availableAd
+                                )
+                            }
 
-
-                    // Optional "Remove Ads" button section
-                    if (showRemoveAdsButton && onRemoveAdsClick != null) {
-                        OutlinedButton(
-                            onClick = onRemoveAdsClick,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                        ) {
-                            Text(
-                                text = "Remove Ads",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
+                            BannerFrame.Chrome.PADDED -> SmartBannerAdContent(
+                                modifier = Modifier.padding(
+                                    horizontal = BannerFrame.PADDED_PAD_DP.dp,
+                                    vertical = 4.dp
+                                ),
+                                showRemoveAdsButton = showRemoveAdsButton,
+                                onSizeChanged = onSizeChanged,
+                                bannerAd = availableAd
                             )
+
+                            else -> SmartBannerAdContent(
+                                modifier = Modifier.padding(vertical = 4.dp),
+                                showRemoveAdsButton = showRemoveAdsButton,
+                                onSizeChanged = onSizeChanged,
+                                bannerAd = availableAd
+                            )
+                        }
+
+                        // Optional "Remove Ads" button, for card placements at any chrome level
+                        if (showCard && showRemoveAdsButton && onRemoveAdsClick != null) {
+                            OutlinedButton(
+                                onClick = onRemoveAdsClick,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                            ) {
+                                Text(
+                                    text = "Remove Ads",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
                 }
-            } else {
-                // Navigation area: no card wrapper
-                SmartBannerAdContent(
-                    modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    adSize = actualAdSize,
-                    showRemoveAdsButton = showRemoveAdsButton,
-                    onSizeChanged = onSizeChanged,
-                    bannerAd = availableAd
-                )
             }
             
             // Log loading state for debugging
@@ -422,54 +453,37 @@ private fun AdShimmerPlaceholder(
 
 @OptIn(DependsOnGoogleMobileAds::class)
 @Composable
-fun SmartBannerAdContent(
+private fun SmartBannerAdContent(
     modifier: Modifier = Modifier,
-    adSize: AdSize,
     showRemoveAdsButton: Boolean,
     onSizeChanged: ((Dp, Int) -> Unit)?,
     bannerAd: BannerAdHandler,
 ) {
-    // Log AdSize dimensions (can't rely on == comparison on iOS since AdSize constants aren't singletons)
+    // The size the AdView was loaded at - the only size it may be shown at
+    val adSize = bannerAd.adSize
+    val density = LocalDensity.current
     log.v { "adSize dimensions = ${adSize.width}x${adSize.height}" }
-    
-    BoxWithConstraints {
-        val availableWidthDp = maxWidth
-        val availableHeightDp = maxHeight
 
-        Column(
-            modifier = modifier.fillMaxWidth()
+    // RectangleShape: Surface clips to its shape, and rounded corners would trim the
+    // corners of an ad that is as wide as the slot
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = if (showRemoveAdsButton) 0.dp else 4.dp, // Only elevate if no card wrapper
+        shape = RectangleShape
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onSizeChanged { size ->
+                    onSizeChanged?.invoke(with(density) { size.width.toDp() }, size.height)
+                },
+            contentAlignment = Alignment.Center
         ) {
-            // Banner Ad Section
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surface,
-                tonalElevation = if (showRemoveAdsButton) 0.dp else 4.dp, // Only elevate if no card wrapper
-                shape = MaterialTheme.shapes.small
-            ) {
-                // Use AdSize height directly - simple and works on all platforms
-                val bannerHeight = when {
-                    adSize.height > 0 -> adSize.height.dp // Use actual height if positive
-                    adSize.height == -2 -> 250.dp // FLUID (WRAP_CONTENT) - use medium rectangle height
-                    else -> 50.dp // Fallback to standard banner size
-                }
-                
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(bannerHeight)
-                        .onSizeChanged { size ->
-                            // Optional: Log the actual size for debugging
-                            log.v { "Available width: ${availableWidthDp}, Height: ${size.height}px, Banner height: ${bannerHeight}" }
-                            // Call custom callback if provided
-                            onSizeChanged?.invoke(availableWidthDp, size.height)
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Constrain BannerAd to exact size to prevent expansion
-                    BannerAd(
-                        ad = bannerAd
-                    )
-                }
+            // Host the AdView at exactly its loaded size: never clipped, squeezed or stretched.
+            // SmartBannerAd only gets here when the slot is wide enough (BannerFrame.chromeFor).
+            Box(modifier = Modifier.size(adSize.width.dp, adSize.height.dp)) {
+                BannerAd(ad = bannerAd)
             }
         }
     }
@@ -490,7 +504,8 @@ fun getAdSizeForPlacement(placementType: AdPlacementType): AdSize {
             when (widthSizeClass) {
                 WindowWidthSizeClass.COMPACT -> AdSize.BANNER // 320x50 for phones
                 WindowWidthSizeClass.MEDIUM -> AdSize.LARGE_BANNER // 320x100 for medium tablets (higher visibility)
-                WindowWidthSizeClass.EXPANDED -> AdSize.LEADERBOARD // 728x90 for large tablets/desktop
+                // Android preloads no 728x90 banner (WithPreloadedAds): ask for the 320x100 it serves
+                WindowWidthSizeClass.EXPANDED -> AdSize.LARGE_BANNER
                 else -> AdSize.BANNER
             }
         }
@@ -517,7 +532,8 @@ fun getAdSizeForPlacement(placementType: AdPlacementType): AdSize {
             when (widthSizeClass) {
                 WindowWidthSizeClass.COMPACT -> AdSize.MEDIUM_RECTANGLE // 300x250 for phones
                 WindowWidthSizeClass.MEDIUM -> AdSize.MEDIUM_RECTANGLE // 300x250 for tablets
-                WindowWidthSizeClass.EXPANDED -> AdSize.LEADERBOARD // 728x90 for large tablets
+                // Android preloads no 728x90 banner (WithPreloadedAds): stay on 300x250
+                WindowWidthSizeClass.EXPANDED -> AdSize.MEDIUM_RECTANGLE
                 else -> AdSize.MEDIUM_RECTANGLE
             }
         }
