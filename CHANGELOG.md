@@ -1,3 +1,13 @@
+## [5.50.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.50.1...v5.50.2) (2026-11-03)
+
+
+### Bug Fixes
+
+* **ads:** drop banner chrome before hiding the ad on narrow slots ([e596bfd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e596bfd1adeb87f5f41826f973b99698bf657486))
+* **ads:** host Android banners at their loaded size to meet AdMob ad-frame policy ([4a1833d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4a1833d420c17b0d623772c41d517433f2e6f3d1))
+
+
+
 ## [5.50.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.50.0...v5.50.1) (2026-11-03)
 
 
@@ -46,15 +56,6 @@
 * **logging:** rethrow coroutine cancellation before logging in catch-alls and warn on remote config backend failures ([d4ae003](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d4ae0030852ec8506cd42ebfcfe416b786dd967d))
 * **subscription:** ignore lastSynced when verifying the storage read-back ([0f2ce7c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0f2ce7c2f997e8e54ea9f2bcc272de851f8bb6c7))
 * **wear:** skip watch sync once the Wearable API is missing instead of logging errors ([8c1fdd0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8c1fdd0f541f7e9186e0eddfc71add43af317fa2))
-
-
-
-# [5.48.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.47.0...v5.48.0) (2026-10-12)
-
-
-### Features
-
-* **detail:** add Share button to phone launch detail hero ([4489156](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/448915620beb9b0734959f0d2d8b8125357dbb70))
 
 
 

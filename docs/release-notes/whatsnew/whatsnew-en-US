@@ -1,3 +1,1 @@
-Fixed the astronaut memorial icon showing a cake instead of a flower.
-Improved reliability when loading launch data, with cached results shown if a live update fails.
-Fixed several crashes and stability issues for smoother browsing.
+Fixed several ad display issues for smoother browsing.
