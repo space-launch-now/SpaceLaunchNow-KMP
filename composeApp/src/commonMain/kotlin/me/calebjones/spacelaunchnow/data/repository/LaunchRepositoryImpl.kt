@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.api.extensions.bodyOrThrow
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchById
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
@@ -170,7 +171,7 @@ class LaunchRepositoryImpl(
             )
             log.d { "API response received - status: ${response.status}, url: ${response.response.request.url}" }
 
-            val launches = response.body()
+            val launches = response.bodyOrThrow("getFeaturedLaunch")
             log.i { "API returned ${launches.results.size} launches (filtered by status at API level)" }
             log.v { "Full API response - count: ${launches.count}, next: ${launches.next}, previous: ${launches.previous}" }
 
@@ -291,7 +292,7 @@ class LaunchRepositoryImpl(
                 ordering = "net"
             )
 
-            val launches = response.body()
+            val launches = response.bodyOrThrow("getInFlightLaunches")
             log.i { "\u2705 API SUCCESS: Fetched ${launches.results.size} in-flight launches" }
 
             // Log each in-flight launch
