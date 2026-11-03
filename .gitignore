@@ -29,6 +29,7 @@ keystore.properties
 .vscode/
 .claude/settings.local.json
 .worktrees/
+.claude/worktrees/
 
 # Signing & certificates
 *.jks
