@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -69,7 +70,7 @@ fun AstronautPersonalInfoCard(
             // Age or Death Date
             if (astronaut.dateOfDeath != null) {
                 InfoTile(
-                    icon = Icons.Default.Cake,
+                    icon = Icons.Default.LocalFlorist,
                     label = "Died",
                     value = formatDate(astronaut.dateOfDeath),
                     color = Color.Red.copy(alpha = 0.7f),
