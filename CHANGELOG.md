@@ -1,3 +1,18 @@
+## [5.50.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.50.0...v5.50.1) (2026-11-03)
+
+
+### Bug Fixes
+
+* **api:** keep the LL2 request URL out of non-2xx exception messages ([ce69034](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ce69034935b047948a4b5fd72a62d3c672a496a3)), closes [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240)
+* **api:** raise ResponseException for non-2xx LL2 responses ([d705c9e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d705c9e86f9503a2ac4ee5bfd9b0053bf9d687dc)), closes [#190](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/190) [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240)
+* **astronaut:** use a flower icon on the Died tile, not a cake ([5834abb](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5834abb080dd5f94342861e34278b131a853102c))
+* **config:** stop recreating the Remote Config session on every fetch ([e50ff46](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e50ff46fc3cefb6c05f5a6bc524a43240713266d)), closes [#247](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/247)
+* **data:** fall back to stale cache when a 200 LL2 response fails to deserialize ([62f5022](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/62f5022b9aaef2a92b706eefcbb75eadaf3ca83b)), closes [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240)
+* **data:** guard remaining LL2 launch repository call sites against non-2xx responses ([8c6fb3d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8c6fb3d4923502906234192bca37a296bca12065)), closes [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240)
+* **data:** serve stale cache when LL2 returns non-2xx for featured and in-flight launches ([d378e75](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d378e75f3d4f9b40fa2b7d3c57c3755224607cc5)), closes [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240) [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240)
+
+
+
 # [5.50.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.49.0...v5.50.0) (2026-10-20)
 
 
@@ -40,21 +55,6 @@
 ### Features
 
 * **detail:** add Share button to phone launch detail hero ([4489156](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/448915620beb9b0734959f0d2d8b8125357dbb70))
-
-
-
-# [5.47.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.46.2...v5.47.0) (2026-10-09)
-
-
-### Bug Fixes
-
-* **ads:** load new inline slot handlers at 300x250, not the library default ([619f183](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/619f18329e33e312e4bb9f60a524ddac4de15ab5))
-
-
-### Features
-
-* **schedule:** drop the inline ad after row 4, keep only page-end ads ([33f6be9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/33f6be98e0ce4e5e0173bb982c5c1a8f7c4cea96))
-* **schedule:** show 300x250 inline ads after row 4 and each loaded page ([24a0a7b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/24a0a7b2fe420d2017821275e9dab8127e3abfd2))
 
 
 
