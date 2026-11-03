@@ -4,6 +4,8 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.remoteconfig.FirebaseRemoteConfig
 import dev.gitlive.firebase.remoteconfig.remoteConfig
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
@@ -42,6 +44,9 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         isLenient = true
     }
     
+    // Serializes fetches so cold start performs one Remote Config round trip, not one per caller
+    private val fetchMutex = Mutex()
+
     companion object {
         private const val ROADMAP_DATA_KEY = "roadmap_data"
         private const val PINNED_CONTENT_KEY = "pinned_content"
@@ -76,10 +81,15 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         
         return try {
             val interval = if (forceRefresh) FORCE_REFRESH_INTERVAL else DEFAULT_FETCH_INTERVAL
-            config.settings {
-                minimumFetchInterval = interval
+            // The interval is passed per fetch rather than through `settings { minimumFetchInterval }`:
+            // on iOS `settings {}` maps to `setConfigSettings:`, which tears down and recreates the
+            // Remote Config NSURLSession. Callers arrive with different intervals in the first second
+            // of a cold start, so the session was being rebuilt under an in-flight fetch (issue #247).
+            // `fetch(interval)` maps to `fetchWithExpirationDuration:` and leaves the session alone.
+            fetchMutex.withLock {
+                config.fetch(interval)
+                config.activate()
             }
-            config.fetchAndActivate()
             log.d { "Remote config fetch and activate succeeded" }
             Result.success(Unit)
         } catch (e: CancellationException) {
