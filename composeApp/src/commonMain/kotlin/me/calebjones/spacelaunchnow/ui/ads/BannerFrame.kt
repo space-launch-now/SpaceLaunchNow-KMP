@@ -2,25 +2,42 @@ package me.calebjones.spacelaunchnow.ui.ads
 
 /**
  * AdMob policy "Modified ad code: Resizing Ad Frames": a banner AdView must show at the exact
- * size it was loaded at. A slot never clips, squeezes or stretches it; a slot too narrow for
- * the ad shows no ad.
+ * size it was loaded at. A slot never clips, squeezes or stretches it. When the slot is too
+ * narrow for SmartBannerAd's card, the ad drops its chrome; when the slot is narrower than the
+ * ad itself, the slot shows no ad.
  */
 internal object BannerFrame {
 
-    /** Horizontal space SmartBannerAd's own chrome takes, in dp, around the AdView. */
-    fun chromeWidthDp(showCard: Boolean): Float =
-        if (showCard) CARD_CHROME_DP else NAV_CHROME_DP
+    /** Card outer padding, each side, in dp. */
+    const val CARD_OUTER_PAD_DP = 8
+
+    /** Padding between the card edge and the ad, each side, in dp. */
+    const val CARD_INNER_PAD_DP = 8
+
+    /** Padding around a banner with no card, each side, in dp. */
+    const val PADDED_PAD_DP = 8
+
+    /** How SmartBannerAd frames a banner, from most chrome to none. */
+    enum class Chrome(val widthDp: Int) {
+        CARD(2 * (CARD_OUTER_PAD_DP + CARD_INNER_PAD_DP)),
+        PADDED(2 * PADDED_PAD_DP),
+        BARE(0),
+
+        /** The slot is narrower than the ad: show no ad. */
+        NONE(0)
+    }
 
     /**
-     * True when an ad loaded at [adWidthDp] x [adHeightDp] fits at full size in a slot that is
-     * [slotWidthDp] wide, after the [chromeDp] of padding around the AdView.
+     * The most chrome that still lets an ad loaded at [adWidthDp] x [adHeightDp] show at full
+     * size in a slot [slotWidthDp] wide. [preferCard] is false for slots that never use a card.
      */
-    fun fits(adWidthDp: Int, adHeightDp: Int, slotWidthDp: Float, chromeDp: Float): Boolean =
-        adWidthDp > 0 && adHeightDp > 0 && slotWidthDp - chromeDp >= adWidthDp
-
-    // Card: 8 dp outer padding + 8 dp inner padding, on each side.
-    private const val CARD_CHROME_DP = 32f
-
-    // No card: 8 dp padding on each side.
-    private const val NAV_CHROME_DP = 16f
+    fun chromeFor(adWidthDp: Int, adHeightDp: Int, slotWidthDp: Float, preferCard: Boolean): Chrome {
+        if (adWidthDp <= 0 || adHeightDp <= 0) return Chrome.NONE
+        val candidates = if (preferCard) {
+            listOf(Chrome.CARD, Chrome.PADDED, Chrome.BARE)
+        } else {
+            listOf(Chrome.PADDED, Chrome.BARE)
+        }
+        return candidates.firstOrNull { slotWidthDp - it.widthDp >= adWidthDp } ?: Chrome.NONE
+    }
 }
