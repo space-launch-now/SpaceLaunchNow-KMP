@@ -70,6 +70,14 @@ object NotificationDisplayHelper {
 
     private const val NOTIFICATION_ID = 1
 
+    /**
+     * Silent channel for the foreground notification that expedited push work needs on
+     * API < 31. Deliberately not a [SpaceLaunchNotificationChannel]: it is not a topic and
+     * must not appear in the user-configurable channel list.
+     */
+    const val PUSH_PROCESSING_CHANNEL_ID = "push_processing_min"
+    const val PUSH_PROCESSING_NOTIFICATION_ID = 9001
+
     private val log = logger()
 
     /**
@@ -230,8 +238,43 @@ object NotificationDisplayHelper {
             notificationManager.createNotificationChannel(channel)
         }
 
+        createPushProcessingChannel(notificationManager)
+
         // Migration: Delete old channels if they exist
         migrateLegacyChannels(notificationManager)
+    }
+
+    private fun createPushProcessingChannel(notificationManager: NotificationManager) {
+        val channel = NotificationChannel(
+            PUSH_PROCESSING_CHANNEL_ID,
+            "Push processing",
+            NotificationManager.IMPORTANCE_MIN
+        ).apply {
+            description = "Shown briefly while a notification is being prepared"
+            setSound(null, null)
+            enableVibration(false)
+            enableLights(false)
+            setShowBadge(false)
+        }
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    /**
+     * Minimal silent notification that backs expedited push work as a foreground service
+     * (required by WorkManager on API < 31). Creates its channel first, so it is safe to
+     * call before [createNotificationChannels] has run.
+     */
+    fun buildPushProcessingNotification(context: Context): android.app.Notification {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        createPushProcessingChannel(notificationManager)
+        return NotificationCompat.Builder(context, PUSH_PROCESSING_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_rocket_notification)
+            .setContentTitle("Preparing notification")
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setOngoing(true)
+            .setSilent(true)
+            .build()
     }
 
     /**

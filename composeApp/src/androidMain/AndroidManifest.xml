@@ -8,6 +8,9 @@
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- Expedited push work runs as a foreground service on API < 31 (WorkManager). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:name=".MainApplication"
@@ -100,6 +103,13 @@
                     android:scheme="wear" />
             </intent-filter>
         </service>
+
+        <!-- Expedited push work (NotificationWorker.getForegroundInfo) starts this service
+             with the dataSync type; targetSdk 34+ requires the type to be declared. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
 
         <!-- Opt out of WorkManager's androidx.startup auto-initialization.
              WorkManagerInitializer runs inside InitializationProvider.onCreate(), so any

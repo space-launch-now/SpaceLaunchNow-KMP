@@ -1,6 +1,9 @@
 package me.calebjones.spacelaunchnow.workers
 
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Build
+import androidx.work.ForegroundInfo
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
@@ -71,6 +74,23 @@ class NotificationWorker(
         } catch (e: Exception) {
             // Analytics must never break notification processing.
             log.w(e) { "Failed to track notification receipt analytics: ${e.message}" }
+        }
+    }
+
+    /**
+     * Required for expedited work: on API < 31 WorkManager runs it as a foreground service
+     * and asks for this notification. On API 31+ it is never shown.
+     */
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        val notification = NotificationDisplayHelper.buildPushProcessingNotification(applicationContext)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                NotificationDisplayHelper.PUSH_PROCESSING_NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            ForegroundInfo(NotificationDisplayHelper.PUSH_PROCESSING_NOTIFICATION_ID, notification)
         }
     }
 
