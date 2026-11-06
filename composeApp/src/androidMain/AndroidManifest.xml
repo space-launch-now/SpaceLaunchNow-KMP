@@ -104,6 +104,13 @@
             </intent-filter>
         </service>
 
+        <!-- Expedited push work (NotificationWorker.getForegroundInfo) starts this service
+             with the dataSync type; targetSdk 34+ requires the type to be declared. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
         <!-- Opt out of WorkManager's androidx.startup auto-initialization.
              WorkManagerInitializer runs inside InitializationProvider.onCreate(), so any
              throwable it raises kills the process during content-provider install, before
@@ -119,13 +126,6 @@
              and android:exported must match the library declaration exactly, otherwise the
              manifest merger adds a second provider instead of merging into the existing one
              and auto-init is silently reinstated. -->
-        <!-- Expedited push work (NotificationWorker.getForegroundInfo) starts this service
-             with the dataSync type; targetSdk 34+ requires the type to be declared. -->
-        <service
-            android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync"
-            tools:node="merge" />
-
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
