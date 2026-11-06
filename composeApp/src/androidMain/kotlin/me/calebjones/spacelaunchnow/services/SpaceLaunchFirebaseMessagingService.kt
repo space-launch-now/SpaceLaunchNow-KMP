@@ -1,7 +1,6 @@
 package me.calebjones.spacelaunchnow.services
 
 import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -15,7 +14,7 @@ import me.calebjones.spacelaunchnow.data.notifications.v6.ReconcileTrigger
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.util.logging.PushDiagnostics
 import me.calebjones.spacelaunchnow.util.logging.logger
-import me.calebjones.spacelaunchnow.workers.NotificationWorker
+import me.calebjones.spacelaunchnow.workers.buildNotificationWorkRequest
 import org.koin.mp.KoinPlatform
 
 /**
@@ -58,9 +57,7 @@ class SpaceLaunchFirebaseMessagingService : FirebaseMessagingService() {
             workData.putString("fcm_body", notification.body)
         }
 
-        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
-            .setInputData(workData.build())
-            .build()
+        val workRequest = buildNotificationWorkRequest(workData.build())
 
         // WorkManager initializes on demand (its androidx.startup auto-initializer is
         // removed in the manifest, issue #181), so initialization failures land here.

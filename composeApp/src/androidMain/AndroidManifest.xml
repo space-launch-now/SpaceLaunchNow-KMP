@@ -8,6 +8,9 @@
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- Expedited push work runs as a foreground service on API < 31 (WorkManager). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:name=".MainApplication"
@@ -116,6 +119,13 @@
              and android:exported must match the library declaration exactly, otherwise the
              manifest merger adds a second provider instead of merging into the existing one
              and auto-init is silently reinstated. -->
+        <!-- Expedited push work (NotificationWorker.getForegroundInfo) starts this service
+             with the dataSync type; targetSdk 34+ requires the type to be declared. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
