@@ -2,17 +2,22 @@ package me.calebjones.spacelaunchnow.database
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.api.terminus.models.LaunchDetailed as TerminusLaunchDetailed
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Clock.System
 
@@ -34,6 +39,12 @@ class LaunchLocalDataSource(
     private val debugCacheDuration = 1.minutes
 
     private val log = logger()
+
+    private companion object {
+        const val TERMINUS_CACHE_SCHEMA_VERSION = 1
+        val NEAR_NET_WINDOW = 24.hours
+        val NEAR_NET_MAX_TTL = 30.seconds
+    }
     
     private suspend fun getEffectiveCacheDuration(): kotlin.time.Duration {
         return if (appPreferences.isDebugShortCacheTtlEnabled()) {
@@ -249,10 +260,83 @@ class LaunchLocalDataSource(
         return cached?.let {
             val ageMinutes = (now - it.cached_at) / 60000
             log.v { "Cache entry age: ${ageMinutes} minutes (cached at ${it.cached_at}, expires at ${it.expires_at})" }
-            json.decodeFromString<LaunchDetailed>(it.json_data)
+            // An undecodable blob (e.g. one written by the Terminus repository) is a miss.
+            try {
+                json.decodeFromString<LaunchDetailed>(it.json_data)
+            } catch (e: Exception) {
+                log.w(e) { "Undecodable LaunchDetailed cache entry for $id, treating as a miss" }
+                null
+            }
         }
     }
     
+    // Terminus LaunchDetailed operations. They share the detailed-launch table with the LL
+    // methods above, so the blob is an envelope. A legacy LL blob has no envelope fields, and an
+    // envelope is not a valid LL LaunchDetailed: each side treats the other's blob as a miss.
+    @Serializable
+    private data class TerminusDetailEnvelope(
+        @SerialName("cache_schema_version") val schemaVersion: Int,
+        @SerialName("backend") val backend: String,
+        @SerialName("launch") val launch: TerminusLaunchDetailed
+    )
+
+    suspend fun cacheTerminusDetailedLaunch(launch: TerminusLaunchDetailed) {
+        val now = System.now().toEpochMilliseconds()
+        var duration = getEffectiveCacheDuration()
+        val netMs = launch.net?.toEpochMilliseconds()
+        if (netMs != null && abs(netMs - now) <= NEAR_NET_WINDOW.inWholeMilliseconds) {
+            // Launches within 24 h of NET change often: cap the TTL at 30 s.
+            duration = minOf(duration, NEAR_NET_MAX_TTL)
+        }
+        queries.insertOrReplaceDetailed(
+            id = launch.id,
+            name = launch.name ?: "",
+            status_id = launch.status.id.toLong(),
+            status_name = launch.status.name,
+            net = netMs,
+            window_end = launch.windowEnd?.toEpochMilliseconds(),
+            window_start = launch.windowStart?.toEpochMilliseconds(),
+            launch_service_provider_id = launch.launchServiceProvider.id.toLong(),
+            launch_service_provider_name = launch.launchServiceProvider.name,
+            rocket_configuration_id = launch.rocket?.configuration?.id?.toLong(),
+            rocket_configuration_name = launch.rocket?.configuration?.name,
+            pad_name = launch.pad.name,
+            location_name = launch.pad.location?.name,
+            image_url = launch.image?.imageUrl,
+            mission_name = launch.mission?.name,
+            mission_description = launch.mission?.description,
+            json_data = json.encodeToString(
+                TerminusDetailEnvelope(TERMINUS_CACHE_SCHEMA_VERSION, "terminus", launch)
+            ),
+            cached_at = now,
+            expires_at = now + duration.inWholeMilliseconds
+        )
+    }
+
+    suspend fun getTerminusDetailedLaunch(id: String): TerminusLaunchDetailed? {
+        val now = System.now().toEpochMilliseconds()
+        return decodeTerminusDetail(id, queries.getDetailedById(id, now).executeAsOneOrNull()?.json_data)
+    }
+
+    suspend fun getTerminusDetailedLaunchStale(id: String): TerminusLaunchDetailed? {
+        return decodeTerminusDetail(id, queries.getDetailedByIdStale(id).executeAsOneOrNull()?.json_data)
+    }
+
+    private fun decodeTerminusDetail(id: String, blob: String?): TerminusLaunchDetailed? {
+        if (blob == null) return null
+        return try {
+            val envelope = json.decodeFromString<TerminusDetailEnvelope>(blob)
+            if (envelope.schemaVersion == TERMINUS_CACHE_SCHEMA_VERSION && envelope.backend == "terminus") {
+                envelope.launch
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            log.w(e) { "Undecodable Terminus launch detail cache entry for $id, treating as a miss" }
+            null
+        }
+    }
+
     // In-flight launch cache methods (status_id = 6)
     suspend fun getInFlightNormalLaunches(limit: Int): List<Launch> {
         return getInFlightNormalLaunchesApi(limit).map { it.toDomain() }

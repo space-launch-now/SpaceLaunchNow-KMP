@@ -33,6 +33,9 @@ import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.ll.LLLaunchRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.createLaunchRepository
+import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchesApi as TerminusLaunchesApi
+import me.calebjones.spacelaunchnow.di.terminus.terminusApiModule
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
@@ -133,7 +136,7 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, appModule, debugModule, imageLoaderModule, analyticsModule)
+    modules(networkModule, apiModule, terminusApiModule, appModule, debugModule, imageLoaderModule, analyticsModule)
 }
 
 val appModule = module {
@@ -156,13 +159,22 @@ val appModule = module {
     single { StatsLocalDataSource(get(), get()) }
     single { TopicSubscriptionStore(get()) }
 
+    // The LL repository always exists: it is the default backend and the delegate of the
+    // Terminus one for every call not yet ported. The Terminus client is only resolved on
+    // DataBackend.TERMINUS, so the default path never builds it.
     single<LaunchRepository> {
-        LLLaunchRepositoryImpl(
+        val llRepository = LLLaunchRepositoryImpl(
             launchesApi = get(),
             agenciesApi = get(),
             appPreferences = get(),
             localDataSource = get(),
             statsLocalDataSource = get()
+        )
+        createLaunchRepository(
+            backend = get<DataBackend>(),
+            llRepository = llRepository,
+            terminusLaunchesApi = { get<TerminusLaunchesApi>() },
+            localDataSource = get()
         )
     }
     single<ArticlesRepository> {
@@ -256,8 +268,8 @@ val appModule = module {
     // granularity, no hot swap). The DebugPreferences override wins when set (debug builds
     // only); otherwise Remote Config's `data_backend` key, which falls back to LL on any
     // failure. Release users therefore stay on LL until the flag is set.
-    // Repositories still read LL for every value; the Terminus client ports belong to
-    // Tasks#1006 and will branch on this value.
+    // The launch repository branches on this value (launch detail on Terminus); the other
+    // repositories still read LL until their Tasks#1006 ports land.
     single<DataBackend> {
         val remote = try {
             runBlocking { get<RemoteConfigRepository>().getDataBackend() }
