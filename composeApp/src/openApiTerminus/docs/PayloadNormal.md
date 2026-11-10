@@ -14,8 +14,8 @@
 | **cost** | **kotlin.Int** |  |  |
 | **mass** | **kotlin.Double** |  |  |
 | **name** | **kotlin.String** |  |  [optional] |
-| **wikiLink** | [**PayloadDetailedWikiLink**](PayloadDetailedWikiLink.md) |  |  [optional] |
-| **infoLink** | [**PayloadDetailedWikiLink**](PayloadDetailedWikiLink.md) |  |  [optional] |
+| **wikiLink** | [**kotlin.String**](PayloadDetailedWikiLink.md) |  |  [optional] |
+| **infoLink** | [**kotlin.String**](PayloadDetailedWikiLink.md) |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
 
 

@@ -39,7 +39,7 @@ data class ImageLicense (
 
     @SerialName(value = "priority") val priority: kotlin.Int? = null,
 
-    @SerialName(value = "link") val link: ImageLicenseLink? = null
+    @SerialName(value = "link") val link: kotlin.String? = null
 
 ) {
 

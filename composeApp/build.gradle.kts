@@ -515,6 +515,15 @@ tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("gen
     inputSpec.set(file("$projectDir/../schema/terminus_v1.yaml").absolutePath.replace("\\", "/"))
     outputDir.set("$projectDir/src/openApiTerminus")
     configFile.set("$projectDir/openapi-config-terminus.yaml")
+    // Tasks#1005: Terminus sends plain strings for 13 `oneOf [uri, empty]` fields; the generator
+    // would emit empty wrapper classes for them. Map the wrappers to String.
+    typeMappings.set(
+        mapOf(
+            "ImageLicenseLink" to "kotlin.String",
+            "PayloadDetailedWikiLink" to "kotlin.String",
+            "LocationDetailedMapImage" to "kotlin.String",
+        )
+    )
     // The generator HTML-escapes the backticks (&#x60;) it wraps around the reserved-word
     // query parameter `when` in SearchApi, which is invalid Kotlin. Fix the enum name, then restore real backticks.
     doLast {

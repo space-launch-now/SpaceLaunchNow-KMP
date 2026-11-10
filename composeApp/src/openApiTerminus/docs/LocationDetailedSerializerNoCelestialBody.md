@@ -12,7 +12,7 @@
 | **name** | **kotlin.String** |  |  [optional] |
 | **active** | **kotlin.Boolean** |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
-| **mapImage** | [**LocationDetailedMapImage**](LocationDetailedMapImage.md) |  |  [optional] |
+| **mapImage** | [**kotlin.String**](LocationDetailedMapImage.md) |  |  [optional] |
 | **longitude** | **kotlin.Double** |  |  [optional] |
 | **latitude** | **kotlin.Double** |  |  [optional] |
 | **timezoneName** | **kotlin.String** |  |  [optional] |
