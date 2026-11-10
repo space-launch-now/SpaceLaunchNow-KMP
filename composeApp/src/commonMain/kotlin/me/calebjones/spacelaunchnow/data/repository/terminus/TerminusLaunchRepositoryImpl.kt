@@ -4,7 +4,6 @@ import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CancellationException
 import kotlinx.io.IOException
-import me.calebjones.spacelaunchnow.api.extensions.terminus.getLaunchDetail
 import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.terminus.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -43,6 +42,10 @@ class TerminusLaunchRepositoryImpl(
         return result.mapCatching { it.toDomain() }
     }
 
+    private companion object {
+        const val MAX_ERROR_BODY_CHARS = 200
+    }
+
     private class LaunchNotFoundException(message: String) : Exception(message)
 
     private suspend fun getLaunchDetails(id: String, forceRefresh: Boolean): Result<LaunchDetailed> {
@@ -56,9 +59,10 @@ class TerminusLaunchRepositoryImpl(
                 }
             }
 
-            val response = launchesApi.getLaunchDetail(id)
+            val response = launchesApi.launchesRetrieve(id)
             if (response.status >= 400) {
-                val rawResponse = response.response.bodyAsText()
+                // Cap the body: an error page can be large and must not fill the log or the message.
+                val rawResponse = response.response.bodyAsText().take(MAX_ERROR_BODY_CHARS)
                 log.e { "HTTP Error ${response.status}: $rawResponse" }
                 // A server error is like a network failure: serve the stale entry when there is one.
                 if (response.status >= 500) {
