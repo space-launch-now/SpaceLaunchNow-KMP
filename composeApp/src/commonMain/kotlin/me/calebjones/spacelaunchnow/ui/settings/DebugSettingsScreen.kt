@@ -704,21 +704,14 @@ private fun DataSourceCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedButton(
-                        onClick = { debugViewModel.setDataBackendOverride(null) },
-                        enabled = !isLoading,
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Auto", fontSize = 12.sp) }
-                    OutlinedButton(
-                        onClick = { debugViewModel.setDataBackendOverride(DataBackend.LL) },
-                        enabled = !isLoading,
-                        modifier = Modifier.weight(1f)
-                    ) { Text("LL", fontSize = 12.sp) }
-                    OutlinedButton(
-                        onClick = { debugViewModel.setDataBackendOverride(DataBackend.TERMINUS) },
-                        enabled = !isLoading,
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Terminus", fontSize = 12.sp) }
+                    listOf(null to "Auto", DataBackend.LL to "LL", DataBackend.TERMINUS to "Terminus")
+                        .forEach { (backend, label) ->
+                            OutlinedButton(
+                                onClick = { debugViewModel.setDataBackendOverride(backend) },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) { Text(label, fontSize = 12.sp) }
+                        }
                 }
                 Text(
                     text = "Selected: ${debugSettings.dataBackendOverride?.name ?: "Auto (Remote Config)"}",

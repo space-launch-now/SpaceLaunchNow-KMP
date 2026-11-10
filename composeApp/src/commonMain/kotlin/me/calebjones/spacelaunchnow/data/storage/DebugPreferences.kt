@@ -46,9 +46,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         DebugSettings(
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
-            dataBackendOverride = preferences[DATA_BACKEND_OVERRIDE]?.let {
-                DataBackend.entries.find { backend -> backend.value == it }
-            },
+            dataBackendOverride = DataBackend.parseOrNull(preferences[DATA_BACKEND_OVERRIDE]),
             useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
             datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 100f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,

@@ -18,8 +18,9 @@ enum class DataBackend(val value: String) {
          */
         val DEFAULT: DataBackend = LL
 
-        fun fromString(raw: String?): DataBackend =
-            entries.find { it.value == raw } ?: DEFAULT
+        fun parseOrNull(raw: String?): DataBackend? = entries.find { it.value == raw }
+
+        fun fromString(raw: String?): DataBackend = parseOrNull(raw) ?: DEFAULT
     }
 }
 
