@@ -44,6 +44,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,7 +63,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.compose.LocalPlatformContext
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
@@ -546,6 +551,15 @@ private fun SystemTabContent(
             }
         }
         
+        // Section: Data Source (LL or Terminus)
+        item {
+            DataSourceCard(
+                debugViewModel = debugViewModel,
+                debugSettings = debugSettings,
+                isLoading = isLoading
+            )
+        }
+
         // Section 5: Cache Configuration
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -606,6 +620,14 @@ private fun SystemTabContent(
             }
         }
         
+        // Section: Local Caches
+        item {
+            ClearAllCachesCard(
+                isLoading = isLoading,
+                onConfirm = { imageLoader -> debugViewModel.clearAllCaches(imageLoader) }
+            )
+        }
+
         // Section 6: Info Section
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -643,6 +665,147 @@ private fun SystemTabContent(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Switches the data source between LL and Terminus. Auto (no override) follows Remote
+ * Config's `data_backend` key, which defaults to LL. The choice resolves once at app
+ * start, so it applies after a restart.
+ */
+@Composable
+private fun DataSourceCard(
+    debugViewModel: DebugSettingsViewModel,
+    debugSettings: DebugSettings,
+    isLoading: Boolean
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "Data Source",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Choose where launch data comes from. Auto follows Remote Config " +
+                        "(default LL). Restart the app after changing it, and clear local " +
+                        "caches so old data does not linger.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = { debugViewModel.setDataBackendOverride(null) },
+                        enabled = !isLoading,
+                        modifier = Modifier.weight(1f)
+                    ) { Text("Auto", fontSize = 12.sp) }
+                    OutlinedButton(
+                        onClick = { debugViewModel.setDataBackendOverride(DataBackend.LL) },
+                        enabled = !isLoading,
+                        modifier = Modifier.weight(1f)
+                    ) { Text("LL", fontSize = 12.sp) }
+                    OutlinedButton(
+                        onClick = { debugViewModel.setDataBackendOverride(DataBackend.TERMINUS) },
+                        enabled = !isLoading,
+                        modifier = Modifier.weight(1f)
+                    ) { Text("Terminus", fontSize = 12.sp) }
+                }
+                Text(
+                    text = "Selected: ${debugSettings.dataBackendOverride?.name ?: "Auto (Remote Config)"}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Active this launch: ${debugViewModel.activeDataBackend?.name ?: "unknown"}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Empties every local cache (SQLDelight tables, in-memory LaunchCache, Coil image cache)
+ * so the next fetch comes from the selected data source. Preference stores are not
+ * touched, so the data source choice survives.
+ */
+@Composable
+private fun ClearAllCachesCard(
+    isLoading: Boolean,
+    onConfirm: (ImageLoader?) -> Unit
+) {
+    val imageLoader = SingletonImageLoader.get(LocalPlatformContext.current)
+    var showConfirm by remember { mutableStateOf(false) }
+
+    if (showConfirm) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showConfirm = false },
+            title = { Text("Clear all caches?") },
+            text = {
+                Text(
+                    "Wipes every cached launch, event, article, filter option, stat and " +
+                        "image on this device. Settings and the data source choice are kept. " +
+                        "Restart the app afterwards."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirm = false
+                        onConfirm(imageLoader)
+                    }
+                ) { Text("Clear") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirm = false }) { Text("Cancel") }
+            }
+        )
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "Local Caches",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Wipe every cached API response and image so the next launch " +
+                        "refetches from the selected data source. Preferences are not touched.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+                Button(
+                    onClick = { showConfirm = true },
+                    enabled = !isLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                ) { Text("Clear All Caches") }
             }
         }
     }

@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
@@ -16,6 +17,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     var mockPinnedContent: PinnedContent? = null
     var mockDiagnosticsConfigJson: String? = null
     var onboardingVariant: OnboardingVariant = OnboardingVariant.CONTROL
+    var dataBackend: DataBackend = DataBackend.DEFAULT
     var fetchAndActivateCalled = false
     var setDefaultsCalled = false
     var lastForceRefresh: Boolean? = null
@@ -56,6 +58,8 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     override suspend fun getDiagnosticsConfigJson(): String? = mockDiagnosticsConfigJson
 
     override suspend fun getOnboardingVariant(): OnboardingVariant = onboardingVariant
+
+    override suspend fun getDataBackend(): DataBackend = dataBackend
 
     override suspend fun getInterstitialVisits(): Int = 4
 

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.NotificationHistoryItem
@@ -18,6 +19,7 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.DebugSettings
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
+import me.calebjones.spacelaunchnow.database.CacheWiper
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import kotlin.random.Random
 
@@ -36,7 +38,10 @@ class DebugSettingsViewModel(
     private val launchRepository: LaunchRepository? = null,
     private val notificationRepository: NotificationRepository? = null,
     private val pushMessaging: PushMessaging? = null,
-    private val notificationHistoryStorage: NotificationHistoryStorage? = null
+    private val notificationHistoryStorage: NotificationHistoryStorage? = null,
+    private val cacheWiper: CacheWiper? = null,
+    /** The data source resolved at app start; changes to the override apply on restart. */
+    val activeDataBackend: DataBackend? = null
 ) : ViewModel() {
 
     private val _debugSettings = MutableStateFlow(
@@ -199,6 +204,49 @@ class DebugSettingsViewModel(
                 _statusMessage.value = "Switched to local API URL"
             } catch (e: Exception) {
                 _statusMessage.value = "Failed to switch to local URL: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun setDataBackendOverride(backend: DataBackend?) {
+        if (debugPreferences == null) return
+
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                debugPreferences.setDataBackendOverride(backend)
+                _statusMessage.value = when (backend) {
+                    null -> "Data source override cleared - following Remote Config (restart to apply)"
+                    else -> "Data source set to ${backend.name} (restart to apply)"
+                }
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to update data source: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Empty every local cache (SQLDelight tables, in-memory LaunchCache, Coil image cache)
+     * so the next fetch comes from the selected data source. Preference stores are
+     * untouched, so the data source override survives.
+     */
+    fun clearAllCaches(imageLoader: coil3.ImageLoader? = null) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                if (cacheWiper == null) {
+                    _statusMessage.value = "Cache wiper not available"
+                    return@launch
+                }
+                cacheWiper.clearAll(imageLoader)
+                _statusMessage.value =
+                    "All caches cleared - settings kept. Restart the app to refetch."
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to clear caches: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
