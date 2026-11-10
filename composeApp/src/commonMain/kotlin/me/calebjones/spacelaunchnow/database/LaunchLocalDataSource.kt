@@ -227,29 +227,75 @@ class LaunchLocalDataSource(
         val duration = getEffectiveCacheDuration()
         val expiresAt = now + duration.inWholeMilliseconds
         
-        queries.insertOrReplaceDetailed(
-            id = launch.id,
-            name = launch.name ?: "",
-            status_id = launch.status?.id?.toLong(),
-            status_name = launch.status?.name,
-            net = launch.net?.toEpochMilliseconds(),
-            window_end = launch.windowEnd?.toEpochMilliseconds(),
-            window_start = launch.windowStart?.toEpochMilliseconds(),
-            launch_service_provider_id = launch.launchServiceProvider?.id?.toLong(),
-            launch_service_provider_name = launch.launchServiceProvider?.name,
-            rocket_configuration_id = launch.rocket?.configuration?.id?.toLong(),
-            rocket_configuration_name = launch.rocket?.configuration?.name,
-            pad_name = launch.pad?.name,
-            location_name = launch.pad?.location?.name,
-            image_url = launch.image?.imageUrl,
-            mission_name = launch.mission?.name,
-            mission_description = launch.mission?.description,
-            json_data = json.encodeToString(launch),
-            cached_at = now,
-            expires_at = expiresAt
+        insertDetailedRow(
+            DetailedColumns(
+                id = launch.id,
+                name = launch.name ?: "",
+                statusId = launch.status?.id?.toLong(),
+                statusName = launch.status?.name,
+                net = launch.net?.toEpochMilliseconds(),
+                windowEnd = launch.windowEnd?.toEpochMilliseconds(),
+                windowStart = launch.windowStart?.toEpochMilliseconds(),
+                providerId = launch.launchServiceProvider?.id?.toLong(),
+                providerName = launch.launchServiceProvider?.name,
+                rocketConfigurationId = launch.rocket?.configuration?.id?.toLong(),
+                rocketConfigurationName = launch.rocket?.configuration?.name,
+                padName = launch.pad?.name,
+                locationName = launch.pad?.location?.name,
+                imageUrl = launch.image?.imageUrl,
+                missionName = launch.mission?.name,
+                missionDescription = launch.mission?.description
+            ),
+            json.encodeToString(launch),
+            now,
+            expiresAt
         )
     }
     
+    /** The searchable columns of a detailed-launch row; the LL and Terminus models both map to it. */
+    private class DetailedColumns(
+        val id: String,
+        val name: String,
+        val statusId: Long?,
+        val statusName: String?,
+        val net: Long?,
+        val windowEnd: Long?,
+        val windowStart: Long?,
+        val providerId: Long?,
+        val providerName: String?,
+        val rocketConfigurationId: Long?,
+        val rocketConfigurationName: String?,
+        val padName: String?,
+        val locationName: String?,
+        val imageUrl: String?,
+        val missionName: String?,
+        val missionDescription: String?
+    )
+
+    private fun insertDetailedRow(columns: DetailedColumns, jsonBlob: String, cachedAt: Long, expiresAt: Long) {
+        queries.insertOrReplaceDetailed(
+            id = columns.id,
+            name = columns.name,
+            status_id = columns.statusId,
+            status_name = columns.statusName,
+            net = columns.net,
+            window_end = columns.windowEnd,
+            window_start = columns.windowStart,
+            launch_service_provider_id = columns.providerId,
+            launch_service_provider_name = columns.providerName,
+            rocket_configuration_id = columns.rocketConfigurationId,
+            rocket_configuration_name = columns.rocketConfigurationName,
+            pad_name = columns.padName,
+            location_name = columns.locationName,
+            image_url = columns.imageUrl,
+            mission_name = columns.missionName,
+            mission_description = columns.missionDescription,
+            json_data = jsonBlob,
+            cached_at = cachedAt,
+            expires_at = expiresAt
+        )
+    }
+
     suspend fun getDetailedLaunch(id: String): Launch? {
         return getDetailedLaunchApi(id)?.toDomain()
     }
@@ -288,28 +334,28 @@ class LaunchLocalDataSource(
             // Launches within 24 h of NET change often: cap the TTL at 30 s.
             duration = minOf(duration, NEAR_NET_MAX_TTL)
         }
-        queries.insertOrReplaceDetailed(
-            id = launch.id,
-            name = launch.name ?: "",
-            status_id = launch.status.id.toLong(),
-            status_name = launch.status.name,
-            net = netMs,
-            window_end = launch.windowEnd?.toEpochMilliseconds(),
-            window_start = launch.windowStart?.toEpochMilliseconds(),
-            launch_service_provider_id = launch.launchServiceProvider.id.toLong(),
-            launch_service_provider_name = launch.launchServiceProvider.name,
-            rocket_configuration_id = launch.rocket?.configuration?.id?.toLong(),
-            rocket_configuration_name = launch.rocket?.configuration?.name,
-            pad_name = launch.pad.name,
-            location_name = launch.pad.location?.name,
-            image_url = launch.image?.imageUrl,
-            mission_name = launch.mission?.name,
-            mission_description = launch.mission?.description,
-            json_data = json.encodeToString(
-                TerminusDetailEnvelope(TERMINUS_CACHE_SCHEMA_VERSION, "terminus", launch)
+        insertDetailedRow(
+            DetailedColumns(
+                id = launch.id,
+                name = launch.name ?: "",
+                statusId = launch.status.id.toLong(),
+                statusName = launch.status.name,
+                net = netMs,
+                windowEnd = launch.windowEnd?.toEpochMilliseconds(),
+                windowStart = launch.windowStart?.toEpochMilliseconds(),
+                providerId = launch.launchServiceProvider.id.toLong(),
+                providerName = launch.launchServiceProvider.name,
+                rocketConfigurationId = launch.rocket?.configuration?.id?.toLong(),
+                rocketConfigurationName = launch.rocket?.configuration?.name,
+                padName = launch.pad.name,
+                locationName = launch.pad.location?.name,
+                imageUrl = launch.image?.imageUrl,
+                missionName = launch.mission?.name,
+                missionDescription = launch.mission?.description
             ),
-            cached_at = now,
-            expires_at = now + duration.inWholeMilliseconds
+            json.encodeToString(TerminusDetailEnvelope(TERMINUS_CACHE_SCHEMA_VERSION, "terminus", launch)),
+            now,
+            now + duration.inWholeMilliseconds
         )
     }
 
