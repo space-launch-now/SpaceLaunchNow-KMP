@@ -47,7 +47,7 @@ open class SearchApi : ApiClient {
      * enum for parameter &#x60;when&#x60;
      */
     @Serializable
-    enum class &#x60;When&#x60;SearchList(val value: kotlin.String) {
+    enum class WhenSearchList(val value: kotlin.String) {
         
         @SerialName(value = "any")
         any("any"),
@@ -70,7 +70,7 @@ open class SearchApi : ApiClient {
      * @return SearchResponse
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun searchList(q: kotlin.String, limit: kotlin.Int? = null, types: kotlin.String? = null, `when`: &#x60;When&#x60;SearchList? = null): HttpResponse<SearchResponse> {
+    open suspend fun searchList(q: kotlin.String, limit: kotlin.Int? = null, types: kotlin.String? = null, `when`: WhenSearchList? = null): HttpResponse<SearchResponse> {
 
         val localVariableAuthNames = listOf<String>()
 

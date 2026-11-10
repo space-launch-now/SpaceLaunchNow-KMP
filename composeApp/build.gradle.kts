@@ -515,6 +515,14 @@ tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("gen
     inputSpec.set(file("$projectDir/../schema/terminus_v1.yaml").absolutePath.replace("\\", "/"))
     outputDir.set("$projectDir/src/openApiTerminus")
     configFile.set("$projectDir/openapi-config-terminus.yaml")
+    // The generator emits `When`SearchList with HTML-escaped backticks (&#x60;) for the
+    // reserved-word query parameter `when`, which is invalid Kotlin. Strip them.
+    doLast {
+        val searchApi = file("$projectDir/src/openApiTerminus/src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/terminus/apis/SearchApi.kt")
+        if (searchApi.exists()) {
+            searchApi.writeText(searchApi.readText().replace("&#x60;When&#x60;", "When"))
+        }
+    }
 }
 
 // Convenience task to generate both API clients
