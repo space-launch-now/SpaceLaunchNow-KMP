@@ -1,0 +1,26 @@
+
+# LocationSerializerWithPads
+
+## Properties
+| Name | Type | Description | Notes |
+| ------------ | ------------- | ------------- | ------------- |
+| **responseMode** | **kotlin.String** |  |  [readonly] |
+| **id** | **kotlin.Int** |  |  [readonly] |
+| **url** | **kotlin.String** |  |  [readonly] |
+| **celestialBody** | [**CelestialBodyDetailed**](CelestialBodyDetailed.md) |  |  |
+| **country** | [**Country**](Country.md) |  |  |
+| **image** | [**Image**](Image.md) |  |  |
+| **pads** | [**kotlin.collections.List&lt;PadDetailedSerializerNoLocation&gt;**](PadDetailedSerializerNoLocation.md) |  |  |
+| **name** | **kotlin.String** |  |  [optional] |
+| **active** | **kotlin.Boolean** |  |  [optional] |
+| **description** | **kotlin.String** |  |  [optional] |
+| **mapImage** | [**LocationDetailedMapImage**](LocationDetailedMapImage.md) |  |  [optional] |
+| **longitude** | **kotlin.Double** |  |  [optional] |
+| **latitude** | **kotlin.Double** |  |  [optional] |
+| **timezoneName** | **kotlin.String** |  |  [optional] |
+| **lastUpdated** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
+| **totalLaunchCount** | **kotlin.Int** |  |  [optional] |
+| **totalLandingCount** | **kotlin.Int** |  |  [optional] |
+
+
+

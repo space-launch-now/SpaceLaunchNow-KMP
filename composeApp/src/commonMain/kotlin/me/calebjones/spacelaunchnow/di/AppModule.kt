@@ -14,6 +14,8 @@ import me.calebjones.spacelaunchnow.data.billing.BillingClient
 import me.calebjones.spacelaunchnow.data.billing.DefaultRevenueCatAttributes
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributes
 import me.calebjones.spacelaunchnow.data.billing.RevenueCatAttributesSyncer
+import me.calebjones.spacelaunchnow.data.model.DataBackend
+import me.calebjones.spacelaunchnow.data.model.resolveDataBackend
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
@@ -71,6 +73,8 @@ import me.calebjones.spacelaunchnow.data.subscription.LocalSubscriptionStorage
 import me.calebjones.spacelaunchnow.data.subscription.SubscriptionSyncer
 import me.calebjones.spacelaunchnow.database.ArticleLocalDataSource
 import me.calebjones.spacelaunchnow.database.CacheCleanupService
+import me.calebjones.spacelaunchnow.database.CacheWiper
+import me.calebjones.spacelaunchnow.database.LocalCacheWiper
 import me.calebjones.spacelaunchnow.database.DatabaseDriverFactory
 import me.calebjones.spacelaunchnow.database.EventLocalDataSource
 import me.calebjones.spacelaunchnow.database.FilterOptionsLocalDataSource
@@ -113,6 +117,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.StarshipViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
+import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -246,6 +251,34 @@ val appModule = module {
     }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
+
+    // Data source switch (LL or Terminus): resolved once per Koin graph (app-restart
+    // granularity, no hot swap). The DebugPreferences override wins when set (debug builds
+    // only); otherwise Remote Config's `data_backend` key, which falls back to LL on any
+    // failure. Release users therefore stay on LL until the flag is set.
+    // Repositories still read LL for every value; the Terminus client ports belong to
+    // Tasks#1006 and will branch on this value.
+    single<DataBackend> {
+        val remote = try {
+            runBlocking { get<RemoteConfigRepository>().getDataBackend() }
+        } catch (e: Exception) {
+            DataBackend.DEFAULT
+        }
+        val override = if (BuildConfig.IS_DEBUG) {
+            try {
+                getOrNull<DebugPreferences>()?.let { prefs ->
+                    runBlocking { prefs.getDebugSettings().dataBackendOverride }
+                }
+            } catch (e: Exception) {
+                null
+            }
+        } else {
+            null
+        }
+        resolveDataBackend(override, remote)
+    }
+
+    single<CacheWiper> { LocalCacheWiper(database = get(), launchCache = get()) }
 
     // Background cleanup task for expired cache entries
     single {
@@ -463,7 +496,9 @@ val debugModule = module {
             launchRepository = getOrNull(),
             notificationRepository = getOrNull(),
             pushMessaging = getOrNull(),
-            notificationHistoryStorage = get()  // NOT optional - we need this!
+            notificationHistoryStorage = get(),  // NOT optional - we need this!
+            cacheWiper = getOrNull(),
+            activeDataBackend = getOrNull()
         )
     }
 }

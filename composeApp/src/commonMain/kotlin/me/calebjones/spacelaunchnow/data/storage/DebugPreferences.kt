@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 
 /**
  * Debug-specific preferences for development and testing
@@ -14,6 +15,9 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     companion object {
         private val CUSTOM_API_BASE_URL = stringPreferencesKey("debug_custom_api_base_url")
         private val USE_CUSTOM_API_URL = booleanPreferencesKey("debug_use_custom_api_url")
+        // Local override of the DataBackend flag. Null = follow Firebase Remote Config's
+        // `data_backend` key.
+        private val DATA_BACKEND_OVERRIDE = stringPreferencesKey("debug_data_backend_override")
         private val USE_FCM_DEBUG_TOPICS = booleanPreferencesKey("debug_use_fcm_debug_topics")
         // Sampling is a debug-only cost knob now; user-facing cost control is the
         // DiagnosticLevel consent (OFF = NOT_GRANTED = nothing uploads).
@@ -42,6 +46,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         DebugSettings(
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
+            dataBackendOverride = DataBackend.parseOrNull(preferences[DATA_BACKEND_OVERRIDE]),
             useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
             datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 100f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
@@ -144,6 +149,20 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
     }
 
     /**
+     * Set (or clear, with null) the local DataBackend override. Null means "follow
+     * Firebase Remote Config's `data_backend` key".
+     */
+    suspend fun setDataBackendOverride(backend: DataBackend?) {
+        dataStore.edit { preferences ->
+            if (backend == null) {
+                preferences.remove(DATA_BACKEND_OVERRIDE)
+            } else {
+                preferences[DATA_BACKEND_OVERRIDE] = backend.value
+            }
+        }
+    }
+
+    /**
      * Enable debug subscription simulation
      */
     suspend fun setDebugSubscriptionSimulation(
@@ -184,6 +203,8 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
 data class DebugSettings(
     val useCustomApiUrl: Boolean = false,
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
+    /** Local override of the DataBackend flag; null follows Remote Config. */
+    val dataBackendOverride: DataBackend? = null,
     val useDebugTopics: Boolean = false,
     val datadogSampleRate: Float = 100f,
     val debugSubscriptionActive: Boolean = false,

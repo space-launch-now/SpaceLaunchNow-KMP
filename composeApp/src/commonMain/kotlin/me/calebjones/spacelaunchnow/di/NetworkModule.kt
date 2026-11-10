@@ -75,4 +75,10 @@ val networkModule = module {
             "https://spacelaunchnow.app"
         }
     }
+
+    // Terminus base URL: host only, the generated schema paths already carry /api/v1.
+    // Distinct from "BaseUrl" so debug-menu URL switching never redirects Terminus.
+    single<String>(named("TerminusBaseUrl")) {
+        "https://staging-terminus.spacelaunchnow.app"
+    }
 }
