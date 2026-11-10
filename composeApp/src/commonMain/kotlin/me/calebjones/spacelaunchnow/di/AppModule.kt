@@ -32,7 +32,7 @@ import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLLaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
@@ -157,7 +157,7 @@ val appModule = module {
     single { TopicSubscriptionStore(get()) }
 
     single<LaunchRepository> {
-        LaunchRepositoryImpl(
+        LLLaunchRepositoryImpl(
             launchesApi = get(),
             agenciesApi = get(),
             appPreferences = get(),

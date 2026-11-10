@@ -15,6 +15,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.data.repository.ll.LLLaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
@@ -95,7 +96,7 @@ class LaunchRepositoryNonSuccessTest {
     private fun newRepository(
         writer: CapturingWriter,
         engine: MockEngine,
-    ): LaunchRepositoryImpl = run {
+    ): LLLaunchRepositoryImpl = run {
         // The repository captures its logger at construction, so install the writer first.
         SpaceLogger.initialize(LogConfig(Severity.Verbose, listOf(writer)))
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
@@ -112,7 +113,7 @@ class LaunchRepositoryNonSuccessTest {
                 )
             )
         }
-        LaunchRepositoryImpl(
+        LLLaunchRepositoryImpl(
             launchesApi = LaunchesApi(baseUrl = "https://ll.test", httpClientEngine = engine),
             agenciesApi = AgenciesApi(baseUrl = "https://ll.test", httpClientEngine = engine),
             appPreferences = preferences,
