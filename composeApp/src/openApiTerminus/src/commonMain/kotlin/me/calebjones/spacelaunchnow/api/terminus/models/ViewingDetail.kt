@@ -80,21 +80,21 @@ data class ViewingDetail (
 
     @SerialName(value = "time_set") val timeSet: kotlin.Boolean? = null,
 
-    @SerialName(value = "track") val track: kotlin.Any? = null,
+    @SerialName(value = "track") val track: kotlinx.serialization.json.JsonElement? = null,
 
     @SerialName(value = "computed_at") val computedAt: kotlin.time.Instant? = null,
 
     @SerialName(value = "state") val state: StateEnum? = null,
 
-    @SerialName(value = "sun") val sun: kotlin.Any? = null,
+    @SerialName(value = "sun") val sun: kotlinx.serialization.json.JsonElement? = null,
 
-    @SerialName(value = "booster_tracks") val boosterTracks: kotlin.Any? = null,
+    @SerialName(value = "booster_tracks") val boosterTracks: kotlinx.serialization.json.JsonElement? = null,
 
-    @SerialName(value = "events") val events: kotlin.Any? = null,
+    @SerialName(value = "events") val events: kotlinx.serialization.json.JsonElement? = null,
 
-    @SerialName(value = "nearby") val nearby: kotlin.Any? = null,
+    @SerialName(value = "nearby") val nearby: kotlinx.serialization.json.JsonElement? = null,
 
-    @SerialName(value = "bands") val bands: kotlin.Any? = null
+    @SerialName(value = "bands") val bands: kotlinx.serialization.json.JsonElement? = null
 
 ) {
 

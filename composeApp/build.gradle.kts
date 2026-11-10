@@ -516,11 +516,11 @@ tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("gen
     outputDir.set("$projectDir/src/openApiTerminus")
     configFile.set("$projectDir/openapi-config-terminus.yaml")
     // The generator HTML-escapes the backticks (&#x60;) it wraps around the reserved-word
-    // query parameter `when` in SearchApi, which is invalid Kotlin. Restore real backticks.
+    // query parameter `when` in SearchApi, which is invalid Kotlin. Fix the enum name, then restore real backticks.
     doLast {
         val searchApi = file("$projectDir/src/openApiTerminus/src/commonMain/kotlin/me/calebjones/spacelaunchnow/api/terminus/apis/SearchApi.kt")
         if (searchApi.exists()) {
-            searchApi.writeText(searchApi.readText().replace("&#x60;", "`"))
+            searchApi.writeText(searchApi.readText().replace("&#x60;When&#x60;", "When").replace("&#x60;", "`"))
         }
     }
 }

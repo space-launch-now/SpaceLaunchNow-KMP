@@ -5,7 +5,7 @@
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
 | **place** | [**Place**](Place.md) |  |  |
-| **result** | [**kotlin.Any**](.md) |  |  |
+| **result** | [**kotlinx.serialization.json.JsonElement**](.md) |  |  |
 
 
 

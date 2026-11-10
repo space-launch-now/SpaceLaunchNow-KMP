@@ -17,14 +17,14 @@
 | **default** | [**Default**](Default.md) |  |  [readonly] |
 | **flightclubUrl** | **kotlin.String** |  |  [readonly] |
 | **timeSet** | **kotlin.Boolean** |  |  [optional] |
-| **track** | [**kotlin.Any**](.md) |  |  [optional] |
+| **track** | [**kotlinx.serialization.json.JsonElement**](.md) |  |  [optional] |
 | **computedAt** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **state** | [**StateEnum**](StateEnum.md) |  |  [optional] |
-| **sun** | [**kotlin.Any**](.md) |  |  [optional] |
-| **boosterTracks** | [**kotlin.Any**](.md) |  |  [optional] |
-| **events** | [**kotlin.Any**](.md) |  |  [optional] |
-| **nearby** | [**kotlin.Any**](.md) |  |  [optional] |
-| **bands** | [**kotlin.Any**](.md) |  |  [optional] |
+| **sun** | [**kotlinx.serialization.json.JsonElement**](.md) |  |  [optional] |
+| **boosterTracks** | [**kotlinx.serialization.json.JsonElement**](.md) |  |  [optional] |
+| **events** | [**kotlinx.serialization.json.JsonElement**](.md) |  |  [optional] |
+| **nearby** | [**kotlinx.serialization.json.JsonElement**](.md) |  |  [optional] |
+| **bands** | [**kotlinx.serialization.json.JsonElement**](.md) |  |  [optional] |
 
 
 

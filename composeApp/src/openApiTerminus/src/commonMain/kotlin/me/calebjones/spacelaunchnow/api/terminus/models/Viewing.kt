@@ -73,7 +73,7 @@ data class Viewing (
 
     @SerialName(value = "time_set") val timeSet: kotlin.Boolean? = null,
 
-    @SerialName(value = "track") val track: kotlin.Any? = null,
+    @SerialName(value = "track") val track: kotlinx.serialization.json.JsonElement? = null,
 
     @SerialName(value = "computed_at") val computedAt: kotlin.time.Instant? = null
 

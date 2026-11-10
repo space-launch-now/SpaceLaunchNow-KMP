@@ -33,7 +33,7 @@ data class Default (
 
     @SerialName(value = "place") @Required val place: Place,
 
-    @SerialName(value = "result") @Required val result: kotlin.Any?
+    @SerialName(value = "result") @Required val result: kotlinx.serialization.json.JsonElement?
 
 ) {
 

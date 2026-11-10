@@ -16,3 +16,10 @@ additionalProperties:
   useNullableCollections: true
   # Better Kotlin naming conventions
   useKotlinConventions: true
+
+# Free-form schemas (Default.result, Viewing.track/sun/events) generate kotlin.Any?, which
+# kotlinx.serialization cannot encode. Use JsonElement instead.
+typeMappings:
+  AnyType: JsonElement
+importMappings:
+  JsonElement: kotlinx.serialization.json.JsonElement

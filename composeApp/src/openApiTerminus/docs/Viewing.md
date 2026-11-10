@@ -17,7 +17,7 @@
 | **default** | [**Default**](Default.md) |  |  [readonly] |
 | **flightclubUrl** | **kotlin.String** |  |  [readonly] |
 | **timeSet** | **kotlin.Boolean** |  |  [optional] |
-| **track** | [**kotlin.Any**](.md) |  |  [optional] |
+| **track** | [**kotlinx.serialization.json.JsonElement**](.md) |  |  [optional] |
 | **computedAt** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 
 
