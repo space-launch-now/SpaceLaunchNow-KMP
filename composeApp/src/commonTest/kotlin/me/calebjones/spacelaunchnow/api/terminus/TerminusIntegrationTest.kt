@@ -1,7 +1,7 @@
 package me.calebjones.spacelaunchnow.api.terminus
 
 import kotlinx.coroutines.test.runTest
-import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchesApi
+import me.calebjones.spacelaunchnow.api.terminus.apis.ConfigApi
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -14,13 +14,13 @@ internal expect fun terminusTestEnv(name: String): String?
  */
 class TerminusIntegrationTest {
     @Test
-    fun launchesListReturnsPage() = runTest {
+    fun configAgencyTypesReturnsPage() = runTest {
         if (terminusTestEnv("TERMINUS_INTEGRATION") != "true") return@runTest
 
-        val api = LaunchesApi(baseUrl = "https://staging-terminus.spacelaunchnow.app")
-        val response = api.launchesList(limit = 1)
+        val api = ConfigApi(baseUrl = "https://staging-terminus.spacelaunchnow.app")
+        val response = api.configAgencyTypesList(limit = 1)
 
-        assertTrue(response.success, "Terminus launches list failed: ${response.status}")
+        assertTrue(response.success, "Terminus agency types list failed: ${response.status}")
         assertTrue(response.body().results.size <= 1)
     }
 }
