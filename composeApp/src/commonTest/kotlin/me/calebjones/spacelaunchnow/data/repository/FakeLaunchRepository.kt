@@ -2,7 +2,6 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
@@ -178,7 +177,7 @@ class FakeLaunchRepository : LaunchRepository {
     override suspend fun getLaunchesByDayAndMonth(day: Int, month: Int, limit: Int): Result<PaginatedLaunchNormalList> =
         Result.failure(NotImplementedError("Not wired in fake"))
 
-    override suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed? = null
+    override suspend fun getStaleDetailedLaunch(id: String): Launch? = null
 
     override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> =
         Result.failure(NotImplementedError("Not wired in fake"))

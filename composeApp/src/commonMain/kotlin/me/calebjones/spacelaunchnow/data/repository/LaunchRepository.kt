@@ -2,7 +2,6 @@ package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
@@ -18,7 +17,7 @@ interface LaunchRepository {
         limit: Int = 100
     ): Result<PaginatedLaunchNormalList>
 
-    suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed?
+    suspend fun getStaleDetailedLaunch(id: String): Launch?
     suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed>
 
     suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList>
