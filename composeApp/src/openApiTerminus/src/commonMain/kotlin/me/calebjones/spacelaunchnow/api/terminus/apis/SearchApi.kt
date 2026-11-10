@@ -44,10 +44,10 @@ open class SearchApi : ApiClient {
 
 
     /**
-     * enum for parameter &#x60;when&#x60;
+     * enum for parameter `when`
      */
     @Serializable
-    enum class WhenSearchList(val value: kotlin.String) {
+    enum class `When`SearchList(val value: kotlin.String) {
         
         @SerialName(value = "any")
         any("any"),
@@ -62,15 +62,15 @@ open class SearchApi : ApiClient {
 
     /**
      * Search across resources
-     * One query across launches, events, astronauts, rockets (launcher configurations), spacecraft, pads, agencies and programs: a count per type and the best &#x60;limit&#x60; items per type. &#x60;top&#x60; is an exact name match when there is one (program, rocket, spacecraft, astronaut, launch), else the next upcoming launch, else the most recent one. The crew of a matching launch joins &#x60;astronauts&#x60; with &#x60;via_launch&#x60; set to that launch. The answer is cached for 300 seconds.
+     * One query across launches, events, astronauts, rockets (launcher configurations), spacecraft, pads, agencies and programs: a count per type and the best `limit` items per type. `top` is an exact name match when there is one (program, rocket, spacecraft, astronaut, launch), else the next upcoming launch, else the most recent one. The crew of a matching launch joins `astronauts` with `via_launch` set to that launch. The answer is cached for 300 seconds.
      * @param q The query, 2 to 100 characters.
      * @param limit Items per type, 1 to 10. Default 3. (optional)
      * @param types Comma list of: launches, events, astronauts, rockets, spacecraft, pads, agencies, programs. Default: all of them. (optional)
-     * @param `when` Launches and events only. Default &#x60;any&#x60;. (optional)
+     * @param `when` Launches and events only. Default `any`. (optional)
      * @return SearchResponse
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun searchList(q: kotlin.String, limit: kotlin.Int? = null, types: kotlin.String? = null, `when`: WhenSearchList? = null): HttpResponse<SearchResponse> {
+    open suspend fun searchList(q: kotlin.String, limit: kotlin.Int? = null, types: kotlin.String? = null, `when`: `When`SearchList? = null): HttpResponse<SearchResponse> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -81,7 +81,7 @@ open class SearchApi : ApiClient {
         limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
         q?.apply { localVariableQuery["q"] = listOf("$q") }
         types?.apply { localVariableQuery["types"] = listOf("$types") }
-        `when`?.apply { localVariableQuery["when"] = listOf("${ &#x60;when&#x60;.value }") }
+        `when`?.apply { localVariableQuery["when"] = listOf("${ `when`.value }") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
         val localVariableConfig = RequestConfig<kotlin.Any?>(
