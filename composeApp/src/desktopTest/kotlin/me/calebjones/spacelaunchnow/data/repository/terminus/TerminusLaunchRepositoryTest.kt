@@ -22,12 +22,17 @@ import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchesApi as TerminusLau
 import me.calebjones.spacelaunchnow.api.terminus.models.LaunchDetailed as TerminusLaunchDetailed
 import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.repository.createLaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.ll.LLLaunchRepositoryImpl
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
+import me.calebjones.spacelaunchnow.database.StatsLocalDataSource
+import me.calebjones.spacelaunchnow.di.LL_REPOSITORY
+import me.calebjones.spacelaunchnow.di.launchRepositoryModule
 import me.calebjones.spacelaunchnow.ui.viewmodel.InMemoryPreferencesDataStore
+import org.koin.core.qualifier.named
+import org.koin.dsl.koinApplication
+import org.koin.dsl.module
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -60,12 +65,18 @@ class TerminusLaunchRepositoryTest {
         val database: SpaceLaunchDatabase,
         val local: LaunchLocalDataSource,
         val llRepository: LLLaunchRepositoryImpl,
-        val terminusApi: TerminusLaunchesApi,
-    )
+        val repository: LaunchRepository,
+        private val terminusClientBuilt: () -> Boolean,
+    ) {
+        /** True once Koin has resolved the Terminus client (the provider ran). */
+        val terminusClientWasBuilt: Boolean get() = terminusClientBuilt()
+    }
 
     private val jsonHeaders: Headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
 
-    private fun env(terminusHandler: (String) -> Reply): Env {
+    private fun env(terminusHandler: (String) -> Reply): Env = envFor(DataBackend.TERMINUS, terminusHandler)
+
+    private fun envFor(backend: DataBackend, terminusHandler: (String) -> Reply): Env {
         val terminusRequests = mutableListOf<String>()
         val llRequests = mutableListOf<String>()
         val terminusEngine = MockEngine { request ->
@@ -82,20 +93,34 @@ class TerminusLaunchRepositoryTest {
         val database = SpaceLaunchDatabase(driver)
         val preferences = AppPreferences(InMemoryPreferencesDataStore())
         val local = LaunchLocalDataSource(database, preferences)
-        val ll = LLLaunchRepositoryImpl(
-            launchesApi = LLLaunchesApi(baseUrl = "https://ll.test", httpClientEngine = llEngine),
-            agenciesApi = AgenciesApi(baseUrl = "https://ll.test", httpClientEngine = llEngine),
-            appPreferences = preferences,
-            localDataSource = local
-        )
+        var terminusClientBuilt = false
+        // The production module picks the repository by backend; the test supplies its inputs.
+        val koin = koinApplication {
+            modules(
+                module {
+                    single { preferences }
+                    single { local }
+                    single { StatsLocalDataSource(database, preferences) }
+                    single { LLLaunchesApi(baseUrl = "https://ll.test", httpClientEngine = llEngine) }
+                    single { AgenciesApi(baseUrl = "https://ll.test", httpClientEngine = llEngine) }
+                    single<TerminusLaunchesApi> {
+                        terminusClientBuilt = true
+                        TerminusLaunchesApi(baseUrl = "https://terminus.test", httpClientEngine = terminusEngine)
+                    }
+                    single<DataBackend> { backend }
+                },
+                launchRepositoryModule()
+            )
+        }.koin
         return Env(
-            terminusRequests, llRequests, database, local, ll,
-            TerminusLaunchesApi(baseUrl = "https://terminus.test", httpClientEngine = terminusEngine)
+            terminusRequests, llRequests, database, local,
+            koin.get<LLLaunchRepositoryImpl>(named(LL_REPOSITORY)), koin.get<LaunchRepository>(),
+            { terminusClientBuilt }
         )
     }
 
     private fun Env.terminusRepository(): LaunchRepository =
-        createLaunchRepository(DataBackend.TERMINUS, llRepository, { terminusApi }, local)
+        repository
 
     private fun okWith(body: String = fixture): (String) -> Reply = { Reply(body) }
 
@@ -106,23 +131,14 @@ class TerminusLaunchRepositoryTest {
 
     @Test
     fun llBackendMakesZeroTerminusCalls() = runTest {
-        val env = env(okWith())
-        var terminusClientBuilt = false
-        val repository = createLaunchRepository(
-            backend = DataBackend.LL,
-            llRepository = env.llRepository,
-            terminusLaunchesApi = {
-                terminusClientBuilt = true
-                env.terminusApi
-            },
-            localDataSource = env.local
-        )
+        val env = envFor(DataBackend.LL, okWith())
+        val repository = env.repository
 
         assertSame(env.llRepository, repository)
         val result = repository.getLaunchDetailDomain(fixtureId)
 
         assertTrue(result.isSuccess, "LL detail failed: ${result.exceptionOrNull()}")
-        assertFalse(terminusClientBuilt)
+        assertFalse(env.terminusClientWasBuilt)
         assertTrue(env.terminusRequests.isEmpty(), "Terminus got ${env.terminusRequests}")
         assertEquals(1, env.llRequests.size)
     }

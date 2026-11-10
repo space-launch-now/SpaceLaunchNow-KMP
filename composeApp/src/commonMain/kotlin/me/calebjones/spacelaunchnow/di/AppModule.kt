@@ -32,9 +32,6 @@ import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.repository.ll.LLLaunchRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.createLaunchRepository
-import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchesApi as TerminusLaunchesApi
 import me.calebjones.spacelaunchnow.di.terminus.terminusApiModule
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepositoryImpl
@@ -136,7 +133,7 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, terminusApiModule, appModule, debugModule, imageLoaderModule, analyticsModule)
+    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
 }
 
 val appModule = module {
@@ -159,24 +156,6 @@ val appModule = module {
     single { StatsLocalDataSource(get(), get()) }
     single { TopicSubscriptionStore(get()) }
 
-    // The LL repository always exists: it is the default backend and the delegate of the
-    // Terminus one for every call not yet ported. The Terminus client is only resolved on
-    // DataBackend.TERMINUS, so the default path never builds it.
-    single<LaunchRepository> {
-        val llRepository = LLLaunchRepositoryImpl(
-            launchesApi = get(),
-            agenciesApi = get(),
-            appPreferences = get(),
-            localDataSource = get(),
-            statsLocalDataSource = get()
-        )
-        createLaunchRepository(
-            backend = get<DataBackend>(),
-            llRepository = llRepository,
-            terminusLaunchesApi = { get<TerminusLaunchesApi>() },
-            localDataSource = get()
-        )
-    }
     single<ArticlesRepository> {
         ArticlesRepositoryImpl(
             articlesApi = get(),
