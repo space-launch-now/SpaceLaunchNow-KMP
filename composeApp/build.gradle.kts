@@ -224,6 +224,7 @@ kotlin {
         commonMain {
             kotlin.srcDir("$projectDir/src/openApiLL/src/commonMain/kotlin")
             kotlin.srcDir("$projectDir/src/openApiSNAPI/src/commonMain/kotlin")
+            kotlin.srcDir("$projectDir/src/openApiTerminus/src/commonMain/kotlin")
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
@@ -506,10 +507,20 @@ tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("gen
     configFile.set("$projectDir/openapi-config-snapi.yaml")
 }
 
+// Register separate task for Terminus (SLN's own LL-compatible API) generation
+tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("generateTerminusClient") {
+    generatorName.set("kotlin")
+    // Normalize to forward slashes: mixing $projectDir backslashes with "/../" yields a
+    // malformed URI on Windows that the generator's spec validator rejects.
+    inputSpec.set(file("$projectDir/../schema/terminus_v1.yaml").absolutePath.replace("\\", "/"))
+    outputDir.set("$projectDir/src/openApiTerminus")
+    configFile.set("$projectDir/openapi-config-terminus.yaml")
+}
+
 // Convenience task to generate both API clients
 tasks.register("generateAllApiClients") {
-    dependsOn("openApiGenerate", "generateSnapiClient")
-    description = "Generate both Launch Library 2.4.0 and SNAPI v4 API clients"
+    dependsOn("openApiGenerate", "generateSnapiClient", "generateTerminusClient")
+    description = "Generate Launch Library 2.4.0, SNAPI v4, and Terminus API clients"
 }
 
 // Helper to safely copy build outputs (APKs/AABs). Checks for existence, avoids copying
