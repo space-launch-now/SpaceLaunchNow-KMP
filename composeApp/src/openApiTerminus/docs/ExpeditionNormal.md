@@ -1,0 +1,18 @@
+
+# ExpeditionNormal
+
+## Properties
+| Name | Type | Description | Notes |
+| ------------ | ------------- | ------------- | ------------- |
+| **id** | **kotlin.Int** |  |  [readonly] |
+| **url** | **kotlin.String** |  |  [readonly] |
+| **name** | **kotlin.String** |  |  |
+| **start** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
+| **end** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  |
+| **responseMode** | **kotlin.String** |  |  [readonly] |
+| **spacestation** | [**SpaceStationNormal**](SpaceStationNormal.md) |  |  |
+| **missionPatches** | [**kotlin.collections.List&lt;MissionPatch&gt;**](MissionPatch.md) |  |  |
+| **spacewalks** | [**kotlin.collections.List&lt;SpacewalkList&gt;**](SpacewalkList.md) |  |  |
+
+
+

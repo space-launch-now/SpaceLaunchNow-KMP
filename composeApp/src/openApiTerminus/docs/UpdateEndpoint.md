@@ -1,0 +1,18 @@
+
+# UpdateEndpoint
+
+## Properties
+| Name | Type | Description | Notes |
+| ------------ | ------------- | ------------- | ------------- |
+| **id** | **kotlin.Int** |  |  |
+| **profileImage** | **kotlin.String** |  |  |
+| **comment** | **kotlin.String** |  |  |
+| **infoUrl** | **kotlin.String** |  |  |
+| **createdBy** | **kotlin.String** |  |  |
+| **launch** | [**LaunchBasic**](LaunchBasic.md) |  |  |
+| **event** | [**EventMini**](EventMini.md) |  |  |
+| **program** | [**ProgramMini**](ProgramMini.md) |  |  |
+| **createdOn** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
+
+
+
