@@ -108,8 +108,6 @@ internal class LaunchListQuery private constructor(
         )
 
     companion object {
-        private fun List<Int>?.normalized(): List<Int>? = this?.takeIf { it.isNotEmpty() }?.distinct()?.sorted()
-
         fun of(
             limit: Int? = null,
             offset: Int? = null,
@@ -136,16 +134,16 @@ internal class LaunchListQuery private constructor(
             previous = previous,
             ordering = ordering,
             search = search,
-            lspId = lspId.normalized(),
-            locationIds = locationIds.normalized(),
-            program = program.normalized(),
+            lspId = lspId.normalizedIds(),
+            locationIds = locationIds.normalizedIds(),
+            program = program.normalizedIds(),
             rocketConfigurationId = rocketConfigurationId,
             isCrewed = isCrewed,
             includeSuborbital = includeSuborbital,
-            statusIds = statusIds.normalized(),
-            orbitIds = orbitIds.normalized(),
-            missionTypeIds = missionTypeIds.normalized(),
-            launcherConfigFamilyIds = launcherConfigFamilyIds.normalized(),
+            statusIds = statusIds.normalizedIds(),
+            orbitIds = orbitIds.normalizedIds(),
+            missionTypeIds = missionTypeIds.normalizedIds(),
+            launcherConfigFamilyIds = launcherConfigFamilyIds.normalizedIds(),
             netGt = netGt?.let { TimeFilterRounding.floor(it) },
             netLt = netLt?.let { TimeFilterRounding.ceil(it) }
         )
