@@ -41,10 +41,20 @@ internal class LaunchListQuery private constructor(
     val netGt: Instant?,
     val netLt: Instant?
 ) {
-    /** Stable name of this request, for the cache. Every set filter appears, in a fixed order. */
-    val key: String = listOf(
+    /**
+     * Stable name of this request, for the cache only (never log it: it holds the search text).
+     * Every set filter appears, in a fixed order. Values are percent-encoded, so no value can
+     * forge another filter, and a long search is replaced by its length and a hash.
+     */
+    val key: String = describe(searchPart = search?.let { keyedSearch(it) })
+
+    /** Name of this request for logs: the same filters, but the search text is shown as `<set>`. */
+    val logLabel: String = describe(searchPart = search?.let { "<set>" })
+
+    private fun describe(searchPart: String?): String = listOf(
         "limit" to limit, "offset" to offset, "upcoming" to upcoming, "previous" to previous,
-        "ordering" to ordering, "search" to search, "lsp__id" to lspId?.joinToString(","),
+        "ordering" to ordering?.let { encode(it) }, "search" to searchPart,
+        "lsp__id" to lspId?.joinToString(","),
         "location__ids" to locationIds?.joinToString(","), "program" to program?.joinToString(","),
         "rocket__configuration__id" to rocketConfigurationId, "is_crewed" to isCrewed,
         "include_suborbital" to includeSuborbital, "status__ids" to statusIds?.joinToString(","),
@@ -98,6 +108,32 @@ internal class LaunchListQuery private constructor(
         )
 
     companion object {
+        private const val MAX_KEY_SEARCH_CHARS = 64
+
+        /** Percent-encodes everything but ASCII letters, digits and `-._~`. */
+        private fun encode(value: String): String = buildString {
+            for (byte in value.encodeToByteArray()) {
+                val c = byte.toInt() and 0xFF
+                val plain = c < 0x80 && (c.toChar().isLetterOrDigit() || c.toChar() in "-._~")
+                if (plain) append(c.toChar()) else {
+                    append('%')
+                    append("0123456789ABCDEF"[c shr 4])
+                    append("0123456789ABCDEF"[c and 0xF])
+                }
+            }
+        }
+
+        /** The encoded search, or `h<length>:<FNV-1a 64 hash>` when it is long. `:` never appears encoded. */
+        private fun keyedSearch(search: String): String {
+            val encoded = encode(search)
+            if (encoded.length <= MAX_KEY_SEARCH_CHARS) return encoded
+            var hash = -0x340d631b7bdddcdbL
+            for (byte in search.encodeToByteArray()) {
+                hash = (hash xor (byte.toLong() and 0xFF)) * 0x100000001b3L
+            }
+            return "h${search.length}:${hash.toULong().toString(16)}"
+        }
+
         private fun List<Int>?.normalized(): List<Int>? = this?.takeIf { it.isNotEmpty() }?.distinct()?.sorted()
 
         fun of(

@@ -165,7 +165,7 @@ class TerminusLaunchRepositoryImpl(
 
     private suspend fun miniList(query: LaunchListQuery): Result<TerminusFetched<PaginatedResult<Launch>>> =
         terminusCachedFetch(
-            what = "launch mini list ${query.key}",
+            what = "launch mini list ${query.logLabel}",
             forceRefresh = false,
             readFresh = {
                 localDataSource?.getTerminusMiniList(query.key)?.let { TerminusCacheHit(it.value, it.cachedAt) }
@@ -182,7 +182,7 @@ class TerminusLaunchRepositoryImpl(
         forceRefresh: Boolean
     ): Result<DataResult<PaginatedResult<Launch>>> =
         terminusCachedFetch(
-            what = "launch list ${query.key}",
+            what = "launch list ${query.logLabel}",
             forceRefresh = forceRefresh,
             readFresh = {
                 localDataSource?.getTerminusNormalList(query.key)?.let { TerminusCacheHit(it.value, it.cachedAt) }

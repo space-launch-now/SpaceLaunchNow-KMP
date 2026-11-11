@@ -452,4 +452,30 @@ class TerminusLaunchListRepositoryTest {
     /** The cache row id of the list the `limit=3` upcoming request made. */
     private fun cacheId(kind: String): String =
         "terminus-list:$kind:" + LaunchListQuery.of(limit = 3, upcoming = true, ordering = "net").key
+
+    @Test
+    fun logLabelNeverContainsSearchText() {
+        val query = LaunchListQuery.of(limit = 3, search = "secret rocket", lspId = listOf(4))
+        assertFalse(query.logLabel.contains("secret"))
+        assertFalse(query.logLabel.contains("rocket"))
+        assertTrue(query.logLabel.contains("search=<set>"))
+        assertTrue(query.logLabel.contains("lsp__id=4"))
+        assertTrue(query.key.contains("secret"))
+    }
+
+    @Test
+    fun keyDiffersWhenSearchForgesAnotherFilter() {
+        val forged = LaunchListQuery.of(search = "x&lsp__id=1")
+        val real = LaunchListQuery.of(search = "x", lspId = listOf(1))
+        assertTrue(forged.key != real.key)
+        assertTrue(LaunchListQuery.of(search = "a=b").key != LaunchListQuery.of(search = "a%3Db").key)
+    }
+
+    @Test
+    fun keyStaysShortForLongSearch() {
+        val a = LaunchListQuery.of(search = "a".repeat(5000))
+        val b = LaunchListQuery.of(search = "a".repeat(4999) + "b")
+        assertTrue(a.key.length < 100)
+        assertTrue(a.key != b.key)
+    }
 }
