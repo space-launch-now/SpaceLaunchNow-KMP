@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.model.DataBackend
+import me.calebjones.spacelaunchnow.data.model.TerminusHost
 import me.calebjones.spacelaunchnow.data.model.NotificationData
 import me.calebjones.spacelaunchnow.data.model.NotificationFilter
 import me.calebjones.spacelaunchnow.data.model.NotificationHistoryItem
@@ -41,7 +42,9 @@ class DebugSettingsViewModel(
     private val notificationHistoryStorage: NotificationHistoryStorage? = null,
     private val cacheWiper: CacheWiper? = null,
     /** The data source resolved at app start; changes to the override apply on restart. */
-    val activeDataBackend: DataBackend? = null
+    val activeDataBackend: DataBackend? = null,
+    /** The Terminus base URL resolved at app start; changes to the host apply on restart. */
+    activeTerminusBaseUrl: String? = null
 ) : ViewModel() {
 
     private val _debugSettings = MutableStateFlow(
@@ -204,6 +207,25 @@ class DebugSettingsViewModel(
                 _statusMessage.value = "Switched to local API URL"
             } catch (e: Exception) {
                 _statusMessage.value = "Failed to switch to local URL: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /** The Terminus host in use this launch, or null when unknown. */
+    val activeTerminusHost: TerminusHost? = TerminusHost.fromBaseUrl(activeTerminusBaseUrl)
+
+    fun setTerminusHost(host: TerminusHost) {
+        if (debugPreferences == null) return
+
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                debugPreferences.setTerminusHost(host)
+                _statusMessage.value = "Terminus host set to ${host.name} (restart to apply)"
+            } catch (e: Exception) {
+                _statusMessage.value = "Failed to update Terminus host: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

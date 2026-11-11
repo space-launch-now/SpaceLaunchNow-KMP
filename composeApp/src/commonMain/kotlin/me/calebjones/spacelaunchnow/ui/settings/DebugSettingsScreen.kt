@@ -68,6 +68,7 @@ import coil3.SingletonImageLoader
 import coil3.compose.LocalPlatformContext
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.DataBackend
+import me.calebjones.spacelaunchnow.data.model.TerminusHost
 import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
@@ -720,6 +721,33 @@ private fun DataSourceCard(
                 )
                 Text(
                     text = "Active this launch: ${debugViewModel.activeDataBackend?.name ?: "unknown"}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                HorizontalDivider()
+                Text(
+                    text = "Terminus host. Prod is the default. Restart the app after changing it.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TerminusHost.entries.forEach { host ->
+                        OutlinedButton(
+                            onClick = { debugViewModel.setTerminusHost(host) },
+                            enabled = !isLoading,
+                            modifier = Modifier.weight(1f)
+                        ) { Text(host.name.lowercase().replaceFirstChar { it.uppercase() }, fontSize = 12.sp) }
+                    }
+                }
+                Text(
+                    text = "Selected host: ${debugSettings.terminusHost.name}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Active host this launch: ${debugViewModel.activeTerminusHost?.name ?: "unknown"}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
