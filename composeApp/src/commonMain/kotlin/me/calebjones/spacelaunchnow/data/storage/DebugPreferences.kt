@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
 import me.calebjones.spacelaunchnow.data.model.DataBackend
+import me.calebjones.spacelaunchnow.data.model.TerminusHost
 
 /**
  * Debug-specific preferences for development and testing
@@ -18,6 +19,8 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         // Local override of the DataBackend flag. Null = follow Firebase Remote Config's
         // `data_backend` key.
         private val DATA_BACKEND_OVERRIDE = stringPreferencesKey("debug_data_backend_override")
+        // Terminus host choice (Prod / Staging). Absent = Prod. Debug builds only.
+        private val TERMINUS_HOST = stringPreferencesKey("debug_terminus_host")
         private val USE_FCM_DEBUG_TOPICS = booleanPreferencesKey("debug_use_fcm_debug_topics")
         // Sampling is a debug-only cost knob now; user-facing cost control is the
         // DiagnosticLevel consent (OFF = NOT_GRANTED = nothing uploads).
@@ -47,6 +50,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
             useCustomApiUrl = preferences[USE_CUSTOM_API_URL] ?: false,
             customApiBaseUrl = preferences[CUSTOM_API_BASE_URL] ?: PROD_API_URL,
             dataBackendOverride = DataBackend.parseOrNull(preferences[DATA_BACKEND_OVERRIDE]),
+            terminusHost = TerminusHost.parseOrNull(preferences[TERMINUS_HOST]) ?: TerminusHost.DEFAULT,
             useDebugTopics = preferences[USE_FCM_DEBUG_TOPICS] ?: false,
             datadogSampleRate = preferences[DATADOG_SAMPLE_RATE] ?: 100f,
             debugSubscriptionActive = preferences[DEBUG_SUBSCRIPTION_ACTIVE] ?: false,
@@ -162,6 +166,11 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+    /** Persist the Terminus host choice. Applies after a restart. */
+    suspend fun setTerminusHost(host: TerminusHost) {
+        dataStore.edit { preferences -> preferences[TERMINUS_HOST] = host.value }
+    }
+
     /**
      * Enable debug subscription simulation
      */
@@ -205,6 +214,8 @@ data class DebugSettings(
     val customApiBaseUrl: String = DebugPreferences.PROD_API_URL,
     /** Local override of the DataBackend flag; null follows Remote Config. */
     val dataBackendOverride: DataBackend? = null,
+    /** Stored Terminus host choice; only debug builds honour it. */
+    val terminusHost: TerminusHost = TerminusHost.DEFAULT,
     val useDebugTopics: Boolean = false,
     val datadogSampleRate: Float = 100f,
     val debugSubscriptionActive: Boolean = false,

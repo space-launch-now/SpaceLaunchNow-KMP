@@ -515,4 +515,28 @@ class DebugSettingsViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
         assertNull(prefs.getDebugSettings().dataBackendOverride)
     }
+
+    @Test
+    fun `setTerminusHost persists Staging, defaults to Prod, and survives clearAllCaches`() = runTest {
+        val prefs = DebugPreferences(InMemoryPreferencesDataStore())
+        val wiper = FakeCacheWiper()
+        val vm = DebugSettingsViewModel(
+            debugPreferences = prefs,
+            billingManager = billingManager,
+            launchRepository = null,
+            notificationRepository = null,
+            cacheWiper = wiper,
+            activeTerminusBaseUrl = "https://terminus.spacelaunchnow.app"
+        )
+        assertEquals(me.calebjones.spacelaunchnow.data.model.TerminusHost.PROD, prefs.getDebugSettings().terminusHost)
+        assertEquals(me.calebjones.spacelaunchnow.data.model.TerminusHost.PROD, vm.activeTerminusHost)
+
+        vm.setTerminusHost(me.calebjones.spacelaunchnow.data.model.TerminusHost.STAGING)
+        testDispatcher.scheduler.advanceUntilIdle()
+        vm.clearAllCaches()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(1, wiper.clearCalls)
+        assertEquals(me.calebjones.spacelaunchnow.data.model.TerminusHost.STAGING, prefs.getDebugSettings().terminusHost)
+    }
 }

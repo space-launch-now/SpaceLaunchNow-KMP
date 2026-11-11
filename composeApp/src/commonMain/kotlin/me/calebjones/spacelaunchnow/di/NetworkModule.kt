@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 
 import me.calebjones.spacelaunchnow.util.EnvironmentManager
 import me.calebjones.spacelaunchnow.util.BuildConfig
+import me.calebjones.spacelaunchnow.data.model.resolveTerminusHost
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -78,7 +79,18 @@ val networkModule = module {
 
     // Terminus base URL: host only, the generated schema paths already carry /api/v1.
     // Distinct from "BaseUrl" so debug-menu URL switching never redirects Terminus.
+    // Prod by default and in every release build; debug builds follow the stored choice.
+    // Resolved once per Koin graph, so a change applies after restart.
     single<String>(named("TerminusBaseUrl")) {
-        "https://staging-terminus.spacelaunchnow.app"
+        val stored = if (BuildConfig.IS_DEBUG) {
+            try {
+                getOrNull<DebugPreferences>()?.let { runBlocking { it.getDebugSettings().terminusHost } }
+            } catch (e: Exception) {
+                null
+            }
+        } else {
+            null
+        }
+        resolveTerminusHost(BuildConfig.IS_DEBUG, stored).baseUrl
     }
 }

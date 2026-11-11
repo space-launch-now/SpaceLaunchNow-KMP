@@ -489,7 +489,8 @@ val debugModule = module {
             pushMessaging = getOrNull(),
             notificationHistoryStorage = get(),  // NOT optional - we need this!
             cacheWiper = getOrNull(),
-            activeDataBackend = getOrNull()
+            activeDataBackend = getOrNull(),
+            activeTerminusBaseUrl = getOrNull(named("TerminusBaseUrl"))
         )
     }
 }
