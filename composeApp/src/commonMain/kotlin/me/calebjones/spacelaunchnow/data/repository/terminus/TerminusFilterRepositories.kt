@@ -48,10 +48,7 @@ class TerminusScheduleFilterRepositoryImpl internal constructor(
         { limit, offset -> agenciesApi.agenciesMiniList(limit = limit, offset = offset, ordering = "name", featured = true) }
     ) { page -> FilterPage(page.results.map { FilterOption(it.id, it.name, it.abbrev) }, page.count) }
 
-    override suspend fun getPrograms(forceRefresh: Boolean) = fetcher.options(
-        "programs", forceRefresh,
-        { limit, offset -> programsApi.programsMiniList(limit = limit, offset = offset, ordering = "name") }
-    ) { page -> FilterPage(page.results.map { FilterOption(it.id, it.name) }, page.count) }
+    override suspend fun getPrograms(forceRefresh: Boolean) = programs(programsApi, fetcher, forceRefresh)
 
     override suspend fun getRockets(forceRefresh: Boolean) = fetcher.options(
         "rockets", forceRefresh,
@@ -102,10 +99,7 @@ class TerminusRocketFilterRepositoryImpl internal constructor(
         launcherConfigurationFamiliesApi: LauncherConfigurationFamiliesApi
     ) : this(programsApi, launcherConfigurationFamiliesApi, TerminusFilterFetcher())
 
-    override suspend fun getPrograms(forceRefresh: Boolean) = fetcher.options(
-        "programs", forceRefresh,
-        { limit, offset -> programsApi.programsMiniList(limit = limit, offset = offset, ordering = "name") }
-    ) { page -> FilterPage(page.results.map { FilterOption(it.id, it.name) }, page.count) }
+    override suspend fun getPrograms(forceRefresh: Boolean) = programs(programsApi, fetcher, forceRefresh)
 
     override suspend fun getFamilies(forceRefresh: Boolean) =
         launcherFamilies(launcherConfigurationFamiliesApi, fetcher, forceRefresh)
@@ -124,7 +118,17 @@ class TerminusAstronautFilterRepositoryImpl internal constructor(
     ) { page -> FilterPage(page.results.map { FilterOption(it.id, it.name) }, page.count) }
 }
 
-/** Launcher families feed the schedule and the rocket list; one read, one cache key. */
+/** Programs feed the schedule and the rocket list; both read them the same way. */
+private suspend fun programs(
+    api: ProgramsApi,
+    fetcher: TerminusFilterFetcher,
+    forceRefresh: Boolean
+) = fetcher.options(
+    "programs", forceRefresh,
+    { limit, offset -> api.programsMiniList(limit = limit, offset = offset, ordering = "name") }
+) { page -> FilterPage(page.results.map { FilterOption(it.id, it.name) }, page.count) }
+
+/** Launcher families feed the schedule and the rocket list; both read them the same way. */
 private suspend fun launcherFamilies(
     api: LauncherConfigurationFamiliesApi,
     fetcher: TerminusFilterFetcher,
