@@ -84,9 +84,9 @@ Each provides:
 Updated 4 repository implementations to use cache-first strategy:
 
 - `LaunchRepositoryImpl`
-- `EventsRepositoryImpl`
+- `LLEventsRepositoryImpl` (`TerminusEventsRepositoryImpl` on the Terminus backend)
 - `ArticlesRepositoryImpl`
-- `UpdatesRepositoryImpl`
+- `LLUpdatesRepositoryImpl` (`TerminusUpdatesRepositoryImpl` on the Terminus backend)
 
 Pattern:
 ```kotlin
