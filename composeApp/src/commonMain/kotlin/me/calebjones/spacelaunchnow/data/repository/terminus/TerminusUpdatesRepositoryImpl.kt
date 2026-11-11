@@ -51,13 +51,12 @@ class TerminusUpdatesRepositoryImpl internal constructor(
             "all__program" to allProgram
         )
         log.d { "terminus read updates limit=$limit allProgram=$allProgram forceRefresh=$forceRefresh" }
-        return terminusCachedFetch(
+        return terminusMemoryCachedFetch(
+            cache = cache,
+            key = key,
             what = "updates limit=$limit allProgram=$allProgram",
             forceRefresh = forceRefresh,
-            readFresh = { cache.fresh(key) },
-            readStale = { cache.stale(key) },
-            fetch = { updatesApi.updatesList(limit = limit, ordering = ordering, allProgram = allProgram) },
-            store = { cache.put(key, it) }
+            fetch = { updatesApi.updatesList(limit = limit, ordering = ordering, allProgram = allProgram) }
         ).mapCatching { DataResult(it.value.toDomain(), it.source, it.timestamp) }
     }
 }

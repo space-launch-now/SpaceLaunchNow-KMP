@@ -85,3 +85,19 @@ internal suspend fun <T : Any> terminusCachedFetch(
         Result.failure(e)
     }
 }
+
+/** [terminusCachedFetch] over a [TerminusMemoryCache]: read fresh and stale by [key], store on success. */
+internal suspend fun <T : Any> terminusMemoryCachedFetch(
+    cache: TerminusMemoryCache,
+    key: String,
+    what: String,
+    forceRefresh: Boolean,
+    fetch: suspend () -> HttpResponse<T>
+): Result<TerminusFetched<T>> = terminusCachedFetch(
+    what = what,
+    forceRefresh = forceRefresh,
+    readFresh = { cache.fresh(key) },
+    readStale = { cache.stale(key) },
+    fetch = fetch,
+    store = { cache.put(key, it) }
+)

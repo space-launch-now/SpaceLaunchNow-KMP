@@ -41,14 +41,7 @@ class TerminusEventsRepositoryImpl internal constructor(
         fetch: suspend () -> HttpResponse<T>
     ): Result<TerminusFetched<T>> {
         log.d { "terminus read $what, forceRefresh: $forceRefresh" }
-        return terminusCachedFetch(
-            what = what,
-            forceRefresh = forceRefresh,
-            readFresh = { cache.fresh(key) },
-            readStale = { cache.stale(key) },
-            fetch = fetch,
-            store = { cache.put(key, it) }
-        )
+        return terminusMemoryCachedFetch(cache, key, what, forceRefresh, fetch)
     }
 
     private suspend fun list(query: EventListQuery, forceRefresh: Boolean = false) =
