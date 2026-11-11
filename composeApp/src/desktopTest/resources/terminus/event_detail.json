@@ -1,0 +1,133 @@
+{
+ "id": 1201,
+ "url": "https://staging-terminus.spacelaunchnow.app/api/v1/events/1201/",
+ "name": "ISS US Spacewalk",
+ "response_mode": "detailed",
+ "info_urls": [
+  {
+   "priority": 1,
+   "source": "NASA",
+   "title": "Event page",
+   "description": null,
+   "feature_image": null,
+   "url": "https://example.test/event",
+   "type": {
+    "id": 1,
+    "name": "Official Website"
+   },
+   "language": {
+    "id": 1,
+    "name": "English",
+    "code": "en"
+   }
+  }
+ ],
+ "vid_urls": [],
+ "image": {
+  "id": 3101,
+  "name": "Crew-12 spacewalk preview",
+  "image_url": "https://example.test/media/events/spacewalk.jpg",
+  "thumbnail_url": "https://example.test/media/events/spacewalk_thumb.jpg",
+  "credit": "NASA",
+  "license": {
+   "id": 1,
+   "name": "Public domain",
+   "priority": 1,
+   "link": "https://example.test/license"
+  },
+  "single_use": false,
+  "variants": []
+ },
+ "slug": "iss-us-spacewalk",
+ "type": {
+  "id": 5,
+  "name": "Spacewalk"
+ },
+ "date_precision": {
+  "id": 2,
+  "name": "Hour",
+  "abbrev": "HR",
+  "description": "The T-0 is accurate to the hour."
+ },
+ "duration": "06:30:00",
+ "phase": "scheduled",
+ "updates": [
+  {
+   "id": 9001,
+   "profile_image": "https://example.test/media/profile/ops.jpg",
+   "comment": "Spacewalk start moved up 30 minutes.",
+   "info_url": "https://example.test/news/spacewalk",
+   "created_by": "Mission Ops",
+   "created_on": "2026-11-02T14:05:00Z"
+  }
+ ],
+ "date": "2026-11-14T13:00:00Z",
+ "description": "Planned work outside the station.",
+ "webcast_live": false,
+ "location": "International Space Station",
+ "last_updated": "2026-11-02T14:05:00Z",
+ "agencies": [],
+ "launches": [
+  {
+   "id": "ef9850ad-1096-425b-9d27-f7bbd186e61a",
+   "url": "https://staging-terminus.spacelaunchnow.app/api/v1/launches/ef9850ad-1096-425b-9d27-f7bbd186e61a/",
+   "name": "Vulcan VC6L | Amazon Leo (LV-01)",
+   "response_mode": "list",
+   "slug": "vulcan-vc6l-amazon-leo-lv-01",
+   "previous_slugs": [],
+   "launch_designator": null,
+   "status": {
+    "id": 2,
+    "name": "To Be Determined",
+    "abbrev": "TBD",
+    "description": "Current date is a placeholder or rough estimation based on unreliable or interpreted sources."
+   },
+   "last_updated": "2026-10-28T15:16:48Z",
+   "net": "2026-11-13T00:00:00Z",
+   "net_precision": {
+    "id": 5,
+    "name": "Day",
+    "abbrev": "DAY",
+    "description": "The T-0 is expected on the given day."
+   },
+   "window_end": "2026-11-13T00:00:00Z",
+   "window_start": "2026-11-13T00:00:00Z",
+   "image": {
+    "id": 1864,
+    "name": "Vulcan VC6L render",
+    "image_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/vulcan_vc6l_image_20220406123130.jpg",
+    "thumbnail_url": "https://thespacedevs-dev.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305193955.jpeg",
+    "credit": "United Launch Alliance",
+    "license": {
+     "id": 10,
+     "name": "ULA Image Use Policy",
+     "priority": 3,
+     "link": "https://www.ulalaunch.com/terms-and-conditions"
+    },
+    "single_use": true,
+    "variants": []
+   },
+   "launch_service_provider": {
+    "response_mode": "list",
+    "id": 124,
+    "url": "https://staging-terminus.spacelaunchnow.app/api/v1/agencies/124/",
+    "name": "United Launch Alliance",
+    "abbrev": "ULA",
+    "type": {
+     "id": 3,
+     "name": "Commercial"
+    }
+   },
+   "infographic": null,
+   "location_name": "Cape Canaveral SFS, FL, USA",
+   "pad_name": "Space Launch Complex 41",
+   "rocket_configuration_name": "Vulcan VC6L",
+   "mission_name": "Amazon Leo (LV-01)",
+   "webcast_live": false
+  }
+ ],
+ "expeditions": [],
+ "spacestations": [],
+ "program": [],
+ "astronauts": []
+}

@@ -27,8 +27,6 @@ import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.EventsRepository
-import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -57,8 +55,6 @@ import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
-import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
-import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialGate
@@ -133,7 +129,7 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
+    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), eventsUpdatesRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
 }
 
 val appModule = module {
@@ -192,7 +188,6 @@ val appModule = module {
     viewModelOf(::StarshipViewModel)
 
     viewModelOf(::ScheduleViewModel)
-    singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
@@ -227,19 +222,6 @@ val appModule = module {
             localDataSource = get()
         )
     }
-    single<EventsRepository> {
-        EventsRepositoryImpl(
-            eventsApi = get(),
-            configApi = get(),
-            localDataSource = get()
-        )
-    }
-    single<UpdatesRepository> {
-        UpdatesRepositoryImpl(
-            updatesApi = get(),
-            localDataSource = get()
-        )
-    }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
 
@@ -247,7 +229,7 @@ val appModule = module {
     // granularity, no hot swap). The DebugPreferences override wins when set (debug builds
     // only); otherwise Remote Config's `data_backend` key, which falls back to LL on any
     // failure. Release users therefore stay on LL until the flag is set.
-    // The launch repository branches on this value (launch detail on Terminus); the other
+    // The launch, events and updates repositories branch on this value; the other
     // repositories still read LL until their Tasks#1006 ports land.
     single<DataBackend> {
         val remote = try {

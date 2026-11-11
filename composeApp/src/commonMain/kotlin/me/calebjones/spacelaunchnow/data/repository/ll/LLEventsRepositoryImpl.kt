@@ -1,5 +1,6 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
+import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getEventList
@@ -22,7 +23,7 @@ import kotlin.time.Clock
 import kotlin.time.Clock.System
 
 
-class EventsRepositoryImpl(
+class LLEventsRepositoryImpl(
     private val eventsApi: EventsApi,
     private val configApi: ConfigApi,
     private val localDataSource: EventLocalDataSource? = null

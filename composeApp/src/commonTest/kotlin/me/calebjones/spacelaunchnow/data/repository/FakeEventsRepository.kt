@@ -101,7 +101,7 @@ class FakeEventsRepository : EventsRepository {
     ): Result<DataResult<PaginatedResult<Event>>> {
         getEventsPaginatedDomainCalled = true
         eventsPaginatedOffsetsRequested += offset
-        // Returned rather than thrown, matching EventsRepositoryImpl, whose
+        // Returned rather than thrown, matching LLEventsRepositoryImpl, whose
         // `catch (e: Exception)` swallows CancellationException into a Result.failure.
         try {
             eventGatesByOffset[offset]?.await()

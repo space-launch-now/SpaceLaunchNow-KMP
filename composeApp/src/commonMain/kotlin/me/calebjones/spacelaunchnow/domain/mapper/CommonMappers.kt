@@ -26,6 +26,7 @@ import me.calebjones.spacelaunchnow.domain.model.InfoLink
 import me.calebjones.spacelaunchnow.domain.model.LandingAttemptSummary
 import me.calebjones.spacelaunchnow.domain.model.LandingLocationSummary
 import me.calebjones.spacelaunchnow.domain.model.LandingTypeSummary
+import me.calebjones.spacelaunchnow.domain.model.LaunchRef
 import me.calebjones.spacelaunchnow.domain.model.LauncherSummary
 import me.calebjones.spacelaunchnow.domain.model.Location
 import me.calebjones.spacelaunchnow.domain.model.MissionPatchSummary
@@ -429,7 +430,7 @@ fun UpdateEndpoint.toDomain(): DomainUpdate = DomainUpdate(
     infoUrl = infoUrl,
     createdBy = createdBy,
     createdOn = createdOn,
-    launch = launch?.toDomain(),
+    launch = launch?.let { LaunchRef(id = it.id, name = it.name ?: "") },
     event = event?.let { UpdateEventRef(id = it.id, name = it.name) },
     program = program?.toDomain()
 )

@@ -307,6 +307,12 @@ data class TimelineEntry(
     val relativeTime: String?
 )
 
+/** The launch an update is about. Updates need only its id (to open it) and its name. */
+data class LaunchRef(
+    val id: String,
+    val name: String
+)
+
 data class UpdateEventRef(
     val id: Int,
     val name: String
@@ -319,7 +325,7 @@ data class Update(
     val infoUrl: String?,
     val createdBy: String?,
     val createdOn: Instant?,
-    val launch: Launch? = null,
+    val launch: LaunchRef? = null,
     val event: UpdateEventRef? = null,
     val program: ProgramSummary? = null
 )

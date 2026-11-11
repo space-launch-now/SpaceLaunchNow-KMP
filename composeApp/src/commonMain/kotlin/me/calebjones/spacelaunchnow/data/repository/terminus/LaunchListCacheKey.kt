@@ -20,3 +20,13 @@ internal object LaunchListCacheKey {
         return "h${search.length}:${hash.toULong().toString(16)}"
     }
 }
+
+/**
+ * Cache key of one request: the kind, then every set part in the given order. Values are
+ * percent-encoded, so no value can forge another part. A search is encoded (long ones hashed) by
+ * the caller through [LaunchListCacheKey.search]. Never log a key: it holds the search text.
+ */
+internal fun terminusCacheKey(kind: String, vararg parts: Pair<String, Any?>): String =
+    kind + "?" + parts.filter { it.second != null }.joinToString("&") { "${it.first}=${it.second}" }
+
+internal fun List<Int>?.normalizedIds(): List<Int>? = this?.takeIf { it.isNotEmpty() }?.distinct()?.sorted()
