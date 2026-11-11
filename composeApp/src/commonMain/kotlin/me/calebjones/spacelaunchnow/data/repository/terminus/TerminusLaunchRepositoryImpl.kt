@@ -71,7 +71,8 @@ class TerminusLaunchRepositoryImpl(
         limit: Int,
         offset: Int,
         netGt: Instant?,
-        netLt: Instant?
+        netLt: Instant?,
+        forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> {
         // Same arguments as the LL repository: a time window replaces the `upcoming` flag.
         val query = if (netGt != null || netLt != null) {
@@ -79,15 +80,18 @@ class TerminusLaunchRepositoryImpl(
         } else {
             LaunchListQuery.of(limit = limit, offset = offset, upcoming = true, ordering = "net")
         }
-        return miniList(query).map { it.value }
+        return miniList(query, forceRefresh).map { it.value }
     }
 
     override suspend fun getPreviousLaunchesDomain(
         limit: Int,
-        offset: Int
+        offset: Int,
+        forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> =
-        miniList(LaunchListQuery.of(limit = limit, offset = offset, previous = true, ordering = "-net"))
-            .map { it.value }
+        miniList(
+            LaunchListQuery.of(limit = limit, offset = offset, previous = true, ordering = "-net"),
+            forceRefresh
+        ).map { it.value }
 
     override suspend fun getFilteredLaunchesDomain(
         limit: Int,
@@ -105,7 +109,8 @@ class TerminusLaunchRepositoryImpl(
         statusIds: List<Int>?,
         orbitIds: List<Int>?,
         missionTypeIds: List<Int>?,
-        launcherConfigFamilyIds: List<Int>?
+        launcherConfigFamilyIds: List<Int>?,
+        forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> =
         miniList(
             LaunchListQuery.of(
@@ -125,7 +130,8 @@ class TerminusLaunchRepositoryImpl(
                 orbitIds = orbitIds,
                 missionTypeIds = missionTypeIds,
                 launcherConfigFamilyIds = launcherConfigFamilyIds
-            )
+            ),
+            forceRefresh
         ).map { it.value }
 
     override suspend fun getUpcomingLaunchesNormalDomain(
@@ -164,10 +170,13 @@ class TerminusLaunchRepositoryImpl(
             forceRefresh
         )
 
-    private suspend fun miniList(query: LaunchListQuery): Result<TerminusFetched<PaginatedResult<Launch>>> =
+    private suspend fun miniList(
+        query: LaunchListQuery,
+        forceRefresh: Boolean
+    ): Result<TerminusFetched<PaginatedResult<Launch>>> =
         terminusCachedFetch(
             what = "launch mini list ${query.logLabel}",
-            forceRefresh = false,
+            forceRefresh = forceRefresh,
             readFresh = { localDataSource?.getTerminusMiniList(query.key) },
             readStale = { localDataSource?.getTerminusMiniListStale(query.key) },
             fetch = { query.fetchMini(launchesApi) },

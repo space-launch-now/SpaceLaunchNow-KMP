@@ -172,9 +172,9 @@ class ScheduleViewModel(
 
             // Reload both tabs
             log.d { "Loading Upcoming tab..." }
-            loadTab(ScheduleTab.Upcoming, reset = true)
+            loadTab(ScheduleTab.Upcoming, reset = true, forceRefresh = true)
             log.d { "Loading Previous tab..." }
-            loadTab(ScheduleTab.Previous, reset = true)
+            loadTab(ScheduleTab.Previous, reset = true, forceRefresh = true)
 
             // Wait a bit for both to complete
             delay(500)
@@ -183,25 +183,25 @@ class ScheduleViewModel(
         }
     }
 
-    private fun loadTab(tab: ScheduleTab, reset: Boolean) {
+    private fun loadTab(tab: ScheduleTab, reset: Boolean, forceRefresh: Boolean = false) {
         // Cancel any existing load for this tab
         when (tab) {
             ScheduleTab.Upcoming -> {
                 loadJobsUpcoming?.cancel()
                 loadJobsUpcoming = viewModelScope.launch {
-                    executeLoadTab(tab, reset)
+                    executeLoadTab(tab, reset, forceRefresh)
                 }
             }
             ScheduleTab.Previous -> {
                 loadJobsPrevious?.cancel()
                 loadJobsPrevious = viewModelScope.launch {
-                    executeLoadTab(tab, reset)
+                    executeLoadTab(tab, reset, forceRefresh)
                 }
             }
         }
     }
 
-    private suspend fun executeLoadTab(tab: ScheduleTab, reset: Boolean) {
+    private suspend fun executeLoadTab(tab: ScheduleTab, reset: Boolean, forceRefresh: Boolean) {
             log.d { "Loading tab: $tab, reset: $reset" }
             val requestVersion = queryVersion
             val tabState = getTabState(tab)
@@ -247,7 +247,8 @@ class ScheduleViewModel(
                         statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }?.toList(),
                         orbitIds = filterState.selectedOrbitIds.takeIf { it.isNotEmpty() }?.toList(),
                         missionTypeIds = filterState.selectedMissionTypeIds.takeIf { it.isNotEmpty() }?.toList(),
-                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }?.toList()
+                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }?.toList(),
+                        forceRefresh = forceRefresh
                     ).getOrThrow().also {
                         log.v { "Repository response received for PREVIOUS - count: ${it.count}" }
                     }
@@ -268,7 +269,8 @@ class ScheduleViewModel(
                         statusIds = filterState.selectedStatusIds.takeIf { it.isNotEmpty() }?.toList(),
                         orbitIds = filterState.selectedOrbitIds.takeIf { it.isNotEmpty() }?.toList(),
                         missionTypeIds = filterState.selectedMissionTypeIds.takeIf { it.isNotEmpty() }?.toList(),
-                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }?.toList()
+                        launcherConfigFamilyIds = filterState.selectedLauncherConfigFamilyIds.takeIf { it.isNotEmpty() }?.toList(),
+                        forceRefresh = forceRefresh
                     ).getOrThrow().also {
                         log.d { "Repository response received for UPCOMING - count: ${it.count}" }
                     }

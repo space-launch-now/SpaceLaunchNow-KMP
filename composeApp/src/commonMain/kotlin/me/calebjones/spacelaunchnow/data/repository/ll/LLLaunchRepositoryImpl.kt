@@ -1305,7 +1305,8 @@ class LLLaunchRepositoryImpl(
         limit: Int,
         offset: Int,
         netGt: Instant?,
-        netLt: Instant?
+        netLt: Instant?,
+        forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> {
         val result = if (netGt != null || netLt != null) {
             getUpcomingLaunchesList(limit, netGt, netLt)
@@ -1317,7 +1318,8 @@ class LLLaunchRepositoryImpl(
 
     override suspend fun getPreviousLaunchesDomain(
         limit: Int,
-        offset: Int
+        offset: Int,
+        forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> {
         return getPreviousLaunchesList(limit).map { it.toDomain() }
     }
@@ -1428,7 +1430,8 @@ class LLLaunchRepositoryImpl(
         statusIds: List<Int>?,
         orbitIds: List<Int>?,
         missionTypeIds: List<Int>?,
-        launcherConfigFamilyIds: List<Int>?
+        launcherConfigFamilyIds: List<Int>?,
+        forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> {
         return try {
             log.d { "getFilteredLaunchesDomain - limit: $limit, offset: $offset, upcoming: $upcoming, previous: $previous" }

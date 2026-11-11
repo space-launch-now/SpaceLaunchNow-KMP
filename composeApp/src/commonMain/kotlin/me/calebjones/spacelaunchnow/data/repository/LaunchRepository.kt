@@ -36,12 +36,14 @@ interface LaunchRepository {
         limit: Int,
         offset: Int = 0,
         netGt: Instant? = null,
-        netLt: Instant? = null
+        netLt: Instant? = null,
+        forceRefresh: Boolean = false
     ): Result<PaginatedResult<Launch>>
 
     suspend fun getPreviousLaunchesDomain(
         limit: Int,
-        offset: Int = 0
+        offset: Int = 0,
+        forceRefresh: Boolean = false
     ): Result<PaginatedResult<Launch>>
 
     suspend fun getFeaturedLaunchDomain(
@@ -104,6 +106,7 @@ interface LaunchRepository {
         statusIds: List<Int>? = null,
         orbitIds: List<Int>? = null,
         missionTypeIds: List<Int>? = null,
-        launcherConfigFamilyIds: List<Int>? = null
+        launcherConfigFamilyIds: List<Int>? = null,
+        forceRefresh: Boolean = false
     ): Result<PaginatedResult<Launch>>
 }
