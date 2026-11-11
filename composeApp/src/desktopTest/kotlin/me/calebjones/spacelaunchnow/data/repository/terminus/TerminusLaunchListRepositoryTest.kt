@@ -1,6 +1,8 @@
 package me.calebjones.spacelaunchnow.data.repository.terminus
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Severity
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.ContentType
@@ -28,6 +30,8 @@ import me.calebjones.spacelaunchnow.database.StatsLocalDataSource
 import me.calebjones.spacelaunchnow.di.LL_REPOSITORY
 import me.calebjones.spacelaunchnow.di.launchRepositoryModule
 import me.calebjones.spacelaunchnow.ui.viewmodel.InMemoryPreferencesDataStore
+import me.calebjones.spacelaunchnow.util.logging.LogConfig
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.core.qualifier.named
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -477,5 +481,40 @@ class TerminusLaunchListRepositoryTest {
         val b = LaunchListQuery.of(search = "a".repeat(4999) + "b")
         assertTrue(a.key.length < 100)
         assertTrue(a.key != b.key)
+    }
+
+    @Test
+    fun undecodableListEntryLogDoesNotContainSearchText() = runTest {
+        val lines = mutableListOf<String>()
+        val writer = object : LogWriter() {
+            override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
+                lines += message
+            }
+        }
+        SpaceLogger.initialize(LogConfig(Severity.Verbose, listOf(writer)))
+        try {
+            val env = env { error("Terminus must not be called") }
+            val query = LaunchListQuery.of(limit = 3, search = "secret rocket")
+            val now = Clock.System.now().toEpochMilliseconds()
+            env.database.launchQueries.insertOrReplaceDetailed(
+                id = "terminus-list:mini:" + query.key, name = "x", status_id = null, status_name = null,
+                net = null, window_end = null, window_start = null, launch_service_provider_id = null,
+                launch_service_provider_name = null, rocket_configuration_id = null,
+                rocket_configuration_name = null, pad_name = null, location_name = null, image_url = null,
+                mission_name = null, mission_description = null, json_data = "not json",
+                cached_at = now, expires_at = now + 60_000
+            )
+
+            assertNull(env.local.getTerminusMiniList(query.key))
+
+            val undecodable = lines.filter { it.contains("Undecodable") }
+            assertTrue(undecodable.isNotEmpty(), "expected an Undecodable log line, got $lines")
+            for (line in lines) {
+                assertFalse(line.contains("secret"), line)
+                assertFalse(line.contains("rocket"), line)
+            }
+        } finally {
+            SpaceLogger.initialize(LogConfig(Severity.Verbose, emptyList()))
+        }
     }
 }

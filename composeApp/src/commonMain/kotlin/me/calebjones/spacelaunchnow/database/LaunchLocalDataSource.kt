@@ -465,7 +465,7 @@ class LaunchLocalDataSource(
                 null
             }
         } catch (e: Exception) {
-            log.w(e) { "Undecodable Terminus list cache entry $id, treating as a miss" }
+            log.w(e) { "Undecodable Terminus $kind list cache entry, treating as a miss" }
             null
         }
     }
