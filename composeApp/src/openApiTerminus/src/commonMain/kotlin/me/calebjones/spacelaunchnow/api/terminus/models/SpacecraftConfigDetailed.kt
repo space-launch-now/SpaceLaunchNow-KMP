@@ -108,9 +108,9 @@ data class SpacecraftConfigDetailed (
 
     @SerialName(value = "flight_life") val flightLife: kotlin.String? = null,
 
-    @SerialName(value = "wiki_link") val wikiLink: PayloadDetailedWikiLink? = null,
+    @SerialName(value = "wiki_link") val wikiLink: kotlin.String? = null,
 
-    @SerialName(value = "info_link") val infoLink: PayloadDetailedWikiLink? = null,
+    @SerialName(value = "info_link") val infoLink: kotlin.String? = null,
 
     @SerialName(value = "spacecraft_flown") val spacecraftFlown: kotlin.Int? = null,
 

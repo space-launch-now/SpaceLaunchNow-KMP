@@ -49,7 +49,8 @@ private val terminusHttpLogger = object : Logger {
 // Terminus (SLN's own LL-compatible API) is anonymous: no Authorization header, so none of
 // these call setApiKey(...). Clients resolve against named("TerminusBaseUrl") (see
 // NetworkModule.kt), separate from the LL/SNAPI named("BaseUrl") because Terminus paths
-// carry the /api/v1 prefix. Not yet loaded by any app module; nothing consumes it.
+// carry the /api/v1 prefix. Loaded by startKoin in AppModule.kt; the Terminus repository is the only consumer.
+// Clients are lazy singletons, so none is built unless the Terminus backend is active.
 val terminusApiModule = module {
     val httpClientConfig: io.ktor.client.HttpClientConfig<*>.() -> Unit = {
         install(UserAgent) {

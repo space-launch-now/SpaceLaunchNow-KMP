@@ -12,7 +12,7 @@
 | **image** | [**Image**](Image.md) |  |  |
 | **name** | **kotlin.String** |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
-| **mapImage** | [**LocationDetailedMapImage**](LocationDetailedMapImage.md) |  |  [optional] |
+| **mapImage** | [**kotlin.String**](LocationDetailedMapImage.md) |  |  [optional] |
 | **timezoneName** | **kotlin.String** |  |  [optional] |
 
 

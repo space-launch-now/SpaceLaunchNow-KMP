@@ -12,7 +12,7 @@
 | **publisher** | **kotlin.String** |  |  [optional] |
 | **title** | **kotlin.String** |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
-| **featureImage** | [**ImageLicenseLink**](ImageLicenseLink.md) |  |  [optional] |
+| **featureImage** | [**kotlin.String**](ImageLicenseLink.md) |  |  [optional] |
 | **startTime** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **endTime** | [**kotlin.time.Instant**](kotlin.time.Instant.md) |  |  [optional] |
 | **live** | **kotlin.Boolean** |  |  [optional] |

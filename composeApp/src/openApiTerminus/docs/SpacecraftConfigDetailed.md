@@ -26,8 +26,8 @@
 | **payloadCapacity** | **kotlin.Int** |  |  [optional] |
 | **payloadReturnCapacity** | **kotlin.Int** |  |  [optional] |
 | **flightLife** | **kotlin.String** |  |  [optional] |
-| **wikiLink** | [**PayloadDetailedWikiLink**](PayloadDetailedWikiLink.md) |  |  [optional] |
-| **infoLink** | [**PayloadDetailedWikiLink**](PayloadDetailedWikiLink.md) |  |  [optional] |
+| **wikiLink** | [**kotlin.String**](PayloadDetailedWikiLink.md) |  |  [optional] |
+| **infoLink** | [**kotlin.String**](PayloadDetailedWikiLink.md) |  |  [optional] |
 | **spacecraftFlown** | **kotlin.Int** |  |  [optional] |
 | **totalLaunchCount** | **kotlin.Int** |  |  [optional] |
 | **successfulLaunches** | **kotlin.Int** |  |  [optional] |

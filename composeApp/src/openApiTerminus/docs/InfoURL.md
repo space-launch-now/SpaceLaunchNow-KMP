@@ -11,7 +11,7 @@
 | **source** | **kotlin.String** |  |  [optional] |
 | **title** | **kotlin.String** |  |  [optional] |
 | **description** | **kotlin.String** |  |  [optional] |
-| **featureImage** | [**ImageLicenseLink**](ImageLicenseLink.md) |  |  [optional] |
+| **featureImage** | [**kotlin.String**](ImageLicenseLink.md) |  |  [optional] |
 
 
 

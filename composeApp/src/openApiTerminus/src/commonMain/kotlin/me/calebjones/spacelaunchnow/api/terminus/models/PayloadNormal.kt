@@ -66,9 +66,9 @@ data class PayloadNormal (
 
     @SerialName(value = "name") val name: kotlin.String? = null,
 
-    @SerialName(value = "wiki_link") val wikiLink: PayloadDetailedWikiLink? = null,
+    @SerialName(value = "wiki_link") val wikiLink: kotlin.String? = null,
 
-    @SerialName(value = "info_link") val infoLink: PayloadDetailedWikiLink? = null,
+    @SerialName(value = "info_link") val infoLink: kotlin.String? = null,
 
     @SerialName(value = "description") val description: kotlin.String? = null
 

@@ -58,7 +58,7 @@ data class LocationList (
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 
-    @SerialName(value = "map_image") val mapImage: LocationDetailedMapImage? = null,
+    @SerialName(value = "map_image") val mapImage: kotlin.String? = null,
 
     @SerialName(value = "timezone_name") val timezoneName: kotlin.String? = null
 

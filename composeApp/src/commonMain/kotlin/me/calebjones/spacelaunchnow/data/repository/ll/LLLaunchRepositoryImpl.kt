@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.bodyAsText
@@ -23,6 +23,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNorm
 import me.calebjones.spacelaunchnow.data.model.ApiError
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
@@ -33,7 +34,7 @@ import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
-class LaunchRepositoryImpl(
+class LLLaunchRepositoryImpl(
     private val launchesApi: LaunchesApi,
     private val agenciesApi: AgenciesApi,
     private val appPreferences: AppPreferences,
@@ -839,8 +840,8 @@ class LaunchRepositoryImpl(
      * Get stale detailed launch data from local cache without checking TTL.
      * Used for stale-while-revalidate pattern to show data immediately while refreshing.
      */
-    override suspend fun getStaleDetailedLaunch(id: String): LaunchDetailed? {
-        return localDataSource?.getDetailedLaunchStaleApi(id)
+    override suspend fun getStaleDetailedLaunch(id: String): Launch? {
+        return localDataSource?.getDetailedLaunchStale(id)
     }
 
     override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> {

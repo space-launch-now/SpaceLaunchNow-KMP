@@ -66,7 +66,7 @@ data class LocationDetailed (
 
     @SerialName(value = "description") val description: kotlin.String? = null,
 
-    @SerialName(value = "map_image") val mapImage: LocationDetailedMapImage? = null,
+    @SerialName(value = "map_image") val mapImage: kotlin.String? = null,
 
     @SerialName(value = "longitude") val longitude: kotlin.Double? = null,
 
