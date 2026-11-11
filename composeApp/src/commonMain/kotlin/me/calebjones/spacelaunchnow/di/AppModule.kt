@@ -23,8 +23,6 @@ import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepository
-import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
@@ -41,12 +39,8 @@ import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepository
-import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
-import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepositoryImpl
@@ -129,7 +123,7 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), eventsUpdatesRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
+    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), eventsUpdatesRepositoryModule(), filterRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
 }
 
 val appModule = module {
@@ -194,7 +188,6 @@ val appModule = module {
     viewModelOf(::AgencyListViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
-    singleOf(::AstronautFilterRepositoryImpl) { bind<AstronautFilterRepository>() }
     viewModelOf(::AstronautListViewModel)
     viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), get(), astronautId) }
 
@@ -205,23 +198,11 @@ val appModule = module {
     singleOf(::SpaceStationRepositoryImpl) { bind<SpaceStationRepository>() }
     viewModelOf(::SpaceStationViewModel)
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
-    singleOf(::RocketFilterRepositoryImpl) { bind<RocketFilterRepository>() }
     singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
     singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
     singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
     singleOf(::LauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
     singleOf(::SpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
-    single<ScheduleFilterRepository> {
-        ScheduleFilterRepositoryImpl(
-            agenciesApi = get(),
-            programsApi = get(),
-            launcherConfigurationsApi = get(),
-            launcherConfigurationFamiliesApi = get(),
-            locationsApi = get(),
-            configApi = get(),
-            localDataSource = get()
-        )
-    }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
 
@@ -229,7 +210,7 @@ val appModule = module {
     // granularity, no hot swap). The DebugPreferences override wins when set (debug builds
     // only); otherwise Remote Config's `data_backend` key, which falls back to LL on any
     // failure. Release users therefore stay on LL until the flag is set.
-    // The launch, events and updates repositories branch on this value; the other
+    // The launch, events, updates and filter repositories branch on this value; the other
     // repositories still read LL until their Tasks#1006 ports land.
     single<DataBackend> {
         val remote = try {
