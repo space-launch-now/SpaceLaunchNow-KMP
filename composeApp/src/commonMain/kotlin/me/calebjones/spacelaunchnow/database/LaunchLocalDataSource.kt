@@ -11,6 +11,8 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.terminus.models.LaunchDetailed as TerminusLaunchDetailed
+import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchBasicList as TerminusPaginatedLaunchBasicList
+import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchNormalList as TerminusPaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Launch
@@ -42,6 +44,8 @@ class LaunchLocalDataSource(
 
     private companion object {
         const val TERMINUS_CACHE_SCHEMA_VERSION = 1
+        const val TERMINUS_MINI_KIND = "mini"
+        const val TERMINUS_NORMAL_KIND = "normal"
         val NEAR_NET_WINDOW = 24.hours
         val NEAR_NET_MAX_TTL = 30.seconds
     }
@@ -316,6 +320,14 @@ class LaunchLocalDataSource(
         }
     }
     
+    /** The cache duration, capped at 30 s when any NET in [netsMs] is within 24 h of [now]. */
+    private suspend fun nearNetCappedDuration(netsMs: List<Long?>, now: Long): kotlin.time.Duration {
+        val duration = getEffectiveCacheDuration()
+        // Launches within 24 h of NET change often: cap the TTL at 30 s.
+        val nearNet = netsMs.any { it != null && abs(it - now) <= NEAR_NET_WINDOW.inWholeMilliseconds }
+        return if (nearNet) minOf(duration, NEAR_NET_MAX_TTL) else duration
+    }
+
     // Terminus LaunchDetailed operations. They share the detailed-launch table with the LL
     // methods above, so the blob is an envelope. A legacy LL blob has no envelope fields, and an
     // envelope is not a valid LL LaunchDetailed: each side treats the other's blob as a miss.
@@ -328,12 +340,8 @@ class LaunchLocalDataSource(
 
     suspend fun cacheTerminusDetailedLaunch(launch: TerminusLaunchDetailed) {
         val now = System.now().toEpochMilliseconds()
-        var duration = getEffectiveCacheDuration()
         val netMs = launch.net?.toEpochMilliseconds()
-        if (netMs != null && abs(netMs - now) <= NEAR_NET_WINDOW.inWholeMilliseconds) {
-            // Launches within 24 h of NET change often: cap the TTL at 30 s.
-            duration = minOf(duration, NEAR_NET_MAX_TTL)
-        }
+        val duration = nearNetCappedDuration(listOf(netMs), now)
         insertDetailedRow(
             DetailedColumns(
                 id = launch.id,
@@ -379,6 +387,85 @@ class LaunchLocalDataSource(
             }
         } catch (e: Exception) {
             log.w(e) { "Undecodable Terminus launch detail cache entry for $id, treating as a miss" }
+            null
+        }
+    }
+
+    // Terminus launch-list pages. A page is stored whole under its request key, in the
+    // detailed-launch table (that table is only ever read by id, so the row never reaches a
+    // launch query). The envelope names the backend, the list kind and a schema version; a row
+    // that does not match, such as an LL row or a legacy blob, is a miss.
+    @Serializable
+    private data class TerminusListEnvelope<T>(
+        @SerialName("cache_schema_version") val schemaVersion: Int,
+        @SerialName("backend") val backend: String,
+        @SerialName("kind") val kind: String,
+        @SerialName("list") val list: T
+    )
+
+    /** A cached value and the time it was stored (epoch milliseconds, null when the cache does not keep it). */
+    class CachedValue<T>(val value: T, val cachedAt: Long? = null)
+
+    suspend fun cacheTerminusMiniList(key: String, page: TerminusPaginatedLaunchBasicList) =
+        cacheTerminusList(key, TERMINUS_MINI_KIND, page, page.results.map { it.net?.toEpochMilliseconds() })
+
+    suspend fun getTerminusMiniList(key: String): CachedValue<TerminusPaginatedLaunchBasicList>? =
+        readTerminusList(key, TERMINUS_MINI_KIND, stale = false)
+
+    suspend fun getTerminusMiniListStale(key: String): CachedValue<TerminusPaginatedLaunchBasicList>? =
+        readTerminusList(key, TERMINUS_MINI_KIND, stale = true)
+
+    suspend fun cacheTerminusNormalList(key: String, page: TerminusPaginatedLaunchNormalList) =
+        cacheTerminusList(key, TERMINUS_NORMAL_KIND, page, page.results.map { it.net?.toEpochMilliseconds() })
+
+    suspend fun getTerminusNormalList(key: String): CachedValue<TerminusPaginatedLaunchNormalList>? =
+        readTerminusList(key, TERMINUS_NORMAL_KIND, stale = false)
+
+    suspend fun getTerminusNormalListStale(key: String): CachedValue<TerminusPaginatedLaunchNormalList>? =
+        readTerminusList(key, TERMINUS_NORMAL_KIND, stale = true)
+
+    private fun terminusListRowId(kind: String, key: String) = "terminus-list:$kind:$key"
+
+    private suspend inline fun <reified T> cacheTerminusList(
+        key: String,
+        kind: String,
+        page: T,
+        netsMs: List<Long?>
+    ) {
+        val now = System.now().toEpochMilliseconds()
+        val duration = nearNetCappedDuration(netsMs, now)
+        val id = terminusListRowId(kind, key)
+        insertDetailedRow(
+            DetailedColumns(
+                id = id, name = id, statusId = null, statusName = null, net = null, windowEnd = null,
+                windowStart = null, providerId = null, providerName = null, rocketConfigurationId = null,
+                rocketConfigurationName = null, padName = null, locationName = null, imageUrl = null,
+                missionName = null, missionDescription = null
+            ),
+            json.encodeToString(TerminusListEnvelope(TERMINUS_CACHE_SCHEMA_VERSION, "terminus", kind, page)),
+            now,
+            now + duration.inWholeMilliseconds
+        )
+    }
+
+    private inline fun <reified T> readTerminusList(key: String, kind: String, stale: Boolean): CachedValue<T>? {
+        val id = terminusListRowId(kind, key)
+        val row = if (stale) {
+            queries.getDetailedByIdStale(id).executeAsOneOrNull()
+        } else {
+            queries.getDetailedById(id, System.now().toEpochMilliseconds()).executeAsOneOrNull()
+        } ?: return null
+        return try {
+            val envelope = json.decodeFromString<TerminusListEnvelope<T>>(row.json_data)
+            if (envelope.schemaVersion == TERMINUS_CACHE_SCHEMA_VERSION &&
+                envelope.backend == "terminus" && envelope.kind == kind
+            ) {
+                CachedValue(envelope.list, row.cached_at)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            log.w(e) { "Undecodable Terminus $kind list cache entry, treating as a miss" }
             null
         }
     }

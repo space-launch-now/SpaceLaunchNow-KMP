@@ -35,7 +35,8 @@ fun launchRepositoryModule(): Module = module {
         TerminusLaunchRepositoryImpl(
             delegate = get<LLLaunchRepositoryImpl>(named(LL_REPOSITORY)),
             launchesApi = get(),
-            localDataSource = get()
+            localDataSource = get(),
+            appPreferences = get()
         )
     }
     single<LaunchRepository> {
