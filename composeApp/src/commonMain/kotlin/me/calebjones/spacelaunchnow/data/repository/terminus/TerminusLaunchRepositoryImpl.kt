@@ -10,6 +10,7 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
+import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource.CachedValue
 import me.calebjones.spacelaunchnow.domain.mapper.terminus.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
@@ -57,8 +58,8 @@ class TerminusLaunchRepositoryImpl(
         return terminusCachedFetch(
             what = "launch detail $id",
             forceRefresh = forceRefresh,
-            readFresh = { localDataSource?.getTerminusDetailedLaunch(id)?.let { TerminusCacheHit(it) } },
-            readStale = { localDataSource?.getTerminusDetailedLaunchStale(id)?.let { TerminusCacheHit(it) } },
+            readFresh = { localDataSource?.getTerminusDetailedLaunch(id)?.let { CachedValue(it) } },
+            readStale = { localDataSource?.getTerminusDetailedLaunchStale(id)?.let { CachedValue(it) } },
             fetch = { launchesApi.launchesRetrieve(id) },
             store = { localDataSource?.cacheTerminusDetailedLaunch(it) }
         ).map { it.value }
@@ -167,12 +168,8 @@ class TerminusLaunchRepositoryImpl(
         terminusCachedFetch(
             what = "launch mini list ${query.logLabel}",
             forceRefresh = false,
-            readFresh = {
-                localDataSource?.getTerminusMiniList(query.key)?.let { TerminusCacheHit(it.value, it.cachedAt) }
-            },
-            readStale = {
-                localDataSource?.getTerminusMiniListStale(query.key)?.let { TerminusCacheHit(it.value, it.cachedAt) }
-            },
+            readFresh = { localDataSource?.getTerminusMiniList(query.key) },
+            readStale = { localDataSource?.getTerminusMiniListStale(query.key) },
             fetch = { query.fetchMini(launchesApi) },
             store = { localDataSource?.cacheTerminusMiniList(query.key, it) }
         ).mapCatching { TerminusFetched(it.value.toDomain(), it.source, it.timestamp) }
@@ -184,12 +181,8 @@ class TerminusLaunchRepositoryImpl(
         terminusCachedFetch(
             what = "launch list ${query.logLabel}",
             forceRefresh = forceRefresh,
-            readFresh = {
-                localDataSource?.getTerminusNormalList(query.key)?.let { TerminusCacheHit(it.value, it.cachedAt) }
-            },
-            readStale = {
-                localDataSource?.getTerminusNormalListStale(query.key)?.let { TerminusCacheHit(it.value, it.cachedAt) }
-            },
+            readFresh = { localDataSource?.getTerminusNormalList(query.key) },
+            readStale = { localDataSource?.getTerminusNormalListStale(query.key) },
             fetch = { query.fetchNormal(launchesApi) },
             store = { localDataSource?.cacheTerminusNormalList(query.key, it) }
         ).mapCatching { DataResult(it.value.toDomain(), it.source, it.timestamp) }

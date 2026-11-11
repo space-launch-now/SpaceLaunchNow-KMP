@@ -6,17 +6,15 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.terminus.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource.CachedValue
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Clock
 
 /** The Terminus backend answered 404. A caller may turn this into an empty result. */
 internal class TerminusNotFoundException(message: String) : Exception(message)
 
-/** A value plus where it came from. [TerminusCacheHit.cachedAt] is null when the cache does not keep it. */
+/** A value plus where it came from. [CachedValue.cachedAt] is null when the cache does not keep it. */
 internal class TerminusFetched<T>(val value: T, val source: DataSource, val timestamp: Long)
-
-/** A cached value and the time it was stored, in epoch milliseconds (null when unknown). */
-internal class TerminusCacheHit<T>(val value: T, val cachedAt: Long? = null)
 
 private const val MAX_ERROR_BODY_CHARS = 200
 private val log get() = SpaceLogger.getLogger("TerminusCachedFetch")
@@ -32,8 +30,8 @@ private val log get() = SpaceLogger.getLogger("TerminusCachedFetch")
 internal suspend fun <T : Any> terminusCachedFetch(
     what: String,
     forceRefresh: Boolean,
-    readFresh: suspend () -> TerminusCacheHit<T>?,
-    readStale: suspend () -> TerminusCacheHit<T>?,
+    readFresh: suspend () -> CachedValue<T>?,
+    readStale: suspend () -> CachedValue<T>?,
     fetch: suspend () -> HttpResponse<T>,
     store: suspend (T) -> Unit
 ): Result<TerminusFetched<T>> {

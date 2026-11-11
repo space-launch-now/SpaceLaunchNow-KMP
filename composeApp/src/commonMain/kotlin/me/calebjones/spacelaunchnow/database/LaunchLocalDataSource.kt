@@ -403,8 +403,8 @@ class LaunchLocalDataSource(
         @SerialName("list") val list: T
     )
 
-    /** A cached value and the time it was stored (epoch milliseconds). */
-    class CachedValue<T>(val value: T, val cachedAt: Long)
+    /** A cached value and the time it was stored (epoch milliseconds, null when the cache does not keep it). */
+    class CachedValue<T>(val value: T, val cachedAt: Long? = null)
 
     suspend fun cacheTerminusMiniList(key: String, page: TerminusPaginatedLaunchBasicList) =
         cacheTerminusList(key, TERMINUS_MINI_KIND, page, page.results.map { it.net?.toEpochMilliseconds() })
