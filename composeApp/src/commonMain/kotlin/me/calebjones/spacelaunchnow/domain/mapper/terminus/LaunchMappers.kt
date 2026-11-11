@@ -16,7 +16,7 @@ import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 // model reuses the one tested LL -> domain mapping, so both backends produce the same domain
 // Launch for the same launch. A field Terminus drops and LL requires fails loudly here
 // (SerializationException) instead of mapping to a silent default.
-private val bridgeJson = Json {
+internal val bridgeJson = Json {
     ignoreUnknownKeys = true
     encodeDefaults = true
 }
