@@ -28,7 +28,7 @@ import me.calebjones.spacelaunchnow.data.repository.AstronautFilterRepositoryImp
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
-import me.calebjones.spacelaunchnow.data.repository.EventsRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLEventsRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -58,7 +58,7 @@ import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
-import me.calebjones.spacelaunchnow.data.repository.UpdatesRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLUpdatesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialGate
@@ -192,7 +192,7 @@ val appModule = module {
     viewModelOf(::StarshipViewModel)
 
     viewModelOf(::ScheduleViewModel)
-    singleOf(::UpdatesRepositoryImpl) { bind<UpdatesRepository>() }
+    singleOf(::LLUpdatesRepositoryImpl) { bind<UpdatesRepository>() }
     viewModelOf(::UpdatesViewModel)
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
@@ -228,14 +228,14 @@ val appModule = module {
         )
     }
     single<EventsRepository> {
-        EventsRepositoryImpl(
+        LLEventsRepositoryImpl(
             eventsApi = get(),
             configApi = get(),
             localDataSource = get()
         )
     }
     single<UpdatesRepository> {
-        UpdatesRepositoryImpl(
+        LLUpdatesRepositoryImpl(
             updatesApi = get(),
             localDataSource = get()
         )

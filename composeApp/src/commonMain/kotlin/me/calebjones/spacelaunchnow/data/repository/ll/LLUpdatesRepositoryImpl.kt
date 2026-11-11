@@ -1,5 +1,6 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
+import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getLatestUpdates
@@ -15,7 +16,7 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
 import kotlin.time.Clock.System
 
-class UpdatesRepositoryImpl(
+class LLUpdatesRepositoryImpl(
     private val updatesApi: UpdatesApi,
     private val localDataSource: UpdateLocalDataSource? = null
 ) : UpdatesRepository {
