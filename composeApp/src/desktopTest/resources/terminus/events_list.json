@@ -1,0 +1,136 @@
+{
+ "count": 42,
+ "next": "https://staging-terminus.spacelaunchnow.app/api/v1/events/?limit=2&offset=2&ordering=date&upcoming=true",
+ "previous": null,
+ "results": [
+  {
+   "id": 1201,
+   "url": "https://staging-terminus.spacelaunchnow.app/api/v1/events/1201/",
+   "name": "ISS US Spacewalk",
+   "response_mode": "normal",
+   "info_urls": [
+    {
+     "priority": 1,
+     "source": "NASA",
+     "title": "Event page",
+     "description": null,
+     "feature_image": null,
+     "url": "https://example.test/event",
+     "type": {
+      "id": 1,
+      "name": "Official Website"
+     },
+     "language": {
+      "id": 1,
+      "name": "English",
+      "code": "en"
+     }
+    }
+   ],
+   "vid_urls": [],
+   "image": {
+    "id": 3101,
+    "name": "Crew-12 spacewalk preview",
+    "image_url": "https://example.test/media/events/spacewalk.jpg",
+    "thumbnail_url": "https://example.test/media/events/spacewalk_thumb.jpg",
+    "credit": "NASA",
+    "license": {
+     "id": 1,
+     "name": "Public domain",
+     "priority": 1,
+     "link": "https://example.test/license"
+    },
+    "single_use": false,
+    "variants": []
+   },
+   "slug": "iss-us-spacewalk",
+   "type": {
+    "id": 5,
+    "name": "Spacewalk"
+   },
+   "date_precision": {
+    "id": 2,
+    "name": "Hour",
+    "abbrev": "HR",
+    "description": "The T-0 is accurate to the hour."
+   },
+   "duration": "06:30:00",
+   "phase": "scheduled",
+   "updates": [
+    {
+     "id": 9001,
+     "profile_image": "https://example.test/media/profile/ops.jpg",
+     "comment": "Spacewalk start moved up 30 minutes.",
+     "info_url": "https://example.test/news/spacewalk",
+     "created_by": "Mission Ops",
+     "created_on": "2026-11-02T14:05:00Z"
+    }
+   ],
+   "date": "2026-11-14T13:00:00Z",
+   "description": "Planned work outside the station.",
+   "webcast_live": false,
+   "location": "International Space Station",
+   "last_updated": "2026-11-02T14:05:00Z"
+  },
+  {
+   "id": 1202,
+   "url": "https://staging-terminus.spacelaunchnow.app/api/v1/events/1202/",
+   "name": "Agency Press Briefing",
+   "response_mode": "normal",
+   "info_urls": [
+    {
+     "priority": 1,
+     "source": "NASA",
+     "title": "Event page",
+     "description": null,
+     "feature_image": null,
+     "url": "https://example.test/event",
+     "type": {
+      "id": 1,
+      "name": "Official Website"
+     },
+     "language": {
+      "id": 1,
+      "name": "English",
+      "code": "en"
+     }
+    }
+   ],
+   "vid_urls": [],
+   "image": {
+    "id": 3101,
+    "name": "Crew-12 spacewalk preview",
+    "image_url": "https://example.test/media/events/spacewalk.jpg",
+    "thumbnail_url": "https://example.test/media/events/spacewalk_thumb.jpg",
+    "credit": "NASA",
+    "license": {
+     "id": 1,
+     "name": "Public domain",
+     "priority": 1,
+     "link": "https://example.test/license"
+    },
+    "single_use": false,
+    "variants": []
+   },
+   "slug": "agency-press-briefing",
+   "type": {
+    "id": 10,
+    "name": "Press Event"
+   },
+   "date_precision": {
+    "id": 2,
+    "name": "Hour",
+    "abbrev": "HR",
+    "description": "The T-0 is accurate to the hour."
+   },
+   "duration": "06:30:00",
+   "phase": "scheduled",
+   "updates": [],
+   "date": "2026-11-16T18:00:00Z",
+   "description": "Planned work outside the station.",
+   "webcast_live": false,
+   "location": "International Space Station",
+   "last_updated": "2026-11-02T14:05:00Z"
+  }
+ ]
+}

@@ -48,7 +48,7 @@ class TerminusUpdatesRepositoryImpl internal constructor(
             "updates",
             "limit" to limit,
             "ordering" to LaunchListCacheKey.encode(ordering),
-            "all_program" to allProgram
+            "all__program" to allProgram
         )
         log.d { "terminus read updates limit=$limit allProgram=$allProgram forceRefresh=$forceRefresh" }
         return terminusCachedFetch(

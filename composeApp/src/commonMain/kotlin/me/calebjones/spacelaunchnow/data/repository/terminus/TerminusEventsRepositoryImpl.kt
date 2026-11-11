@@ -15,7 +15,7 @@ import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Events repository for the Terminus backend. Every [EventsRepository] method is served by
- * Terminus (`GET /api/v1/events/`, `GET /api/v1/events/{id}/`, `GET /api/v1/config/event-types/`),
+ * Terminus (`GET /api/v1/events/`, `GET /api/v1/events/{id}/`, `GET /api/v1/config/event_types/`),
  * so nothing delegates to LL. The list endpoint is the normal variant, as the LL repository
  * uses; the detail endpoint is the detailed variant.
  *
