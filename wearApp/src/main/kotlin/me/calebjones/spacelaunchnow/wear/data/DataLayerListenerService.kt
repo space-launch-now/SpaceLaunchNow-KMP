@@ -44,6 +44,7 @@ class DataLayerListenerService : WearableListenerService() {
                 when (path) {
                     PATH_SYNC -> handleLaunchSync(dataMap)
                     PATH_ENTITLEMENT -> handleEntitlementSync(dataMap)
+                    PATH_BACKEND -> handleBackendSync(dataMap)
                 }
             }
         }
@@ -127,6 +128,20 @@ class DataLayerListenerService : WearableListenerService() {
         }
     }
 
+    private fun handleBackendSync(dataMap: DataMap) {
+        val backend = dataMap.getString(KEY_BACKEND)
+        val terminusBaseUrl = dataMap.getString(KEY_TERMINUS_BASE_URL)
+        Logger.i { "Received data backend sync: backend=$backend, terminusBaseUrl=$terminusBaseUrl" }
+
+        serviceScope.launch {
+            try {
+                WatchBackendStore.save(dataStore, backend, terminusBaseUrl)
+            } catch (e: Exception) {
+                Logger.e(e) { "Failed to persist data backend sync" }
+            }
+        }
+    }
+
     private fun requestTileUpdate() {
         try {
             TileService.getUpdater(this)
@@ -153,6 +168,9 @@ class DataLayerListenerService : WearableListenerService() {
     companion object {
         private const val PATH_SYNC = "/spacelaunchnow/sync"
         private const val PATH_ENTITLEMENT = "/spacelaunchnow/entitlement"
+        private const val PATH_BACKEND = "/spacelaunchnow/backend"
+        private const val KEY_BACKEND = "backend"
+        private const val KEY_TERMINUS_BASE_URL = "terminusBaseUrl"
         private const val KEY_ACTIVE = "active"
         private const val KEY_EXPIRES_AT = "expiresAt"
     }

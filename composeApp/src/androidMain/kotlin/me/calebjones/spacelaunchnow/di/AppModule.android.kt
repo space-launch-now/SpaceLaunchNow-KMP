@@ -12,6 +12,7 @@ import me.calebjones.spacelaunchnow.analytics.core.AnalyticsProvider
 import me.calebjones.spacelaunchnow.analytics.providers.FirebaseAnalyticsProvider
 import me.calebjones.spacelaunchnow.sync.PhoneDataLayerService
 import me.calebjones.spacelaunchnow.sync.PhoneDataLayerSync
+import me.calebjones.spacelaunchnow.sync.WearBackendPusher
 import me.calebjones.spacelaunchnow.sync.WearEntitlementPusher
 import me.calebjones.spacelaunchnow.sync.WearFilterSyncPusher
 import me.calebjones.spacelaunchnow.util.AndroidSharingService
@@ -33,6 +34,9 @@ val androidModule = module {
 
     // Observe subscription state and push entitlement changes to watch
     single { WearEntitlementPusher(get(), get(), kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default + kotlinx.coroutines.SupervisorJob())) }
+
+    // Tell the watch which data backend (LL or Terminus) the phone resolved
+    single { WearBackendPusher(get(), get(named("TerminusBaseUrl")), get(), kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default + kotlinx.coroutines.SupervisorJob())) }
 
     // Observe filter preference changes and push updated launch list to watch
     single { WearFilterSyncPusher(get(), get(), kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default + kotlinx.coroutines.SupervisorJob())) }

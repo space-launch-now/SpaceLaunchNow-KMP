@@ -35,7 +35,9 @@ class PhoneDataLayerListenerService : WearableListenerService() {
                         active = hasWearOs,
                         expiresAt = expiresAt,
                     )
-                    log.i { "Synced launches + entitlement (hasWearOs=$hasWearOs) to watch" }
+                    // Backend choice: a freshly installed watch has none yet and stays on LL.
+                    koin.get<WearBackendPusher>().pushNow()
+                    log.i { "Synced launches + entitlement (hasWearOs=$hasWearOs) + backend to watch" }
                 } catch (e: Exception) {
                     log.e(e) { "Failed to handle sync request from watch" }
                 }

@@ -254,6 +254,10 @@ class MainApplication : Application(), Configuration.Provider {
                 wearFilterPusher.start()
                 log.d { "✅ WearFilterSyncPusher started" }
 
+                // Step 7: Tell the watch which data backend (LL or Terminus) this phone resolved
+                getKoin().get<me.calebjones.spacelaunchnow.sync.WearBackendPusher>().start()
+                log.d { "✅ WearBackendPusher started" }
+
                 log.i { "🎉 All billing and subscription systems initialized" }
             } catch (e: Exception) {
                 log.e(e) { "❌ Failed to initialize Billing/Subscription system" }
