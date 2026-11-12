@@ -1,0 +1,80 @@
+{
+  "response_mode": "detailed",
+  "id": 11,
+  "url": "https://terminus.test/api/v1/spacecraft_configurations/11/",
+  "name": "Crew Dragon",
+  "type": {
+    "id": 2,
+    "name": "Capsule"
+  },
+  "agency": {
+    "response_mode": "normal",
+    "id": 121,
+    "url": "https://terminus.test/api/v1/agencies/121/",
+    "name": "SpaceX",
+    "type": {
+      "id": 3,
+      "name": "Commercial"
+    },
+    "country": [
+      {
+        "id": 1,
+        "name": "United States of America",
+        "alpha_2_code": "US",
+        "alpha_3_code": "USA",
+        "nationality_name": "American",
+        "nationality_name_composed": "American"
+      }
+    ],
+    "parent": null,
+    "image": null,
+    "logo": null,
+    "social_logo": null,
+    "abbrev": "SpX",
+    "featured": true,
+    "description": "Space Exploration Technologies Corp.",
+    "administrator": "CEO: Elon Musk",
+    "founding_year": 2002,
+    "launchers": "Falcon | Starship",
+    "spacecraft": "Dragon"
+  },
+  "family": [],
+  "image": {
+    "id": 51,
+    "name": "crew_dragon",
+    "image_url": "https://example.com/crew_dragon.jpg",
+    "thumbnail_url": "https://example.com/crew_dragon_t.jpg",
+    "credit": "SpaceX",
+    "license": {
+      "id": 1,
+      "name": "Public Domain",
+      "priority": 1,
+      "link": null
+    },
+    "variants": [],
+    "single_use": false
+  },
+  "fastest_turnaround": null,
+  "in_use": true,
+  "capability": "Carries up to four crew to low Earth orbit.",
+  "history": "First crewed flight in 2020.",
+  "details": "Reusable crew capsule.",
+  "maiden_flight": "2019-03-02",
+  "height": 8.1,
+  "diameter": 4.0,
+  "human_rated": true,
+  "crew_capacity": 4,
+  "payload_capacity": 3307,
+  "payload_return_capacity": 3000,
+  "flight_life": "210 days",
+  "wiki_link": "https://en.wikipedia.org/wiki/Crew_Dragon",
+  "info_link": "https://spacex.com/dragon",
+  "spacecraft_flown": 5,
+  "total_launch_count": 12,
+  "successful_launches": 12,
+  "failed_launches": 0,
+  "attempted_landings": 12,
+  "successful_landings": 12,
+  "failed_landings": 0,
+  "last_updated": "2026-11-01T12:00:00Z"
+}

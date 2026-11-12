@@ -1,0 +1,23 @@
+{
+  "response_mode": "detailed",
+  "id": 301,
+  "url": "https://terminus.test/api/v1/spacecraft/301/",
+  "name": "Endeavour",
+  "serial_number": "C206",
+  "image": null,
+  "time_in_space": "P180D",
+  "time_docked": "P170D",
+  "flights_count": 5,
+  "mission_ends_count": 5,
+  "status": {
+    "id": 2,
+    "name": "Active"
+  },
+  "description": "Crew Dragon capsule C206.",
+  "spacecraft_config": "__SPACECRAFT_CONFIG__",
+  "fastest_turnaround": null,
+  "flights": [],
+  "is_placeholder": false,
+  "in_space": true,
+  "last_updated": "2026-11-01T12:00:00Z"
+}

@@ -1,0 +1,105 @@
+{
+  "id": 1,
+  "url": "https://terminus.test/api/v1/astronauts/1/",
+  "response_mode": "normal",
+  "name": "Jane Doe",
+  "status": {
+    "id": 1,
+    "name": "Active"
+  },
+  "agency": {
+    "response_mode": "mini",
+    "id": 44,
+    "url": "https://terminus.test/api/v1/agencies/44/",
+    "name": "National Aeronautics and Space Administration",
+    "type": {
+      "id": 1,
+      "name": "Government"
+    },
+    "abbrev": "NASA"
+  },
+  "image": {
+    "id": 11,
+    "name": "image_11",
+    "image_url": "https://example.com/11.jpg",
+    "thumbnail_url": "https://example.com/11_t.jpg",
+    "credit": "NASA",
+    "license": {
+      "id": 1,
+      "name": "Public Domain",
+      "priority": 1,
+      "link": null
+    },
+    "variants": [],
+    "single_use": false
+  },
+  "age": 45,
+  "bio": "Bio of Jane Doe.",
+  "type": {
+    "id": 1,
+    "name": "Government"
+  },
+  "nationality": [
+    {
+      "id": 164,
+      "name": "United States of America",
+      "alpha_2_code": "US",
+      "alpha_3_code": "USA",
+      "nationality_name": "American",
+      "nationality_name_composed": "American"
+    }
+  ],
+  "last_updated": "2026-11-01T12:00:00Z",
+  "in_space": true,
+  "time_in_space": "P180DT04:00:00",
+  "eva_time": "P0DT42:10:00",
+  "date_of_birth": "1980-03-02",
+  "date_of_death": null,
+  "wiki": "https://en.wikipedia.org/wiki/Jane_Doe",
+  "last_flight": "2025-04-20T00:00:00Z",
+  "first_flight": "2018-06-01T00:00:00Z",
+  "social_media_links": [
+    {
+      "id": 5,
+      "social_media": {
+        "id": 1,
+        "url": "https://x.com",
+        "logo": {
+          "id": 30,
+          "name": "image_30",
+          "image_url": "https://example.com/30.jpg",
+          "thumbnail_url": "https://example.com/30_t.jpg",
+          "credit": "NASA",
+          "license": {
+            "id": 1,
+            "name": "Public Domain",
+            "priority": 1,
+            "link": null
+          },
+          "variants": [],
+          "single_use": false
+        },
+        "name": "X"
+      },
+      "url": "https://x.com/janedoe"
+    }
+  ],
+  "flights_count": 2,
+  "landings_count": 2,
+  "spacewalks_count": 1,
+  "flights": [],
+  "landings": [],
+  "spacewalks": [
+    {
+      "response_mode": "normal",
+      "id": 55,
+      "url": "https://terminus.test/api/v1/spacewalks/55/",
+      "name": "US EVA 91",
+      "start": "2025-05-01T10:00:00Z",
+      "end": "2025-05-01T16:30:00Z",
+      "duration": "P0DT06:30:00",
+      "location": "ISS",
+      "crew": []
+    }
+  ]
+}

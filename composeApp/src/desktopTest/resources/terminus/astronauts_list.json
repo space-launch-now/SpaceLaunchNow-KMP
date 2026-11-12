@@ -1,0 +1,113 @@
+{
+  "count": 2,
+  "next": "https://terminus.test/api/v1/astronauts/?limit=2&offset=2",
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "url": "https://terminus.test/api/v1/astronauts/1/",
+      "response_mode": "normal",
+      "name": "Jane Doe",
+      "status": {
+        "id": 1,
+        "name": "Active"
+      },
+      "agency": {
+        "response_mode": "mini",
+        "id": 44,
+        "url": "https://terminus.test/api/v1/agencies/44/",
+        "name": "National Aeronautics and Space Administration",
+        "type": {
+          "id": 1,
+          "name": "Government"
+        },
+        "abbrev": "NASA"
+      },
+      "image": {
+        "id": 11,
+        "name": "image_11",
+        "image_url": "https://example.com/11.jpg",
+        "thumbnail_url": "https://example.com/11_t.jpg",
+        "credit": "NASA",
+        "license": {
+          "id": 1,
+          "name": "Public Domain",
+          "priority": 1,
+          "link": null
+        },
+        "variants": [],
+        "single_use": false
+      },
+      "age": 45,
+      "bio": "Bio of Jane Doe.",
+      "type": {
+        "id": 1,
+        "name": "Government"
+      },
+      "nationality": [
+        {
+          "id": 164,
+          "name": "United States of America",
+          "alpha_2_code": "US",
+          "alpha_3_code": "USA",
+          "nationality_name": "American",
+          "nationality_name_composed": "American"
+        }
+      ],
+      "last_updated": "2026-11-01T12:00:00Z"
+    },
+    {
+      "id": 2,
+      "url": "https://terminus.test/api/v1/astronauts/2/",
+      "response_mode": "normal",
+      "name": "John Roe",
+      "status": {
+        "id": 1,
+        "name": "Active"
+      },
+      "agency": {
+        "response_mode": "mini",
+        "id": 44,
+        "url": "https://terminus.test/api/v1/agencies/44/",
+        "name": "National Aeronautics and Space Administration",
+        "type": {
+          "id": 1,
+          "name": "Government"
+        },
+        "abbrev": "NASA"
+      },
+      "image": {
+        "id": 12,
+        "name": "image_12",
+        "image_url": "https://example.com/12.jpg",
+        "thumbnail_url": "https://example.com/12_t.jpg",
+        "credit": "NASA",
+        "license": {
+          "id": 1,
+          "name": "Public Domain",
+          "priority": 1,
+          "link": null
+        },
+        "variants": [],
+        "single_use": false
+      },
+      "age": 45,
+      "bio": "Bio of John Roe.",
+      "type": {
+        "id": 1,
+        "name": "Government"
+      },
+      "nationality": [
+        {
+          "id": 164,
+          "name": "United States of America",
+          "alpha_2_code": "US",
+          "alpha_3_code": "USA",
+          "nationality_name": "American",
+          "nationality_name_composed": "American"
+        }
+      ],
+      "last_updated": "2026-11-01T12:00:00Z"
+    }
+  ]
+}

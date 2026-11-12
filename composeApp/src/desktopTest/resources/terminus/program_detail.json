@@ -1,0 +1,87 @@
+{
+  "response_mode": "normal",
+  "id": 17,
+  "url": "https://terminus.test/api/v1/programs/17/",
+  "name": "Artemis",
+  "image": {
+    "id": 40,
+    "name": "image_40",
+    "image_url": "https://example.com/40.jpg",
+    "thumbnail_url": "https://example.com/40_t.jpg",
+    "credit": "NASA",
+    "license": {
+      "id": 1,
+      "name": "Public Domain",
+      "priority": 1,
+      "link": null
+    },
+    "variants": [],
+    "single_use": false
+  },
+  "info_url": "https://nasa.gov/artemis",
+  "wiki_url": "https://en.wikipedia.org/wiki/Artemis_program",
+  "description": "Return humans to the Moon.",
+  "agencies": [
+    {
+      "response_mode": "mini",
+      "id": 44,
+      "url": "https://terminus.test/api/v1/agencies/44/",
+      "name": "National Aeronautics and Space Administration",
+      "type": {
+        "id": 1,
+        "name": "Government"
+      },
+      "abbrev": "NASA"
+    }
+  ],
+  "start_date": "2017-12-11T00:00:00Z",
+  "end_date": null,
+  "mission_patches": [
+    {
+      "id": 7,
+      "name": "Expedition 72 patch",
+      "image_url": "https://example.com/patch.png",
+      "agency": {
+        "response_mode": "mini",
+        "id": 44,
+        "url": "https://terminus.test/api/v1/agencies/44/",
+        "name": "National Aeronautics and Space Administration",
+        "type": {
+          "id": 1,
+          "name": "Government"
+        },
+        "abbrev": "NASA"
+      },
+      "response_mode": "normal",
+      "priority": 1
+    }
+  ],
+  "type": {
+    "id": 1,
+    "name": "Human Spaceflight"
+  },
+  "vid_urls": [
+    {
+      "url": "https://youtube.com/watch?v=x",
+      "type": {
+        "id": 1,
+        "name": "Official Webcast"
+      },
+      "language": {
+        "id": 1,
+        "name": "English",
+        "code": "en"
+      },
+      "priority": 1,
+      "source": "youtube",
+      "publisher": "NASA",
+      "title": "Artemis",
+      "description": "d",
+      "feature_image": null,
+      "start_time": null,
+      "end_time": null,
+      "live": false
+    }
+  ],
+  "space_stations": []
+}

@@ -1,5 +1,6 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
+import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getConfigurationDetails
@@ -14,7 +15,7 @@ import me.calebjones.spacelaunchnow.domain.model.SpacecraftConfig
 /**
  * Implementation of SpacecraftConfigRepository using the generated SpacecraftConfigurationsApi
  */
-class SpacecraftConfigRepositoryImpl(
+class LLSpacecraftConfigRepositoryImpl(
     private val spacecraftConfigurationsApi: SpacecraftConfigurationsApi
 ) : SpacecraftConfigRepository {
 

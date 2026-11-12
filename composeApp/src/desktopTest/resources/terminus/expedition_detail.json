@@ -1,0 +1,213 @@
+{
+  "id": 300,
+  "url": "https://terminus.test/api/v1/expeditions/300/",
+  "name": "Expedition 73",
+  "start": "2025-04-20T00:00:00Z",
+  "end": null,
+  "response_mode": "detailed",
+  "spacestation": {
+    "id": 4,
+    "url": "https://terminus.test/api/v1/space_stations/4/",
+    "name": "International Space Station",
+    "image": {
+      "id": 20,
+      "name": "image_20",
+      "image_url": "https://example.com/20.jpg",
+      "thumbnail_url": "https://example.com/20_t.jpg",
+      "credit": "NASA",
+      "license": {
+        "id": 1,
+        "name": "Public Domain",
+        "priority": 1,
+        "link": null
+      },
+      "variants": [],
+      "single_use": false
+    },
+    "status": {
+      "id": 1,
+      "name": "Active"
+    },
+    "founded": "1998-11-20",
+    "deorbited": false,
+    "deorbited_date": null,
+    "description": "A habitable space station in low Earth orbit.",
+    "orbit": "Low Earth Orbit",
+    "type": {
+      "id": 1,
+      "name": "LEO"
+    },
+    "owners": [
+      {
+        "response_mode": "normal",
+        "id": 44,
+        "url": "https://terminus.test/api/v1/agencies/44/",
+        "name": "National Aeronautics and Space Administration",
+        "type": {
+          "id": 1,
+          "name": "Government"
+        },
+        "abbrev": "NASA",
+        "country": [
+          {
+            "id": 164,
+            "name": "United States of America",
+            "alpha_2_code": "US",
+            "alpha_3_code": "USA",
+            "nationality_name": "American",
+            "nationality_name_composed": "American"
+          }
+        ],
+        "parent": null,
+        "image": {
+          "id": 2,
+          "name": "image_2",
+          "image_url": "https://example.com/2.jpg",
+          "thumbnail_url": "https://example.com/2_t.jpg",
+          "credit": "NASA",
+          "license": {
+            "id": 1,
+            "name": "Public Domain",
+            "priority": 1,
+            "link": null
+          },
+          "variants": [],
+          "single_use": false
+        },
+        "logo": {
+          "id": 3,
+          "name": "image_3",
+          "image_url": "https://example.com/3.jpg",
+          "thumbnail_url": "https://example.com/3_t.jpg",
+          "credit": "NASA",
+          "license": {
+            "id": 1,
+            "name": "Public Domain",
+            "priority": 1,
+            "link": null
+          },
+          "variants": [],
+          "single_use": false
+        },
+        "social_logo": {
+          "id": 4,
+          "name": "image_4",
+          "image_url": "https://example.com/4.jpg",
+          "thumbnail_url": "https://example.com/4_t.jpg",
+          "credit": "NASA",
+          "license": {
+            "id": 1,
+            "name": "Public Domain",
+            "priority": 1,
+            "link": null
+          },
+          "variants": [],
+          "single_use": false
+        },
+        "featured": true,
+        "description": "US space agency",
+        "administrator": "Administrator",
+        "founding_year": 1958,
+        "launchers": "Space Shuttle",
+        "spacecraft": "Orion",
+        "last_updated": "2026-11-01T12:00:00Z"
+      }
+    ],
+    "last_updated": "2026-11-01T12:00:00Z"
+  },
+  "mission_patches": [
+    {
+      "id": 7,
+      "name": "Expedition 72 patch",
+      "image_url": "https://example.com/patch.png",
+      "agency": {
+        "response_mode": "mini",
+        "id": 44,
+        "url": "https://terminus.test/api/v1/agencies/44/",
+        "name": "National Aeronautics and Space Administration",
+        "type": {
+          "id": 1,
+          "name": "Government"
+        },
+        "abbrev": "NASA"
+      },
+      "response_mode": "normal",
+      "priority": 1
+    }
+  ],
+  "spacewalks": [
+    {
+      "response_mode": "list",
+      "id": 55,
+      "url": "https://terminus.test/api/v1/spacewalks/55/",
+      "name": "US EVA 91",
+      "start": "2025-05-01T10:00:00Z",
+      "end": "2025-05-01T16:30:00Z",
+      "duration": "P0DT06:30:00",
+      "location": "ISS"
+    }
+  ],
+  "crew": [
+    {
+      "id": 900,
+      "role": {
+        "id": 2,
+        "role": "Commander",
+        "priority": 1
+      },
+      "astronaut": {
+        "id": 1,
+        "url": "https://terminus.test/api/v1/astronauts/1/",
+        "response_mode": "normal",
+        "name": "Jane Doe",
+        "status": {
+          "id": 1,
+          "name": "Active"
+        },
+        "agency": {
+          "response_mode": "mini",
+          "id": 44,
+          "url": "https://terminus.test/api/v1/agencies/44/",
+          "name": "National Aeronautics and Space Administration",
+          "type": {
+            "id": 1,
+            "name": "Government"
+          },
+          "abbrev": "NASA"
+        },
+        "image": {
+          "id": 11,
+          "name": "image_11",
+          "image_url": "https://example.com/11.jpg",
+          "thumbnail_url": "https://example.com/11_t.jpg",
+          "credit": "NASA",
+          "license": {
+            "id": 1,
+            "name": "Public Domain",
+            "priority": 1,
+            "link": null
+          },
+          "variants": [],
+          "single_use": false
+        },
+        "age": 45,
+        "bio": "Bio of Jane Doe.",
+        "type": {
+          "id": 1,
+          "name": "Government"
+        },
+        "nationality": [
+          {
+            "id": 164,
+            "name": "United States of America",
+            "alpha_2_code": "US",
+            "alpha_3_code": "USA",
+            "nationality_name": "American",
+            "nationality_name_composed": "American"
+          }
+        ],
+        "last_updated": "2026-11-01T12:00:00Z"
+      }
+    }
+  ]
+}

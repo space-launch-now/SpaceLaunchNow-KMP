@@ -1,16 +1,17 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ProgramsApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.database.ProgramLocalDataSource
 import me.calebjones.spacelaunchnow.domain.mapper.toDomainProgram
 import me.calebjones.spacelaunchnow.domain.model.Program
 import kotlin.time.Clock
 
-class ProgramRepositoryImpl(
+class LLProgramRepositoryImpl(
     private val programsApi: ProgramsApi,
     private val localDataSource: ProgramLocalDataSource? = null
 ) : ProgramRepository {

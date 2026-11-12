@@ -21,25 +21,15 @@ import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
-import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.di.terminus.terminusApiModule
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
-import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
-import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
-import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
-import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
-import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -115,7 +105,7 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), eventsUpdatesRepositoryModule(), filterRepositoryModule(), vehicleRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
+    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), eventsUpdatesRepositoryModule(), filterRepositoryModule(), spaceRepositoryModule(), vehicleRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
 }
 
 val appModule = module {
@@ -178,7 +168,6 @@ val appModule = module {
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
     viewModelOf(::AgencyListViewModel)
-    singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
     viewModelOf(::AstronautListViewModel)
     viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), get(), astronautId) }
 
@@ -186,11 +175,7 @@ val appModule = module {
     singleOf(::IssTrackingRepositoryImpl) {
         bind<IssTrackingRepository>()
     }
-    singleOf(::SpaceStationRepositoryImpl) { bind<SpaceStationRepository>() }
     viewModelOf(::SpaceStationViewModel)
-    singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
-    singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
-    singleOf(::SpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
 
@@ -198,8 +183,7 @@ val appModule = module {
     // granularity, no hot swap). The DebugPreferences override wins when set (debug builds
     // only); otherwise Remote Config's `data_backend` key, which falls back to LL on any
     // failure. Release users therefore stay on LL until the flag is set.
-    // The launch, events, updates and filter repositories branch on this value; the other
-    // repositories still read LL until their Tasks#1006 ports land.
+    // The launch, events, updates, filter, vehicle and space repositories branch on this value.
     single<DataBackend> {
         val remote = try {
             runBlocking { get<RemoteConfigRepository>().getDataBackend() }
