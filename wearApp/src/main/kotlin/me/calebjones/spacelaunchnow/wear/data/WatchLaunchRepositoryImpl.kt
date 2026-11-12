@@ -11,11 +11,8 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.Wearable
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
@@ -24,67 +21,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.wear.data.model.CachedLaunch
 import me.calebjones.spacelaunchnow.wear.data.model.DataLayerSyncPayload
 import me.calebjones.spacelaunchnow.wear.data.model.DataSource
 import me.calebjones.spacelaunchnow.wear.data.model.WatchLaunchCache
-
-/**
- * Minimal API response models for direct Launch Library API calls from the watch.
- * These are intentionally lightweight — only fields needed for CachedLaunch mapping.
- */
-@Serializable
-private data class ApiLaunchListResponse(
-    val count: Int,
-    val results: List<ApiLaunchBasic>,
-    val next: String? = null,
-    val previous: String? = null,
-)
-
-@Serializable
-private data class ApiLaunchBasic(
-    val id: String,
-    val name: String? = null,
-    val net: String? = null,
-    val status: ApiLaunchStatus? = null,
-    @SerialName("launch_service_provider") val launchServiceProvider: ApiAgencyMini? = null,
-    @SerialName("launch_designator") val launchDesignator: String? = null,
-    @SerialName("location_name") val locationName: String? = null,
-    val image: ApiImage? = null,
-)
-
-@Serializable
-private data class ApiLaunchStatus(
-    val id: Int? = null,
-    val name: String? = null,
-    val abbrev: String? = null,
-)
-
-@Serializable
-private data class ApiAgencyMini(
-    val id: Int? = null,
-    val name: String? = null,
-    val abbrev: String? = null,
-)
-
-@Serializable
-private data class ApiImage(
-    @SerialName("image_url") val imageUrl: String? = null,
-    @SerialName("thumbnail_url") val thumbnailUrl: String? = null,
-)
-
-/**
- * Persisted filter preferences synced from the phone app.
- */
-@Serializable
-private data class WatchFilterPreferences(
-    val followAllLaunches: Boolean = true,
-    val agencyIds: List<Int>? = null,
-    val locationIds: List<Int>? = null,
-)
 
 class WatchLaunchRepositoryImpl(
     private val context: Context,
@@ -95,14 +36,15 @@ class WatchLaunchRepositoryImpl(
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    private val httpClient = HttpClient(Android) {
-        install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true })
+    private val launchApi = WatchLaunchApi(
+        HttpClient(Android) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
         }
-    }
+    )
 
     companion object {
-        private const val LL_API_BASE_URL = "https://ll.thespacedevs.com/2.4.0/launches/upcoming/"
         private const val PATH_SYNC = "/spacelaunchnow/sync"
         val LAUNCH_CACHE_KEY = stringPreferencesKey("launch_cache_json")
         val FILTER_PREFS_KEY = stringPreferencesKey("watch_filter_prefs_json")
@@ -158,22 +100,9 @@ class WatchLaunchRepositoryImpl(
         return try {
             log.d { "Tier 1: Attempting direct API call" }
             val filterPrefs = loadFilterPreferences()
-            val response = httpClient.get(LL_API_BASE_URL) {
-                parameter("limit", limit)
-                parameter("mode", "list")
-                parameter("format", "json")
-                if (!filterPrefs.followAllLaunches) {
-                    filterPrefs.agencyIds?.takeIf { it.isNotEmpty() }?.let {
-                        parameter("lsp__id", it.joinToString(","))
-                    }
-                    filterPrefs.locationIds?.takeIf { it.isNotEmpty() }?.let {
-                        parameter("location__ids", it.joinToString(","))
-                    }
-                }
-            }
-            val apiResponse = response.body<ApiLaunchListResponse>()
-            val launches = apiResponse.results.mapNotNull { it.toCachedLaunch() }
-            log.i { "Tier 1 SUCCESS: Fetched ${launches.size} launches via direct API (filtered: ${!filterPrefs.followAllLaunches})" }
+            val backendConfig = WatchBackendStore.load(dataStore)
+            val launches = launchApi.fetchUpcoming(backendConfig, filterPrefs, limit)
+            log.i { "Tier 1 SUCCESS: Fetched ${launches.size} launches via direct API (${backendConfig.backend}, filtered: ${!filterPrefs.followAllLaunches})" }
             updateCache(launches, DataSource.DIRECT_API)
             launches
         } catch (e: Exception) {
@@ -302,29 +231,4 @@ class WatchLaunchRepositoryImpl(
             log.w(e) { "Failed to save filter preferences" }
         }
     }
-}
-
-private fun ApiLaunchBasic.toCachedLaunch(): CachedLaunch? {
-    val parsedNet = net?.let {
-        try {
-            Instant.parse(it)
-        } catch (e: Exception) {
-            null
-        }
-    } ?: return null
-
-    return CachedLaunch(
-        id = id,
-        name = name ?: "Unknown",
-        net = parsedNet,
-        statusAbbrev = status?.abbrev,
-        statusName = status?.name,
-        lspName = launchServiceProvider?.name,
-        lspAbbrev = launchServiceProvider?.abbrev,
-        rocketConfigName = launchDesignator,
-        missionName = null, // Not available in basic/list mode
-        missionDescription = null, // Not available in basic/list mode
-        padLocationName = locationName,
-        imageUrl = image?.imageUrl,
-    )
 }

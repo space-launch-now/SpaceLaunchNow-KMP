@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
@@ -54,6 +55,12 @@ private data class PhoneSyncLaunch(
 interface PhoneDataLayerSync {
     suspend fun syncToWatch()
     suspend fun syncEntitlementToWatch(active: Boolean, expiresAt: Instant?)
+
+    /**
+     * Tells the watch which backend the phone resolved (LL or Terminus) and which Terminus host
+     * it talks to. The watch has no Firebase, so it reads launches from this value.
+     */
+    suspend fun syncBackendToWatch(backend: DataBackend, terminusBaseUrl: String)
 }
 
 class PhoneDataLayerService(
@@ -139,10 +146,32 @@ class PhoneDataLayerService(
         }
     }
 
+    override suspend fun syncBackendToWatch(backend: DataBackend, terminusBaseUrl: String) {
+        // Failures other than "Wearable API missing" propagate; the caller logs them once.
+        val synced = wearAvailability.runIfAvailable {
+            val request = PutDataMapRequest.create(PATH_BACKEND).apply {
+                dataMap.putString(KEY_BACKEND, backend.value)
+                dataMap.putString(KEY_TERMINUS_BASE_URL, terminusBaseUrl)
+            }.asPutDataRequest().setUrgent()
+
+            suspendCancellableCoroutine { cont ->
+                dataClient.putDataItem(request)
+                    .addOnSuccessListener { cont.resume(Unit) }
+                    .addOnFailureListener { cont.resumeWithException(it) }
+            }
+        }
+        if (synced) {
+            Logger.i { "Synced data backend to watch: backend=${backend.value}, terminusBaseUrl=$terminusBaseUrl" }
+        }
+    }
+
     companion object {
         const val PATH_SYNC = "/spacelaunchnow/sync"
         const val PATH_REQUEST_SYNC = "/spacelaunchnow/request-sync"
         private const val PATH_ENTITLEMENT = "/spacelaunchnow/entitlement"
+        private const val PATH_BACKEND = "/spacelaunchnow/backend"
+        private const val KEY_BACKEND = "backend"
+        private const val KEY_TERMINUS_BASE_URL = "terminusBaseUrl"
         private const val KEY_ACTIVE = "active"
         private const val KEY_EXPIRES_AT = "expiresAt"
         private const val KEY_TIMESTAMP = "timestamp"

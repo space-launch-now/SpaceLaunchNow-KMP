@@ -137,4 +137,10 @@ dependencies {
 
     // Logging
     implementation(libs.kermit)
+
+    // Unit tests (JVM): Ktor MockEngine for the launch API, DataStore for the backend store
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.ktor.client.mock)
 }
