@@ -1,4 +1,4 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.coroutines.async
@@ -12,6 +12,7 @@ import me.calebjones.spacelaunchnow.api.launchlibrary.apis.ExpeditionsApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.SpaceStationsApi
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
+import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
 import me.calebjones.spacelaunchnow.database.SpaceStationLocalDataSource
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
@@ -25,7 +26,7 @@ import kotlin.time.Clock
  * Implementation of SpaceStationRepository with cache-first pattern.
  * Provides offline support through stale-while-revalidate for space station data.
  */
-class SpaceStationRepositoryImpl(
+class LLSpaceStationRepositoryImpl(
     private val spaceStationsApi: SpaceStationsApi,
     private val expeditionsApi: ExpeditionsApi,
     private val issTrackingRepository: IssTrackingRepository,

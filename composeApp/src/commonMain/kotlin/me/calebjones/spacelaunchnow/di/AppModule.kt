@@ -24,7 +24,7 @@ import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
-import me.calebjones.spacelaunchnow.data.repository.AstronautRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLAstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -36,7 +36,7 @@ import me.calebjones.spacelaunchnow.data.repository.LauncherRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
-import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
@@ -47,7 +47,7 @@ import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepositoryIm
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
-import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLSpaceStationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -187,7 +187,7 @@ val appModule = module {
     viewModelOf(::AgencyViewModel)
     viewModelOf(::AgencyListViewModel)
     singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
-    singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
+    singleOf(::LLAstronautRepositoryImpl) { bind<AstronautRepository>() }
     viewModelOf(::AstronautListViewModel)
     viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), get(), astronautId) }
 
@@ -195,12 +195,12 @@ val appModule = module {
     singleOf(::IssTrackingRepositoryImpl) {
         bind<IssTrackingRepository>()
     }
-    singleOf(::SpaceStationRepositoryImpl) { bind<SpaceStationRepository>() }
+    singleOf(::LLSpaceStationRepositoryImpl) { bind<SpaceStationRepository>() }
     viewModelOf(::SpaceStationViewModel)
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
     singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
     singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
-    singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
+    singleOf(::LLProgramRepositoryImpl) { bind<ProgramRepository>() }
     singleOf(::LauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
     singleOf(::SpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
     viewModelOf(::RocketViewModel)

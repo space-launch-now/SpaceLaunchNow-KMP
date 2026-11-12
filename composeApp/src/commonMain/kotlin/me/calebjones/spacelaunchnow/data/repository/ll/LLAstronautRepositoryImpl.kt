@@ -1,10 +1,11 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getAstronautDetail
 import me.calebjones.spacelaunchnow.api.extensions.getAstronautList
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AstronautsApi
+import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.mapper.toDomainDetail
 import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
@@ -18,7 +19,7 @@ import me.calebjones.spacelaunchnow.util.logging.logger
  * This repository handles network calls to fetch astronaut data and wraps
  * responses in Result<T> for proper error handling.
  */
-class AstronautRepositoryImpl(
+class LLAstronautRepositoryImpl(
     private val astronautsApi: AstronautsApi
 ) : AstronautRepository {
 
