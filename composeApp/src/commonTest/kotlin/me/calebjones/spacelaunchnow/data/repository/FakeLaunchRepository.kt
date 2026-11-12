@@ -70,14 +70,15 @@ class FakeLaunchRepository : LaunchRepository {
         limit: Int,
         offset: Int,
         netGt: Instant?,
-        netLt: Instant?
+        netLt: Instant?,
+        forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> {
         getUpcomingLaunchesDomainCalled = true
         if (shouldFail) return Result.failure(failureException)
         return upcomingLaunchesDomainResult
     }
 
-    override suspend fun getPreviousLaunchesDomain(limit: Int, offset: Int): Result<PaginatedResult<Launch>> {
+    override suspend fun getPreviousLaunchesDomain(limit: Int, offset: Int, forceRefresh: Boolean): Result<PaginatedResult<Launch>> {
         getPreviousLaunchesDomainCalled = true
         if (shouldFail) return Result.failure(failureException)
         return previousLaunchesDomainResult
@@ -165,7 +166,8 @@ class FakeLaunchRepository : LaunchRepository {
         statusIds: List<Int>?,
         orbitIds: List<Int>?,
         missionTypeIds: List<Int>?,
-        launcherConfigFamilyIds: List<Int>?
+        launcherConfigFamilyIds: List<Int>?,
+        forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> {
         if (shouldFail) return Result.failure(failureException)
         // Default to an empty page so ViewModels under test reach their success path.

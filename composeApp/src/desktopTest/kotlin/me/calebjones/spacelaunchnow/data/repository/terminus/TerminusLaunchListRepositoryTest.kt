@@ -310,6 +310,35 @@ class TerminusLaunchListRepositoryTest {
     }
 
     @Test
+    fun forceRefreshSkipsTheFreshMiniListCache() = runTest {
+        val fixture = miniFixture
+        val env = env { Reply(fixture) }
+
+        env.repository.getUpcomingLaunchesDomain(limit = 3).getOrThrow()
+        env.repository.getUpcomingLaunchesDomain(limit = 3).getOrThrow()
+        assertEquals(1, env.terminusRequests.size, "a normal read hits the fresh cache")
+
+        env.repository.getUpcomingLaunchesDomain(limit = 3, forceRefresh = true).getOrThrow()
+        assertEquals(2, env.terminusRequests.size, "forceRefresh calls the network")
+        env.repository.getPreviousLaunchesDomain(limit = 3).getOrThrow()
+        env.repository.getPreviousLaunchesDomain(limit = 3, forceRefresh = true).getOrThrow()
+        assertEquals(4, env.terminusRequests.size)
+    }
+
+    @Test
+    fun forceRefreshSkipsTheFreshFilteredListCache() = runTest {
+        val fixture = miniFixture
+        val env = env { Reply(fixture) }
+
+        env.repository.getFilteredLaunchesDomain(limit = 3, upcoming = true).getOrThrow()
+        env.repository.getFilteredLaunchesDomain(limit = 3, upcoming = true).getOrThrow()
+        assertEquals(1, env.terminusRequests.size, "a normal read hits the fresh cache")
+
+        env.repository.getFilteredLaunchesDomain(limit = 3, upcoming = true, forceRefresh = true).getOrThrow()
+        assertEquals(2, env.terminusRequests.size, "forceRefresh calls the network")
+    }
+
+    @Test
     fun listWithinADayOfNetCachesForAtMost30Seconds() = runTest {
         val near = withNet(resource("launches_mini_list.json"), nearNet)
         val env = env { Reply(near) }
