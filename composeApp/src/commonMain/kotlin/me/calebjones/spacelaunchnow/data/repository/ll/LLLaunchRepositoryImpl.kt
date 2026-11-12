@@ -12,13 +12,10 @@ import me.calebjones.spacelaunchnow.api.extensions.bodyOrThrow
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchById
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchList
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchMiniList
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchBasicList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.ApiError
 import me.calebjones.spacelaunchnow.data.model.DataResult
@@ -36,7 +33,6 @@ import kotlin.time.Duration.Companion.hours
 
 class LLLaunchRepositoryImpl(
     private val launchesApi: LaunchesApi,
-    private val agenciesApi: AgenciesApi,
     private val appPreferences: AppPreferences,
     private val localDataSource: LaunchLocalDataSource? = null,
     private val statsLocalDataSource: me.calebjones.spacelaunchnow.database.StatsLocalDataSource? = null
@@ -739,8 +735,9 @@ class LLLaunchRepositoryImpl(
     override suspend fun getLaunchesByDayAndMonth(
         day: Int,
         month: Int,
-        limit: Int
-    ): Result<PaginatedLaunchNormalList> {
+        limit: Int,
+        forceRefresh: Boolean
+    ): Result<PaginatedResult<Launch>> {
         return try {
             log.d { "getLaunchesByDayAndMonth - day: $day, month: $month, limit: $limit" }
             val response = launchesApi.getLaunchList(
@@ -752,7 +749,7 @@ class LLLaunchRepositoryImpl(
             )
             val launches = response.bodyOrThrow("getLaunchesByDayAndMonth")
             log.i { "✅ API SUCCESS: Fetched ${launches.results.size} launches for day $day, month $month" }
-            Result.success(launches)
+            Result.success(launches.toDomain())
         } catch (e: ResponseException) {
             log.e(e) { "❌ API ERROR in getLaunchesByDayAndMonth: ${e.message}" }
             Result.failure(e)
@@ -842,25 +839,6 @@ class LLLaunchRepositoryImpl(
      */
     override suspend fun getStaleDetailedLaunch(id: String): Launch? {
         return localDataSource?.getDetailedLaunchStale(id)
-    }
-
-    override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> {
-        return try {
-            log.d { "getAgencyDetails - id: $id" }
-            val response = agenciesApi.agenciesRetrieve(id)
-            val agency = response.bodyOrThrow("getAgencyDetails")
-            log.i { "✅ API SUCCESS: Fetched agency details: ${agency.name} (ID: $id)" }
-            Result.success(agency)
-        } catch (e: ResponseException) {
-            log.e(e) { "❌ API ERROR in getAgencyDetails for ID $id: ${e.message}" }
-            Result.failure(e)
-        } catch (e: IOException) {
-            log.e(e) { "❌ NETWORK ERROR in getAgencyDetails for ID $id: ${e.message}" }
-            Result.failure(e)
-        } catch (e: Exception) {
-            log.e(e) { "❌ UNEXPECTED ERROR in getAgencyDetails for ID $id: ${e::class.simpleName}: ${e.message}" }
-            Result.failure(e)
-        }
     }
 
     private suspend fun getNextStarshipLaunch(
@@ -1033,81 +1011,6 @@ class LLLaunchRepositoryImpl(
             Result.failure(e)
         } catch (e: Exception) {
             log.e(e) { "❌ UNEXPECTED ERROR in getStarshipHistoryLaunches: ${e::class.simpleName}: ${e.message}" }
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun getNextDetailedLaunch(
-        limit: Int
-    ): Result<PaginatedLaunchDetailedList> {
-        return try {
-            val response = launchesApi.launchesDetailedList(
-                limit = limit,
-                upcoming = true,
-                ordering = "net"
-            )
-
-            // Verbose debug logging for API response
-            val rawResponse = response.response.bodyAsText()
-            log.v { "API Response Debug - URL: ${response.response.request.url}, Status: ${response.status}, Length: ${rawResponse.length} chars" }
-            log.v { "Full Response Body: $rawResponse" }
-
-            // Check if it's an error response
-            if (response.status >= 400) {
-                val errorMessage = parseApiError(rawResponse)
-                log.e { "HTTP Error ${response.status}: $errorMessage" }
-                return Result.failure(Exception("API Error ${response.status}: $errorMessage"))
-            }
-
-            // Check if response looks like an error (contains "detail" field)
-            if (rawResponse.contains("\"detail\"")) {
-                val errorMessage = parseApiError(rawResponse)
-                log.e { "API returned error response: $errorMessage" }
-                return Result.failure(Exception("API Error: $errorMessage"))
-            }
-
-            // Try to deserialize the response body
-            val body = response.body()
-            Result.success(body)
-        } catch (e: ResponseException) {
-            log.e(e) { "ResponseException in getNextDetailedLaunch: ${e.message}" }
-            // Try to get the error response body
-            try {
-                val errorBody = e.response.bodyAsText()
-                val errorMessage = parseApiError(errorBody)
-                log.e { "Error response body: $errorMessage" }
-                Result.failure(Exception("API Error: $errorMessage"))
-            } catch (bodyException: Exception) {
-                Result.failure(e)
-            }
-        } catch (e: IOException) {
-            log.e(e) { "IOException in getNextDetailedLaunch: ${e.message}" }
-            Result.failure(e)
-        } catch (e: Exception) {
-            log.e(e) { "Exception in getNextDetailedLaunch: ${e::class.simpleName}: ${e.message}" }
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun getNextNormalLaunch(
-        limit: Int
-    ): Result<PaginatedLaunchNormalList> {
-        return try {
-            val response = launchesApi.getLaunchList(
-                limit = limit,
-                upcoming = true,
-                ordering = "net"
-            )
-            val body = response.bodyOrThrow("getNextNormalLaunch")
-            Result.success(body)
-        } catch (e: ResponseException) {
-            log.e(e) { "ResponseException in getNextNormalLaunch: ${e.message}" }
-            Result.failure(e)
-        } catch (e: IOException) {
-            log.e(e) { "IOException in getNextNormalLaunch: ${e.message}" }
-            Result.failure(e)
-        } catch (e: Exception) {
-            log.e(e) { "Exception in getNextNormalLaunch: ${e::class.simpleName}: ${e.message}" }
             Result.failure(e)
         }
     }

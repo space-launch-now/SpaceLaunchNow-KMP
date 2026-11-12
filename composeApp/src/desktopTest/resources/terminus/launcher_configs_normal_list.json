@@ -1,0 +1,23 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "response_mode": "normal",
+      "id": 164,
+      "url": "https://terminus.test/api/v1/launcher_configurations/164/",
+      "name": "Falcon 9",
+      "families": null,
+      "manufacturer": null,
+      "program": [],
+      "image": null,
+      "info_url": null,
+      "wiki_url": null,
+      "full_name": "Falcon 9 Block 5",
+      "variant": "Block 5",
+      "active": true,
+      "reusable": true
+    }
+  ]
+}

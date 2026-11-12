@@ -19,24 +19,16 @@ import me.calebjones.spacelaunchnow.data.model.resolveDataBackend
 import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
-import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
-import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.InfoRepository
 import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.di.terminus.terminusApiModule
-import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
-import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
-import me.calebjones.spacelaunchnow.data.repository.LauncherRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.RocketRepository
-import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
@@ -113,7 +105,7 @@ expect fun nativeConfig(): KoinAppDeclaration
 
 val koinConfig = koinConfiguration {
     includes(nativeConfig())
-    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), eventsUpdatesRepositoryModule(), filterRepositoryModule(), spaceRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
+    modules(networkModule, apiModule, terminusApiModule, launchRepositoryModule(), eventsUpdatesRepositoryModule(), filterRepositoryModule(), spaceRepositoryModule(), vehicleRepositoryModule(), appModule, debugModule, imageLoaderModule, analyticsModule)
 }
 
 val appModule = module {
@@ -176,7 +168,6 @@ val appModule = module {
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
     viewModelOf(::AgencyListViewModel)
-    singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
     viewModelOf(::AstronautListViewModel)
     viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), get(), astronautId) }
 
@@ -185,9 +176,6 @@ val appModule = module {
         bind<IssTrackingRepository>()
     }
     viewModelOf(::SpaceStationViewModel)
-    singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
-    singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
-    singleOf(::LauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
 
@@ -195,8 +183,7 @@ val appModule = module {
     // granularity, no hot swap). The DebugPreferences override wins when set (debug builds
     // only); otherwise Remote Config's `data_backend` key, which falls back to LL on any
     // failure. Release users therefore stay on LL until the flag is set.
-    // The launch, events, updates and filter repositories branch on this value; the other
-    // repositories still read LL until their Tasks#1006 ports land.
+    // The launch, events, updates, filter, vehicle and space repositories branch on this value.
     single<DataBackend> {
         val remote = try {
             runBlocking { get<RemoteConfigRepository>().getDataBackend() }
