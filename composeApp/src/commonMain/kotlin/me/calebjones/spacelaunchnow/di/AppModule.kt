@@ -38,10 +38,6 @@ import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
-import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
-import me.calebjones.spacelaunchnow.data.repository.ll.LLSpacecraftConfigRepositoryImpl
-import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
-import me.calebjones.spacelaunchnow.data.repository.ll.LLSpacecraftRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
@@ -190,10 +186,8 @@ val appModule = module {
     }
     viewModelOf(::SpaceStationViewModel)
     singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
-    singleOf(::LLSpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
     singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
     singleOf(::LauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
-    singleOf(::LLSpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)
 

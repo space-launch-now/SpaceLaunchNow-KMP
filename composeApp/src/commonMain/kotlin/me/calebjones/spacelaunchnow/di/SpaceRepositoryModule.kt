@@ -4,17 +4,24 @@ import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
 import me.calebjones.spacelaunchnow.data.repository.SpaceStationRepository
+import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
+import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
 import me.calebjones.spacelaunchnow.data.repository.ll.LLAstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ll.LLProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ll.LLSpaceStationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLSpacecraftConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLSpacecraftRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusAstronautRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusSpaceStationRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusSpacecraftConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusSpacecraftRepositoryImpl
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 /**
- * Picks the [SpaceStationRepository], [AstronautRepository] and [ProgramRepository] by
+ * Picks the [SpaceStationRepository], [AstronautRepository], [ProgramRepository],
+ * [SpacecraftRepository] and [SpacecraftConfigRepository] by
  * [DataBackend] (Tasks#1012). The branch sits inside each factory, and Koin singles are lazy, so
  * the Terminus repositories and the Terminus clients behind them are only built on
  * [DataBackend.TERMINUS]; the LL path never resolves them.
@@ -51,6 +58,18 @@ fun spaceRepositoryModule(): Module = module {
         when (get<DataBackend>()) {
             DataBackend.LL -> LLProgramRepositoryImpl(programsApi = get(), localDataSource = getOrNull())
             DataBackend.TERMINUS -> TerminusProgramRepositoryImpl(programsApi = get())
+        }
+    }
+    single<SpacecraftRepository> {
+        when (get<DataBackend>()) {
+            DataBackend.LL -> LLSpacecraftRepositoryImpl(spacecraftApi = get(), localDataSource = getOrNull())
+            DataBackend.TERMINUS -> TerminusSpacecraftRepositoryImpl(spacecraftApi = get())
+        }
+    }
+    single<SpacecraftConfigRepository> {
+        when (get<DataBackend>()) {
+            DataBackend.LL -> LLSpacecraftConfigRepositoryImpl(spacecraftConfigurationsApi = get())
+            DataBackend.TERMINUS -> TerminusSpacecraftConfigRepositoryImpl(spacecraftConfigurationsApi = get())
         }
     }
 }
