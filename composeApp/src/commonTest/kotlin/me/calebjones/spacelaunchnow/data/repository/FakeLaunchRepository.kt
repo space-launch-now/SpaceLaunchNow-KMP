@@ -1,9 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.domain.model.Launch
@@ -176,19 +173,10 @@ class FakeLaunchRepository : LaunchRepository {
 
     // -- Non-deprecated legacy passthroughs (API types kept on interface) --
 
-    override suspend fun getLaunchesByDayAndMonth(day: Int, month: Int, limit: Int): Result<PaginatedLaunchNormalList> =
+    override suspend fun getLaunchesByDayAndMonth(day: Int, month: Int, limit: Int, forceRefresh: Boolean): Result<PaginatedResult<Launch>> =
         Result.failure(NotImplementedError("Not wired in fake"))
 
     override suspend fun getStaleDetailedLaunch(id: String): Launch? = null
-
-    override suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed> =
-        Result.failure(NotImplementedError("Not wired in fake"))
-
-    override suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList> =
-        Result.failure(NotImplementedError("Not wired in fake"))
-
-    override suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedLaunchNormalList> =
-        Result.failure(NotImplementedError("Not wired in fake"))
 
     override suspend fun getStatsCount(key: String, netGt: Instant, netLt: Instant, forceRefresh: Boolean): Result<DataResult<Int>> =
         Result.failure(NotImplementedError("Not wired in fake"))

@@ -1,9 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.AgencyEndpointDetailed
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchDetailedList
-import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedLaunchNormalList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
@@ -14,14 +11,11 @@ interface LaunchRepository {
     suspend fun getLaunchesByDayAndMonth(
         day: Int,
         month: Int,
-        limit: Int = 100
-    ): Result<PaginatedLaunchNormalList>
+        limit: Int = 100,
+        forceRefresh: Boolean = false
+    ): Result<PaginatedResult<Launch>>
 
     suspend fun getStaleDetailedLaunch(id: String): Launch?
-    suspend fun getAgencyDetails(id: Int): Result<AgencyEndpointDetailed>
-
-    suspend fun getNextDetailedLaunch(limit: Int): Result<PaginatedLaunchDetailedList>
-    suspend fun getNextNormalLaunch(limit: Int): Result<PaginatedLaunchNormalList>
 
     suspend fun getStatsCount(
         key: String,

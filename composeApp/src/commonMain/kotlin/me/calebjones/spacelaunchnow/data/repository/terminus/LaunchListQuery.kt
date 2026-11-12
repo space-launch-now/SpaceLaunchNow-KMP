@@ -18,7 +18,7 @@ import kotlin.time.Instant
  * `status__ids`, orbitIds to `orbit__ids`, missionTypeIds to `mission_type__ids`,
  * launcherConfigFamilyIds to `launcher_config_family_ids`, rocketConfigurationId to
  * `rocket__configuration__id`, isCrewed to `is_crewed`, includeSuborbital to `include_suborbital`,
- * netGt to `net__gt`, netLt to `net__lt`.
+ * netGt to `net__gt`, netLt to `net__lt`, netDay to `net__day`, netMonth to `net__month`.
  */
 @OptIn(ExperimentalTime::class)
 internal class LaunchListQuery private constructor(
@@ -39,7 +39,9 @@ internal class LaunchListQuery private constructor(
     val missionTypeIds: List<Int>?,
     val launcherConfigFamilyIds: List<Int>?,
     val netGt: Instant?,
-    val netLt: Instant?
+    val netLt: Instant?,
+    val netDay: List<Int>?,
+    val netMonth: List<Int>?
 ) {
     /**
      * Stable name of this request, for the cache only (never log it: it holds the search text).
@@ -60,7 +62,8 @@ internal class LaunchListQuery private constructor(
         "include_suborbital" to includeSuborbital, "status__ids" to statusIds?.joinToString(","),
         "orbit__ids" to orbitIds?.joinToString(","), "mission_type__ids" to missionTypeIds?.joinToString(","),
         "launcher_config_family_ids" to launcherConfigFamilyIds?.joinToString(","),
-        "net__gt" to netGt, "net__lt" to netLt
+        "net__gt" to netGt, "net__lt" to netLt,
+        "net__day" to netDay?.joinToString(","), "net__month" to netMonth?.joinToString(",")
     ).filter { it.second != null }.joinToString("&") { "${it.first}=${it.second}" }
 
     suspend fun fetchMini(api: LaunchesApi): HttpResponse<PaginatedLaunchBasicList> =
@@ -82,7 +85,9 @@ internal class LaunchListQuery private constructor(
             missionTypeIds = missionTypeIds,
             launcherConfigFamilyIds = launcherConfigFamilyIds,
             netGt = netGt,
-            netLt = netLt
+            netLt = netLt,
+            netDay = netDay?.map { it.toDouble() },
+            netMonth = netMonth?.map { it.toDouble() }
         )
 
     suspend fun fetchNormal(api: LaunchesApi): HttpResponse<PaginatedLaunchNormalList> =
@@ -104,7 +109,9 @@ internal class LaunchListQuery private constructor(
             missionTypeIds = missionTypeIds,
             launcherConfigFamilyIds = launcherConfigFamilyIds,
             netGt = netGt,
-            netLt = netLt
+            netLt = netLt,
+            netDay = netDay?.map { it.toDouble() },
+            netMonth = netMonth?.map { it.toDouble() }
         )
 
     companion object {
@@ -126,7 +133,9 @@ internal class LaunchListQuery private constructor(
             missionTypeIds: List<Int>? = null,
             launcherConfigFamilyIds: List<Int>? = null,
             netGt: Instant? = null,
-            netLt: Instant? = null
+            netLt: Instant? = null,
+            netDay: List<Int>? = null,
+            netMonth: List<Int>? = null
         ) = LaunchListQuery(
             limit = limit,
             offset = offset?.takeIf { it > 0 },
@@ -145,7 +154,9 @@ internal class LaunchListQuery private constructor(
             missionTypeIds = missionTypeIds.normalizedIds(),
             launcherConfigFamilyIds = launcherConfigFamilyIds.normalizedIds(),
             netGt = netGt?.let { TimeFilterRounding.floor(it) },
-            netLt = netLt?.let { TimeFilterRounding.ceil(it) }
+            netLt = netLt?.let { TimeFilterRounding.ceil(it) },
+            netDay = netDay.normalizedIds(),
+            netMonth = netMonth.normalizedIds()
         )
     }
 }
