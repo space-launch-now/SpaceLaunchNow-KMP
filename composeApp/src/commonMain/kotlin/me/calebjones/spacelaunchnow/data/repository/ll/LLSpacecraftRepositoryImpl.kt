@@ -1,5 +1,6 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
+import me.calebjones.spacelaunchnow.data.repository.SpacecraftRepository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getSpacecraft
@@ -13,7 +14,7 @@ import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import kotlin.time.Clock
 
-class SpacecraftRepositoryImpl(
+class LLSpacecraftRepositoryImpl(
     private val spacecraftApi: SpacecraftApi,
     private val localDataSource: SpacecraftLocalDataSource? = null
 ) : SpacecraftRepository {
