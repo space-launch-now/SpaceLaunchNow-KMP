@@ -1,12 +1,10 @@
 package me.calebjones.spacelaunchnow.data.repository.terminus
 
 import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchersApi
-import me.calebjones.spacelaunchnow.api.terminus.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
 import me.calebjones.spacelaunchnow.domain.mapper.terminus.toDomain
 import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
-import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Launcher repository for the Terminus backend. Lists use `GET /api/v1/launchers/detailed/` and
@@ -21,17 +19,6 @@ class TerminusLauncherRepositoryImpl internal constructor(
 
     constructor(api: LaunchersApi) : this(api, TerminusMemoryCache())
 
-    private val log = logger()
-
-    private suspend fun <T : Any> read(
-        key: String,
-        what: String,
-        fetch: suspend () -> HttpResponse<T>
-    ): Result<TerminusFetched<T>> {
-        log.d { "terminus read $what" }
-        return terminusMemoryCachedFetch(cache, key, what, forceRefresh = false, fetch = fetch)
-    }
-
     override suspend fun getLaunchersDomain(
         limit: Int,
         offset: Int,
@@ -40,7 +27,7 @@ class TerminusLauncherRepositoryImpl internal constructor(
         launcherConfigId: Int?,
         isPlaceholder: Boolean?
     ): Result<PaginatedResult<LauncherDetail>> =
-        read(
+        cache.terminusRead(
             "launchers?limit=$limit&offset=$offset&search=$search&ordering=$ordering&config=$launcherConfigId",
             "launchers"
         ) {
@@ -69,6 +56,6 @@ class TerminusLauncherRepositoryImpl internal constructor(
         )
 
     override suspend fun getLauncherDetailsDomain(launcherId: Int): Result<LauncherDetail> =
-        read("launcher-detail?id=$launcherId", "launcher $launcherId") { api.launchersRetrieve(launcherId) }
+        cache.terminusRead("launcher-detail?id=$launcherId", "launcher $launcherId") { api.launchersRetrieve(launcherId) }
             .mapCatching { it.value.toDomain() }
 }

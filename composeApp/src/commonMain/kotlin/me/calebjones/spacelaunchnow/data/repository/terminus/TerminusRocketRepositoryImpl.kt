@@ -1,13 +1,11 @@
 package me.calebjones.spacelaunchnow.data.repository.terminus
 
 import me.calebjones.spacelaunchnow.api.terminus.apis.LauncherConfigurationsApi
-import me.calebjones.spacelaunchnow.api.terminus.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.domain.mapper.terminus.toDomain
 import me.calebjones.spacelaunchnow.domain.mapper.terminus.toVehicleDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
-import me.calebjones.spacelaunchnow.util.logging.logger
 
 /**
  * Rocket repository for the Terminus backend. A "rocket" here is a launcher configuration, as in
@@ -23,17 +21,6 @@ class TerminusRocketRepositoryImpl internal constructor(
 
     constructor(api: LauncherConfigurationsApi) : this(api, TerminusMemoryCache())
 
-    private val log = logger()
-
-    private suspend fun <T : Any> read(
-        key: String,
-        what: String,
-        fetch: suspend () -> HttpResponse<T>
-    ): Result<TerminusFetched<T>> {
-        log.d { "terminus read $what" }
-        return terminusMemoryCachedFetch(cache, key, what, forceRefresh = false, fetch = fetch)
-    }
-
     override suspend fun getRocketsDomain(
         limit: Int,
         offset: Int,
@@ -44,7 +31,7 @@ class TerminusRocketRepositoryImpl internal constructor(
         active: Boolean?,
         reusable: Boolean?
     ): Result<PaginatedResult<VehicleConfig>> =
-        read(
+        cache.terminusRead(
             "rockets?limit=$limit&offset=$offset&ordering=$ordering&search=$search&program=$programIds&families=$familyIds&active=$active&reusable=$reusable",
             "rockets"
         ) {
@@ -61,6 +48,6 @@ class TerminusRocketRepositoryImpl internal constructor(
         }.mapCatching { it.value.toDomain() }
 
     override suspend fun getRocketDetailsDomain(id: Int): Result<VehicleConfig> =
-        read("rocket-detail?id=$id", "rocket $id") { api.launcherConfigurationsRetrieve(id) }
+        cache.terminusRead("rocket-detail?id=$id", "rocket $id") { api.launcherConfigurationsRetrieve(id) }
             .mapCatching { it.value.toVehicleDomain() }
 }

@@ -1,5 +1,8 @@
 package me.calebjones.spacelaunchnow.di
 
+import me.calebjones.spacelaunchnow.api.terminus.apis.AgenciesApi
+import me.calebjones.spacelaunchnow.api.terminus.apis.LauncherConfigurationsApi
+import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchersApi
 import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
@@ -27,29 +30,25 @@ fun vehicleRepositoryModule(): Module = module {
     single<AgencyRepository> {
         when (get<DataBackend>()) {
             DataBackend.LL -> LLAgencyRepositoryImpl(get())
-            DataBackend.TERMINUS -> TerminusAgencyRepositoryImpl(get<me.calebjones.spacelaunchnow.api.terminus.apis.AgenciesApi>())
+            DataBackend.TERMINUS -> TerminusAgencyRepositoryImpl(get<AgenciesApi>())
         }
     }
     single<LauncherConfigRepository> {
         when (get<DataBackend>()) {
             DataBackend.LL -> LLLauncherConfigRepositoryImpl(get())
-            DataBackend.TERMINUS -> TerminusLauncherConfigRepositoryImpl(
-                get<me.calebjones.spacelaunchnow.api.terminus.apis.LauncherConfigurationsApi>()
-            )
+            DataBackend.TERMINUS -> TerminusLauncherConfigRepositoryImpl(get<LauncherConfigurationsApi>())
         }
     }
     single<LauncherRepository> {
         when (get<DataBackend>()) {
             DataBackend.LL -> LLLauncherRepositoryImpl(get())
-            DataBackend.TERMINUS -> TerminusLauncherRepositoryImpl(get<me.calebjones.spacelaunchnow.api.terminus.apis.LaunchersApi>())
+            DataBackend.TERMINUS -> TerminusLauncherRepositoryImpl(get<LaunchersApi>())
         }
     }
     single<RocketRepository> {
         when (get<DataBackend>()) {
             DataBackend.LL -> LLRocketRepositoryImpl(get())
-            DataBackend.TERMINUS -> TerminusRocketRepositoryImpl(
-                get<me.calebjones.spacelaunchnow.api.terminus.apis.LauncherConfigurationsApi>()
-            )
+            DataBackend.TERMINUS -> TerminusRocketRepositoryImpl(get<LauncherConfigurationsApi>())
         }
     }
 }

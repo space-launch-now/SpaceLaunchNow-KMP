@@ -27,37 +27,39 @@ import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 // Terminus model is re-read as the LL model by the JSON bridge, then the one tested LL -> domain
 // mapping runs, as the event and launch mappers do.
 
+private inline fun <reified T, reified R> T.bridge(): R = bridgeJson.decodeFromString<R>(bridgeJson.encodeToString(this))
+
 fun TerminusPaginatedAgencyNormalList.toLL(): LLPaginatedAgencyNormalList =
-    bridgeJson.decodeFromString<LLPaginatedAgencyNormalList>(bridgeJson.encodeToString(this))
+    this.bridge()
 
 fun TerminusPaginatedAgencyNormalList.toDomain(): PaginatedResult<Agency> = toLL().toDomain()
 
 fun TerminusAgencyEndpointDetailed.toLL(): LLAgencyEndpointDetailed =
-    bridgeJson.decodeFromString<LLAgencyEndpointDetailed>(bridgeJson.encodeToString(this))
+    this.bridge()
 
 fun TerminusAgencyEndpointDetailed.toDomainAgency(): Agency = toLL().toDomainAgency()
 
 fun TerminusPaginatedLauncherConfigNormalList.toLL(): LLPaginatedLauncherConfigNormalList =
-    bridgeJson.decodeFromString<LLPaginatedLauncherConfigNormalList>(bridgeJson.encodeToString(this))
+    this.bridge()
 
 fun TerminusPaginatedLauncherConfigNormalList.toDomain(): PaginatedResult<VehicleConfig> = toLL().toDomain()
 
 fun TerminusPaginatedLauncherConfigDetailedList.toLL(): LLPaginatedLauncherConfigDetailedList =
-    bridgeJson.decodeFromString<LLPaginatedLauncherConfigDetailedList>(bridgeJson.encodeToString(this))
+    this.bridge()
 
 fun TerminusPaginatedLauncherConfigDetailedList.toDomain(): PaginatedResult<VehicleConfig> = toLL().toDomain()
 
 fun TerminusLauncherConfigDetailed.toLL(): LLLauncherConfigDetailed =
-    bridgeJson.decodeFromString<LLLauncherConfigDetailed>(bridgeJson.encodeToString(this))
+    this.bridge()
 
 fun TerminusLauncherConfigDetailed.toVehicleDomain(): VehicleConfig = toLL().toVehicleDomain()
 
 fun TerminusPaginatedLauncherDetailedList.toLL(): LLPaginatedLauncherDetailedList =
-    bridgeJson.decodeFromString<LLPaginatedLauncherDetailedList>(bridgeJson.encodeToString(this))
+    this.bridge()
 
 fun TerminusPaginatedLauncherDetailedList.toDomain(): PaginatedResult<LauncherDetail> = toLL().toDomain()
 
 fun TerminusLauncherDetailed.toLL(): LLLauncherDetailed =
-    bridgeJson.decodeFromString<LLLauncherDetailed>(bridgeJson.encodeToString(this))
+    this.bridge()
 
 fun TerminusLauncherDetailed.toDomain(): LauncherDetail = toLL().toDomain()
