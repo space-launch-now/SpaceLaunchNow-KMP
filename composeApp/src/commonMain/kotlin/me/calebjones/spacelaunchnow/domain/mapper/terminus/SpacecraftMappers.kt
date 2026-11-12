@@ -1,6 +1,5 @@
 package me.calebjones.spacelaunchnow.domain.mapper.terminus
 
-import kotlinx.serialization.encodeToString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacecraftConfigDetailedList as LLPaginatedSpacecraftConfigDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedSpacecraftEndpointDetailedList as LLPaginatedSpacecraftEndpointDetailedList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.SpacecraftConfigDetailed as LLSpacecraftConfigDetailed
@@ -15,29 +14,25 @@ import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import me.calebjones.spacelaunchnow.domain.model.SpacecraftConfig
 
 // Terminus serves the LL2 shapes for spacecraft and spacecraft configurations. Each mapper
-// re-reads the Terminus model as the LL model (see bridgeJson) and reuses the one tested
+// re-reads the Terminus model as the LL model (see Bridge.kt) and reuses the one tested
 // LL -> domain mapping.
 
 /** Terminus `GET /spacecraft/{id}/` to the domain spacecraft. */
 fun TerminusSpacecraftEndpointDetailed.toDomain(): Spacecraft =
-    bridgeJson
-        .decodeFromString<LLSpacecraftEndpointDetailed>(bridgeJson.encodeToString(this))
+    bridge<_, LLSpacecraftEndpointDetailed>()
         .toDomain()
 
 /** Terminus `GET /spacecraft/detailed/` page to the domain page. */
 fun TerminusPaginatedSpacecraftEndpointDetailedList.toDomain(): PaginatedResult<Spacecraft> =
-    bridgeJson
-        .decodeFromString<LLPaginatedSpacecraftEndpointDetailedList>(bridgeJson.encodeToString(this))
+    bridge<_, LLPaginatedSpacecraftEndpointDetailedList>()
         .toDomain()
 
 /** Terminus `GET /spacecraft_configurations/{id}/` to the domain spacecraft configuration. */
 fun TerminusSpacecraftConfigDetailed.toDomain(): SpacecraftConfig =
-    bridgeJson
-        .decodeFromString<LLSpacecraftConfigDetailed>(bridgeJson.encodeToString(this))
+    bridge<_, LLSpacecraftConfigDetailed>()
         .toDomain()
 
 /** Terminus `GET /spacecraft_configurations/detailed/` page to the domain page. */
 fun TerminusPaginatedSpacecraftConfigDetailedList.toDomain(): PaginatedResult<SpacecraftConfig> =
-    bridgeJson
-        .decodeFromString<LLPaginatedSpacecraftConfigDetailedList>(bridgeJson.encodeToString(this))
+    bridge<_, LLPaginatedSpacecraftConfigDetailedList>()
         .toDomain()

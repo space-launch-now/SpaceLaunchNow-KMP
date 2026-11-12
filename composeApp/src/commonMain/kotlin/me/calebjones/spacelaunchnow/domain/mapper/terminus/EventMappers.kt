@@ -1,6 +1,5 @@
 package me.calebjones.spacelaunchnow.domain.mapper.terminus
 
-import kotlinx.serialization.encodeToString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.EventEndpointDetailed as LLEventEndpointDetailed
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventEndpointNormalList as LLPaginatedEventEndpointNormalList
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.PaginatedEventTypeList as LLPaginatedEventTypeList
@@ -22,25 +21,23 @@ import me.calebjones.spacelaunchnow.domain.model.Update
 
 /** Terminus `GET /events/` page as the LL page the [me.calebjones.spacelaunchnow.data.repository.EventsRepository] interface returns. */
 fun TerminusPaginatedEventEndpointNormalList.toLL(): LLPaginatedEventEndpointNormalList =
-    bridgeJson.decodeFromString<LLPaginatedEventEndpointNormalList>(bridgeJson.encodeToString(this))
+    bridge<_, LLPaginatedEventEndpointNormalList>()
 
 fun TerminusPaginatedEventEndpointNormalList.toDomain(): PaginatedResult<Event> = toLL().toDomain()
 
 /** Terminus `GET /events/{id}/` to the domain event. */
 fun TerminusEventEndpointDetailed.toDomain(): Event =
-    bridgeJson
-        .decodeFromString<LLEventEndpointDetailed>(bridgeJson.encodeToString(this))
+    bridge<_, LLEventEndpointDetailed>()
         .toDomain()
 
 /** Terminus `GET /config/event-types/` page to the domain event types. */
 fun TerminusPaginatedEventTypeList.toDomain(): List<EventType> =
-    bridgeJson
-        .decodeFromString<LLPaginatedEventTypeList>(bridgeJson.encodeToString(this))
+    bridge<_, LLPaginatedEventTypeList>()
         .results.map { it.toDomain() }
 
 /** Terminus `GET /updates/` page to the domain page. `launch` becomes a LaunchRef, `created_by` stays text. */
 fun TerminusPaginatedUpdateEndpointList.toDomain(): PaginatedResult<Update> {
-    val page = bridgeJson.decodeFromString<LLPaginatedUpdateEndpointList>(bridgeJson.encodeToString(this))
+    val page = bridge<_, LLPaginatedUpdateEndpointList>()
     return PaginatedResult(
         count = page.count,
         next = page.next,
