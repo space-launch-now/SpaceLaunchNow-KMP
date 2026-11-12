@@ -20,7 +20,7 @@ import me.calebjones.spacelaunchnow.data.notifications.PushMessaging
 import me.calebjones.spacelaunchnow.data.notifications.v6.TopicSubscriptionStore
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
-import me.calebjones.spacelaunchnow.data.repository.AgencyRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLAgencyRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
@@ -30,9 +30,9 @@ import me.calebjones.spacelaunchnow.data.repository.InfoRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.di.terminus.terminusApiModule
 import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
-import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLLauncherConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
-import me.calebjones.spacelaunchnow.data.repository.LauncherRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLLauncherRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ProgramRepository
@@ -40,7 +40,7 @@ import me.calebjones.spacelaunchnow.data.repository.ProgramRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.RocketRepository
-import me.calebjones.spacelaunchnow.data.repository.RocketRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.ll.LLRocketRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepository
 import me.calebjones.spacelaunchnow.data.repository.SpacecraftConfigRepositoryImpl
@@ -186,7 +186,7 @@ val appModule = module {
     viewModelOf(::EventViewModel)
     viewModelOf(::AgencyViewModel)
     viewModelOf(::AgencyListViewModel)
-    singleOf(::AgencyRepositoryImpl) { bind<AgencyRepository>() }
+    singleOf(::LLAgencyRepositoryImpl) { bind<AgencyRepository>() }
     singleOf(::AstronautRepositoryImpl) { bind<AstronautRepository>() }
     viewModelOf(::AstronautListViewModel)
     viewModel { (astronautId: Int) -> AstronautDetailViewModel(get(), get(), astronautId) }
@@ -197,11 +197,11 @@ val appModule = module {
     }
     singleOf(::SpaceStationRepositoryImpl) { bind<SpaceStationRepository>() }
     viewModelOf(::SpaceStationViewModel)
-    singleOf(::RocketRepositoryImpl) { bind<RocketRepository>() }
+    singleOf(::LLRocketRepositoryImpl) { bind<RocketRepository>() }
     singleOf(::SpacecraftRepositoryImpl) { bind<SpacecraftRepository>() }
-    singleOf(::LauncherRepositoryImpl) { bind<LauncherRepository>() }
+    singleOf(::LLLauncherRepositoryImpl) { bind<LauncherRepository>() }
     singleOf(::ProgramRepositoryImpl) { bind<ProgramRepository>() }
-    singleOf(::LauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
+    singleOf(::LLLauncherConfigRepositoryImpl) { bind<LauncherConfigRepository>() }
     singleOf(::SpacecraftConfigRepositoryImpl) { bind<SpacecraftConfigRepository>() }
     viewModelOf(::RocketViewModel)
     singleOf(::LaunchCache)

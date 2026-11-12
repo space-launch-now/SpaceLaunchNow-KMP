@@ -1,5 +1,6 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
+import me.calebjones.spacelaunchnow.data.repository.LauncherConfigRepository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getConfigurationsByProgram
@@ -15,7 +16,7 @@ import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 /**
  * Implementation of LauncherConfigRepository using the generated LauncherConfigurationsApi
  */
-class LauncherConfigRepositoryImpl(
+class LLLauncherConfigRepositoryImpl(
     private val launcherConfigurationsApi: LauncherConfigurationsApi
 ) : LauncherConfigRepository {
 
