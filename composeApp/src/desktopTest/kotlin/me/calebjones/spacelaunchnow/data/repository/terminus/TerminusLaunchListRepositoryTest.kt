@@ -449,17 +449,180 @@ class TerminusLaunchListRepositoryTest {
         assertNull(env.llRepository.getStaleDetailedLaunch(cacheId("mini")))
     }
 
+    // -- Featured, in flight, Starship, by day and stats (Tasks#1015 S6b) -------
+
     @Test
-    fun otherCallsStayOnLl() = runTest {
-        val fixture = miniFixture
+    fun llBackendMakesZeroTerminusCallsForTheLaunchReads() = runTest {
+        val env = env(DataBackend.LL, llBody = normalFixture) { error("Terminus must not be called") }
+        val repository = env.repository
+        val window = Clock.System.now()
+
+        repository.getFeaturedLaunchDomain(forceRefresh = true)
+        repository.getInFlightLaunchesDomain(forceRefresh = true)
+        repository.getStarshipLaunchesDomain(limit = 3, forceRefresh = true, programId = listOf(1))
+        repository.getStarshipHistoryDomain(limit = 3, forceRefresh = true)
+        repository.getLaunchesByDayAndMonth(day = 15, month = 11)
+        repository.getStatsCount("stats-ll", window, window + 1.days, forceRefresh = true)
+
+        assertTrue(env.llRequests.size >= 6, "LL got ${env.llRequests}")
+        assertFalse(env.terminusClientWasBuilt)
+        assertTrue(env.terminusRequests.isEmpty(), "Terminus got ${env.terminusRequests}")
+    }
+
+    @Test
+    fun featuredRequestsTheNextFourFromOneHourAgoAndMapsLikeLl() = runTest {
+        val fixture = normalFixture
+        val env = env(llBody = fixture) { Reply(fixture) }
+        env.preferences.updateHideTbdLaunches(true)
+
+        val viaTerminus = env.repository.getFeaturedLaunchDomain(
+            forceRefresh = true, agencyIds = listOf(121, 44), locationIds = listOf(12)
+        ).getOrThrow()
+
+        val url = env.terminusRequests.single()
+        assertEquals("/api/v1/launches/", url.encodedPath)
+        assertEquals("4", url.param("limit"))
+        assertEquals("net", url.param("ordering"))
+        assertEquals("44,121", url.param("lsp__id"))
+        assertEquals("12", url.param("location__ids"))
+        assertEquals("1,3,4,5,6,7,9", url.param("status__ids"))
+        val netGt = Instant.parse(assertNotNull(url.param("net__gt")))
+        val oneHourAgo = Clock.System.now() - 1.hours
+        assertTrue(netGt <= oneHourAgo && oneHourAgo - netGt < 2.hours / 60, "net__gt $netGt")
+        assertNull(url.param("upcoming"))
+        assertEquals(DataSource.NETWORK, viaTerminus.source)
+
+        val viaLl = env.llRepository.getFeaturedLaunchDomain(
+            forceRefresh = true, agencyIds = null, locationIds = null
+        ).getOrThrow()
+        assertEquals(viaLl.data, viaTerminus.data)
+    }
+
+    @Test
+    fun inFlightRequestsStatusSixAndMapsLikeLl() = runTest {
+        val fixture = normalFixture
         val env = env(llBody = fixture) { Reply(fixture) }
 
-        env.repository.getFeaturedLaunchDomain(forceRefresh = true)
-        env.repository.getInFlightLaunchesDomain(forceRefresh = true)
-        env.repository.getStarshipLaunchesDomain(limit = 3, forceRefresh = true)
+        val viaTerminus = env.repository.getInFlightLaunchesDomain(
+            forceRefresh = true, agencyIds = listOf(44), locationIds = null
+        ).getOrThrow()
 
-        assertTrue(env.terminusRequests.isEmpty(), "Terminus got ${env.terminusRequests}")
-        assertTrue(env.llRequests.isNotEmpty())
+        val url = env.terminusRequests.single()
+        assertEquals("/api/v1/launches/", url.encodedPath)
+        assertEquals("6", url.param("status__ids"))
+        assertEquals("5", url.param("limit"))
+        assertEquals("net", url.param("ordering"))
+        assertEquals("44", url.param("lsp__id"))
+        assertNull(url.param("net__gt"))
+
+        val viaLl = env.llRepository.getInFlightLaunchesDomain(
+            forceRefresh = true, agencyIds = null, locationIds = null
+        ).getOrThrow()
+        assertEquals(viaLl.data, viaTerminus.data)
+    }
+
+    @Test
+    fun starshipReadsRequestTheProgramAndMapLikeLl() = runTest {
+        val fixture = normalFixture
+        val env = env(llBody = fixture) { Reply(fixture) }
+
+        val upcoming = env.repository.getStarshipLaunchesDomain(limit = 3, forceRefresh = true, programId = listOf(1)).getOrThrow()
+        val history = env.repository.getStarshipHistoryDomain(limit = 25, forceRefresh = true).getOrThrow()
+
+        val (up, past) = env.terminusRequests
+        assertEquals("/api/v1/launches/", up.encodedPath)
+        assertEquals("true", up.param("upcoming"))
+        assertEquals("net", up.param("ordering"))
+        assertEquals("1", up.param("program"))
+        assertEquals("3", up.param("limit"))
+        assertEquals("true", past.param("previous"))
+        assertEquals("-net", past.param("ordering"))
+        assertEquals("1", past.param("program"))
+        assertEquals("25", past.param("limit"))
+        assertNull(past.param("upcoming"))
+        assertEquals(DataSource.NETWORK, history.source)
+
+        val upcomingViaLl = env.llRepository.getStarshipLaunchesDomain(limit = 3, forceRefresh = true, programId = listOf(1)).getOrThrow()
+        val historyViaLl = env.llRepository.getStarshipHistoryDomain(limit = 25, forceRefresh = true).getOrThrow()
+        assertEquals(upcomingViaLl, upcoming)
+        assertEquals(historyViaLl.data, history.data)
+    }
+
+    @Test
+    fun byDayAndMonthRequestsPastLaunchesOfThatDayAndMapsLikeLl() = runTest {
+        val fixture = normalFixture
+        val env = env(llBody = fixture) { Reply(fixture) }
+
+        val viaTerminus = env.repository.getLaunchesByDayAndMonth(day = 15, month = 11, limit = 50).getOrThrow()
+
+        val url = env.terminusRequests.single()
+        assertEquals("/api/v1/launches/", url.encodedPath)
+        assertEquals("true", url.param("previous"))
+        assertEquals("-net", url.param("ordering"))
+        assertEquals("50", url.param("limit"))
+        assertEquals("15.0", url.param("net__day"))
+        assertEquals("11.0", url.param("net__month"))
+
+        val viaLl = env.llRepository.getLaunchesByDayAndMonth(day = 15, month = 11, limit = 50).getOrThrow()
+        assertEquals(viaLl, viaTerminus)
+    }
+
+    @Test
+    fun byDayAndMonthUsesTheCacheUntilForceRefresh() = runTest {
+        val fixture = normalFixture
+        val env = env { Reply(fixture) }
+
+        env.repository.getLaunchesByDayAndMonth(day = 15, month = 11).getOrThrow()
+        env.repository.getLaunchesByDayAndMonth(day = 15, month = 11).getOrThrow()
+        assertEquals(1, env.terminusRequests.size, "the second read is a fresh cache hit")
+
+        env.repository.getLaunchesByDayAndMonth(day = 15, month = 11, forceRefresh = true).getOrThrow()
+        assertEquals(2, env.terminusRequests.size, "forceRefresh calls the network")
+        env.repository.getLaunchesByDayAndMonth(day = 16, month = 11).getOrThrow()
+        assertEquals(3, env.terminusRequests.size, "another day is another cache entry")
+    }
+
+    @Test
+    fun statsCountRequestsOneUpcomingRowAndReturnsTheCountLikeLl() = runTest {
+        val fixture = miniFixture
+        val env = env(llBody = fixture) { Reply(fixture) }
+        val netGt = Instant.parse("2026-01-01T00:00:30Z")
+        val netLt = Instant.parse("2027-01-01T00:00:30Z")
+
+        val viaTerminus = env.repository.getStatsCount("stats-terminus", netGt, netLt).getOrThrow()
+
+        val url = env.terminusRequests.single()
+        assertEquals("/api/v1/launches/mini/", url.encodedPath)
+        assertEquals("1", url.param("limit"))
+        assertEquals("true", url.param("upcoming"))
+        assertEquals("2026-01-01T00:00:00Z", url.param("net__gt"))
+        assertEquals("2027-01-01T00:01:00Z", url.param("net__lt"))
+        assertEquals(DataSource.NETWORK, viaTerminus.source)
+
+        val viaLl = env.llRepository.getStatsCount("stats-ll", netGt, netLt).getOrThrow()
+        assertEquals(viaLl.data, viaTerminus.data)
+        assertTrue(viaTerminus.data >= 3)
+    }
+
+    @Test
+    fun statsCountUsesTheStatsCacheAndServesItStaleOnAServerError() = runTest {
+        var status = HttpStatusCode.OK
+        val fixture = miniFixture
+        val env = env { Reply(if (status == HttpStatusCode.OK) fixture else "oops", status) }
+        val netGt = Instant.parse("2026-01-01T00:00:00Z")
+        val netLt = Instant.parse("2027-01-01T00:00:00Z")
+
+        val first = env.repository.getStatsCount("stats-cache", netGt, netLt).getOrThrow()
+        val second = env.repository.getStatsCount("stats-cache", netGt, netLt).getOrThrow()
+        assertEquals(1, env.terminusRequests.size, "the second read is a fresh cache hit")
+        assertEquals(DataSource.CACHE, second.source)
+        assertEquals(first.data, second.data)
+
+        status = HttpStatusCode.ServiceUnavailable
+        val stale = env.repository.getStatsCount("stats-cache", netGt, netLt, forceRefresh = true).getOrThrow()
+        assertEquals(2, env.terminusRequests.size)
+        assertEquals(DataSource.STALE_CACHE, stale.source)
+        assertEquals(first.data, stale.data)
     }
 
     @Test

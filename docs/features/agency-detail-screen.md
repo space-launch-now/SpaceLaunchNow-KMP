@@ -29,7 +29,7 @@ navController.navigate(AgencyDetail(agencyId = 44))
 ### Data Flow
 ```
 User navigates → AgencyDetailScreen → AgencyViewModel.fetchAgencyDetails()
-                                    → LaunchRepository.getAgencyDetails()
+                                    → AgencyRepository.getAgencyDetailDomain()
                                     → API Call → AgencyDetailView renders
 ```
 

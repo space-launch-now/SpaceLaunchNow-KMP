@@ -23,7 +23,6 @@ import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
-import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.Update
@@ -627,7 +626,8 @@ class HomeViewModel(
                 val result = launchRepository.getLaunchesByDayAndMonth(
                     day = day,
                     month = month,
-                    limit = limit
+                    limit = limit,
+                    forceRefresh = forceRefresh
                 )
 
                 result.onSuccess { paginatedLaunches ->
@@ -637,7 +637,7 @@ class HomeViewModel(
                         it.copy(
                             data = HistoryData(
                                 count = paginatedLaunches.count,
-                                launches = paginatedLaunches.results.reversed().map { launch -> launch.toDomain() }
+                                launches = paginatedLaunches.results.reversed()
                             ),
                             isLoading = false
                         )

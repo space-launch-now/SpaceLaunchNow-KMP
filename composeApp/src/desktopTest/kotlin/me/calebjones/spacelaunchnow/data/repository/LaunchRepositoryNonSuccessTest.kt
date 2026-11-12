@@ -11,7 +11,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.test.runTest
-import me.calebjones.spacelaunchnow.api.launchlibrary.apis.AgenciesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.data.model.DataSource
@@ -115,7 +114,6 @@ class LaunchRepositoryNonSuccessTest {
         }
         LLLaunchRepositoryImpl(
             launchesApi = LaunchesApi(baseUrl = "https://ll.test", httpClientEngine = engine),
-            agenciesApi = AgenciesApi(baseUrl = "https://ll.test", httpClientEngine = engine),
             appPreferences = preferences,
             localDataSource = local
         )
