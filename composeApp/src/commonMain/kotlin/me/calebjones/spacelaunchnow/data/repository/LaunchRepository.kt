@@ -8,6 +8,7 @@ import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
 interface LaunchRepository {
 
+    /** [forceRefresh] skips the fresh cache on the Terminus backend; the LL backend has no cache here and ignores it. */
     suspend fun getLaunchesByDayAndMonth(
         day: Int,
         month: Int,
