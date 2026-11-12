@@ -1,0 +1,135 @@
+{
+  "id": 4,
+  "url": "https://terminus.test/api/v1/space_stations/4/",
+  "name": "International Space Station",
+  "image": {
+    "id": 20,
+    "name": "image_20",
+    "image_url": "https://example.com/20.jpg",
+    "thumbnail_url": "https://example.com/20_t.jpg",
+    "credit": "NASA",
+    "license": {
+      "id": 1,
+      "name": "Public Domain",
+      "priority": 1,
+      "link": null
+    },
+    "variants": [],
+    "single_use": false
+  },
+  "status": {
+    "id": 1,
+    "name": "Active"
+  },
+  "founded": "1998-11-20",
+  "deorbited": false,
+  "deorbited_date": null,
+  "description": "A habitable space station in low Earth orbit.",
+  "orbit": "Low Earth Orbit",
+  "type": {
+    "id": 1,
+    "name": "LEO"
+  },
+  "owners": [
+    {
+      "response_mode": "normal",
+      "id": 44,
+      "url": "https://terminus.test/api/v1/agencies/44/",
+      "name": "National Aeronautics and Space Administration",
+      "type": {
+        "id": 1,
+        "name": "Government"
+      },
+      "abbrev": "NASA",
+      "country": [
+        {
+          "id": 164,
+          "name": "United States of America",
+          "alpha_2_code": "US",
+          "alpha_3_code": "USA",
+          "nationality_name": "American",
+          "nationality_name_composed": "American"
+        }
+      ],
+      "parent": null,
+      "image": {
+        "id": 2,
+        "name": "image_2",
+        "image_url": "https://example.com/2.jpg",
+        "thumbnail_url": "https://example.com/2_t.jpg",
+        "credit": "NASA",
+        "license": {
+          "id": 1,
+          "name": "Public Domain",
+          "priority": 1,
+          "link": null
+        },
+        "variants": [],
+        "single_use": false
+      },
+      "logo": {
+        "id": 3,
+        "name": "image_3",
+        "image_url": "https://example.com/3.jpg",
+        "thumbnail_url": "https://example.com/3_t.jpg",
+        "credit": "NASA",
+        "license": {
+          "id": 1,
+          "name": "Public Domain",
+          "priority": 1,
+          "link": null
+        },
+        "variants": [],
+        "single_use": false
+      },
+      "social_logo": {
+        "id": 4,
+        "name": "image_4",
+        "image_url": "https://example.com/4.jpg",
+        "thumbnail_url": "https://example.com/4_t.jpg",
+        "credit": "NASA",
+        "license": {
+          "id": 1,
+          "name": "Public Domain",
+          "priority": 1,
+          "link": null
+        },
+        "variants": [],
+        "single_use": false
+      },
+      "featured": true,
+      "description": "US space agency",
+      "administrator": "Administrator",
+      "founding_year": 1958,
+      "launchers": "Space Shuttle",
+      "spacecraft": "Orion",
+      "last_updated": "2026-11-01T12:00:00Z"
+    }
+  ],
+  "last_updated": "2026-11-01T12:00:00Z",
+  "response_mode": "detailed",
+  "active_expeditions": [
+    {
+      "id": 300,
+      "url": "https://terminus.test/api/v1/expeditions/300/",
+      "name": "Expedition 73",
+      "start": "2025-04-20T00:00:00Z",
+      "end": null
+    }
+  ],
+  "programs": [],
+  "docking_location": [
+    {
+      "id": 1,
+      "name": "Harmony Forward",
+      "currently_docked": null
+    }
+  ],
+  "active_docking_events": [],
+  "height": 109.0,
+  "width": 73.0,
+  "mass": 419725.0,
+  "volume": 1005,
+  "onboard_crew": 7,
+  "docked_vehicles": 4
+}
