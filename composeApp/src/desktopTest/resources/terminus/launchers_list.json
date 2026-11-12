@@ -1,0 +1,27 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "response_mode": "detailed",
+      "id": 77,
+      "url": "https://terminus.test/api/v1/launchers/77/",
+      "serial_number": "B1080",
+      "status": {
+        "id": 1,
+        "name": "Active"
+      },
+      "image": null,
+      "details": null,
+      "successful_landings": null,
+      "attempted_landings": null,
+      "flights": null,
+      "last_launch_date": null,
+      "first_launch_date": null,
+      "fastest_turnaround": null,
+      "launcher_config": null,
+      "flight_proven": true
+    }
+  ]
+}

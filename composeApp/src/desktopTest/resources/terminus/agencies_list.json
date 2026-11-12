@@ -1,0 +1,46 @@
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "response_mode": "normal",
+      "id": 44,
+      "url": "https://terminus.test/api/v1/agencies/44/",
+      "name": "National Aeronautics and Space Administration",
+      "type": {
+        "id": 3,
+        "name": "Government"
+      },
+      "country": [
+        {
+          "id": 1,
+          "name": "United States of America",
+          "alpha_2_code": "US",
+          "alpha_3_code": "USA",
+          "nationality_name": "American",
+          "nationality_name_composed": "American"
+        }
+      ],
+      "parent": null,
+      "image": null,
+      "logo": null,
+      "social_logo": null,
+      "abbrev": "NASA",
+      "featured": true
+    },
+    {
+      "response_mode": "normal",
+      "id": 121,
+      "url": "https://terminus.test/api/v1/agencies/121/",
+      "name": "SpaceX",
+      "type": null,
+      "country": [],
+      "parent": null,
+      "image": null,
+      "logo": null,
+      "social_logo": null,
+      "abbrev": "SpX"
+    }
+  ]
+}
