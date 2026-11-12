@@ -1,5 +1,6 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
+import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getAgencyList
@@ -10,7 +11,7 @@ import me.calebjones.spacelaunchnow.domain.mapper.toDomainAgency
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 
-class AgencyRepositoryImpl(
+class LLAgencyRepositoryImpl(
     private val agenciesApi: AgenciesApi
 ) : AgencyRepository {
 

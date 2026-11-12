@@ -1,5 +1,6 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
+import me.calebjones.spacelaunchnow.data.repository.LauncherRepository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getLaunchers
@@ -13,7 +14,7 @@ import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 /**
  * Implementation of LauncherRepository using the generated LaunchersApi
  */
-class LauncherRepositoryImpl(
+class LLLauncherRepositoryImpl(
     private val launchersApi: LaunchersApi
 ) : LauncherRepository {
 

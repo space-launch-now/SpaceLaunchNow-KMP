@@ -1,0 +1,48 @@
+{
+  "response_mode": "detailed",
+  "id": 44,
+  "url": "https://terminus.test/api/v1/agencies/44/",
+  "name": "National Aeronautics and Space Administration",
+  "type": {
+    "id": 3,
+    "name": "Government"
+  },
+  "country": [
+    {
+      "id": 1,
+      "name": "United States of America",
+      "alpha_2_code": "US",
+      "alpha_3_code": "USA",
+      "nationality_name": "American",
+      "nationality_name_composed": "American"
+    }
+  ],
+  "parent": null,
+  "image": null,
+  "logo": null,
+  "social_logo": null,
+  "total_launch_count": null,
+  "consecutive_successful_launches": null,
+  "successful_launches": null,
+  "failed_launches": null,
+  "pending_launches": null,
+  "consecutive_successful_landings": null,
+  "successful_landings": null,
+  "failed_landings": null,
+  "attempted_landings": null,
+  "successful_landings_spacecraft": null,
+  "failed_landings_spacecraft": null,
+  "attempted_landings_spacecraft": null,
+  "successful_landings_payload": null,
+  "failed_landings_payload": null,
+  "attempted_landings_payload": null,
+  "info_url": null,
+  "wiki_url": null,
+  "social_media_links": [],
+  "launcher_list": [],
+  "spacecraft_list": [],
+  "abbrev": "NASA",
+  "featured": true,
+  "description": "The agency.",
+  "founding_year": 1958
+}

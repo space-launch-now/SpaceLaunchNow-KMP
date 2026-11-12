@@ -1,5 +1,6 @@
-package me.calebjones.spacelaunchnow.data.repository
+package me.calebjones.spacelaunchnow.data.repository.ll
 
+import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import io.ktor.client.plugins.ResponseException
 import kotlinx.io.IOException
 import me.calebjones.spacelaunchnow.api.extensions.getRocketDetails
@@ -13,7 +14,7 @@ import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.util.logging.logger
 
-class RocketRepositoryImpl(
+class LLRocketRepositoryImpl(
     private val launcherConfigurationsApi: LauncherConfigurationsApi
 ) : RocketRepository {
 
