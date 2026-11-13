@@ -2,7 +2,10 @@ package me.calebjones.spacelaunchnow.data.repository.terminus
 
 import me.calebjones.spacelaunchnow.api.terminus.infrastructure.HttpResponse
 import me.calebjones.spacelaunchnow.data.model.FilterOption
+import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Duration.Companion.hours
+
+private val log get() = SpaceLogger.getLogger("TerminusFilterFetcher")
 
 /** One page of a Terminus list, reduced to the filter options it holds. */
 internal class FilterPage(val options: List<FilterOption>, val total: Int)
@@ -22,7 +25,8 @@ internal class TerminusFilterFetcher(
 ) {
     /**
      * Pages through one list ([PAGE_SIZE] rows at a time) until [FilterPage.total] rows are in,
-     * or a page comes back empty. [name] keys the cache and labels the log.
+     * or a page comes back empty. It also stops after [MAX_PAGES] pages and returns the rows read
+     * so far, so a server that never ends its list cannot loop the app. [name] keys the cache and labels the log.
      */
     suspend fun <P : Any> options(
         name: String,
@@ -32,7 +36,7 @@ internal class TerminusFilterFetcher(
     ): Result<List<FilterOption>> {
         val all = mutableListOf<FilterOption>()
         var offset = 0
-        while (true) {
+        repeat(MAX_PAGES) {
             val fetched = terminusMemoryCachedFetch(
                 cache = cache,
                 key = "filter:$name?offset=$offset",
@@ -44,9 +48,14 @@ internal class TerminusFilterFetcher(
             offset += PAGE_SIZE
             if (current.options.isEmpty() || all.size >= current.total) return Result.success(all)
         }
+        log.w { "$name filter options hit the $MAX_PAGES page cap; using the ${all.size} rows read" }
+        return Result.success(all)
     }
 
     companion object {
         const val PAGE_SIZE = 100
+
+        /** Upper bound on pages per list; 50 pages of 100 is far above any real filter list. */
+        const val MAX_PAGES = 50
     }
 }
