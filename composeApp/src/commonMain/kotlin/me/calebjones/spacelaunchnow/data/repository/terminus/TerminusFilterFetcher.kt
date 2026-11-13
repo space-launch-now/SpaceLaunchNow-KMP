@@ -53,9 +53,9 @@ internal class TerminusFilterFetcher(
     }
 
     companion object {
-        const val PAGE_SIZE = 100
+        const val PAGE_SIZE = 25
 
-        /** Upper bound on pages per list; 50 pages of 100 is far above any real filter list. */
+        /** Upper bound on pages per list; 50 pages of 25 is 1,250 rows, far above any real filter list (rockets, the largest, has 527). */
         const val MAX_PAGES = 50
     }
 }

@@ -224,33 +224,44 @@ class TerminusLaunchRepositoryImpl(
             forceRefresh
         ).map { it.data }
 
-    /** Every previous launch of the Starship program, newest first. */
+    /** Every previous launch of the Starship program, newest first; read 25 rows at a time. */
     override suspend fun getStarshipHistoryDomain(
         limit: Int,
         forceRefresh: Boolean
     ): Result<DataResult<PaginatedResult<Launch>>> =
-        normalList(
-            LaunchListQuery.of(limit = limit, previous = true, ordering = "-net", program = listOf(STARSHIP_PROGRAM_ID)),
-            forceRefresh
-        )
+        terminusPagedList(limit) { pageLimit, offset ->
+            normalList(
+                LaunchListQuery.of(
+                    limit = pageLimit,
+                    offset = offset,
+                    previous = true,
+                    ordering = "-net",
+                    program = listOf(STARSHIP_PROGRAM_ID)
+                ),
+                forceRefresh
+            )
+        }
 
-    /** Past launches on one day of one month, newest first. */
+    /** Past launches on one day of one month, newest first; read 25 rows at a time. */
     override suspend fun getLaunchesByDayAndMonth(
         day: Int,
         month: Int,
         limit: Int,
         forceRefresh: Boolean
     ): Result<PaginatedResult<Launch>> =
-        normalList(
-            LaunchListQuery.of(
-                limit = limit,
-                previous = true,
-                netDay = listOf(day),
-                netMonth = listOf(month),
-                ordering = "-net"
-            ),
-            forceRefresh
-        ).map { it.data }
+        terminusPagedList(limit) { pageLimit, offset ->
+            normalList(
+                LaunchListQuery.of(
+                    limit = pageLimit,
+                    offset = offset,
+                    previous = true,
+                    netDay = listOf(day),
+                    netMonth = listOf(month),
+                    ordering = "-net"
+                ),
+                forceRefresh
+            )
+        }.map { it.data }
 
     /**
      * The `count` of a one-row page of upcoming launches in the window. The stats cache keeps the

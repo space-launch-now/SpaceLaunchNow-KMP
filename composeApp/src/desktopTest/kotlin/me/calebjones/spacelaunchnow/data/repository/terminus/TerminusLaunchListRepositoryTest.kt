@@ -71,6 +71,9 @@ class TerminusLaunchListRepositoryTest {
     private val miniFixture: String get() = withNet(resource("launches_mini_list.json"), farNet)
     private val normalFixture: String get() = withNet(resource("launches_normal_list.json"), farNet)
 
+    /** The last page of a list: no `next` link. */
+    private fun String.lastPage(): String = replace(Regex("\"next\":\"[^\"]*\""), "\"next\":null")
+
     private val jsonHeaders: Headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
 
     private class Reply(val body: String, val status: HttpStatusCode = HttpStatusCode.OK)
@@ -550,7 +553,7 @@ class TerminusLaunchListRepositoryTest {
 
     @Test
     fun byDayAndMonthRequestsPastLaunchesOfThatDayAndMapsLikeLl() = runTest {
-        val fixture = normalFixture
+        val fixture = normalFixture.lastPage()
         val env = env(llBody = fixture) { Reply(fixture) }
 
         val viaTerminus = env.repository.getLaunchesByDayAndMonth(day = 15, month = 11, limit = 50).getOrThrow()
@@ -559,7 +562,7 @@ class TerminusLaunchListRepositoryTest {
         assertEquals("/api/v1/launches/", url.encodedPath)
         assertEquals("true", url.param("previous"))
         assertEquals("-net", url.param("ordering"))
-        assertEquals("50", url.param("limit"))
+        assertEquals("25", url.param("limit"))
         assertEquals("15.0", url.param("net__day"))
         assertEquals("11.0", url.param("net__month"))
 
@@ -569,7 +572,7 @@ class TerminusLaunchListRepositoryTest {
 
     @Test
     fun byDayAndMonthUsesTheCacheUntilForceRefresh() = runTest {
-        val fixture = normalFixture
+        val fixture = normalFixture.lastPage()
         val env = env { Reply(fixture) }
 
         env.repository.getLaunchesByDayAndMonth(day = 15, month = 11).getOrThrow()
@@ -580,6 +583,45 @@ class TerminusLaunchListRepositoryTest {
         assertEquals(2, env.terminusRequests.size, "forceRefresh calls the network")
         env.repository.getLaunchesByDayAndMonth(day = 16, month = 11).getOrThrow()
         assertEquals(3, env.terminusRequests.size, "another day is another cache entry")
+    }
+
+    // -- Page size 25 (Tasks#1030) -------------------------------------------------
+
+    @Test
+    fun aLargeLimitIsReadInPagesOf25UntilTheLimitIsReached() = runTest {
+        val more = normalFixture
+        val env = env { Reply(more) }
+
+        val history = env.repository.getStarshipHistoryDomain(limit = 50, forceRefresh = true).getOrThrow()
+
+        // Each reply holds 3 rows and links to a next page, so 50 rows need 17 pages of 25.
+        assertEquals(17, env.terminusRequests.size)
+        assertTrue(env.terminusRequests.all { it.param("limit") == "25" })
+        assertEquals(listOf(null) + (1..16).map { (it * 25).toString() }, env.terminusRequests.map { it.param("offset") })
+        assertEquals(50, history.data.results.size)
+    }
+
+    @Test
+    fun aLargeLimitStopsWhenThereIsNoNextPage() = runTest {
+        val env = env { url ->
+            Reply(if (url.param("offset") == "25") normalFixture.lastPage() else normalFixture)
+        }
+
+        val day = env.repository.getLaunchesByDayAndMonth(day = 15, month = 11, limit = 100).getOrThrow()
+
+        assertEquals(listOf(null, "25"), env.terminusRequests.map { it.param("offset") })
+        assertEquals(listOf("25", "25"), env.terminusRequests.map { it.param("limit") })
+        assertEquals(6, day.results.size)
+        assertEquals(null, day.next)
+    }
+
+    @Test
+    fun aLimitOf25OrLessIsOneRequestOfThatSize() = runTest {
+        val env = env { Reply(normalFixture) }
+
+        env.repository.getStarshipHistoryDomain(limit = 10, forceRefresh = true).getOrThrow()
+
+        assertEquals("10", env.terminusRequests.single().param("limit"))
     }
 
     @Test

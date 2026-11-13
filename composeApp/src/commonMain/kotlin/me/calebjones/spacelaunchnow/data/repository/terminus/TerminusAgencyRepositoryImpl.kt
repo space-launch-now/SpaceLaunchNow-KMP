@@ -1,6 +1,7 @@
 package me.calebjones.spacelaunchnow.data.repository.terminus
 
 import me.calebjones.spacelaunchnow.api.terminus.apis.AgenciesApi
+import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.domain.mapper.terminus.toDomain
 import me.calebjones.spacelaunchnow.domain.mapper.terminus.toDomainAgency
@@ -48,9 +49,16 @@ class TerminusAgencyRepositoryImpl internal constructor(
         searchQuery: String,
         limit: Int
     ): Result<PaginatedResult<Agency>> =
-        cache.terminusRead("agencies-search?q=$searchQuery&limit=$limit", "agency search") {
-            agenciesApi.agenciesList(limit = limit, search = searchQuery, ordering = "-total_launch_count")
-        }.mapCatching { it.value.toDomain() }
+        terminusPagedList(limit) { pageLimit, offset ->
+            cache.terminusRead("agencies-search?q=$searchQuery&limit=$pageLimit&offset=$offset", "agency search") {
+                agenciesApi.agenciesList(
+                    limit = pageLimit,
+                    offset = offset.takeIf { it > 0 },
+                    search = searchQuery,
+                    ordering = "-total_launch_count"
+                )
+            }.mapCatching { DataResult(it.value.toDomain(), it.source, it.timestamp) }
+        }.map { it.data }
 
     override suspend fun getAgencyDetailDomain(id: Int): Result<Agency> =
         cache.terminusRead("agency-detail?id=$id", "agency detail $id") { agenciesApi.agenciesRetrieve(id) }
