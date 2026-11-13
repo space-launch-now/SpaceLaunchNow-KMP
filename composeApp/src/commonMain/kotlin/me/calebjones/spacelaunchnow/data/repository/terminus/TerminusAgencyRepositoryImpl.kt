@@ -53,7 +53,7 @@ class TerminusAgencyRepositoryImpl internal constructor(
             cache.terminusRead("agencies-search?q=$searchQuery&limit=$pageLimit&offset=$offset", "agency search") {
                 agenciesApi.agenciesList(
                     limit = pageLimit,
-                    offset = offset,
+                    offset = offset.takeIf { it > 0 },
                     search = searchQuery,
                     ordering = "-total_launch_count"
                 )
