@@ -33,11 +33,11 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 /**
- * Agency, launcher configuration, launcher and rocket repositories on Terminus behind
- * [DataBackend] (Tasks#1011 S5). The fixtures in `resources/terminus` follow the generated
- * Terminus models. The same JSON is served to the LL repository (Terminus serves the LL2 shapes),
- * so each row checks that the Terminus repository returns the same domain value as LL.
- */
+\s* Agency, launcher configuration, launcher and rocket repositories on Terminus behind
+\s* [DataBackend] (Tasks#1011 S5). The fixtures in `resources/terminus` follow the generated
+\s* Terminus models. The same JSON is served to the LL repository (Terminus serves the LL2 shapes),
+\s* so each row checks that the Terminus repository returns the same domain value as LL.
+\s*/
 class TerminusVehicleRepositoriesTest {
 
     private fun resource(name: String): String = checkNotNull(
@@ -46,7 +46,7 @@ class TerminusVehicleRepositoriesTest {
 
     private val jsonHeaders = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
 
-    /** Serves the fixture that matches the endpoint, whatever the base path prefix. */
+    /** Serves the fixture that matches the endpoint, whatever the base path prefix.\s*/
     private fun byPath(url: Url): String {
         val segments = url.encodedPath.trim('/').split('/')
         val last = segments.last()
@@ -123,6 +123,30 @@ class TerminusVehicleRepositoriesTest {
     fun searchAgenciesDomainMatchesLl() = runTest {
         val p = agencies()
         assertEquals(p.ll.searchAgenciesDomain("nasa", 5).getOrThrow(), p.terminus.searchAgenciesDomain("nasa", 5).getOrThrow())
+    }
+
+    @Test
+    fun searchAgenciesDomainReadsPagesOf25() = runTest {
+        val requests = mutableListOf<Url>()
+        val page = resource("agencies_list.json")
+        val nextLink = Regex("\"next\"\\s*:\\s*(null|\"[^\"]*\")")
+        val e = MockEngine { request ->
+            requests += request.url
+            val body = if (request.url.parameters["offset"] == "25") {
+                page.replace(nextLink, "\"next\": null")
+            } else {
+                page.replace(nextLink, "\"next\": \"https://terminus.test/api/v1/agencies/?offset=25\"")
+            }
+            respond(content = body, status = HttpStatusCode.OK, headers = jsonHeaders)
+        }
+        val terminus = TerminusAgencyRepositoryImpl(TerminusAgenciesApi(baseUrl = "https://terminus.test", httpClientEngine = e))
+
+        val result = terminus.searchAgenciesDomain("nasa", 50).getOrThrow()
+
+        assertEquals(listOf("25", "25"), requests.map { it.parameters["limit"] })
+        assertEquals(listOf(null, "25"), requests.map { it.parameters["offset"] })
+        assertEquals(4, result.results.size)
+        assertEquals(null, result.next)
     }
 
     @Test
