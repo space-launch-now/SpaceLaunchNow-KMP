@@ -126,6 +126,30 @@ class TerminusVehicleRepositoriesTest {
     }
 
     @Test
+    fun searchAgenciesDomainReadsPagesOf25() = runTest {
+        val requests = mutableListOf<Url>()
+        val page = resource("agencies_list.json")
+        val nextLink = Regex("\"next\"\\s*:\\s*(null|\"[^\"]*\")")
+        val e = MockEngine { request ->
+            requests += request.url
+            val body = if (request.url.parameters["offset"] == "25") {
+                page.replace(nextLink, "\"next\": null")
+            } else {
+                page.replace(nextLink, "\"next\": \"https://terminus.test/api/v1/agencies/?offset=25\"")
+            }
+            respond(content = body, status = HttpStatusCode.OK, headers = jsonHeaders)
+        }
+        val terminus = TerminusAgencyRepositoryImpl(TerminusAgenciesApi(baseUrl = "https://terminus.test", httpClientEngine = e))
+
+        val result = terminus.searchAgenciesDomain("nasa", 50).getOrThrow()
+
+        assertEquals(listOf("25", "25"), requests.map { it.parameters["limit"] })
+        assertEquals(listOf(null, "25"), requests.map { it.parameters["offset"] })
+        assertEquals(4, result.results.size)
+        assertEquals(null, result.next)
+    }
+
+    @Test
     fun getAgencyDetailDomainMatchesLl() = runTest {
         val p = agencies()
         val actual = p.terminus.getAgencyDetailDomain(44).getOrThrow()
