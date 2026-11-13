@@ -84,7 +84,7 @@ class TerminusFilterRepositoryTest {
     private fun family(id: Int, name: String) =
         """{"response_mode":"normal","id":$id,"name":"$name","manufacturer":[],"parent":null}"""
 
-    /** Answers each Terminus filter endpoint with one row; a path in [big] answers 150 rows over two pages. */
+    /** Answers each Terminus filter endpoint with one row; a path in [big] answers 150 rows over six pages. */
     private fun byPath(url: Url): String {
         val path = url.encodedPath
         val offset = url.parameters["offset"]?.toInt() ?: 0
@@ -179,7 +179,7 @@ class TerminusFilterRepositoryTest {
         val agencies = env.requests.first { it.encodedPath.startsWith("/api/v1/agencies/mini") }
         assertEquals("true", agencies.parameters["featured"])
         assertEquals("name", agencies.parameters["ordering"])
-        assertEquals("100", agencies.parameters["limit"])
+        assertEquals("25", agencies.parameters["limit"])
         val rockets = env.requests.first { it.encodedPath.startsWith("/api/v1/launcher_configurations") }
         assertEquals("false", rockets.parameters["is_placeholder"])
         val locations = env.requests.first { it.encodedPath.startsWith("/api/v1/locations") }
@@ -205,7 +205,7 @@ class TerminusFilterRepositoryTest {
 
         assertEquals(150, agencies.size)
         assertEquals(FilterOption(149, "Agency 149", "A149"), agencies.last())
-        assertEquals(listOf("0", "100"), env.requests.map { it.parameters["offset"] })
+        assertEquals(listOf("0", "25", "50", "75", "100", "125"), env.requests.map { it.parameters["offset"] })
     }
 
     @Test
