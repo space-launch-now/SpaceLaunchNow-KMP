@@ -226,6 +226,7 @@ class TerminusFilterRepositoryTest {
         assertEquals(TerminusFilterFetcher.MAX_PAGES, requests.size)
         assertEquals(TerminusFilterFetcher.MAX_PAGES * TerminusFilterFetcher.PAGE_SIZE, programs.size)
     }
+
     @Test
     fun aSecondReadIsServedFromMemoryAndForceRefreshAsksAgain() = runTest {
         val env = direct()
