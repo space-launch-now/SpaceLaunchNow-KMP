@@ -228,6 +228,25 @@ class TerminusFilterRepositoryTest {
     }
 
     @Test
+    fun anEndlessListStopsAtThePageCap() = runTest {
+        val requests = mutableListOf<Url>()
+        val engine = MockEngine { request ->
+            requests += request.url
+            val offset = request.url.parameters["offset"]?.toInt() ?: 0
+            val rows = rows(offset, Int.MAX_VALUE) { program(it, "Program $it") }
+            respond(page(Int.MAX_VALUE, *rows), HttpStatusCode.OK, jsonHeaders)
+        }
+        val repo = TerminusRocketFilterRepositoryImpl(
+            TerminusProgramsApi(base, engine), TerminusFamiliesApi(base, engine), TerminusFilterFetcher()
+        )
+
+        val programs = repo.getPrograms().getOrThrow()
+
+        assertEquals(TerminusFilterFetcher.MAX_PAGES, requests.size)
+        assertEquals(TerminusFilterFetcher.MAX_PAGES * TerminusFilterFetcher.PAGE_SIZE, programs.size)
+    }
+
+    @Test
     fun aSecondReadIsServedFromMemoryAndForceRefreshAsksAgain() = runTest {
         val env = direct()
 

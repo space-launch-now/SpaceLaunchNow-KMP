@@ -16,7 +16,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
@@ -64,6 +66,12 @@ fun preloadDestination(liveOnboardingCompleted: Boolean, onboardingPaywallShown:
     onboardingPaywallShown -> Home
     else -> Onboarding
 }
+
+/**
+ * Day and month for the by-day history read. The month is 1-based (`number`), as
+ * HomeViewModel and HistoryViewModel use it, so the warmed cache key matches the screen's.
+ */
+internal fun historyDayAndMonth(today: LocalDateTime): Pair<Int, Int> = today.day to today.month.number
 
 class PreloadViewModel(
     private val launchRepository: LaunchRepository,
@@ -250,7 +258,9 @@ class PreloadViewModel(
                 eventsRepository.getUpcomingEventsDomain()
             },
             PreloadTask("History launches", PreloadTier.WARM_CACHE) {
-                launchRepository.getLaunchesByDayAndMonth(today.day, today.month.ordinal)
+                historyDayAndMonth(today).let { (day, month) ->
+                    launchRepository.getLaunchesByDayAndMonth(day, month)
+                }
             },
             PreloadTask("Filter: agencies", PreloadTier.WARM_CACHE) {
                 scheduleFilterRepository.getAgencies()
