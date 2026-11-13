@@ -84,7 +84,7 @@ class TerminusFilterRepositoryTest {
     private fun family(id: Int, name: String) =
         """{"response_mode":"normal","id":$id,"name":"$name","manufacturer":[],"parent":null}"""
 
-    /** Answers each Terminus filter endpoint with one row; a path in [big] answers 150 rows over six pages. */
+    /** Answers each Terminus filter endpoint with one row; a path in [big] answers 150 rows over two pages. */
     private fun byPath(url: Url): String {
         val path = url.encodedPath
         val offset = url.parameters["offset"]?.toInt() ?: 0
@@ -206,6 +206,25 @@ class TerminusFilterRepositoryTest {
         assertEquals(150, agencies.size)
         assertEquals(FilterOption(149, "Agency 149", "A149"), agencies.last())
         assertEquals(listOf("0", "25", "50", "75", "100", "125"), env.requests.map { it.parameters["offset"] })
+    }
+
+    @Test
+    fun anEndlessListStopsAtThePageCap() = runTest {
+        val requests = mutableListOf<Url>()
+        val engine = MockEngine { request ->
+            requests += request.url
+            val offset = request.url.parameters["offset"]?.toInt() ?: 0
+            val rows = rows(offset, Int.MAX_VALUE) { program(it, "Program $it") }
+            respond(page(Int.MAX_VALUE, *rows), HttpStatusCode.OK, jsonHeaders)
+        }
+        val repo = TerminusRocketFilterRepositoryImpl(
+            TerminusProgramsApi(base, engine), TerminusFamiliesApi(base, engine), TerminusFilterFetcher()
+        )
+
+        val programs = repo.getPrograms().getOrThrow()
+
+        assertEquals(TerminusFilterFetcher.MAX_PAGES, requests.size)
+        assertEquals(TerminusFilterFetcher.MAX_PAGES * TerminusFilterFetcher.PAGE_SIZE, programs.size)
     }
 
     @Test
