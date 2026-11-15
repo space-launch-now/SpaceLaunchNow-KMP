@@ -9208,6 +9208,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedLaunchNormalList'
           description: ''
+  /api/v1/launches/{id}/rocket/:
+    get:
+      operationId: launches_rocket_retrieve
+      description: 'The `rocket` key of the launch detail: the configuration with
+        its launcher stages, spacecraft stages and payloads. The cache lifetime follows
+        the launch: 30 seconds within 24 hours of its NET.'
+      summary: The rocket of one launch
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - launches
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RocketDetailed'
+          description: ''
+  /api/v1/launches/{id}/timeline/:
+    get:
+      operationId: launches_timeline_retrieve
+      description: 'The `timeline` key of the launch detail, as `{"timeline": [...]}`.
+        The cache lifetime follows the launch: 30 seconds within 24 hours of its NET.'
+      summary: The timeline of one launch
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - launches
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LaunchTimeline'
+          description: ''
   /api/v1/launches/{id}/:
     get:
       operationId: launches_retrieve
@@ -12052,6 +12101,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RocketStandaloneDetailed'
+          description: ''
+  /api/v1/rockets/detailed/:
+    get:
+      operationId: rockets_detailed_list
+      description: The detailed rocket of each launch, each with its `launch_id`.
+        Filter with `launch__ids` (comma-separated launch ids). A page holds at most
+        25 rows. A rocket with no launch is left out. The cache lifetime follows the
+        shortest launch row of the page.
+      summary: Detailed rockets by launch
+      parameters:
+      - in: query
+        name: launch__ids
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Comma-separated launch ids (UUIDs).
+        explode: false
+        style: form
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - rockets
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRocketDetailedLaunchList'
           description: ''
   /api/v1/search/:
     get:
@@ -17446,7 +17537,7 @@ components:
           nullable: true
         rocket:
           allOf:
-          - $ref: '#/components/schemas/RocketDetailed'
+          - $ref: '#/components/schemas/RocketNormal'
           nullable: true
         mission:
           allOf:
@@ -17501,10 +17592,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VidURL'
-        timeline:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimelineEvent'
         pad_turnaround:
           type: string
           readOnly: true
@@ -17543,7 +17630,6 @@ components:
       - rocket
       - slug
       - status
-      - timeline
       - updates
       - url
       - vid_urls
@@ -17725,6 +17811,17 @@ components:
       required:
       - id
       - name
+    LaunchTimeline:
+      type: object
+      description: '`launches/{id}/timeline/`: the `timeline` key of the launch detail,
+        and nothing else.'
+      properties:
+        timeline:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimelineEvent'
+      required:
+      - timeline
     LauncherConfigDetailed:
       type: object
       properties:
@@ -20632,6 +20729,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProgramType'
+    PaginatedRocketDetailedLaunchList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RocketDetailedLaunch'
     PaginatedRocketStandaloneNormalList:
       type: object
       required:
@@ -21926,6 +22046,39 @@ components:
       required:
       - configuration
       - id
+      - launcher_stage
+      - payloads
+      - spacecraft_stage
+    RocketDetailedLaunch:
+      type: object
+      description: '`rockets/detailed/`: the rocket as the launch detail serves it,
+        plus the launch it flies on.'
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        configuration:
+          $ref: '#/components/schemas/LauncherConfigDetailed'
+        launcher_stage:
+          type: array
+          items:
+            $ref: '#/components/schemas/FirstStageNormal'
+        spacecraft_stage:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpacecraftFlightDetailedSerializerNoLaunch'
+        payloads:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayloadFlightSerializerNoLaunch'
+        launch_id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+      - configuration
+      - id
+      - launch_id
       - launcher_stage
       - payloads
       - spacecraft_stage

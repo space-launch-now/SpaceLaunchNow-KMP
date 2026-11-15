@@ -16,9 +16,11 @@
 package me.calebjones.spacelaunchnow.api.terminus.apis
 
 import me.calebjones.spacelaunchnow.api.terminus.models.LaunchDetailed
+import me.calebjones.spacelaunchnow.api.terminus.models.LaunchTimeline
 import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchDetailedList
 import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchNormalList
+import me.calebjones.spacelaunchnow.api.terminus.models.RocketDetailed
 
 import me.calebjones.spacelaunchnow.api.terminus.infrastructure.*
 import io.ktor.client.HttpClient
@@ -773,6 +775,72 @@ open class LaunchesApi : ApiClient {
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
             "/api/v1/launches/{id}/".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * The rocket of one launch
+     * The &#x60;rocket&#x60; key of the launch detail: the configuration with its launcher stages, spacecraft stages and payloads. The cache lifetime follows the launch: 30 seconds within 24 hours of its NET.
+     * @param id 
+     * @return RocketDetailed
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun launchesRocketRetrieve(id: kotlin.String): HttpResponse<RocketDetailed> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/api/v1/launches/{id}/rocket/".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * The timeline of one launch
+     * The &#x60;timeline&#x60; key of the launch detail, as &#x60;{\&quot;timeline\&quot;: [...]}&#x60;. The cache lifetime follows the launch: 30 seconds within 24 hours of its NET.
+     * @param id 
+     * @return LaunchTimeline
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun launchesTimelineRetrieve(id: kotlin.String): HttpResponse<LaunchTimeline> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/api/v1/launches/{id}/timeline/".replace("{" + "id" + "}", "$id"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

@@ -15,6 +15,7 @@
 
 package me.calebjones.spacelaunchnow.api.terminus.apis
 
+import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedRocketDetailedLaunchList
 import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedRocketStandaloneNormalList
 import me.calebjones.spacelaunchnow.api.terminus.models.RocketStandaloneDetailed
 
@@ -42,6 +43,44 @@ open class RocketsApi : ApiClient {
         baseUrl: String,
         httpClient: HttpClient
     ): super(baseUrl = baseUrl, httpClient = httpClient)
+
+    /**
+     * Detailed rockets by launch
+     * The detailed rocket of each launch, each with its &#x60;launch_id&#x60;. Filter with &#x60;launch__ids&#x60; (comma-separated launch ids). A page holds at most 25 rows. A rocket with no launch is left out. The cache lifetime follows the shortest launch row of the page.
+     * @param launchIds Comma-separated launch ids (UUIDs). (optional)
+     * @param limit Number of results to return per page. (optional)
+     * @param offset The initial index from which to return the results. (optional)
+     * @return PaginatedRocketDetailedLaunchList
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun rocketsDetailedList(launchIds: kotlin.collections.List<kotlin.String>? = null, limit: kotlin.Int? = null, offset: kotlin.Int? = null): HttpResponse<PaginatedRocketDetailedLaunchList> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        launchIds?.apply { localVariableQuery["launch__ids"] = toMultiValue(this, "csv") }
+        limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
+        offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/api/v1/rockets/detailed/",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
 
     /**
      * 

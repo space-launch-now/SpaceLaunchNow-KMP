@@ -130,6 +130,8 @@ All URIs are relative to *http://localhost*
 | *LaunchesApi* | [**launchesList**](docs/LaunchesApi.md#launcheslist) | **GET** /api/v1/launches/ |  |
 | *LaunchesApi* | [**launchesMiniList**](docs/LaunchesApi.md#launchesminilist) | **GET** /api/v1/launches/mini/ |  |
 | *LaunchesApi* | [**launchesRetrieve**](docs/LaunchesApi.md#launchesretrieve) | **GET** /api/v1/launches/{id}/ |  |
+| *LaunchesApi* | [**launchesRocketRetrieve**](docs/LaunchesApi.md#launchesrocketretrieve) | **GET** /api/v1/launches/{id}/rocket/ | The rocket of one launch |
+| *LaunchesApi* | [**launchesTimelineRetrieve**](docs/LaunchesApi.md#launchestimelineretrieve) | **GET** /api/v1/launches/{id}/timeline/ | The timeline of one launch |
 | *LocationsApi* | [**locationsDetailedList**](docs/LocationsApi.md#locationsdetailedlist) | **GET** /api/v1/locations/detailed/ |  |
 | *LocationsApi* | [**locationsList**](docs/LocationsApi.md#locationslist) | **GET** /api/v1/locations/ |  |
 | *LocationsApi* | [**locationsRetrieve**](docs/LocationsApi.md#locationsretrieve) | **GET** /api/v1/locations/{id}/ |  |
@@ -148,6 +150,7 @@ All URIs are relative to *http://localhost*
 | *ProgramsApi* | [**programsList**](docs/ProgramsApi.md#programslist) | **GET** /api/v1/programs/ |  |
 | *ProgramsApi* | [**programsMiniList**](docs/ProgramsApi.md#programsminilist) | **GET** /api/v1/programs/mini/ |  |
 | *ProgramsApi* | [**programsRetrieve**](docs/ProgramsApi.md#programsretrieve) | **GET** /api/v1/programs/{id}/ |  |
+| *RocketsApi* | [**rocketsDetailedList**](docs/RocketsApi.md#rocketsdetailedlist) | **GET** /api/v1/rockets/detailed/ | Detailed rockets by launch |
 | *RocketsApi* | [**rocketsList**](docs/RocketsApi.md#rocketslist) | **GET** /api/v1/rockets/ |  |
 | *RocketsApi* | [**rocketsRetrieve**](docs/RocketsApi.md#rocketsretrieve) | **GET** /api/v1/rockets/{id}/ |  |
 | *SearchApi* | [**searchList**](docs/SearchApi.md#searchlist) | **GET** /api/v1/search/ | Search across resources |
@@ -245,6 +248,7 @@ All URIs are relative to *http://localhost*
  - [me.calebjones.spacelaunchnow.api.terminus.models.LaunchMini](docs/LaunchMini.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.LaunchNormal](docs/LaunchNormal.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.LaunchStatus](docs/LaunchStatus.md)
+ - [me.calebjones.spacelaunchnow.api.terminus.models.LaunchTimeline](docs/LaunchTimeline.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.LauncherConfigDetailed](docs/LauncherConfigDetailed.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.LauncherConfigDetailedSerializerNoManufacturer](docs/LauncherConfigDetailedSerializerNoManufacturer.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.LauncherConfigFamilyDetailed](docs/LauncherConfigFamilyDetailed.md)
@@ -333,6 +337,7 @@ All URIs are relative to *http://localhost*
  - [me.calebjones.spacelaunchnow.api.terminus.models.PaginatedProgramEndpointList](docs/PaginatedProgramEndpointList.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.PaginatedProgramMiniList](docs/PaginatedProgramMiniList.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.PaginatedProgramTypeList](docs/PaginatedProgramTypeList.md)
+ - [me.calebjones.spacelaunchnow.api.terminus.models.PaginatedRocketDetailedLaunchList](docs/PaginatedRocketDetailedLaunchList.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.PaginatedRocketStandaloneNormalList](docs/PaginatedRocketStandaloneNormalList.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.PaginatedSpaceStationDetailedEndpointList](docs/PaginatedSpaceStationDetailedEndpointList.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.PaginatedSpaceStationEndpointList](docs/PaginatedSpaceStationEndpointList.md)
@@ -379,6 +384,7 @@ All URIs are relative to *http://localhost*
  - [me.calebjones.spacelaunchnow.api.terminus.models.ProgramNormal](docs/ProgramNormal.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.ProgramType](docs/ProgramType.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.RocketDetailed](docs/RocketDetailed.md)
+ - [me.calebjones.spacelaunchnow.api.terminus.models.RocketDetailedLaunch](docs/RocketDetailedLaunch.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.RocketNormal](docs/RocketNormal.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.RocketStandaloneDetailed](docs/RocketStandaloneDetailed.md)
  - [me.calebjones.spacelaunchnow.api.terminus.models.RocketStandaloneNormal](docs/RocketStandaloneNormal.md)

@@ -24,8 +24,7 @@ import me.calebjones.spacelaunchnow.api.terminus.models.MissionPatch
 import me.calebjones.spacelaunchnow.api.terminus.models.NetPrecision
 import me.calebjones.spacelaunchnow.api.terminus.models.PadDetailed
 import me.calebjones.spacelaunchnow.api.terminus.models.ProgramNormal
-import me.calebjones.spacelaunchnow.api.terminus.models.RocketDetailed
-import me.calebjones.spacelaunchnow.api.terminus.models.TimelineEvent
+import me.calebjones.spacelaunchnow.api.terminus.models.RocketNormal
 import me.calebjones.spacelaunchnow.api.terminus.models.Update
 import me.calebjones.spacelaunchnow.api.terminus.models.VidURL
 
@@ -67,7 +66,6 @@ import kotlinx.serialization.encoding.*
  * @param updates 
  * @param infoUrls 
  * @param vidUrls 
- * @param timeline 
  * @param padTurnaround 
  * @param missionPatches 
  * @param name 
@@ -111,7 +109,7 @@ data class LaunchDetailed (
 
     @SerialName(value = "hashtag") @Required val hashtag: kotlin.String?,
 
-    @SerialName(value = "rocket") @Required val rocket: RocketDetailed?,
+    @SerialName(value = "rocket") @Required val rocket: RocketNormal?,
 
     @SerialName(value = "mission") @Required val mission: Mission?,
 
@@ -142,8 +140,6 @@ data class LaunchDetailed (
     @SerialName(value = "info_urls") @Required val infoUrls: kotlin.collections.List<InfoURL>,
 
     @SerialName(value = "vid_urls") @Required val vidUrls: kotlin.collections.List<VidURL>,
-
-    @SerialName(value = "timeline") @Required val timeline: kotlin.collections.List<TimelineEvent>,
 
     @SerialName(value = "pad_turnaround") @Required val padTurnaround: kotlin.String?,
 
