@@ -1,11 +1,13 @@
 package me.calebjones.spacelaunchnow.data.repository.terminus
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.api.extensions.TimeFilterRounding
 import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchesApi
-import me.calebjones.spacelaunchnow.api.terminus.models.LaunchDetailed
 import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
@@ -13,6 +15,7 @@ import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource.CachedValue
 import me.calebjones.spacelaunchnow.database.StatsLocalDataSource
+import me.calebjones.spacelaunchnow.domain.mapper.terminus.TerminusLaunchDetail
 import me.calebjones.spacelaunchnow.domain.mapper.terminus.toDomain
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
@@ -22,7 +25,7 @@ import kotlin.time.Duration.Companion.hours
 
 /**
  * Launch repository for the Terminus backend. It serves every [LaunchRepository] method and
- * does not call LL: launch detail (`GET /api/v1/launches/{id}/`), the launch lists
+ * does not call LL: launch detail (`GET /api/v1/launches/{id}/`, `.../rocket/` and `.../timeline/`), the launch lists
  * (`GET /api/v1/launches/mini/` and `GET /api/v1/launches/`), and the reads built on them
  * (featured, in flight, Starship, by day and the stats count).
  *
@@ -57,17 +60,53 @@ class TerminusLaunchRepositoryImpl(
         return result.mapCatching { it.toDomain() }
     }
 
-    private suspend fun getLaunchDetails(id: String, forceRefresh: Boolean): Result<LaunchDetailed> {
+    /**
+     * The launch, its full rocket and its timeline: three reads made at the same time and cached
+     * as one entry (Tasks#1078). A read that fails fails the detail, which then falls back to the
+     * stale entry. The rocket read result is ignored when the launch has no rocket.
+     */
+    private suspend fun getLaunchDetails(id: String, forceRefresh: Boolean): Result<TerminusLaunchDetail> {
         log.d { "getLaunchDetails (terminus) - id: $id, forceRefresh: $forceRefresh" }
-        return terminusCachedFetch(
+        return terminusCachedFetchBody(
             what = "launch detail $id",
             forceRefresh = forceRefresh,
             readFresh = { localDataSource?.getTerminusDetailedLaunch(id)?.let { CachedValue(it) } },
             readStale = { localDataSource?.getTerminusDetailedLaunchStale(id)?.let { CachedValue(it) } },
-            fetch = { launchesApi.launchesRetrieve(id) },
+            fetch = { fetchLaunchDetail(id) },
             store = { localDataSource?.cacheTerminusDetailedLaunch(it) }
         ).map { it.value }
     }
+
+    private suspend fun fetchLaunchDetail(id: String): TerminusLaunchDetail = coroutineScope {
+        val launch = async { settle { launchesApi.launchesRetrieve(id).bodyOrThrow() } }
+        val rocket = async { settle { launchesApi.launchesRocketRetrieve(id).bodyOrThrow() } }
+        val timeline = async { settle { launchesApi.launchesTimelineRetrieve(id).bodyOrThrow() } }
+        // The launch decides first: a 404 there is a 404 for the detail, whatever the other reads say.
+        val launchBody = launch.await().getOrThrow()
+        TerminusLaunchDetail(
+            launch = launchBody,
+            rocket = if (launchBody.rocket == null) null else rocket.await().getOrElse { throw sectionFailure("rocket", it) },
+            timeline = timeline.await().getOrElse { throw sectionFailure("timeline", it) }.timeline
+        )
+    }
+
+    /** A 404 on a section of a launch that exists is a failure, not "launch not found". */
+    private fun sectionFailure(section: String, cause: Throwable): Throwable =
+        if (cause is TerminusHttpStatusException && cause.status == 404) {
+            IllegalStateException("The $section read answered 404 for a launch that exists", cause)
+        } else {
+            cause
+        }
+
+    /** The result of [block], holding every failure but cancellation, so one failed read does not cancel its siblings. */
+    private suspend fun <T> settle(block: suspend () -> T): Result<T> =
+        try {
+            Result.success(block())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
     // -- Launch lists ---------------------------------------------------------
 

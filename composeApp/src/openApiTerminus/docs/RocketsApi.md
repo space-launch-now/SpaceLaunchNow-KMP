@@ -4,9 +4,60 @@ All URIs are relative to *http://localhost*
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
+| [**rocketsDetailedList**](RocketsApi.md#rocketsDetailedList) | **GET** /api/v1/rockets/detailed/ | Detailed rockets by launch |
 | [**rocketsList**](RocketsApi.md#rocketsList) | **GET** /api/v1/rockets/ |  |
 | [**rocketsRetrieve**](RocketsApi.md#rocketsRetrieve) | **GET** /api/v1/rockets/{id}/ |  |
 
+
+<a id="rocketsDetailedList"></a>
+# **rocketsDetailedList**
+> PaginatedRocketDetailedLaunchList rocketsDetailedList(launchIds, limit, offset)
+
+Detailed rockets by launch
+
+The detailed rocket of each launch, each with its &#x60;launch_id&#x60;. Filter with &#x60;launch__ids&#x60; (comma-separated launch ids). A page holds at most 25 rows. A rocket with no launch is left out. The cache lifetime follows the shortest launch row of the page.
+
+### Example
+```kotlin
+// Import classes:
+//import me.calebjones.spacelaunchnow.api.terminus.infrastructure.*
+//import me.calebjones.spacelaunchnow.api.terminus.models.*
+
+val apiInstance = RocketsApi()
+val launchIds : kotlin.collections.List<kotlin.String> =  // kotlin.collections.List<kotlin.String> | Comma-separated launch ids (UUIDs).
+val limit : kotlin.Int = 56 // kotlin.Int | Number of results to return per page.
+val offset : kotlin.Int = 56 // kotlin.Int | The initial index from which to return the results.
+try {
+    val result : PaginatedRocketDetailedLaunchList = apiInstance.rocketsDetailedList(launchIds, limit, offset)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling RocketsApi#rocketsDetailedList")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling RocketsApi#rocketsDetailedList")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| **launchIds** | [**kotlin.collections.List&lt;kotlin.String&gt;**](kotlin.String.md)| Comma-separated launch ids (UUIDs). | [optional] |
+| **limit** | **kotlin.Int**| Number of results to return per page. | [optional] |
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **offset** | **kotlin.Int**| The initial index from which to return the results. | [optional] |
+
+### Return type
+
+[**PaginatedRocketDetailedLaunchList**](PaginatedRocketDetailedLaunchList.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
 <a id="rocketsList"></a>
 # **rocketsList**

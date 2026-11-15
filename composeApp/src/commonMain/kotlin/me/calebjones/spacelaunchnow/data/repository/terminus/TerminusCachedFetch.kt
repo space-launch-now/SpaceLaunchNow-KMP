@@ -16,6 +16,9 @@ internal class TerminusNotFoundException(message: String) : Exception(message)
 /** A value plus where it came from. [CachedValue.cachedAt] is null when the cache does not keep it. */
 internal class TerminusFetched<T>(val value: T, val source: DataSource, val timestamp: Long)
 
+/** A Terminus read that answered 4xx or 5xx. [terminusCachedFetchBody] maps it like an HTTP error answer. */
+internal class TerminusHttpStatusException(val status: Int, val body: String) : Exception("API Error $status: $body")
+
 private const val MAX_ERROR_BODY_CHARS = 200
 private val log get() = SpaceLogger.getLogger("TerminusCachedFetch")
 
@@ -33,6 +36,36 @@ internal suspend fun <T : Any> terminusCachedFetch(
     readFresh: suspend () -> CachedValue<T>?,
     readStale: suspend () -> CachedValue<T>?,
     fetch: suspend () -> HttpResponse<T>,
+    store: suspend (T) -> Unit
+): Result<TerminusFetched<T>> = terminusCachedFetchBody(
+    what = what,
+    forceRefresh = forceRefresh,
+    readFresh = readFresh,
+    readStale = readStale,
+    fetch = { fetch().bodyOrThrow() },
+    store = store
+)
+
+/**
+ * The body of this response, or a [TerminusHttpStatusException] for a 4xx or 5xx answer. The error
+ * text is capped: an error page can be large and must not fill the log or the message.
+ */
+internal suspend fun <T : Any> HttpResponse<T>.bodyOrThrow(): T {
+    if (status >= 400) throw TerminusHttpStatusException(status, response.bodyAsText().take(MAX_ERROR_BODY_CHARS))
+    return body()
+}
+
+/**
+ * [terminusCachedFetch] for a read that is more than one request. [fetch] returns the value or
+ * throws; a [TerminusHttpStatusException] from it (see [bodyOrThrow]) is handled as an HTTP error,
+ * so a read made of several requests fails and falls back to the stale entry like a single one.
+ */
+internal suspend fun <T : Any> terminusCachedFetchBody(
+    what: String,
+    forceRefresh: Boolean,
+    readFresh: suspend () -> CachedValue<T>?,
+    readStale: suspend () -> CachedValue<T>?,
+    fetch: suspend () -> T,
     store: suspend (T) -> Unit
 ): Result<TerminusFetched<T>> {
     suspend fun staleOr(cause: Exception): Result<TerminusFetched<T>> {
@@ -56,24 +89,18 @@ internal suspend fun <T : Any> terminusCachedFetch(
             }
         }
 
-        val response = fetch()
-        if (response.status >= 400) {
-            // Cap the body: an error page can be large and must not fill the log or the message.
-            val rawResponse = response.response.bodyAsText().take(MAX_ERROR_BODY_CHARS)
-            log.e { "HTTP Error ${response.status} for $what: $rawResponse" }
-            val message = "API Error ${response.status}: $rawResponse"
-            return when {
-                response.status >= 500 -> staleOr(Exception(message))
-                response.status == 404 -> Result.failure(TerminusNotFoundException(message))
-                else -> Result.failure(Exception(message))
-            }
-        }
-
-        val body = response.body()
+        val body = fetch()
         store(body)
         Result.success(TerminusFetched(body, DataSource.NETWORK, Clock.System.now().toEpochMilliseconds()))
     } catch (e: CancellationException) {
         throw e
+    } catch (e: TerminusHttpStatusException) {
+        log.e { "HTTP Error ${e.status} for $what: ${e.body}" }
+        when {
+            e.status >= 500 -> staleOr(Exception(e.message))
+            e.status == 404 -> Result.failure(TerminusNotFoundException(e.message ?: ""))
+            else -> Result.failure(Exception(e.message))
+        }
     } catch (e: ResponseException) {
         log.e(e) { "ResponseException for $what" }
         staleOr(e)

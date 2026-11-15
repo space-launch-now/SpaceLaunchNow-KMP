@@ -8,6 +8,8 @@ All URIs are relative to *http://localhost*
 | [**launchesList**](LaunchesApi.md#launchesList) | **GET** /api/v1/launches/ |  |
 | [**launchesMiniList**](LaunchesApi.md#launchesMiniList) | **GET** /api/v1/launches/mini/ |  |
 | [**launchesRetrieve**](LaunchesApi.md#launchesRetrieve) | **GET** /api/v1/launches/{id}/ |  |
+| [**launchesRocketRetrieve**](LaunchesApi.md#launchesRocketRetrieve) | **GET** /api/v1/launches/{id}/rocket/ | The rocket of one launch |
+| [**launchesTimelineRetrieve**](LaunchesApi.md#launchesTimelineRetrieve) | **GET** /api/v1/launches/{id}/timeline/ | The timeline of one launch |
 
 
 <a id="launchesDetailedList"></a>
@@ -790,6 +792,98 @@ try {
 ### Return type
 
 [**LaunchDetailed**](LaunchDetailed.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+<a id="launchesRocketRetrieve"></a>
+# **launchesRocketRetrieve**
+> RocketDetailed launchesRocketRetrieve(id)
+
+The rocket of one launch
+
+The &#x60;rocket&#x60; key of the launch detail: the configuration with its launcher stages, spacecraft stages and payloads. The cache lifetime follows the launch: 30 seconds within 24 hours of its NET.
+
+### Example
+```kotlin
+// Import classes:
+//import me.calebjones.spacelaunchnow.api.terminus.infrastructure.*
+//import me.calebjones.spacelaunchnow.api.terminus.models.*
+
+val apiInstance = LaunchesApi()
+val id : kotlin.String = 38400000-8cf0-11bd-b23e-10b96e4ef00d // kotlin.String | 
+try {
+    val result : RocketDetailed = apiInstance.launchesRocketRetrieve(id)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling LaunchesApi#launchesRocketRetrieve")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling LaunchesApi#launchesRocketRetrieve")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **id** | **kotlin.String**|  | |
+
+### Return type
+
+[**RocketDetailed**](RocketDetailed.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+<a id="launchesTimelineRetrieve"></a>
+# **launchesTimelineRetrieve**
+> LaunchTimeline launchesTimelineRetrieve(id)
+
+The timeline of one launch
+
+The &#x60;timeline&#x60; key of the launch detail, as &#x60;{\&quot;timeline\&quot;: [...]}&#x60;. The cache lifetime follows the launch: 30 seconds within 24 hours of its NET.
+
+### Example
+```kotlin
+// Import classes:
+//import me.calebjones.spacelaunchnow.api.terminus.infrastructure.*
+//import me.calebjones.spacelaunchnow.api.terminus.models.*
+
+val apiInstance = LaunchesApi()
+val id : kotlin.String = 38400000-8cf0-11bd-b23e-10b96e4ef00d // kotlin.String | 
+try {
+    val result : LaunchTimeline = apiInstance.launchesTimelineRetrieve(id)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling LaunchesApi#launchesTimelineRetrieve")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling LaunchesApi#launchesTimelineRetrieve")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **id** | **kotlin.String**|  | |
+
+### Return type
+
+[**LaunchTimeline**](LaunchTimeline.md)
 
 ### Authorization
 

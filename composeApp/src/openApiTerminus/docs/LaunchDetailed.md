@@ -19,7 +19,7 @@
 | **weatherConcerns** | **kotlin.String** |  |  |
 | **failreason** | **kotlin.String** |  |  |
 | **hashtag** | **kotlin.String** |  |  |
-| **rocket** | [**RocketDetailed**](RocketDetailed.md) |  |  |
+| **rocket** | [**RocketNormal**](RocketNormal.md) |  |  |
 | **mission** | [**Mission**](Mission.md) |  |  |
 | **pad** | [**PadDetailed**](PadDetailed.md) |  |  |
 | **program** | [**kotlin.collections.List&lt;ProgramNormal&gt;**](ProgramNormal.md) |  |  |
@@ -35,7 +35,6 @@
 | **updates** | [**kotlin.collections.List&lt;Update&gt;**](Update.md) |  |  |
 | **infoUrls** | [**kotlin.collections.List&lt;InfoURL&gt;**](InfoURL.md) |  |  |
 | **vidUrls** | [**kotlin.collections.List&lt;VidURL&gt;**](VidURL.md) |  |  |
-| **timeline** | [**kotlin.collections.List&lt;TimelineEvent&gt;**](TimelineEvent.md) |  |  |
 | **padTurnaround** | **kotlin.String** |  |  [readonly] |
 | **missionPatches** | [**kotlin.collections.List&lt;MissionPatch&gt;**](MissionPatch.md) |  |  |
 | **name** | **kotlin.String** |  |  [optional] |
