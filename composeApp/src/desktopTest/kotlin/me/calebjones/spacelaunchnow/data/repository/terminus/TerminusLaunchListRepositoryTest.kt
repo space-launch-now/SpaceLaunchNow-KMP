@@ -313,6 +313,32 @@ class TerminusLaunchListRepositoryTest {
     }
 
     @Test
+    fun schemaOneListRowIsACacheMissAndTheNewRowIsSchemaTwo() = runTest {
+        // Tasks#1078 raised the Terminus cache schema to 2 (the detail row keeps three reads).
+        // A list row written under schema 1 is ignored and read again from the network.
+        val fixture = miniFixture
+        val env = env { Reply(fixture) }
+        val id = cacheId("mini")
+        val now = Clock.System.now().toEpochMilliseconds()
+        val v1 = """{"cache_schema_version":1,"backend":"terminus","kind":"mini","list":$fixture}"""
+        env.database.launchQueries.insertOrReplaceDetailed(
+            id = id, name = id, status_id = null, status_name = null, net = null, window_end = null,
+            window_start = null, launch_service_provider_id = null, launch_service_provider_name = null,
+            rocket_configuration_id = null, rocket_configuration_name = null, pad_name = null,
+            location_name = null, image_url = null, mission_name = null, mission_description = null,
+            json_data = v1, cached_at = now, expires_at = now + 600_000
+        )
+
+        assertTrue(env.repository.getUpcomingLaunchesDomain(limit = 3).isSuccess)
+
+        assertEquals(1, env.terminusRequests.size, "a schema 1 row must not count as a cache hit")
+        val row = assertNotNull(env.cacheRow(id))
+        assertTrue(row.json_data.contains("\"cache_schema_version\":2"), row.json_data.take(80))
+        env.repository.getUpcomingLaunchesDomain(limit = 3).getOrThrow()
+        assertEquals(1, env.terminusRequests.size, "the schema 2 row is a fresh hit")
+    }
+
+    @Test
     fun forceRefreshSkipsTheFreshMiniListCache() = runTest {
         val fixture = miniFixture
         val env = env { Reply(fixture) }

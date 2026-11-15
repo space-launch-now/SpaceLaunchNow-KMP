@@ -102,6 +102,29 @@ class LocalCacheWiperTest {
     }
 
     @Test
+    fun clearAll_removesTerminusDetailRowsOfEverySchemaVersion() = runTest {
+        // Tasks#1078: the Terminus detail row moved from schema 1 (launch only) to 2 (launch,
+        // rocket, timeline). Clear All Caches must drop a row of either version.
+        val database = newDatabase()
+        val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
+        for ((id, version) in listOf("terminus-detail-v1" to 1, "terminus-detail-v2" to 2)) {
+            database.launchQueries.insertOrReplaceDetailed(
+                id = id, name = id, status_id = null, status_name = null, net = null, window_end = null,
+                window_start = null, launch_service_provider_id = null, launch_service_provider_name = null,
+                rocket_configuration_id = null, rocket_configuration_name = null, pad_name = null,
+                location_name = null, image_url = null, mission_name = null, mission_description = null,
+                json_data = "{\"cache_schema_version\":$version,\"backend\":\"terminus\"}",
+                cached_at = now, expires_at = now + 600_000L
+            )
+        }
+
+        LocalCacheWiper(database, LaunchCache()).clearAll()
+
+        assertNull(database.launchQueries.getDetailedByIdStale("terminus-detail-v1").executeAsOneOrNull())
+        assertNull(database.launchQueries.getDetailedByIdStale("terminus-detail-v2").executeAsOneOrNull())
+    }
+
+    @Test
     fun clearAll_keepsTheTopicSubscriptionLedger() = runTest {
         val database = newDatabase()
         database.topicSubscriptionQueries.insertDesired("v6_prod_agency_121")
