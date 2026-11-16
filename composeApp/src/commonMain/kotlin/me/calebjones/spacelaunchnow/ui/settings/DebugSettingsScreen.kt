@@ -673,7 +673,7 @@ private fun SystemTabContent(
 
 /**
  * Switches the data source between LL and Terminus. Auto (no override) follows Remote
- * Config's `data_backend` key, which defaults to LL. The choice resolves once at app
+ * Config's `use_legacy_backend` key, which defaults to Terminus. The choice resolves once at app
  * start, so it applies after a restart.
  */
 @Composable

@@ -53,7 +53,7 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         private const val PINNED_CONTENT_KEY = "pinned_content"
         private const val DIAGNOSTICS_CONFIG_KEY = "diagnostics_config"
         private const val ONBOARDING_VARIANT_KEY = "onboarding_variant"
-        private const val DATA_BACKEND_KEY = "data_backend"
+        private const val USE_LEGACY_BACKEND_KEY = "use_legacy_backend"
         private const val INTERSTITIAL_VISITS_KEY = "ads_interstitial_visits"
         private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
         const val DEFAULT_INTERSTITIAL_VISITS = 4
@@ -163,7 +163,7 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
                 PINNED_CONTENT_KEY to DEFAULT_PINNED_CONTENT_JSON,
                 DIAGNOSTICS_CONFIG_KEY to "",
                 ONBOARDING_VARIANT_KEY to "control",
-                DATA_BACKEND_KEY to DataBackend.DEFAULT.value,
+                USE_LEGACY_BACKEND_KEY to "false",
                 INTERSTITIAL_VISITS_KEY to DEFAULT_INTERSTITIAL_VISITS.toString(),
                 INTERSTITIAL_MIN_INTERVAL_KEY to DEFAULT_INTERSTITIAL_MIN_INTERVAL_S.toString()
             )
@@ -193,12 +193,13 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         }
     }
 
+    // Never reads `data_backend`: builds older than 5.51.0 do, and it must stay `ll` for them.
     override suspend fun getDataBackend(): DataBackend {
         val config = remoteConfig ?: return DataBackend.DEFAULT
         return try {
-            DataBackend.fromString(config.getValue(DATA_BACKEND_KEY).asString())
+            DataBackend.fromLegacyFlag(config.getValue(USE_LEGACY_BACKEND_KEY).asString())
         } catch (e: Exception) {
-            log.w(e) { "Failed to read data backend flag - defaulting to ${DataBackend.DEFAULT}" }
+            log.w(e) { "Failed to read use_legacy_backend flag - defaulting to ${DataBackend.DEFAULT}" }
             DataBackend.DEFAULT
         }
     }
