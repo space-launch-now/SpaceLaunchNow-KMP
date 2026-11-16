@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.first
 
 /**
  * Which server the watch reads launches from. The phone resolves the real value (Remote Config
- * `data_backend` plus the debug override) and sends it over the Wearable Data Layer; the watch
- * has no Firebase. Until a value arrives the watch stays on [LL], like the phone's
- * `DataBackend.DEFAULT`.
+ * `use_legacy_backend` plus the debug override) and sends it over the Wearable Data Layer; the watch
+ * has no Firebase. Until a value arrives the watch stays on [LL]: it trusts only what the phone
+ * sends, so a phone with `use_legacy_backend = true` moves the watch too.
  */
 enum class WatchDataBackend(val value: String) {
     LL("ll"),

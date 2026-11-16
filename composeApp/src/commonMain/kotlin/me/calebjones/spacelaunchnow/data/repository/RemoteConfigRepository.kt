@@ -75,8 +75,9 @@ interface RemoteConfigRepository {
     suspend fun getOnboardingVariant(): OnboardingVariant
 
     /**
-     * The data source switch from the 'data_backend' parameter. [DataBackend.DEFAULT] (LL)
-     * when unset, unrecognized, or Firebase is unavailable: the fail-safe side.
+     * The data source from the boolean 'use_legacy_backend' parameter: `true` gives
+     * [DataBackend.LL]. [DataBackend.DEFAULT] (Terminus) when unset, unrecognized, or Firebase
+     * is unavailable: the fail-safe side. The old 'data_backend' parameter is not read.
      */
     suspend fun getDataBackend(): DataBackend
 

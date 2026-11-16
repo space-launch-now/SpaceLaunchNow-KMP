@@ -17,7 +17,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
         private val CUSTOM_API_BASE_URL = stringPreferencesKey("debug_custom_api_base_url")
         private val USE_CUSTOM_API_URL = booleanPreferencesKey("debug_use_custom_api_url")
         // Local override of the DataBackend flag. Null = follow Firebase Remote Config's
-        // `data_backend` key.
+        // `use_legacy_backend` key.
         private val DATA_BACKEND_OVERRIDE = stringPreferencesKey("debug_data_backend_override")
         // Terminus host choice (Prod / Staging). Absent = Prod. Debug builds only.
         private val TERMINUS_HOST = stringPreferencesKey("debug_terminus_host")
@@ -154,7 +154,7 @@ class DebugPreferences(private val dataStore: DataStore<Preferences>) {
 
     /**
      * Set (or clear, with null) the local DataBackend override. Null means "follow
-     * Firebase Remote Config's `data_backend` key".
+     * Firebase Remote Config's `use_legacy_backend` key".
      */
     suspend fun setDataBackendOverride(backend: DataBackend?) {
         dataStore.edit { preferences ->

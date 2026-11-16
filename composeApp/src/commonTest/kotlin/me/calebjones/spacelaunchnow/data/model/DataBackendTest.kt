@@ -5,18 +5,28 @@ import kotlin.test.assertEquals
 
 class DataBackendTest {
 
-    @Test fun `fromString maps known values`() {
-        assertEquals(DataBackend.TERMINUS, DataBackend.fromString("terminus"))
-        assertEquals(DataBackend.LL, DataBackend.fromString("ll"))
+    @Test fun `no key gives Terminus`() {
+        assertEquals(DataBackend.TERMINUS, DataBackend.fromLegacyFlag(null))
+        assertEquals(DataBackend.TERMINUS, DataBackend.fromLegacyFlag(""))
     }
 
-    @Test fun `fromString falls back to LL on unknown or null`() {
-        assertEquals(DataBackend.LL, DataBackend.fromString("something_else"))
-        assertEquals(DataBackend.LL, DataBackend.fromString(null))
+    @Test fun `use_legacy_backend true gives LL`() {
+        assertEquals(DataBackend.LL, DataBackend.fromLegacyFlag("true"))
+        assertEquals(DataBackend.LL, DataBackend.fromLegacyFlag(" TRUE "))
     }
 
-    @Test fun `DEFAULT is LL so a missing or failed flag never routes production to Terminus`() {
-        assertEquals(DataBackend.LL, DataBackend.DEFAULT)
+    @Test fun `use_legacy_backend false or junk gives Terminus`() {
+        assertEquals(DataBackend.TERMINUS, DataBackend.fromLegacyFlag("false"))
+        assertEquals(DataBackend.TERMINUS, DataBackend.fromLegacyFlag("something_else"))
+    }
+
+    @Test fun `a data_backend style value changes nothing`() {
+        assertEquals(DataBackend.TERMINUS, DataBackend.fromLegacyFlag("terminus"))
+        assertEquals(DataBackend.TERMINUS, DataBackend.fromLegacyFlag("ll"))
+    }
+
+    @Test fun `DEFAULT is Terminus so a missing or failed flag never routes users to LL`() {
+        assertEquals(DataBackend.TERMINUS, DataBackend.DEFAULT)
     }
 
     @Test fun `resolve prefers a non-null local override over remote`() {
@@ -41,8 +51,8 @@ class DataBackendTest {
         )
     }
 
-    @Test fun `default is LL when both override and remote are unresolved`() {
-        val remoteDefault = DataBackend.fromString(null)
-        assertEquals(DataBackend.LL, resolveDataBackend(override = null, remote = remoteDefault))
+    @Test fun `default is Terminus when both override and remote are unresolved`() {
+        val remoteDefault = DataBackend.fromLegacyFlag(null)
+        assertEquals(DataBackend.TERMINUS, resolveDataBackend(override = null, remote = remoteDefault))
     }
 }

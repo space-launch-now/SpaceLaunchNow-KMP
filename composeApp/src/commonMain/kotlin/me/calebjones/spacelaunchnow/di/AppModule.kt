@@ -181,8 +181,8 @@ val appModule = module {
 
     // Data source switch (LL or Terminus): resolved once per Koin graph (app-restart
     // granularity, no hot swap). The DebugPreferences override wins when set (debug builds
-    // only); otherwise Remote Config's `data_backend` key, which falls back to LL on any
-    // failure. Release users therefore stay on LL until the flag is set.
+    // only); otherwise Remote Config's `use_legacy_backend` key, which falls back to Terminus on
+    // any failure. Release users therefore read Terminus unless the emergency switch is `true`.
     // The launch, events, updates, filter, vehicle and space repositories branch on this value.
     single<DataBackend> {
         val remote = try {
