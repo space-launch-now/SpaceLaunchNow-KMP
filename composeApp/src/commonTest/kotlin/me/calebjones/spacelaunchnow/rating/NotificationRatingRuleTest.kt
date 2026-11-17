@@ -11,7 +11,6 @@ class NotificationRatingRuleTest {
     private val day = 24L * 60 * 60 * 1000
 
     private fun allow() = Input(
-        openedFromNotification = true,
         launchCount = 5,
         lastPromptAtMs = null,
         nowMs = now,
@@ -27,12 +26,6 @@ class NotificationRatingRuleTest {
     fun `flag off blocks`() = assertEquals(
         Decision.BLOCKED_FLAG_OFF,
         NotificationRatingRule.evaluate(allow().copy(flagEnabled = false))
-    )
-
-    @Test
-    fun `not from notification blocks`() = assertEquals(
-        Decision.BLOCKED_NOT_FROM_NOTIFICATION,
-        NotificationRatingRule.evaluate(allow().copy(openedFromNotification = false))
     )
 
     @Test

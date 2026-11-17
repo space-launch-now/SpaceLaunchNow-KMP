@@ -52,7 +52,6 @@ class NotificationRatingPrompter(
         if (now - pendingSetAtMs > PENDING_TTL_MS) return
         val decision = NotificationRatingRule.evaluate(
             NotificationRatingRule.Input(
-                openedFromNotification = true,
                 launchCount = launchCount(),
                 lastPromptAtMs = lastPromptAtMs(),
                 nowMs = now,
