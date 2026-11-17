@@ -26,6 +26,8 @@ struct NextUpWidgetView: View {
             // Content
             if entry.isPlaceholder {
                 placeholderView
+            } else if !entry.hasWidgetAccess {
+                lockedView  // Premium upsell for non-premium users, never the empty state
             } else if let errorMessage = entry.errorMessage {
                 errorView(message: errorMessage)
             } else if let launch = entry.launches.first {
@@ -372,6 +374,54 @@ struct NextUpWidgetView: View {
                 .foregroundStyle(.secondary)
         }
         .padding()
+    }
+
+    // MARK: - Locked View (Premium Paywall)
+    private var lockedView: some View {
+        GeometryReader { geometry in
+            let compact = isSmallWidget(for: geometry.size)
+            let large = isLargeWidget(for: geometry.size)
+            VStack(spacing: compact ? 6 : 8) {
+                Spacer(minLength: 0)
+
+                Image(systemName: "lock.fill")
+                    .font(.system(size: compact ? 28 : (large ? 40 : 32)))
+                    .foregroundStyle(.orange)
+
+                Text("Premium Widget")
+                    .font(compact ? .subheadline : .headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+
+                if !compact {
+                    Text("Upgrade to Premium to unlock the Next Launch widget")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.9)
+                }
+
+                if large {
+                    Divider()
+                        .padding(.vertical, 4)
+                }
+
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.caption2)
+                    Text("Tap to upgrade")
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                }
+                .foregroundStyle(.blue)
+
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(adaptivePadding(for: geometry.size))
+        }
+        .widgetURL(URL(string: "spacelaunchnow://subscription"))  // Deep link to subscription screen
     }
 
     // MARK: - Adaptive Layout Helpers
