@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
+import me.calebjones.spacelaunchnow.util.isFirebaseAppConfigured
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -26,14 +27,25 @@ import kotlin.time.Duration.Companion.seconds
  * - Default values for offline/initial state
  * - Graceful fallback when Firebase is unavailable (Desktop)
  */
-class RemoteConfigRepositoryImpl : RemoteConfigRepository {
+class RemoteConfigRepositoryImpl(
+    /** Whether this process has a configured Firebase app. Injectable for tests. */
+    private val firebaseConfigured: () -> Boolean = ::isFirebaseAppConfigured,
+    /** Produces the SDK's Remote Config instance. Injectable for tests. */
+    private val createRemoteConfig: () -> FirebaseRemoteConfig = { Firebase.remoteConfig },
+) : RemoteConfigRepository {
     
     private val log by lazy { logger() }
     
-    // Lazy initialization to catch Firebase setup errors gracefully
+    // Created lazily, and never in a process without a Firebase app (the iOS widget extension):
+    // there the SDK raises an Objective-C exception that no Kotlin catch block can stop, and the
+    // process is killed. Every reader treats null as "use the default".
     private val remoteConfig: FirebaseRemoteConfig? by lazy {
+        if (!firebaseConfigured()) {
+            log.d { "No Firebase app in this process - Remote Config disabled, using defaults" }
+            return@lazy null
+        }
         try {
-            Firebase.remoteConfig
+            createRemoteConfig()
         } catch (e: Exception) {
             log.w(e) { "Firebase Remote Config unavailable - using fallback data" }
             null
