@@ -137,6 +137,7 @@ class LaunchViewModel(
                 _launchDetails.value = cachedLaunch
                 updateVideoPlayerState(cachedLaunch)
                 _isLoading.value = false
+                notificationRatingTrigger.onLaunchLoaded(cachedLaunch.id, cachedLaunch.status?.id)
                 return
             }
         }

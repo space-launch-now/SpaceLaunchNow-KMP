@@ -28,12 +28,14 @@ class NotificationRatingPrompter(
 ) : NotificationRatingTrigger {
 
     private var pendingLaunchId: String? = null
+    private var pendingSetAtMs: Long = 0L
 
     private val _promptRequest = MutableStateFlow(false)
     val promptRequest: StateFlow<Boolean> = _promptRequest.asStateFlow()
 
     fun onOpenedFromNotification(launchId: String) {
         pendingLaunchId = launchId
+        pendingSetAtMs = nowMs()
     }
 
     fun consume() {
@@ -46,6 +48,8 @@ class NotificationRatingPrompter(
         pendingLaunchId = null
 
         val now = nowMs()
+        // The launch never loaded in time (for example a failed fetch): ignore the stale id.
+        if (now - pendingSetAtMs > PENDING_TTL_MS) return
         val decision = NotificationRatingRule.evaluate(
             NotificationRatingRule.Input(
                 openedFromNotification = true,
@@ -66,5 +70,6 @@ class NotificationRatingPrompter(
 
     companion object {
         const val SOURCE_NOTIFICATION = "notification"
+        const val PENDING_TTL_MS = 2 * 60 * 1000L
     }
 }

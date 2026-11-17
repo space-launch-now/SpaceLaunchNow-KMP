@@ -27,7 +27,7 @@ class NotificationRatingPrompterTest {
         var launchCount: Long = 5,
         var lastPrompt: Long? = null,
         var rated: Boolean = false,
-        val now: Long = 1_800_000_000_000L,
+        var now: Long = 1_800_000_000_000L,
     ) {
         val config = MockRemoteConfigRepository().apply { notificationRatingPromptEnabled = true }
         val analytics = RecordingAnalytics()
@@ -113,6 +113,29 @@ class NotificationRatingPrompterTest {
         f.prompter.onLaunchLoaded("L1", 1)
         assertFalse(f.prompter.promptRequest.value)
         assertTrue(f.analytics.events.isEmpty())
+    }
+
+    @Test
+    fun `pending id just under two minutes old still prompts`() = runTest {
+        val f = Fixture()
+        f.prompter.onOpenedFromNotification("L1")
+        f.now += NotificationRatingPrompter.PENDING_TTL_MS - 1
+        f.prompter.onLaunchLoaded("L1", 1)
+        assertTrue(f.prompter.promptRequest.value)
+    }
+
+    @Test
+    fun `pending id over two minutes old is ignored and cleared`() = runTest {
+        val f = Fixture()
+        f.prompter.onOpenedFromNotification("L1")
+        f.now += NotificationRatingPrompter.PENDING_TTL_MS + 1
+        f.prompter.onLaunchLoaded("L1", 1)
+        assertFalse(f.prompter.promptRequest.value)
+        assertTrue(f.analytics.events.isEmpty())
+        assertNull(f.lastPrompt)
+        f.now = 1_800_000_000_000L
+        f.prompter.onLaunchLoaded("L1", 1)
+        assertFalse(f.prompter.promptRequest.value)
     }
 
     @Test

@@ -401,8 +401,11 @@ fun SpaceLaunchNowApp(
             val notificationPromptRequested by notificationRatingPrompter.promptRequest.collectAsState()
             LaunchedEffect(notificationPromptRequested) {
                 if (notificationPromptRequested) {
-                    appRatingManager.requestReview(contextFactory.getActivity())
-                    notificationRatingPrompter.consume()
+                    try {
+                        appRatingManager.requestReview(contextFactory.getActivity())
+                    } finally {
+                        notificationRatingPrompter.consume()
+                    }
                 }
             }
 
