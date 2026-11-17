@@ -5,16 +5,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchBasic
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchNormal
 import me.calebjones.spacelaunchnow.api.launchlibrary.models.LaunchDetailed
-import me.calebjones.spacelaunchnow.api.terminus.models.LaunchDetailed as TerminusLaunchDetailed
 import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchBasicList as TerminusPaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchNormalList as TerminusPaginatedLaunchNormalList
-import me.calebjones.spacelaunchnow.api.terminus.models.RocketDetailed as TerminusRocketDetailed
-import me.calebjones.spacelaunchnow.api.terminus.models.TimelineEvent as TerminusTimelineEvent
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.domain.mapper.terminus.TerminusLaunchDetail
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
@@ -336,14 +337,17 @@ class LaunchLocalDataSource(
     // envelope is not a valid LL LaunchDetailed: each side treats the other's blob as a miss.
     // Schema 2 (Tasks#1078) keeps the launch, its full rocket and its timeline, which Terminus
     // serves from three reads. A schema 1 blob holds the launch alone, so it is a miss.
+    // The blob is flat: these two header keys, then the TerminusLaunchDetail keys.
     @Serializable
-    private data class TerminusDetailEnvelope(
+    private data class TerminusCacheHeader(
         @SerialName("cache_schema_version") val schemaVersion: Int,
-        @SerialName("backend") val backend: String,
-        @SerialName("launch") val launch: TerminusLaunchDetailed,
-        @SerialName("rocket") val rocket: TerminusRocketDetailed?,
-        @SerialName("timeline") val timeline: List<TerminusTimelineEvent>
+        @SerialName("backend") val backend: String
     )
+
+    private fun encodeTerminusDetail(detail: TerminusLaunchDetail): String {
+        val header = json.encodeToJsonElement(TerminusCacheHeader(TERMINUS_CACHE_SCHEMA_VERSION, "terminus")).jsonObject
+        return JsonObject(header + json.encodeToJsonElement(detail).jsonObject).toString()
+    }
 
     suspend fun cacheTerminusDetailedLaunch(detail: TerminusLaunchDetail) {
         val launch = detail.launch
@@ -369,7 +373,7 @@ class LaunchLocalDataSource(
                 missionName = launch.mission?.name,
                 missionDescription = launch.mission?.description
             ),
-            json.encodeToString(TerminusDetailEnvelope(TERMINUS_CACHE_SCHEMA_VERSION, "terminus", launch, detail.rocket, detail.timeline)),
+            encodeTerminusDetail(detail),
             now,
             now + duration.inWholeMilliseconds
         )
@@ -387,9 +391,10 @@ class LaunchLocalDataSource(
     private fun decodeTerminusDetail(id: String, blob: String?): TerminusLaunchDetail? {
         if (blob == null) return null
         return try {
-            val envelope = json.decodeFromString<TerminusDetailEnvelope>(blob)
-            if (envelope.schemaVersion == TERMINUS_CACHE_SCHEMA_VERSION && envelope.backend == "terminus") {
-                TerminusLaunchDetail(envelope.launch, envelope.rocket, envelope.timeline)
+            val element = json.parseToJsonElement(blob)
+            val header = json.decodeFromJsonElement<TerminusCacheHeader>(element)
+            if (header.schemaVersion == TERMINUS_CACHE_SCHEMA_VERSION && header.backend == "terminus") {
+                json.decodeFromJsonElement<TerminusLaunchDetail>(element)
             } else {
                 null
             }
