@@ -119,7 +119,7 @@ fun LaunchCountdown(
         }
 
         // Countdown display
-        CountdownDisplay(launchTime = launchTime, precision = precision)
+        CountdownDisplay(launchTime = launchTime, precision = precision, status = status)
     }
 
     // Status Information Dialog
@@ -184,8 +184,8 @@ fun LaunchStatusDialog(
 }
 
 @Composable
-private fun CountdownDisplay(launchTime: Instant, precision: NetPrecision?) {
-    val state = rememberCountdownState(launchTime, precision)
+private fun CountdownDisplay(launchTime: Instant, precision: NetPrecision?, status: LaunchStatus?) {
+    val state = rememberCountdownState(launchTime, precision, status)
 
     if (state.showCountdown) {
         CountdownDigits(state)
@@ -206,17 +206,18 @@ private fun CountdownDisplay(launchTime: Instant, precision: NetPrecision?) {
  * Renders a single-line "T- 1d 06h 59m 59s" row — a small timer icon plus monospace text
  * styled to match the sibling location row (same onSurfaceVariant color) so it sits neatly
  * in the card. Monospace keeps the digits from jittering as they tick. When the launch is
- * too far out or its date is too imprecise to count down, [fallback] is shown instead —
- * typically the formatted launch date.
+ * too far out, its date is too imprecise to count down, or its [status] is final, [fallback]
+ * is shown instead — typically the formatted launch date.
  */
 @Composable
 fun CompactLaunchCountdown(
     launchTime: Instant,
     precision: NetPrecision?,
+    status: LaunchStatus?,
     modifier: Modifier = Modifier,
     fallback: @Composable () -> Unit
 ) {
-    val state = rememberCountdownState(launchTime, precision)
+    val state = rememberCountdownState(launchTime, precision, status)
 
     if (state.showCountdown) {
         val countdownText = buildString {
@@ -263,17 +264,33 @@ private data class CountdownState(
     val showCountdown: Boolean
 )
 
+/** Launch status ids that end a launch: Success, Failure and Partial Failure. */
+private val FINAL_LAUNCH_STATUS_IDS = setOf(3, 4, 7)
+
+/**
+ * True when a live countdown makes sense: the launch is within 30 days, its net time is
+ * precise enough (precision id 0..4), and its status is not final. After a final status
+ * the status pill tells the result, so a T+ counter would only keep ticking with no meaning.
+ */
+internal fun isCountdownShown(days: Int, precisionId: Int?, statusId: Int?): Boolean =
+    days < 30 && precisionId in 0..4 && statusId !in FINAL_LAUNCH_STATUS_IDS
+
 /**
  * Ticks once per second and returns the current [CountdownState] for [launchTime].
- * A live countdown is only shown when the launch is within 30 days and its net time
- * is precise enough (precision id 0..4); otherwise callers fall back to a date.
+ * See [isCountdownShown] for when callers get digits and when they fall back to a date.
  */
 @Composable
-private fun rememberCountdownState(launchTime: Instant, precision: NetPrecision?): CountdownState {
+private fun rememberCountdownState(
+    launchTime: Instant,
+    precision: NetPrecision?,
+    status: LaunchStatus?
+): CountdownState {
     val remainingTime = remember { mutableStateOf(launchTime - System.now()) }
+    val isFinal = status?.id in FINAL_LAUNCH_STATUS_IDS
 
-    LaunchedEffect(launchTime) {
-        while (true) {
+    LaunchedEffect(launchTime, isFinal) {
+        // Nothing is shown for a final status, so do not tick.
+        while (!isFinal) {
             remainingTime.value = launchTime - System.now()
             delay(1.seconds)
         }
@@ -288,8 +305,7 @@ private fun rememberCountdownState(launchTime: Instant, precision: NetPrecision?
     val minutes = ((absoluteSeconds % 3600) / 60).toInt()
     val seconds = (absoluteSeconds % 60).toInt()
 
-    val precisionAllowed = precision?.id in 0..4
-    val showCountdown = (days < 30) && precisionAllowed
+    val showCountdown = isCountdownShown(days, precision?.id, status?.id)
 
     return CountdownState(days, hours, minutes, seconds, isPast, showCountdown)
 }
@@ -427,12 +443,14 @@ private fun CompactCountdownPreviewContent() {
             CompactLaunchCountdown(
                 launchTime = System.now().plus(2.days).plus(6.hours).plus(34.minutes),
                 precision = precise,
+                status = null,
                 fallback = { Text("fallback") }
             )
             // Fallback: 120 days out is past the 30-day countdown window
             CompactLaunchCountdown(
                 launchTime = System.now().plus(120.days),
                 precision = precise,
+                status = null,
                 fallback = {
                     Text(
                         text = "NET Feb 15, 2026",

@@ -222,6 +222,7 @@ fun FeaturedLaunchRowCard(
                         CompactLaunchCountdown(
                             launchTime = net,
                             precision = launch.netPrecision,
+                            status = launch.status,
                             fallback = {
                                 LaunchDateRow(
                                     text = DateTimeUtil.formatLaunchDateTime(net, useUtc)
