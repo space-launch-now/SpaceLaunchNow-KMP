@@ -15,6 +15,10 @@ fun wearVersionCode(): Int {
     return 1_100_000_000 + (build * 2) + 1
 }
 
+// Phone-style name with the build suffix (5.50.2-b113), used for the User-Agent header.
+fun wearUserAgentVersion(): String =
+    "${wearVersionName()}-b${versionProps["versionBuildNumber"].toString().toInt()}"
+
 fun wearVersionName(): String {
     val major = versionProps["versionMajor"].toString()
     val minor = versionProps["versionMinor"].toString()
@@ -45,6 +49,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = wearVersionCode()
         versionName = wearVersionName()
+        buildConfigField("String", "APP_VERSION_NAME", "\"${wearUserAgentVersion()}\"")
     }
 
     signingConfigs {
@@ -82,6 +87,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
