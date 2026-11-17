@@ -88,6 +88,12 @@ interface RemoteConfigRepository {
     suspend fun getInterstitialVisits(): Int
 
     /**
+     * Whether the review prompt after opening a launch from a notification is on,
+     * from 'rating_prompt_after_notification_enabled'. Default false; false on read failure.
+     */
+    suspend fun getNotificationRatingPromptEnabled(): Boolean
+
+    /**
      * Minimum seconds between interstitials, from 'ads_interstitial_min_interval_s'.
      * Default 120.
      */

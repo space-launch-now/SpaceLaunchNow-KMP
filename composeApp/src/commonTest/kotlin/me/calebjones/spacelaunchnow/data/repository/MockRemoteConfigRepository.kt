@@ -18,6 +18,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     var mockDiagnosticsConfigJson: String? = null
     var onboardingVariant: OnboardingVariant = OnboardingVariant.CONTROL
     var dataBackend: DataBackend = DataBackend.DEFAULT
+    var notificationRatingPromptEnabled = false
     var fetchAndActivateCalled = false
     var setDefaultsCalled = false
     var lastForceRefresh: Boolean? = null
@@ -63,6 +64,8 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
 
     override suspend fun getInterstitialVisits(): Int = 4
 
+    override suspend fun getNotificationRatingPromptEnabled(): Boolean = notificationRatingPromptEnabled
+
     override suspend fun getInterstitialMinIntervalSeconds(): Long = 120L
 
     fun reset() {
@@ -72,6 +75,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
         mockPinnedContent = null
         mockDiagnosticsConfigJson = null
         onboardingVariant = OnboardingVariant.CONTROL
+        notificationRatingPromptEnabled = false
         fetchAndActivateCalled = false
         setDefaultsCalled = false
         lastForceRefresh = null

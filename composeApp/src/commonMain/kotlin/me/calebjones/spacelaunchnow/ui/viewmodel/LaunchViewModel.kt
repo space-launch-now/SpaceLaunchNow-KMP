@@ -21,6 +21,7 @@ import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.VideoLink
+import me.calebjones.spacelaunchnow.rating.NotificationRatingTrigger
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 
 class LaunchViewModel(
@@ -29,7 +30,8 @@ class LaunchViewModel(
     private val articlesRepository: ArticlesRepository,
     private val eventsRepository: EventsRepository,
     private val agencyRepository: AgencyRepository,
-    private val analyticsManager: AnalyticsManager
+    private val analyticsManager: AnalyticsManager,
+    private val notificationRatingTrigger: NotificationRatingTrigger
 ) : ViewModel() {
 
     private val log = Logger.withTag("LaunchViewModel")
@@ -172,6 +174,7 @@ class LaunchViewModel(
             // Cache the detailed data for future use
             launchCache.cacheLaunch(launch)
             analyticsManager.track(AnalyticsEvent.LaunchViewed(launch.id, launch.name))
+            notificationRatingTrigger.onLaunchLoaded(launch.id, launch.status?.id)
         }.onFailure { exception ->
             log.w(exception) {
                 "fetchLaunchDetailsSuspend (forceRefresh=$forceRefresh) failed"

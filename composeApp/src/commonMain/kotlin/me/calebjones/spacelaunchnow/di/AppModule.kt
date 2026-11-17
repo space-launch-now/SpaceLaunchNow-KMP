@@ -33,6 +33,8 @@ import me.calebjones.spacelaunchnow.data.repository.SimpleSubscriptionRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
+import me.calebjones.spacelaunchnow.rating.NotificationRatingPrompter
+import me.calebjones.spacelaunchnow.rating.NotificationRatingTrigger
 import me.calebjones.spacelaunchnow.ui.ads.InterstitialGate
 import me.calebjones.spacelaunchnow.ui.ads.createInterstitialGate
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
@@ -219,6 +221,22 @@ val appModule = module {
             statsDataSource = get()
         )
     }
+
+    // Review prompt after opening a launch from a notification
+    single {
+        val prefs = get<AppPreferences>()
+        val remoteConfig = get<RemoteConfigRepository>()
+        NotificationRatingPrompter(
+            launchCount = { prefs.getAppLaunchCount() },
+            lastPromptAtMs = { prefs.getLastRatingPromptDate() },
+            hasRated = { prefs.hasUserRated() },
+            saveLastPromptAtMs = { prefs.updateLastRatingPromptDate(it) },
+            flagEnabled = { remoteConfig.getNotificationRatingPromptEnabled() },
+            nowMs = { kotlin.time.Clock.System.now().toEpochMilliseconds() },
+            analytics = get(),
+        )
+    }
+    single<NotificationRatingTrigger> { get<NotificationRatingPrompter>() }
 
     // Interstitial pacing gate - persisted counters, Remote Config thresholds
     single { createInterstitialGate(get<AppPreferences>(), get<RemoteConfigRepository>()) }

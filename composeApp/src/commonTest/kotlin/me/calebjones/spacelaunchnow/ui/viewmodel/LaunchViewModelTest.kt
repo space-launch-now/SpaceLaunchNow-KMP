@@ -21,6 +21,7 @@ import me.calebjones.spacelaunchnow.data.repository.FakeLaunchRepository
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import me.calebjones.spacelaunchnow.rating.NotificationRatingTrigger
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -61,7 +62,10 @@ class LaunchViewModelTest {
             articlesRepository = NoOpArticlesRepository(),
             eventsRepository = FakeEventsRepository(),
             agencyRepository = FakeAgencyRepository(),
-            analyticsManager = AnalyticsManagerImpl(emptyList())
+            analyticsManager = AnalyticsManagerImpl(emptyList()),
+            notificationRatingTrigger = object : NotificationRatingTrigger {
+                override suspend fun onLaunchLoaded(launchId: String, statusId: Int?) = Unit
+            }
         )
 
         viewModel.fetchUpcomingLaunchesNormal(limit = 1)
@@ -83,7 +87,10 @@ class LaunchViewModelTest {
             articlesRepository = NoOpArticlesRepository(),
             eventsRepository = FakeEventsRepository(),
             agencyRepository = FakeAgencyRepository(),
-            analyticsManager = AnalyticsManagerImpl(emptyList())
+            analyticsManager = AnalyticsManagerImpl(emptyList()),
+            notificationRatingTrigger = object : NotificationRatingTrigger {
+                override suspend fun onLaunchLoaded(launchId: String, statusId: Int?) = Unit
+            }
         )
 
         viewModel.fetchLaunchDetails("missing")
