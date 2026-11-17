@@ -17,6 +17,11 @@ sealed class AnalyticsEvent(val name: String) {
         override fun toParameters() = mapOf("launch_id" to launchId, "launch_name" to launchName)
     }
 
+    data class RatingPromptRequested(val source: String, val launchId: String) :
+        AnalyticsEvent("rating_prompt_requested") {
+        override fun toParameters() = mapOf("source" to source, "launch_id" to launchId)
+    }
+
     data class LaunchShared(val launchId: String, val method: String) :
         AnalyticsEvent("launch_shared") {
         override fun toParameters() = mapOf("launch_id" to launchId, "method" to method)

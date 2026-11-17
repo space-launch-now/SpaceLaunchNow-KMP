@@ -8,6 +8,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import me.calebjones.spacelaunchnow.rating.AppRatingManager
+import me.calebjones.spacelaunchnow.rating.NotificationRatingPrompter
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -393,6 +395,20 @@ fun SpaceLaunchNowApp(
                 }
             }
 
+            // System review prompt after the user opens a launch from a notification (Tasks#1152)
+            val notificationRatingPrompter: NotificationRatingPrompter = koinInject()
+            val appRatingManager: AppRatingManager = koinInject()
+            val notificationPromptRequested by notificationRatingPrompter.promptRequest.collectAsState()
+            LaunchedEffect(notificationPromptRequested) {
+                if (notificationPromptRequested) {
+                    try {
+                        appRatingManager.requestReview(contextFactory.getActivity())
+                    } finally {
+                        notificationRatingPrompter.consume()
+                    }
+                }
+            }
+
             // CR-2: Gate ad preloading on consent resolution; content renders immediately either way
             WithPreloadedAds(
                 context = contextFactory.getActivity(),
@@ -663,6 +679,7 @@ fun SpaceLaunchNowApp(
                         LaunchedEffect(notificationLaunchId) {
                             if (notificationLaunchId != null) {
                                 log.d { "Navigating to launch detail for ID: $notificationLaunchId" }
+                                notificationRatingPrompter.onOpenedFromNotification(notificationLaunchId)
                                 navController.navigate(LaunchDetail(notificationLaunchId))
                                 onNotificationLaunchIdConsumed()
                             }

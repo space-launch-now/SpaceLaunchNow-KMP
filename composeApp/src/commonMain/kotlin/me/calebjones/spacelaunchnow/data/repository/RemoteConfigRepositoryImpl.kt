@@ -55,6 +55,7 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         private const val ONBOARDING_VARIANT_KEY = "onboarding_variant"
         private const val USE_LEGACY_BACKEND_KEY = "use_legacy_backend"
         private const val INTERSTITIAL_VISITS_KEY = "ads_interstitial_visits"
+        private const val NOTIFICATION_RATING_PROMPT_KEY = "rating_prompt_after_notification_enabled"
         private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
         const val DEFAULT_INTERSTITIAL_VISITS = 4
         const val DEFAULT_INTERSTITIAL_MIN_INTERVAL_S = 120L
@@ -165,7 +166,8 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
                 ONBOARDING_VARIANT_KEY to "control",
                 USE_LEGACY_BACKEND_KEY to "false",
                 INTERSTITIAL_VISITS_KEY to DEFAULT_INTERSTITIAL_VISITS.toString(),
-                INTERSTITIAL_MIN_INTERVAL_KEY to DEFAULT_INTERSTITIAL_MIN_INTERVAL_S.toString()
+                INTERSTITIAL_MIN_INTERVAL_KEY to DEFAULT_INTERSTITIAL_MIN_INTERVAL_S.toString(),
+                NOTIFICATION_RATING_PROMPT_KEY to "false"
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -212,6 +214,16 @@ class RemoteConfigRepositoryImpl : RemoteConfigRepository {
         } catch (e: Exception) {
             log.w(e) { "Failed to read interstitial visits - using default" }
             DEFAULT_INTERSTITIAL_VISITS
+        }
+    }
+
+    override suspend fun getNotificationRatingPromptEnabled(): Boolean {
+        val config = remoteConfig ?: return false
+        return try {
+            config.getValue(NOTIFICATION_RATING_PROMPT_KEY).asString().trim().equals("true", ignoreCase = true)
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read notification rating prompt flag - defaulting to off" }
+            false
         }
     }
 

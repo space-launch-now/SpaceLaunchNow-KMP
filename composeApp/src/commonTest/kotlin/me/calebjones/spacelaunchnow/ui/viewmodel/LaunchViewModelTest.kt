@@ -21,6 +21,7 @@ import me.calebjones.spacelaunchnow.data.repository.FakeLaunchRepository
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import me.calebjones.spacelaunchnow.rating.NotificationRatingTrigger
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -61,7 +62,10 @@ class LaunchViewModelTest {
             articlesRepository = NoOpArticlesRepository(),
             eventsRepository = FakeEventsRepository(),
             agencyRepository = FakeAgencyRepository(),
-            analyticsManager = AnalyticsManagerImpl(emptyList())
+            analyticsManager = AnalyticsManagerImpl(emptyList()),
+            notificationRatingTrigger = object : NotificationRatingTrigger {
+                override suspend fun onLaunchLoaded(launchId: String, statusId: Int?) = Unit
+            }
         )
 
         viewModel.fetchUpcomingLaunchesNormal(limit = 1)
@@ -83,13 +87,64 @@ class LaunchViewModelTest {
             articlesRepository = NoOpArticlesRepository(),
             eventsRepository = FakeEventsRepository(),
             agencyRepository = FakeAgencyRepository(),
-            analyticsManager = AnalyticsManagerImpl(emptyList())
+            analyticsManager = AnalyticsManagerImpl(emptyList()),
+            notificationRatingTrigger = object : NotificationRatingTrigger {
+                override suspend fun onLaunchLoaded(launchId: String, statusId: Int?) = Unit
+            }
         )
 
         viewModel.fetchLaunchDetails("missing")
         advanceUntilIdle()
 
         assertEquals("detail failed", viewModel.error.value)
+    }
+
+    private class RecordingTrigger : NotificationRatingTrigger {
+        val calls = mutableListOf<Pair<String, Int?>>()
+        override suspend fun onLaunchLoaded(launchId: String, statusId: Int?) {
+            calls += launchId to statusId
+        }
+    }
+
+    @Test
+    fun fetchLaunchDetails_callsTrigger_onNetworkSuccess() = runTest(dispatcher) {
+        val launch = sampleLaunch(id = "n-1", name = "Network")
+        val trigger = RecordingTrigger()
+        val viewModel = LaunchViewModel(
+            repository = FakeLaunchRepository().apply { launchDetailDomainResult = Result.success(launch) },
+            launchCache = LaunchCache(),
+            articlesRepository = NoOpArticlesRepository(),
+            eventsRepository = FakeEventsRepository(),
+            agencyRepository = FakeAgencyRepository(),
+            analyticsManager = AnalyticsManagerImpl(emptyList()),
+            notificationRatingTrigger = trigger
+        )
+
+        viewModel.fetchLaunchDetails("n-1")
+        advanceUntilIdle()
+
+        assertEquals(listOf("n-1" to launch.status?.id), trigger.calls)
+    }
+
+    @Test
+    fun fetchLaunchDetails_callsTrigger_onCacheHit() = runTest(dispatcher) {
+        val launch = sampleLaunch(id = "c-1", name = "Cached")
+        val cache = LaunchCache().apply { cacheLaunch(launch) }
+        val trigger = RecordingTrigger()
+        val viewModel = LaunchViewModel(
+            repository = FakeLaunchRepository(),
+            launchCache = cache,
+            articlesRepository = NoOpArticlesRepository(),
+            eventsRepository = FakeEventsRepository(),
+            agencyRepository = FakeAgencyRepository(),
+            analyticsManager = AnalyticsManagerImpl(emptyList()),
+            notificationRatingTrigger = trigger
+        )
+
+        viewModel.fetchLaunchDetails("c-1")
+        advanceUntilIdle()
+
+        assertEquals(listOf("c-1" to launch.status?.id), trigger.calls)
     }
 }
 

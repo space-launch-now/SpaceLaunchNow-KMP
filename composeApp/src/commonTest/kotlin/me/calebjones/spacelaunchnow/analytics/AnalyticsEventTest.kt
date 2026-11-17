@@ -11,6 +11,11 @@ class AnalyticsEventTest {
     // ── name property ────────────────────────────────────────────────────────
 
     @Test fun `LaunchViewed has correct name`() = assertEquals("launch_viewed", AnalyticsEvent.LaunchViewed("id", "name").name)
+    @Test fun `RatingPromptRequested has correct name and params`() {
+        val e = AnalyticsEvent.RatingPromptRequested("notification", "id1")
+        assertEquals("rating_prompt_requested", e.name)
+        assertEquals(mapOf("source" to "notification", "launch_id" to "id1"), e.toParameters())
+    }
     @Test fun `LaunchShared has correct name`() = assertEquals("launch_shared", AnalyticsEvent.LaunchShared("id", "method").name)
     @Test fun `LaunchReminderSet has correct name`() = assertEquals("launch_reminder_set", AnalyticsEvent.LaunchReminderSet("id").name)
     @Test fun `LaunchFavorited has correct name`() = assertEquals("launch_favorited", AnalyticsEvent.LaunchFavorited("id", true).name)
