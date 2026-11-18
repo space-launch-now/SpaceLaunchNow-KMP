@@ -465,6 +465,14 @@ fun SettingsScreen(
                         onClick = onAbout
                     )
                 }
+                Spacer(Modifier.height(4.dp))
+                SettingsCardRow {
+                    SettingsNavigationRow(
+                        title = "Shop",
+                        subtitle = "Space Launch Now merch",
+                        onClick = { uriHandler.openUri(me.calebjones.spacelaunchnow.util.ShopLink.URL) }
+                    )
+                }
                 // Ad privacy / consent revocation
                 val privacyOptionsRequired =
                     me.calebjones.spacelaunchnow.ui.ads.rememberPrivacyOptionsRequired()
