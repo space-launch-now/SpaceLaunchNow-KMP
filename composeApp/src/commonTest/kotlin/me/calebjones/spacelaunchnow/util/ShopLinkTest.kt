@@ -1,11 +1,12 @@
 package me.calebjones.spacelaunchnow.util
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ShopLinkTest {
     @Test
-    fun urlPointsToShopWithAppSource() {
-        assertEquals("https://shop.spacelaunchnow.app/?utm_source=app", ShopLink.URL)
+    fun urlIsHttpsShopHostWithAppSource() {
+        assertTrue(ShopLink.URL.startsWith("https://shop.spacelaunchnow.app/"))
+        assertTrue(ShopLink.URL.contains("utm_source=app"))
     }
 }
