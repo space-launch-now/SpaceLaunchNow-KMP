@@ -10,10 +10,7 @@ import co.touchlab.kermit.Logger
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.Wearable
-import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.flow.Flow
@@ -37,11 +34,7 @@ class WatchLaunchRepositoryImpl(
     private val json = Json { ignoreUnknownKeys = true }
 
     private val launchApi = WatchLaunchApi(
-        HttpClient(Android) {
-            install(ContentNegotiation) {
-                json(Json { ignoreUnknownKeys = true })
-            }
-        }
+        createWatchHttpClient(Android.create())
     )
 
     companion object {
