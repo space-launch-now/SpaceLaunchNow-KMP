@@ -74,6 +74,7 @@ import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.DebugUnlock
 import me.calebjones.spacelaunchnow.util.NotificationSettingsHelper
 import me.calebjones.spacelaunchnow.util.isWearOsConnected
+import me.calebjones.spacelaunchnow.util.ShopLink
 import me.calebjones.spacelaunchnow.util.isWearOsSupportedPlatform
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import org.koin.compose.koinInject
@@ -463,6 +464,14 @@ fun SettingsScreen(
                     SettingsNavigationRow(
                         title = "About Details",
                         onClick = onAbout
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                SettingsCardRow {
+                    SettingsNavigationRow(
+                        title = "Shop",
+                        subtitle = "Space Launch Now merch",
+                        onClick = { uriHandler.openUri(ShopLink.URL) }
                     )
                 }
                 // Ad privacy / consent revocation
