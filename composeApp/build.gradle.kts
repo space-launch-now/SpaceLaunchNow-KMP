@@ -142,6 +142,8 @@ kotlin {
                 implementation(libs.androidx.glance)
                 implementation(libs.androidx.glance.material3)
 
+                implementation(project.dependencies.platform(libs.okhttp.bom))
+
                 implementation(project.dependencies.platform(libs.firebase.bom))
                 implementation(libs.android.firebase.analytics)
                 implementation(libs.android.firebase.messaging)
