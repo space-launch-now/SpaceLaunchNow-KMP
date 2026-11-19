@@ -31,18 +31,6 @@ class TerminusScheduleFilterRepositoryImpl internal constructor(
     private val fetcher: TerminusFilterFetcher
 ) : ScheduleFilterRepository {
 
-    constructor(
-        agenciesApi: AgenciesApi,
-        programsApi: ProgramsApi,
-        launcherConfigurationsApi: LauncherConfigurationsApi,
-        launcherConfigurationFamiliesApi: LauncherConfigurationFamiliesApi,
-        locationsApi: LocationsApi,
-        configApi: ConfigApi
-    ) : this(
-        agenciesApi, programsApi, launcherConfigurationsApi, launcherConfigurationFamiliesApi,
-        locationsApi, configApi, TerminusFilterFetcher()
-    )
-
     override suspend fun getAgencies(forceRefresh: Boolean) = fetcher.options(
         "agencies", forceRefresh,
         { limit, offset -> agenciesApi.agenciesMiniList(limit = limit, offset = offset, ordering = "name", featured = true) }
@@ -94,11 +82,6 @@ class TerminusRocketFilterRepositoryImpl internal constructor(
     private val fetcher: TerminusFilterFetcher
 ) : RocketFilterRepository {
 
-    constructor(
-        programsApi: ProgramsApi,
-        launcherConfigurationFamiliesApi: LauncherConfigurationFamiliesApi
-    ) : this(programsApi, launcherConfigurationFamiliesApi, TerminusFilterFetcher())
-
     override suspend fun getPrograms(forceRefresh: Boolean) = programs(programsApi, fetcher, forceRefresh)
 
     override suspend fun getFamilies(forceRefresh: Boolean) =
@@ -109,8 +92,6 @@ class TerminusAstronautFilterRepositoryImpl internal constructor(
     private val configApi: ConfigApi,
     private val fetcher: TerminusFilterFetcher
 ) : AstronautFilterRepository {
-
-    constructor(configApi: ConfigApi) : this(configApi, TerminusFilterFetcher())
 
     override suspend fun getStatuses(forceRefresh: Boolean) = fetcher.options(
         "astronaut-statuses", forceRefresh,

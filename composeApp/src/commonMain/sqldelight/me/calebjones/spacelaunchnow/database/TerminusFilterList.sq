@@ -1,0 +1,16 @@
+-- TerminusFilterList: the Terminus filter options, one row per list. Kept apart from the
+-- Filterable* tables, which hold LL rows keyed by LL id; the two backends must not mix.
+-- options_json is a List<FilterOption> encoded with kotlinx.serialization.
+
+CREATE TABLE TerminusFilterList (
+    list_key     TEXT NOT NULL PRIMARY KEY,
+    options_json TEXT NOT NULL,
+    cached_at    INTEGER NOT NULL
+);
+
+getList:
+SELECT options_json, cached_at FROM TerminusFilterList WHERE list_key = ?;
+
+insertOrReplaceList:
+INSERT OR REPLACE INTO TerminusFilterList(list_key, options_json, cached_at)
+VALUES (?, ?, ?);

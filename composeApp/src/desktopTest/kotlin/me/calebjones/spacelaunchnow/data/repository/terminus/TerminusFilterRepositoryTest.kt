@@ -38,6 +38,8 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.InMemoryPreferencesDataStore
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
@@ -127,7 +129,10 @@ class TerminusFilterRepositoryTest {
             else respond(byPath(request.url), HttpStatusCode.OK, jsonHeaders)
         }
         val clock = Clock()
-        fun fetcher() = TerminusFilterFetcher(TerminusMemoryCache(now = { clock.nowMs }, maxEntries = 128))
+        val store = FakeFilterOptionStore()
+        fun fetcher() = TerminusFilterFetcher(
+            store, { 7.days }, TerminusMemoryCache(ttl = 1.hours, now = { clock.nowMs }, maxEntries = 128), { clock.nowMs }
+        )
         val agencies = TerminusAgenciesApi(base, engine)
         val programs = TerminusProgramsApi(base, engine)
         val configurations = TerminusConfigurationsApi(base, engine)
@@ -218,7 +223,8 @@ class TerminusFilterRepositoryTest {
             respond(page(Int.MAX_VALUE, *rows), HttpStatusCode.OK, jsonHeaders)
         }
         val repo = TerminusRocketFilterRepositoryImpl(
-            TerminusProgramsApi(base, engine), TerminusFamiliesApi(base, engine), TerminusFilterFetcher()
+            TerminusProgramsApi(base, engine), TerminusFamiliesApi(base, engine),
+            TerminusFilterFetcher(FakeFilterOptionStore(), { 7.days })
         )
 
         val programs = repo.getPrograms().getOrThrow()
@@ -244,7 +250,7 @@ class TerminusFilterRepositoryTest {
         val env = direct()
         env.astronaut.getStatuses().getOrThrow()
 
-        env.clock.nowMs += 2 * 60 * 60 * 1000L
+        env.clock.nowMs += 8 * 24 * 60 * 60 * 1000L
         env.fail(true)
         val stale = env.astronaut.getStatuses().getOrThrow()
 
@@ -296,6 +302,8 @@ class TerminusFilterRepositoryTest {
         val koin = koinApplication {
             modules(
                 module {
+                    single { database }
+                    single { preferences }
                     single { FilterOptionsLocalDataSource(database, preferences) }
                     single { LLAgenciesApi("https://ll.test", llEngine) }
                     single { LLProgramsApi("https://ll.test", llEngine) }

@@ -7,9 +7,12 @@ import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepository
 import me.calebjones.spacelaunchnow.data.repository.RocketFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepository
 import me.calebjones.spacelaunchnow.data.repository.ScheduleFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.terminus.SqlFilterOptionStore
 import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusAstronautFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusFilterFetcher
 import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusRocketFilterRepositoryImpl
 import me.calebjones.spacelaunchnow.data.repository.terminus.TerminusScheduleFilterRepositoryImpl
+import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -21,6 +24,8 @@ import org.koin.dsl.module
  * gets its own singletons.
  */
 fun filterRepositoryModule(): Module = module {
+    // One fetcher for the three Terminus filter repositories: they share the memory cache and the disk copy.
+    single { TerminusFilterFetcher(SqlFilterOptionStore(get()), get<AppPreferences>()) }
     single<ScheduleFilterRepository> {
         when (get<DataBackend>()) {
             DataBackend.LL -> ScheduleFilterRepositoryImpl(
@@ -38,7 +43,8 @@ fun filterRepositoryModule(): Module = module {
                 launcherConfigurationsApi = get(),
                 launcherConfigurationFamiliesApi = get(),
                 locationsApi = get(),
-                configApi = get()
+                configApi = get(),
+                fetcher = get()
             )
         }
     }
@@ -50,14 +56,15 @@ fun filterRepositoryModule(): Module = module {
             )
             DataBackend.TERMINUS -> TerminusRocketFilterRepositoryImpl(
                 programsApi = get(),
-                launcherConfigurationFamiliesApi = get()
+                launcherConfigurationFamiliesApi = get(),
+                fetcher = get()
             )
         }
     }
     single<AstronautFilterRepository> {
         when (get<DataBackend>()) {
             DataBackend.LL -> AstronautFilterRepositoryImpl(configApi = get())
-            DataBackend.TERMINUS -> TerminusAstronautFilterRepositoryImpl(configApi = get())
+            DataBackend.TERMINUS -> TerminusAstronautFilterRepositoryImpl(configApi = get(), fetcher = get())
         }
     }
 }

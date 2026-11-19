@@ -1,0 +1,7 @@
+-- Adds TerminusFilterList: one row per Terminus filter list (see TerminusFilterList.sq).
+
+CREATE TABLE TerminusFilterList (
+    list_key     TEXT NOT NULL PRIMARY KEY,
+    options_json TEXT NOT NULL,
+    cached_at    INTEGER NOT NULL
+);
