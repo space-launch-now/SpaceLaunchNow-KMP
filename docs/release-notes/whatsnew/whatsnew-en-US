@@ -1,4 +1,1 @@
-Faster loading across launch lists, launch details, and search.
-Countdown timers now hide properly once a launch's final status is known.
-Added a quick link to the shop in Settings.
-Fixed several crashes and a map loading issue for smoother, more stable browsing.
+Fixed a text display issue on the onboarding screen.

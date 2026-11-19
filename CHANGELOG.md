@@ -1,3 +1,19 @@
+# [5.52.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.51.0...v5.52.0) (2026-11-19)
+
+
+### Bug Fixes
+
+* **ci:** keep the encoding check ASCII and cover 3-byte and 4-byte damage ([decdad7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/decdad7aae6e510d450c68c7015cee7fdfe71057))
+* **onboarding:** restore paywall text damaged by wrong encoding and add a CI check ([44fefed](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/44fefed03bb2e17c57c30fed0fa2efce12c91e74))
+
+
+### Features
+
+* **filters:** add TerminusFilterList table and SQL filter option store ([deeeeb6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/deeeeb6db9002cd9935ea9197e56400eb742c11f))
+* **filters:** keep Terminus filter options on disk for 7 days ([f038628](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f0386287f1efd6d2139b0bc65c2b2a8ba792f8c9))
+
+
+
 # [5.51.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.50.2...v5.51.0) (2026-11-19)
 
 
@@ -83,18 +99,6 @@
 ### Features
 
 * **logging:** emit push_summary after the app-start reconcile with toggle state ([1986654](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1986654e58db0ae428db8486cd024ce25c8610bf))
-
-
-
-# [5.49.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.48.1...v5.49.0) (2026-10-18)
-
-
-### Features
-
-* **logging:** add DiagnosticEvents and push_reconcile event with failure classes ([4658be5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4658be5e978585f0f6f4d87810a54d4cf56adee2))
-* **logging:** emit filter_decision and trim iOS notification log noise ([b7c5b8a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b7c5b8ae7e9365c26a44c6a0469f0193e2232adb))
-* **logging:** emit notification_displayed and trim Android push log noise ([c6e5100](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c6e51005d8d7f43ddf2a45da5bac7cfbbc5a8f6f))
-* **logging:** route iOS startup/NSE events through DiagnosticEvents and pass POST_APNS trigger ([2f527bc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2f527bc0f90dfc3fe6887f9207b2eaf9bba3a8dc))
 
 
 
