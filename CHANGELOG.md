@@ -1,3 +1,56 @@
+# [5.51.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.50.2...v5.51.0) (2026-11-19)
+
+
+### Bug Fixes
+
+* **ads:** host iOS banners at their loaded size to meet AdMob ad-frame policy ([e4921e8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e4921e85106f245d8f85f1c82d3b1d38a49c2ddb))
+* **android:** declare org.apache.http.legacy so the Maps renderer loads ([20ec834](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/20ec834fd210e9007c65a65ef6cb6fb73495586b))
+* **api:** generate Terminus free-form fields as JsonElement ([398cef2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/398cef22401280392e6808c5dc95ebf565c639da))
+* **api:** map Terminus uri-or-empty fields to plain strings in the generated client ([5986fde](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5986fde91725b92a2453783a648f59a77e9883ba))
+* **api:** restore backticks in generated Terminus SearchApi ([924d4c0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/924d4c0c742497517a6b4ad62c88d03ab3795c64))
+* **api:** strip escaped backticks from generated Terminus SearchApi ([ff3c352](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ff3c352534430dbb1c93df6c712d3f0a4a9a30cc))
+* **config:** never create Remote Config in a process without a Firebase app ([f56ffb8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f56ffb89c6143fc59ea7b94f7c7a1094ddda245e))
+* **countdown:** hide digits once a launch has a final status ([0e406fd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0e406fd531cb96baa6d13c31782caefda3d97b62))
+* **preload:** import month number ([9ab2a31](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9ab2a31e70653805a025778ed6573de7533e3363))
+* **preload:** warm the by-day history cache with the 1-based month ([46696d9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/46696d92d1b20b2d77906a3434000b611f910908))
+* **rating:** evaluate cached launches, expire pending id, always consume prompt ([170533d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/170533d05dec6f267ea674a93ac2bdea76f26b24))
+* **terminus:** add the shared 25-row page reader ([0f6f56d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0f6f56deb4e2b04d92a60e62ef0d86c144182445))
+* **terminus:** cap filter paging at 50 pages ([a46a7d2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a46a7d2ec4fd54166c364485ad2e7ab2b48df716))
+* **terminus:** honour forceRefresh for mini and filtered launch lists ([69e29ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/69e29acee4c4f8d0e3d4a6bdf8cc524c0eab78e6))
+* **terminus:** keep search text out of logs and escape list cache keys ([1baf891](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1baf8919027c08fa801f1d1db67a9c5bed317247))
+* **terminus:** keep the filter page cap and test, restore comments ([9df05e6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9df05e622f786573af0fb3231d95d09a94a1a485))
+* **terminus:** leave offset 0 out of the agency search request ([27feede](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/27feede7103ff3071737dd95e2511cef3eb6db0b))
+* **terminus:** read filter lists 25 rows at a time ([6459bea](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6459bea79aaa503f3ac6be28c3dab1ba4135207e))
+* **terminus:** read launches by day, Starship history and agency search 25 rows at a time ([98a946c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/98a946c7f2550095495e8bbfd115e283cadd2a43))
+* **terminus:** redact list cache key from undecodable-entry log ([99c0c98](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/99c0c98c91a876acce0a2435a3fd7186f10445e4))
+* **wear:** send SpaceLaunchNow-v User-Agent ([7ed5f6d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7ed5f6d4bf78e913be355dd130630c5ed94e9dbd))
+* **widget:** show the premium lock in the Next Launch widget ([0ef7ed4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0ef7ed4c3842c5671b87e7f0dccb5b63e3962d52))
+
+
+### Features
+
+* add Shop link row to Settings ([4802526](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4802526991e362815af3403264640cb759ebf53d))
+* **api:** add Terminus launch rocket, timeline and detailed rockets endpoints ([8ef77ed](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8ef77edcce35bc795bbbe32fec2fa6b099fb2044))
+* **config:** default to Terminus with use_legacy_backend emergency switch ([9dd6ed8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9dd6ed817302be3e97b877cddf475a0e644fc619))
+* **data:** read featured, in-flight, Starship, stats and by-day launches from Terminus ([1126e0f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1126e0f60dee5d2d1a401dbc33f039d6b76c28b7))
+* **data:** read filter options from Terminus behind DataBackend ([f4790cc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f4790ccf222c4574140b7533080bd570624e52fd))
+* **data:** read launch detail from Terminus behind DataBackend ([967c647](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/967c647a461da452705756b2a176fcd5de4587f6))
+* **data:** serve spacecraft and spacecraft configs from Terminus behind DataBackend ([2b6740d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2b6740d31efd7b92ae59e48eb081b71252408915))
+* **data:** serve stations, astronauts and programs from Terminus behind DataBackend ([170c6b7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/170c6b7dd0f783d0451fbeed50b4e4775e5f633d))
+* **debug:** add data source switch and clear-all-caches action ([f7dc4e5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f7dc4e5bdf6af26af664d79e528b6bbbf7bc22be))
+* **debug:** Terminus prod/staging host switch in the debug menu ([bb24507](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb245072ba53a70169923ef5b7c8eb49355c453d))
+* **di:** add Terminus API Koin module and base URL ([3f8fc02](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3f8fc020193746d4b5c03c0b6bf261d25c3068c1))
+* **di:** bind vehicle repositories on DataBackend ([f0e3360](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f0e336053c7046792378079cc42cf78c09acd31f))
+* **rating:** prompt for review after opening a launch from a notification ([e0be1f6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e0be1f62dc7ef63e446f791fc034148d1aa5aae2))
+* **terminus:** add Terminus agency repository and vehicle mappers ([2a40681](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2a406814069e7129964ee0193c7209912788fe50))
+* **terminus:** add Terminus launcher config, launcher and rocket repositories ([8acdf19](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8acdf19bd0a57d7953ca94ab4e3fec855b843a93))
+* **terminus:** events and updates repositories behind DataBackend ([ee73b53](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ee73b53f6a42e78642938c87b1643c0a9099db1a))
+* **terminus:** read launch rocket and timeline from their own endpoints ([a650fac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a650fac44d247eb315db1f1866ec90aef9661fbd))
+* **terminus:** serve launch lists from Terminus behind DataBackend ([b794f55](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b794f557fa90c7c7fc0e4bf10109b966b1f7f16a))
+* **wear:** read launches from Terminus when the phone sends the backend ([d2a639e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d2a639e0ce0398e3892790f2a9cdc42f78fc47d1))
+
+
+
 ## [5.50.2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.50.1...v5.50.2) (2026-11-03)
 
 
@@ -41,21 +94,6 @@
 * **logging:** emit filter_decision and trim iOS notification log noise ([b7c5b8a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b7c5b8ae7e9365c26a44c6a0469f0193e2232adb))
 * **logging:** emit notification_displayed and trim Android push log noise ([c6e5100](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c6e51005d8d7f43ddf2a45da5bac7cfbbc5a8f6f))
 * **logging:** route iOS startup/NSE events through DiagnosticEvents and pass POST_APNS trigger ([2f527bc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2f527bc0f90dfc3fe6887f9207b2eaf9bba3a8dc))
-
-
-
-## [5.48.1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.48.0...v5.48.1) (2026-10-13)
-
-
-### Bug Fixes
-
-* **logging:** cap Ktor HTTP logging at INFO so API bodies never ship ([53483e5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/53483e5d3dc95ad939cb78a862b9226b4fcfd3ae))
-* **logging:** collapse purchase-state, widget, feature-gate and ad-size trace bursts ([d57834e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d57834e9e03493c5e67b69831432d905e2b7b8a0))
-* **logging:** demote billing activity reflection misses to debug ([a4c193c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a4c193ca0ab332c63eab87da720f6e1267d07d0d))
-* **logging:** drop Datadog logger init line and demote consent and user-set lines ([7b0b629](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7b0b62995c4f398c6cd41a77e5c143dc6ba77100))
-* **logging:** rethrow coroutine cancellation before logging in catch-alls and warn on remote config backend failures ([d4ae003](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d4ae0030852ec8506cd42ebfcfe416b786dd967d))
-* **subscription:** ignore lastSynced when verifying the storage read-back ([0f2ce7c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0f2ce7c2f997e8e54ea9f2bcc272de851f8bb6c7))
-* **wear:** skip watch sync once the Wearable API is missing instead of logging errors ([8c1fdd0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8c1fdd0f541f7e9186e0eddfc71add43af317fa2))
 
 
 
