@@ -9,6 +9,7 @@
 * **api:** map Terminus uri-or-empty fields to plain strings in the generated client ([5986fde](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5986fde91725b92a2453783a648f59a77e9883ba))
 * **api:** restore backticks in generated Terminus SearchApi ([924d4c0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/924d4c0c742497517a6b4ad62c88d03ab3795c64))
 * **api:** strip escaped backticks from generated Terminus SearchApi ([ff3c352](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ff3c352534430dbb1c93df6c712d3f0a4a9a30cc))
+* **build:** align okhttp-sse with OkHttp 5 core so release R8 passes ([fa69187](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/fa69187f080a522acbc889a3c203d9aa9b71ece8))
 * **config:** never create Remote Config in a process without a Firebase app ([f56ffb8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f56ffb89c6143fc59ea7b94f7c7a1094ddda245e))
 * **countdown:** hide digits once a launch has a final status ([0e406fd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0e406fd531cb96baa6d13c31782caefda3d97b62))
 * **preload:** import month number ([9ab2a31](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9ab2a31e70653805a025778ed6573de7533e3363))

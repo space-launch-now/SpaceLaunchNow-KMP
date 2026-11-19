@@ -1,9 +1,4 @@
-Added a Shop link in Settings for easy access to merchandise.
-
-Faster, more reliable loading for launches, agencies, and launch details.
-
-Improved countdown accuracy and Maps reliability on Android.
-
-Fixed the premium lock display on the Next Launch widget.
-
-Fixed several crashes and stability issues for smoother browsing.
+Faster loading across launch lists, launch details, and search.
+Countdown timers now hide properly once a launch's final status is known.
+Added a quick link to the shop in Settings.
+Fixed several crashes and a map loading issue for smoother, more stable browsing.
