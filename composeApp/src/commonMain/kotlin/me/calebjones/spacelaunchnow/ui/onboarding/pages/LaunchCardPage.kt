@@ -16,7 +16,7 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * Onboarding page 1 Ã¢â‚¬â€ shows a live [NextLaunchItemView] with real launch data
+ * Onboarding page 1 — shows a live [NextLaunchItemView] with real launch data
  * inside a device frame.
  */
 @Composable

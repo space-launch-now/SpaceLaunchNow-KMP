@@ -33,7 +33,7 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * Onboarding page 2 Ã¢â‚¬â€ shows a schedule screen with live launch data,
+ * Onboarding page 2 — shows a schedule screen with live launch data,
  * functional Upcoming/Previous tabs inside a device frame.
  */
 @Composable

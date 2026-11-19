@@ -176,7 +176,7 @@ fun OnboardingPaywallScreen(
 }
 
 // ---------------------------------------------------------------------------
-// Stateless content Ã¢â‚¬â€ previewable
+// Stateless content — previewable
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -377,7 +377,7 @@ fun OnboardingContent(
                         }
                     }
 
-                    // Ã¢â€â‚¬Ã¢â€â‚¬ Monthly fallback Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+                    // ── Monthly fallback ───────────────────────────────────
                     if (monthlyProduct != null) {
                         Spacer(modifier = Modifier.height(12.dp))
                         val perMonth =
@@ -398,7 +398,7 @@ fun OnboardingContent(
                             Text(
                                 text = buildString {
                                     append("Or go Monthly")
-                                    if (perMonth != null) append(" Ã‚Â· $perMonth/mo")
+                                    if (perMonth != null) append(" · $perMonth/mo")
                                 },
                                 style = MaterialTheme.typography.labelMedium
                             )
@@ -463,7 +463,7 @@ fun OnboardingContent(
                 }
             }
 
-            // Ã¢â€â‚¬Ã¢â€â‚¬ Continue to App (subscribed users only) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+            // ── Continue to App (subscribed users only) ──────────────────
             if (isSubscribed) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
@@ -483,7 +483,7 @@ fun OnboardingContent(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Ã¢â€â‚¬Ã¢â€â‚¬ Error message Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+            // ── Error message ─────────────────────────────────────────────
             if (errorMessage != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -497,7 +497,7 @@ fun OnboardingContent(
 
             Spacer(modifier = Modifier.height(64.dp))
 
-            // Ã¢â€â‚¬Ã¢â€â‚¬ Legal footer Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+            // ── Legal footer ──────────────────────────────────────────────
             FinePrint(
                 dimColor = Color.White.copy(alpha = 0.25f),
                 linkColor = Color.White.copy(alpha = 0.55f)
@@ -849,7 +849,7 @@ private val previewMonthlyProduct = ProductInfo(
     currencyCode = "USD"
 )
 
-// Loading Ã¢â‚¬â€ products not yet fetched
+// Loading — products not yet fetched
 @Preview
 @Composable
 private fun OnboardingLoadingPreview() {
@@ -883,7 +883,7 @@ private fun OnboardingTrialDarkPreview() {
     }
 }
 
-// Existing subscriber Ã¢â‚¬â€ welcome back view
+// Existing subscriber — welcome back view
 @Preview
 @Composable
 private fun OnboardingSubscribedPreview() {
