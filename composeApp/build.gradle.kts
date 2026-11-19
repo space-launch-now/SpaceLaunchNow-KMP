@@ -143,7 +143,6 @@ kotlin {
                 implementation(libs.androidx.glance.material3)
 
                 implementation(project.dependencies.platform(libs.firebase.bom))
-                implementation(libs.android.firebase.auth)
                 implementation(libs.android.firebase.analytics)
                 implementation(libs.android.firebase.messaging)
                 implementation(libs.android.firebase.crashlytics)
