@@ -279,7 +279,7 @@ fun ResponsiveHomeContent(
             )
         }
 
-        // Quick Stats Ã¢â‚¬â€ loads when this section scrolls into view
+        // Quick Stats — loads when this section scrolls into view
         item(key = "quick_stats") {
             LaunchedEffect(Unit) {
                 onStatsVisible()

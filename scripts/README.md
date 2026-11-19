@@ -47,3 +47,13 @@ $ ./scripts/generate-ios-secrets.sh
 ## See Also
 
 - [iOS API Key Setup Guide](../docs/IOS_API_KEY_SETUP.md)
+
+# Source Encoding Check
+
+`check-encoding.py` fails when a tracked text file holds text that a tool saved through the wrong encoding (for example, two wrong characters and a middle dot where only a middle dot was meant). PR validation runs it.
+
+```bash
+python3 scripts/check-encoding.py
+```
+
+To repair a file, restore the correct characters and save the file as UTF-8. On Windows PowerShell 5.1, `Get-Content` and `Set-Content` without `-Encoding utf8` cause this damage.

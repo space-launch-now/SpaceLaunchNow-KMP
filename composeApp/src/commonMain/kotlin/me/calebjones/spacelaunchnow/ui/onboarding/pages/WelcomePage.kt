@@ -43,7 +43,7 @@ private val spaceGradient = Brush.verticalGradient(
 )
 
 /**
- * Onboarding page 0 Ã¢â‚¬â€ branded welcome screen with the app icon,
+ * Onboarding page 0 — branded welcome screen with the app icon,
  * "Welcome to" label, and "Space Launch Now" title.
  */
 @Composable
@@ -51,7 +51,7 @@ fun WelcomePage(
     modifier: Modifier = Modifier,
     nextLaunch: Launch? = null
 ) {
-    // Use wide (side-by-side) layout only when width is EXPANDED (Ã¢â€°Â¥840dp).
+    // Use wide (side-by-side) layout only when width is EXPANDED (≥840dp).
     // MEDIUM (600-840dp, e.g. tablet portrait) is too narrow for side-by-side.
     val useWideLayout = rememberAdaptiveLayoutState().isExpanded
 
