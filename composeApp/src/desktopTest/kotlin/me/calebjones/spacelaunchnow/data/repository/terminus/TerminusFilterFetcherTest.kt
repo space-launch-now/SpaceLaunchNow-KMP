@@ -14,7 +14,6 @@ import me.calebjones.spacelaunchnow.api.terminus.apis.ConfigApi
 import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.FilterOptionsLocalDataSource
-import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource.CachedValue
 import me.calebjones.spacelaunchnow.database.SpaceLaunchDatabase
 import me.calebjones.spacelaunchnow.ui.viewmodel.InMemoryPreferencesDataStore
 import kotlin.test.Test
@@ -24,15 +23,8 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
-
-/** In-memory [FilterOptionStore] for tests. */
-internal class FakeFilterOptionStore : FilterOptionStore {
-    val rows = mutableMapOf<String, CachedValue<List<FilterOption>>>()
-    override suspend fun read(key: String) = rows[key]
-    override suspend fun write(key: String, options: List<FilterOption>, cachedAt: Long) {
-        rows[key] = CachedValue(options, cachedAt)
-    }
-}
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Clock
 
 /** The Terminus filter fetcher with its disk store (Tasks#1207). */
 class TerminusFilterFetcherTest {
@@ -107,6 +99,22 @@ class TerminusFilterFetcherTest {
 
         assertEquals(2, env.requests.size)
         assertEquals(env.nowMs, store.rows[key]?.cachedAt)
+    }
+
+    @Test
+    fun theDebugShortCacheSwitchShortensTheDiskTtl() = runTest {
+        val env = env()
+        val store = FakeFilterOptionStore()
+        val aged = Clock.System.now().toEpochMilliseconds() - 90.minutes.inWholeMilliseconds
+        store.write(key, active, aged)
+        val preferences = AppPreferences(InMemoryPreferencesDataStore())
+
+        env.read(TerminusFilterFetcher(store, preferences)).getOrThrow()
+        assertEquals(0, env.requests.size, "switch off: a 90-minute-old copy is fresh")
+
+        preferences.setDebugShortCacheTtl(true)
+        env.read(TerminusFilterFetcher(store, preferences)).getOrThrow()
+        assertEquals(1, env.requests.size, "switch on: a 90-minute-old copy is refetched")
     }
 
     @Test
