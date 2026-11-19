@@ -633,7 +633,8 @@ sqldelight {
             // Version 9 adds SpaceStationCache, ExpeditionCache, IssTleCache tables (8.sqm)
             // Version 10 adds StatsCache table (9.sqm)
             // Version 11 adds TopicSubscription table for V6 FCM subscriptions (10.sqm)
-            version = 11
+            // Version 12 adds TerminusFilterList table (11.sqm)
+            version = 12
         }
     }
 }
