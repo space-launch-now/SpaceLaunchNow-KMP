@@ -28,7 +28,7 @@ in this task.
 | 3 | Move plan | Move by feature, one pull request per task (11 move tasks). A script proves each moved string is byte-equal to the literal it replaced. A CI script with a baseline file stops new English text in code. |
 | 4 | Translation flow | A language model with a glossary and key comments, run from a script. Spot-check the top languages with native speakers from the community. No paid service now. Missing key falls back to English. |
 | 5 | Languages | No data yet: GA4 and RevenueCat exports are needed (Needed from you). A provisional prior list is given for sizing only. |
-| 6 | Layout and format | Dates and numbers already follow the device locale. The relative time, countdown, plural and unit code is English-only and must change (task T6). Test with a pseudo-locale and text-tree snapshots first, screenshots second. |
+| 6 | Layout and format | Dates and numbers already follow the device locale. The relative time, countdown, plural and unit code is English-only and must change (task T7). Test with a pseudo-locale and text-tree snapshots first, screenshots second. |
 | 7 | Language setting | Follow the device language and the OS per-app language setting. No in-app picker in the first release. |
 | 8 | Server text | API data stays English. Map the finite lists (launch status, mission type, orbit) to keys on the client. Push text stays English first; client-built text is the later option. |
 | 9 | Order | 7 phases, 28 tasks. The first translated app ships after phase 4 (all shared screens moved). |
@@ -40,7 +40,7 @@ in this task.
   `files/aboutlibraries.json`. No `values/strings.xml`. `compose.components.resources` is a dependency
   (`composeApp/build.gradle.kts:234`), so the library is ready. Compose plugin 1.11.1, Kotlin 2.3.21.
 - **Android resources:** 29 strings in two files. `composeApp/src/androidMain/res/values/strings.xml`
-  has 14 (app name, 3 widget descriptions, 9 notification messages); `wearApp/src/main/res/values/strings.xml`
+  has 14 (app name, debug app name, 3 widget descriptions, 9 notification messages); `wearApp/src/main/res/values/strings.xml`
   has 15. Only 9 of the phone strings are read from Kotlin (`NotificationDisplayHelper.kt:500-513`); the 3
   widget descriptions are read from `res/xml*/…_widget_info.xml`. In Wear, only `app_name` and
   `next_launch_tile_label` are read (from `AndroidManifest.xml`); the other 13 Wear strings have no
@@ -78,7 +78,7 @@ test folders are skipped. The script is in Appendix A; run `python -I count_stri
 | `composeApp` `iosMain` | 3 | 2 | ads, billing, notifications |
 | `composeApp` `desktopMain` | 2 | 0 | dev target; low priority |
 | `wearApp` | 17 | 1 | 6 in the tile, 5 in settings, 3 launch, 3 premium |
-| iOS widgets (`iosApp/LaunchWidget/*.swift`) | 40 `Text("…")` (9 + 11 + 20) | 3 | the issue counted 37; 3 are preview placeholders |
+| iOS widgets (`iosApp/LaunchWidget/*.swift`) | 40 `Text("…")` (9 + 11 + 20) | 3 | the issue counted 37; the 3 extra were not matched one by one (some are placeholder text such as "Countdown here") |
 | `Info.plist` | 2 | 0 | permission texts |
 | Android `res/values` | 29 | 5 `%s` | see section 3 |
 
@@ -225,7 +225,7 @@ itself, no number suffix.
    `stringResource(Res.string.key)`. Strings built in view models and mappers move too; their return
    type changes to a typed result as in 5.2.
 2. English text is **not** edited during the move. Fixes to wording come later in separate commits.
-3. One pull request per task, at most about 130 sites each.
+3. One pull request per task, about 60 to 130 sites each (T20 is the largest, about 190; the worker may split it).
 
 ### 6.2 The check that a screen did not change
 
@@ -244,7 +244,7 @@ Three layers, cheapest first:
    by Caleb at release time (iOS Kotlin cannot be compiled on the agent host).
 
 Pixel screenshot tests (Roborazzi, Paparazzi, or Compose's `captureToImage`) are a later addition
-(Q6.4); they are not needed to prove an English move.
+(9.3 item 3, task T25); they are not needed to prove an English move.
 
 ### 6.3 Stop new English text in code
 
@@ -353,7 +353,7 @@ the exports arrive. No language in this list is right-to-left.
 | Area | Today | Must change |
 |---|---|---|
 | Date and time | `DateTimeUtil` formats with the device locale (Android `Locale.forLanguageTag(LocaleUtil.getLocaleTag())`; iOS `NSDateFormatter` locale). | Nothing for the basic formats. |
-| Relative day words | English: `"Today at"`, `"Tomorrow at"`, `"Yesterday at"`, `"$dayName at …"` (`DateTimeUtil.kt:83-88`). | Move to keys; pass the time as an argument. Day names already come from the locale formatter. |
+| Relative day words | English: `"Today at"`, `"Tomorrow at"`, `"Yesterday at"`, `"$dayName at …"` (`DateTimeUtil.kt:83-88`). | Move to keys; pass the time as an argument. The weekday name is English enum text (`dayOfWeek.name`, `DateTimeUtil.kt:86-87`), so it needs a key or a locale formatter. |
 | Date precision words | `"TBD"`, `"H1 2026"`, `"H2"`, `"NET"`, quarter formats (`DateTimeUtil.kt:252-265`). | Keys. Decide whether `NET` stays (it is a term of the field; put it in the glossary). |
 | Timeline offsets | `"T - 1d 14h 5m 3s"` built from ISO-8601 durations (`DateTimeUtil.kt:107-176`). | Keys for the unit letters per language (`d h m s`) or a locale-aware duration formatter. |
 | Countdown | `"…d …h …m …s"` and `"DAYS"`, `"HOURS"`, `"MINUTES"`, `"SECONDS"` labels (`CountdownWidget.kt:225-228, 351`). The digit row is a fixed layout. | Keys for the four labels and the unit letters; check the digit row in RTL (stays left to right). |
