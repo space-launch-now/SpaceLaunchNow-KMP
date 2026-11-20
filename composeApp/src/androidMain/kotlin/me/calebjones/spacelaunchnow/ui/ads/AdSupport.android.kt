@@ -3,8 +3,14 @@ package me.calebjones.spacelaunchnow.ui.ads
 import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.Consent
 import app.lexilabs.basic.ads.ConsentDebugSettings
@@ -159,7 +165,7 @@ actual fun WithPreloadedAds(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER,
         onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "BANNER") },
-        onFailure = { AdTelemetry.failed("banner", it, AdSize.BANNER.label(), "BANNER") },
+        onFailure = { /* reported with its code by CodeReportingAdListener */ },
         onShown = {},
         onDismissed = {},
         onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "BANNER") },
@@ -171,7 +177,7 @@ actual fun WithPreloadedAds(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.LARGE_BANNER,
         onLoad = { AdTelemetry.loaded("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
-        onFailure = { AdTelemetry.failed("banner", it, AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
+        onFailure = { /* reported with its code by CodeReportingAdListener */ },
         onShown = {},
         onDismissed = {},
         onImpression = { AdTelemetry.impression("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
@@ -183,7 +189,7 @@ actual fun WithPreloadedAds(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.MEDIUM_RECTANGLE,
         onLoad = { AdTelemetry.loaded("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
-        onFailure = { AdTelemetry.failed("banner", it, AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
+        onFailure = { /* reported with its code by CodeReportingAdListener */ },
         onShown = {},
         onDismissed = {},
         onImpression = { AdTelemetry.impression("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
@@ -196,12 +202,36 @@ actual fun WithPreloadedAds(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER,
         onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "NAVIGATION") },
-        onFailure = { AdTelemetry.failed("banner", it, AdSize.BANNER.label(), "NAVIGATION") },
+        onFailure = { /* reported with its code by CodeReportingAdListener */ },
         onShown = {},
         onDismissed = {},
         onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "NAVIGATION") },
         onClick = { AdTelemetry.clicked("banner", AdSize.BANNER.label(), "NAVIGATION") }
     )
+
+    // The library's rememberBannerAd loads inside composition. Wrap each new AdView's listener
+    // so a failed load reports its AdMob error code.
+    PreloadedBannerSetup(preloadedBannerAd, AdSize.BANNER, "BANNER")
+    PreloadedBannerSetup(preloadedLargeBannerAd, AdSize.LARGE_BANNER, "LARGE_BANNER")
+    PreloadedBannerSetup(preloadedMediumRectangleAd, AdSize.MEDIUM_RECTANGLE, "MEDIUM_RECTANGLE")
+    PreloadedBannerSetup(preloadedNavigationBannerAd, AdSize.BANNER, "NAVIGATION")
+
+    // The Activity ends: destroy the shared AdViews. Screens only pause and resume them.
+    val activityOwner = LocalContextFactory.current?.getActivity() as? LifecycleOwner
+    DisposableEffect(activityOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                listOf(
+                    preloadedBannerAd,
+                    preloadedLargeBannerAd,
+                    preloadedMediumRectangleAd,
+                    preloadedNavigationBannerAd
+                ).forEach { it.bannerView?.destroy() }
+            }
+        }
+        activityOwner?.lifecycle?.addObserver(observer)
+        onDispose { activityOwner?.lifecycle?.removeObserver(observer) }
+    }
 
     // Aliased fallbacks for sizes/placements that produced ~$0 in production.
     // SmartBannerAd's fallback picker still resolves to a usable banner.
@@ -266,6 +296,12 @@ actual fun rememberPrivacyOptionsRequired(): Boolean {
 
     val consent = remember(activity) { Consent(activity) }
     return consent.isPrivacyOptionsRequired()
+}
+
+@OptIn(DependsOnGoogleMobileAds::class)
+@Composable
+private fun PreloadedBannerSetup(handler: BannerAdHandler, size: AdSize, placement: String) {
+    SideEffect { handler.installCodeReporting(size.label(), placement) }
 }
 
 private fun AdSize.label(): String = AdTelemetry.sizeLabel(width, height)
