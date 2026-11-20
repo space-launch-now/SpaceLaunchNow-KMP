@@ -10,9 +10,10 @@ preserve_hierarchy: true
 
 files:
   # Compose Multiplatform resources (shared UI). Android XML format.
-  # Crowdin writes values-<android_code>/strings.xml; Compose resources read the same folders.
-  - source: /composeApp/src/commonMain/composeResources/values/strings.xml
-    translation: /composeApp/src/commonMain/composeResources/values-%android_code%/strings.xml
+  # The glob takes every values/*.xml (strings.xml, strings_time.xml, later files).
+  # Crowdin writes values-<android_code>/<same file name>; Compose resources read the same folders.
+  - source: /composeApp/src/commonMain/composeResources/values/*.xml
+    translation: /composeApp/src/commonMain/composeResources/values-%android_code%/%original_file_name%
     type: android
     # Do not overwrite a translation that a person approved with the model's first fill.
     update_option: update_as_unapproved
