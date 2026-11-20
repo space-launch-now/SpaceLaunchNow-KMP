@@ -48,9 +48,6 @@ import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
-import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.rethrowIfCancellation

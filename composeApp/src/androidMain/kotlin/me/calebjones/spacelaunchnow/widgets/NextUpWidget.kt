@@ -48,16 +48,11 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
-import kotlinx.coroutines.flow.first
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
-import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.theme.getWidgetAppearanceBlocking
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.math.abs
-import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class NextUpWidget : GlanceAppWidget() {
 
