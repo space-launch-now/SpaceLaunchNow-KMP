@@ -75,6 +75,15 @@ kotlin {
             isStatic = true
             // Issue 172: without this, release frameworks ship no stack frames to CrashKiOS.
             binaryOption("sourceInfoType", "libbacktrace")
+            // Replaces the removed kotlin.native.cacheKind=none property. With the cache on,
+            // Kotlin 2.4.21 crashes building the cache for arrow-core 1.2.4 (pulled in by
+            // purchases-kmp-either). The version argument makes Gradle warn once Kotlin moves
+            // past 2.4.21, so re-check then whether the cache can be turned back on.
+            @OptIn(org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCacheApi::class)
+            disableNativeCache(
+                version = org.jetbrains.kotlin.gradle.plugin.mpp.DisableCacheInKotlinVersion.`2_4_21`,
+                reason = "Kotlin/Native cache build crashes on arrow-core 1.2.4",
+            )
         }
     }
     sourceSets {
