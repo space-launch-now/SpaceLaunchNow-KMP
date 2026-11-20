@@ -15,4 +15,37 @@
     <string name="notification_ten_minutes">Launch attempt in less than ten minutes at %s</string>
     <string name="notification_one_hour">Launch attempt in less than one hour at %s</string>
     <string name="notification_twenty_four_hours">Launch attempt in less than 24 hours at %s</string>
+
+    <!-- Notification channels (names and descriptions shown in system settings) -->
+    <string name="channel_launch_imminent_name">Launch Imminent (Critical)</string>
+    <string name="channel_launch_imminent_description">Final countdown notifications (1-10 minutes before launch)</string>
+    <string name="channel_launch_status_updates_name">Launch Status Updates</string>
+    <string name="channel_launch_status_updates_description">Real-time launch progress, success, and failure notifications</string>
+    <string name="channel_schedule_changes_name">Schedule Changes</string>
+    <string name="channel_schedule_changes_description">Notifications when launch dates/times change</string>
+    <string name="channel_launch_reminders_name">Launch Reminders</string>
+    <string name="channel_launch_reminders_description">Launch notifications 1-24 hours in advance</string>
+    <string name="channel_webcast_notifications_name">Webcast Notifications</string>
+    <string name="channel_webcast_notifications_description">Notifications about webcast availability and when webcasts go live</string>
+    <string name="channel_space_events_name">Space Events</string>
+    <string name="channel_space_events_description">Notifications for space-related events and milestones</string>
+    <string name="channel_news_updates_name">News &amp; Updates</string>
+    <string name="channel_news_updates_description">News and general updates about space missions</string>
+    <string name="channel_announcements_name">Announcements</string>
+    <string name="channel_announcements_description">Announcements and special messages from Space Launch Now</string>
+
+    <!-- Notification fallbacks -->
+    <string name="notification_fallback_body">New launch notification</string>
+    <string name="notification_fallback_launch_from">Launch from %s</string>
+    <string name="launch_alert_channel_name">Launch Notifications</string>
+    <string name="launch_alert_channel_description">Notifications for upcoming launches</string>
+    <string name="launch_alert_title">🚀 Launch Alert</string>
+    <string name="launch_alert_text">%1$s is launching %2$s</string>
+    <string name="launch_alert_default_name">Upcoming Launch</string>
+    <string name="launch_alert_default_time">Soon</string>
+
+    <!-- Sharing and feedback -->
+    <string name="share_subject">Space Launch Information</string>
+    <string name="share_chooser_title">Share launch info via</string>
+    <string name="feedback_chooser_title">Send Feedback</string>
 </resources>

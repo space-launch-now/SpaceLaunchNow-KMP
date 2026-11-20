@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.util
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import me.calebjones.spacelaunchnow.R
 
 /**
  * Android implementation for opening external links.
@@ -26,7 +27,7 @@ actual object ExternalLinkHandler {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         
-        context.startActivity(Intent.createChooser(intent, "Send Feedback").apply {
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.feedback_chooser_title)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         })
     }
