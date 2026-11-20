@@ -23,8 +23,8 @@ platform :android do
   desc "Read only: download the live Play listing text into a temp folder and print the diff against fastlane/metadata/android. Uploads nothing; the edit is not committed. Fails on a diff."
   lane :play_listing_diff do
     live = File.join(Dir.tmpdir, "play-listing-live")
+    # supply skips the download when metadata_path already exists, so only remove it.
     FileUtils.rm_rf(live)
-    FileUtils.mkdir_p(live)
     download_from_play_store(
       json_key: ENV.fetch("PLAY_JSON_KEY_FILE", "service-account.json"),
       package_name: CredentialsManager::AppfileConfig.try_fetch_value(:package_name),
