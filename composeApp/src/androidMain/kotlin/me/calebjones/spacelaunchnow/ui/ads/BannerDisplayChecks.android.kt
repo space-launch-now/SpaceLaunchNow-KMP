@@ -34,6 +34,25 @@ internal fun orientationLabel(orientation: Int): String = when (orientation) {
     else -> "unknown"
 }
 
+/**
+ * The visible size of a banner, or null when it cannot be judged. A banner that reaches past a
+ * window edge is scrolled partly off screen, which is not a frame fault, so it gives null. Inside
+ * the window, a visible part smaller than the banner means a parent clips it.
+ */
+internal fun visibleSizeForCheck(
+    left: Int,
+    top: Int,
+    width: Int,
+    height: Int,
+    windowWidth: Int,
+    windowHeight: Int,
+    visibleWidth: Int,
+    visibleHeight: Int
+): Pair<Int, Int>? {
+    val inside = left >= 0 && top >= 0 && left + width <= windowWidth && top + height <= windowHeight
+    return if (inside) visibleWidth to visibleHeight else null
+}
+
 @Composable
 private fun rememberDisplayConfigKey(): DisplayConfigKey {
     val density = LocalDensity.current

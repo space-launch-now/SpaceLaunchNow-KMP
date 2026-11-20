@@ -44,4 +44,23 @@ class BannerDisplayChecksTest {
         assertEquals("landscape", orientationLabel(Configuration.ORIENTATION_LANDSCAPE))
         assertEquals("unknown", orientationLabel(Configuration.ORIENTATION_UNDEFINED))
     }
+
+    @Test
+    fun visibleSizeIsNullWhenBannerReachesPastTheWindow() {
+        assertEquals(null, visibleSizeForCheck(0, 1900, 320, 50, 1080, 1920, 320, 20))
+        assertEquals(null, visibleSizeForCheck(-10, 100, 320, 50, 1080, 1920, 310, 50))
+    }
+
+    @Test
+    fun visibleSizeIsReportedWhenBannerIsInsideTheWindow() {
+        assertEquals(320 to 50, visibleSizeForCheck(40, 100, 320, 50, 1080, 1920, 320, 50))
+        assertEquals(300 to 50, visibleSizeForCheck(40, 100, 320, 50, 1080, 1920, 300, 50))
+    }
+
+    @Test
+    fun clippedBannerInsideTheWindowIsAMismatch() {
+        val clipped = visibleSizeForCheck(40, 100, 880, 138, 1080, 1920, 800, 138)
+        assertTrue(AdFrameCheck.mismatch(880 to 138, 880 to 138, clipped))
+        assertFalse(AdFrameCheck.mismatch(880 to 138, 880 to 138, 880 to 138))
+    }
 }
