@@ -48,16 +48,11 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
-import kotlinx.coroutines.flow.first
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
-import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.theme.getWidgetAppearanceBlocking
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.math.abs
-import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class NextUpWidget : GlanceAppWidget() {
 
@@ -104,20 +99,9 @@ class NextUpWidget : GlanceAppWidget() {
     private suspend fun fetchNextLaunch(): Launch? {
         return withContext(Dispatchers.IO) {
             try {
-                val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
-                val notificationStateStorage: NotificationStateStorage by koinInject(NotificationStateStorage::class.java)
-                val launchFilterService: LaunchFilterService by koinInject(LaunchFilterService::class.java)
-
-                val state = notificationStateStorage.stateFlow.first()
-                val agencyIds = launchFilterService.getAgencyIds(state)
-                val locationIds = launchFilterService.getLocationIds(state)
-
-                val result = launchRepository.getUpcomingLaunchesNormalDomain(
-                    limit = 1,
-                    agencyIds = agencyIds,
-                    locationIds = locationIds
-                )
-                result.getOrNull()?.data?.results?.firstOrNull()
+                // The first row of the list the launch list widget draws; a redraw reads the cache only.
+                val (source, filters) = WidgetLaunchSource.fromKoin()
+                source.launchesForRender(filters).firstOrNull()
             } catch (e: Exception) {
                 e.rethrowIfCancellation()
                 log.e(e) { "Failed to fetch next launch" }

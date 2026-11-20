@@ -10,6 +10,7 @@ import me.calebjones.spacelaunchnow.api.extensions.TimeFilterRounding
 import me.calebjones.spacelaunchnow.api.terminus.apis.LaunchesApi
 import me.calebjones.spacelaunchnow.api.terminus.models.PaginatedLaunchBasicList
 import me.calebjones.spacelaunchnow.data.model.DataResult
+import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.database.LaunchLocalDataSource
@@ -194,6 +195,65 @@ class TerminusLaunchRepositoryImpl(
         return normalList(query, forceRefresh)
     }
 
+    /**
+     * The widget list: `/launches/mini/` (15 KB for 10 rows, against 87 KB for the normal list)
+     * with the filters of the home list. The widgets read these fields only: name, NET, status,
+     * provider and location name.
+     */
+    override suspend fun getUpcomingLaunchesForWidget(
+        limit: Int,
+        forceRefresh: Boolean,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): Result<DataResult<PaginatedResult<Launch>>> =
+        miniList(widgetListQuery(limit, agencyIds, locationIds, hideTbdStatusIds()), forceRefresh)
+            .map { DataResult(it.value, it.source, it.timestamp) }
+
+    /**
+     * The newest of the lists that hold the widget's rows, read with no network call and no
+     * expiry check: the widget's own mini list, and the normal lists the home screen stores for
+     * the same filters (Home reads [limit] rows, the preload reads [PRELOAD_LIMIT]). A list with
+     * fewer rows than [limit] is drawn as it is. The longer list wins a tie in time.
+     */
+    override suspend fun getCachedUpcomingLaunchesForWidget(
+        limit: Int,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?
+    ): DataResult<PaginatedResult<Launch>>? {
+        val local = localDataSource ?: return null
+        val statusIds = hideTbdStatusIds()
+        fun query(rows: Int) = widgetListQuery(rows, agencyIds, locationIds, statusIds)
+
+        // An entry that cannot be mapped is a miss, as for every other cache read.
+        fun <T> CachedValue<T>?.stored(toDomain: (T) -> PaginatedResult<Launch>): DataResult<PaginatedResult<Launch>>? =
+            this?.let { cached ->
+                runCatching { toDomain(cached.value) }.getOrNull()
+                    ?.let { DataResult(it, DataSource.STALE_CACHE, cached.cachedAt ?: 0L) }
+            }
+
+        val candidates = buildList {
+            add(local.getTerminusMiniListStale(query(limit).key).stored { it.toDomain() })
+            for (rows in listOf(limit, PRELOAD_LIMIT).distinct()) {
+                add(local.getTerminusNormalListStale(query(rows).key).stored { it.toDomain() })
+            }
+        }.filterNotNull()
+        return candidates.maxWithOrNull(compareBy({ it.timestamp }, { it.data.results.size }))
+    }
+
+    private fun widgetListQuery(
+        limit: Int,
+        agencyIds: List<Int>?,
+        locationIds: List<Int>?,
+        statusIds: List<Int>?
+    ): LaunchListQuery = LaunchListQuery.of(
+        limit = limit,
+        upcoming = true,
+        ordering = "net",
+        lspId = agencyIds,
+        locationIds = locationIds,
+        statusIds = statusIds
+    )
+
     /** Same filter as the LL repository: hide TBD (2) and TBC (8) when the user asks. */
     private suspend fun hideTbdStatusIds(): List<Int>? {
         val hideTbd = appPreferences?.let { withContext(Dispatchers.Default) { it.getHideTbdLaunches() } } ?: false
@@ -355,6 +415,8 @@ class TerminusLaunchRepositoryImpl(
 
     private companion object {
         const val FEATURED_LIMIT = 4
+        /** Rows the preload reads for the home list. */
+        const val PRELOAD_LIMIT = 8
         const val IN_FLIGHT_LIMIT = 5
         const val IN_FLIGHT_STATUS_ID = 6
         const val STARSHIP_PROGRAM_ID = 1
