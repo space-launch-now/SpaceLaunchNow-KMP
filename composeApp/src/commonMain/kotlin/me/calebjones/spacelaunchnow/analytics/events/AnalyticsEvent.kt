@@ -445,7 +445,8 @@ sealed class AnalyticsEvent(val name: String) {
     enum class AdResult(val eventName: String) {
         LOADED("ad_loaded"),
         FAILED("ad_failed"),
-        IMPRESSION("ad_impression"),
+        // Not "ad_impression": that name belongs to the AdMob SDK.
+        IMPRESSION("ad_shown"),
         CLICKED("ad_clicked")
     }
 

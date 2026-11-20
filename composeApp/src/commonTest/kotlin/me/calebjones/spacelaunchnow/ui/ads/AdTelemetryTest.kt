@@ -28,7 +28,7 @@ class AdTelemetryTest {
     fun eventNamesFollowResult() {
         assertEquals("ad_loaded", AnalyticsEvent.AdLifecycle(AnalyticsEvent.AdResult.LOADED, "banner").name)
         assertEquals("ad_failed", AnalyticsEvent.AdLifecycle(AnalyticsEvent.AdResult.FAILED, "banner").name)
-        assertEquals("ad_impression", AnalyticsEvent.AdLifecycle(AnalyticsEvent.AdResult.IMPRESSION, "banner").name)
+        assertEquals("ad_shown", AnalyticsEvent.AdLifecycle(AnalyticsEvent.AdResult.IMPRESSION, "banner").name)
         assertEquals("ad_clicked", AnalyticsEvent.AdLifecycle(AnalyticsEvent.AdResult.CLICKED, "banner").name)
     }
 
@@ -45,5 +45,18 @@ class AdTelemetryTest {
         val loaded = AnalyticsEvent.AdLifecycle(AnalyticsEvent.AdResult.LOADED, "banner").toParameters()
         assertFalse(loaded.containsKey("error_code"))
         assertEquals("banner", loaded["format"])
+    }
+
+    @Test
+    fun failureUsesPlatformCodeWhenGiven() {
+        val p = AdTelemetry.failureEvent("banner", "No fill " + "x".repeat(200), 3, "320x50", "BANNER").toParameters()
+        assertEquals("3", p["error_code"])
+        assertEquals(100, (p["error_message"] as String).length)
+    }
+
+    @Test
+    fun failureFallsBackToParsedCode() {
+        val p = AdTelemetry.failureEvent("banner", "Error code: 2, message: net", null, null, null).toParameters()
+        assertEquals("2", p["error_code"])
     }
 }
