@@ -1,7 +1,6 @@
 package me.calebjones.spacelaunchnow.platform
 
 import android.os.Build
-import me.calebjones.spacelaunchnow.platform.AndroidBuildConfig
 import me.calebjones.spacelaunchnow.util.ShareContextHolder
 import java.util.Locale
 
