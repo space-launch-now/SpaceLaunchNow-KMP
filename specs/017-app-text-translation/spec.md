@@ -193,6 +193,12 @@ four English masters, treats a key as shared when its name starts with `shared_`
 and writes it to each file. A second small script (task T4) copies the shared English keys from the
 Compose master to Wear and to the String Catalog so the English text cannot drift.
 
+`scripts/i18n/sync_shared_keys.py` is that script (T4). It writes each `shared_*` key into a generated block
+of the Wear `values/strings.xml` and into the `en` localization of `iosApp/LaunchWidget/Localizable.xcstrings`
+(`%1$s` becomes `%1$@`; an apostrophe is escaped for Android). A second run changes nothing, and other
+languages and other keys in the catalog are kept. `--check` writes nothing and exits 1 when a file differs;
+a CI step runs it so the copies cannot drift. Tests: `python3 -m unittest discover scripts/i18n/tests`.
+
 ### 5.4 Plurals and arguments
 
 - Arguments: positional only (`%1$s`, `%2$d`) so word order can change. Never build a sentence from
