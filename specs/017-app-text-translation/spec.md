@@ -1,7 +1,7 @@
 # App Text in 10 Languages (Android, iOS, Wear OS) — Plan
 
-**Status:** Draft / proposal (research only, no product code)
-**Date:** 2026-11-19
+**Status:** Draft / proposal (research only, no product code); updated 2026-11-20 with Caleb's rulings (section 16)
+**Date:** 2026-11-19 (updated 2026-11-20)
 **Owner:** Caleb Jones
 **Area:** Localization, Compose Multiplatform resources, Android, iOS widgets, Wear OS
 **Task:** [Tasks#1217](https://github.com/ItsCalebJones/SpaceLaunchNow-Tasks/issues/1217) (parent [Tasks#1214](https://github.com/ItsCalebJones/SpaceLaunchNow-Tasks/issues/1214))
@@ -26,12 +26,12 @@ in this task.
 | 1 | Inventory | About 1,100 translatable text sites in `commonMain` (pattern count, debug screens excluded), 19 in `androidMain`, 17 in Wear, about 40 in the iOS widgets, 2 in `Info.plist`. Expect 1,300 to 1,500 sites and about 900 to 1,100 unique keys once view models and mappers are counted and repeats merged. |
 | 2 | Key system | Compose Multiplatform resources (`values/strings.xml`) for shared UI. Android `res/values` for Android-only surfaces and Wear. A String Catalog (`.xcstrings`) for iOS widgets and `Info.plist`. One English master per scope; one script feeds all of them. |
 | 3 | Move plan | Move by feature, one pull request per task (11 move tasks). A script proves each moved string is byte-equal to the literal it replaced. A CI script with a baseline file stops new English text in code. |
-| 4 | Translation flow | A language model with a glossary and key comments, run from a script. Spot-check the top languages with native speakers from the community. No paid service now. Missing key falls back to English. |
-| 5 | Languages | No data yet: GA4 and RevenueCat exports are needed (Needed from you). A provisional prior list is given for sizing only. |
+| 4 | Translation flow | Crowdin holds the app translations (project `948217`); a language model with a glossary and key comments writes the first fill; people correct it in Crowdin. No paid reviewer now. Missing key falls back to English. |
+| 5 | Languages | Fixed by Caleb (2026-11-20): German, Spanish, French, Chinese (Simplified), Dutch, Ukrainian, Italian, Polish, Portuguese (Brazil), Czech. Crowdin targets `de`, `es-ES`, `fr`, `zh-CN`, `nl`, `uk`, `it`, `pl`, `pt-BR`, `cs`. Russian is out by his choice. No right-to-left language. |
 | 6 | Layout and format | Dates and numbers already follow the device locale. The relative time, countdown, plural and unit code is English-only and must change (task T7). Test with a pseudo-locale and text-tree snapshots first, screenshots second. |
 | 7 | Language setting | Follow the device language and the OS per-app language setting. No in-app picker in the first release. |
 | 8 | Server text | API data stays English. Map the finite lists (launch status, mission type, orbit) to keys on the client. Push text stays English first; client-built text is the later option. |
-| 9 | Order | 7 phases, 28 tasks. The first translated app ships after phase 4 (all shared screens moved). |
+| 9 | Order | 7 phases, 27 tasks. The first translated app ships after phase 4 (all shared screens moved), in all 10 languages at once. |
 | 10 | Measure | Active users per device language, D1/D7/D30 retention per language, rating per country, premium conversion per language. Take a 28-day baseline before the first release. |
 
 ## 3. Current state (verified 2026-11-19)
@@ -197,10 +197,10 @@ Compose master to Wear and to the String Catalog so the English text cannot drif
 
 - Arguments: positional only (`%1$s`, `%2$d`) so word order can change. Never build a sentence from
   pieces in code.
-- Plurals: `<plurals>` with CLDR categories. English needs `one` and `other`; Russian needs `one`,
-  `few`, `many`, `other`; Japanese, Korean and Chinese need only `other`; Arabic needs six. The
-  proof-of-concept task (T1) must show that Compose resources pick the correct category for Russian
-  (and Arabic, if chosen) on Android and iOS.
+- Plurals: `<plurals>` with CLDR categories. English needs `one` and `other`; Ukrainian and Polish need `one`,
+  `few`, `many`, `other`; Czech needs `one`, `few`, `many`, `other`; Chinese needs only `other`. The
+  proof-of-concept task (T1) must show that Compose resources pick the correct category for Ukrainian
+  and Polish on Android and iOS.
 - Numbers inside strings come from `NumberFormatUtil` and are passed as arguments.
 
 ### 5.5 Key naming rule
@@ -308,42 +308,36 @@ runtime); a language under 95% is a release-checklist item for Caleb, not a fail
 
 ## 8. Q5 — Which 10 languages
 
-### 8.1 What was not available
+### 8.1 The set (ruling of 2026-11-20)
 
-No data was pulled for this plan. The Google Analytics MCP server is not set up
-(`docs/business/ANALYTICS_MCP_SETUP_TODO.md`, status Open), and RevenueCat and the store consoles need
-sign-in. This plan asks for the exports in the Needed from you comment.
+Caleb fixed the set. The first draft planned a data pull (GA4, RevenueCat); it is not needed.
 
-### 8.2 Method (so the table can be filled in quickly)
+| Language | Crowdin target | Active users (GA4 app property `164090905`, 90 days to 2026-11-19) |
+|---|---|---|
+| German | `de` | 1,313 |
+| Spanish | `es-ES` | 1,070 |
+| French | `fr` | 907 |
+| Chinese (Simplified) | `zh-CN` | 616 |
+| Dutch | `nl` | 453 |
+| Italian | `it` | 398 |
+| Polish | `pl` | 363 |
+| Portuguese (Brazil) | `pt-BR` | 328 |
+| Czech | `cs` | 186 |
+| Ukrainian | `uk` | 74 |
 
-GA4 (property linked to Firebase), 90 days, split by platform (`platform` user property, or
-`operatingSystem`):
-
-- Report A: dimension `language`, metric `activeUsers`, filter `platform` = android, then ios.
-- Report B: dimension `country`, metric `activeUsers` and `totalRevenue`.
-- Report C: dimensions `language` and `country`, metric `activeUsers`, to see Spanish in Spain vs Mexico
-  and Portuguese in Brazil vs Portugal.
-
-RevenueCat: Charts → Revenue (or Active Subscriptions) segmented by Country, 90 days, export CSV. The
-app also writes a `locale` subscriber attribute (`RevenueCatAttributesSyncer.kt:88`), so a customer export
-can give revenue by device locale.
-
-Rank each language by `0.5 × share of active users + 0.5 × share of revenue`, per platform, then merge.
-Group by language, not country, and keep the regional script: Brazilian Portuguese (`pt-BR`) apart from
-European (`pt-PT`), Simplified (`zh-Hans`) apart from Traditional (`zh-Hant`).
-
-| Rank | Language | Active users (GA4) | Revenue (RevenueCat) |
-|---|---|---|---|
-| _to fill from the exports_ | | | |
-
-### 8.3 Provisional list (a prior, not data: for sizing the work only)
-
-Spanish (`es`), Portuguese Brazil (`pt-BR`), German (`de`), French (`fr`), Russian (`ru`), Japanese
-(`ja`), Simplified Chinese (`zh-Hans`), Italian (`it`), Korean (`ko`), Turkish (`tr`). This is from general
-knowledge of mobile language markets and the known audience of launch-watching apps. Replace it when
-the exports arrive. No language in this list is right-to-left.
+- Russian (437 users) is out by Caleb's choice ("replace Russian with Ukrainian"), not by the data.
+  Do not add it back.
+- Ukrainian has the best old material: 574 of 597 strings in the old Android project.
+- The count of 10 fits the free Crowdin plan: 60,000 hosted words (source words times target
+  languages); the app is estimated at about 50,000.
+- Compose resource folders use Android codes: `values-de`, `values-es`, `values-fr`, `values-zh-rCN`,
+  `values-nl`, `values-uk`, `values-it`, `values-pl`, `values-pt-rBR`, `values-cs`. `crowdin.yml`
+  maps them through `%android_code%`.
 
 ### 8.4 What a right-to-left or CJK language adds
+
+Not needed for this set: no language in it is right-to-left, and Chinese (Simplified) is the only CJK
+language. The notes stay for a later set.
 
 - **Right-to-left (Arabic, Hebrew, Persian, Urdu):** the layout mirrors. The manifests already set
   `supportsRtl="true"`, but no screen has been checked. Needs: replace `Modifier.padding(left/right)`
@@ -357,7 +351,7 @@ the exports arrive. No language in this list is right-to-left.
   choice and all-caps labels (`"NEXT LAUNCH"`, `"UPCOMING LAUNCHES"`) need a look, because CJK has no
   upper case and wide letter spacing hurts. Chinese needs `zh-Hans` and, if data asks, `zh-Hant` as a
   second language. Estimate: no extra build task, one extra QA pass per language.
-- **Languages with long words (German, Russian, Finnish):** see Q6.
+- **Languages with long words (German, Dutch, Polish, Finnish):** see Q6.
 
 ## 9. Q6 — Layout and format
 
@@ -379,7 +373,7 @@ the exports arrive. No language in this list is right-to-left.
 
 ### 9.2 Longer text
 
-German and Russian run 30% to 40% longer than English; Finnish more. Fixed-width controls, single-line
+German and Dutch run 30% to 40% longer than English; Finnish more. Fixed-width controls, single-line
 `maxLines = 1` labels, bottom-bar tabs, chips and the 3 Android widgets and Wear tile are the risk.
 Rules for the move tasks: no new fixed `width` on text containers; use `Modifier.weight` or `widthIn`;
 allow wrap or ellipsis; keep key comments with the length limit for tight controls.
@@ -398,7 +392,7 @@ allow wrap or ellipsis; keep key comments with the length limit for tight contro
    Arabic if chosen). Tool choice (Roborazzi on Android JVM, or `captureToImage` in `desktopTest`) is a
    task of its own (T25); it is not needed before the first release of the move.
 4. **Device pass** by Caleb or an agent on one phone and one Wear emulator in German and one CJK
-   language before each language wave ships.
+   language before the first translated release ships.
 
 ## 10. Q7 — Language setting
 
@@ -408,6 +402,8 @@ allow wrap or ellipsis; keep key comments with the length limit for tight contro
 |---|---|---|
 | **A. Follow the device language and the OS per-app setting (recommend)** | Android: `res/xml/locales_config.xml` (or `androidResources { generateLocaleConfig = true }` with `resources.properties`; AGP 8.13 supports it) and `android:localeConfig` in the manifest. iOS: add the languages to `knownRegions` and `CFBundleLocalizations`. | Android 13+ and iOS show a per-app language row in system settings. Android 12 and below (`minSdk` 26) follow the device language only. One source of truth for Compose, notifications, widgets and Wear. |
 | B. In-app language picker | Compose side: a locale override as in the Compose docs. Android: the app needs `AppCompatDelegate.setApplicationLocales` on `AppCompatActivity` (today `ComponentActivity`) for Android 12 and below; AAB language splits must be turned off or the extra languages are not installed. iOS: set `AppleLanguages` and restart. `LocaleUtil` must read the override. | Notifications, widgets and Wear do not follow a Compose-only override, so users see two languages. Costs about 3 tasks. |
+
+**Decided (Caleb, 2026-11-20): A.** The app follows the device language and the OS per-app setting; there is no in-app picker.
 
 Recommend A for the first release. Add a "Language" row in Settings that opens the OS per-app screen
 (`Settings.ACTION_APP_LOCALE_SETTINGS` on Android 13+, `UIApplication.openSettingsURLString` on iOS):
@@ -443,17 +439,27 @@ because every one of them edits `strings.xml` (merge conflicts in one file: use 
 
 ### Phase 0 — Decisions and data (Tasks repo)
 
-- **T0** Pull GA4 and RevenueCat exports; fix the 10 languages (S; Caleb gives the exports).
+- ~~T0~~ Dropped. Caleb fixed the 10 languages (section 8.1); no data pull is needed.
 
 ### Phase 1 — Foundation (no visible change)
 
 | ID | Title | Size | Blocked by |
 |---|---|---|---|
-| T1 | i18n: enable Compose string resources, move the `ui/about` screen as proof, text-tree snapshot harness, check plural rules for `ru` | M | none |
+| T1 | i18n: enable Compose string resources, move the `ui/about` screen as proof, text-tree snapshot harness, check plural rules for `uk` and `pl` | M | none |
 | T2 | i18n: `scripts/i18n/verify_move.py` and the pseudo-locale generator | M | T1 |
 | T3 | i18n: CI check for new hard-coded text with baseline | S | T1 |
 | T4 | i18n: shared-key sync script (Compose master → Wear and String Catalog) | M | T1 |
 | T5 | i18n: translation script (`translate.py`), glossary, placeholder and plural checks | M | T1 |
+
+### Phase 1b — Crowdin (added 2026-11-20)
+
+`crowdin.yml` is merged ([KMP PR #297](https://github.com/space-launch-now/SpaceLaunchNow-KMP/pull/297)). The
+Crowdin project (`948217`) exists, and `CROWDIN_PROJECT_ID` and `CROWDIN_PERSONAL_TOKEN` are repo secrets.
+
+| ID | Title | Size | Blocked by |
+|---|---|---|---|
+| T28 | i18n: first Crowdin sync: CI step for `crowdin upload sources` and `crowdin download` (as a pull request) | M | T1 |
+| T29 | i18n: load translation memory `406219` (old project, 606 segments) into project `948217` | S | none |
 
 ### Phase 2 — Surfaces outside Compose
 
@@ -484,18 +490,18 @@ because every one of them edits `strings.xml` (merge conflicts in one file: use 
 
 | ID | Title | Size | Blocked by |
 |---|---|---|---|
-| T21 | i18n: wave 1 translations (top 4 languages from the data), `locales_config.xml`, device pass | M | T5, T6 to T20 |
+| T21 | i18n: first translations in all 10 languages (one wave), `locales_config.xml`, device pass | M | T5, T6 to T20, T28 |
 | T22 | i18n: "Language" row in Settings opening the OS per-app screen | S | T21 |
 
 **The first release with a translated app is after T21.** Moving only some screens first would show a
 mix of English and another language in one app; Phase 3 should be finished first.
 
-### Phase 5 — Waves 2 and 3
+### Phase 5 — After the first translated release
 
 | ID | Title | Size | Blocked by |
 |---|---|---|---|
-| T23 | wave 2 translations (next 6 languages), device pass | M | T21 |
-| T24 | RTL pass, only if an RTL language is chosen | L | T21 |
+| ~~T23~~ | Dropped: the set is one wave of 10 languages (T21). | | |
+| ~~T24~~ | Dropped: no right-to-left language is in the set. | | |
 | T25 | screenshot tests for the 8 densest screens (Roborazzi or `captureToImage`) | M | T21 |
 
 ### Phase 6 — Server text and measuring
@@ -505,13 +511,13 @@ mix of English and another language in one app; Phase 3 should be finished first
 | T26 | client-built push text on Android and in the iOS extension (only if the payload carries all fields; otherwise a Server task that needs approval) | M | T21 |
 | T27 | analytics: `app_language` user property and a GA4 report per language | S | T21 |
 
-Total 28 tasks (S 4, M 20, L 4; T24 only if an RTL language is chosen); a rough sum is
+Total 27 tasks (S 3, M 21, L 3; T0, T23 and T24 dropped, T28 and T29 added); a rough sum is
 30 to 40 worker days. Phase 3 is the long part; 4 parallel workers finish it in about 4 rounds.
 
 ## 13. Q10 — Measure
 
 Take the baseline before T21 ships: the 28 days before the release, per platform. Compare with 28
-days after each wave, for the new languages only, against the same languages' earlier numbers.
+days after the first translated release, for the new languages only, against the same languages' earlier numbers.
 
 | Number | Source | Why |
 |---|---|---|
@@ -535,8 +541,7 @@ T27 adds the `app_language` user property so the funnel in spec 014 can be cut b
 
 ## 15. Open questions (for Caleb)
 
-See the Needed from you comment on the task: languages and data exports, English in the count of 10,
-translation spend, RTL, language picker, first-release timing, and permission to file the build tasks.
+All answered by Caleb on 2026-11-20; see section 16.
 
 ## Appendix A — `count_strings.py`
 
@@ -590,3 +595,16 @@ Result on `main` `e98c97e7`: `commonMain` 1,095 (63 templates), `androidMain` 19
   `iosApp/iosApp/Info.plist`, `iosApp/LaunchWidget/`, `iosApp/NotificationServiceExtension/NotificationService.swift`.
 - Links in this list were not all opened by the author: the Compose pages were read; the Android and
   Apple pages are cited from memory and must be re-checked in task T1 and T8.
+
+## 16. Caleb's rulings (chat, 2026-11-20)
+
+1. App language picker: none. The app follows the device language and the OS per-app setting.
+2. First translated release: waits until all shared screens are moved (T10 to T20), so no screen mixes
+   two languages.
+3. Build tasks: filed from this spec, T1 to T5 first.
+4. Store listings: a listing gets a language when the app ships that language.
+5. Store text: a model writes the first draft with the glossary; the text stays in git and out of
+   Crowdin (the free plan holds 60,000 hosted words and the app is estimated at 50,000). No paid reviewer.
+6. Store screenshots stay English.
+7. Languages: the 10 in section 8.1. No right-to-left language. Russian is out.
+8. Tools: Crowdin for the app text (project `948217`), a model for the first fill.
