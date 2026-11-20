@@ -42,6 +42,8 @@ import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.domain.model.LaunchStatus
 import me.calebjones.spacelaunchnow.domain.model.NetPrecision
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
+import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.resolve
 import me.calebjones.spacelaunchnow.util.StatusColorUtil
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -50,12 +52,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.countdown_label_days
 import spacelaunchnow_kmp.composeapp.generated.resources.countdown_label_hours
 import spacelaunchnow_kmp.composeapp.generated.resources.countdown_label_minutes
 import spacelaunchnow_kmp.composeapp.generated.resources.countdown_label_seconds
-import spacelaunchnow_kmp.composeapp.generated.resources.time_compact_after
-import spacelaunchnow_kmp.composeapp.generated.resources.time_compact_before
-import spacelaunchnow_kmp.composeapp.generated.resources.time_unit_days
-import spacelaunchnow_kmp.composeapp.generated.resources.time_unit_hours
-import spacelaunchnow_kmp.composeapp.generated.resources.time_unit_minutes
-import spacelaunchnow_kmp.composeapp.generated.resources.time_unit_seconds
 import kotlin.math.abs
 import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.days
@@ -235,15 +231,9 @@ fun CompactLaunchCountdown(
     val state = rememberCountdownState(launchTime, precision, status)
 
     if (state.showCountdown) {
-        val countdownText = stringResource(
-            if (state.isPast) Res.string.time_compact_after else Res.string.time_compact_before,
-            listOf(
-                stringResource(Res.string.time_unit_days, state.days.toString()),
-                stringResource(Res.string.time_unit_hours, state.hours.toString().padStart(2, '0')),
-                stringResource(Res.string.time_unit_minutes, state.minutes.toString().padStart(2, '0')),
-                stringResource(Res.string.time_unit_seconds, state.seconds.toString().padStart(2, '0')),
-            ).joinToString(" ")
-        )
+        val countdownText = DateTimeUtil.compactCountdown(
+            state.days, state.hours, state.minutes, state.seconds, state.isPast
+        ).resolve()
 
         Row(
             modifier = modifier,
@@ -335,6 +325,12 @@ private fun rememberCountdownState(
 private fun CountdownDigits(state: CountdownState, modifier: Modifier = Modifier) {
     // The digit row reads DAYS : HOURS : MINUTES : SECONDS in every language, so it stays left to right.
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        CountdownDigitRow(state, modifier)
+    }
+}
+
+@Composable
+private fun CountdownDigitRow(state: CountdownState, modifier: Modifier = Modifier) {
     // Use BoxWithConstraints at the top level to determine sizing for all elements
     BoxWithConstraints(
         modifier = modifier
@@ -395,7 +391,6 @@ private fun CountdownDigits(state: CountdownState, modifier: Modifier = Modifier
                 )
             }
         }
-    }
     }
 }
 

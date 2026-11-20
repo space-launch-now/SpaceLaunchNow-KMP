@@ -241,6 +241,21 @@ object DateTimeUtil {
         }
     }
 
+    /** The compact "T- 1d 06h 59m 59s" text. Hours, minutes and seconds are padded to two digits. */
+    fun compactCountdown(days: Int, hours: Int, minutes: Int, seconds: Int, isPast: Boolean): LocalizedText {
+        fun padded(value: Int) = value.toString().padStart(2, '0')
+        val parts = listOf(
+            LocalizedText.Str(Res.string.time_unit_days, listOf(days.toString())),
+            LocalizedText.Str(Res.string.time_unit_hours, listOf(padded(hours))),
+            LocalizedText.Str(Res.string.time_unit_minutes, listOf(padded(minutes))),
+            LocalizedText.Str(Res.string.time_unit_seconds, listOf(padded(seconds))),
+        )
+        return LocalizedText.Str(
+            if (isPast) Res.string.time_compact_after else Res.string.time_compact_before,
+            listOf(LocalizedText.Joined(parts))
+        )
+    }
+
     private fun unitText(unit: StringResource, value: Int) = LocalizedText.Str(unit, listOf(value.toString()))
 
     private fun timelineText(negative: Boolean, parts: List<LocalizedText>) = LocalizedText.Str(

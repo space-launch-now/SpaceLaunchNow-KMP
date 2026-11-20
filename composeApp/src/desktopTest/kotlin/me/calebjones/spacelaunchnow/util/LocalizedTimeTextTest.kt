@@ -83,6 +83,13 @@ class LocalizedTimeTextTest {
     }
 
     @Test
+    fun englishCompactCountdownIsUnchanged() = runTest {
+        Locale.setDefault(Locale.ENGLISH)
+        assertEquals("T- 1d 06h 05m 09s", DateTimeUtil.compactCountdown(1, 6, 5, 9, isPast = false).load())
+        assertEquals("T+ 12d 00h 59m 59s", DateTimeUtil.compactCountdown(12, 0, 59, 59, isPast = true).load())
+    }
+
+    @Test
     fun englishRelativeDaysAreUnchanged() = runTest {
         Locale.setDefault(Locale.ENGLISH)
         val now = Clock.System.now()
