@@ -121,8 +121,6 @@ class LaunchListWidget : GlanceAppWidget() {
         return withContext(Dispatchers.IO) {
             try {
                 val widgetPreferences: WidgetPreferences by koinInject(WidgetPreferences::class.java)
-                if (!widgetPreferences.widgetAccessGrantedFlow.first()) return@withContext emptyList()
-
                 val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
                 val notificationStateStorage: NotificationStateStorage by koinInject(NotificationStateStorage::class.java)
                 val launchFilterService: LaunchFilterService by koinInject(LaunchFilterService::class.java)
@@ -130,7 +128,9 @@ class LaunchListWidget : GlanceAppWidget() {
                 val state = notificationStateStorage.stateFlow.first()
                 WidgetLaunchSource(launchRepository).launchesForRender(
                     agencyIds = launchFilterService.getAgencyIds(state),
-                    locationIds = launchFilterService.getLocationIds(state)
+                    locationIds = launchFilterService.getLocationIds(state),
+                    // A locked widget draws no launches: no cache read and no fetch.
+                    hasAccess = widgetPreferences.widgetAccessGrantedFlow.first()
                 )
             } catch (e: Exception) {
                 e.rethrowIfCancellation()
