@@ -303,6 +303,14 @@ kotlin {
             }
         }
 
+        val desktopTest by getting {
+            dependencies {
+                // Text-tree snapshot harness (spec 017, 6.2) and plural checks render Compose on the JVM.
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
+            }
+        }
+
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
