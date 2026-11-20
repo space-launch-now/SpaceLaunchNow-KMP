@@ -108,13 +108,14 @@ fun OnboardingPaywallScreen(
     val nextLaunch by nextUpViewModel.nextLaunch.collectAsState()
     val availableProducts by viewModel.availableProducts.collectAsState()
     val shownAt = remember { TimeSource.Monotonic.markNow() }
+    val source = PaywallSource.ONBOARDING.value
 
     LaunchedEffect(Unit) {
         nextUpViewModel.fetchNextLaunch()
-        viewModel.trackPaywallViewed(PaywallSource.ONBOARDING.value)
+        viewModel.trackPaywallViewed(source)
         DatadogLogger.info(
             "onboarding_paywall_shown",
-            mapOf("source" to PaywallSource.ONBOARDING.value, "screen" to "OnboardingScreen")
+            mapOf("source" to source, "screen" to "OnboardingScreen")
         )
     }
 
@@ -159,13 +160,13 @@ fun OnboardingPaywallScreen(
         nextLaunch = nextLaunch,
         isSubscribed = subscriptionState.isSubscribed,
         onSubscribe = { type, product ->
-            viewModel.trackTierSelected(type, product.productId, source = PaywallSource.ONBOARDING.value)
-            viewModel.purchaseProduct(product, source = PaywallSource.ONBOARDING.value)
+            viewModel.trackTierSelected(type, product.productId, source = source)
+            viewModel.purchaseProduct(product, source = source)
         },
-        onRestorePurchases = { viewModel.restorePurchases(source = PaywallSource.ONBOARDING.value) },
+        onRestorePurchases = { viewModel.restorePurchases(source = source) },
         onDismiss = {
             if (!subscriptionState.isSubscribed) {
-                viewModel.trackPaywallDismissed(PaywallSource.ONBOARDING.value, shownAt.elapsedNow().inWholeSeconds)
+                viewModel.trackPaywallDismissed(source, shownAt.elapsedNow().inWholeSeconds)
             }
             coroutineScope.launch {
                 appPreferences.setOnboardingCompleted(true)
