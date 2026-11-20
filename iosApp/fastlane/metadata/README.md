@@ -14,4 +14,4 @@ A missing file leaves that field as it is in App Store Connect.
 
 - Check: `node scripts/check-ios-metadata.mjs [--strict]`
 - Upload: merge to `main` (workflow `ios-metadata.yml`), or `bundle exec fastlane upload_metadata` from `iosApp/`. Text only: no binary, screenshots or review submission.
-- `en-US` `name` and `description` came from the public App Store page (2026-11-20). Subtitle, keywords and promotional text are not public: add them from App Store Connect.
+- `en-US` `name`, `subtitle` and `description` came from the public App Store page (2026-11-20). Keywords and promotional text are not public. Run the workflow `ios-metadata.yml` by hand with `download` on (or `bundle exec fastlane download_metadata` from `iosApp/`) to pull them from App Store Connect into `fastlane/metadata_downloaded`, then copy `keywords.txt` and `promotional_text.txt` here.
