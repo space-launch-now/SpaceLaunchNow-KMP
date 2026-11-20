@@ -26,11 +26,11 @@ wear-remote-interactions = "1.1.0"
 android-wear-minSdk = "30"
 
 
-compose-plugin = "1.13.0-rc01"
+compose-plugin = "1.12.2"
 compose = "2.2.21"
 compose-material3 = "1.5.0"
 compose-material3-adaptive = "1.3.0"
-compose-material3-navigation-suite = "1.13.0-rc01"
+compose-material3-navigation-suite = "1.12.0-alpha03"
 compose-hot-reload = "1.1.1"
 coreSplashscreen = "1.2.0"
 ddSdkKotlinMultiplatformLogs = "1.4.0"
