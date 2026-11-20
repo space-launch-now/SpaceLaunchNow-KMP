@@ -10,6 +10,10 @@ on:
       - '.github/workflows/play-listing.yml'
   workflow_dispatch:
     inputs:
+      diff_only:
+        description: 'Read only: print the diff between the live Play listing and git. Uploads nothing.'
+        type: boolean
+        default: false
       validate_only:
         description: 'Check the upload with Google Play without publishing.'
         type: boolean
@@ -24,7 +28,7 @@ jobs:
       - run: python3 scripts/check-play-listing.py
 
   upload:
-    name: Upload listing to Google Play
+    name: Upload listing to Google Play, or diff it (diff_only)
     if: github.event_name == 'workflow_dispatch'
     needs: check
     runs-on: ubuntu-latest
@@ -41,7 +45,13 @@ jobs:
           PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
         run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
 
+      # Read only: prints the live Play listing against git (Tasks#1232). Run before the first real upload.
+      - name: Diff live listing against git
+        if: inputs.diff_only
+        run: bundle exec fastlane android play_listing_diff
+
       - name: Upload listing
+        if: '!inputs.diff_only'
         run: bundle exec fastlane android play_listing validate_only:${{ inputs.validate_only }}
 
       - name: Remove Service Account
