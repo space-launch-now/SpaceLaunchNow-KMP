@@ -203,7 +203,9 @@ class TranslateTest(unittest.TestCase):
         self.assertIn("German (de)", prompt)
 
     def test_unparseable_reply_is_reported_not_raised(self):
-        report = self.run_de(lambda prompt: "sorry, no")
+        prompts = []
+        report = self.run_de(lambda prompt: prompts.append(prompt) or "sorry, no")
+        self.assertEqual(len(prompts), 2)  # one retry
         self.assertEqual(len(report.failed), 5)
         self.assertFalse(self.read(COMPOSE).exists())
 

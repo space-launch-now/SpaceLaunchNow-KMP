@@ -222,8 +222,11 @@ def translate_language(root, language, jobs, call_model, glossary, batch_size):
                 reply = {}
                 for job in batch:
                     failed[job.id] = [f"bad reply: {error}"]
+                    retry.append(job)
             for job in batch:
                 if job.id not in reply:
+                    if job in retry:
+                        continue
                     failed.setdefault(job.id, ["no answer for this key"])
                     retry.append(job)
                     continue

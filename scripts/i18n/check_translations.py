@@ -44,6 +44,8 @@ MASTERS = (
 NEVER_TRANSLATE = frozenset({"app_name", "app_name_debug"})
 
 COVERAGE_TARGET = 0.95
+# Every plural warning holds this text; --strict-plurals tests for it.
+PLURAL_WARNING = "plural categories"
 
 # %1$s, %d, %.2f, %% and the backslash escapes that change layout. A quote escape only quotes.
 _FORMAT = r"%(?:\d+\$)?[-#+0,(]*\d*(?:\.\d+)?[a-zA-Z%]"
@@ -138,10 +140,10 @@ def problems(source, target, language):
         wanted = LANGUAGES[language]["plurals"]
         missing = [q for q in wanted if q not in target.items]
         if missing:
-            warnings.append(f"{source.name}: missing plural categories {missing}")
+            warnings.append(f"{source.name}: missing {PLURAL_WARNING} {missing}")
         extra = [q for q in target.items if q not in wanted]
         if extra:
-            warnings.append(f"{source.name}: plural categories {extra} not used by {language}")
+            warnings.append(f"{source.name}: {PLURAL_WARNING} {extra} not used by {language}")
     limit = length_limit(source.comment)
     if limit:
         for quantity, text in texts.items():
@@ -201,7 +203,7 @@ def main(argv=None):
         print(f"warning: {message}")
     for message in errors:
         print(f"error: {message}")
-    failed = bool(errors) or (args.strict_plurals and any("plural" in w for w in warnings))
+    failed = bool(errors) or (args.strict_plurals and any(PLURAL_WARNING in w for w in warnings))
     return 1 if failed else 0
 
 
