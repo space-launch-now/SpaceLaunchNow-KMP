@@ -22,6 +22,7 @@ data class LaunchListUiState(
     val dataSource: DataSource = DataSource.STALE_CACHE,
     val lastUpdated: Instant? = null,
     val error: String? = null,
+    val refreshFailed: Boolean = false,
     val isPremium: Boolean = false,
 )
 
@@ -40,12 +41,13 @@ class LaunchListViewModel(
 
     fun refresh() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null, refreshFailed = false)
             val result = watchLaunchRepository.refreshLaunches()
             if (result.isFailure) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to refresh",
+                    error = result.exceptionOrNull()?.message,
+                    refreshFailed = true,
                 )
             }
         }
