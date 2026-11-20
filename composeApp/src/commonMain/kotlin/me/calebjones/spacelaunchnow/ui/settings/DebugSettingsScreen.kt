@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -1154,7 +1155,7 @@ private fun NotificationsTabContent(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = agencyDropdownExpanded) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(),
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
                             AdCoveringExposedDropdownMenu(
@@ -1186,7 +1187,7 @@ private fun NotificationsTabContent(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationDropdownExpanded) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(),
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
                             AdCoveringExposedDropdownMenu(
@@ -1218,7 +1219,7 @@ private fun NotificationsTabContent(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeDropdownExpanded) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(),
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
                             AdCoveringExposedDropdownMenu(
