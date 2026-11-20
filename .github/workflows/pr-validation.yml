@@ -33,6 +33,11 @@ jobs:
       - name: Verify string moves keep the English text
         run: python3 scripts/i18n/verify_move.py --base origin/${{ github.base_ref }} --only-if-strings-changed
 
+      - name: Check shared string keys are in sync
+        run: |
+          python3 scripts/i18n/sync_shared_keys.py --check
+          python3 -m unittest discover -s scripts/i18n/tests -p 'test_sync_shared_keys.py'
+
       - name: Set up JDK 23
         uses: actions/setup-java@v5
         with:
