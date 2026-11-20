@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="test_plural_launches">
+        <item quantity="one">one:%1$d</item>
+        <item quantity="few">few:%1$d</item>
+        <item quantity="many">many:%1$d</item>
+        <item quantity="other">other:%1$d</item>
+    </plurals>
+</resources>
