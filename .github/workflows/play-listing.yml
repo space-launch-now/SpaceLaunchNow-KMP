@@ -10,6 +10,10 @@ on:
       - '.github/workflows/play-listing.yml'
   workflow_dispatch:
     inputs:
+      diff_only:
+        description: 'Read only: print the diff between the live Play listing and git. Uploads nothing.'
+        type: boolean
+        default: false
       validate_only:
         description: 'Check the upload with Google Play without publishing.'
         type: boolean
@@ -25,7 +29,7 @@ jobs:
 
   upload:
     name: Upload listing to Google Play
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && !inputs.diff_only
     needs: check
     runs-on: ubuntu-latest
     steps:
@@ -43,6 +47,32 @@ jobs:
 
       - name: Upload listing
         run: bundle exec fastlane android play_listing validate_only:${{ inputs.validate_only }}
+
+      - name: Remove Service Account
+        if: always()
+        run: rm -f service-account.json
+
+  # Read only. Run it before the first real upload (Tasks#1232).
+  diff:
+    name: Diff live Google Play listing against git
+    if: github.event_name == 'workflow_dispatch' && inputs.diff_only
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Decode Service Account
+        env:
+          PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+        run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
+
+      - name: Diff listing
+        run: bundle exec fastlane android play_listing_diff
 
       - name: Remove Service Account
         if: always()

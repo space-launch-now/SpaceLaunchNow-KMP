@@ -17,3 +17,9 @@ Run the `Play Store Listing` workflow by hand (Actions, `workflow_dispatch`). Le
 Locally: put the service account key at `service-account.json` (git-ignored) and run `bundle exec fastlane android play_listing validate_only:true` from the repo root.
 
 The first upload replaces whatever is in Play Console for each locale folder. Compare Play Console with the files before the first real upload.
+
+## Compare before the first upload
+
+Run the `Play Store Listing` workflow by hand with `diff_only` on. It downloads the live title and descriptions (`fastlane supply init` into a temp folder, read only, the edit is never committed), compares them with `fastlane/metadata/android/`, and prints `no diff` or the diff. The job fails when text differs. It changes no file and uploads nothing. Locally: `bundle exec fastlane android play_listing_diff`, or `python3 scripts/diff-play-listing.py <folder>` on a folder you downloaded.
+
+If the diff shows text that Play holds and git lacks, copy it into the files first, then upload.
