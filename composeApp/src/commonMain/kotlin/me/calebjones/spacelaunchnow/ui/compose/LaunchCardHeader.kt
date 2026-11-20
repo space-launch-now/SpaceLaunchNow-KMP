@@ -41,6 +41,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.LocalUseUtc
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.time_tbd
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
@@ -108,17 +111,14 @@ fun LaunchCardHeaderOverlay(
         }
     }
 
-    val formattedDate by remember(launch.net, useRelativeTime, useUtc) {
-        mutableStateOf(
-            launch.net?.let {
-                if (useRelativeTime) {
-                    DateTimeUtil.formatLaunchDateTimeRelative(it, useUtc)
-                } else {
-                    DateTimeUtil.formatLaunchDateTime(it, useUtc)
-                }
-            } ?: "TBD"
-        )
-    }
+    // formatLaunchDateTimeRelative reads string resources, so it runs in composition, not in remember.
+    val formattedDate = launch.net?.let {
+        if (useRelativeTime) {
+            DateTimeUtil.formatLaunchDateTimeRelative(it, useUtc)
+        } else {
+            DateTimeUtil.formatLaunchDateTime(it, useUtc)
+        }
+    } ?: stringResource(Res.string.time_tbd)
 
     Row(
         modifier = modifier.padding(contentPadding),

@@ -27,12 +27,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -40,7 +43,19 @@ import me.calebjones.spacelaunchnow.domain.model.LaunchStatus
 import me.calebjones.spacelaunchnow.domain.model.NetPrecision
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.StatusColorUtil
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.countdown_label_days
+import spacelaunchnow_kmp.composeapp.generated.resources.countdown_label_hours
+import spacelaunchnow_kmp.composeapp.generated.resources.countdown_label_minutes
+import spacelaunchnow_kmp.composeapp.generated.resources.countdown_label_seconds
+import spacelaunchnow_kmp.composeapp.generated.resources.time_compact_after
+import spacelaunchnow_kmp.composeapp.generated.resources.time_compact_before
+import spacelaunchnow_kmp.composeapp.generated.resources.time_unit_days
+import spacelaunchnow_kmp.composeapp.generated.resources.time_unit_hours
+import spacelaunchnow_kmp.composeapp.generated.resources.time_unit_minutes
+import spacelaunchnow_kmp.composeapp.generated.resources.time_unit_seconds
 import kotlin.math.abs
 import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.days
@@ -220,13 +235,15 @@ fun CompactLaunchCountdown(
     val state = rememberCountdownState(launchTime, precision, status)
 
     if (state.showCountdown) {
-        val countdownText = buildString {
-            append(if (state.isPast) "T+ " else "T- ")
-            append(state.days).append("d ")
-            append(state.hours.toString().padStart(2, '0')).append("h ")
-            append(state.minutes.toString().padStart(2, '0')).append("m ")
-            append(state.seconds.toString().padStart(2, '0')).append("s")
-        }
+        val countdownText = stringResource(
+            if (state.isPast) Res.string.time_compact_after else Res.string.time_compact_before,
+            listOf(
+                stringResource(Res.string.time_unit_days, state.days.toString()),
+                stringResource(Res.string.time_unit_hours, state.hours.toString().padStart(2, '0')),
+                stringResource(Res.string.time_unit_minutes, state.minutes.toString().padStart(2, '0')),
+                stringResource(Res.string.time_unit_seconds, state.seconds.toString().padStart(2, '0')),
+            ).joinToString(" ")
+        )
 
         Row(
             modifier = modifier,
@@ -316,6 +333,8 @@ private fun rememberCountdownState(
  */
 @Composable
 private fun CountdownDigits(state: CountdownState, modifier: Modifier = Modifier) {
+    // The digit row reads DAYS : HOURS : MINUTES : SECONDS in every language, so it stays left to right.
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
     // Use BoxWithConstraints at the top level to determine sizing for all elements
     BoxWithConstraints(
         modifier = modifier
@@ -348,34 +367,35 @@ private fun CountdownDigits(state: CountdownState, modifier: Modifier = Modifier
                     )
                 }
                 CountdownItem(
-                    label = "DAYS",
+                    label = stringResource(Res.string.countdown_label_days),
                     value = state.days,
                     digitFontSize = digitFontSize,
                     labelFontSize = labelFontSize
                 )
                 CountdownSeparator(fontSize = digitFontSize)
                 CountdownItem(
-                    label = "HOURS",
+                    label = stringResource(Res.string.countdown_label_hours),
                     value = state.hours,
                     digitFontSize = digitFontSize,
                     labelFontSize = labelFontSize
                 )
                 CountdownSeparator(fontSize = digitFontSize)
                 CountdownItem(
-                    label = "MINUTES",
+                    label = stringResource(Res.string.countdown_label_minutes),
                     value = state.minutes,
                     digitFontSize = digitFontSize,
                     labelFontSize = labelFontSize
                 )
                 CountdownSeparator(fontSize = digitFontSize)
                 CountdownItem(
-                    label = "SECONDS",
+                    label = stringResource(Res.string.countdown_label_seconds),
                     value = state.seconds,
                     digitFontSize = digitFontSize,
                     labelFontSize = labelFontSize
                 )
             }
         }
+    }
     }
 }
 
