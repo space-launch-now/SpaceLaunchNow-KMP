@@ -82,7 +82,7 @@ jobs:
           VERSION_PATCH=$(echo $NEW_VERSION | cut -d'.' -f3 | cut -d'-' -f1)  # Strip any remaining suffixes
           
           VERSION_NAME="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-b${NEW_BUILD_NUMBER}"
-          # Monotonic counter — see composeApp/build.gradle.kts computeVersionCode()
+          # Monotonic counter — see androidApp/build.gradle.kts computeVersionCode()
           VERSION_CODE=$((1100000000 + NEW_BUILD_NUMBER * 2))
           
           cat > version.properties << EOF
@@ -391,7 +391,7 @@ jobs:
       - name: Decode Google Services JSON
         env:
           FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
-        run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
+        run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > androidApp/google-services.json
 
       - name: Grant execute permission
         run: chmod +x gradlew
@@ -538,10 +538,10 @@ jobs:
       - name: Decode Google Services JSON
         env:
           FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
-        run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
+        run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > androidApp/google-services.json
 
       - name: Print google-services.json MD5 hash
-        run: md5sum composeApp/google-services.json
+        run: md5sum androidApp/google-services.json
 
       - name: Decode Keystore
         env:
@@ -557,7 +557,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew :composeApp:bundleRelease :wearApp:bundleRelease \
+          ./gradlew :androidApp:bundleRelease :wearApp:bundleRelease \
             -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
@@ -568,8 +568,8 @@ jobs:
         with:
           name: release-aab
           path: |
-            composeApp/build/outputs/bundle/release/*.aab
-            composeApp/build/outputs/mapping/release/mapping.txt
+            androidApp/build/outputs/bundle/release/*.aab
+            androidApp/build/outputs/mapping/release/mapping.txt
             wearApp/build/outputs/bundle/release/*.aab
             wearApp/build/outputs/mapping/release/mapping.txt
           retention-days: 90
@@ -601,9 +601,9 @@ jobs:
       - name: Resolve artifact paths
         id: artifacts
         run: |
-          PHONE_AAB=$(find aab/composeApp -name "*.aab" -type f | head -n 1)
+          PHONE_AAB=$(find aab/androidApp -name "*.aab" -type f | head -n 1)
           WEAR_AAB=$(find aab/wearApp -name "*.aab" -type f | head -n 1)
-          PHONE_MAPPING=$(find aab/composeApp -name "mapping.txt" -type f | head -n 1)
+          PHONE_MAPPING=$(find aab/androidApp -name "mapping.txt" -type f | head -n 1)
           WEAR_MAPPING=$(find aab/wearApp -name "mapping.txt" -type f | head -n 1)
           echo "phone_aab=$PHONE_AAB" >> $GITHUB_OUTPUT
           echo "wear_aab=$WEAR_AAB" >> $GITHUB_OUTPUT
@@ -683,7 +683,7 @@ jobs:
         id: artifacts
         run: |
           # Firebase only distributes the phone APK/AAB — find it explicitly
-          AAB_PATH=$(find aab/composeApp -name "*.aab" -type f | head -n 1)
+          AAB_PATH=$(find aab/androidApp -name "*.aab" -type f | head -n 1)
           echo "aab=$AAB_PATH" >> $GITHUB_OUTPUT
 
       - name: Decode Service Account
