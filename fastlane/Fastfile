@@ -1,0 +1,22 @@
+# Google Play store listing, managed as files in git (Tasks#1215).
+# Phone and Wear OS share one applicationId, so they share one listing.
+# Run from the repo root:  bundle exec fastlane android play_listing
+default_platform(:android)
+
+platform :android do
+  desc "Upload the listing text (title, short and full description) from fastlane/metadata/android to Google Play. Pass validate_only:true to check without publishing."
+  lane :play_listing do |options|
+    supply(
+      json_key: ENV.fetch("PLAY_JSON_KEY_FILE", "service-account.json"),
+      metadata_path: "fastlane/metadata/android",
+      validate_only: options[:validate_only] == true,
+      # Text only. The release step uploads builds and release notes
+      # (r0adkll/upload-google-play in release-main.yml); images stay in Play Console.
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end
