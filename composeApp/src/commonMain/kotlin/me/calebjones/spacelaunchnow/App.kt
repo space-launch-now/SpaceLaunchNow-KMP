@@ -193,6 +193,15 @@ fun SpaceLaunchNowApp(
                     emptyList()
                 }
 
+                // Apply the request configuration BEFORE initializing. BasicAds runs
+                // MobileAds.initialize() on a background thread; it holds the SDK lock while it
+                // waits for the main thread (WebSettings.getDefaultUserAgent on WebView 149+).
+                // Calling setRequestConfiguration() on Main during that window blocks on the same
+                // lock -> deadlock (ANR on the preload screen). Google recommends this order anyway.
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
+                }
+
                 // CR-3: Ad SDK must initialize on Main thread per Google AdMob threading contract
                 val adInitSuccess =
                     kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
@@ -200,10 +209,6 @@ fun SpaceLaunchNowApp(
                     }
 
                 if (adInitSuccess) {
-                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                        AdInitializer.configure(BuildConfig.IS_DEBUG, testDeviceIds)
-                    }
-                    
                     // Idempotent; Koin already ran it at construction
                     val koinForAds = org.koin.mp.KoinPlatform.getKoin()
                     val globalAdManager = koinForAds.get<me.calebjones.spacelaunchnow.ui.ads.GlobalAdManager>()
