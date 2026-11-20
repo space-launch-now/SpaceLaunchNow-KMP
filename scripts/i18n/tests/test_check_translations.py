@@ -53,6 +53,9 @@ class PlaceholderTest(unittest.TestCase):
             ct.placeholders("A %1$s, %2$d, %% \\n and \\' quote"), ["%%", "%1$s", "%2$d", "\\n"]
         )
 
+    def test_percent_sign_in_prose_is_not_a_placeholder(self):
+        self.assertEqual(ct.placeholders("50 % Rabatt, 50% off"), [])
+
     def test_length_limit(self):
         self.assertEqual(ct.length_limit("Button. max 14 chars."), 14)
         self.assertIsNone(ct.length_limit("Heading."))

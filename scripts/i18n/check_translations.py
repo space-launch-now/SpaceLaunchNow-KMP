@@ -46,7 +46,7 @@ NEVER_TRANSLATE = frozenset({"app_name", "app_name_debug"})
 COVERAGE_TARGET = 0.95
 
 # %1$s, %d, %.2f, %% and the backslash escapes that change layout. A quote escape only quotes.
-_FORMAT = r"%(?:\d+\$)?[-#+ 0,(]*\d*(?:\.\d+)?[a-zA-Z%]"
+_FORMAT = r"%(?:\d+\$)?[-#+0,(]*\d*(?:\.\d+)?[a-zA-Z%]"
 _ESCAPE = r"\\(?:n|t|\\|u[0-9a-fA-F]{4}|@|\?)"
 _TOKEN = re.compile(f"{_FORMAT}|{_ESCAPE}")
 _LIMIT = re.compile(r"max\s+(\d+)\s+chars", re.IGNORECASE)
