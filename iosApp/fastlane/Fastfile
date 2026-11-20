@@ -148,6 +148,7 @@ platform :ios do
   desc "Download the live App Store listing text to fastlane/metadata_downloaded"
   lane :download_metadata do
     require "json"
+    require "fileutils"
     key_file = File.join(Dir.tmpdir, "asc_api_key.json")
     File.write(key_file, JSON.generate(
       key_id: ENV["APPLE_API_KEY_ID"],
@@ -155,10 +156,17 @@ platform :ios do
       key: ENV["APPLE_API_KEY_CONTENT"],
       is_key_content_base64: true
     ))
+    # A lane and its `sh` calls run inside the fastlane folder, so the output path is absolute.
+    # A relative "./fastlane/metadata_downloaded" lands in fastlane/fastlane/.
+    out_dir = File.expand_path("metadata_downloaded")
     begin
-      sh("bundle exec fastlane deliver download_metadata --api_key_path #{key_file} "          "--app_identifier me.spacelaunchnow.spacelaunchnow --metadata_path ./fastlane/metadata_downloaded --force")
+      sh("bundle exec fastlane deliver download_metadata --api_key_path #{key_file} " \
+         "--app_identifier me.spacelaunchnow.spacelaunchnow --metadata_path #{out_dir} --force")
     ensure
       File.delete(key_file) if File.exist?(key_file)
+      # The review contact (phone, email, demo sign-in) must not reach a build artifact:
+      # the repo is public.
+      FileUtils.rm_rf(File.join(out_dir, "review_information"))
     end
   end
 end

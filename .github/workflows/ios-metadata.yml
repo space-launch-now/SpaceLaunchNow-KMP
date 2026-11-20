@@ -76,4 +76,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: app-store-listing
-          path: iosApp/fastlane/metadata_downloaded
+          # The lane deletes review_information; the second line keeps it out even if that fails.
+          path: |
+            iosApp/fastlane/metadata_downloaded
+            !iosApp/fastlane/metadata_downloaded/review_information/**
+          if-no-files-found: error
