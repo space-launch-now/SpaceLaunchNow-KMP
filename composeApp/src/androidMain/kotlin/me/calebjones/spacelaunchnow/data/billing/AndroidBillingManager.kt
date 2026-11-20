@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Instant
 import me.calebjones.spacelaunchnow.platform.AndroidBuildConfig
+import me.calebjones.spacelaunchnow.platform.AndroidEnvConfig
 import me.calebjones.spacelaunchnow.analytics.DatadogRUM
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
@@ -68,7 +69,7 @@ class AndroidBillingManager(
             // Configure RevenueCat
             Purchases.logLevel = if (AndroidBuildConfig.IS_DEBUG) LogLevel.DEBUG else LogLevel.WARN
 
-            Purchases.configure(apiKey = AndroidBuildConfig.REVENUECAT_ANDROID_KEY) {
+            Purchases.configure(apiKey = AndroidEnvConfig.REVENUECAT_ANDROID_KEY) {
                 this.appUserId = appUserId
             }
 
