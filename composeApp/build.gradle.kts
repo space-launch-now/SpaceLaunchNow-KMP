@@ -466,12 +466,25 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    testOptions {
+        unitTests {
+            // AGP 9 defaults this to false; the Compose preview tooling needs compiled resources.
+            isIncludeAndroidResources = true
+        }
+    }
     buildFeatures {
         compose = true
         buildConfig = true
     }
     dependencies {
         debugImplementation(compose.uiTooling)
+    }
+}
+
+// AGP 9 Compose Preview packaging needs host (unit) tests on every variant, release included.
+androidComponents {
+    beforeVariants { variantBuilder ->
+        variantBuilder.hostTests[com.android.build.api.variant.HostTestBuilder.UNIT_TEST_TYPE]?.enable = true
     }
 }
 
