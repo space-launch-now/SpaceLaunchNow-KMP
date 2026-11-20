@@ -31,7 +31,7 @@ in this task.
 | 6 | Layout and format | Dates and numbers already follow the device locale. The relative time, countdown, plural and unit code is English-only and must change (task T7). Test with a pseudo-locale and text-tree snapshots first, screenshots second. |
 | 7 | Language setting | Follow the device language and the OS per-app language setting. No in-app picker in the first release. |
 | 8 | Server text | API data stays English. Map the finite lists (launch status, mission type, orbit) to keys on the client. Push text stays English first; client-built text is the later option. |
-| 9 | Order | 7 phases, 27 tasks. The first translated app ships after phase 4 (all shared screens moved), in all 10 languages at once. |
+| 9 | Order | 7 phases (1, 1b, 2 to 6; phase 0 is dropped), 27 tasks. The first translated app ships after phase 4 (all shared screens moved), in all 10 languages at once. |
 | 10 | Measure | Active users per device language, D1/D7/D30 retention per language, rating per country, premium conversion per language. Take a 28-day baseline before the first release. |
 
 ## 3. Current state (verified 2026-11-19)
@@ -272,6 +272,8 @@ Pixel screenshot tests (Roborazzi, Paparazzi, or Compose's `captureToImage`) are
 
 ### 7.2 Recommended flow
 
+_Steps 2 and 5 are superseded by 7.4: people correct the text in Crowdin, with no paid reviewer, and the model fill goes through Crowdin._
+
 1. A new English key is added with its comment (5.5).
 2. `translate.py` reads the four English masters, the **glossary** (`specs/017-app-text-translation/glossary.md`
    in the build task: "launch", "scrub", "NET", "T-minus", "payload", "booster", "Go for Launch", agency
@@ -281,9 +283,8 @@ Pixel screenshot tests (Roborazzi, Paparazzi, or Compose's `captureToImage`) are
 3. A check runs placeholders (`%1$s`, `%d`, `\n`, `&amp;`), plural categories per language, and length
    against the comment limit. A failed string is retried once, then listed in a report.
 4. A second model call back-translates the result into English and flags meaning drift.
-5. The pull request shows the diff. For the first release, a native speaker checks the 100 busiest
-   strings in each of the top 3 languages (volunteers from the Discord or Reddit audience, or a
-   freelancer for about 2 hours per language; cost not verified).
+5. The pull request shows the diff. Volunteers from the Discord or Reddit audience may correct
+   strings in Crowdin; no paid reviewer.
 6. Merge. A user report of a bad translation becomes a one-line fix to the XML.
 
 ### 7.4 Crowdin (ruling of 2026-11-20)
@@ -297,7 +298,7 @@ The flow in 7.2 stands with one change: Crowdin is the store of translations and
   (`crowdin upload translations --auto-approve-imported=false`), so people can review them.
 - Step 3: `crowdin download` brings the reviewed files back as a pull request.
 - The old Android app's Crowdin project (`SpaceLaunchNow-Android`, 597 strings, 26 languages) can seed
-  the translation memory. Whether that project still exists is a question for Caleb.
+  the translation memory. The old project is deleted; T29 loads its translation memory (`406219`) into project `948217`.
 
 ### 7.3 When a translation is missing
 
@@ -349,8 +350,7 @@ language. The notes stay for a later set.
   differently; text is often shorter, so fixed-width chips may look empty; system fonts are used
   (`Type.kt` sets no custom font), so no font file is bundled, but every `FontWeight`/`letterSpacing`
   choice and all-caps labels (`"NEXT LAUNCH"`, `"UPCOMING LAUNCHES"`) need a look, because CJK has no
-  upper case and wide letter spacing hurts. Chinese needs `zh-Hans` and, if data asks, `zh-Hant` as a
-  second language. Estimate: no extra build task, one extra QA pass per language.
+  upper case and wide letter spacing hurts. Chinese is `zh-CN` (Simplified) only. Estimate: no extra build task, one extra QA pass per language.
 - **Languages with long words (German, Dutch, Polish, Finnish):** see Q6.
 
 ## 9. Q6 — Layout and format
@@ -363,11 +363,11 @@ language. The notes stay for a later set.
 | Relative day words | English: `"Today at"`, `"Tomorrow at"`, `"Yesterday at"`, `"$dayName at …"` (`DateTimeUtil.kt:83-88`). | Move to keys; pass the time as an argument. The weekday name is English enum text (`dayOfWeek.name`, `DateTimeUtil.kt:86-87`), so it needs a key or a locale formatter. |
 | Date precision words | `"TBD"`, `"H1 2026"`, `"H2"`, `"NET"`, quarter formats (`DateTimeUtil.kt:252-265`). | Keys. Decide whether `NET` stays (it is a term of the field; put it in the glossary). |
 | Timeline offsets | `"T - 1d 14h 5m 3s"` built from ISO-8601 durations (`DateTimeUtil.kt:107-176`). | Keys for the unit letters per language (`d h m s`) or a locale-aware duration formatter. |
-| Countdown | `"…d …h …m …s"` and `"DAYS"`, `"HOURS"`, `"MINUTES"`, `"SECONDS"` labels (`CountdownWidget.kt:225-228, 351`). The digit row is a fixed layout. | Keys for the four labels and the unit letters; check the digit row in RTL (stays left to right). |
+| Countdown | `"…d …h …m …s"` and `"DAYS"`, `"HOURS"`, `"MINUTES"`, `"SECONDS"` labels (`CountdownWidget.kt:225-228, 351`). The digit row is a fixed layout. | Keys for the four labels and the unit letters; the digit row stays left to right (RTL only matters for a later set). |
 | Numbers | `NumberFormatUtil` uses `NumberFormat.getNumberInstance(Locale.getDefault())` / iOS actual. | Nothing. |
 | Units | Metric only, English suffixes in code (`"$x km"`, `"N/A"`); no unit setting. | Keys for the suffixes. A units setting (imperial for en-US) is out of scope; note it as a later idea. |
 | Plurals | English `if (n == 1)` hacks (4.4). | `<plurals>`. |
-| Fonts | System fonts. | Nothing. Check CJK and Arabic fall back correctly on iOS and Android (system does this). |
+| Fonts | System fonts. | Nothing. Check Chinese falls back correctly on iOS and Android (system does this). |
 | Layout | Fixed widths in chips, buttons, tabs, the tile and the widgets (not audited). | Audit with the pseudo-locale (9.3). |
 | Custom locale source | `LocaleUtil` reads the platform locale. | If an in-app picker is added later (Q7), `LocaleUtil` must read the override too. |
 
@@ -385,11 +385,10 @@ allow wrap or ellipsis; keep key comments with the length limit for tight contro
    builds, previews and the desktop tests through the locale override pattern in the Compose
    documentation. It shows both untranslated literals (no markers → still hard-coded) and overflow. The
    Android system pseudo-locales `en-XA` and `ar-XB` (`pseudoLocalesEnabled`) also work for
-   `androidMain/res` strings and test RTL for those surfaces.
+   `androidMain/res` strings and test layout for those surfaces (RTL only if a later set needs it).
 2. **Text-tree snapshots** (6.2) in each language: catches a missing key or a wrong plural.
 3. **Screenshot tests** for the 8 densest screens (home, launch detail, rocket detail, settings,
-   notification settings, onboarding, paywall, schedule) in English, German, and pseudo-locale (and
-   Arabic if chosen). Tool choice (Roborazzi on Android JVM, or `captureToImage` in `desktopTest`) is a
+   notification settings, onboarding, paywall, schedule) in English, German, and pseudo-locale. Tool choice (Roborazzi on Android JVM, or `captureToImage` in `desktopTest`) is a
    task of its own (T25); it is not needed before the first release of the move.
 4. **Device pass** by Caleb or an agent on one phone and one Wear emulator in German and one CJK
    language before the first translated release ships.
@@ -511,7 +510,7 @@ mix of English and another language in one app; Phase 3 should be finished first
 | T26 | client-built push text on Android and in the iOS extension (only if the payload carries all fields; otherwise a Server task that needs approval) | M | T21 |
 | T27 | analytics: `app_language` user property and a GA4 report per language | S | T21 |
 
-Total 27 tasks (S 3, M 21, L 3; T0, T23 and T24 dropped, T28 and T29 added); a rough sum is
+Total 27 tasks (S 4, M 20, L 3; T0, T23 and T24 dropped, T28 and T29 added); a rough sum is
 30 to 40 worker days. Phase 3 is the long part; 4 parallel workers finish it in about 4 rounds.
 
 ## 13. Q10 — Measure
@@ -526,7 +525,7 @@ days after the first translated release, for the new languages only, against the
 | Retention D1, D7, D30 per language | GA4 cohort exploration | a translated app should retain better than the same language in English |
 | Rating and review text per country | Play Console and App Store Connect | catches wrong translations |
 | Premium conversion and trial to paid per language | RevenueCat (`locale` attribute) + GA4 funnel events (spec 014) | revenue effect |
-| Crash-free users and layout complaints per language | Firebase Crashlytics, support mail | overflow and RTL bugs |
+| Crash-free users and layout complaints per language | Firebase Crashlytics, support mail | overflow bugs |
 | Missing-key and fallback rate | a debug log or event when a key falls back to English | translation coverage |
 
 T27 adds the `app_language` user property so the funnel in spec 014 can be cut by language.
@@ -536,7 +535,7 @@ T27 adds the `app_language` user property so the funnel in spec 014 can be cut b
 - Key system: Compose resources for shared UI, native files for Android-only, Wear and iOS widgets (not
   one library for all).
 - Move rule: English text is not edited during the move.
-- Translation: model plus glossary first; no paid service or platform at the start.
+- Translation: model plus glossary first; Crowdin free plan plus a model for the first fill; no paid reviewer.
 - Server text: no API change is proposed.
 
 ## 15. Open questions (for Caleb)
