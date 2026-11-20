@@ -1,0 +1,18 @@
+# Crowdin sync for app text. Spec: specs/017-app-text-translation/spec.md (Q4).
+# Task: https://github.com/ItsCalebJones/SpaceLaunchNow-Tasks/issues/1217
+#
+# Secrets stay out of this file. Set CROWDIN_PROJECT_ID and CROWDIN_PERSONAL_TOKEN
+# in the environment or as CI secrets. The CLI reads them as project_id_env and api_token_env.
+project_id_env: CROWDIN_PROJECT_ID
+api_token_env: CROWDIN_PERSONAL_TOKEN
+base_path: .
+preserve_hierarchy: true
+
+files:
+  # Compose Multiplatform resources (shared UI). Android XML format.
+  # Crowdin writes values-<android_code>/strings.xml; Compose resources read the same folders.
+  - source: /composeApp/src/commonMain/composeResources/values/strings.xml
+    translation: /composeApp/src/commonMain/composeResources/values-%android_code%/strings.xml
+    type: android
+    # Do not overwrite a translation that a person approved with the model's first fill.
+    update_option: update_as_unapproved

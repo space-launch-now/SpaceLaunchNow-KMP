@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared word. Top bar navigation icon, content description for screen readers. -->
+    <string name="common_back">Back</string>
+    <!-- Shared word. Title and icon description on an error screen. -->
+    <string name="common_error">Error</string>
+    <!-- Shared word. Top bar title while a screen loads. -->
+    <string name="common_loading">Loading...</string>
+    <!-- Button, one line, max 14 chars. Tries a failed load again. -->
+    <string name="common_retry">Retry</string>
+    <!-- Heading on the rocket detail error screen, above the error message. One or two lines. -->
+    <string name="rocket_detail_error_title">Error loading rocket details</string>
+</resources>
