@@ -23,7 +23,8 @@ DEFAULT_STRINGS = [Path("composeApp/src/commonMain/composeResources/values/strin
 KEY_RE = re.compile(r"\bRes\.string\.([A-Za-z0-9_]+)")
 LITERAL_RE = re.compile(r'(?<!")"((?:[^"\\\n]|\\.)*)"(?!")')
 KT_VAR_RE = re.compile(r"\$(?:\{([^{}]*)\}|([A-Za-z_][A-Za-z0-9_]*))")
-PRINTF_RE = re.compile(r"%(?:(\d+)\$)?[-#+ 0,(]*\d*(?:\.\d+)?([a-zA-Z%])")
+PRINTF_PATTERN = r"%(?:(\d+)\$)?[-#+ 0,(]*\d*(?:\.\d+)?([a-zA-Z%])"  # shared with pseudo_locale
+PRINTF_RE = re.compile(PRINTF_PATTERN)
 SIMPLE_ESCAPES = {"n": "\n", "t": "\t", "b": "\b", "r": "\r"}
 DOLLAR_MARK = "\x00"
 

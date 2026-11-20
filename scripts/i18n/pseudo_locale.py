@@ -19,6 +19,8 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from verify_move import PRINTF_PATTERN
+
 DEFAULT_SOURCE = Path("composeApp/src/commonMain/composeResources/values/strings.xml")
 DEFAULT_QUALIFIER = "en-rXA"
 OPEN_MARK, CLOSE_MARK = "[!! ", " !!]"
@@ -32,8 +34,8 @@ ACCENTS = str.maketrans(
 
 # Anything that must survive untouched: printf placeholders, brace names, backslash escapes.
 PROTECTED = re.compile(
-    r"%(?:\d+\$)?[-#+ 0,(]*\d*(?:\.\d+)?[a-zA-Z%]"
-    r"|\{[^{}]*\}"
+    PRINTF_PATTERN
+    + r"|\{[^{}]*\}"
     r"|\\u[0-9a-fA-F]{4}"
     r"|\\."
 )
