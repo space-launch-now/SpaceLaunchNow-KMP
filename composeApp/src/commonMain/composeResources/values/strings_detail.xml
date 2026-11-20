@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Content description of the info icon on the Website button. Read by screen readers. -->
+    <string name="launch_detail_info_description">Information</string>
+    <!-- Button label, one word. Opens the website of an agency, rocket or location. -->
+    <string name="launch_detail_link_website">Website</string>
+    <!-- Content description of the Wikipedia icon on the Wikipedia button. Read by screen readers. -->
+    <string name="launch_detail_link_wikipedia_description">Wikipedia</string>
+    <!-- Button label, one word. Opens the Wikipedia page of an agency, rocket or location. -->
+    <string name="launch_detail_link_wikipedia">Wikipedia</string>
+    <!-- Statistic label under a percentage. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_success_rate">Success
+Rate</string>
+    <!-- Statistic label under a launch count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_total_launches">Total
+Launches</string>
+    <!-- Statistic label under a launch count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_successful_launches">Successful
+Launches</string>
+    <!-- Statistic label under a launch count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_failed_launches">Failed
+Launches</string>
+    <!-- Content description of the agency logo image. Read by screen readers. -->
+    <string name="launch_detail_agency_logo_description">Agency logo</string>
+    <!-- Content description of the placeholder agency icon, shown when the logo is missing. Read by screen readers. -->
+    <string name="launch_detail_agency_icon_description">Agency</string>
+    <!-- Label of an info tile on the agency card. One word; the value is the agency type, such as Government. -->
+    <string name="launch_detail_agency_tile_type">Type</string>
+    <!-- Label of an info tile on the agency card. One word; the value is a year. -->
+    <string name="launch_detail_agency_tile_founded">Founded</string>
+    <!-- Label of an info tile on the agency card, max 14 chars. The value is a person's name. -->
+    <string name="launch_detail_agency_tile_administrator">Administrator</string>
+    <!-- Label of an info tile on the agency card. One word; the value is a country code. -->
+    <string name="launch_detail_agency_tile_country">Country</string>
+    <!-- Heading above the agency description on the agency card. One line. -->
+    <string name="launch_detail_agency_about_heading">About</string>
+    <!-- Heading above the list of alternate videos for a launch. One line. -->
+    <string name="launch_detail_videos_more_heading">More Videos</string>
+    <!-- Content description of the play button on a video row. Read by screen readers. -->
+    <string name="launch_detail_videos_open_description">Open video in app</string>
+    <!-- Badge on a video thumbnail while the stream is live. One word, max 6 chars. -->
+    <string name="launch_detail_videos_live_badge">LIVE</string>
+</resources>

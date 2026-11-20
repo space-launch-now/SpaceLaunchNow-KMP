@@ -46,6 +46,19 @@ import me.calebjones.spacelaunchnow.ui.compose.LogoWellColor
 import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileData
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_about_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_tile_administrator
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_tile_country
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_tile_founded
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_tile_type
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_info_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_website
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia_description
 
 /**
  * Reusable Agency Details Card for displaying comprehensive agency information
@@ -78,7 +91,7 @@ fun AgencyDetailsCard(
             ) {
                 SubcomposeAsyncImage(
                     model = provider.logoUrl ?: "",
-                    contentDescription = "Agency logo",
+                    contentDescription = stringResource(Res.string.launch_detail_agency_logo_description),
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(150.dp)
@@ -109,7 +122,7 @@ fun AgencyDetailsCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Business,
-                                contentDescription = "Agency",
+                                contentDescription = stringResource(Res.string.launch_detail_agency_icon_description),
                                 modifier = Modifier.size(64.dp),
                                 tint = Color.White.copy(alpha = 0.4f)
                             )
@@ -127,18 +140,22 @@ fun AgencyDetailsCard(
             )
 
             // Grid of key details
+            val typeLabel = stringResource(Res.string.launch_detail_agency_tile_type)
+            val foundedLabel = stringResource(Res.string.launch_detail_agency_tile_founded)
+            val administratorLabel = stringResource(Res.string.launch_detail_agency_tile_administrator)
+            val countryLabel = stringResource(Res.string.launch_detail_agency_tile_country)
             val infoTiles = buildList {
                 provider.type?.takeIf { it.isNotBlank() }?.let {
-                    add(InfoTileData(Icons.Filled.Business, "Type", it))
+                    add(InfoTileData(Icons.Filled.Business, typeLabel, it))
                 }
                 providerDetail?.foundingYear?.let { year ->
-                    add(InfoTileData(Icons.Filled.CalendarToday, "Founded", year.toString()))
+                    add(InfoTileData(Icons.Filled.CalendarToday, foundedLabel, year.toString()))
                 }
                 providerDetail?.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
-                    add(InfoTileData(Icons.Filled.Person, "Administrator", admin))
+                    add(InfoTileData(Icons.Filled.Person, administratorLabel, admin))
                 }
                 provider.countryCode?.takeIf { it.isNotBlank() }?.let { code ->
-                    add(InfoTileData(Icons.Filled.Flag, "Country", code))
+                    add(InfoTileData(Icons.Filled.Flag, countryLabel, code))
                 }
             }
             if (infoTiles.isNotEmpty()) {
@@ -163,7 +180,7 @@ fun AgencyDetailsCard(
             // Agency description
             providerDetail?.description?.let { description ->
                 Text(
-                    text = "About",
+                    text = stringResource(Res.string.launch_detail_agency_about_heading),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
@@ -185,11 +202,11 @@ fun AgencyDetailsCard(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                            contentDescription = "Information",
+                            contentDescription = stringResource(Res.string.launch_detail_info_description),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Website")
+                        Text(stringResource(Res.string.launch_detail_link_website))
                     }
                 }
                 providerDetail?.wikiUrl?.let { url ->
@@ -200,11 +217,11 @@ fun AgencyDetailsCard(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Brands.WikipediaW,
-                            contentDescription = "Wikipedia",
+                            contentDescription = stringResource(Res.string.launch_detail_link_wikipedia_description),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Wikipedia")
+                        Text(stringResource(Res.string.launch_detail_link_wikipedia))
                     }
                 }
             }
@@ -229,6 +246,7 @@ private fun AgencyDetailsCardPreview() {
                     imageUrl = null
                 ),
                 providerDetail = ProviderDetail(
+                    // i18n-ignore: preview sample data
                     description = "The National Aeronautics and Space Administration is an independent agency of the executive branch of the United States federal government responsible for the civilian space program, as well as aeronautics and aerospace research.",
                     administrator = "Bill Nelson",
                     foundingYear = 1958,
