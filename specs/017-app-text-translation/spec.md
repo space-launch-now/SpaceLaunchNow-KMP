@@ -197,7 +197,7 @@ Compose master to Wear and to the String Catalog so the English text cannot drif
 of the Wear `values/strings.xml` and into the `en` localization of `iosApp/LaunchWidget/Localizable.xcstrings`
 (`%1$s` becomes `%1$@`; an apostrophe is escaped for Android). A second run changes nothing, and other
 languages and other keys in the catalog are kept. `--check` writes nothing and exits 1 when a file differs;
-a CI step runs it so the copies cannot drift. Tests: `python3 -m unittest discover scripts/i18n/tests`.
+a CI step (added with the pr-validation changes, not in the T4 PR) runs it so the copies cannot drift. Tests: `python3 -m unittest discover scripts/i18n/tests`.
 
 ### 5.4 Plurals and arguments
 
