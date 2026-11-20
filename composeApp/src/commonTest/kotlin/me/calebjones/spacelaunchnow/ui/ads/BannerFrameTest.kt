@@ -3,6 +3,8 @@ package me.calebjones.spacelaunchnow.ui.ads
 import me.calebjones.spacelaunchnow.ui.ads.BannerFrame.Chrome
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class BannerFrameTest {
 
@@ -49,5 +51,30 @@ class BannerFrameTest {
         // FLUID (-2 height) and INVALID (0x0) have no fixed frame to host
         assertEquals(Chrome.NONE, BannerFrame.chromeFor(-1, -2, 1000f, preferCard = true))
         assertEquals(Chrome.NONE, BannerFrame.chromeFor(0, 0, 1000f, preferCard = true))
+    }
+
+    @Test
+    fun noneWhenTheHostCannotGiveTheFullHeight() {
+        assertEquals(Chrome.NONE, BannerFrame.chromeFor(320, 100, 360f, 99f, preferCard = true))
+        assertEquals(Chrome.CARD, BannerFrame.chromeFor(320, 100, 360f, 100f, preferCard = true))
+    }
+
+    @Test
+    fun noneWhenTheHostCannotGiveTheFullWidth() {
+        assertEquals(Chrome.NONE, BannerFrame.chromeFor(320, 50, 319f, 500f, preferCard = true))
+    }
+
+    @Test
+    fun unboundedHeightIsNotALimit() {
+        assertEquals(Chrome.BARE, BannerFrame.chromeFor(320, 50, 320f, Float.POSITIVE_INFINITY, preferCard = true))
+        assertEquals(Chrome.BARE, BannerFrame.chromeFor(320, 50, 320f, -1f, preferCard = true))
+    }
+
+    @Test
+    fun fitsNeedsBothWidthAndHeight() {
+        assertTrue(BannerFrame.fits(320, 50, 320f, 50f))
+        assertFalse(BannerFrame.fits(320, 50, 320f, 49f))
+        assertFalse(BannerFrame.fits(320, 50, 319f, 50f))
+        assertFalse(BannerFrame.fits(0, 50, 400f, 400f))
     }
 }
