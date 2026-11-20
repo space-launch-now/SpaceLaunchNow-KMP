@@ -19,12 +19,10 @@
     <string name="wear_tile_details">Details</string>
     <!-- Tile edge button when the tile has no launch to open, one line -->
     <string name="wear_tile_open">Open</string>
-    <!-- Tile body for a free user, two lines, 
- splits them -->
-    <string name="wear_tile_upgrade_prompt">Upgrade on phone
-to see launches</string>
+    <!-- Tile body for a free user, two lines, \n splits them -->
+    <string name="wear_tile_upgrade_prompt">Upgrade on phone\nto see launches</string>
     <!-- Tile title when the tile failed to load, one line -->
-    <string name="wear_tile_error_title">Couldn't load</string>
+    <string name="wear_tile_error_title">Couldn\'t load</string>
     <!-- Tile body under the error title -->
     <string name="wear_tile_error_retry">Tap to retry</string>
 
@@ -68,12 +66,8 @@ to see launches</string>
     <string name="wear_settings_version">v%1$s</string>
     <!-- Settings screen, heading above the about text -->
     <string name="wear_settings_about">About</string>
-    <!-- Settings screen, about text, two paragraphs, 
-
- splits them -->
-    <string name="wear_settings_about_body">Launch data is refreshed every 5 minutes when a launch is under 1 hour away, and every 30 minutes otherwise.
-
-The tile and complication both follow your filter preferences set on your phone.</string>
+    <!-- Settings screen, about text, two paragraphs, \n\n splits them -->
+    <string name="wear_settings_about_body">Launch data is refreshed every 5 minutes when a launch is under 1 hour away, and every 30 minutes otherwise.\n\nThe tile and complication both follow your filter preferences set on your phone.</string>
 
     <!-- Complication, accessibility text: %1$s vehicle name, %2$s countdown such as T-1D 13H -->
     <string name="wear_complication_next_launch_description">Next launch: %1$s in %2$s</string>
