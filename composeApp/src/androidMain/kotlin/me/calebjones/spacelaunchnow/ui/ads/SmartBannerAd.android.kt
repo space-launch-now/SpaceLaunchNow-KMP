@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -280,17 +281,24 @@ actual fun SmartBannerAd(
             // narrow for the card drops chrome (BannerFrame.chromeFor); a slot narrower than the
             // ad shows no ad. The caller's modifier goes on this outer box, once.
             val loadedSize = availableAd.adSize
-            BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+            // Something covers the screen (sheet, dialog, menu, keyboard): show blank space of
+            // the reserved height instead of the AdView. The nav banner is also gated by its
+            // scaffold; the check is safe when both apply.
+            if (isAdCovered() && (slotHandler != null || placementType != AdPlacementType.NAVIGATION)) {
+                Spacer(modifier = modifier.fillMaxWidth().height(bannerHeight + 8.dp))
+            } else BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
                 val chrome = BannerFrame.chromeFor(
                     adWidthDp = loadedSize.width,
                     adHeightDp = loadedSize.height,
                     slotWidthDp = maxWidth.value,
+                    // Infinity in an unbounded slot, which chromeFor reads as no height limit
+                    slotHeightDp = maxHeight.value,
                     preferCard = showCard
                 )
                 if (chrome == BannerFrame.Chrome.NONE) {
                     log.d {
                         "Skipping ${loadedSize.width}x${loadedSize.height} banner for $placementType: " +
-                            "slot is only $maxWidth wide"
+                            "slot is only $maxWidth x $maxHeight"
                     }
                 } else {
                     Column(
