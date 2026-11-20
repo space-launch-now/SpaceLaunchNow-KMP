@@ -151,7 +151,7 @@ The action generates a well-formatted changelog following the [Keep a Changelog]
 
 **Signing Configuration:**
 ```bash
-./gradlew :composeApp:bundleRelease \
+./gradlew :androidApp:bundleRelease \
   -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
   -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
   -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
@@ -393,7 +393,7 @@ firebase login:ci
 #### Encode Google Services JSON
 ```bash
 # Linux/Mac
-base64 -i composeApp/google-services.json | tr -d '\n'
+base64 -i androidApp/google-services.json | tr -d '\n'
 
 # Windows PowerShell
 [Convert]::ToBase64String([IO.File]::ReadAllBytes("composeApp\google-services.json"))
@@ -470,8 +470,8 @@ gh workflow run master-deploy.yml
 - `FIREBASE_APP_ID` is correct (format: `1:123456789:android:abc123`)
 - `FIREBASE_TOKEN` is valid (regenerate with `firebase login:ci`)
 - AAB/APK files exist at expected paths:
-  - AAB: `composeApp/build/outputs/bundle/release/*.aab`
-  - APK: `composeApp/build/outputs/apk/release/*.apk`
+  - AAB: `androidApp/build/outputs/bundle/release/*.aab`
+  - APK: `androidApp/build/outputs/apk/release/*.apk`
 - Artifact path resolution is correct in the deploy job
 
 ### Version Not Bumping
