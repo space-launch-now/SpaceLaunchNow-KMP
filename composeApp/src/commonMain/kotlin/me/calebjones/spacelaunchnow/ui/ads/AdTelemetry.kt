@@ -68,6 +68,16 @@ internal object AdTelemetry {
         send(AnalyticsEvent.AdLifecycle(AdResult.CLICKED, format, size, handler))
     }
 
+    /** Sends ad_frame_mismatch if [FrameMismatchLimiter] has not seen [placement] this session. */
+    fun frameMismatch(placement: String, loadedPx: Pair<Int, Int>, realPx: Pair<Int, Int>, windowDp: Pair<Int, Int>, orientation: String) {
+        if (!FrameMismatchLimiter.shouldReport(placement)) return
+        val loaded = "${loadedPx.first}x${loadedPx.second}"
+        val real = "${realPx.first}x${realPx.second}"
+        val window = "${windowDp.first}x${windowDp.second}"
+        log.w { "ad_frame_mismatch placement=$placement loaded=$loaded real=$real window=$window orientation=$orientation" }
+        send(AnalyticsEvent.AdFrameMismatch(placement, loaded, real, window, orientation))
+    }
+
     fun trackingStatus(status: String) {
         log.i { "ad_att_status status=$status" }
         send(AnalyticsEvent.AdTrackingStatus(status))

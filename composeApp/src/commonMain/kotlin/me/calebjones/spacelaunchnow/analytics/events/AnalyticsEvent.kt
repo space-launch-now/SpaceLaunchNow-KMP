@@ -471,4 +471,24 @@ sealed class AnalyticsEvent(val name: String) {
     data class AdTrackingStatus(val status: String) : AnalyticsEvent("ad_att_status") {
         override fun toParameters(): Map<String, Any?> = mapOf("status" to status)
     }
+
+    /**
+     * A banner's real on-screen size differs from the size it loaded at (or part of it is cut
+     * off). Sent at most once per placement per session. Sizes read "WxH" in px; [windowDp] in dp.
+     */
+    data class AdFrameMismatch(
+        val placement: String,
+        val loadedSize: String,
+        val realSize: String,
+        val windowDp: String,
+        val orientation: String
+    ) : AnalyticsEvent("ad_frame_mismatch") {
+        override fun toParameters(): Map<String, Any?> = mapOf(
+            "placement" to placement,
+            "loaded_size" to loadedSize,
+            "real_size" to realSize,
+            "window_dp" to windowDp,
+            "orientation" to orientation
+        )
+    }
 }
