@@ -324,7 +324,6 @@ fun HomeScreenWidgetMediumMockup(modifier: Modifier = Modifier) {
 @Composable
 fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
     val widgetGreen = Color(0xFF4CAF50)
-    val goForLaunch = stringResource(Res.string.onboarding_widget_status_go)
 
     Column(
         modifier = modifier
@@ -349,7 +348,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "National Aeronautics and Space Administration",
             location = "Kennedy Space Center, FL, USA",
             countdown = "1h 24m",
-            status = goForLaunch,
+            status = stringResource(Res.string.onboarding_widget_status_go),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -357,7 +356,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "SpaceX",
             location = "Cape Canaveral SFS, FL, USA",
             countdown = "14h 52m",
-            status = goForLaunch,
+            status = stringResource(Res.string.onboarding_widget_status_go),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -365,7 +364,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "SpaceX",
             location = "Vandenberg SFB, CA, USA",
             countdown = "1d 2h",
-            status = goForLaunch,
+            status = stringResource(Res.string.onboarding_widget_status_go),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -373,7 +372,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "Space Pioneer",
             location = "Jiuquan Satellite Launch Center, People's Republic of China",
             countdown = "1d 7h",
-            status = goForLaunch,
+            status = stringResource(Res.string.onboarding_widget_status_go),
             accentColor = widgetGreen
         )
     }
