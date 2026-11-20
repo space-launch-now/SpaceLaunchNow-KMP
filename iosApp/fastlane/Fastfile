@@ -121,4 +121,24 @@ platform :ios do
       UI.important("Skipping dSYM upload: upload-symbols=#{upload_symbols}, dsym=#{File.exist?(dsym_path.to_s)}")
     end
   end
+
+  # Task 1216: App Store listing text lives in fastlane/metadata/<locale>/*.txt.
+  # Sends text only: no binary, screenshots or version bump. A field with no file is left as it is
+  # in App Store Connect. Fields tied to a version (description, keywords, name, subtitle) need an
+  # editable version; promotional text can change at any time.
+  desc "Upload App Store listing text (name, subtitle, description, keywords, promotional text) from fastlane/metadata"
+  lane :upload_metadata do
+    deliver(
+      api_key: api_key,
+      app_identifier: "me.spacelaunchnow.spacelaunchnow",
+      metadata_path: "./fastlane/metadata",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      skip_app_version_update: true,
+      submit_for_review: false,
+      automatic_release: false,
+      force: true,
+      run_precheck_before_submit: false
+    )
+  end
 end
