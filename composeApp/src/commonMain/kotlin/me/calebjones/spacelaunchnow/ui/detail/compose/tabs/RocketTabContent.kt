@@ -18,6 +18,11 @@ import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchVehicleDetailedStatistics
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchVehicleDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.SpacecraftDetailsCard
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_rocket_tab_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_vehicle_details
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_spacecraft_details
 
 /**
  * Rocket tab content for launch detail view.
@@ -41,7 +46,7 @@ fun RocketTabContent(
             // Empty state
             Spacer(Modifier.height(32.dp))
             Text(
-                text = "No rocket or spacecraft details available for this launch.",
+                text = stringResource(Res.string.launch_detail_rocket_tab_empty),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -54,7 +59,7 @@ fun RocketTabContent(
         // Launch Vehicle Details Card
         launch.rocket?.let { rocketConfig ->
             Text(
-                text = "Launch Vehicle Details",
+                text = stringResource(Res.string.launch_detail_section_launch_vehicle_details),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -81,7 +86,7 @@ fun RocketTabContent(
         if (hasSpacecraft) {
             launch.rocketDetail?.spacecraftFlights?.let { spacecraftStages ->
                 Text(
-                    text = "Spacecraft Details",
+                    text = stringResource(Res.string.launch_detail_section_spacecraft_details),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )

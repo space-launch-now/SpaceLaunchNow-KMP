@@ -57,6 +57,27 @@ import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_landing_type
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_more
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less_lower
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_departed
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_docked
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_docking_events
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_image_failed_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_in_space
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_serial
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_completed_missions
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_destination
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_landing_location
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_mission_duration
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_mission_end
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_time_docked
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_time_in_space
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_total_flights
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_turnaround_time
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_fastest_turnaround
 
 @Composable
 fun SpacecraftDetailsCard(
@@ -133,7 +154,7 @@ fun SpacecraftDetailCard(
                                 ) {
                                     Icon(
                                         imageVector = CustomIcons.RocketLaunch,
-                                        contentDescription = "Spacecraft image failed to load",
+                                        contentDescription = stringResource(Res.string.launch_detail_spacecraft_image_failed_description),
                                         modifier = Modifier.size(64.dp),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                                     )
@@ -164,14 +185,14 @@ fun SpacecraftDetailCard(
 
                 spacecraft?.serialNumber?.let { serial ->
                     StatusChip(
-                        text = "S/N: $serial",
+                        text = stringResource(Res.string.launch_detail_spacecraft_serial, serial),
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
 
                 if (spacecraft?.inSpace == true) {
                     StatusChip(
-                        text = "In Space",
+                        text = stringResource(Res.string.launch_detail_spacecraft_in_space),
                         color = MaterialTheme.colorScheme.tertiary
                     )
                 }
@@ -192,7 +213,7 @@ fun SpacecraftDetailCard(
                 )
                 if (hasOverflow || expanded) {
                     TextButton(onClick = { expanded = !expanded }) {
-                        Text(if (expanded) "Show less" else "Read more")
+                        Text(if (expanded) stringResource(Res.string.launch_detail_show_less_lower) else stringResource(Res.string.launch_detail_read_more))
                     }
                 }
             }
@@ -200,18 +221,18 @@ fun SpacecraftDetailCard(
             // Flight information tiles
             val infoTiles = buildList {
                 spacecraftFlight.destination?.let {
-                    add(InfoTileData(Icons.Filled.LocationOn, "Destination", it))
+                    add(InfoTileData(Icons.Filled.LocationOn, stringResource(Res.string.launch_detail_spacecraft_tile_destination), it))
                 }
 
                 if (spacecraft?.isPlaceholder != true) {
                     spacecraft?.flightsCount?.let {
-                        add(InfoTileData(CustomIcons.RocketLaunch, "Total Flights", "$it"))
+                        add(InfoTileData(CustomIcons.RocketLaunch, stringResource(Res.string.launch_detail_spacecraft_tile_total_flights), "$it"))
                     }
                 }
 
                 if (spacecraft?.isPlaceholder != true) {
                     spacecraft?.missionEndsCount?.let {
-                        add(InfoTileData(Icons.Filled.CheckCircle, "Completed Missions", "$it"))
+                        add(InfoTileData(Icons.Filled.CheckCircle, stringResource(Res.string.launch_detail_spacecraft_tile_completed_missions), "$it"))
                     }
                 }
 
@@ -219,7 +240,7 @@ fun SpacecraftDetailCard(
                     add(
                         InfoTileData(
                             Icons.Filled.Schedule,
-                            "Mission End",
+                            stringResource(Res.string.launch_detail_spacecraft_tile_mission_end),
                             formatLaunchTime(it, useUtc)
                         )
                     )
@@ -229,7 +250,7 @@ fun SpacecraftDetailCard(
                     add(
                         InfoTileData(
                             Icons.Filled.Timelapse,
-                            "Mission Duration",
+                            stringResource(Res.string.launch_detail_spacecraft_tile_mission_duration),
                             parseIsoDurationToHumanReadable(it)
                         )
                     )
@@ -240,7 +261,7 @@ fun SpacecraftDetailCard(
                         add(
                             InfoTileData(
                                 Icons.Filled.Satellite,
-                                "Time in Space",
+                                stringResource(Res.string.launch_detail_spacecraft_tile_time_in_space),
                                 parseIsoDurationToHumanReadable(it)
                             )
                         )
@@ -252,7 +273,7 @@ fun SpacecraftDetailCard(
                         add(
                             InfoTileData(
                                 Icons.Filled.SatelliteAlt,
-                                "Time Docked",
+                                stringResource(Res.string.launch_detail_spacecraft_tile_time_docked),
                                 parseIsoDurationToHumanReadable(it)
                             )
                         )
@@ -264,7 +285,7 @@ fun SpacecraftDetailCard(
                         add(
                             InfoTileData(
                                 Icons.Filled.Refresh,
-                                "Turnaround Time",
+                                stringResource(Res.string.launch_detail_spacecraft_tile_turnaround_time),
                                 parseIsoDurationToHumanReadable(it)
                             )
                         )
@@ -276,7 +297,7 @@ fun SpacecraftDetailCard(
                         add(
                             InfoTileData(
                                 Icons.Filled.Speed,
-                                "Fastest Turnaround",
+                                stringResource(Res.string.launch_detail_vehicle_tile_fastest_turnaround),
                                 parseIsoDurationToHumanReadable(it)
                             )
                         )
@@ -284,11 +305,11 @@ fun SpacecraftDetailCard(
                 }
 
                 spacecraftFlight.landing?.type?.name?.let {
-                    add(InfoTileData(Icons.Filled.FlightLand, "Landing Type", it))
+                    add(InfoTileData(Icons.Filled.FlightLand, stringResource(Res.string.launch_detail_landing_tile_landing_type), it))
                 }
 
                 spacecraftFlight.landing?.landingLocation?.name?.let {
-                    add(InfoTileData(Icons.Filled.Place, "Landing Location", it))
+                    add(InfoTileData(Icons.Filled.Place, stringResource(Res.string.launch_detail_spacecraft_tile_landing_location), it))
                 }
             }
 
@@ -324,7 +345,7 @@ fun SpacecraftDetailCard(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 Text(
-                    text = "Docking Events (${spacecraftFlight.dockingEvents.size})",
+                    text = stringResource(Res.string.launch_detail_spacecraft_docking_events, spacecraftFlight.dockingEvents.size),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -370,7 +391,7 @@ fun SpacecraftDetailCard(
                                 dockingEvent.docking.let { dockingTime ->
                                     Column {
                                         Text(
-                                            text = "Docked",
+                                            text = stringResource(Res.string.launch_detail_spacecraft_docked),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -384,7 +405,7 @@ fun SpacecraftDetailCard(
                                 dockingEvent.departure?.let { departureTime ->
                                     Column {
                                         Text(
-                                            text = "Departed",
+                                            text = stringResource(Res.string.launch_detail_spacecraft_departed),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )

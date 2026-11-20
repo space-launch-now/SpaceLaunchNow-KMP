@@ -32,6 +32,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.flightclub
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_flightclub_button
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_flightclub_link_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_flightclub_logo_description
 
 // Flight Club brand colors
 private val FlightClubBackground = Color(0xFF203956)
@@ -87,7 +91,7 @@ fun FlightClubCard(
                     // Flight Club logo
                     Image(
                         painter = painterResource(Res.drawable.flightclub),
-                        contentDescription = "Flight Club",
+                        contentDescription = stringResource(Res.string.launch_detail_flightclub_logo_description),
                         modifier = Modifier.size(40.dp)
                     )
 
@@ -95,7 +99,7 @@ fun FlightClubCard(
 
                     // Text content
                     Text(
-                        text = "View Telemetry on Flight Club",
+                        text = stringResource(Res.string.launch_detail_flightclub_button),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -105,7 +109,7 @@ fun FlightClubCard(
                 // External link icon
                 Icon(
                     imageVector = FontAwesomeIcons.Solid.ExternalLinkAlt,
-                    contentDescription = "Open external link",
+                    contentDescription = stringResource(Res.string.launch_detail_flightclub_link_description),
                     tint = FlightClubLogo,
                     modifier = Modifier.size(20.dp)
                 )
