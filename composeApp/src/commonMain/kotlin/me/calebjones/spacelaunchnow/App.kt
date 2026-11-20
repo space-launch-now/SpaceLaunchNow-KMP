@@ -57,6 +57,8 @@ import me.calebjones.spacelaunchnow.navigation.Starship
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.navigation.ThemeCustomization
 import me.calebjones.spacelaunchnow.platform.ContextFactory
+import me.calebjones.spacelaunchnow.ui.ads.LocalAdCover
+import me.calebjones.spacelaunchnow.ui.ads.rememberAdCoverState
 import me.calebjones.spacelaunchnow.ui.about.AboutLibrariesScreen
 import me.calebjones.spacelaunchnow.ui.ads.AdConsentPopup
 import me.calebjones.spacelaunchnow.ui.ads.AdInitializer
@@ -282,7 +284,8 @@ fun SpaceLaunchNowApp(
     SpaceLaunchNowTheme(themeOption = themeOption) {
         CompositionLocalProvider(
             LocalUseUtc provides useUtc,
-            LocalContextFactory provides contextFactory
+            LocalContextFactory provides contextFactory,
+            LocalAdCover provides rememberAdCoverState()
         ) {
             // Migrate existing users: if they've seen BetaWarningDialog, mark onboarding complete
             val appPreferences: AppPreferences = koinInject()

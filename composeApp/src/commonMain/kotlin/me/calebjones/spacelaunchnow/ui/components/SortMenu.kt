@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.components
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringDropdownMenu
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringModalBottomSheet
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,11 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,7 +56,7 @@ fun SortMenu(
         
         Column {
             anchorView()
-            DropdownMenu(
+            AdCoveringDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = {
                     expanded = false
@@ -88,7 +88,7 @@ fun SortMenu(
         }
     } else {
         // Mobile: Bottom sheet
-        ModalBottomSheet(
+        AdCoveringModalBottomSheet(
             onDismissRequest = onDismiss
         ) {
             Column(

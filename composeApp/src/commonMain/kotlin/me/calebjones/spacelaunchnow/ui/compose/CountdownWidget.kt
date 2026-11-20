@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -12,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
@@ -138,7 +138,7 @@ fun LaunchStatusDialog(
     statusDescription: String?,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
+    AdCoveringAlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Row(

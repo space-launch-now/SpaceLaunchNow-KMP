@@ -40,4 +40,21 @@ internal object BannerFrame {
         }
         return candidates.firstOrNull { slotWidthDp - it.widthDp >= adWidthDp } ?: Chrome.NONE
     }
+
+    /**
+     * Same as the width-only [chromeFor], and also NONE when the host cannot give the full loaded
+     * height ([slotHeightDp] below [adHeightDp]). A negative or infinite height means the host
+     * puts no limit on height. The ad is never scaled or clipped to fit.
+     */
+    fun chromeFor(
+        adWidthDp: Int,
+        adHeightDp: Int,
+        slotWidthDp: Float,
+        slotHeightDp: Float,
+        preferCard: Boolean,
+    ): Chrome {
+        val heightLimited = slotHeightDp >= 0f && slotHeightDp.isFinite()
+        if (heightLimited && slotHeightDp < adHeightDp) return Chrome.NONE
+        return chromeFor(adWidthDp, adHeightDp, slotWidthDp, preferCard)
+    }
 }

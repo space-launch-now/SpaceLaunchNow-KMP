@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.components
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -26,7 +27,7 @@ fun AppRatingDialog(
     onNotNow: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
+    AdCoveringAlertDialog(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
@@ -88,7 +89,7 @@ fun FeedbackDialog(
     onOpenDiscord: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
+    AdCoveringAlertDialog(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface,
         titleContentColor = MaterialTheme.colorScheme.onSurface,

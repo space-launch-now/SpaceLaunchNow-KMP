@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,7 +37,7 @@ import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.AdState
 import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
-import app.lexilabs.basic.ads.composable.BannerAd
+import com.google.android.gms.ads.AdView
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.LocalContextFactory
@@ -192,6 +192,14 @@ actual fun SmartBannerAd(
     val reservedSize = if (availableAd.state == AdState.NONE) actualAdSize else availableAd.adSize
     val bannerHeight = if (reservedSize.height > 0) reservedSize.height.dp else 50.dp
 
+    // Inline slot handlers are not preloaded, so they reload here on a display change
+    // (preloaded handlers reload in WithPreloadedAds)
+    ReloadOnDisplayChange {
+        if (slotHandler != null && isBannerLoaded(slotHandler.state)) {
+            slotHandler.reloadBannerView(placementType.name, actualAdSize)
+        }
+    }
+
     // A new screen visit (e.g. a different launch) loads a fresh creative instead of
     // re-showing the one this shared banner already displayed. Hold the shimmer until
     // the check runs so the old creative never flashes.
@@ -208,7 +216,7 @@ actual fun SmartBannerAd(
             )
         ) {
             log.d { "New screen for placement $placementType - loading a fresh banner" }
-            availableAd.reloadBanner(placementType.name)
+            availableAd.reloadBannerView(placementType.name)
         }
         refreshChecked = true
     }
@@ -233,7 +241,7 @@ actual fun SmartBannerAd(
             // Preloaded handlers load themselves; a slot handler starts empty (at the library's
             // FULL_BANNER default size), so load it now at the slot's size
             AdState.NONE -> if (slotHandler != null) {
-                availableAd.reloadBanner(placementType.name, actualAdSize)
+                availableAd.reloadBannerView(placementType.name, actualAdSize)
             }
 
             AdState.FAILING -> {
@@ -241,7 +249,7 @@ actual fun SmartBannerAd(
                 log.d { "Ad failed, retrying in ${delayMs}ms for placement $placementType" }
                 delay(delayMs)
                 retryPolicy.recordAttempt(availableAd)
-                availableAd.reloadBanner(placementType.name)
+                availableAd.reloadBannerView(placementType.name)
                 retryRound++
             }
 
@@ -281,17 +289,24 @@ actual fun SmartBannerAd(
             // narrow for the card drops chrome (BannerFrame.chromeFor); a slot narrower than the
             // ad shows no ad. The caller's modifier goes on this outer box, once.
             val loadedSize = availableAd.adSize
-            BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+            // Something covers the screen (sheet, dialog, menu, keyboard): show blank space of
+            // the reserved height instead of the AdView. The nav banner is also gated by its
+            // scaffold; the check is safe when both apply.
+            if (isAdCovered() && (slotHandler != null || placementType != AdPlacementType.NAVIGATION)) {
+                Spacer(modifier = modifier.fillMaxWidth().height(bannerHeight + 8.dp))
+            } else BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
                 val chrome = BannerFrame.chromeFor(
                     adWidthDp = loadedSize.width,
                     adHeightDp = loadedSize.height,
                     slotWidthDp = maxWidth.value,
+                    // Infinity in an unbounded slot, which chromeFor reads as no height limit
+                    slotHeightDp = maxHeight.value,
                     preferCard = showCard
                 )
                 if (chrome == BannerFrame.Chrome.NONE) {
                     log.d {
                         "Skipping ${loadedSize.width}x${loadedSize.height} banner for $placementType: " +
-                            "slot is only $maxWidth wide"
+                            "slot is only $maxWidth x $maxHeight"
                     }
                 } else {
                     Column(
@@ -317,7 +332,9 @@ actual fun SmartBannerAd(
                                     modifier = Modifier.padding(BannerFrame.CARD_INNER_PAD_DP.dp),
                                     showRemoveAdsButton = showRemoveAdsButton,
                                     onSizeChanged = onSizeChanged,
-                                    bannerAd = availableAd
+                                    bannerAd = availableAd,
+                                    adView = availableAd.bannerView,
+                                    placement = placementType.name
                                 )
                             }
 
@@ -328,14 +345,18 @@ actual fun SmartBannerAd(
                                 ),
                                 showRemoveAdsButton = showRemoveAdsButton,
                                 onSizeChanged = onSizeChanged,
-                                bannerAd = availableAd
+                                bannerAd = availableAd,
+                                adView = availableAd.bannerView,
+                                placement = placementType.name
                             )
 
                             else -> SmartBannerAdContent(
                                 modifier = Modifier.padding(vertical = 4.dp),
                                 showRemoveAdsButton = showRemoveAdsButton,
                                 onSizeChanged = onSizeChanged,
-                                bannerAd = availableAd
+                                bannerAd = availableAd,
+                                adView = availableAd.bannerView,
+                                placement = placementType.name
                             )
                         }
 
@@ -385,25 +406,6 @@ actual fun SmartBannerAd(
 @OptIn(DependsOnGoogleMobileAds::class)
 internal actual fun destroyBannerHandler(handler: Any) {
     (handler as? BannerAdHandler)?.bannerView?.destroy()
-}
-
-/**
- * Reloads with this app's ad unit and [loadSize], by default the handler's own size. A bare
- * load() falls back to the library defaults: Google's test ad unit at FULL_BANNER size.
- */
-@OptIn(DependsOnGoogleMobileAds::class)
-private fun BannerAdHandler.reloadBanner(placement: String, loadSize: AdSize = adSize) {
-    val size = AdTelemetry.sizeLabel(loadSize.width, loadSize.height)
-    load(
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = loadSize,
-        onLoad = { AdTelemetry.loaded("banner", size, placement) },
-        onFailure = { AdTelemetry.failed("banner", it, size, placement) },
-        onDismissed = {},
-        onShown = {},
-        onImpression = { AdTelemetry.impression("banner", size, placement) },
-        onClick = { AdTelemetry.clicked("banner", size, placement) }
-    )
 }
 
 /**
@@ -458,6 +460,10 @@ private fun SmartBannerAdContent(
     showRemoveAdsButton: Boolean,
     onSizeChanged: ((Dp, Int) -> Unit)?,
     bannerAd: BannerAdHandler,
+    // Read by the caller: bannerView is not Compose state, so a new AdView must arrive as a
+    // changed parameter or this content would skip recomposition
+    adView: AdView?,
+    placement: String,
 ) {
     // The size the AdView was loaded at - the only size it may be shown at
     val adSize = bannerAd.adSize
@@ -482,9 +488,9 @@ private fun SmartBannerAdContent(
         ) {
             // Host the AdView at exactly its loaded size: never clipped, squeezed or stretched.
             // SmartBannerAd only gets here when the slot is wide enough (BannerFrame.chromeFor).
-            Box(modifier = Modifier.size(adSize.width.dp, adSize.height.dp)) {
-                BannerAd(ad = bannerAd)
-            }
+            // The handler's AdView is not Compose state; the state change that got us here
+            // (LOADING to READY) recomposes this, so a reloaded AdView is read fresh.
+            adView?.let { BannerAdViewHost(view = it, placement = placement) }
         }
     }
 }

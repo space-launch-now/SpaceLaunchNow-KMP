@@ -35,20 +35,47 @@ internal object AdTelemetry {
     }
 
     fun failed(format: String, error: Throwable?, size: String? = null, handler: String? = null) {
-        val message = error?.message
-        val code = parseErrorCode(message)
-        log.w { "ad_failed format=$format size=$size handler=$handler code=$code message=$message" }
-        send(AnalyticsEvent.AdLifecycle(AdResult.FAILED, format, size, handler, code, message ?: "unknown"))
+        failed(format, error?.message, null, size, handler)
+    }
+
+    /**
+     * Failure with the platform's numeric error [code] when it has one. Without a code, the code
+     * is parsed from [message].
+     */
+    fun failed(format: String, message: String?, code: Int?, size: String? = null, handler: String? = null) {
+        send(failureEvent(format, message, code, size, handler))
+    }
+
+    internal fun failureEvent(
+        format: String,
+        message: String?,
+        code: Int?,
+        size: String?,
+        handler: String?,
+    ): AnalyticsEvent.AdLifecycle {
+        val codeText = code?.toString() ?: parseErrorCode(message)
+        log.w { "ad_failed format=$format size=$size handler=$handler code=$codeText message=$message" }
+        return AnalyticsEvent.AdLifecycle(AdResult.FAILED, format, size, handler, codeText, message ?: "unknown")
     }
 
     fun impression(format: String, size: String? = null, handler: String? = null) {
-        log.d { "ad_impression format=$format size=$size handler=$handler" }
+        log.d { "ad_shown format=$format size=$size handler=$handler" }
         send(AnalyticsEvent.AdLifecycle(AdResult.IMPRESSION, format, size, handler))
     }
 
     fun clicked(format: String, size: String? = null, handler: String? = null) {
         log.d { "ad_clicked format=$format size=$size handler=$handler" }
         send(AnalyticsEvent.AdLifecycle(AdResult.CLICKED, format, size, handler))
+    }
+
+    /** Sends ad_frame_mismatch if [FrameMismatchLimiter] has not seen [placement] this session. */
+    fun frameMismatch(placement: String, loadedPx: Pair<Int, Int>, realPx: Pair<Int, Int>, windowDp: Pair<Int, Int>, orientation: String) {
+        if (!FrameMismatchLimiter.shouldReport(placement)) return
+        val loaded = "${loadedPx.first}x${loadedPx.second}"
+        val real = "${realPx.first}x${realPx.second}"
+        val window = "${windowDp.first}x${windowDp.second}"
+        log.w { "ad_frame_mismatch placement=$placement loaded=$loaded real=$real window=$window orientation=$orientation" }
+        send(AnalyticsEvent.AdFrameMismatch(placement, loaded, real, window, orientation))
     }
 
     fun trackingStatus(status: String) {

@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.AdCoverGate
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
@@ -179,21 +180,24 @@ fun AdaptiveAppScaffold(
                     // all navigations so the ad is never destroyed/recreated on screen changes.
                     // Positioned above the NavigationBar on compact (phone) layouts.
                     if (showAds) {
-                        SmartBannerAd(
-                            modifier = if (!showCompactNavBar) {
-                                // No NavigationBar below — banner needs system nav bar inset
-                                Modifier.padding(
-                                    bottom = WindowInsets.navigationBars.asPaddingValues()
-                                        .calculateBottomPadding()
-                                )
-                            } else {
-                                Modifier
-                            },
-                            placementType = AdPlacementType.NAVIGATION,
-                            showCard = false,
-                            // Each navigation may load a fresh ad, subject to the reload floor
-                            refreshKey = navBackStackEntry?.id ?: currentRoute,
-                        )
+                        // Leaves composition while a sheet, dialog, menu or the keyboard covers it
+                        AdCoverGate {
+                            SmartBannerAd(
+                                modifier = if (!showCompactNavBar) {
+                                    // No NavigationBar below — banner needs system nav bar inset
+                                    Modifier.padding(
+                                        bottom = WindowInsets.navigationBars.asPaddingValues()
+                                            .calculateBottomPadding()
+                                    )
+                                } else {
+                                    Modifier
+                                },
+                                placementType = AdPlacementType.NAVIGATION,
+                                showCard = false,
+                                // Each navigation may load a fresh ad, subject to the reload floor
+                                refreshKey = navBackStackEntry?.id ?: currentRoute,
+                            )
+                        }
                     }
 
                     // Bottom NavigationBar — only for compact (phone) layouts with main tabs

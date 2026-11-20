@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringExposedDropdownMenu
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +24,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Watch
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -537,7 +538,7 @@ fun SettingsScreen(
 
     // Password dialog for debug unlock
     if (showPasswordDialog) {
-        AlertDialog(
+        AdCoveringAlertDialog(
             onDismissRequest = {
                 showPasswordDialog = false
                 passwordInput = ""
@@ -840,7 +841,7 @@ private fun ThemeSettingRow(
                 .menuAnchor()
                 .fillMaxWidth()
         )
-        ExposedDropdownMenu(
+        AdCoveringExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
