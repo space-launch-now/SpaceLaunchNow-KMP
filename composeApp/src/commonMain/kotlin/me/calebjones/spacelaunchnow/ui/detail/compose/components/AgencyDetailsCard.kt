@@ -140,22 +140,18 @@ fun AgencyDetailsCard(
             )
 
             // Grid of key details
-            val typeLabel = stringResource(Res.string.launch_detail_agency_tile_type)
-            val foundedLabel = stringResource(Res.string.launch_detail_agency_tile_founded)
-            val administratorLabel = stringResource(Res.string.launch_detail_agency_tile_administrator)
-            val countryLabel = stringResource(Res.string.launch_detail_agency_tile_country)
             val infoTiles = buildList {
                 provider.type?.takeIf { it.isNotBlank() }?.let {
-                    add(InfoTileData(Icons.Filled.Business, typeLabel, it))
+                    add(InfoTileData(Icons.Filled.Business, stringResource(Res.string.launch_detail_agency_tile_type), it))
                 }
                 providerDetail?.foundingYear?.let { year ->
-                    add(InfoTileData(Icons.Filled.CalendarToday, foundedLabel, year.toString()))
+                    add(InfoTileData(Icons.Filled.CalendarToday, stringResource(Res.string.launch_detail_agency_tile_founded), year.toString()))
                 }
                 providerDetail?.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
-                    add(InfoTileData(Icons.Filled.Person, administratorLabel, admin))
+                    add(InfoTileData(Icons.Filled.Person, stringResource(Res.string.launch_detail_agency_tile_administrator), admin))
                 }
                 provider.countryCode?.takeIf { it.isNotBlank() }?.let { code ->
-                    add(InfoTileData(Icons.Filled.Flag, countryLabel, code))
+                    add(InfoTileData(Icons.Filled.Flag, stringResource(Res.string.launch_detail_agency_tile_country), code))
                 }
             }
             if (infoTiles.isNotEmpty()) {
