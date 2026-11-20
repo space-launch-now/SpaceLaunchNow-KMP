@@ -1,0 +1,90 @@
+name: Crowdin Sync
+
+# App text sync with Crowdin (project 948217). Spec: specs/017-app-text-translation/spec.md (7.4).
+# Task: https://github.com/ItsCalebJones/SpaceLaunchNow-Tasks/issues/1264
+#
+# - Upload: English sources go up on a push to main that changes the source file, or by hand.
+# - Download: translations come back as a pull request, weekly or by hand. Never a push to main.
+# - Upload translations (by hand): the model fill goes up as unapproved, so people can review it.
+# Secrets CROWDIN_PROJECT_ID and CROWDIN_PERSONAL_TOKEN come from the repo secrets. The mapping is in crowdin.yml.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'composeApp/src/commonMain/composeResources/values/*.xml'
+      - 'crowdin.yml'
+  schedule:
+    - cron: '17 6 * * 1' # Mondays 06:17 UTC
+  workflow_dispatch:
+    inputs:
+      upload_sources:
+        description: 'Upload the English source files to Crowdin.'
+        type: boolean
+        default: true
+      upload_translations:
+        description: 'Upload existing values-<lang> files as unapproved translations (the model fill).'
+        type: boolean
+        default: false
+      download_translations:
+        description: 'Download translations into a pull request.'
+        type: boolean
+        default: false
+
+concurrency:
+  group: crowdin-sync
+  cancel-in-progress: false
+
+env:
+  CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+  CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+jobs:
+  upload:
+    name: Upload sources to Crowdin
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.upload_sources || inputs.upload_translations))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Upload sources and, on request, unapproved translations
+        uses: crowdin/github-action@v2
+        with:
+          config: crowdin.yml
+          upload_sources: ${{ github.event_name == 'push' || inputs.upload_sources }}
+          upload_translations: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_translations }}
+          auto_approve_imported: false
+          import_eq_suggestions: false
+
+  download:
+    name: Download translations into a pull request
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && inputs.download_translations)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download translations and open a pull request
+        uses: crowdin/github-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config: crowdin.yml
+          upload_sources: false
+          download_translations: true
+          skip_untranslated_strings: true
+          export_only_approved: false
+          localization_branch_name: l10n_crowdin_translations
+          create_pull_request: true
+          pull_request_base_branch_name: main
+          pull_request_title: 'i18n: sync translations from Crowdin'
+          pull_request_body: 'Translations downloaded from Crowdin project 948217 by the Crowdin Sync workflow. Task: https://github.com/ItsCalebJones/SpaceLaunchNow-Tasks/issues/1264'
+          commit_message: 'i18n: sync translations from Crowdin'
