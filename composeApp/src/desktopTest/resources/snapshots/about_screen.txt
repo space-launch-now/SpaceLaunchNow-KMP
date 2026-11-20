@@ -1,0 +1,30 @@
+description="App Logo"
+text="Space Launch Now"
+text="Version: unknown (0)"
+click
+  description="GitHub"
+text="GitHub"
+click
+  description="Changelog"
+text="Changelog"
+click
+  description="Discord"
+text="Discord"
+text="About Space Launch Now"
+text="Space Launch Now started as a weekend project in 2016 and has grown into the best space launch schedule for keeping up to date on rocket launches from around the world. Get updates and notifications for launches from SpaceX, NASA, ULA, Roscosmos, ISRO, and many more! "
+click
+  text="Learn More"
+text="About The Space Devs"
+text="The Space Devs is an alliance of spaceflight enthusiast developers and librarians united with the shared objective of providing free access to spaceflight data. Our REST APIs span the world of spaceflight—from rocket launches to events and news.\n\nAs Space Launch Now's developer, I am a Board Member and Proud Supporter of The Space Devs!"
+click
+  text="Visit The Space Devs"
+text="Open Source Libraries"
+click
+  text="AboutLibraries Compose Material 3 Library"
+  text="12.2.4"
+  text="Mike Penz"
+  text="AboutLibraries automatically detects all dependencies of a project and collects their information including the license. Optionally visualising it via the provided ui components."
+  text="Apache License 2.0"
+click
+  description="Back"
+text="About"

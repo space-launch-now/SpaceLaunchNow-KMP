@@ -10,4 +10,32 @@
     <string name="common_retry">Retry</string>
     <!-- Heading on the rocket detail error screen, above the error message. One or two lines. -->
     <string name="rocket_detail_error_title">Error loading rocket details</string>
+    <!-- Screen title in the top bar. One line, large heading. -->
+    <string name="about_title">About</string>
+    <!-- Content description of the app logo above the version. Read by screen readers. -->
+    <string name="about_header_logo_description">App Logo</string>
+    <!-- App name under the logo. One line. -->
+    <string name="about_header_app_name">Space Launch Now</string>
+    <!-- Version line under the app name. %1$s is the version name, %2$d the build number. -->
+    <string name="about_header_version">Version: %1$s (%2$d)</string>
+    <!-- Label under the GitHub icon button and its content description. One word. -->
+    <string name="about_link_github">GitHub</string>
+    <!-- Label under the changelog icon button and its content description. One word. -->
+    <string name="about_link_changelog">Changelog</string>
+    <!-- Label under the Discord icon button and its content description. One word. -->
+    <string name="about_link_discord">Discord</string>
+    <!-- Section heading, above the app description. One line. -->
+    <string name="about_sln_title">About Space Launch Now</string>
+    <!-- Section body about the app. Several lines; ends with a space. -->
+    <string name="about_sln_description">Space Launch Now started as a weekend project in 2016 and has grown into the best space launch schedule for keeping up to date on rocket launches from around the world. Get updates and notifications for launches from SpaceX, NASA, ULA, Roscosmos, ISRO, and many more! </string>
+    <!-- Text button under the app description. Opens the website. One line. -->
+    <string name="about_sln_link">Learn More</string>
+    <!-- Section heading, above the Space Devs description. One line. -->
+    <string name="about_tsd_title">About The Space Devs</string>
+    <!-- Section body about The Space Devs. Several lines with a blank line between two paragraphs. -->
+    <string name="about_tsd_description">The Space Devs is an alliance of spaceflight enthusiast developers and librarians united with the shared objective of providing free access to spaceflight data. Our REST APIs span the world of spaceflight—from rocket launches to events and news.\n\nAs Space Launch Now's developer, I am a Board Member and Proud Supporter of The Space Devs!</string>
+    <!-- Text button under the Space Devs description. Opens the website. One line. -->
+    <string name="about_tsd_link">Visit The Space Devs</string>
+    <!-- Heading above the list of open source libraries. One line. -->
+    <string name="about_libraries_heading">Open Source Libraries</string>
 </resources>

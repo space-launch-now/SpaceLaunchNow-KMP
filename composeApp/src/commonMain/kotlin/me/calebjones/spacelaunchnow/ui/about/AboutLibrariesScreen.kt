@@ -47,10 +47,26 @@ import compose.icons.fontawesomeicons.brands.Discord
 import compose.icons.fontawesomeicons.brands.Github
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
+import spacelaunchnow_kmp.composeapp.generated.resources.about_header_app_name
+import spacelaunchnow_kmp.composeapp.generated.resources.about_header_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.about_header_version
+import spacelaunchnow_kmp.composeapp.generated.resources.about_libraries_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.about_link_changelog
+import spacelaunchnow_kmp.composeapp.generated.resources.about_link_discord
+import spacelaunchnow_kmp.composeapp.generated.resources.about_link_github
+import spacelaunchnow_kmp.composeapp.generated.resources.about_sln_description
+import spacelaunchnow_kmp.composeapp.generated.resources.about_sln_link
+import spacelaunchnow_kmp.composeapp.generated.resources.about_sln_title
+import spacelaunchnow_kmp.composeapp.generated.resources.about_title
+import spacelaunchnow_kmp.composeapp.generated.resources.about_tsd_description
+import spacelaunchnow_kmp.composeapp.generated.resources.about_tsd_link
+import spacelaunchnow_kmp.composeapp.generated.resources.about_tsd_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +85,7 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            text = "About",
+                            text = stringResource(Res.string.about_title),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             fontSize = 36.sp
@@ -80,7 +96,7 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
                             IconButton(onClick = onNavigateBack) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowBack,
-                                    contentDescription = "Back"
+                                    contentDescription = stringResource(Res.string.common_back)
                                 )
                             }
                         }
@@ -106,9 +122,9 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
                     item {
                         // About Space Launch Now Section
                         AboutSection(
-                            title = "About Space Launch Now",
-                            description = "Space Launch Now started as a weekend project in 2016 and has grown into the best space launch schedule for keeping up to date on rocket launches from around the world. Get updates and notifications for launches from SpaceX, NASA, ULA, Roscosmos, ISRO, and many more! ",
-                            linkText = "Learn More",
+                            title = stringResource(Res.string.about_sln_title),
+                            description = stringResource(Res.string.about_sln_description),
+                            linkText = stringResource(Res.string.about_sln_link),
                             linkUrl = "https://spacelaunchnow.app/about/"
                         )
                     }
@@ -116,16 +132,16 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
                     item {
                         // About The Space Devs Section
                         AboutSection(
-                            title = "About The Space Devs",
-                            description = "The Space Devs is an alliance of spaceflight enthusiast developers and librarians united with the shared objective of providing free access to spaceflight data. Our REST APIs span the world of spaceflight—from rocket launches to events and news.\n\nAs Space Launch Now's developer, I am a Board Member and Proud Supporter of The Space Devs!",
-                            linkText = "Visit The Space Devs",
+                            title = stringResource(Res.string.about_tsd_title),
+                            description = stringResource(Res.string.about_tsd_description),
+                            linkText = stringResource(Res.string.about_tsd_link),
                             linkUrl = "https://thespacedevs.com/about"
                         )
                     }
 
                     item {
                         Text(
-                            "Open Source Libraries",
+                            stringResource(Res.string.about_libraries_heading),
                             modifier = Modifier.padding(16.dp),
                             style = MaterialTheme.typography.headlineMedium
                         )
@@ -154,7 +170,7 @@ private fun AboutHeader(modifier: Modifier = Modifier) {
             val painter = painterResource(Res.drawable.launcher)
             Image(
                 painter = painter,
-                contentDescription = "App Logo",
+                contentDescription = stringResource(Res.string.about_header_logo_description),
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape),
@@ -163,8 +179,8 @@ private fun AboutHeader(modifier: Modifier = Modifier) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Space Launch Now")
-        Text("Version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+        Text(stringResource(Res.string.about_header_app_name))
+        Text(stringResource(Res.string.about_header_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
         Row(
             modifier = Modifier.padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.Center,
@@ -174,33 +190,33 @@ private fun AboutHeader(modifier: Modifier = Modifier) {
                 IconButton(onClick = { uriHandler.openUri("https://github.com/ItsCalebJones/SpaceLaunchNow-KMP") }) {
                     Icon(
                         imageVector = FontAwesomeIcons.Brands.Github,
-                        contentDescription = "GitHub",
+                        contentDescription = stringResource(Res.string.about_link_github),
                         modifier = Modifier.size(40.dp).padding(4.dp)
                     )
                 }
-                Text("GitHub", fontSize = 12.sp)
+                Text(stringResource(Res.string.about_link_github), fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.size(16.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 IconButton(onClick = { uriHandler.openUri("https://github.com/ItsCalebJones/SpaceLaunchNow-KMP/releases") }) {
                     Icon(
                         imageVector = Icons.Filled.List,
-                        contentDescription = "Changelog",
+                        contentDescription = stringResource(Res.string.about_link_changelog),
                         modifier = Modifier.size(40.dp).padding(4.dp)
                     )
                 }
-                Text("Changelog", fontSize = 12.sp)
+                Text(stringResource(Res.string.about_link_changelog), fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.size(16.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 IconButton(onClick = { uriHandler.openUri("https://discord.gg/WVfzEDW") }) {
                     Icon(
                         imageVector = FontAwesomeIcons.Brands.Discord,
-                        contentDescription = "Discord",
+                        contentDescription = stringResource(Res.string.about_link_discord),
                         modifier = Modifier.size(40.dp).padding(4.dp)
                     )
                 }
-                Text("Discord", fontSize = 12.sp)
+                Text(stringResource(Res.string.about_link_discord), fontSize = 12.sp)
             }
         }
     }
@@ -248,9 +264,9 @@ private fun AboutSection(
 private fun AboutSectionPreview() {
     SpaceLaunchNowPreviewTheme {
         AboutSection(
-            title = "About Space Launch Now",
-            description = "Space Launch Now started as a weekend project in 2016 and has grown into the best space launch schedule for keeping up to date on rocket launches from around the world.",
-            linkText = "Learn More",
+            title = stringResource(Res.string.about_sln_title),
+            description = stringResource(Res.string.about_sln_description),
+            linkText = stringResource(Res.string.about_sln_link),
             linkUrl = "https://spacelaunchnow.app/about/"
         )
     }
@@ -261,9 +277,9 @@ private fun AboutSectionPreview() {
 private fun AboutSectionDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         AboutSection(
-            title = "About The Space Devs",
-            description = "The Space Devs is an alliance of spaceflight enthusiast developers and librarians united with the shared objective of providing free access to spaceflight data.",
-            linkText = "Visit The Space Devs",
+            title = stringResource(Res.string.about_tsd_title),
+            description = stringResource(Res.string.about_tsd_description),
+            linkText = stringResource(Res.string.about_tsd_link),
             linkUrl = "https://thespacedevs.com/about"
         )
     }

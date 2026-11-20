@@ -607,3 +607,32 @@ Result on `main` `e98c97e7`: `commonMain` 1,095 (63 templates), `androidMain` 19
 6. Store screenshots stay English.
 7. Languages: the 10 in section 8.1. No right-to-left language. Russian is out.
 8. Tools: Crowdin for the app text (project `948217`), a model for the first fill.
+
+## Appendix C — Text-tree snapshot harness and plural check (task T1)
+
+Built in Tasks#1238. Both live in `composeApp/src/desktopTest` and run with `:composeApp:desktopTest`.
+
+**Snapshot harness**
+- `i18n/TextTreeSnapshot.kt` dumps the semantics tree of a `runComposeUiTest` run: each node's text,
+  content description and a `click` flag, indented by depth. It compares the dump with
+  `composeApp/src/desktopTest/resources/snapshots/<name>.txt`.
+- First snapshot: `about_screen.txt`, taken on the code before the move and still equal after it
+  (`ui/about/AboutLibrariesScreenSnapshotTest`). The About screen now reads every text from
+  `composeResources/values/strings.xml`.
+- To add a screen: write a test like the About one, run it once with `I18N_SNAPSHOT_UPDATE=true` on the
+  code before the move, commit the `.txt`, then move the strings and run it again without the variable.
+  A change in any text or content description fails the test and shows both versions.
+- Limits: a lazy list dumps only the rows it composes (the About list shows the first library only);
+  the screen runs in the English default locale; it checks text, not layout or colour. The desktop
+  `BuildConfig` gives `Version: unknown (0)`.
+- To run it in another language later, set `Locale.setDefault` before `setContent` and store the file
+  under another name (tasks T2 and T25).
+
+**Plural check**
+- `i18n/PluralCategoryTest.kt` reads `<plurals>` from test-only resources in
+  `src/desktopTest/composeResources/values`, `values-uk` and `values-pl`. Each translated item shows
+  its own category, so the test proves which one Compose picked: `uk` 1, 21 give `one`; 2 to 4, 22 give
+  `few`; 0, 5 to 20, 25 give `many`. `pl` 1 gives `one`; 2 to 4, 22, 24 give `few`; 0, 5, 12, 21, 25 give
+  `many`. English gives `one` and `other`.
+- Result: Compose resources use the CLDR rules for both languages on desktop. Android runs the same
+  common code; iOS is checked by the Xcode CI build. Fractions are not tested.
