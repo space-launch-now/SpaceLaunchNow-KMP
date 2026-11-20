@@ -1,0 +1,79 @@
+name: iOS App Store listing
+
+# Task 1216. Checks the listing files, and uploads them to App Store Connect from main.
+# The upload sends text only (see the upload_metadata lane in iosApp/fastlane/Fastfile).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'iosApp/fastlane/metadata/**'
+      - 'scripts/check-ios-metadata.mjs'
+  pull_request:
+    paths:
+      - 'iosApp/fastlane/metadata/**'
+      - 'scripts/check-ios-metadata.mjs'
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: 'Upload to App Store Connect (off = check only)'
+        type: boolean
+        default: false
+      download:
+        description: 'Download the live listing (keywords and promotional text too) as an artifact'
+        type: boolean
+        default: false
+
+jobs:
+  check:
+    name: Check listing files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - run: node scripts/check-ios-metadata.mjs
+
+  upload:
+    name: Upload listing to App Store Connect
+    needs: check
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.upload)
+    runs-on: ubuntu-latest
+    concurrency: ios-metadata-upload
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: iosApp
+      - name: Upload metadata
+        working-directory: iosApp
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
+        run: bundle exec fastlane upload_metadata
+
+  download:
+    name: Download live listing from App Store Connect
+    if: github.event_name == 'workflow_dispatch' && inputs.download
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: iosApp
+      - name: Download metadata
+        working-directory: iosApp
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
+        run: bundle exec fastlane download_metadata
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-store-listing
+          path: iosApp/fastlane/metadata_downloaded

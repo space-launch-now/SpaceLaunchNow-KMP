@@ -1,0 +1,21 @@
+Get updates and notifications for rocket launches from SpaceX, NASA, ULA, ROSCOSMOS, ISRO, and many more!
+
+Features:
+• Notifications for upcoming rocket launches.
+• History of space flight back to the first manned space flight.
+• Vehicle details on commonly used launch vehicles by SpaceX, NASA, ULA and others..
+• Advanced search and filters for finding specific space launches.
+• Optional Day/Night theme.
+
+Launch Tracking
+Track rocket launches from SpaceX, ULA, and Orbital/ATK as well as international launches from NASA, ROSCOSMOS, ISRO, JAXA and ESA.
+
+Science Missions
+Follow along with NASA resupply missions to the International Space Station, commercial satellite launches from providers like IRIDIUM and science missions like James Webb Space Telescope!
+
+Vehicle Information
+Get to know all the rockets that take us to orbit such as the Soyuz, Atlas, Delta, Ariane, Proton and Falcon 9 launch vehicle families.
+
+Space Launch Now is in no way affiliated with SpaceX, NASA, ULA, ISRO, ESA or any other launch provider.
+
+By using this app you agree to the Apple Terms of Use (EULA) https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
