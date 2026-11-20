@@ -67,6 +67,12 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_placeholder_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launches_error
 
 // Constants for layout dimensions
 private val CARD_HEIGHT = 200.dp
@@ -211,7 +217,7 @@ fun LaunchItemView(
             launch.imageUrl?.let { url ->
                 SubcomposeAsyncImage(
                     model = url,
-                    contentDescription = "Launch Image",
+                    contentDescription = stringResource(Res.string.home_launch_image_description),
                     modifier = Modifier
                         .fillMaxSize(),
                     contentScale = ContentScale.Crop,
@@ -249,7 +255,7 @@ fun LaunchItemView(
                         ) {
                             Icon(
                                 imageVector = CustomIcons.RocketLaunch,
-                                contentDescription = "Launch placeholder",
+                                contentDescription = stringResource(Res.string.home_launch_placeholder_description),
                                 modifier = Modifier.size(72.dp),
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                             )
@@ -273,7 +279,7 @@ fun LaunchItemView(
                 ) {
                     Icon(
                         imageVector = CustomIcons.RocketLaunch,
-                        contentDescription = "Launch placeholder",
+                        contentDescription = stringResource(Res.string.home_launch_placeholder_description),
                         modifier = Modifier.size(72.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
@@ -445,7 +451,7 @@ fun LaunchListErrorCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Failed to load launches",
+                text = stringResource(Res.string.home_launches_error),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -464,7 +470,7 @@ fun LaunchListErrorCard(
                 ),
                 modifier = Modifier.padding(top = 4.dp)
             ) {
-                Text("Retry")
+                Text(stringResource(Res.string.common_retry))
             }
         }
     }

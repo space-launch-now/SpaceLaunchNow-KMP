@@ -16,6 +16,9 @@ import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_featured_view_more
 
 /**
  * A vertical column of featured launches displayed below the hero launch card.
@@ -75,7 +78,7 @@ fun FeaturedLaunchesRow(
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("View more")
+                Text(stringResource(Res.string.home_featured_view_more))
             }
         }
     }

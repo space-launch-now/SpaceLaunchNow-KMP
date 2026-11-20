@@ -55,6 +55,15 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedContentData
 import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedLaunchContent
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_events_title
+import spacelaunchnow_kmp.composeapp.generated.resources.home_history_title
+import spacelaunchnow_kmp.composeapp.generated.resources.home_news_title
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_info_confirm
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_info_title
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_title
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_info_body
 
 // Tab indices for the News & Events screen (mirrors NewsEventsTab ordinals).
 private const val NEWS_TAB_INDEX = 0
@@ -137,19 +146,13 @@ fun ResponsiveHomeContent(
     if (showUpdatesInfoDialog) {
         AdCoveringAlertDialog(
             onDismissRequest = { showUpdatesInfoDialog = false },
-            title = { Text("About Latest Updates") },
+            title = { Text(stringResource(Res.string.home_updates_info_title)) },
             text = {
-                Text(
-                    "Updates are sourced from The Space Devs' volunteer librarians who use " +
-                    "open-source intelligence (OSINT) techniques to track launches worldwide. " +
-                    "They monitor agency announcements, regulatory filings, and social media " +
-                    "to keep the database accurate and current.\n\n" +
-                    "As Space Launch Now's developer, I am a Founding Board Member and Proud Supporter of The Space Devs!"
-                )
+                Text(stringResource(Res.string.home_updates_info_body))
             },
             confirmButton = {
                 TextButton(onClick = { showUpdatesInfoDialog = false }) {
-                    Text("Got it")
+                    Text(stringResource(Res.string.home_updates_info_confirm))
                 }
             }
         )
@@ -302,7 +305,7 @@ fun ResponsiveHomeContent(
             item(key = "history_section") {
                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
                     Text(
-                        text = "This Day in History",
+                        text = stringResource(Res.string.home_history_title),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         modifier = Modifier.padding(horizontal = 16.dp)
@@ -334,7 +337,7 @@ fun ResponsiveHomeContent(
 
         item(key = "updates_title") {
             SectionTitle(
-                title = "Latest Updates",
+                title = stringResource(Res.string.home_updates_title),
                 hasAction = false,
                 showInfoButton = true,
                 onInfoClick = { showUpdatesInfoDialog = true }
@@ -348,7 +351,7 @@ fun ResponsiveHomeContent(
         }
         item(key = "news_title") {
             SectionTitle(
-                title = "Latest News",
+                title = stringResource(Res.string.home_news_title),
                 hasAction = true,
                 onActionClick = { navController.navigateToNewsEventsTab(NEWS_TAB_INDEX) }
             )
@@ -356,7 +359,7 @@ fun ResponsiveHomeContent(
         item(key = "news_view") { ArticlesView(state = articlesState, onArticleClick = onArticleClick) }
         item(key = "events_title") {
             SectionTitle(
-                title = "Upcoming Events",
+                title = stringResource(Res.string.home_events_title),
                 hasAction = true,
                 onActionClick = { navController.navigateToNewsEventsTab(EVENTS_TAB_INDEX) }
             )
@@ -387,13 +390,13 @@ private fun TabletHistoryCard(
             ) {
                 Icon(
                     Icons.Default.History,
-                    contentDescription = "This Day in History",
+                    contentDescription = stringResource(Res.string.home_history_title),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "This Day in History",
+                    text = stringResource(Res.string.home_history_title),
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 )

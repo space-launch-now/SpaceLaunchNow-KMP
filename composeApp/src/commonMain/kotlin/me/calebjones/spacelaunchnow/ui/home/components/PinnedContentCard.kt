@@ -56,6 +56,15 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedLaunchContent
 import me.calebjones.spacelaunchnow.ui.viewmodel.PinnedMotdContent
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_image_for_title_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_pinned_badge
+import spacelaunchnow_kmp.composeapp.generated.resources.home_pinned_dismiss_featured
+import spacelaunchnow_kmp.composeapp.generated.resources.home_pinned_dismiss_message
+import spacelaunchnow_kmp.composeapp.generated.resources.home_pinned_motd_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_pinned_featured_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_pinned_featured_launch_description
 
 /**
  * Featured/Pinned content color - Amber 600 (#FFB300)
@@ -96,6 +105,7 @@ fun PinnedContentCard(
 
     // Custom messages get a second line, so the card needs extra height for it
     val hasCustomMessage = pinnedContent.customMessage != null
+    val featuredDescription = stringResource(Res.string.home_pinned_featured_description, title, pinnedContent.customMessage ?: "")
 
     Card(
         modifier = modifier
@@ -110,7 +120,7 @@ fun PinnedContentCard(
                 }
             }
             .semantics {
-                contentDescription = "Featured: $title. ${pinnedContent.customMessage ?: ""}. Tap to view details."
+                contentDescription = featuredDescription
             },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -133,7 +143,7 @@ fun PinnedContentCard(
                     pinnedContent.imageUrl?.let { url ->
                     SubcomposeAsyncImage(
                         model = url,
-                        contentDescription = "Launch image for $title",
+                        contentDescription = stringResource(Res.string.home_launch_image_for_title_description, title),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                         loading = {
@@ -240,7 +250,7 @@ fun PinnedContentCard(
                         contentColor = Color.Black
                     ) {
                         Text(
-                            text = "FEATURED",
+                            text = stringResource(Res.string.home_pinned_badge),
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Medium
@@ -265,7 +275,7 @@ fun PinnedContentCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Dismiss featured launch",
+                    contentDescription = stringResource(Res.string.home_pinned_dismiss_featured),
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
@@ -288,12 +298,13 @@ fun MessageOfTheDayBanner(
     modifier: Modifier = Modifier
 ) {
     val message = motd.customMessage ?: return
+    val motdDescription = stringResource(Res.string.home_pinned_motd_description, message)
 
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .semantics { contentDescription = "Message of the Day: $message" },
+            .semantics { contentDescription = motdDescription },
         shape = RoundedCornerShape(8.dp),
         color = MaterialTheme.colorScheme.secondaryContainer,
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -329,7 +340,7 @@ fun MessageOfTheDayBanner(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Dismiss message",
+                    contentDescription = stringResource(Res.string.home_pinned_dismiss_message),
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                 )
@@ -382,6 +393,7 @@ private fun PinnedContentCardPreviewContent(
         mutableStateOf(LaunchFormatUtil.formatLaunchTitle(launch))
     }
     val hasCustomMessage = pinnedContent.customMessage != null
+    val featuredLaunchDescription = stringResource(Res.string.home_pinned_featured_launch_description, title, pinnedContent.customMessage ?: "")
 
     Card(
         modifier = Modifier
@@ -389,7 +401,7 @@ private fun PinnedContentCardPreviewContent(
             .height(if (hasCustomMessage) 150.dp else 130.dp)
             .padding(horizontal = 16.dp)
             .semantics {
-                contentDescription = "Featured launch: $title. ${pinnedContent.customMessage ?: ""}. Tap to view details."
+                contentDescription = featuredLaunchDescription
             },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -475,7 +487,7 @@ private fun PinnedContentCardPreviewContent(
                         contentColor = Color.Black
                     ) {
                         Text(
-                            text = "FEATURED",
+                            text = stringResource(Res.string.home_pinned_badge),
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Medium
