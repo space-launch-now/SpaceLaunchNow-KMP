@@ -73,8 +73,9 @@ object DateTimeUtil {
      *
      * @param instant The instant to format
      * @param useUtc If true, uses UTC timezone for calculations and display
+     *
+     * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
-    /** Read the result with [resolve] in a composable or [load] in a coroutine. */
     fun relativeLaunchDateTime(instant: Instant, useUtc: Boolean = false): LocalizedText {
         return try {
             val timeZone = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
@@ -118,8 +119,9 @@ object DateTimeUtil {
      * - "PT1H" -> "T + 1h"
      * - "-P1DT14H" -> "T - 1d 14h"
      * - "P2D" -> "T + 2d"
+     *
+     * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
-    /** Read the result with [resolve] in a composable or [load] in a coroutine. */
     fun timelineRelativeTime(relativeTime: String?): LocalizedText {
         val zero = timelineText(negative = false, listOf(unitText(Res.string.time_unit_seconds, 0)))
         if (relativeTime.isNullOrBlank()) return zero
@@ -286,8 +288,9 @@ object DateTimeUtil {
 
     /**
      * Formats a domain Launch's NET date with custom precision fallback logic.
+     *
+     * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
-    /** Read the result with [resolve] in a composable or [load] in a coroutine. */
     fun dateWithPrecisionFallback(launch: me.calebjones.spacelaunchnow.domain.model.Launch, useUtc: Boolean = false): LocalizedText {
         val net = launch.net ?: return LocalizedText.Str(Res.string.time_tbd)
         val precisionId = launch.netPrecision?.id
