@@ -28,8 +28,8 @@ jobs:
       - run: python3 scripts/check-play-listing.py
 
   upload:
-    name: Upload listing to Google Play
-    if: github.event_name == 'workflow_dispatch' && !inputs.diff_only
+    name: Upload listing to Google Play, or diff it (diff_only)
+    if: github.event_name == 'workflow_dispatch'
     needs: check
     runs-on: ubuntu-latest
     steps:
@@ -44,35 +44,15 @@ jobs:
         env:
           PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
         run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
+
+      # Read only: prints the live Play listing against git (Tasks#1232). Run before the first real upload.
+      - name: Diff live listing against git
+        if: inputs.diff_only
+        run: bundle exec fastlane android play_listing_diff
 
       - name: Upload listing
+        if: '!inputs.diff_only'
         run: bundle exec fastlane android play_listing validate_only:${{ inputs.validate_only }}
-
-      - name: Remove Service Account
-        if: always()
-        run: rm -f service-account.json
-
-  # Read only. Run it before the first real upload (Tasks#1232).
-  diff:
-    name: Diff live Google Play listing against git
-    if: github.event_name == 'workflow_dispatch' && inputs.diff_only
-    needs: check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-          bundler-cache: true
-
-      - name: Decode Service Account
-        env:
-          PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
-        run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
-
-      - name: Diff listing
-        run: bundle exec fastlane android play_listing_diff
 
       - name: Remove Service Account
         if: always()
