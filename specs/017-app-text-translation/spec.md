@@ -267,7 +267,7 @@ Pixel screenshot tests (Roborazzi, Paparazzi, or Compose's `captureToImage`) are
 | Option | Cost (estimate) | Where it runs | Review | Verdict |
 |---|---|---|---|---|
 | **Language model with glossary and key comments** | Under US$10 per full pass of 10 languages (about 5,000 English words × 10 languages; assumes 4.5 words per string × 1,100 strings; token prices not checked) | A script in the repo (`scripts/i18n/translate.py`) run by an agent or by Caleb | Back-translation check by a second model call; native-speaker spot checks for the top languages | **Recommend** |
-| Community platform (Crowdin, Weblate, and similar) | Both list free plans for open-source projects; terms not checked here. Pay in coordination time. | Hosted web tool; sync through a pull request or a bot | The community. The repo is public, but the app has no community yet; expect long gaps. | Later add-on for corrections, not the first source |
+| Community platform (Crowdin, Weblate, and similar) | Both list free plans for open-source projects; terms not checked here. Pay in coordination time. | Hosted web tool; sync through a pull request or a bot | The community. The repo is public, but the app has no community yet; expect long gaps. | **Chosen by Caleb, 2026-11-20 (Tasks#1217): Crowdin holds the strings and the review; the model fills first.** See 7.4. |
 | Paid human service | US$0.08 to 0.20 per word is the usual range (not verified here); 50,000 words → about US$4,000 to 10,000 per full pass, and again for each change | Vendor portal | The vendor | Reject for now; revisit for the top 2 languages when data shows revenue |
 
 ### 7.2 Recommended flow
@@ -285,6 +285,19 @@ Pixel screenshot tests (Roborazzi, Paparazzi, or Compose's `captureToImage`) are
    strings in each of the top 3 languages (volunteers from the Discord or Reddit audience, or a
    freelancer for about 2 hours per language; cost not verified).
 6. Merge. A user report of a bad translation becomes a one-line fix to the XML.
+
+### 7.4 Crowdin (ruling of 2026-11-20)
+
+Caleb ruled: use Crowdin, pull the strings into resources, and let a language model fill first.
+The flow in 7.2 stands with one change: Crowdin is the store of translations and the review tool.
+- `crowdin.yml` at the repo root maps each English master to its `values-<lang>` files. It holds no
+  secret; the project id and token come from `CROWDIN_PROJECT_ID` and `CROWDIN_PERSONAL_TOKEN`.
+- Step 1: the English `strings.xml` goes up (`crowdin upload sources`).
+- Step 2: the model fills the missing keys and uploads them as unapproved translations
+  (`crowdin upload translations --auto-approve-imported=false`), so people can review them.
+- Step 3: `crowdin download` brings the reviewed files back as a pull request.
+- The old Android app's Crowdin project (`SpaceLaunchNow-Android`, 597 strings, 26 languages) can seed
+  the translation memory. Whether that project still exists is a question for Caleb.
 
 ### 7.3 When a translation is missing
 
