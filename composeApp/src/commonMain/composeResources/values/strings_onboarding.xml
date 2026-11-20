@@ -13,8 +13,8 @@
     <string name="onboarding_welcome_tagline">Your guide to every rocket launch,\nright from your pocket.</string>
     <!-- Welcome page. Small caps label above the next launch card. -->
     <string name="onboarding_welcome_next_launch">NEXT UPCOMING LAUNCH</string>
-    <!-- Welcome page. Short label between two divider lines, above a row of feature icons. Two spaces on each side keep it clear of the lines. -->
-    <string name="onboarding_welcome_explore">"  Explore the App  "</string>
+    <!-- Welcome page. Short label between two divider lines, above a row of feature icons. Two spaces on each side keep it clear of the lines (written as &amp;#32; in the file). -->
+    <string name="onboarding_welcome_explore">&#32;&#32;Explore the App&#32;&#32;</string>
 
     <!-- Welcome page. Caption under a feature icon. One word. -->
     <string name="onboarding_feature_countdown">Countdown</string>
@@ -100,11 +100,11 @@
     <!-- Notification permission page. Content description of the bell icon. Read by screen readers. -->
     <string name="onboarding_permission_icon_description">Notifications</string>
     <!-- Notification permission page. Title when notifications are already on. One line. -->
-    <string name="onboarding_permission_title_granted">You\'re All Set!</string>
+    <string name="onboarding_permission_title_granted">You're All Set!</string>
     <!-- Notification permission page. Title when the app asks for permission. One line. -->
     <string name="onboarding_permission_title_ask">Stay in the Loop</string>
     <!-- Notification permission page. Text under the title when notifications are already on. Two or three lines. -->
-    <string name="onboarding_permission_subtitle_granted">Notifications are enabled. You\'ll be notified before launches so you never miss a liftoff.</string>
+    <string name="onboarding_permission_subtitle_granted">Notifications are enabled. You'll be notified before launches so you never miss a liftoff.</string>
     <!-- Notification permission page. Text under the title when the app asks for permission. Two or three lines. -->
     <string name="onboarding_permission_subtitle_ask">Get notified before launches so you never miss a liftoff. You can customize which notifications you receive.</string>
     <!-- Notification permission page. Button that opens the system settings after the user denied permission. -->
@@ -119,7 +119,7 @@
     <!-- Premium offer page. Heading for a user without Premium. One line. -->
     <string name="onboarding_paywall_title_trial">Try Premium Free</string>
     <!-- Premium offer page. Text under the heading when the user already has Premium. One or two lines. -->
-    <string name="onboarding_paywall_subtitle_subscribed">You\'re a Premium member. Thanks for supporting!</string>
+    <string name="onboarding_paywall_subtitle_subscribed">You're a Premium member. Thanks for supporting!</string>
     <!-- Premium offer page. Text under the heading for a user without Premium. The three dots are part of the text. -->
     <string name="onboarding_paywall_subtitle_trial">Get the most out of Space Launch Now with a free trial... cancel anytime.</string>
     <!-- Premium offer page. Small caps heading above the list of Premium perks. -->
@@ -155,7 +155,7 @@
     <!-- Premium offer page. Monthly plan button, without a price. -->
     <string name="onboarding_paywall_monthly">Or go Monthly</string>
     <!-- Premium offer page. Added after the monthly plan button text when a price is known. %1$s is the monthly price with currency. The text starts with a space, a middle dot and a space. -->
-    <string name="onboarding_paywall_monthly_per_month">" · %1$s/mo"</string>
+    <string name="onboarding_paywall_monthly_per_month">&#32;·&#32;%1$s/mo</string>
     <!-- Premium offer page. Button that leaves the page without buying. -->
     <string name="onboarding_paywall_continue_free">Continue for free</string>
     <!-- Premium offer page. Message shown when the device cannot make purchases. -->
