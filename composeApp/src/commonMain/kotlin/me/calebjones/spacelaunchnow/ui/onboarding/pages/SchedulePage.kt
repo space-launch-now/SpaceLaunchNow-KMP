@@ -31,6 +31,12 @@ import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPage
 import me.calebjones.spacelaunchnow.ui.schedule.components.ScheduleLaunchView
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_previous
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_title
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_upcoming
 
 /**
  * Onboarding page 2 — shows a schedule screen with live launch data,
@@ -43,8 +49,8 @@ fun SchedulePage(
     previousLaunches: List<Launch> = emptyList()
 ) {
     OnboardingPage(
-        title = "Your Launch Schedule",
-        subtitle = "Browse upcoming and previous launches in a clean, organized timeline.",
+        title = stringResource(Res.string.onboarding_schedule_title),
+        subtitle = stringResource(Res.string.onboarding_schedule_subtitle),
         icon = Icons.Default.CalendarMonth,
         modifier = modifier,
         allowInteraction = true
@@ -74,12 +80,12 @@ private fun SchedulePreviewContent(
                 Tab(
                     selected = selectedTabIndex == 0,
                     onClick = { selectedTabIndex = 0 },
-                    text = { Text("Upcoming") }
+                    text = { Text(stringResource(Res.string.onboarding_schedule_upcoming)) }
                 )
                 Tab(
                     selected = selectedTabIndex == 1,
                     onClick = { selectedTabIndex = 1 },
-                    text = { Text("Previous") }
+                    text = { Text(stringResource(Res.string.onboarding_schedule_previous)) }
                 )
             }
 
