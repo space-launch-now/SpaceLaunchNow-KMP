@@ -11,6 +11,8 @@ import me.calebjones.spacelaunchnow.data.billing.BillingManager
 import me.calebjones.spacelaunchnow.data.notifications.NotificationDisplayHelper
 import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.di.koinConfig
+import me.calebjones.spacelaunchnow.platform.AndroidBuildConfig
+import me.calebjones.spacelaunchnow.platform.AndroidAppInfo
 import me.calebjones.spacelaunchnow.util.initializeBuildConfig
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
@@ -44,6 +46,14 @@ class MainApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        // The shared module is an Android library with no BuildConfig; hand it the variant values.
+        AndroidBuildConfig.initialize(
+            AndroidAppInfo(
+                versionName = BuildConfig.VERSION_NAME,
+                versionCode = BuildConfig.VERSION_CODE,
+                isDebug = BuildConfig.IS_DEBUG,
+            )
+        )
         me.calebjones.spacelaunchnow.util.ShareContextHolder.appContext = applicationContext
         instance = this
 
@@ -59,7 +69,7 @@ class MainApplication : Application(), Configuration.Provider {
             val crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
             crashlytics.setCrashlyticsCollectionEnabled(true)
             crashlytics.sendUnsentReports()
-            val variant = if (me.calebjones.spacelaunchnow.BuildConfig.IS_DEBUG) "debug" else "release"
+            val variant = if (BuildConfig.IS_DEBUG) "debug" else "release"
             crashlytics.setCustomKey("app_variant", variant)
             crashlytics.log("Crashlytics initialized in MainApplication.onCreate ($variant)")
             log.i { "\u2705 Firebase Crashlytics initialized and collection enabled ($variant)" }

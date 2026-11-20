@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.data.model
 
 import android.app.NotificationManager
 import androidx.annotation.StringRes
-import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.shared.R
 
 /**
  * Defines notification channels for granular user control

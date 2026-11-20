@@ -1,6 +1,6 @@
 package me.calebjones.spacelaunchnow.data.config
 
-import me.calebjones.spacelaunchnow.BuildConfig
+import me.calebjones.spacelaunchnow.platform.AndroidBuildConfig
 
 /**
  * Android implementation of RevenueCat configuration
@@ -11,9 +11,9 @@ actual object RevenueCatConfig {
      * Android RevenueCat API key from .env file
      * Set REVENUECAT_ANDROID_KEY in .env file
      */
-    actual val apiKey: String = BuildConfig.REVENUECAT_ANDROID_KEY
+    actual val apiKey: String = AndroidBuildConfig.REVENUECAT_ANDROID_KEY
 
     actual val platform: String = "Android"
 
-    actual val isDebug: Boolean = BuildConfig.IS_DEBUG
+    actual val isDebug: Boolean = AndroidBuildConfig.IS_DEBUG
 }

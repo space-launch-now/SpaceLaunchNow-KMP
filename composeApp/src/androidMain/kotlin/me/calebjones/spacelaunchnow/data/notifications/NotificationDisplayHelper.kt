@@ -24,8 +24,8 @@ import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import me.calebjones.spacelaunchnow.MainActivity
-import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.platform.mainActivityIntent
+import me.calebjones.spacelaunchnow.shared.R
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.model.CustomNotificationPayload
@@ -555,7 +555,7 @@ object NotificationDisplayHelper {
 
         // Create intent with launch data
         // Use launchUuid for navigation since API 2.4.0 requires UUID for launch details
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val intent = mainActivityIntent(context).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("launch_id", notificationData.launchUuid) // Use UUID for API 2.4.0
             putExtra("launch_uuid", notificationData.launchUuid)
@@ -680,7 +680,7 @@ object NotificationDisplayHelper {
         log.i("📱 [Notification] Showing basic fallback notification...")
         createNotificationChannels(context)
 
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val intent = mainActivityIntent(context).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("notification_type", "basic")
         }
@@ -742,7 +742,7 @@ object NotificationDisplayHelper {
         }
 
         // Create intent with launch data for deep linking
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val intent = mainActivityIntent(context).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("launch_id", payload.launchUuid) // Use UUID for API 2.4.0
             putExtra("launch_uuid", payload.launchUuid)
@@ -855,7 +855,7 @@ object NotificationDisplayHelper {
         }
 
         // Create intent with event data for deep linking to EventDetail
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val intent = mainActivityIntent(context).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("event_id", payload.eventId)
             putExtra("event_name", payload.eventName)
@@ -958,7 +958,7 @@ object NotificationDisplayHelper {
         // Tap opens the article in-app via MainActivity -> NewsDetail (internal WebView),
         // so the user lands inside the app and back navigation returns into it rather than
         // bouncing out to the external browser.
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val intent = mainActivityIntent(context).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("news_url", payload.articleUrl)
             putExtra("news_title", payload.articleTitle)
@@ -1049,7 +1049,7 @@ object NotificationDisplayHelper {
 
         // Build tap intent by target type, reusing existing deep-link mechanisms.
         val tapIntent = when (payload.targetType.lowercase()) {
-            CustomNotificationPayload.TARGET_LAUNCH -> Intent(context, MainActivity::class.java).apply {
+            CustomNotificationPayload.TARGET_LAUNCH -> mainActivityIntent(context).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 putExtra("launch_id", payload.targetId)
                 putExtra("launch_uuid", payload.targetId)
@@ -1057,7 +1057,7 @@ object NotificationDisplayHelper {
                 putExtra("notification_type", payload.notificationType)
             }
 
-            CustomNotificationPayload.TARGET_EVENT -> Intent(context, MainActivity::class.java).apply {
+            CustomNotificationPayload.TARGET_EVENT -> mainActivityIntent(context).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 payload.targetId.toIntOrNull()?.let { putExtra("event_id", it) }
                 putExtra("notification_type", payload.notificationType)
@@ -1067,7 +1067,7 @@ object NotificationDisplayHelper {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
 
-            else -> Intent(context, MainActivity::class.java).apply {
+            else -> mainActivityIntent(context).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 putExtra("notification_type", payload.notificationType)
             }

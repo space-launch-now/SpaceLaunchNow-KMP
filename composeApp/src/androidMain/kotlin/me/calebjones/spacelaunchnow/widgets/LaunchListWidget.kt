@@ -44,8 +44,8 @@ import androidx.glance.text.TextStyle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import me.calebjones.spacelaunchnow.MainActivity
-import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.platform.mainActivityIntent
+import me.calebjones.spacelaunchnow.shared.R
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import me.calebjones.spacelaunchnow.domain.model.Launch
@@ -143,7 +143,7 @@ fun LaunchListWidgetLockedContent(
             .cornerRadius(cornerRadius.dp)
             .clickable(
                 actionStartActivity(
-                    Intent(context, MainActivity::class.java).apply {
+                    mainActivityIntent(context).apply {
                         putExtra("navigate_to", "subscription")
                         // Clear back stack and bring to front if already running
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -221,7 +221,7 @@ fun LaunchListWidgetContent(
                     .padding(8.dp)
                     .clickable(
                         actionStartActivity(
-                            Intent(context, MainActivity::class.java)
+                            mainActivityIntent(context)
                         )
                     ),
                 verticalAlignment = Alignment.CenterVertically
@@ -286,7 +286,7 @@ fun LaunchListItem(launch: Launch) {
             .padding(8.dp)
             .clickable(
                 actionStartActivity(
-                    Intent(context, MainActivity::class.java).apply {
+                    mainActivityIntent(context).apply {
                         putExtra("launch_id", launch.id)
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     }
