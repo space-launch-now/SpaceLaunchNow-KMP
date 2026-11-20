@@ -35,6 +35,7 @@ import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.resolve
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -64,7 +65,7 @@ fun ScheduleLaunchView(
     ) {
         val imageUrl = launch.thumbnailUrl ?: launch.imageUrl
         val useUtc = LocalUseUtc.current
-        val dateText = DateTimeUtil.formatDateWithPrecisionFallback(launch, useUtc)
+        val dateText = DateTimeUtil.dateWithPrecisionFallback(launch, useUtc).resolve()
         val title = launch.name ?: "Unknown Launch"
         val location = launch.pad?.location?.name ?: "Unknown Location"
         val mission = launch.provider.name

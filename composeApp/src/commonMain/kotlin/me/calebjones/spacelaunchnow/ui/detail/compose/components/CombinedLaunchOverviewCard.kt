@@ -40,6 +40,7 @@ import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.compose.LaunchCountdown
 import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.resolve
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 
 /**
@@ -114,10 +115,10 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                                     ) {
                                         launch.net?.let { net ->
                                             val relativeDateText =
-                                                DateTimeUtil.formatLaunchDateTimeRelative(
+                                                DateTimeUtil.relativeLaunchDateTime(
                                                     net,
                                                     useUtc
-                                                )
+                                                ).resolve()
                                             // Extract just the date part (everything before the time)
                                             // e.g., "Today at 12:31pm" -> "Today at"
                                             val dateOnlyText =

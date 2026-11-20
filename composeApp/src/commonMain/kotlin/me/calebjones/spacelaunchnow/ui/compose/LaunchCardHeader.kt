@@ -48,6 +48,7 @@ import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import me.calebjones.spacelaunchnow.util.resolve
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -111,10 +112,10 @@ fun LaunchCardHeaderOverlay(
         }
     }
 
-    // formatLaunchDateTimeRelative reads string resources, so it runs in composition, not in remember.
+    // relativeLaunchDateTime(...).resolve() reads string resources, so it runs in composition, not in remember.
     val formattedDate = launch.net?.let {
         if (useRelativeTime) {
-            DateTimeUtil.formatLaunchDateTimeRelative(it, useUtc)
+            DateTimeUtil.relativeLaunchDateTime(it, useUtc).resolve()
         } else {
             DateTimeUtil.formatLaunchDateTime(it, useUtc)
         }

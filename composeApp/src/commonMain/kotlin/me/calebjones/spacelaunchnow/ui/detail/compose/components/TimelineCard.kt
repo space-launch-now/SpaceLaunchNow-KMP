@@ -36,7 +36,8 @@ import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.domain.model.TimelineEntry
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
-import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatTimelineRelativeTime
+import me.calebjones.spacelaunchnow.util.DateTimeUtil.timelineRelativeTime
+import me.calebjones.spacelaunchnow.util.resolve
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -187,7 +188,7 @@ fun TimelineEventRow(
 
                 // Relative time at the end of the line
                 Text(
-                    text = formatTimelineRelativeTime(event.relativeTime),
+                    text = timelineRelativeTime(event.relativeTime).resolve(),
                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(start = 8.dp)
