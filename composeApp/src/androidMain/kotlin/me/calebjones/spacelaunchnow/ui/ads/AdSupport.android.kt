@@ -216,6 +216,19 @@ actual fun WithPreloadedAds(
     PreloadedBannerSetup(preloadedMediumRectangleAd, AdSize.MEDIUM_RECTANGLE, "MEDIUM_RECTANGLE")
     PreloadedBannerSetup(preloadedNavigationBannerAd, AdSize.BANNER, "NAVIGATION")
 
+    // Density, font scale or window size class changed: the loaded AdViews have a stale pixel
+    // size, so load fresh ones (the old ones are destroyed). Skips the first composition.
+    ReloadOnDisplayChange {
+        listOf(
+            preloadedBannerAd to "BANNER",
+            preloadedLargeBannerAd to "LARGE_BANNER",
+            preloadedMediumRectangleAd to "MEDIUM_RECTANGLE",
+            preloadedNavigationBannerAd to "NAVIGATION"
+        ).forEach { (handler, placement) ->
+            if (isBannerLoaded(handler.state)) handler.reloadBannerView(placement)
+        }
+    }
+
     // The Activity ends: destroy the shared AdViews. Screens only pause and resume them.
     val activityOwner = LocalContextFactory.current?.getActivity() as? LifecycleOwner
     DisposableEffect(activityOwner) {

@@ -192,6 +192,14 @@ actual fun SmartBannerAd(
     val reservedSize = if (availableAd.state == AdState.NONE) actualAdSize else availableAd.adSize
     val bannerHeight = if (reservedSize.height > 0) reservedSize.height.dp else 50.dp
 
+    // Inline slot handlers are not preloaded, so they reload here on a display change
+    // (preloaded handlers reload in WithPreloadedAds)
+    ReloadOnDisplayChange {
+        if (slotHandler != null && isBannerLoaded(slotHandler.state)) {
+            slotHandler.reloadBannerView(placementType.name, actualAdSize)
+        }
+    }
+
     // A new screen visit (e.g. a different launch) loads a fresh creative instead of
     // re-showing the one this shared banner already displayed. Hold the shimmer until
     // the check runs so the old creative never flashes.
