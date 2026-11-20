@@ -1,0 +1,98 @@
+NEVER MISS ANOTHER ROCKET LAUNCH.
+
+Space Launch Now gives you real-time schedules, live countdowns, mission data, and alerts for every major rocket launch and spaceflight event happening around the world.
+
+Follow launches from SpaceX, NASA, ULA, ISRO, JAXA, Roscosmos, ESA and more all in one fast, reliable, and beautifully designed app.
+
+────────────────────────
+🚀 FEATURES
+────────────────────────
+
+• Live Rocket Launch Tracking
+  - Global launch schedule updated continuously
+  - Second-accurate live countdowns
+  - Push notifications for launch updates
+
+• Mission and Vehicle Details
+  - Detailed payload, orbit, and mission type info
+  - Booster landing results and reuse history for SpaceX
+  - Rocket encyclopedia of the entirety of spaceflight history 
+
+• Astronaut Profiles
+  - Crew assignments and upcoming flights
+  - Complete human spaceflight history, from early missions to today
+
+• Historical Spaceflight Archive
+  - Explore decades of spaceflight missions and major milestones
+  - Browse previous launches and flight data
+
+────────────────────────
+🌍 WHY SPACE LAUNCH NOW?
+────────────────────────
+
+Space Launch Now is built by and for space enthusiasts. It is fast, accurate, and designed to keep you informed without clutter or distractions.
+
+Whether you follow every SpaceX launch or just want to know when the next big mission is scheduled, the app gives you the tools to stay up to date anywhere, anytime.
+
+────────────────────────
+🛰️ TRACK EVERY KIND OF MISSION
+────────────────────────
+
+From crewed flights to satellite deployments, Space Launch Now covers every category of orbital and suborbital activity:
+
+• SpaceX Falcon 9, Falcon Heavy, Starship, Crew Dragon and Cargo Dragon
+• NASA Artemis lunar missions, SLS, and crew rotations to the ISS
+• ULA Atlas V, Vulcan Centaur, and Delta IV Heavy
+• ISRO PSLV, GSLV, and LVM3 launches from Sriharikota
+• Roscosmos Soyuz and Progress flights
+• Chinese Long March, Japanese H3, European Ariane 6 and Vega
+• Rocket Lab Electron, Blue Origin New Shepard and New Glenn, and emerging launch vehicles
+
+Whether it is a Starship test flight, a Falcon 9 Starlink mission, an Artemis lunar launch, or a new Indian satellite, you will see it on the schedule with full mission details.
+
+────────────────────────
+⌚ WEAR OS COMPANION
+────────────────────────
+
+Space Launch Now Premium includes a full Wear OS experience for your smartwatch:
+
+• Live launch countdowns on your wrist
+• Watch face complications showing the next mission
+• Tiles for instant access to upcoming launches and details
+• Notifications synced seamlessly from your phone
+
+Glance at your watch and know exactly when liftoff is.
+
+────────────────────────
+⭐ PREMIUM FEATURES
+────────────────────────
+
+Support development and unlock additional enhancements:
+
+• Unlock Premium-widgets 
+• Customize widget appearance
+• Access Calendar Sync
+• Premium App Themes
+• Wear OS App with Complications and Tiles
+• NO ADS
+
+All upgrades support ongoing development.
+
+────────────────────────
+🔔 NEVER MISS LIFTOFF
+────────────────────────
+
+Turn on notifications to receive alerts for launch events.
+
+Stay ready for liftoff anywhere in the world.
+
+────────────────────────
+📫 DEVELOPER CONTACT
+────────────────────────
+
+Email: support@spacelaunchnow.me
+Website: https://spacelaunchnow.me
+Privacy Policy: https://spacelaunchnow.me/privacy
+
+
+Space Launch Now is an independent project and is **not affiliated** with SpaceX, NASA, ULA, ISRO, ESA, ROSCOSMOS, JAXA or any other launch provider.

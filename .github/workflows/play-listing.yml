@@ -1,0 +1,49 @@
+name: Play Store Listing
+
+# The listing text lives in fastlane/metadata/android/<locale>/ (Tasks#1215).
+# A pull request that changes it is checked. The upload runs by hand only.
+on:
+  pull_request:
+    paths:
+      - 'fastlane/metadata/android/**'
+      - 'scripts/check-play-listing.py'
+      - '.github/workflows/play-listing.yml'
+  workflow_dispatch:
+    inputs:
+      validate_only:
+        description: 'Check the upload with Google Play without publishing.'
+        type: boolean
+        default: true
+
+jobs:
+  check:
+    name: Check listing files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: python3 scripts/check-play-listing.py
+
+  upload:
+    name: Upload listing to Google Play
+    if: github.event_name == 'workflow_dispatch'
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Decode Service Account
+        env:
+          PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+        run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
+
+      - name: Upload listing
+        run: bundle exec fastlane android play_listing validate_only:${{ inputs.validate_only }}
+
+      - name: Remove Service Account
+        if: always()
+        run: rm -f service-account.json
