@@ -279,11 +279,13 @@ class MainApplication : Application(), Configuration.Provider {
     }
 
     private fun scheduleWidgetUpdates() {
-        // Deliberately unconstrained: WidgetUpdateWorker does no network I/O of its own. It
-        // re-renders the Glance widgets, and NextUpWidget's T-minus countdown is clock
-        // arithmetic over the stale-while-revalidate cache. A NetworkType.CONNECTED
-        // constraint gated that on connectivity, degrading the offline countdown to the
-        // ~30-minute updatePeriodMillis floor; 15 minutes is only reachable via WorkManager.
+        // Deliberately unconstrained: a run must redraw the widgets offline. The redraw reads the
+        // cached launch list only, and NextUpWidget's T-minus countdown is clock arithmetic over
+        // it. A NetworkType.CONNECTED constraint gated that on connectivity, degrading the offline
+        // countdown to the ~30-minute updatePeriodMillis floor; 15 minutes is only reachable via
+        // WorkManager. The run reads the network only when WidgetRefreshPolicy says the cached
+        // list is too old for how near the next launch is (6 h, 1 h or 15 min), and a failed
+        // read keeps the cached list.
         val widgetUpdateRequest = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(
             15, TimeUnit.MINUTES // Update every 15 minutes
         )

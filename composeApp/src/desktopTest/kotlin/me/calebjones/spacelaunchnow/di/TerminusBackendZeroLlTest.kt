@@ -122,6 +122,8 @@ class TerminusBackendZeroLlTest {
             "LaunchRepository.getInFlightLaunchesDomain" to { launches.getInFlightLaunchesDomain(forceRefresh = true) },
             "LaunchRepository.getUpcomingLaunchesNormalDomain" to { launches.getUpcomingLaunchesNormalDomain(5, forceRefresh = true) },
             "LaunchRepository.getPreviousLaunchesNormalDomain" to { launches.getPreviousLaunchesNormalDomain(5, forceRefresh = true) },
+            "LaunchRepository.getUpcomingLaunchesForWidget" to { launches.getUpcomingLaunchesForWidget(10, forceRefresh = true) },
+            "LaunchRepository.getCachedUpcomingLaunchesForWidget" to { launches.getCachedUpcomingLaunchesForWidget(10) },
             "LaunchRepository.getLaunchDetailDomain" to { launches.getLaunchDetailDomain("abc", forceRefresh = true) },
             "LaunchRepository.getStarshipLaunchesDomain" to { launches.getStarshipLaunchesDomain(5, forceRefresh = true) },
             "LaunchRepository.getStarshipHistoryDomain" to { launches.getStarshipHistoryDomain(5, forceRefresh = true) },
@@ -181,7 +183,10 @@ class TerminusBackendZeroLlTest {
     private val notLl = setOf("SpaceStationRepository.getIssTle", "SpaceStationRepository.prewarmIssCache")
 
     // Reads the local cache only, so it makes no request by design.
-    private val localOnly = setOf("LaunchRepository.getStaleDetailedLaunch")
+    private val localOnly = setOf(
+        "LaunchRepository.getStaleDetailedLaunch",
+        "LaunchRepository.getCachedUpcomingLaunchesForWidget"
+    )
 
     private val interfaces: List<KClass<*>> = listOf(
         LaunchRepository::class, EventsRepository::class, UpdatesRepository::class,

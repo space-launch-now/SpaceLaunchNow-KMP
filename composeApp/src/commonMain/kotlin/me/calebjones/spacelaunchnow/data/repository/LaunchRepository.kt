@@ -60,6 +60,30 @@ interface LaunchRepository {
         locationIds: List<Int>? = null
     ): Result<DataResult<PaginatedResult<Launch>>>
 
+    /**
+     * The upcoming launches the Android home-screen widgets draw, with the user's filters.
+     * The Terminus backend reads the slim `/launches/mini/` list; the default (the LL backend)
+     * reads the same list as [getUpcomingLaunchesNormalDomain].
+     */
+    suspend fun getUpcomingLaunchesForWidget(
+        limit: Int,
+        forceRefresh: Boolean = false,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): Result<DataResult<PaginatedResult<Launch>>> =
+        getUpcomingLaunchesNormalDomain(limit, forceRefresh, agencyIds, locationIds)
+
+    /**
+     * The newest cached upcoming list a widget can draw, with no network call and no expiry
+     * check ([DataResult.timestamp] says when it was stored). Null when nothing is cached, and
+     * for a backend that keeps no such cache (the default).
+     */
+    suspend fun getCachedUpcomingLaunchesForWidget(
+        limit: Int,
+        agencyIds: List<Int>? = null,
+        locationIds: List<Int>? = null
+    ): DataResult<PaginatedResult<Launch>>? = null
+
     suspend fun getPreviousLaunchesNormalDomain(
         limit: Int,
         forceRefresh: Boolean = false,

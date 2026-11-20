@@ -46,6 +46,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import me.calebjones.spacelaunchnow.MainActivity
 import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
 import me.calebjones.spacelaunchnow.data.preferences.WidgetThemeSource
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
@@ -70,9 +71,9 @@ class LaunchListWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         log.d { "provideGlance START for id: $id" }
 
-        // Pre-fetch launches outside composable (need to check access first from state)
-        // We'll fetch optimistically - if no access, we just won't show them
-        val launches = fetchUpcomingLaunches()
+        // A redraw reads the cache only (WidgetLaunchSource). The access flag comes first, so a
+        // locked widget reads nothing.
+        val launches = loadLaunches()
 
         provideContent {
             // Read appearance from Glance state (written by WidgetUpdater)
@@ -116,28 +117,24 @@ class LaunchListWidget : GlanceAppWidget() {
         }
     }
 
-    // Removed checkWidgetAccess() - now reads from cached DataStore value
-
-    private suspend fun fetchUpcomingLaunches(): List<Launch> {
+    private suspend fun loadLaunches(): List<Launch> {
         return withContext(Dispatchers.IO) {
             try {
+                val widgetPreferences: WidgetPreferences by koinInject(WidgetPreferences::class.java)
+                if (!widgetPreferences.widgetAccessGrantedFlow.first()) return@withContext emptyList()
+
                 val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
                 val notificationStateStorage: NotificationStateStorage by koinInject(NotificationStateStorage::class.java)
                 val launchFilterService: LaunchFilterService by koinInject(LaunchFilterService::class.java)
 
                 val state = notificationStateStorage.stateFlow.first()
-                val agencyIds = launchFilterService.getAgencyIds(state)
-                val locationIds = launchFilterService.getLocationIds(state)
-
-                val result = launchRepository.getUpcomingLaunchesNormalDomain(
-                    limit = 10,
-                    agencyIds = agencyIds,
-                    locationIds = locationIds
+                WidgetLaunchSource(launchRepository).launchesForRender(
+                    agencyIds = launchFilterService.getAgencyIds(state),
+                    locationIds = launchFilterService.getLocationIds(state)
                 )
-                result.getOrNull()?.data?.results ?: emptyList()
             } catch (e: Exception) {
                 e.rethrowIfCancellation()
-                log.e(e) { "Failed to fetch launches" }
+                log.e(e) { "Failed to load launches" }
                 emptyList()
             }
         }
