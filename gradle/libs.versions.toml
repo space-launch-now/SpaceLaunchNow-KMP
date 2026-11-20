@@ -37,8 +37,8 @@ ddSdkKotlinMultiplatformLogs = "1.4.0"
 ddSdkKotlinMultiplatformRum = "1.4.0"
 junit = "4.13.2"
 kermit = "2.1.0"
-kotlin = "2.3.21"
-kotlin-test = "2.3.21"
+kotlin = "2.4.21"
+kotlin-test = "2.4.21"
 koin = "4.2.1"
 kotlinxCoroutinesTest = "1.8.0"
 
@@ -90,7 +90,7 @@ kstore = "1.0.0"
 sqldelight = "2.3.2"
 
 # Basic Ads (Google AdMob for KMP)
-basic-ads = "1.1.1"
+basic-ads = "1.2.1"
 google-play-services-ads = "25.2.0"
 android-ump = "4.0.0"
 
@@ -194,9 +194,10 @@ compose-media-player = { module = "network.chaintech:compose-multiplatform-media
 # Google Maps Compose for Android
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 
-# Keeps every OkHttp module on the core version. basic-ads pins okhttp strictly 5.3.2;
-# the media player's ktor-client-okhttp 3.0.3 brings okhttp-sse 4.12.0, which calls
-# okhttp3.internal.Util (removed in OkHttp 5) and fails R8. Bump with basic-ads' okhttp.
+# Keeps every OkHttp module on one version, 5.3.2. Since basic-ads 1.2.x no library needs
+# OkHttp 5 (Datadog, the media player's ktor-client-okhttp and others ask for 4.x), so this
+# BOM is what holds the app on 5.3.2. It also keeps okhttp-sse on the core version: mixing
+# okhttp-sse 4.x with OkHttp 5 fails R8 (it calls okhttp3.internal.Util, removed in 5).
 okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version = "5.3.2" }
 
 firebase-bom = { module = "com.google.firebase:firebase-bom", version = "34.4.0" }
