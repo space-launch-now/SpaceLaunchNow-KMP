@@ -57,8 +57,4 @@ internal object BannerFrame {
         if (heightLimited && slotHeightDp < adHeightDp) return Chrome.NONE
         return chromeFor(adWidthDp, adHeightDp, slotWidthDp, preferCard)
     }
-
-    /** True when an ad loaded at [adWidthDp] x [adHeightDp] shows at full size in the space given. */
-    fun fits(adWidthDp: Int, adHeightDp: Int, availableWidthDp: Float, availableHeightDp: Float): Boolean =
-        chromeFor(adWidthDp, adHeightDp, availableWidthDp, availableHeightDp, preferCard = false) != Chrome.NONE
 }

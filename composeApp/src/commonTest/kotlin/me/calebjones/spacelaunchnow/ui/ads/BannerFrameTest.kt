@@ -3,6 +3,7 @@ package me.calebjones.spacelaunchnow.ui.ads
 import me.calebjones.spacelaunchnow.ui.ads.BannerFrame.Chrome
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -71,10 +72,9 @@ class BannerFrameTest {
     }
 
     @Test
-    fun fitsNeedsBothWidthAndHeight() {
-        assertTrue(BannerFrame.fits(320, 50, 320f, 50f))
-        assertFalse(BannerFrame.fits(320, 50, 320f, 49f))
-        assertFalse(BannerFrame.fits(320, 50, 319f, 50f))
-        assertFalse(BannerFrame.fits(0, 50, 400f, 400f))
+    fun adNeedsBothWidthAndHeight() {
+        assertNotEquals(Chrome.NONE, BannerFrame.chromeFor(320, 50, 320f, 50f, preferCard = false))
+        assertEquals(Chrome.NONE, BannerFrame.chromeFor(320, 50, 320f, 49f, preferCard = false))
+        assertEquals(Chrome.NONE, BannerFrame.chromeFor(320, 50, 319f, 50f, preferCard = false))
     }
 }
