@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.schedule
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringModalBottomSheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +10,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -60,7 +60,7 @@ fun ScheduleFilterBottomSheet(
     )
 
     if (isOpen) {
-        ModalBottomSheet(
+        AdCoveringModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState
         ) {

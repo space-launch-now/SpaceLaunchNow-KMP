@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.newsevents
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringModalBottomSheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -19,7 +20,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -54,7 +54,7 @@ fun NewsEventsFilterBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     if (isOpen) {
-        ModalBottomSheet(
+        AdCoveringModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState
         ) {

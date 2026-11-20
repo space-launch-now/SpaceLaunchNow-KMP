@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringExposedDropdownMenu
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -594,7 +595,7 @@ private fun ThemeSettingRow(
                 .menuAnchor()
                 .fillMaxWidth()
         )
-        ExposedDropdownMenu(
+        AdCoveringExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {

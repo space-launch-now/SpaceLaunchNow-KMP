@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.astronaut
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringExposedDropdownMenu
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -15,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -83,7 +84,7 @@ fun AstronautFilterSheet(
 
     // Reload confirmation dialog
     if (showReloadConfirmDialog) {
-        AlertDialog(
+        AdCoveringAlertDialog(
             onDismissRequest = { showReloadConfirmDialog = false },
             title = { Text("Reload Filter Options?") },
             text = {
@@ -214,7 +215,7 @@ fun AstronautFilterSheet(
                             shape = RoundedCornerShape(12.dp)
                         )
 
-                        ExposedDropdownMenu(
+                        AdCoveringExposedDropdownMenu(
                             expanded = sortExpanded,
                             onDismissRequest = { sortExpanded = false }
                         ) {

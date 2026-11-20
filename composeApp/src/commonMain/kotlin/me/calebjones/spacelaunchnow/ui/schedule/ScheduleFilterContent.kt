@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.schedule
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringDropdownMenu
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +19,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
@@ -77,7 +77,7 @@ fun ScheduleFilterContent(
 
     // Reload confirmation dialog
     if (showReloadConfirmDialog) {
-        AlertDialog(
+        AdCoveringAlertDialog(
             onDismissRequest = { showReloadConfirmDialog = false },
             title = { Text("Reload Filter Options?") },
             text = {
@@ -476,7 +476,7 @@ private fun FilterSection(
                 singleLine = true
             )
 
-            DropdownMenu(
+            AdCoveringDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = {
                     expanded = false

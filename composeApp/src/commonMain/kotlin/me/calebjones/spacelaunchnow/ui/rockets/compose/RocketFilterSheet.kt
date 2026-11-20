@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.rockets.compose
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringDropdownMenu
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringExposedDropdownMenu
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +24,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -189,7 +190,7 @@ fun RocketFilterSheet(
                                 .menuAnchor(),
                             shape = RoundedCornerShape(12.dp)
                         )
-                        ExposedDropdownMenu(
+                        AdCoveringExposedDropdownMenu(
                             expanded = sortExpanded,
                             onDismissRequest = { sortExpanded = false }
                         ) {
@@ -449,7 +450,7 @@ private fun FilterSection(
                 singleLine = true
             )
 
-            DropdownMenu(
+            AdCoveringDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = {
                     expanded = false
@@ -606,7 +607,7 @@ private fun FilterSectionByName(
                 singleLine = true
             )
 
-            DropdownMenu(
+            AdCoveringDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = {
                     expanded = false

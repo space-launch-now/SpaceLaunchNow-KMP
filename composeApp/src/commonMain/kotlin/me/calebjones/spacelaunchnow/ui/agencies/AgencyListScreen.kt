@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.agencies
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringModalBottomSheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +25,6 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -214,7 +214,7 @@ fun AgencyListScreen(
     
     // Filter bottom sheet
     if (showFilterSheet) {
-        ModalBottomSheet(
+        AdCoveringModalBottomSheet(
             onDismissRequest = { showFilterSheet = false },
             sheetState = sheetState
         ) {

@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.agencies
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringExposedDropdownMenu
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -172,7 +173,7 @@ fun AgencyFilterSheet(
                             shape = RoundedCornerShape(12.dp)
                         )
 
-                        ExposedDropdownMenu(
+                        AdCoveringExposedDropdownMenu(
                             expanded = sortExpanded,
                             onDismissRequest = { sortExpanded = false }
                         ) {

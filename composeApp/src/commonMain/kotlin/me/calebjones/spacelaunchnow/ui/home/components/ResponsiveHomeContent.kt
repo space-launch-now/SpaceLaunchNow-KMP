@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -135,7 +135,7 @@ fun ResponsiveHomeContent(
     
     // Updates info dialog
     if (showUpdatesInfoDialog) {
-        AlertDialog(
+        AdCoveringAlertDialog(
             onDismissRequest = { showUpdatesInfoDialog = false },
             title = { Text("About Latest Updates") },
             text = {

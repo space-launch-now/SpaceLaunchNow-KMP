@@ -60,6 +60,7 @@ import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import me.calebjones.spacelaunchnow.ui.ads.AdCoverGate
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.agencies.AgencyDetailScreen
 import me.calebjones.spacelaunchnow.ui.agencies.AgencyListScreen
@@ -210,15 +211,17 @@ fun TabletDesktopLayout(
                     }
 
                     // Smart banner ad for tablets/desktop - placement-aware sizing
-                    SmartBannerAd(
-                        modifier = Modifier.padding(
-                            bottom = WindowInsets.navigationBars.asPaddingValues()
-                                .calculateBottomPadding()
-                        ),
-                        placementType = AdPlacementType.NAVIGATION, // Navigation context
-                        showCard = false,
-                        refreshKey = navBackStackEntry?.id,
-                    )
+                    AdCoverGate {
+                        SmartBannerAd(
+                            modifier = Modifier.padding(
+                                bottom = WindowInsets.navigationBars.asPaddingValues()
+                                    .calculateBottomPadding()
+                            ),
+                            placementType = AdPlacementType.NAVIGATION, // Navigation context
+                            showCard = false,
+                            refreshKey = navBackStackEntry?.id,
+                        )
+                    }
                 }
             }
         }

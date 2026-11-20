@@ -1,5 +1,7 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringExposedDropdownMenu
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -181,7 +183,7 @@ fun DebugSettingsScreen(
 
     // Detailed message dialog
     if (showDetailedDialog && detailedMessage != null) {
-        androidx.compose.material3.AlertDialog(
+        AdCoveringAlertDialog(
             onDismissRequest = {
                 showDetailedDialog = false
                 debugViewModel.clearStatusMessage()
@@ -770,7 +772,7 @@ private fun ClearAllCachesCard(
     var showConfirm by remember { mutableStateOf(false) }
 
     if (showConfirm) {
-        androidx.compose.material3.AlertDialog(
+        AdCoveringAlertDialog(
             onDismissRequest = { showConfirm = false },
             title = { Text("Clear all caches?") },
             text = {
@@ -1155,7 +1157,7 @@ private fun NotificationsTabContent(
                                     .menuAnchor(),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-                            ExposedDropdownMenu(
+                            AdCoveringExposedDropdownMenu(
                                 expanded = agencyDropdownExpanded,
                                 onDismissRequest = { agencyDropdownExpanded = false }
                             ) {
@@ -1187,7 +1189,7 @@ private fun NotificationsTabContent(
                                     .menuAnchor(),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-                            ExposedDropdownMenu(
+                            AdCoveringExposedDropdownMenu(
                                 expanded = locationDropdownExpanded,
                                 onDismissRequest = { locationDropdownExpanded = false }
                             ) {
@@ -1219,7 +1221,7 @@ private fun NotificationsTabContent(
                                     .menuAnchor(),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                             )
-                            ExposedDropdownMenu(
+                            AdCoveringExposedDropdownMenu(
                                 expanded = typeDropdownExpanded,
                                 onDismissRequest = { typeDropdownExpanded = false }
                             ) {

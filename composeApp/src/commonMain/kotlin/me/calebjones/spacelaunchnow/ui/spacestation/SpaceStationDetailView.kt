@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.spacestation
 
+import me.calebjones.spacelaunchnow.ui.ads.AdCoveringDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import chaintech.videoplayer.model.VideoPlayerConfig
 import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
@@ -339,7 +339,7 @@ private fun SpaceStationDetailContent(
 
                 // Fullscreen dialog
                 if (isMapFullscreen) {
-                    Dialog(
+                    AdCoveringDialog(
                         onDismissRequest = { isMapFullscreen = false },
                         properties = DialogProperties(
                             usePlatformDefaultWidth = false
