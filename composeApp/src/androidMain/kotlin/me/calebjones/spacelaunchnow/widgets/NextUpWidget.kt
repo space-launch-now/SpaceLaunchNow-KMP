@@ -104,17 +104,9 @@ class NextUpWidget : GlanceAppWidget() {
     private suspend fun fetchNextLaunch(): Launch? {
         return withContext(Dispatchers.IO) {
             try {
-                val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
-                val notificationStateStorage: NotificationStateStorage by koinInject(NotificationStateStorage::class.java)
-                val launchFilterService: LaunchFilterService by koinInject(LaunchFilterService::class.java)
-
-                val state = notificationStateStorage.stateFlow.first()
-
                 // The first row of the list the launch list widget draws; a redraw reads the cache only.
-                WidgetLaunchSource(launchRepository).launchesForRender(
-                    agencyIds = launchFilterService.getAgencyIds(state),
-                    locationIds = launchFilterService.getLocationIds(state)
-                ).firstOrNull()
+                val (source, filters) = WidgetLaunchSource.fromKoin()
+                source.launchesForRender(filters).firstOrNull()
             } catch (e: Exception) {
                 e.rethrowIfCancellation()
                 log.e(e) { "Failed to fetch next launch" }

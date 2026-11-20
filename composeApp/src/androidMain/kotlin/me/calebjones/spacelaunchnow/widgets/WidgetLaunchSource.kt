@@ -1,11 +1,15 @@
 package me.calebjones.spacelaunchnow.widgets
 
+import kotlinx.coroutines.flow.first
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
+import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
+import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import kotlin.time.Clock
 import kotlin.time.Instant
+import org.koin.java.KoinJavaComponent.inject
 
 /**
  * The one list of upcoming launches that both widgets draw (Tasks#1223). The next-up widget
@@ -19,6 +23,9 @@ class WidgetLaunchSource(
     private val clock: Clock = Clock.System
 ) {
     private val log = logger()
+
+    /** The user's agency and location filters, read when the widget runs. */
+    class Filters(val agencyIds: List<Int>?, val locationIds: List<Int>?)
 
     /**
      * The launches to draw. A cached list is used whatever its age, and may come from the home
@@ -66,7 +73,24 @@ class WidgetLaunchSource(
         null
     }
 
+    /** [launchesForRender] with the user's filters. */
+    suspend fun launchesForRender(filters: Filters, hasAccess: Boolean = true): List<Launch> =
+        launchesForRender(filters.agencyIds, filters.locationIds, hasAccess)
+
+    /** [refreshIfDue] with the user's filters. */
+    suspend fun refreshIfDue(filters: Filters): Boolean = refreshIfDue(filters.agencyIds, filters.locationIds)
+
     companion object {
+        /** The source over the app's repository, and the user's filters, both from Koin. */
+        suspend fun fromKoin(): Pair<WidgetLaunchSource, Filters> {
+            val repository: LaunchRepository by inject(LaunchRepository::class.java)
+            val notificationStateStorage: NotificationStateStorage by inject(NotificationStateStorage::class.java)
+            val launchFilterService: LaunchFilterService by inject(LaunchFilterService::class.java)
+            val state = notificationStateStorage.stateFlow.first()
+            return WidgetLaunchSource(repository) to
+                Filters(launchFilterService.getAgencyIds(state), launchFilterService.getLocationIds(state))
+        }
+
         /** Rows read for the list widget. */
         const val LIST_LIMIT = 10
     }

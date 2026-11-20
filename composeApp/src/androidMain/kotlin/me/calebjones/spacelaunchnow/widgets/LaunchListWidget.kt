@@ -121,17 +121,9 @@ class LaunchListWidget : GlanceAppWidget() {
         return withContext(Dispatchers.IO) {
             try {
                 val widgetPreferences: WidgetPreferences by koinInject(WidgetPreferences::class.java)
-                val launchRepository: LaunchRepository by koinInject(LaunchRepository::class.java)
-                val notificationStateStorage: NotificationStateStorage by koinInject(NotificationStateStorage::class.java)
-                val launchFilterService: LaunchFilterService by koinInject(LaunchFilterService::class.java)
-
-                val state = notificationStateStorage.stateFlow.first()
-                WidgetLaunchSource(launchRepository).launchesForRender(
-                    agencyIds = launchFilterService.getAgencyIds(state),
-                    locationIds = launchFilterService.getLocationIds(state),
-                    // A locked widget draws no launches: no cache read and no fetch.
-                    hasAccess = widgetPreferences.widgetAccessGrantedFlow.first()
-                )
+                val (source, filters) = WidgetLaunchSource.fromKoin()
+                // A locked widget draws no launches: no cache read and no fetch.
+                source.launchesForRender(filters, hasAccess = widgetPreferences.widgetAccessGrantedFlow.first())
             } catch (e: Exception) {
                 e.rethrowIfCancellation()
                 log.e(e) { "Failed to load launches" }

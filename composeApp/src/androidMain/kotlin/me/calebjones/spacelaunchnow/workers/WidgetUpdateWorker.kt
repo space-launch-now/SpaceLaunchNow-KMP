@@ -7,9 +7,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import me.calebjones.spacelaunchnow.data.preferences.WidgetPreferences
-import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
-import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
-import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.util.logging.logger
 import me.calebjones.spacelaunchnow.util.rethrowIfCancellation
 import me.calebjones.spacelaunchnow.widgets.LaunchListWidget
@@ -60,14 +57,8 @@ class WidgetUpdateWorker(
             )
             if (!needed) return
 
-            val launchRepository: LaunchRepository by inject(LaunchRepository::class.java)
-            val notificationStateStorage: NotificationStateStorage by inject(NotificationStateStorage::class.java)
-            val launchFilterService: LaunchFilterService by inject(LaunchFilterService::class.java)
-            val state = notificationStateStorage.stateFlow.first()
-            WidgetLaunchSource(launchRepository).refreshIfDue(
-                agencyIds = launchFilterService.getAgencyIds(state),
-                locationIds = launchFilterService.getLocationIds(state)
-            )
+            val (source, filters) = WidgetLaunchSource.fromKoin()
+            source.refreshIfDue(filters)
         } catch (e: Exception) {
             e.rethrowIfCancellation()
             // The cached list still draws; the redraw goes on.
