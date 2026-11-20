@@ -1,6 +1,5 @@
 package me.calebjones.spacelaunchnow.util
 
-import androidx.compose.runtime.Composable
 import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -10,46 +9,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.util.logging.logger
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.getString
-import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.*
-
-/**
- * Text that still waits for the device language. Compose string resources load only inside a
- * composable ([resolve]) or a coroutine ([load]), so the pure formatting code builds this tree
- * and the caller picks how to read it.
- */
-sealed interface LocalizedText {
-    /** Text that needs no translation, such as a date the platform already formatted. */
-    data class Plain(val value: String) : LocalizedText
-
-    /** A string resource. An argument may itself be a [LocalizedText]. */
-    data class Str(val res: StringResource, val args: List<Any> = emptyList()) : LocalizedText
-
-    /** Parts joined by [separator]. */
-    data class Joined(val parts: List<LocalizedText>, val separator: String = " ") : LocalizedText
-}
-
-@Composable
-fun LocalizedText.resolve(): String = when (this) {
-    is LocalizedText.Plain -> value
-    is LocalizedText.Str -> {
-        val resolved = ArrayList<Any>(args.size)
-        for (arg in args) resolved.add(if (arg is LocalizedText) arg.resolve() else arg)
-        stringResource(res, *resolved.toTypedArray())
-    }
-    is LocalizedText.Joined -> {
-        val resolved = ArrayList<String>(parts.size)
-        for (part in parts) resolved.add(part.resolve())
-        resolved.joinToString(separator)
-    }
-}
-
-suspend fun LocalizedText.load(): String = when (this) {
-    is LocalizedText.Plain -> value
-    is LocalizedText.Str -> getString(res, *args.map { if (it is LocalizedText) it.load() else it }.toTypedArray())
-    is LocalizedText.Joined -> parts.map { it.load() }.joinToString(separator)
-}
 
 /**
  * Utility object for formatting dates and times in a locale-appropriate way using platform-specific formatters
@@ -113,12 +73,9 @@ object DateTimeUtil {
      *
      * @param instant The instant to format
      * @param useUtc If true, uses UTC timezone for calculations and display
+     *
+     * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
-    @Composable
-    fun formatLaunchDateTimeRelative(instant: Instant, useUtc: Boolean = false): String =
-        relativeLaunchDateTime(instant, useUtc).resolve()
-
-    /** Same as [formatLaunchDateTimeRelative], for code that is not a composable. */
     fun relativeLaunchDateTime(instant: Instant, useUtc: Boolean = false): LocalizedText {
         return try {
             val timeZone = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
@@ -162,12 +119,9 @@ object DateTimeUtil {
      * - "PT1H" -> "T + 1h"
      * - "-P1DT14H" -> "T - 1d 14h"
      * - "P2D" -> "T + 2d"
+     *
+     * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
-    @Composable
-    fun formatTimelineRelativeTime(relativeTime: String?): String =
-        timelineRelativeTime(relativeTime).resolve()
-
-    /** Same as [formatTimelineRelativeTime], for code that is not a composable. */
     fun timelineRelativeTime(relativeTime: String?): LocalizedText {
         val zero = timelineText(negative = false, listOf(unitText(Res.string.time_unit_seconds, 0)))
         if (relativeTime.isNullOrBlank()) return zero
@@ -334,12 +288,9 @@ object DateTimeUtil {
 
     /**
      * Formats a domain Launch's NET date with custom precision fallback logic.
+     *
+     * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
-    @Composable
-    fun formatDateWithPrecisionFallback(launch: me.calebjones.spacelaunchnow.domain.model.Launch, useUtc: Boolean = false): String =
-        dateWithPrecisionFallback(launch, useUtc).resolve()
-
-    /** Same as [formatDateWithPrecisionFallback], for code that is not a composable. */
     fun dateWithPrecisionFallback(launch: me.calebjones.spacelaunchnow.domain.model.Launch, useUtc: Boolean = false): LocalizedText {
         val net = launch.net ?: return LocalizedText.Str(Res.string.time_tbd)
         val precisionId = launch.netPrecision?.id
