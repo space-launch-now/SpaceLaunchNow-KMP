@@ -60,3 +60,6 @@ pnpm-lock.yaml
 
 specs/business/
 *.preferences_pb
+
+# Python bytecode
+__pycache__/
