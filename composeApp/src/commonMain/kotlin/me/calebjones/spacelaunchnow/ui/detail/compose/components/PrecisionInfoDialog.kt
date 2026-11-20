@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,7 +33,7 @@ fun PrecisionInfoDialog(
     netPrecision: NetPrecision?,
     onDismiss: () -> Unit
 ) {
-    val ui = remember(netPrecision) { mapNetPrecisionUi(netPrecision) }
+    val ui = mapNetPrecisionUi(netPrecision)
     AdCoveringAlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -63,7 +62,7 @@ fun PrecisionInfoDialog(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = ui.primary ?: stringResource(Res.string.launch_detail_value_unknown),
+                        text = ui.primary,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -88,14 +87,16 @@ fun PrecisionInfoDialog(
 
 private data class PrecisionUi(
     val icon: ImageVector,
-    val primary: String?,
+    val primary: String,
     val secondary: String?
 )
 
+@Composable
 private fun mapNetPrecisionUi(netPrecision: NetPrecision?): PrecisionUi {
     // Defaults
     val defaultPrimary = netPrecision?.name?.takeIf { it.isNotBlank() }
         ?: netPrecision?.abbrev?.takeIf { it.isNotBlank() }
+        ?: stringResource(Res.string.launch_detail_value_unknown)
     val fallbackSecondary = netPrecision?.description?.takeIf { it.isNotBlank() }
 
     // Choose icon and concise secondary by id when available

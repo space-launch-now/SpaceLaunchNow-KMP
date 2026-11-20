@@ -208,7 +208,7 @@
     <!-- Heading above the launch statistics of a rocket. One line. -->
     <string name="launch_detail_vehicle_statistics_heading">Launch Vehicle Statistics</string>
     <!-- Statistic label under a launch count. Two short lines; the line break is part of the text. -->
-    <string name="launch_detail_stat_pending_launches">Pending\nnLaunches</string>
+    <string name="launch_detail_stat_pending_launches">Pending\nLaunches</string>
     <!-- Statistic label under a count of successes in a row. Two short lines; the line break is part of the text. -->
     <string name="launch_detail_stat_consecutive_success">Consecutive\nSuccess</string>
     <!-- Heading above the landing statistics of a rocket. One line. -->
