@@ -1,6 +1,8 @@
 package me.calebjones.spacelaunchnow.data.model
 
 import android.app.NotificationManager
+import androidx.annotation.StringRes
+import me.calebjones.spacelaunchnow.R
 
 /**
  * Defines notification channels for granular user control
@@ -9,16 +11,16 @@ import android.app.NotificationManager
  */
 enum class SpaceLaunchNotificationChannel(
     val id: String,
-    val displayName: String,
-    val description: String,
+    @StringRes val nameRes: Int,
+    @StringRes val descriptionRes: Int,
     val importance: Int,
     val topics: List<NotificationTopic>
 ) {
     // Critical - Immediate launch events (1-10 minutes, can bypass DND)
     LAUNCH_IMMINENT(
         "launch_imminent_critical",
-        "Launch Imminent (Critical)",
-        "Final countdown notifications (1-10 minutes before launch)",
+        R.string.channel_launch_imminent_name,
+        R.string.channel_launch_imminent_description,
         NotificationManager.IMPORTANCE_HIGH,
         listOf(NotificationTopic.TEN_MINUTES, NotificationTopic.ONE_MINUTE)
     ),
@@ -26,8 +28,8 @@ enum class SpaceLaunchNotificationChannel(
     // High Priority - Real-time launch status updates
     LAUNCH_STATUS_UPDATES(
         "launch_status_high",
-        "Launch Status Updates",
-        "Real-time launch progress, success, and failure notifications",
+        R.string.channel_launch_status_updates_name,
+        R.string.channel_launch_status_updates_description,
         NotificationManager.IMPORTANCE_HIGH,
         listOf(
             NotificationTopic.IN_FLIGHT, NotificationTopic.SUCCESS,
@@ -38,8 +40,8 @@ enum class SpaceLaunchNotificationChannel(
     // High Priority - Schedule changes (important for planning)
     SCHEDULE_CHANGES(
         "schedule_changes_high",
-        "Schedule Changes",
-        "Notifications when launch dates/times change",
+        R.string.channel_schedule_changes_name,
+        R.string.channel_schedule_changes_description,
         NotificationManager.IMPORTANCE_LOW,
         listOf(NotificationTopic.NETSTAMP_CHANGED)
     ),
@@ -47,8 +49,8 @@ enum class SpaceLaunchNotificationChannel(
     // Default Priority - Advance launch reminders
     LAUNCH_REMINDERS(
         "launch_reminders_default",
-        "Launch Reminders",
-        "Launch notifications 1-24 hours in advance",
+        R.string.channel_launch_reminders_name,
+        R.string.channel_launch_reminders_description,
         NotificationManager.IMPORTANCE_DEFAULT,
         listOf(NotificationTopic.TWENTY_FOUR_HOUR, NotificationTopic.ONE_HOUR)
     ),
@@ -56,8 +58,8 @@ enum class SpaceLaunchNotificationChannel(
     // Default Priority - Webcast notifications
     WEBCAST_NOTIFICATIONS(
         "webcast_notifications_default",
-        "Webcast Notifications",
-        "Notifications about webcast availability and when webcasts go live",
+        R.string.channel_webcast_notifications_name,
+        R.string.channel_webcast_notifications_description,
         NotificationManager.IMPORTANCE_DEFAULT,
         listOf(NotificationTopic.WEBCAST_LIVE, NotificationTopic.WEBCAST_ONLY)
     ),
@@ -65,8 +67,8 @@ enum class SpaceLaunchNotificationChannel(
     // Default Priority - General space events
     SPACE_EVENTS(
         "space_events_default",
-        "Space Events",
-        "Notifications for space-related events and milestones",
+        R.string.channel_space_events_name,
+        R.string.channel_space_events_description,
         NotificationManager.IMPORTANCE_DEFAULT,
         listOf(NotificationTopic.EVENTS)
     ),
@@ -74,8 +76,8 @@ enum class SpaceLaunchNotificationChannel(
     // Low Priority - News and updates
     NEWS_UPDATES(
         "news_updates_low",
-        "News & Updates",
-        "News and general updates about space missions",
+        R.string.channel_news_updates_name,
+        R.string.channel_news_updates_description,
         NotificationManager.IMPORTANCE_LOW,
         listOf(NotificationTopic.FEATURED_NEWS)
     ),
@@ -83,8 +85,8 @@ enum class SpaceLaunchNotificationChannel(
     // Default Priority - Admin announcements / custom broadcasts
     ANNOUNCEMENTS(
         "announcements_default",
-        "Announcements",
-        "Announcements and special messages from Space Launch Now",
+        R.string.channel_announcements_name,
+        R.string.channel_announcements_description,
         NotificationManager.IMPORTANCE_DEFAULT,
         listOf(NotificationTopic.ANNOUNCEMENTS)
     );

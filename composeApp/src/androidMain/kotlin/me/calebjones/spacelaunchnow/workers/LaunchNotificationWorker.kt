@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import me.calebjones.spacelaunchnow.MainActivity
+import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class LaunchNotificationWorker(
@@ -21,7 +22,6 @@ class LaunchNotificationWorker(
 
     companion object {
         private const val CHANNEL_ID = "launch_notifications"
-        private const val CHANNEL_NAME = "Launch Notifications"
         private const val NOTIFICATION_ID = 2
     }
 
@@ -29,8 +29,8 @@ class LaunchNotificationWorker(
         try {
             createNotificationChannel()
 
-            val launchName = inputData.getString("launch_name") ?: "Upcoming Launch"
-            val launchTime = inputData.getString("launch_time") ?: "Soon"
+            val launchName = inputData.getString("launch_name") ?: context.getString(R.string.launch_alert_default_name)
+            val launchTime = inputData.getString("launch_time") ?: context.getString(R.string.launch_alert_default_time)
             val launchId = inputData.getString("launch_id")
 
             log.i { "Showing launch notification - name: $launchName, time: $launchTime, id: $launchId" }
@@ -47,10 +47,10 @@ class LaunchNotificationWorker(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                context.getString(R.string.launch_alert_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifications for upcoming launches"
+                description = context.getString(R.string.launch_alert_channel_description)
                 enableVibration(true)
             }
 
@@ -74,8 +74,8 @@ class LaunchNotificationWorker(
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setContentTitle("🚀 Launch Alert")
-            .setContentText("$launchName is launching $launchTime")
+            .setContentTitle(context.getString(R.string.launch_alert_title))
+            .setContentText(context.getString(R.string.launch_alert_text, launchName, launchTime))
             .setSmallIcon(me.calebjones.spacelaunchnow.R.mipmap.ic_launcher_monochrome)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

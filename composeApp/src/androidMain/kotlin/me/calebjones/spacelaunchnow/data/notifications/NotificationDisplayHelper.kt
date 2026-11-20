@@ -165,10 +165,10 @@ object NotificationDisplayHelper {
         SpaceLaunchNotificationChannel.values().forEach { channelConfig ->
             val channel = NotificationChannel(
                 channelConfig.id,
-                channelConfig.displayName,
+                context.getString(channelConfig.nameRes),
                 channelConfig.importance
             ).apply {
-                description = channelConfig.description
+                description = context.getString(channelConfig.descriptionRes)
 
                 // Enable lights and vibration with patterns based on channel type
                 when (channelConfig) {
@@ -514,7 +514,7 @@ object NotificationDisplayHelper {
                 formattedDate
             )
 
-            else -> "Launch from $launchLocation" // Fallback
+            else -> context.getString(R.string.notification_fallback_launch_from, launchLocation) // Fallback
         }
     }
 
@@ -663,8 +663,8 @@ object NotificationDisplayHelper {
             // Fallback: show basic notification if parsing fails
             showBasicNotification(
                 context,
-                title ?: "Space Launch Now",
-                body ?: "New launch notification"
+                title ?: context.getString(R.string.app_name),
+                body ?: context.getString(R.string.notification_fallback_body)
             )
         }
     }

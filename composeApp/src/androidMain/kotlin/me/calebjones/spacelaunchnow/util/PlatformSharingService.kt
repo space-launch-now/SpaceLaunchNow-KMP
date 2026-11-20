@@ -2,6 +2,7 @@ package me.calebjones.spacelaunchnow.util
 
 import android.content.Context
 import android.content.Intent
+import me.calebjones.spacelaunchnow.R
 import me.calebjones.spacelaunchnow.domain.model.Launch
 
 /**
@@ -27,11 +28,11 @@ class AndroidSharingService(private val context: Context) : LaunchSharingService
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)
-            putExtra(Intent.EXTRA_SUBJECT, "Space Launch Information")
+            putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_subject))
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         
-        val chooserIntent = Intent.createChooser(intent, "Share launch info via").apply {
+        val chooserIntent = Intent.createChooser(intent, context.getString(R.string.share_chooser_title)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         
