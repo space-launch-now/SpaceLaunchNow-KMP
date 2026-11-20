@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -116,7 +117,7 @@ fun CalendarSyncScreen(
                     description = "Upgrade to Premium to sync launches and events to your calendar.",
                     icon = Icons.Default.Star,
                     onUpgradeClick = {
-                        navController.navigate(SupportUs)
+                        navController.navigate(SupportUs(PaywallSource.CALENDAR_SYNC.value))
                     }
                 )
             }

@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -326,7 +327,7 @@ fun ResponsiveHomeContent(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     placementType = AdPlacementType.FEED,
                     showRemoveAdsButton = true,
-                    onRemoveAdsClick = { navController.navigate(SupportUs) },
+                    onRemoveAdsClick = { navController.navigate(SupportUs(PaywallSource.HOME_REMOVE_ADS.value)) },
                     refreshKey = visitKey
                 )
             }

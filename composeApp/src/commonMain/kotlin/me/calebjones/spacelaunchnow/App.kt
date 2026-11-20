@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -555,8 +556,9 @@ fun SpaceLaunchNowApp(
                             composableWithCompositionLocal<AboutLibraries> {
                                 AboutLibrariesScreen(onNavigateBack = { navController.popBackStack() })
                             }
-                            composableWithCompositionLocal<SupportUs> {
+                            composableWithCompositionLocal<SupportUs> { backStackEntry ->
                                 SupportUsScreen(
+                                    source = backStackEntry.toRoute<SupportUs>().source,
                                     onNavigateBack = { navController.popBackStack() }
                                 )
                             }
@@ -715,7 +717,7 @@ fun SpaceLaunchNowApp(
                             when (navigationDestination) {
                                 "subscription" -> {
                                     log.d { "Navigating to SupportUs from widget" }
-                                    navController.navigate(SupportUs)
+                                    navController.navigate(SupportUs(PaywallSource.WIDGET_LOCK.value))
                                     onNavigationDestinationConsumed()
                                 }
                                 null -> {} // No navigation destination

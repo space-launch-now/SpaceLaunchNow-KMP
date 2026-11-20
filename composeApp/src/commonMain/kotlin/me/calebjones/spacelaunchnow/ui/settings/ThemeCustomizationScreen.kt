@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import me.calebjones.spacelaunchnow.ui.ads.AdCoveringExposedDropdownMenu
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -184,7 +185,7 @@ fun ThemeCustomizationScreen(
                         description = "Customize your app's theme with custom colors and palette styles",
                         icon = Icons.Default.Palette,
                         onUpgradeClick = {
-                            navController.navigate(SupportUs)
+                            navController.navigate(SupportUs(PaywallSource.THEME_PROMPT.value))
                         }
                     )
                 }
@@ -513,7 +514,7 @@ fun ThemeCustomizationScreen(
                                 if (hasWidgetCustomization) {
                                     viewModel.applyWidgetChanges()
                                 } else {
-                                    navController.navigate(SupportUs)
+                                    navController.navigate(SupportUs(PaywallSource.THEME_WIDGET_APPLY.value))
                                 }
                             },
                             enabled = if (hasWidgetCustomization) hasUnappliedWidgetChanges else true,
@@ -550,7 +551,7 @@ fun ThemeCustomizationScreen(
                         if (hasCustomTheme) {
                             viewModel.resetToDefaults()
                         } else {
-                            navController.navigate(SupportUs)
+                            navController.navigate(SupportUs(PaywallSource.THEME_RESET.value))
                         }
                     },
                     enabled = hasCustomTheme,

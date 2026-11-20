@@ -36,7 +36,10 @@ data object Diagnostics
 data object AboutLibraries
 
 @Serializable
-data object SupportUs
+data class SupportUs(
+    /** [me.calebjones.spacelaunchnow.analytics.events.PaywallSource.value] of the entry that opened the paywall. */
+    val source: String = me.calebjones.spacelaunchnow.analytics.events.PaywallSource.SUPPORT_US.value
+)
 
 @Serializable
 data object ThemeCustomization

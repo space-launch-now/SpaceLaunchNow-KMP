@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.subscription
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -93,6 +94,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 @Composable
 fun SupportUsScreen(
     viewModel: SubscriptionViewModel = koinInject(),
+    source: String = PaywallSource.SUPPORT_US.value,
     onNavigateBack: () -> Unit = {}
 ) {
     val subscriptionState by viewModel.subscriptionState.collectAsState()
@@ -108,7 +110,7 @@ fun SupportUsScreen(
 
     // Funnel top (spec 014 FR-1): once per presentation, mirroring OnboardingPaywallScreen.
     LaunchedEffect(Unit) {
-        viewModel.trackPaywallViewed("support_us")
+        viewModel.trackPaywallViewed(source)
     }
 
     // Determine user status for different upgrade flows
@@ -315,8 +317,8 @@ fun SupportUsScreen(
                         isProcessing = uiState.isProcessing,
                         onSubscribe = {
                             if (annualProduct != null) {
-                                viewModel.trackTierSelected(ProductType.ANNUAL, annualProduct.productId)
-                                viewModel.purchaseProduct(annualProduct)
+                                viewModel.trackTierSelected(ProductType.ANNUAL, annualProduct.productId, source)
+                                viewModel.purchaseProduct(annualProduct, source)
                             }
                         },
                         enabled = annualProduct != null,
@@ -339,8 +341,8 @@ fun SupportUsScreen(
                         isProcessing = uiState.isProcessing,
                         onSubscribe = {
                             if (monthlyProduct != null) {
-                                viewModel.trackTierSelected(ProductType.MONTHLY, monthlyProduct.productId)
-                                viewModel.purchaseProduct(monthlyProduct)
+                                viewModel.trackTierSelected(ProductType.MONTHLY, monthlyProduct.productId, source)
+                                viewModel.purchaseProduct(monthlyProduct, source)
                             }
                         },
                         enabled = monthlyProduct != null
@@ -376,8 +378,8 @@ fun SupportUsScreen(
                         isProcessing = uiState.isProcessing,
                         onPurchase = {
                             if (lifetimeProduct != null) {
-                                viewModel.trackTierSelected(ProductType.LIFETIME, lifetimeProduct.productId)
-                                viewModel.purchaseProduct(lifetimeProduct)
+                                viewModel.trackTierSelected(ProductType.LIFETIME, lifetimeProduct.productId, source)
+                                viewModel.purchaseProduct(lifetimeProduct, source)
                             }
                         },
                         enabled = lifetimeProduct != null
@@ -404,7 +406,7 @@ fun SupportUsScreen(
                     CurrentPlanCard(
                         subscriptionState = subscriptionState,
                         onVerifySubscription = { viewModel.verifySubscription(forceRefresh = true) },
-                        onRestorePurchases = { viewModel.restorePurchases() },
+                        onRestorePurchases = { viewModel.restorePurchases(source) },
                         isProcessing = uiState.isProcessing
                     )
                 }
@@ -416,7 +418,7 @@ fun SupportUsScreen(
 
                 // Restore Purchases
                 TextButton(
-                    onClick = { viewModel.restorePurchases() },
+                    onClick = { viewModel.restorePurchases(source) },
                     modifier = Modifier.padding(horizontal = 24.dp),
                     enabled = !uiState.isProcessing
                 ) {
