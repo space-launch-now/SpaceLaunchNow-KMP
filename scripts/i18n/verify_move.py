@@ -25,6 +25,7 @@ LITERAL_RE = re.compile(r'(?<!")"((?:[^"\\\n]|\\.)*)"(?!")')
 KT_VAR_RE = re.compile(r"\$(?:\{([^{}]*)\}|([A-Za-z_][A-Za-z0-9_]*))")
 PRINTF_PATTERN = r"%(?:(\d+)\$)?[-#+ 0,(]*\d*(?:\.\d+)?([a-zA-Z%])"  # shared with pseudo_locale
 PRINTF_RE = re.compile(PRINTF_PATTERN)
+JOIN_RE = re.compile(r'"\s*\+\s*"')
 SIMPLE_ESCAPES = {"n": "\n", "t": "\t", "b": "\b", "r": "\r"}
 DOLLAR_MARK = "\x00"
 
@@ -118,6 +119,8 @@ def parse_hunks(diff: str):
 def check_hunk(removed, added, strings, other):
     """Return a list of problem strings for one hunk."""
     pool = [normalize_literal(m.group(1)) for line in removed for m in LITERAL_RE.finditer(line)]
+    joined = JOIN_RE.sub("", chr(10).join(removed))  # "a" + "b" over several lines is one literal
+    pool += [normalize_literal(m.group(1)) for m in LITERAL_RE.finditer(joined)]
     problems = []
     for line in added:
         for key in KEY_RE.findall(line):

@@ -746,37 +746,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/Schedu
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Select a launch to view details
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Upcoming
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Upcoming
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Calendar Feed URLs
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Calendar Sync
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Click the \
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Copy URL
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Copy the calendar feed URL above
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Google Calendar Setup
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	How it works
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Open Google Calendar on your computer
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Paste the copied URL and click \
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Premium Feature
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Repeat for both Launches and Events feeds
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Select \
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Subscribe to space-related events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Subscribe to upcoming space launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	These links will work on any calendar that supports ICS URL feeds.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	To add these feeds to Google Calendar:
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Unlock Calendar Sync
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Upgrade to Premium to sync launches and events to your calendar.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Use the Calendar ICS URLs below to subscribe to Space Launch Now events and launches in your calendar app. Your calendar will automatically update with the latest information.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Your calendar will automatically update with new launches and events!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/DiagnosticsScreen.kt	${crumb.timestampEpochSeconds} ${crumb.type} → ${crumb.decision} (${crumb.reason})
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/DiagnosticsScreen.kt	${row.topic} desired=${row.desired} confirmed=${row.confirmed} attempts=${row.attempts} lastAttempt=${row.last_attempt ?: 
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/DiagnosticsScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/DiagnosticsScreen.kt	Diagnostics
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/DiagnosticsScreen.kt	Reset push subscriptions (resubscribe from scratch)
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/LoggingSettingsSection.kt	Diagnostic Logging
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/LoggingSettingsSection.kt	Help us debug issues by sharing diagnostic logs. Standard sends warnings 
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/LoggingSettingsSection.kt	Open Diagnostics
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 Hour Notice
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 Minute Notice
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 hour before launch
@@ -831,87 +800,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/Notifi
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	You're following all launches! Individual selections below are overridden.
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	• ✅ SpaceX from KSC\n• ❌ SpaceX from other locations\n• ❌ Other agencies from KSC
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	• ✅ SpaceX from anywhere\n• ✅ Any agency from KSC\n• ✅ Much more notifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	API URL switching, topic testing, and developer options
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	About Details
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Ad privacy settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Ad-free, widgets, themes & more
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Allow notifications for news, launches and events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Appearance, colors, and palette customization
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Calendar Sync
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Cancel
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Data updates
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Debug Settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Early Release
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Filter launches shown in app and notifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Go Premium \u2728
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Hide TBD Launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Hide launches without confirmed dates
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Launch data on your watch is refreshed every 5 minutes when a launch is under 1 hour away, and every 30 minutes otherwise. The tile and complication follow the same filter preferences you set here in the app.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Manage notification channels, sounds, and do-not-disturb
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Notification Filters
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Notifications Disabled
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Notifications Enabled
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Permission required to send notifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Privacy policy
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Report issues or suggest improvements
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Roadmap
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Send Feedback
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Shop
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Show dates/times in UTC instead of local timezone
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Space Launch Now is also available on Wear OS.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Space Launch Now merch
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Sync Launches and Events to your calendar
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	System Settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Terms of service
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Theme
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Theme Settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Unlock
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Use UTC time
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Version ${BuildConfig.VERSION_NAME}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	View planned features and development timeline
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Wear OS App Available
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Wear OS support is in early release. More features, polish, and improvements are on the way.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	● Watch connected
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/TestLoggingButtons.kt	DEBUG
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/TestLoggingButtons.kt	ERROR
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/TestLoggingButtons.kt	ERROR+EX
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/TestLoggingButtons.kt	Generate test log messages at different severity levels to verify Datadog logging configuration.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/TestLoggingButtons.kt	INFO
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/TestLoggingButtons.kt	VERBOSE
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/TestLoggingButtons.kt	WARN
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/TestLoggingButtons.kt	💡 Tip: Check your Datadog dashboard or logcat/Xcode console to verify which levels are being logged based on your current configuration.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	${(widgetBackgroundAlpha * 100).toInt()}%
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	${widgetCornerRadius}dp
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	0% = Fully transparent, 100% = Fully opaque
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	24h Premium Access
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Auto light/dark based on system settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Background Transparency
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Corner Radius
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Customize your app's theme with custom colors and palette styles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Customize your app's theme with custom colors and palette styles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Dynamic Colors
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Follow App Theme
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Follow System Theme
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Hex
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Hue
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Match wallpaper colors (Android 12+)
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Premium Feature
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Premium Feature
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Premium Feature
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Primary
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Rounded corners for widget background (0-40dp, increments of 4dp)
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Secondary
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Selected
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Selected
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Selected
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Tertiary
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Theme
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Theme Settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Unlock Custom Themes
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Upgrade to Premium
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Use your custom app theme colors in widgets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Watch an ad to unlock premium theme features for 24 hours
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailLoadingView.kt	Error
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailLoadingView.kt	Failed to load station details
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailLoadingView.kt	Navigate back
