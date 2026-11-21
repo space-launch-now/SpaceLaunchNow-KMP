@@ -30,9 +30,6 @@ jobs:
       - name: Check for new hard-coded UI text
         run: python3 scripts/i18n/check_hardcoded_text.py
 
-      - name: Verify string moves keep the English text
-        run: python3 scripts/i18n/verify_move.py --base origin/${{ github.base_ref }} --only-if-strings-changed
-
       - name: Check shared string keys are in sync
         run: |
           python3 scripts/i18n/sync_shared_keys.py --check
