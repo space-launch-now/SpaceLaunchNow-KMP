@@ -152,6 +152,9 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/astronaut/compo
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/astronaut/components/AstronautStatsCard.kt	Overview
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/astronaut/components/AstronautStatsCard.kt	Status
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/astronaut/components/AstronautStatsCard.kt	Time in Space
+composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Any purchase unlocks all premium features. 
+composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Free trial will automatically convert to a paid subscription 
+composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Secure Billing
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Description
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Launch Status
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	NET Feb 15, 2026

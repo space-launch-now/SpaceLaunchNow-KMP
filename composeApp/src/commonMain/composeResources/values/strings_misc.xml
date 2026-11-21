@@ -20,24 +20,6 @@
     <string name="app_components_feedback_title">I\'d Love Your Feedback</string>
     <!-- Content description of the close icon on a filter chip. %1$s is the filter label. Read by screen readers. -->
     <string name="app_components_filter_chip_remove_description">Remove %1$s filter</string>
-    <!-- Text button with an open icon on iOS, opens the store subscription page. One line. -->
-    <string name="app_components_fine_print_manage_app_store">Manage Subscriptions in App Store</string>
-    <!-- Text button with an open icon on Android, opens the store subscription page. One line. -->
-    <string name="app_components_fine_print_manage_google_play">Manage Subscriptions on Google Play</string>
-    <!-- Text button with an open icon on other platforms. One line. -->
-    <string name="app_components_fine_print_manage_other">Manage Subscriptions</string>
-    <!-- Subscription fine print on iOS. Centered, small text, one or two lines. -->
-    <string name="app_components_fine_print_secure_app_store">Purchases are processed securely through the App Store.</string>
-    <!-- Subscription fine print on Android. Centered, small text, one or two lines. -->
-    <string name="app_components_fine_print_secure_google_play">Purchases are processed securely through Google Play.</string>
-    <!-- Subscription fine print on other platforms. Centered, small text, one or two lines. -->
-    <string name="app_components_fine_print_secure_other">Purchases are processed securely through your platform\'s store.</string>
-    <!-- Small bold heading in the subscription fine print, under the lock icon. One line. -->
-    <string name="app_components_fine_print_secure_title">Secure Billing</string>
-    <!-- Subscription fine print above the manage button. Centered, small text, three or four lines. -->
-    <string name="app_components_fine_print_terms">Any purchase unlocks all premium features. Subscriptions auto-renew unless cancelled. You can manage or cancel your subscription at any time by following the link below.</string>
-    <!-- Subscription fine print shown with a free trial. %1$s is the price after the trial, %2$s is the trial length such as 3-day. Centered, small text, three or four lines. -->
-    <string name="app_components_fine_print_trial">Free trial will automatically convert to a paid subscription at %1$s unless canceled before the trial ends. You won\'t be charged if you cancel during the %2$s trial period.</string>
     <!-- Banner text next to the cloud-off icon when data comes from the cache. One line, may truncate. -->
     <string name="app_components_offline_banner_message">Offline - Showing cached data</string>
     <!-- Text button in the rating dialog, full width, one line. -->
