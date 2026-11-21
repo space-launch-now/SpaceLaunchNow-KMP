@@ -50,6 +50,13 @@ import me.calebjones.spacelaunchnow.ui.compose.NextUpShimmerBox
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_placeholder_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_next_up_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.home_next_up_explore
+import spacelaunchnow_kmp.composeapp.generated.resources.home_next_up_share
 
 @Composable
 fun NextLaunchView(
@@ -133,7 +140,7 @@ fun NextLaunchItemView(
                     // not circular progress indicators. Circular loaders are jarring for image content.
                     SubcomposeAsyncImage(
                             model = url,
-                            contentDescription = "Launch Image",
+                            contentDescription = stringResource(Res.string.home_launch_image_description),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
                             loading = {
@@ -161,7 +168,7 @@ fun NextLaunchItemView(
                                 ) {
                                     Icon(
                                         imageVector = CustomIcons.RocketLaunch,
-                                        contentDescription = "Launch placeholder",
+                                        contentDescription = stringResource(Res.string.home_launch_placeholder_description),
                                         modifier = Modifier.size(96.dp),
                                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                     )
@@ -178,7 +185,7 @@ fun NextLaunchItemView(
                         ) {
                             Icon(
                                 imageVector = CustomIcons.RocketLaunch,
-                                contentDescription = "Launch placeholder",
+                                contentDescription = stringResource(Res.string.home_launch_placeholder_description),
                                 modifier = Modifier.size(96.dp),
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                             )
@@ -257,12 +264,12 @@ fun NextLaunchItemView(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Explore,
-                            contentDescription = "Explore",
+                            contentDescription = stringResource(Res.string.home_next_up_explore),
                             tint = Color.White
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Explore",
+                            text = stringResource(Res.string.home_next_up_explore),
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Medium
                         )
@@ -280,12 +287,12 @@ fun NextLaunchItemView(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Share,
-                            contentDescription = "Share",
+                            contentDescription = stringResource(Res.string.home_next_up_share),
                             tint = Color.White
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Share",
+                            text = stringResource(Res.string.home_next_up_share),
                             color = MaterialTheme.colorScheme.onErrorContainer,
                             fontWeight = FontWeight.Medium
                         )
@@ -329,7 +336,7 @@ fun ErrorMessageView(errorMessage: String) {
             ) {
                 // Error title
                 Text(
-                    text = "API Request Error",
+                    text = stringResource(Res.string.home_next_up_error_title),
                     style = MaterialTheme.typography.headlineSmall,
                 )
 

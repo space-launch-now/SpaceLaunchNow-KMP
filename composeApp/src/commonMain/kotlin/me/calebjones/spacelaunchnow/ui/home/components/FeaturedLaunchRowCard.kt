@@ -54,6 +54,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_date_tbd
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_placeholder_description
 
 /**
  * A compact, wide card for displaying featured launches in a horizontal row.
@@ -96,7 +101,7 @@ fun FeaturedLaunchRowCard(
                 launch.imageUrl?.let { url ->
                     SubcomposeAsyncImage(
                         model = url,
-                        contentDescription = "Launch Image",
+                        contentDescription = stringResource(Res.string.home_launch_image_description),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                         loading = {
@@ -125,7 +130,7 @@ fun FeaturedLaunchRowCard(
                             ) {
                                 Icon(
                                     imageVector = CustomIcons.RocketLaunch,
-                                    contentDescription = "Launch placeholder",
+                                    contentDescription = stringResource(Res.string.home_launch_placeholder_description),
                                     modifier = Modifier.size(36.dp),
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 )
@@ -141,7 +146,7 @@ fun FeaturedLaunchRowCard(
                     ) {
                         Icon(
                             imageVector = CustomIcons.RocketLaunch,
-                            contentDescription = "Launch placeholder",
+                            contentDescription = stringResource(Res.string.home_launch_placeholder_description),
                             modifier = Modifier.size(36.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
@@ -230,7 +235,7 @@ fun FeaturedLaunchRowCard(
                             }
                         )
                     } else {
-                        LaunchDateRow(text = "TBD")
+                        LaunchDateRow(text = stringResource(Res.string.home_launch_date_tbd))
                     }
 
                 }

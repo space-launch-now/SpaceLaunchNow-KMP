@@ -27,6 +27,10 @@ import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.home_last_launch_title
 
 private val LastLaunchCardHeight = 380.dp
 private val LoadingPlaceholderHeight = 240.dp
@@ -49,13 +53,13 @@ fun LastLaunchCard(
             ) {
                 Icon(
                     Icons.Default.CheckCircle,
-                    contentDescription = "Last Launch",
+                    contentDescription = stringResource(Res.string.home_last_launch_title),
                     tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Last Launch",
+                    text = stringResource(Res.string.home_last_launch_title),
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 )
@@ -76,7 +80,7 @@ fun LastLaunchCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "Loading...",
+                        stringResource(Res.string.common_loading),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f)
                     )

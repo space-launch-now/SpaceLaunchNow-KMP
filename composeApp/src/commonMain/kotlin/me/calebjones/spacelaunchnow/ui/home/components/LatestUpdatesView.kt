@@ -57,6 +57,15 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.home_cached_data_notice
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_author_profile_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_error
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_profile_placeholder_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_source_description
 
 @Composable
 fun LatestUpdatesView(
@@ -80,7 +89,7 @@ fun LatestUpdatesView(
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = "Showing cached data",
+                            text = stringResource(Res.string.home_cached_data_notice),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                             modifier = Modifier.padding(8.dp)
@@ -169,7 +178,7 @@ fun UpdateItem(
             // Author profile image
             SubcomposeAsyncImage(
                 model = update.profileImage ?: "",
-                contentDescription = "Author profile",
+                contentDescription = stringResource(Res.string.home_updates_author_profile_description),
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape),
@@ -199,7 +208,7 @@ fun UpdateItem(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Person,
-                            contentDescription = "Profile placeholder",
+                            contentDescription = stringResource(Res.string.home_updates_profile_placeholder_description),
                             modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
@@ -281,7 +290,7 @@ fun UpdateItem(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                            contentDescription = "Source",
+                            contentDescription = stringResource(Res.string.home_updates_source_description),
                             modifier = Modifier.size(10.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -352,7 +361,7 @@ fun UpdateCard(
                     // Author profile image
                     SubcomposeAsyncImage(
                         model = update.profileImage ?: "",
-                        contentDescription = "Author profile",
+                        contentDescription = stringResource(Res.string.home_updates_author_profile_description),
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape),
@@ -383,7 +392,7 @@ fun UpdateCard(
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Person,
-                                    contentDescription = "Profile placeholder",
+                                    contentDescription = stringResource(Res.string.home_updates_profile_placeholder_description),
                                     modifier = Modifier.size(32.dp),
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 )
@@ -473,7 +482,7 @@ fun UpdateCard(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                            contentDescription = "Source",
+                            contentDescription = stringResource(Res.string.home_updates_source_description),
                             modifier = Modifier.size(12.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -581,7 +590,7 @@ fun ErrorCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Failed to load updates",
+                text = stringResource(Res.string.home_updates_error),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -601,7 +610,7 @@ fun ErrorCard(
                     ),
                     modifier = Modifier.padding(top = 4.dp)
                 ) {
-                    Text("Retry")
+                    Text(stringResource(Res.string.common_retry))
                 }
             }
         }
@@ -627,7 +636,7 @@ fun EmptyUpdatesCard(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No updates available",
+                text = stringResource(Res.string.home_updates_empty),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

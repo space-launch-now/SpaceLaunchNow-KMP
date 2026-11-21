@@ -48,6 +48,12 @@ import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilitySc
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_cached_data_notice
+import spacelaunchnow_kmp.composeapp.generated.resources.home_events_error
+import spacelaunchnow_kmp.composeapp.generated.resources.home_events_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_events_image_description
 
 @Composable
 fun EventsView(
@@ -71,7 +77,7 @@ fun EventsView(
                                 .padding(horizontal = 16.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "Showing cached data",
+                                text = stringResource(Res.string.home_cached_data_notice),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.padding(8.dp)
@@ -187,7 +193,7 @@ fun EventItem(event: Event, navController: NavController) {
                     val image = event.imageUrl
                     SubcomposeAsyncImage(
                         model = image,
-                        contentDescription = "Event Image",
+                        contentDescription = stringResource(Res.string.home_events_image_description),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(120.dp)
@@ -230,7 +236,7 @@ fun EventItem(event: Event, navController: NavController) {
                             ) {
                                 Icon(
                                     imageVector = FontAwesomeIcons.Solid.CalendarDay,
-                                    contentDescription = "Event Icon",
+                                    contentDescription = stringResource(Res.string.home_events_icon_description),
                                     modifier = Modifier.size(64.dp),
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 )
@@ -311,7 +317,7 @@ fun EventItem(event: Event, navController: NavController) {
             val image = event.imageUrl
             SubcomposeAsyncImage(
                 model = image,
-                contentDescription = "Event Image",
+                contentDescription = stringResource(Res.string.home_events_image_description),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
@@ -344,7 +350,7 @@ fun EventItem(event: Event, navController: NavController) {
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.CalendarDay,
-                            contentDescription = "Event Icon",
+                            contentDescription = stringResource(Res.string.home_events_icon_description),
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
@@ -472,7 +478,7 @@ fun EventErrorCard(error: String) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Failed to load events",
+                text = stringResource(Res.string.home_events_error),
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
