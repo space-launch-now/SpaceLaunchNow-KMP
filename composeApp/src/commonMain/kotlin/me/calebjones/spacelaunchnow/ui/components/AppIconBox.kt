@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
-import spacelaunchnow_kmp.composeapp.generated.resources.app_components_app_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_app_name
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -84,7 +84,7 @@ fun AppIconBox(
         ) {
             Image(
                 painter = painterResource(Res.drawable.launcher),
-                contentDescription = stringResource(Res.string.app_components_app_icon_description),
+                contentDescription = stringResource(Res.string.common_app_name),
                 modifier = Modifier
                     .size(iconSize)
                     .align(Alignment.Center)

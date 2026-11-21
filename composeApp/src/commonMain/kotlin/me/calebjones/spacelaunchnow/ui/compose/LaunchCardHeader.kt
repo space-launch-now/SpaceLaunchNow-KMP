@@ -43,7 +43,7 @@ import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.time_tbd
+import spacelaunchnow_kmp.composeapp.generated.resources.common_tbd
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
@@ -52,7 +52,7 @@ import me.calebjones.spacelaunchnow.util.resolve
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_card_header_agency_logo_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_card_header_agency_placeholder_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_card_header_location_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_location
 
 @Composable
 private fun AgencyLogoShimmer(logoSize: Dp) {
@@ -122,7 +122,7 @@ fun LaunchCardHeaderOverlay(
         } else {
             DateTimeUtil.formatLaunchDateTime(it, useUtc)
         }
-    } ?: stringResource(Res.string.time_tbd)
+    } ?: stringResource(Res.string.common_tbd)
 
     Row(
         modifier = modifier.padding(contentPadding),
@@ -203,7 +203,7 @@ fun LaunchCardHeaderOverlay(
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = stringResource(Res.string.app_compose_launch_card_header_location_description),
+                        contentDescription = stringResource(Res.string.common_launch_location),
                         modifier = Modifier.size(16.dp),
                         tint = Color.White.copy(alpha = 0.9f)
                     )

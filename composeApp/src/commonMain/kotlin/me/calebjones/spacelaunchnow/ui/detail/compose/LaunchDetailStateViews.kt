@@ -42,8 +42,8 @@ import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 import spacelaunchnow_kmp.composeapp.generated.resources.common_error
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_error_title
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_error_try_again
+import spacelaunchnow_kmp.composeapp.generated.resources.common_oops_something_went_wrong
+import spacelaunchnow_kmp.composeapp.generated.resources.common_try_again
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_quick_facts_heading
 
 /**
@@ -175,7 +175,7 @@ private fun ErrorCard(
             )
 
             Text(
-                text = stringResource(Res.string.launch_detail_error_title),
+                text = stringResource(Res.string.common_oops_something_went_wrong),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -198,7 +198,7 @@ private fun ErrorCard(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(Res.string.launch_detail_error_try_again))
+                Text(stringResource(Res.string.common_try_again))
             }
         }
     }

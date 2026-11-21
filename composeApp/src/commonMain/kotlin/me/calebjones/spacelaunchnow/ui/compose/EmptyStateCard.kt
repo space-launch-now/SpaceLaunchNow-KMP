@@ -29,9 +29,9 @@ import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_empty_state_action
-import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_empty_state_action_icon_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_empty_state_message
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_empty_state_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_settings
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -112,7 +112,7 @@ fun EmptyStateCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = stringResource(Res.string.app_compose_empty_state_action_icon_description)
+                        contentDescription = stringResource(Res.string.common_settings)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(actionButtonText)

@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_updates_show_more
 
 /**
@@ -84,7 +84,7 @@ fun LaunchUpdatesSection(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = stringResource(Res.string.launch_detail_show_less),
+                    text = stringResource(Res.string.common_show_less),
                     style = MaterialTheme.typography.labelLarge
                 )
             }

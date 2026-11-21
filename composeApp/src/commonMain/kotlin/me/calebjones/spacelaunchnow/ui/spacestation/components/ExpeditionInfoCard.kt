@@ -37,13 +37,13 @@ import me.calebjones.spacelaunchnow.domain.model.ExpeditionMiniItem
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_mission_patch
 import spacelaunchnow_kmp.composeapp.generated.resources.station_crew_member_unknown
 import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_crew_placeholder_description
 import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_crew_title
 import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_end
 import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_icon_description
 import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_ongoing
-import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_patch_description
 import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_start
 
 /**
@@ -69,7 +69,7 @@ fun ExpeditionInfoCard(
                 ) {
                     SubcomposeAsyncImage(
                         model = patchUrl,
-                        contentDescription = stringResource(Res.string.station_expedition_patch_description),
+                        contentDescription = stringResource(Res.string.common_mission_patch),
                         modifier = Modifier
                             .size(200.dp)
                             .clip(CircleShape),

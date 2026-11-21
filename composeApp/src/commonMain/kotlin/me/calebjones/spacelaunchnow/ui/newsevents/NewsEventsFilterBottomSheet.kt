@@ -34,13 +34,13 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.NewsEventsTab
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_clear_all
-import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_close
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_event_types_heading
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_event_types_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_remove_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_sources_heading
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_title_events
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_title_news
+import spacelaunchnow_kmp.composeapp.generated.resources.common_close
+import spacelaunchnow_kmp.composeapp.generated.resources.common_remove_filter
 import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
 import org.jetbrains.compose.resources.stringResource
 
@@ -86,7 +86,7 @@ fun NewsEventsFilterBottomSheet(
                         fontWeight = FontWeight.Bold
                     )
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(Res.string.app_newsevents_filter_sheet_close))
+                        Text(stringResource(Res.string.common_close))
                     }
                 }
 
@@ -165,7 +165,7 @@ private fun NewsSiteFilterContent(
                     {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(Res.string.app_newsevents_filter_sheet_remove_description),
+                            contentDescription = stringResource(Res.string.common_remove_filter),
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -210,7 +210,7 @@ private fun EventTypeFilterContent(
                         {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(Res.string.app_newsevents_filter_sheet_remove_description),
+                                contentDescription = stringResource(Res.string.common_remove_filter),
                                 modifier = Modifier.size(16.dp)
                             )
                         }

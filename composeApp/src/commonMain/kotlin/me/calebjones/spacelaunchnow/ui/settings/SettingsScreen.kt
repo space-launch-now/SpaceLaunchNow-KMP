@@ -84,11 +84,21 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_about
+import spacelaunchnow_kmp.composeapp.generated.resources.common_calendar_sync
+import spacelaunchnow_kmp.composeapp.generated.resources.common_cancel
+import spacelaunchnow_kmp.composeapp.generated.resources.common_enable
+import spacelaunchnow_kmp.composeapp.generated.resources.common_notification_filters
+import spacelaunchnow_kmp.composeapp.generated.resources.common_notifications
+import spacelaunchnow_kmp.composeapp.generated.resources.common_notifications_disabled
+import spacelaunchnow_kmp.composeapp.generated.resources.common_open_settings
+import spacelaunchnow_kmp.composeapp.generated.resources.common_premium
+import spacelaunchnow_kmp.composeapp.generated.resources.common_roadmap
+import spacelaunchnow_kmp.composeapp.generated.resources.common_settings
+import spacelaunchnow_kmp.composeapp.generated.resources.common_wear_os
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_about_details
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_ad_privacy
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_calendar_subtitle
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_cancel
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_error_password
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_error_totp
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_field_password
@@ -111,30 +121,20 @@ import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_go_premiu
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_hide_tbd_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_hide_tbd_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notification_filters_subtitle
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notification_filters_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_disabled_subtitle
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_disabled_title
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_enable
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_enabled_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_enabled_title
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_open_settings
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_privacy_policy
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_roadmap_subtitle
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_roadmap_title
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_about
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_developer
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_diagnostic
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_general
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_notifications
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_premium
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_wear_os
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_shop_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_shop_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_system_settings_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_system_settings_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_terms_of_service
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_theme_subtitle
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_utc_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_utc_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_version
@@ -227,7 +227,7 @@ fun SettingsScreen(
             windowInsets = WindowInsets(0, 0, 0, 0),
             title = {
                 Text(
-                    text = stringResource(Res.string.settings_main_title),
+                    text = stringResource(Res.string.common_settings),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -272,7 +272,7 @@ fun SettingsScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         SettingsNavigationRow(
-                            title = stringResource(Res.string.settings_calendar_title),
+                            title = stringResource(Res.string.common_calendar_sync),
                             subtitle = stringResource(Res.string.settings_main_calendar_subtitle),
                             onClick = { navController.navigate(CalendarSync) },
                         )
@@ -281,7 +281,7 @@ fun SettingsScreen(
             }
             // NOTIFICATIONS
             item {
-                SectionHeaderText(stringResource(Res.string.settings_main_section_notifications))
+                SectionHeaderText(stringResource(Res.string.common_notifications))
                 Spacer(Modifier.height(2.dp))
                 SettingsCardRow {
                     Column(Modifier.fillMaxWidth()) {
@@ -292,7 +292,7 @@ fun SettingsScreen(
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = stringResource(Res.string.settings_main_notifications_disabled_title),
+                                        text = stringResource(Res.string.common_notifications_disabled),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.error
@@ -320,9 +320,9 @@ fun SettingsScreen(
                                 ) {
                                     Text(
                                         if (permissionRemedy == NotificationPermissionRemedy.REQUEST_PERMISSION) {
-                                            stringResource(Res.string.settings_main_notifications_enable)
+                                            stringResource(Res.string.common_enable)
                                         } else {
-                                            stringResource(Res.string.settings_main_notifications_open_settings)
+                                            stringResource(Res.string.common_open_settings)
                                         }
                                     )
                                 }
@@ -337,7 +337,7 @@ fun SettingsScreen(
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         SettingsNavigationRow(
-                            title = stringResource(Res.string.settings_main_notification_filters_title),
+                            title = stringResource(Res.string.common_notification_filters),
                             subtitle = stringResource(Res.string.settings_main_notification_filters_subtitle),
                             onClick = onOpenNotificationSettings,
                             enabled = hasNotificationPermission && uiState.notificationsEnabled
@@ -355,7 +355,7 @@ fun SettingsScreen(
 
             // SUPPORT & MEMBERSHIP
             item {
-                SectionHeaderText(stringResource(Res.string.settings_main_section_premium))
+                SectionHeaderText(stringResource(Res.string.common_premium))
                 Spacer(Modifier.height(2.dp))
                 SettingsCardRow {
                     Column(Modifier.fillMaxWidth()) {
@@ -377,7 +377,7 @@ fun SettingsScreen(
                         watchConnected = isWearOsConnected()
                     }
 
-                    SectionHeaderText(stringResource(Res.string.settings_main_section_wear_os))
+                    SectionHeaderText(stringResource(Res.string.common_wear_os))
                     Spacer(Modifier.height(2.dp))
 
                     when (watchConnected) {
@@ -510,11 +510,11 @@ fun SettingsScreen(
 
             // ABOUT
             item {
-                SectionHeaderText(stringResource(Res.string.settings_main_section_about))
+                SectionHeaderText(stringResource(Res.string.common_about))
                 Spacer(Modifier.height(2.dp))
                 SettingsCardRow {
                     SettingsNavigationRow(
-                        title = stringResource(Res.string.settings_main_roadmap_title),
+                        title = stringResource(Res.string.common_roadmap),
                         subtitle = stringResource(Res.string.settings_main_roadmap_subtitle),
                         onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Roadmap) }
                     )
@@ -715,7 +715,7 @@ fun SettingsScreen(
                         useTotp = false
                     }
                 ) {
-                    Text(stringResource(Res.string.settings_main_debug_dialog_cancel))
+                    Text(stringResource(Res.string.common_cancel))
                 }
             }
         )

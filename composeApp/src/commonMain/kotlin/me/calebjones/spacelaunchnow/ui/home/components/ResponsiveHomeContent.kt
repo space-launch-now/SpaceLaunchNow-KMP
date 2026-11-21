@@ -60,7 +60,7 @@ import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.home_events_title
 import spacelaunchnow_kmp.composeapp.generated.resources.home_history_title
-import spacelaunchnow_kmp.composeapp.generated.resources.home_news_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_latest_news
 import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_info_confirm
 import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_info_title
 import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_title
@@ -352,7 +352,7 @@ fun ResponsiveHomeContent(
         }
         item(key = "news_title") {
             SectionTitle(
-                title = stringResource(Res.string.home_news_title),
+                title = stringResource(Res.string.common_latest_news),
                 hasAction = true,
                 onActionClick = { navController.navigateToNewsEventsTab(NEWS_TAB_INDEX) }
             )

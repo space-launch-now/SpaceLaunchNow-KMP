@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.data.model.FilterOption
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.common_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.common_close
 import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_apply_filters
-import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_close
 import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_sheet_title
 
 /**
@@ -87,7 +87,7 @@ fun ScheduleFilterBottomSheet(
                         fontWeight = FontWeight.Bold
                     )
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(Res.string.schedule_filter_close))
+                        Text(stringResource(Res.string.common_close))
                     }
                 }
 
@@ -133,7 +133,7 @@ fun ScheduleFilterBottomSheet(
                             text = if (pendingFilterState.hasActiveFilters())
                                 stringResource(Res.string.schedule_filter_apply_filters, pendingFilterState.activeFilterCount())
                             else
-                                stringResource(Res.string.schedule_filter_apply)
+                                stringResource(Res.string.common_apply)
                         )
                     }
                 }

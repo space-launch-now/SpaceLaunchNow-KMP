@@ -43,8 +43,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_close
 import spacelaunchnow_kmp.composeapp.generated.resources.winback_body
-import spacelaunchnow_kmp.composeapp.generated.resources.winback_close
 import spacelaunchnow_kmp.composeapp.generated.resources.winback_cta
 import spacelaunchnow_kmp.composeapp.generated.resources.winback_cta_trial
 import spacelaunchnow_kmp.composeapp.generated.resources.winback_not_now
@@ -140,7 +140,7 @@ fun WinbackSheetContent(
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.winback_close))
+                Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.common_close))
             }
         }
         Text(

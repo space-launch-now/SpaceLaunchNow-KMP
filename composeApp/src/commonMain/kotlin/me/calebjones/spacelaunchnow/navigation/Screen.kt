@@ -112,7 +112,7 @@ data class FullscreenVideo(
 sealed class Screen(val label: StringResource, val icon: ImageVector) {
     data object Home : Screen(Res.string.app_layout_nav_home_label, Icons.Filled.Home)
     data object Schedule : Screen(Res.string.app_layout_nav_schedule_label, Icons.AutoMirrored.Filled.List)
-    data object Explore : Screen(Res.string.app_layout_nav_explore_label, Icons.Filled.Explore)
-    data object NewsEvents : Screen(Res.string.app_layout_nav_news_label, Icons.Filled.Newspaper)
-    data object Settings : Screen(Res.string.app_layout_nav_settings_label, Icons.Filled.Settings)
+    data object Explore : Screen(Res.string.common_explore, Icons.Filled.Explore)
+    data object NewsEvents : Screen(Res.string.common_news, Icons.Filled.Newspaper)
+    data object Settings : Screen(Res.string.common_settings, Icons.Filled.Settings)
 }

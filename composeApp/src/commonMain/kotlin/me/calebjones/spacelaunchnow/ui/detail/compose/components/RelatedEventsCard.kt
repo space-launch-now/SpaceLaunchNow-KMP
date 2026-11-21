@@ -44,12 +44,12 @@ import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_event_icon_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_event_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_event_icon
+import spacelaunchnow_kmp.composeapp.generated.resources.common_event_image
+import spacelaunchnow_kmp.composeapp.generated.resources.common_load_more_count
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_events_empty
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_events_load_more
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_events_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less
 
 /**
  * Card component for displaying related events to a launch.
@@ -100,7 +100,7 @@ fun RelatedEventsCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = stringResource(Res.string.launch_detail_events_load_more, events.size - 5),
+                            text = stringResource(Res.string.common_load_more_count, events.size - 5),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -115,7 +115,7 @@ fun RelatedEventsCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = stringResource(Res.string.launch_detail_show_less),
+                            text = stringResource(Res.string.common_show_less),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -152,7 +152,7 @@ fun RelatedEventItem(
             val imageUrl = event.imageUrl
             SubcomposeAsyncImage(
                 model = imageUrl,
-                contentDescription = stringResource(Res.string.launch_detail_event_image_description),
+                contentDescription = stringResource(Res.string.common_event_image),
                 modifier = Modifier
                     .size(96.dp)
                     .clip(shape = RoundedCornerShape(2.dp)),
@@ -180,7 +180,7 @@ fun RelatedEventItem(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.CalendarAlt,
-                            contentDescription = stringResource(Res.string.launch_detail_event_icon_description),
+                            contentDescription = stringResource(Res.string.common_event_icon),
                             modifier = Modifier.size(48.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )

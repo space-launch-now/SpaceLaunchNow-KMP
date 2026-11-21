@@ -14,6 +14,4 @@
     <string name="winback_cta">Subscribe</string>
     <!-- Button that closes the sheet without buying. Short. -->
     <string name="winback_not_now">Not now</string>
-    <!-- Screen reader label of the close icon at the top of the sheet. -->
-    <string name="winback_close">Close</string>
 </resources>

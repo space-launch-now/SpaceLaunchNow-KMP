@@ -37,21 +37,21 @@ class LaunchDetailTabsTest {
     fun `fromIndex(0) returns Overview tab`() {
         val tab = LaunchDetailTab.fromIndex(0)
         assertIs<LaunchDetailTab.Overview>(tab)
-        assertEquals("launch_detail_tab_overview", tab.titleRes.key)
+        assertEquals("common_overview", tab.titleRes.key)
     }
 
     @Test
     fun `fromIndex(1) returns Mission tab`() {
         val tab = LaunchDetailTab.fromIndex(1)
         assertIs<LaunchDetailTab.Mission>(tab)
-        assertEquals("launch_detail_tab_mission", tab.titleRes.key)
+        assertEquals("common_mission", tab.titleRes.key)
     }
 
     @Test
     fun `fromIndex(2) returns Agency tab`() {
         val tab = LaunchDetailTab.fromIndex(2)
         assertIs<LaunchDetailTab.Agency>(tab)
-        assertEquals("launch_detail_tab_agency", tab.titleRes.key)
+        assertEquals("common_agency", tab.titleRes.key)
     }
 
     @Test
@@ -87,17 +87,17 @@ class LaunchDetailTabsTest {
 
     @Test
     fun `Overview tab has correct display name`() {
-        assertEquals("launch_detail_tab_overview", LaunchDetailTab.Overview.titleRes.key)
+        assertEquals("common_overview", LaunchDetailTab.Overview.titleRes.key)
     }
 
     @Test
     fun `Mission tab has correct display name`() {
-        assertEquals("launch_detail_tab_mission", LaunchDetailTab.Mission.titleRes.key)
+        assertEquals("common_mission", LaunchDetailTab.Mission.titleRes.key)
     }
 
     @Test
     fun `Agency tab has correct display name`() {
-        assertEquals("launch_detail_tab_agency", LaunchDetailTab.Agency.titleRes.key)
+        assertEquals("common_agency", LaunchDetailTab.Agency.titleRes.key)
     }
 
     @Test

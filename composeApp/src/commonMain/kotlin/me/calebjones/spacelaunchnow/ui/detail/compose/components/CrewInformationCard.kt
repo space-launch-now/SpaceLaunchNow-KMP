@@ -20,11 +20,11 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_onboard_crew
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_astronaut
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_heading
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_landing
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_launch
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_onboard
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_unknown_astronaut
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_unknown_role
 
 /**
@@ -87,7 +87,7 @@ fun CrewInformationCard(
                     if (onboardCrew.isNotEmpty()) {
                         if (needsDivider) HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                         CrewSectionWithLabel(
-                            label = stringResource(Res.string.launch_detail_crew_onboard),
+                            label = stringResource(Res.string.common_onboard_crew),
                             crew = onboardCrew,
                             onAstronautClick = onAstronautClick
                         )
@@ -108,7 +108,7 @@ fun CrewInformationCard(
                 if (crewsAreIdentical && onboardCrew.isNotEmpty()) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     CrewSectionWithLabel(
-                        label = stringResource(Res.string.launch_detail_crew_onboard),
+                        label = stringResource(Res.string.common_onboard_crew),
                         crew = onboardCrew,
                         onAstronautClick = onAstronautClick
                     )
@@ -141,7 +141,7 @@ private fun CrewSection(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         crew.forEach { member ->
             AstronautProfileCard(
-                astronautName = member.astronautName ?: stringResource(Res.string.launch_detail_crew_unknown_astronaut),
+                astronautName = member.astronautName ?: stringResource(Res.string.common_unknown_astronaut),
                 role = member.role ?: stringResource(Res.string.launch_detail_crew_unknown_role),
                 profileImageUrl = member.imageUrl,
                 agencyImageUrl = null,

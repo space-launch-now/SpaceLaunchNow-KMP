@@ -23,8 +23,8 @@ import me.calebjones.spacelaunchnow.ui.components.CountryChip
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_country
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_country_multiple
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_country_single
 
 /**
  * Country info row with chips displaying a list of countries
@@ -49,7 +49,7 @@ fun CountryInfoRow(countries: List<Country>) {
                 modifier = Modifier.size(20.dp)
             )
             Text(
-                text = if (countries.size == 1) stringResource(Res.string.launch_detail_country_single) else stringResource(Res.string.launch_detail_country_multiple),
+                text = if (countries.size == 1) stringResource(Res.string.common_country) else stringResource(Res.string.launch_detail_country_multiple),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

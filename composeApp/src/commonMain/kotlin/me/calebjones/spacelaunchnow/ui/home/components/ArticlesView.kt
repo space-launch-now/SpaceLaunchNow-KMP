@@ -40,9 +40,9 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import kotlin.time.Instant
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_article_icon
+import spacelaunchnow_kmp.composeapp.generated.resources.common_article_image
 import spacelaunchnow_kmp.composeapp.generated.resources.home_articles_error
-import spacelaunchnow_kmp.composeapp.generated.resources.home_articles_icon_description
-import spacelaunchnow_kmp.composeapp.generated.resources.home_articles_image_description
 import spacelaunchnow_kmp.composeapp.generated.resources.home_cached_data_notice
 
 
@@ -155,7 +155,7 @@ fun ArticleItem(article: Article, onClick: () -> Unit = {}) {
             val image = article.imageUrl
             SubcomposeAsyncImage(
                 model = image,
-                contentDescription = stringResource(Res.string.home_articles_image_description),
+                contentDescription = stringResource(Res.string.common_article_image),
                 modifier = Modifier
                     .size(96.dp)
                     .clip(shape = RoundedCornerShape(2.dp)),
@@ -182,7 +182,7 @@ fun ArticleItem(article: Article, onClick: () -> Unit = {}) {
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.Newspaper,
-                            contentDescription = stringResource(Res.string.home_articles_icon_description),
+                            contentDescription = stringResource(Res.string.common_article_icon),
                             modifier = Modifier.size(48.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )

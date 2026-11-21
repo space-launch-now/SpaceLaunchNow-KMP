@@ -43,7 +43,7 @@ import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_card_description
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_unknown
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_card_unknown_name
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_astronaut
 
 /**
  * Card component displaying astronaut information in a list.
@@ -58,7 +58,7 @@ fun AstronautCard(
     modifier: Modifier = Modifier
 ) {
     val unknown = stringResource(Res.string.astronaut_unknown)
-    val unknownName = stringResource(Res.string.astronaut_card_unknown_name)
+    val unknownName = stringResource(Res.string.common_unknown_astronaut)
     val contentDesc = stringResource(
         Res.string.astronaut_card_description,
         astronaut.name?.ifBlank { unknown } ?: unknown,

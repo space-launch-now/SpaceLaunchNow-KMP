@@ -54,13 +54,13 @@ import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_empty_hint
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_empty_title
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_error_title
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_filter_description
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_title
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_title_with_count
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_unknown_error
+import spacelaunchnow_kmp.composeapp.generated.resources.common_astronauts
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filter_and_sort
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_error
 
 /**
  * Main screen for browsing astronauts.
@@ -132,7 +132,7 @@ fun AstronautListScreen(
                         text = if (activeFilterCount > 0) {
                             stringResource(Res.string.astronaut_list_title_with_count, uiState.totalCount)
                         } else {
-                            stringResource(Res.string.astronaut_list_title)
+                            stringResource(Res.string.common_astronauts)
                         }
                     )
                 },
@@ -158,7 +158,7 @@ fun AstronautListScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.FilterList,
-                                contentDescription = stringResource(Res.string.astronaut_list_filter_description)
+                                contentDescription = stringResource(Res.string.common_filter_and_sort)
                             )
                         }
                     }
@@ -179,7 +179,7 @@ fun AstronautListScreen(
                 // Error state
                 uiState.error != null && uiState.astronauts.isEmpty() -> {
                     ErrorContent(
-                        errorMessage = uiState.error ?: stringResource(Res.string.astronaut_unknown_error),
+                        errorMessage = uiState.error ?: stringResource(Res.string.common_unknown_error),
                         onRetry = { viewModel.refresh() }
                     )
                 }

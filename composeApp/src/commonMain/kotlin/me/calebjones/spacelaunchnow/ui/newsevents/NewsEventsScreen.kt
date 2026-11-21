@@ -68,10 +68,10 @@ import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_empty_ev
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_empty_news
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_empty_news_search
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_error_title
-import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_search_placeholder_events
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_search_placeholder_news
-import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filter
+import spacelaunchnow_kmp.composeapp.generated.resources.common_news_and_events
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 import org.jetbrains.compose.resources.stringResource
 
@@ -266,7 +266,7 @@ private fun NewsEventsContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(Res.string.app_newsevents_title),
+                    text = stringResource(Res.string.common_news_and_events),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -281,7 +281,7 @@ private fun NewsEventsContent(
                     IconButton(onClick = { showFilterSheet = true }) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
-                            contentDescription = stringResource(Res.string.app_newsevents_filter_description)
+                            contentDescription = stringResource(Res.string.common_filter)
                         )
                     }
                 }

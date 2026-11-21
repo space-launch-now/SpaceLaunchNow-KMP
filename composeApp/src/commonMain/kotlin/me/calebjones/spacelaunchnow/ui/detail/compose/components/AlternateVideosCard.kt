@@ -40,7 +40,7 @@ import me.calebjones.spacelaunchnow.util.VideoUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_videos_live_badge
+import spacelaunchnow_kmp.composeapp.generated.resources.common_live
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_videos_more_heading
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_videos_open_description
 
@@ -190,7 +190,7 @@ private fun VideoThumbnail(
                     .padding(4.dp)
             ) {
                 Text(
-                    text = stringResource(Res.string.launch_detail_videos_live_badge),
+                    text = stringResource(Res.string.common_live),
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.White,

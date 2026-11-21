@@ -48,17 +48,16 @@ import me.calebjones.spacelaunchnow.ui.components.InfoTileData
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_about_heading
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_icon_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_logo_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_tile_administrator
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_tile_country
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_tile_founded
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_agency_tile_type
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_info_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_website
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_about
+import spacelaunchnow_kmp.composeapp.generated.resources.common_administrator
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agency
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agency_logo
+import spacelaunchnow_kmp.composeapp.generated.resources.common_country
+import spacelaunchnow_kmp.composeapp.generated.resources.common_founded
+import spacelaunchnow_kmp.composeapp.generated.resources.common_information
+import spacelaunchnow_kmp.composeapp.generated.resources.common_type
+import spacelaunchnow_kmp.composeapp.generated.resources.common_website
+import spacelaunchnow_kmp.composeapp.generated.resources.common_wikipedia
 
 /**
  * Reusable Agency Details Card for displaying comprehensive agency information
@@ -91,7 +90,7 @@ fun AgencyDetailsCard(
             ) {
                 SubcomposeAsyncImage(
                     model = provider.logoUrl ?: "",
-                    contentDescription = stringResource(Res.string.launch_detail_agency_logo_description),
+                    contentDescription = stringResource(Res.string.common_agency_logo),
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(150.dp)
@@ -122,7 +121,7 @@ fun AgencyDetailsCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Business,
-                                contentDescription = stringResource(Res.string.launch_detail_agency_icon_description),
+                                contentDescription = stringResource(Res.string.common_agency),
                                 modifier = Modifier.size(64.dp),
                                 tint = Color.White.copy(alpha = 0.4f)
                             )
@@ -142,16 +141,16 @@ fun AgencyDetailsCard(
             // Grid of key details
             val infoTiles = buildList {
                 provider.type?.takeIf { it.isNotBlank() }?.let {
-                    add(InfoTileData(Icons.Filled.Business, stringResource(Res.string.launch_detail_agency_tile_type), it))
+                    add(InfoTileData(Icons.Filled.Business, stringResource(Res.string.common_type), it))
                 }
                 providerDetail?.foundingYear?.let { year ->
-                    add(InfoTileData(Icons.Filled.CalendarToday, stringResource(Res.string.launch_detail_agency_tile_founded), year.toString()))
+                    add(InfoTileData(Icons.Filled.CalendarToday, stringResource(Res.string.common_founded), year.toString()))
                 }
                 providerDetail?.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
-                    add(InfoTileData(Icons.Filled.Person, stringResource(Res.string.launch_detail_agency_tile_administrator), admin))
+                    add(InfoTileData(Icons.Filled.Person, stringResource(Res.string.common_administrator), admin))
                 }
                 provider.countryCode?.takeIf { it.isNotBlank() }?.let { code ->
-                    add(InfoTileData(Icons.Filled.Flag, stringResource(Res.string.launch_detail_agency_tile_country), code))
+                    add(InfoTileData(Icons.Filled.Flag, stringResource(Res.string.common_country), code))
                 }
             }
             if (infoTiles.isNotEmpty()) {
@@ -176,7 +175,7 @@ fun AgencyDetailsCard(
             // Agency description
             providerDetail?.description?.let { description ->
                 Text(
-                    text = stringResource(Res.string.launch_detail_agency_about_heading),
+                    text = stringResource(Res.string.common_about),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
@@ -198,11 +197,11 @@ fun AgencyDetailsCard(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                            contentDescription = stringResource(Res.string.launch_detail_info_description),
+                            contentDescription = stringResource(Res.string.common_information),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(Res.string.launch_detail_link_website))
+                        Text(stringResource(Res.string.common_website))
                     }
                 }
                 providerDetail?.wikiUrl?.let { url ->
@@ -213,11 +212,11 @@ fun AgencyDetailsCard(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Brands.WikipediaW,
-                            contentDescription = stringResource(Res.string.launch_detail_link_wikipedia_description),
+                            contentDescription = stringResource(Res.string.common_wikipedia),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(Res.string.launch_detail_link_wikipedia))
+                        Text(stringResource(Res.string.common_wikipedia))
                     }
                 }
             }

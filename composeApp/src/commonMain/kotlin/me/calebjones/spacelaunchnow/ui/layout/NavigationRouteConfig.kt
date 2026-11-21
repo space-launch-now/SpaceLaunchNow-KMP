@@ -19,15 +19,15 @@ import me.calebjones.spacelaunchnow.navigation.Settings
 import kotlin.reflect.KClass
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_explore_content_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_explore_label
 import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_home_content_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_home_label
 import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_news_content_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_news_label
 import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_schedule_content_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_schedule_label
 import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_settings_content_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_settings_label
+import spacelaunchnow_kmp.composeapp.generated.resources.common_explore
+import spacelaunchnow_kmp.composeapp.generated.resources.common_news
+import spacelaunchnow_kmp.composeapp.generated.resources.common_settings
 
 /**
  * Data class for a navigation tab item. Replaces the parallel lists of
@@ -62,21 +62,21 @@ val mainNavigationItems = listOf(
     ),
     NavigationTabItem(
         route = Explore,
-        label = Res.string.app_layout_nav_explore_label,
+        label = Res.string.common_explore,
         icon = Icons.Filled.Explore,
         contentDescription = Res.string.app_layout_nav_explore_content_description,
         analyticsName = "Explore"
     ),
     NavigationTabItem(
         route = NewsEvents(),
-        label = Res.string.app_layout_nav_news_label,
+        label = Res.string.common_news,
         icon = Icons.Filled.Newspaper,
         contentDescription = Res.string.app_layout_nav_news_content_description,
         analyticsName = "News"
     ),
     NavigationTabItem(
         route = Settings,
-        label = Res.string.app_layout_nav_settings_label,
+        label = Res.string.common_settings,
         icon = Icons.Filled.Settings,
         contentDescription = Res.string.app_layout_nav_settings_content_description,
         analyticsName = "Settings"

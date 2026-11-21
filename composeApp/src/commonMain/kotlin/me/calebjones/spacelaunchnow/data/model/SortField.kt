@@ -18,11 +18,11 @@ enum class SortField(
 ) {
     NAME_ASC(
         apiParam = "name",
-        label = Res.string.rockets_sort_field_name_asc
+        label = Res.string.common_sort_name_asc
     ),
     NAME_DESC(
         apiParam = "-name",
-        label = Res.string.rockets_sort_field_name_desc
+        label = Res.string.common_sort_name_desc
     ),
     TOTAL_LAUNCHES_DESC(
         apiParam = "-total_launch_count",

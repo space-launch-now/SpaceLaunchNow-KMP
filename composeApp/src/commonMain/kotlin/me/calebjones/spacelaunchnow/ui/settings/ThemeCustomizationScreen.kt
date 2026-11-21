@@ -98,8 +98,10 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_24h_premium_access
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_premium_feature
+import spacelaunchnow_kmp.composeapp.generated.resources.common_premium_feature
+import spacelaunchnow_kmp.composeapp.generated.resources.common_upgrade_to_premium
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_appearance_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_hex
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_hue
@@ -131,10 +133,8 @@ import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_selected
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_tab_label
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_trial_body
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_trial_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_unlock_body
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_unlock_title
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_upgrade_to_premium
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_applied
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_apply
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_changes_applied
@@ -205,7 +205,7 @@ fun ThemeCustomizationScreen(
                     if (!hasCustomTheme) {
                         Icon(
                             Icons.Default.Lock,
-                            contentDescription = stringResource(Res.string.settings_main_premium_feature),
+                            contentDescription = stringResource(Res.string.common_premium_feature),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(end = 16.dp)
                         )
@@ -257,7 +257,7 @@ fun ThemeCustomizationScreen(
                         PremiumFeature.ADVANCED_WIDGETS,
                         PremiumFeature.WIDGETS_CUSTOMIZATION
                     ),
-                    title = stringResource(Res.string.settings_theme_trial_title),
+                    title = stringResource(Res.string.common_24h_premium_access),
                     description = stringResource(Res.string.settings_theme_trial_body),
                     icon = Icons.Default.LockClock,
                     hasPermanentPremium = hasPermanentPremium
@@ -545,7 +545,7 @@ fun ThemeCustomizationScreen(
                             if (hasWidgetCustomization) {
                                 stringResource(Res.string.settings_theme_widget_changes_title)
                             } else {
-                                stringResource(Res.string.settings_main_premium_feature)
+                                stringResource(Res.string.common_premium_feature)
                             },
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
@@ -592,7 +592,7 @@ fun ThemeCustomizationScreen(
                                         stringResource(Res.string.settings_theme_widget_applied)
                                     }
                                 } else {
-                                    stringResource(Res.string.settings_theme_upgrade_to_premium)
+                                    stringResource(Res.string.common_upgrade_to_premium)
                                 }
                             )
                         }
@@ -692,7 +692,7 @@ private fun PremiumFeaturePrompt(
         )
         Spacer(Modifier.height(24.dp))
         Text(
-            stringResource(Res.string.settings_main_premium_feature),
+            stringResource(Res.string.common_premium_feature),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
@@ -705,7 +705,7 @@ private fun PremiumFeaturePrompt(
         )
         Spacer(Modifier.height(24.dp))
         Button(onClick = onUpgradeClick) {
-            Text(stringResource(Res.string.settings_theme_upgrade_to_premium))
+            Text(stringResource(Res.string.common_upgrade_to_premium))
         }
     }
 }
@@ -1560,7 +1560,7 @@ private fun ThemeSourceOption(
             } else if (!enabled) {
                 Icon(
                     Icons.Default.Lock,
-                    contentDescription = stringResource(Res.string.settings_main_premium_feature),
+                    contentDescription = stringResource(Res.string.common_premium_feature),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     modifier = Modifier.size(20.dp)
                 )

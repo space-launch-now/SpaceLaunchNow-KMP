@@ -1,31 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Section heading in the event detail card, above the event description text. One line, bold. -->
-    <string name="event_detail_description">Description</string>
     <!-- Section heading in the event detail card, above the list of date, location, duration rows. One line, bold. -->
     <string name="event_detail_event_details">Event Details</string>
     <!-- Row label in the event details list. Value (an event date and time) shows beside it. One word. -->
     <string name="event_detail_label_date">Date</string>
-    <!-- Row label in the event details list. Value (a place name) shows beside it. One word. -->
-    <string name="event_detail_label_location">Location</string>
-    <!-- Row label in the event details list. Value (a length of time) shows beside it. One word. -->
-    <string name="event_detail_label_duration">Duration</string>
-    <!-- Row label in the event details list. Value is the live state, for example Live Now. One word. -->
-    <string name="event_detail_label_status">Status</string>
     <!-- Row value in the event details list when the event webcast is live. The red circle is an emoji; keep it. Short. -->
     <string name="event_detail_status_live_now">Live Now 🔴</string>
     <!-- Row label in the event details list. Value is the date and time of the last data update. Short. -->
     <string name="event_detail_label_last_updated">Last Updated</string>
-    <!-- Card heading above the list of link buttons for the event. One line, bold. -->
-    <string name="event_detail_links">Links</string>
     <!-- Button text for an event link that has no title. One word. -->
     <string name="event_detail_link_fallback">Info</string>
-    <!-- Card heading above the list of agencies, used when the event has exactly one agency. One line, bold. -->
-    <string name="event_detail_agency">Agency</string>
-    <!-- Card heading above the list of agencies, used when the event has two or more agencies. One line, bold. -->
-    <string name="event_detail_agencies">Agencies</string>
-    <!-- Card heading above the list of astronauts at the event. One line, bold. -->
-    <string name="event_detail_astronauts">Astronauts</string>
     <!-- Card heading above the list of space stations at the event. One line, bold. -->
     <string name="event_detail_space_stations">Space Stations</string>
     <!-- Card heading above the list of space station expeditions at the event. One line, bold. -->
@@ -34,14 +18,6 @@
     <string name="event_detail_expedition_fallback">Expedition</string>
     <!-- Card heading above the list of launches linked to the event. One line, bold. -->
     <string name="event_detail_related_launches">Related Launches</string>
-    <!-- Content description of the placeholder icon shown when a program image fails to load. Read by screen readers. One word. -->
-    <string name="event_detail_mission_description">Mission</string>
-    <!-- Card heading above the list of news updates for the event. One line, bold. -->
-    <string name="event_detail_updates">Updates</string>
-    <!-- Heading on the event detail error card, above the error message. One or two lines. -->
-    <string name="event_detail_error_title">Oops! Something went wrong</string>
-    <!-- Button on the event detail error card. Loads the event again. One line, max 14 chars. -->
-    <string name="event_detail_try_again">Try Again</string>
     <!-- Line under the updates list when more than 10 updates exist. %1$d is the number of updates not shown. Keep the leading plus sign. -->
     <string name="event_detail_updates_more">+ %1$d more updates</string>
     <!-- Hint in the empty detail pane of the two-pane Schedule screen on tablets. Tells the user to pick a launch from the list. One or two lines. -->
@@ -52,36 +28,14 @@
     <string name="schedule_search_placeholder">Search launches</string>
     <!-- Screen title at the top of the Schedule screen. One line, large heading. -->
     <string name="schedule_title">Launch Schedule</string>
-    <!-- Content description of the filter icon button in the top bar. Opens the filter sheet. Read by screen readers. -->
-    <string name="schedule_filter_button_description">Filter</string>
-    <!-- Content description of the search icon button in the top bar. Opens the search field. Read by screen readers. -->
-    <string name="schedule_search_button_description">Search</string>
-    <!-- Tab label. Shows launches that have not happened yet. One word, max 14 chars. -->
-    <string name="schedule_tab_upcoming">Upcoming</string>
-    <!-- Tab label. Shows launches that already happened. One word, max 14 chars. -->
-    <string name="schedule_tab_previous">Previous</string>
     <!-- Heading on the launch list error block, above the error message. One line. -->
     <string name="schedule_error_loading">Error loading launches</string>
     <!-- Message in the launch list when no launch matches the filters or search. One line. -->
     <string name="schedule_empty">No launches found</string>
     <!-- Title of the filter sheet. One line, large heading. -->
     <string name="schedule_filter_sheet_title">Filter Launches</string>
-    <!-- Content description of the close icon button on the filter sheet. Read by screen readers. -->
-    <string name="schedule_filter_close">Close</string>
-    <!-- Button on the filter sheet and the reload dialog. Dismisses without changes. One word, max 14 chars. -->
-    <string name="schedule_filter_cancel">Cancel</string>
-    <!-- Button on the filter sheet when no filter is selected. Applies the filters. One word, max 14 chars. -->
-    <string name="schedule_filter_apply">Apply</string>
-    <!-- Title of the confirm dialog opened by the reload button on the filter sheet. A question. One line. -->
-    <string name="schedule_filter_reload_title">Reload Filter Options?</string>
     <!-- Body of the reload confirm dialog. Several lines. -->
     <string name="schedule_filter_reload_message">This will re-download all filter options from the server. This may take a few moments and will refresh the list of agencies, programs, rockets, locations, and statuses.</string>
-    <!-- Confirm button of the reload dialog. One word, max 14 chars. -->
-    <string name="schedule_filter_reload_confirm">Reload</string>
-    <!-- Button at the bottom of the filter sheet. Opens the reload confirm dialog. One line. -->
-    <string name="schedule_filter_reload_button">Reload Filter Options</string>
-    <!-- Small button on the filter sheet next to the active filter count. Removes every selected filter. Max 14 chars. -->
-    <string name="schedule_filter_clear_all">Clear All</string>
     <!-- Info note at the top of the filter sheet, shown next to an info icon. Two or three lines. Home page and Schedule are screen names. -->
     <string name="schedule_filter_scope_note">These filters only affect the Schedule screen. They won't change what appears on the Home page or in notifications.</string>
     <!-- Banner text on the filter sheet. Starts with a construction emoji; keep it. One line. -->
@@ -90,16 +44,8 @@
     <string name="schedule_filter_launch_type_heading">Launch Type Filters</string>
     <!-- Label of a switch on the filter sheet. When on, only crewed launches show. One line. -->
     <string name="schedule_filter_crewed_only">Crewed Launches Only</string>
-    <!-- Filter section heading on the filter sheet. Space agencies and launch providers. One line. -->
-    <string name="schedule_filter_agencies">Agencies</string>
-    <!-- Filter section heading on the filter sheet. Space programs. One line. -->
-    <string name="schedule_filter_programs">Programs</string>
-    <!-- Filter section heading on the filter sheet. Rocket types. One line. -->
-    <string name="schedule_filter_rockets">Rockets</string>
     <!-- Warning under the Rockets filter when more than one rocket is selected. API is a technical term. One or two lines. -->
     <string name="schedule_filter_rocket_limit_note">Note: API supports only 1 rocket filter. Only the first selection will be applied.</string>
-    <!-- Filter section heading on the filter sheet. Launch sites. One line. -->
-    <string name="schedule_filter_locations">Locations</string>
     <!-- Filter section heading on the filter sheet. Launch statuses such as Go or Hold. One line. -->
     <string name="schedule_filter_statuses">Statuses</string>
     <!-- Filter section heading on the filter sheet. Target orbits. One line. -->
@@ -108,18 +54,6 @@
     <string name="schedule_filter_mission_types">Mission Types</string>
     <!-- Filter section heading on the filter sheet. Rocket families such as Falcon. One line. -->
     <string name="schedule_filter_launcher_families">Launcher Families</string>
-    <!-- Content description of the small X icon on a selected filter chip. Removes that filter. Read by screen readers. -->
-    <string name="schedule_filter_remove">Remove filter</string>
-    <!-- Placeholder in a filter dropdown field when nothing is selected. One line. Keep the three dots. -->
-    <string name="schedule_filter_select_options">Select options...</string>
-    <!-- Content description of the dropdown arrow when the list is open. Read by screen readers. -->
-    <string name="schedule_filter_collapse">Collapse</string>
-    <!-- Content description of the dropdown arrow when the list is closed. Read by screen readers. -->
-    <string name="schedule_filter_expand">Expand</string>
-    <!-- Disabled item in a filter dropdown when the typed search matches nothing. One line. -->
-    <string name="schedule_filter_no_results">No results found</string>
-    <!-- Content description of the check mark beside a selected filter option. Read by screen readers. -->
-    <string name="schedule_filter_selected_description">Selected</string>
     <!-- Launch name in a list card when the launch has no name. Short. -->
     <string name="schedule_launch_unknown_name">Unknown Launch</string>
     <!-- Launch site in a list card when the launch has no location. Short. -->
@@ -132,18 +66,8 @@
     <string name="schedule_filter_apply_count">Apply (%1$d)</string>
     <!-- Line at the top of the filter sheet. %1$d is the number of selected filters. (s) marks an optional plural. -->
     <string name="schedule_filter_active_count">%1$d active filter(s)</string>
-    <!-- Placeholder in a filter dropdown field when options are chosen. %1$d is the number of chosen options. One line. -->
-    <string name="schedule_filter_selected_count">%1$d selected</string>
-    <!-- Screen title in the top bar of the notification settings screen. One line. -->
-    <string name="notification_settings_title">Notification Filters</string>
-    <!-- Heading of the warning card shown when the system notification permission is off. One line. -->
-    <string name="notification_settings_disabled_title">Notifications Disabled</string>
     <!-- Text in the warning card shown when the system notification permission is off. One or two lines. -->
     <string name="notification_settings_disabled_message">Enable notifications to receive launch alerts.</string>
-    <!-- Button in the warning card. Asks the system for the notification permission. One word, max 14 chars. -->
-    <string name="notification_settings_enable_button">Enable</string>
-    <!-- Button in the warning card. Opens the system settings screen for the app. Max 14 chars. -->
-    <string name="notification_settings_open_settings_button">Open Settings</string>
     <!-- Intro sentence under the top bar of the notification settings screen. Two lines. -->
     <string name="notification_settings_intro">Configure your notification preferences to stay updated with your favorite launches!</string>
     <!-- Title of a switch. When on, the user gets a notification for every launch. One line. -->

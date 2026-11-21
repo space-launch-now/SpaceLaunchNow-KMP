@@ -63,9 +63,9 @@ import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_copy_url
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feed_events_description
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feed_events_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_events
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feed_launches_description
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feed_launches_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launches
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feeds_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_how_body
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_how_note
@@ -79,11 +79,11 @@ import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_step_paste
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_step_repeat
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_title
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_calendar_sync
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_unlock_body
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_unlock_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_url_copied
-import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_premium_feature
+import spacelaunchnow_kmp.composeapp.generated.resources.common_premium_feature
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,7 +101,7 @@ fun CalendarSyncScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(Res.string.settings_calendar_title),
+                        text = stringResource(Res.string.common_calendar_sync),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -118,7 +118,7 @@ fun CalendarSyncScreen(
                     if (!uiState.hasCalendarSync) {
                         Icon(
                             Icons.Default.Lock,
-                            contentDescription = stringResource(Res.string.settings_main_premium_feature),
+                            contentDescription = stringResource(Res.string.common_premium_feature),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(end = 16.dp)
                         )
@@ -242,7 +242,7 @@ private fun CalendarUrlsSection(
         }
 
         CalendarUrlCard(
-            title = stringResource(Res.string.settings_calendar_feed_launches_title),
+            title = stringResource(Res.string.common_launches),
             description = stringResource(Res.string.settings_calendar_feed_launches_description),
             url = "https://spacelaunchnow.app/launches/latest/feed.ics",
             icon = null,
@@ -251,7 +251,7 @@ private fun CalendarUrlsSection(
         )
 
         CalendarUrlCard(
-            title = stringResource(Res.string.settings_calendar_feed_events_title),
+            title = stringResource(Res.string.common_events),
             description = stringResource(Res.string.settings_calendar_feed_events_description),
             url = "https://spacelaunchnow.app/events/latest/feed.ics",
             icon = Icons.Default.Event,

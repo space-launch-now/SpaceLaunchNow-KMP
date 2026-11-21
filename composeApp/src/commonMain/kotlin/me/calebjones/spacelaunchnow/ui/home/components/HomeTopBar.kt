@@ -35,9 +35,9 @@ import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.subscription.rememberIsPremium
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.home_top_bar_filters_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_app_name
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filters
 import spacelaunchnow_kmp.composeapp.generated.resources.home_top_bar_support_description
-import spacelaunchnow_kmp.composeapp.generated.resources.home_top_bar_title
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +48,7 @@ fun HomeTopBar(navController: NavController) {
         windowInsets = WindowInsets(0, 0, 0, 0),
         title = {
             Text(
-                text = stringResource(Res.string.home_top_bar_title),
+                text = stringResource(Res.string.common_app_name),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -64,7 +64,7 @@ fun HomeTopBar(navController: NavController) {
             ) {
                 Icon(
                     Icons.Default.FilterList,
-                    contentDescription = stringResource(Res.string.home_top_bar_filters_description),
+                    contentDescription = stringResource(Res.string.common_filters),
                     modifier = Modifier.size(24.dp)
                 )
             }

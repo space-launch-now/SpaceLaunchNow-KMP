@@ -32,9 +32,9 @@ import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_active
+import spacelaunchnow_kmp.composeapp.generated.resources.common_reusable
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_item_image_description
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_item_reusable
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_status_active
 
 /**
  * Individual rocket list item card.
@@ -109,7 +109,7 @@ fun RocketListItem(
                 ) {
                     if (rocket.active == true) {
                         Text(
-                            text = stringResource(Res.string.rockets_status_active),
+                            text = stringResource(Res.string.common_active),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.tertiary
                         )
@@ -117,7 +117,7 @@ fun RocketListItem(
 
                     if (rocket.reusable == true) {
                         Text(
-                            text = stringResource(Res.string.rockets_list_item_reusable),
+                            text = stringResource(Res.string.common_reusable),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.secondary
                         )

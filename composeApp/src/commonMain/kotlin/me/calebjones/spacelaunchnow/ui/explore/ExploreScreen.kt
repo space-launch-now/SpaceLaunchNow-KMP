@@ -24,7 +24,7 @@ import androidx.navigation.NavController
 import me.calebjones.spacelaunchnow.ui.explore.components.ExploreCard
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_explore
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -58,7 +58,7 @@ fun ExploreScreen(
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 title = {
                     Text(
-                        text = stringResource(Res.string.app_explore_title),
+                        text = stringResource(Res.string.common_explore),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                     )

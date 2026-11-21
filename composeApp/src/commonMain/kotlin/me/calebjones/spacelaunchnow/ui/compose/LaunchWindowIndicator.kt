@@ -22,9 +22,9 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import kotlin.time.Duration
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_window_duration_label
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_window_instantaneous
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_window_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_duration
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -71,7 +71,7 @@ fun LaunchWindowIndicator(
         val duration: Duration = windowEnd - windowStart
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Text(
-                text = stringResource(Res.string.app_compose_launch_window_duration_label),
+                text = stringResource(Res.string.common_duration),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

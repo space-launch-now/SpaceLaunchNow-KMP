@@ -59,9 +59,10 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less_lower
+import spacelaunchnow_kmp.composeapp.generated.resources.common_time_in_space
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_landing_type
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_more
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less_lower
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_departed
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_docked
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_docking_events
@@ -74,7 +75,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraf
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_mission_duration
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_mission_end
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_time_docked
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_time_in_space
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_total_flights
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_spacecraft_tile_turnaround_time
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_fastest_turnaround
@@ -213,7 +213,7 @@ fun SpacecraftDetailCard(
                 )
                 if (hasOverflow || expanded) {
                     TextButton(onClick = { expanded = !expanded }) {
-                        Text(if (expanded) stringResource(Res.string.launch_detail_show_less_lower) else stringResource(Res.string.launch_detail_read_more))
+                        Text(if (expanded) stringResource(Res.string.common_show_less_lower) else stringResource(Res.string.launch_detail_read_more))
                     }
                 }
             }
@@ -261,7 +261,7 @@ fun SpacecraftDetailCard(
                         add(
                             InfoTileData(
                                 Icons.Filled.Satellite,
-                                stringResource(Res.string.launch_detail_spacecraft_tile_time_in_space),
+                                stringResource(Res.string.common_time_in_space),
                                 parseIsoDurationToHumanReadable(it)
                             )
                         )
