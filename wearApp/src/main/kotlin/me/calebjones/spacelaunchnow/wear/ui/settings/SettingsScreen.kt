@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
@@ -14,6 +15,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
+import me.calebjones.spacelaunchnow.wear.R
 import me.calebjones.spacelaunchnow.wear.ui.theme.wearHorizontalPadding
 
 @Composable
@@ -38,19 +40,19 @@ fun SettingsScreen() {
                         .fillMaxWidth()
                         .transformedHeight(this, transformationSpec),
                 ) {
-                    Text(text = "Settings")
+                    Text(text = stringResource(R.string.settings))
                 }
             }
             item {
                 Text(
-                    text = "Space Launch Now Wear",
+                    text = stringResource(R.string.wear_settings_app_name),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.transformedHeight(this, transformationSpec),
                 )
             }
             item {
                 Text(
-                    text = "v${getAppVersion()}",
+                    text = stringResource(R.string.wear_settings_version, getAppVersion()),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.transformedHeight(this, transformationSpec),
                 )
@@ -61,12 +63,12 @@ fun SettingsScreen() {
                         .fillMaxWidth()
                         .transformedHeight(this, transformationSpec),
                 ) {
-                    Text(text = "About")
+                    Text(text = stringResource(R.string.wear_settings_about))
                 }
             }
             item {
                 Text(
-                    text = "Launch data is refreshed every 5 minutes when a launch is under 1 hour away, and every 30 minutes otherwise.\n\nThe tile and complication both follow your filter preferences set on your phone.",
+                    text = stringResource(R.string.wear_settings_about_body),
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier

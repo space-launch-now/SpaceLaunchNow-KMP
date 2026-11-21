@@ -1088,20 +1088,3 @@ composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/c
 composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/data/billing/IosBillingManager.kt	${pkg.packageType} - ${pkg.storeProduct.period?.unit?.name ?: 
 composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/data/notifications/NSEPreferenceBridge.kt	[NSE-DELIVERY] type=$type decision=$decision reason=$reason ts=$ts platform=ios
 composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/ui/ads/SmartBannerAd.ios.kt	Remove Ads
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/tile/NextLaunchTileService.kt	Couldn't load
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/tile/NextLaunchTileService.kt	No upcoming launches
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/tile/NextLaunchTileService.kt	Space Launch Now
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/tile/NextLaunchTileService.kt	Space Launch Now
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/tile/NextLaunchTileService.kt	Tap to retry
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/tile/NextLaunchTileService.kt	Upgrade on phone\nto see launches
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/launch/LaunchDetailScreen.kt	Open on Phone
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/launch/LaunchListScreen.kt	Loading launches...
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/launch/LaunchListScreen.kt	Upcoming Launches
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/premium/PremiumGateScreen.kt	Open App
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/premium/PremiumGateScreen.kt	Premium Feature
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/premium/PremiumGateScreen.kt	Subscribe on your phone to unlock Wear OS features
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/settings/SettingsScreen.kt	About
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/settings/SettingsScreen.kt	Launch data is refreshed every 5 minutes when a launch is under 1 hour away, and every 30 minutes otherwise.\n\nThe tile and complication both follow your filter preferences set on your phone.
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/settings/SettingsScreen.kt	Settings
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/settings/SettingsScreen.kt	Space Launch Now Wear
-wearApp/src/main/kotlin/me/calebjones/spacelaunchnow/wear/ui/settings/SettingsScreen.kt	v${getAppVersion()}

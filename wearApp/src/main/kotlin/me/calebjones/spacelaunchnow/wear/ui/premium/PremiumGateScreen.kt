@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -74,7 +75,7 @@ fun PremiumGateScreen() {
 
             item {
                 Text(
-                    text = "Premium Feature",
+                    text = stringResource(R.string.wear_premium_title),
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -87,7 +88,7 @@ fun PremiumGateScreen() {
 
             item {
                 Text(
-                    text = "Subscribe on your phone to unlock Wear OS features",
+                    text = stringResource(R.string.wear_premium_message),
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -108,7 +109,7 @@ fun PremiumGateScreen() {
                         .transformedHeight(this, transformationSpec),
                     label = {
                         Text(
-                            text = "Open App",
+                            text = stringResource(R.string.wear_premium_open_app),
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                         )

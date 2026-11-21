@@ -25,6 +25,8 @@ import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Card
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
@@ -33,11 +35,12 @@ import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
+import me.calebjones.spacelaunchnow.wear.R
 import me.calebjones.spacelaunchnow.wear.data.model.CachedLaunch
 import me.calebjones.spacelaunchnow.wear.ui.theme.wearHorizontalPadding
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchListUiState
 import me.calebjones.spacelaunchnow.wear.viewmodel.LaunchListViewModel
-import kotlin.time.Clock
+import me.calebjones.spacelaunchnow.wear.util.formatWearCountdown
 
 @Composable
 fun LaunchListScreen(
@@ -70,7 +73,7 @@ private fun LaunchListContent(
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Loading launches...",
+                    text = stringResource(R.string.wear_launches_loading),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -81,7 +84,9 @@ private fun LaunchListContent(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = uiState.error ?: "No upcoming launches",
+                    text = uiState.error
+                        ?: if (uiState.refreshFailed) stringResource(R.string.wear_launches_refresh_failed)
+                        else stringResource(R.string.no_upcoming_launches),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                 )
@@ -104,7 +109,7 @@ private fun LaunchListContent(
                             .fillMaxWidth()
                             .transformedHeight(this, transformationSpec),
                     ) {
-                        Text(text = "Upcoming Launches")
+                        Text(text = stringResource(R.string.wear_launches_title))
                     }
                 }
                 items(uiState.launches, key = { it.id }) { launch ->
@@ -131,7 +136,8 @@ private fun LaunchCard(
     transformation: SurfaceTransformation,
 ) {
     val title = remember(launch) { formatWearTitle(launch) }
-    val countdown = remember(launch) { formatWearCountdown(launch.net) }
+    val resources = LocalContext.current.resources
+    val countdown = remember(launch) { formatWearCountdown(resources, launch.net) }
 
     Card(
         onClick = onClick,
@@ -195,22 +201,5 @@ internal fun formatWearTitle(launch: CachedLaunch): String {
 
         launch.rocketConfigName != null -> launch.rocketConfigName
         else -> launch.name
-    }
-}
-
-internal fun formatWearCountdown(net: kotlin.time.Instant): String {
-    val now = Clock.System.now()
-    val duration = net - now
-    if (duration.isNegative()) return "Launched"
-
-    val totalMinutes = duration.inWholeMinutes
-    val hours = totalMinutes / 60
-    val minutes = totalMinutes % 60
-
-    return when {
-        hours >= 24 -> "T-${hours / 24}d ${hours % 24}h"
-        hours > 0 -> "T-${hours}h ${minutes}m"
-        minutes > 0 -> "T-${minutes}m"
-        else -> "T-0"
     }
 }
