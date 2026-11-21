@@ -195,4 +195,22 @@
     <string name="support_us_legacy_banner_body">Your legacy purchase helped build Space Launch Now into what it is today. I am incredibly grateful for your early support!</string>
     <!-- Text of the legacy banner, under the continue button. One or two lines. -->
     <string name="support_us_legacy_banner_prompt">Choose a plan below to continue supporting development!</string>
+    <!-- Heading of the fine print on subscription screens. One line. -->
+    <string name="fine_print_secure_billing_title">Secure Billing</string>
+    <!-- Billing note on Android. Google Play is the store name. -->
+    <string name="fine_print_billing_note_android">Purchases are processed securely through Google Play.</string>
+    <!-- Billing note on iOS. The App Store is the store name. -->
+    <string name="fine_print_billing_note_ios">Purchases are processed securely through the App Store.</string>
+    <!-- Billing note on other platforms, such as desktop. -->
+    <string name="fine_print_billing_note_other">Purchases are processed securely through your platform's store.</string>
+    <!-- Free trial disclosure required by store policy. %1$s is the price after the trial, such as $9.99/year. %2$s is the trial length, such as 3-day. -->
+    <string name="fine_print_trial_disclosure">Free trial will automatically convert to a paid subscription at %1$s unless canceled before the trial ends. You won't be charged if you cancel during the %2$s trial period.</string>
+    <!-- Auto-renew notice under the plans. Three sentences. -->
+    <string name="fine_print_auto_renew_notice">Any purchase unlocks all premium features. Subscriptions auto-renew unless cancelled. You can manage or cancel your subscription at any time by following the link below.</string>
+    <!-- Button that opens the Google Play subscriptions page. One line. -->
+    <string name="fine_print_manage_google_play">Manage Subscriptions on Google Play</string>
+    <!-- Button that opens the App Store subscriptions page. One line. -->
+    <string name="fine_print_manage_app_store">Manage Subscriptions in App Store</string>
+    <!-- Generic button for managing subscriptions. One line. -->
+    <string name="fine_print_manage_generic">Manage Subscriptions</string>
 </resources>
