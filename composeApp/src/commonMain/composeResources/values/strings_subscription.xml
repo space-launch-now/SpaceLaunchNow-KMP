@@ -94,8 +94,8 @@
     <string name="support_us_period_year">/year</string>
     <!-- Shown right after the price, for a monthly plan. Short, keeps the slash. -->
     <string name="support_us_period_month">/month</string>
-    <!-- Divider text between the plan cards and the lifetime card. Two spaces on each side keep it away from the lines. -->
-    <string name="support_us_or_go_lifetime">"  Or go lifetime  "</string>
+    <!-- Divider text between the plan cards and the lifetime card. Two spaces on each side (written as \u0020) keep it away from the lines. Keep the spaces. -->
+    <string name="support_us_or_go_lifetime">\u0020\u0020Or go lifetime\u0020\u0020</string>
     <!-- Text button under the plans. For a person who is not a member yet. One line. -->
     <string name="support_us_restore_purchases_member">Already a member? Restore Purchases</string>
     <!-- Text button under the plans. For a person who is a member. One line. -->
