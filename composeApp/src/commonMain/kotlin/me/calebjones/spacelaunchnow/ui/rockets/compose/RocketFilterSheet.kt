@@ -211,7 +211,7 @@ fun RocketFilterSheet(
                         onExpandedChange = { sortExpanded = !sortExpanded }
                     ) {
                         OutlinedTextField(
-                            value = selectedSortOrder.displayName,
+                            value = stringResource(selectedSortOrder.label),
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = {
@@ -229,7 +229,7 @@ fun RocketFilterSheet(
                         ) {
                             RocketSortOrder.entries.forEach { sortOrder ->
                                 DropdownMenuItem(
-                                    text = { Text(sortOrder.displayName) },
+                                    text = { Text(stringResource(sortOrder.label)) },
                                     onClick = {
                                         onSortOrderChange(sortOrder)
                                         sortExpanded = false

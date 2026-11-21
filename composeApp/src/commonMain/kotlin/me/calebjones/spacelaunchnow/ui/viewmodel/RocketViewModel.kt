@@ -17,6 +17,8 @@ import me.calebjones.spacelaunchnow.data.repository.RocketRepository
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
+import org.jetbrains.compose.resources.StringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * ViewModel for displaying a paginated list of rockets.
@@ -427,37 +429,37 @@ data class RocketListUiState(
 /**
  * Sort order options for rocket list.
  */
-enum class RocketSortOrder(val apiValue: String, val displayName: String) {
-    NAME_ASC("name", "Name (A-Z)"),
-    NAME_DESC("-name", "Name (Z-A)"),
-    FAMILY_ASC("family", "Family (A-Z)"),
-    FAMILY_DESC("-family", "Family (Z-A)"),
-    TOTAL_LAUNCHES_ASC("total_launch_count", "Total Launches (Low to High)"),
-    TOTAL_LAUNCHES_DESC("-total_launch_count", "Total Launches (High to Low)"),
-    SUCCESSFUL_LAUNCHES_ASC("successful_launches", "Successful Launches (Low to High)"),
-    SUCCESSFUL_LAUNCHES_DESC("-successful_launches", "Successful Launches (High to Low)"),
-    FAILED_LAUNCHES_ASC("failed_launches", "Failed Launches (Low to High)"),
-    FAILED_LAUNCHES_DESC("-failed_launches", "Failed Launches (High to Low)"),
-    PENDING_LAUNCHES_ASC("pending_launches", "Pending Launches (Low to High)"),
-    PENDING_LAUNCHES_DESC("-pending_launches", "Pending Launches (High to Low)"),
-    CONSECUTIVE_SUCCESSFUL_LAUNCHES_ASC("consecutive_successful_launches", "Consecutive Successes (Low to High)"),
-    CONSECUTIVE_SUCCESSFUL_LAUNCHES_DESC("-consecutive_successful_launches", "Consecutive Successes (High to Low)"),
-    ATTEMPTED_LANDINGS_ASC("attempted_landings", "Attempted Landings (Low to High)"),
-    ATTEMPTED_LANDINGS_DESC("-attempted_landings", "Attempted Landings (High to Low)"),
-    SUCCESSFUL_LANDINGS_ASC("successful_landings", "Successful Landings (Low to High)"),
-    SUCCESSFUL_LANDINGS_DESC("-successful_landings", "Successful Landings (High to Low)"),
-    FAILED_LANDINGS_ASC("failed_landings", "Failed Landings (Low to High)"),
-    FAILED_LANDINGS_DESC("-failed_landings", "Failed Landings (High to Low)"),
-    CONSECUTIVE_SUCCESSFUL_LANDINGS_ASC("consecutive_successful_landings", "Consecutive Landing Successes (Low to High)"),
-    CONSECUTIVE_SUCCESSFUL_LANDINGS_DESC("-consecutive_successful_landings", "Consecutive Landing Successes (High to Low)"),
-    LEO_CAPACITY_ASC("leo_capacity", "LEO Capacity (Low to High)"),
-    LEO_CAPACITY_DESC("-leo_capacity", "LEO Capacity (High to Low)"),
-    GTO_CAPACITY_ASC("gto_capacity", "GTO Capacity (Low to High)"),
-    GTO_CAPACITY_DESC("-gto_capacity", "GTO Capacity (High to Low)"),
-    LAUNCH_MASS_ASC("launch_mass", "Launch Mass (Low to High)"),
-    LAUNCH_MASS_DESC("-launch_mass", "Launch Mass (High to Low)"),
-    LAUNCH_COST_ASC("launch_cost", "Launch Cost (Low to High)"),
-    LAUNCH_COST_DESC("-launch_cost", "Launch Cost (High to Low)"),
-    MAIDEN_FLIGHT_ASC("maiden_flight", "Maiden Flight (Oldest)"),
-    MAIDEN_FLIGHT_DESC("-maiden_flight", "Maiden Flight (Newest)")
+enum class RocketSortOrder(val apiValue: String, val label: StringResource) {
+    NAME_ASC("name", Res.string.rockets_sort_name_asc),
+    NAME_DESC("-name", Res.string.rockets_sort_name_desc),
+    FAMILY_ASC("family", Res.string.rockets_sort_family_asc),
+    FAMILY_DESC("-family", Res.string.rockets_sort_family_desc),
+    TOTAL_LAUNCHES_ASC("total_launch_count", Res.string.rockets_sort_total_launches_asc),
+    TOTAL_LAUNCHES_DESC("-total_launch_count", Res.string.rockets_sort_total_launches_desc),
+    SUCCESSFUL_LAUNCHES_ASC("successful_launches", Res.string.rockets_sort_successful_launches_asc),
+    SUCCESSFUL_LAUNCHES_DESC("-successful_launches", Res.string.rockets_sort_successful_launches_desc),
+    FAILED_LAUNCHES_ASC("failed_launches", Res.string.rockets_sort_failed_launches_asc),
+    FAILED_LAUNCHES_DESC("-failed_launches", Res.string.rockets_sort_failed_launches_desc),
+    PENDING_LAUNCHES_ASC("pending_launches", Res.string.rockets_sort_pending_launches_asc),
+    PENDING_LAUNCHES_DESC("-pending_launches", Res.string.rockets_sort_pending_launches_desc),
+    CONSECUTIVE_SUCCESSFUL_LAUNCHES_ASC("consecutive_successful_launches", Res.string.rockets_sort_consecutive_successful_launches_asc),
+    CONSECUTIVE_SUCCESSFUL_LAUNCHES_DESC("-consecutive_successful_launches", Res.string.rockets_sort_consecutive_successful_launches_desc),
+    ATTEMPTED_LANDINGS_ASC("attempted_landings", Res.string.rockets_sort_attempted_landings_asc),
+    ATTEMPTED_LANDINGS_DESC("-attempted_landings", Res.string.rockets_sort_attempted_landings_desc),
+    SUCCESSFUL_LANDINGS_ASC("successful_landings", Res.string.rockets_sort_successful_landings_asc),
+    SUCCESSFUL_LANDINGS_DESC("-successful_landings", Res.string.rockets_sort_successful_landings_desc),
+    FAILED_LANDINGS_ASC("failed_landings", Res.string.rockets_sort_failed_landings_asc),
+    FAILED_LANDINGS_DESC("-failed_landings", Res.string.rockets_sort_failed_landings_desc),
+    CONSECUTIVE_SUCCESSFUL_LANDINGS_ASC("consecutive_successful_landings", Res.string.rockets_sort_consecutive_successful_landings_asc),
+    CONSECUTIVE_SUCCESSFUL_LANDINGS_DESC("-consecutive_successful_landings", Res.string.rockets_sort_consecutive_successful_landings_desc),
+    LEO_CAPACITY_ASC("leo_capacity", Res.string.rockets_sort_leo_capacity_asc),
+    LEO_CAPACITY_DESC("-leo_capacity", Res.string.rockets_sort_leo_capacity_desc),
+    GTO_CAPACITY_ASC("gto_capacity", Res.string.rockets_sort_gto_capacity_asc),
+    GTO_CAPACITY_DESC("-gto_capacity", Res.string.rockets_sort_gto_capacity_desc),
+    LAUNCH_MASS_ASC("launch_mass", Res.string.rockets_sort_launch_mass_asc),
+    LAUNCH_MASS_DESC("-launch_mass", Res.string.rockets_sort_launch_mass_desc),
+    LAUNCH_COST_ASC("launch_cost", Res.string.rockets_sort_launch_cost_asc),
+    LAUNCH_COST_DESC("-launch_cost", Res.string.rockets_sort_launch_cost_desc),
+    MAIDEN_FLIGHT_ASC("maiden_flight", Res.string.rockets_sort_maiden_flight_asc),
+    MAIDEN_FLIGHT_DESC("-maiden_flight", Res.string.rockets_sort_maiden_flight_desc)
 }

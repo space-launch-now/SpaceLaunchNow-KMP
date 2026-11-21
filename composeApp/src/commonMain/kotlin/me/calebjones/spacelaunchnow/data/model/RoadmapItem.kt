@@ -1,6 +1,8 @@
 package me.calebjones.spacelaunchnow.data.model
 
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.StringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Represents a single roadmap item/milestone
@@ -25,24 +27,24 @@ data class RoadmapItem(
  * Status of a roadmap item
  */
 @Serializable
-enum class RoadmapStatus(val displayName: String) {
-    COMPLETED("Completed"),
-    IN_TESTING("In Testing"),
-    IN_PROGRESS("In Progress"),
-    PLANNED("Planned"),
-    BACKLOG("Backlog")
+enum class RoadmapStatus(val label: StringResource) {
+    COMPLETED(Res.string.app_roadmap_status_completed),
+    IN_TESTING(Res.string.app_roadmap_status_in_testing),
+    IN_PROGRESS(Res.string.app_roadmap_status_in_progress),
+    PLANNED(Res.string.app_roadmap_status_planned),
+    BACKLOG(Res.string.app_roadmap_status_backlog)
 }
 
 /**
  * Category/type of roadmap item
  */
 @Serializable
-enum class RoadmapCategory(val displayName: String) {
-    FEATURE("Feature"),
-    ENHANCEMENT("Enhancement"),
-    BUG_FIX("Bug Fix"),
-    INFRASTRUCTURE("Infrastructure"),
-    DESIGN("Design")
+enum class RoadmapCategory(val label: StringResource) {
+    FEATURE(Res.string.app_roadmap_category_feature),
+    ENHANCEMENT(Res.string.app_roadmap_category_enhancement),
+    BUG_FIX(Res.string.app_roadmap_category_bug_fix),
+    INFRASTRUCTURE(Res.string.app_roadmap_category_infrastructure),
+    DESIGN(Res.string.app_roadmap_category_design)
 }
 
 /**

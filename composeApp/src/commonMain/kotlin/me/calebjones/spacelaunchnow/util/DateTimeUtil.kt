@@ -100,6 +100,34 @@ object DateTimeUtil {
         }
     }
 
+    /**
+     * The date part of [relativeLaunchDateTime], without the clock time: "Today at", "Monday at".
+     * A launch more than a week away gives its formatted date and time without the last word,
+     * the same cut the launch detail card always made.
+     *
+     * Read the result with [resolve] in a composable or [load] in a coroutine.
+     */
+    fun relativeLaunchDateLead(instant: Instant, useUtc: Boolean = false): LocalizedText {
+        return try {
+            val timeZone = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
+            val localDateTime = instant.toLocalDateTime(timeZone)
+            val now = System.now().toLocalDateTime(timeZone)
+
+            when (localDateTime.date.toEpochDays() - now.date.toEpochDays()) {
+                0L -> LocalizedText.Str(Res.string.time_today_at_lead)
+                1L -> LocalizedText.Str(Res.string.time_tomorrow_at_lead)
+                (-1L) -> LocalizedText.Str(Res.string.time_yesterday_at_lead)
+                in 2..6 -> LocalizedText.Str(
+                    Res.string.time_weekday_at_lead,
+                    listOf(LocalizedText.Str(weekdayName(localDateTime.dayOfWeek)))
+                )
+                else -> LocalizedText.Plain(formatLaunchDateTime(instant, useUtc).substringBeforeLast(" "))
+            }
+        } catch (e: Exception) {
+            LocalizedText.Plain(instant.toString().substringBeforeLast(" "))
+        }
+    }
+
     private fun weekdayName(day: DayOfWeek): StringResource = when (day) {
         DayOfWeek.MONDAY -> Res.string.time_weekday_monday
         DayOfWeek.TUESDAY -> Res.string.time_weekday_tuesday

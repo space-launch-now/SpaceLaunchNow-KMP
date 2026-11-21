@@ -127,22 +127,9 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                                         verticalArrangement = Arrangement.spacedBy(4.dp)
                                     ) {
                                         launch.net?.let { net ->
-                                            val relativeDateText =
-                                                DateTimeUtil.relativeLaunchDateTime(
-                                                    net,
-                                                    useUtc
-                                                ).resolve()
-                                            // Extract just the date part (everything before the time)
-                                            // e.g., "Today at 12:31pm" -> "Today at"
-                                            val dateOnlyText =
-                                                if (relativeDateText.contains(" at ")) {
-                                                    relativeDateText.substringBefore(" at ") + " at"
-                                                } else {
-                                                    // Fallback for other formats
-                                                    relativeDateText.substringBeforeLast(" ")
-                                                }
+                                            // Just the date part, without the time: "Today at"
                                             Text(
-                                                text = dateOnlyText,
+                                                text = DateTimeUtil.relativeLaunchDateLead(net, useUtc).resolve(),
                                                 style = MaterialTheme.typography.headlineMedium,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 maxLines = 2,

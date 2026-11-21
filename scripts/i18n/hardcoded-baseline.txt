@@ -1,38 +1,3 @@
 # Hard-coded UI text that exists today (spec 017, section 6.3). One line per literal:
 # <file><TAB><literal>. Delete a line when a move task puts the text in strings.xml.
 # Regenerate: python3 scripts/i18n/check_hardcoded_text.py --update
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/data/billing/AndroidBillingManager.kt	${pkg.packageType} - ${product.period?.unit?.name ?: 
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/data/notifications/NotificationDisplayHelper.kt	🔴 LIVE
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/ui/ads/SmartBannerAd.android.kt	Remove Ads
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/ui/viewmodel/TestNotificationHelper.kt	Test: ${notificationData.launchName}
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	No upcoming launches
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	Space Launch Now
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	Space Launch Now
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	Tap to upgrade
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	Upcoming Launches
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	Upgrade to Premium to unlock the Launch List widget
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	🔒 Premium Widget
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/NextUpWidget.kt	Days
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/NextUpWidget.kt	Hours
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/NextUpWidget.kt	Launched
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/NextUpWidget.kt	Minutes
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/NextUpWidget.kt	No upcoming launches
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/NextUpWidget.kt	Space Launch Now
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/App.kt	Use rememberAdaptiveLayoutState() from ui.layout instead
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/Platform.kt	Use rememberAdaptiveLayoutState() from ui.layout instead
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/data/model/V5FilterPreferences.kt	V5 now uses NotificationState directly instead of V5FilterPreferences. 
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Description
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Launch Status
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	NET Feb 15, 2026
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	OK
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Status information
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	The launch is a go!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	fallback
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preload/PreloadScreen.kt	Loading launch data
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Space Launch Now
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/viewmodel/SpaceStationViewModel.kt	Live HD views of Earth from the International Space Station
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/util/logging/PushDiagnostics.kt	Push registration summary
-composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/Main.kt	Space Launch Now
-composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/data/billing/IosBillingManager.kt	${pkg.packageType} - ${pkg.storeProduct.period?.unit?.name ?: 
-composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/data/notifications/NSEPreferenceBridge.kt	[NSE-DELIVERY] type=$type decision=$decision reason=$reason ts=$ts platform=ios
-composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/ui/ads/SmartBannerAd.ios.kt	Remove Ads

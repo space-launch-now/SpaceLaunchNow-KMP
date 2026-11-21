@@ -215,4 +215,6 @@
     <string name="fine_print_manage_app_store">Manage Subscriptions in App Store</string>
     <!-- Generic button for managing subscriptions. One line. -->
     <string name="fine_print_manage_generic">Manage Subscriptions</string>
+    <!-- Button under a banner ad card. Opens the screen where the user can pay to remove ads. One or two words. -->
+    <string name="ads_remove_ads_button">Remove Ads</string>
 </resources>

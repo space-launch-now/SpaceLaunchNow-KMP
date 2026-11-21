@@ -216,7 +216,7 @@ object NSEPreferenceBridge {
                 val decision = crumb?.decision ?: "unknown"
                 val reason = crumb?.reason ?: ""
 
-                val message = "[NSE-DELIVERY] type=$type decision=$decision reason=$reason ts=$ts platform=ios"
+                val message = "[NSE-DELIVERY] type=$type decision=$decision reason=$reason ts=$ts platform=ios" // i18n-ignore: log line, not shown to users
                 val attributes = mapOf(
                     // log_kind, platform, tag and UserContext are added by DiagnosticEvents.
                     "source" to "nse_breadcrumb",

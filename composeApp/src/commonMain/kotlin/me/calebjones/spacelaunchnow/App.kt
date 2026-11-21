@@ -119,7 +119,7 @@ val LocalContextFactory =
     compositionLocalOf<ContextFactory?> { null }
 
 @Deprecated(
-    message = "Use rememberAdaptiveLayoutState() from ui.layout instead",
+    message = "Use rememberAdaptiveLayoutState() from ui.layout instead", // i18n-ignore: deprecation message for developers
     replaceWith = ReplaceWith(
         "rememberAdaptiveLayoutState()",
         "me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState"

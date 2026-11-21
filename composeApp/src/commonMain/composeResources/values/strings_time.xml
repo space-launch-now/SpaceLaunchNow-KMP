@@ -64,4 +64,12 @@
     <string name="countdown_label_minutes">MINUTES</string>
     <!-- Label under the seconds digits of the countdown. One word, capitals, max 10 chars; the digit row is narrow. -->
     <string name="countdown_label_seconds">SECONDS</string>
+    <!-- Lead-in above a large clock time on the launch detail card; the time shows on the next line. Launches today. Ends with the word for "at". -->
+    <string name="time_today_at_lead">Today at</string>
+    <!-- Lead-in above a large clock time on the launch detail card; the time shows on the next line. Launches tomorrow. -->
+    <string name="time_tomorrow_at_lead">Tomorrow at</string>
+    <!-- Lead-in above a large clock time on the launch detail card; the time shows on the next line. Launches yesterday. -->
+    <string name="time_yesterday_at_lead">Yesterday at</string>
+    <!-- Lead-in above a large clock time on the launch detail card; the time shows on the next line. %1$s is a weekday name (Monday to Sunday). -->
+    <string name="time_weekday_at_lead">%1$s at</string>
 </resources>

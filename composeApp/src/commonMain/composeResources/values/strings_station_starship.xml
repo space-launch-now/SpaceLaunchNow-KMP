@@ -173,4 +173,6 @@
         <item quantity="one">%1$d Flight</item>
         <item quantity="other">%1$d Flights</item>
     </plurals>
+    <!-- Description of the NASA live video stream of Earth from the International Space Station. One sentence. -->
+    <string name="station_iss_live_stream_description">Live HD views of Earth from the International Space Station</string>
 </resources>

@@ -21,6 +21,6 @@ actual fun showTestNotification(notificationData: NotificationData) {
     NotificationDisplayHelper.showNotification(
         context = context,
         notificationData = notificationData,
-        title = "Test: ${notificationData.launchName}"
+        title = "Test: ${notificationData.launchName}" // i18n-ignore: developer test notification
     )
 }

@@ -158,4 +158,68 @@
     <string name="rockets_filter_collapse_description">Collapse</string>
     <!-- Content description of the dropdown arrow when the menu is closed. Read by screen readers. -->
     <string name="rockets_filter_expand_description">Expand</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_name_asc">Name (A-Z)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_name_desc">Name (Z-A)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_family_asc">Family (A-Z)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_family_desc">Family (Z-A)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_total_launches_asc">Total Launches (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_total_launches_desc">Total Launches (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_successful_launches_asc">Successful Launches (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_successful_launches_desc">Successful Launches (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_failed_launches_asc">Failed Launches (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_failed_launches_desc">Failed Launches (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_pending_launches_asc">Pending Launches (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_pending_launches_desc">Pending Launches (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_consecutive_successful_launches_asc">Consecutive Successes (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_consecutive_successful_launches_desc">Consecutive Successes (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_attempted_landings_asc">Attempted Landings (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_attempted_landings_desc">Attempted Landings (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_successful_landings_asc">Successful Landings (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_successful_landings_desc">Successful Landings (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_failed_landings_asc">Failed Landings (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_failed_landings_desc">Failed Landings (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_consecutive_successful_landings_asc">Consecutive Landing Successes (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_consecutive_successful_landings_desc">Consecutive Landing Successes (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_leo_capacity_asc">LEO Capacity (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_leo_capacity_desc">LEO Capacity (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_gto_capacity_asc">GTO Capacity (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_gto_capacity_desc">GTO Capacity (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_launch_mass_asc">Launch Mass (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_launch_mass_desc">Launch Mass (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_launch_cost_asc">Launch Cost (Low to High)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_launch_cost_desc">Launch Cost (High to Low)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_maiden_flight_asc">Maiden Flight (Oldest)</string>
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="rockets_sort_maiden_flight_desc">Maiden Flight (Newest)</string>
 </resources>

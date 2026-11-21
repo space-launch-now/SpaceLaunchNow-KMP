@@ -239,7 +239,7 @@ object PushDiagnostics {
             severity = Severity.Info,
             tag = "SLN-PushDiagnostics",
             attrs = summaryAttributes(snapshot, diagnosticLevelName) + stateAttrs,
-            label = "Push registration summary", // runbook string, kept (spec D2)
+            label = "Push registration summary", // i18n-ignore: runbook string, kept (spec D2)
         )
     }
 }
