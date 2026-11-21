@@ -18,5 +18,6 @@ enum class PaywallSource(val value: String) {
     NOTIFICATION_SETTINGS("notification_settings"),
     CALENDAR_SYNC("calendar_sync"),
     SETTINGS_ROW("settings_row"),
-    WIDGET_LOCK("widget_lock");
+    WIDGET_LOCK("widget_lock"),
+    WINBACK("winback");
 }

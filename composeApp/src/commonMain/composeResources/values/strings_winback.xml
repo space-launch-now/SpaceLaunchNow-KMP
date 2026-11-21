@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Win-back sheet headline, shown once a week after the user skipped the first premium offer. Short. -->
+    <string name="winback_title">Still curious about Premium?</string>
+    <!-- Win-back sheet body, one sentence. Premium removes ads and unlocks extra features. -->
+    <string name="winback_body">Go ad-free and unlock every premium feature in Space Launch Now.</string>
+    <!-- Price and trial terms. %1$s is a trial length such as "2-week", %2$s is a price with currency such as $9.99. -->
+    <string name="winback_price_trial">Try %1$s free, then %2$s per year. Cancel anytime.</string>
+    <!-- Price terms with no trial. %1$s is a price with currency such as $9.99. -->
+    <string name="winback_price_no_trial">%1$s per year. Cancel anytime.</string>
+    <!-- Button that starts the subscription, when the plan has a free trial. -->
+    <string name="winback_cta_trial">Start free trial</string>
+    <!-- Button that starts the subscription, when the plan has no trial. -->
+    <string name="winback_cta">Subscribe</string>
+    <!-- Button that closes the sheet without buying. Short. -->
+    <string name="winback_not_now">Not now</string>
+    <!-- Screen reader label of the close icon at the top of the sheet. -->
+    <string name="winback_close">Close</string>
+</resources>

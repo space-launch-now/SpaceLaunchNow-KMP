@@ -68,6 +68,7 @@ class RemoteConfigRepositoryImpl(
         private const val USE_LEGACY_BACKEND_KEY = "use_legacy_backend"
         private const val INTERSTITIAL_VISITS_KEY = "ads_interstitial_visits"
         private const val NOTIFICATION_RATING_PROMPT_KEY = "rating_prompt_after_notification_enabled"
+        private const val WINBACK_SHEET_KEY = "winback_sheet_enabled"
         private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
         const val DEFAULT_INTERSTITIAL_VISITS = 4
         const val DEFAULT_INTERSTITIAL_MIN_INTERVAL_S = 120L
@@ -179,7 +180,8 @@ class RemoteConfigRepositoryImpl(
                 USE_LEGACY_BACKEND_KEY to "false",
                 INTERSTITIAL_VISITS_KEY to DEFAULT_INTERSTITIAL_VISITS.toString(),
                 INTERSTITIAL_MIN_INTERVAL_KEY to DEFAULT_INTERSTITIAL_MIN_INTERVAL_S.toString(),
-                NOTIFICATION_RATING_PROMPT_KEY to "false"
+                NOTIFICATION_RATING_PROMPT_KEY to "false",
+                WINBACK_SHEET_KEY to "false"
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -226,6 +228,16 @@ class RemoteConfigRepositoryImpl(
         } catch (e: Exception) {
             log.w(e) { "Failed to read interstitial visits - using default" }
             DEFAULT_INTERSTITIAL_VISITS
+        }
+    }
+
+    override suspend fun getWinbackSheetEnabled(): Boolean {
+        val config = remoteConfig ?: return false
+        return try {
+            config.getValue(WINBACK_SHEET_KEY).asString().trim().equals("true", ignoreCase = true)
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read win-back sheet flag - defaulting to off" }
+            false
         }
     }
 

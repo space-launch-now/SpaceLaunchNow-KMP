@@ -94,6 +94,12 @@ interface RemoteConfigRepository {
     suspend fun getNotificationRatingPromptEnabled(): Boolean
 
     /**
+     * Whether the day-7 win-back sheet is on, from 'winback_sheet_enabled'.
+     * Default false; false on read failure.
+     */
+    suspend fun getWinbackSheetEnabled(): Boolean
+
+    /**
      * Minimum seconds between interstitials, from 'ads_interstitial_min_interval_s'.
      * Default 120.
      */
