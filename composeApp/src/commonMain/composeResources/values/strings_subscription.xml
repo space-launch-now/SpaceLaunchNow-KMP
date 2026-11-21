@@ -103,7 +103,7 @@
     <!-- Header of the Support Us screen for a member. One line, large. -->
     <string name="support_us_header_thank_you">Thank You! 🎉</string>
     <!-- Line under the header for a member. %1$s is the plan type in lower case, such as premium or lifetime. -->
-    <string name="support_us_header_member_type">You\'re a %1$s member!</string>
+    <string name="support_us_header_member_type">You're a %1$s member!</string>
     <!-- Header of the Support Us screen for a person who is not a member. One line, large. -->
     <string name="support_us_header_love_title">Love Space Launch Now?</string>
     <!-- Line under the header for a person who is not a member. One or two lines. -->
@@ -121,7 +121,7 @@
     <!-- Content description of the app logo on the thank-you card. Read by screen readers. -->
     <string name="support_us_logo_description">Space Launch Now</string>
     <!-- Heading of the thank-you card for a member. One line. -->
-    <string name="support_us_making_difference">You\'re Making a Difference!</string>
+    <string name="support_us_making_difference">You're Making a Difference!</string>
     <!-- Text on the thank-you card for a legacy supporter. Two or three lines. -->
     <string name="support_us_thanks_legacy">Thank you for your legacy support of Space Launch Now. You have ad-free access.</string>
     <!-- Text on the thank-you card for a member. %1$s is the plan type in lower case, such as premium. -->
@@ -153,7 +153,7 @@
     <!-- Title of the help card. A question. One line. -->
     <string name="support_us_restore_help_title">Unable to Restore Purchase?</string>
     <!-- Text of the help card. Opens a feedback form. One line. -->
-    <string name="support_us_restore_help_body">Let me know and I\'ll help you out</string>
+    <string name="support_us_restore_help_body">Let me know and I'll help you out</string>
     <!-- Content description of the open-in-browser icon on the help card. Read by screen readers. -->
     <string name="support_us_open_form_description">Open form</string>
     <!-- Title of the lifetime plan card. Pro is the name of the tier. One line. -->
